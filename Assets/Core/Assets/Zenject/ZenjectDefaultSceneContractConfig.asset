@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8620c058a9173b84a97d72ed5e94dbd7, type: 3}
+  m_Name: ZenjectDefaultSceneContractConfig
+  m_EditorClassIdentifier: 
+  DefaultContracts:
+  - ContractName: CoreScene
+    Scene: {fileID: 102900000, guid: 423c20e2ae4cf49248dd68c173c1251f, type: 3}
+  - ContractName: GameScene
+    Scene: {fileID: 102900000, guid: ed4bfee96956647359ad4b14e4658de8, type: 3}
+  - ContractName: LobbyScene
+    Scene: {fileID: 102900000, guid: bbace8f30b74a476badde1c439af2266, type: 3}
+  - ContractName: MainGameScene
+    Scene: {fileID: 102900000, guid: b7263984c262d4c1e8e428b378a6b664, type: 3}

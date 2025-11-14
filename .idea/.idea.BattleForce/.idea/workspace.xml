@@ -4,7 +4,33 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c1e12e0-c131-4b63-94f5-2f0c8aa9c131" name="Changes" comment="" />
+    <list default="true" id="3c1e12e0-c131-4b63-94f5-2f0c8aa9c131" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Both.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Both/Player.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Both/Player/PlayerTransformModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Both/Player/PlayerTransformModel.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client/Player.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client/Player/PlayerController.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client/Player/PlayerController.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client/Player/PlayerView.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client/Player/PlayerView.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Server.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Server/ServerStepper.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Server/ServerStepper.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/SimulationStepper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/SimulationStepper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Mirror/Examples/_Common/Textures/(Public Domain) Dirt Hand Painted Texture/Dirt.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Mirror/Examples/_Common/Textures/(Public Domain) Dirt Hand Painted Texture/Dirt.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,39 +40,47 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0a59fff794604187b34e26c62bb2389989e00/5d/dc2d9e2e/PhysicsCallbacks.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0a59fff794604187b34e26c62bb2389989e00/5d/dc2d9e2e/PhysicsCallbacks.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f983fe377b2489e8ed44032915da13e1df600/22/201ed8a9/Awaitable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/SimulationStepper.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Scripts/ZenjectInstallers/GameInstaller.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="SWEA" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="354ueczrVwC9pumBFXtyKXeS69w" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Attach to Unity Editor.Attach to Unity Editor.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "/Users/Raz/Library/Application Support/JetBrains/Rider2023.3/resharper-host/DecompilerCache",
-      "/Users/Raz/Library/Application Support/JetBrains/Rider2023.3/resharper-host/SourcesCache",
-      "/Users/Raz/.local/share/Symbols/src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;/Users/Raz/Library/Application Support/JetBrains/Rider2023.3/resharper-host/DecompilerCache&quot;,
+      &quot;/Users/Raz/Library/Application Support/JetBrains/Rider2023.3/resharper-host/SourcesCache&quot;,
+      &quot;/Users/Raz/.local/share/Symbols/src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="/Applications/Unity/Unity.app/Contents/MacOS/Unity" />
+      <option name="EXE_PATH" value="/Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/MacOS/Unity" />
       <option name="PROGRAM_PARAMETERS" value="-projectPath $PROJECT_DIR$ -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -54,7 +88,7 @@
       <method v="2" />
     </configuration>
     <configuration name="Unit Tests (batch mode)" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="/Applications/Unity/Unity.app/Contents/MacOS/Unity" />
+      <option name="EXE_PATH" value="/Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/MacOS/Unity" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath $PROJECT_DIR$ -testResults Logs/results.xml -testPlatform EditMode -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -91,6 +125,8 @@
       <option name="presentableId" value="Default" />
       <updated>1762381762439</updated>
       <workItem from="1762381763857" duration="2358000" />
+      <workItem from="1762894963721" duration="6528000" />
+      <workItem from="1763127788268" duration="151000" />
     </task>
     <servers />
   </component>
@@ -101,5 +137,388 @@
   <component name="UnityUnitTestConfiguration" currentTestLauncher="Both" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Scripts/ZenjectInstallers/GameInstaller.cs</url>
+          <line>13</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Scripts/ZenjectInstallers/GameInstaller.cs" initialLine="17" containingFunctionPresentation="Method 'InstallBindings'">
+            <startOffsets>
+              <option value="475" />
+            </startOffsets>
+            <endOffsets>
+              <option value="565" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs</url>
+          <line>50</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" initialLine="49" containingFunctionPresentation="Method 'InitEntryPoint'">
+            <startOffsets>
+              <option value="2066" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2118" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs</url>
+          <line>54</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" initialLine="53" containingFunctionPresentation="Method 'InitEntryPoint'">
+            <startOffsets>
+              <option value="2195" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2226" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs</url>
+          <line>76</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" initialLine="75" containingFunctionPresentation="Method 'LoadGameScene'">
+            <startOffsets>
+              <option value="2832" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2947" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/Services/SceneService/SceneLoaderService.cs</url>
+          <line>52</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/SceneService/SceneLoaderService.cs" initialLine="52" containingFunctionPresentation="Method 'TryLoadScene'">
+            <startOffsets>
+              <option value="1840" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1911" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/Services/SceneService/SceneLoaderService.cs</url>
+          <line>57</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/SceneService/SceneLoaderService.cs" initialLine="57" containingFunctionPresentation="Method 'TryLoadScene'">
+            <startOffsets>
+              <option value="1994" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2101" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/Services/InitiatorInvokerService/SceneInitiatorsService.cs</url>
+          <line>24</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/InitiatorInvokerService/SceneInitiatorsService.cs" initialLine="24" containingFunctionPresentation="Method 'InvokeInitiatorLoadEntryPoint'">
+            <startOffsets>
+              <option value="952" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1037" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs</url>
+          <line>30</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs" initialLine="30" containingFunctionPresentation="Method 'Execute'">
+            <startOffsets>
+              <option value="1121" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1122" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs</url>
+          <line>19</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs" initialLine="19" containingFunctionPresentation="Method 'SetEnterData'">
+            <startOffsets>
+              <option value="739" />
+            </startOffsets>
+            <endOffsets>
+              <option value="762" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/Services/SceneService/SceneLoaderService.cs</url>
+          <line>59</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/SceneService/SceneLoaderService.cs" initialLine="58" containingFunctionPresentation="Method 'TryLoadScene'">
+            <startOffsets>
+              <option value="2137" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2149" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs</url>
+          <line>44</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" initialLine="44" containingFunctionPresentation="Method 'InitEntryPoint'">
+            <startOffsets>
+              <option value="1807" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1852" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs</url>
+          <line>46</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" initialLine="46" containingFunctionPresentation="Method 'InitEntryPoint'">
+            <startOffsets>
+              <option value="1964" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1974" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs</url>
+          <line>21</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs" initialLine="21" containingFunctionPresentation="Method 'LoadState'">
+            <startOffsets>
+              <option value="804" />
+            </startOffsets>
+            <endOffsets>
+              <option value="850" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs</url>
+          <line>23</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs" initialLine="23" containingFunctionPresentation="Method 'LoadState'">
+            <startOffsets>
+              <option value="976" />
+            </startOffsets>
+            <endOffsets>
+              <option value="986" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/Services/SceneService/SceneLoaderService.cs</url>
+          <line>58</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/SceneService/SceneLoaderService.cs" initialLine="58" containingFunctionPresentation="Method 'TryLoadScene'">
+            <startOffsets>
+              <option value="2114" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2124" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/Services/StateMachineService/StateMachineService.cs</url>
+          <line>26</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/StateMachineService/StateMachineService.cs" initialLine="26" containingFunctionPresentation="Method 'EnterInitialGameState'">
+            <startOffsets>
+              <option value="863" />
+            </startOffsets>
+            <endOffsets>
+              <option value="922" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/Services/StateMachineService/StateMachineService.cs</url>
+          <line>27</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/StateMachineService/StateMachineService.cs" initialLine="27" containingFunctionPresentation="Method 'EnterInitialGameState'">
+            <startOffsets>
+              <option value="935" />
+            </startOffsets>
+            <endOffsets>
+              <option value="995" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Scripts/GameInitiator/GameInitiator.cs</url>
+          <line>29</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Scripts/GameInitiator/GameInitiator.cs" initialLine="29" containingFunctionPresentation="Method 'LoadEntryPoint'">
+            <startOffsets>
+              <option value="1288" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1419" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs</url>
+          <line>28</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs" initialLine="28" containingFunctionPresentation="Method 'StartState'">
+            <startOffsets>
+              <option value="1120" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1167" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs</url>
+          <line>29</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs" initialLine="29" containingFunctionPresentation="Method 'StartState'">
+            <startOffsets>
+              <option value="1180" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1278" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/Services/StateMachineService/BaseGameState.cs</url>
+          <line>30</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/StateMachineService/BaseGameState.cs" initialLine="30" containingFunctionPresentation="Method 'StartState'">
+            <startOffsets>
+              <option value="1192" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1268" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/Services/SceneService/SceneLoaderService.cs</url>
+          <line>64</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/SceneService/SceneLoaderService.cs" initialLine="64" containingFunctionPresentation="Method 'StartScene'">
+            <startOffsets>
+              <option value="2375" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2483" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/Services/InitiatorInvokerService/SceneInitiatorsService.cs</url>
+          <line>29</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/InitiatorInvokerService/SceneInitiatorsService.cs" initialLine="29" containingFunctionPresentation="Method 'InvokeInitiatorStartEntryPoint'">
+            <startOffsets>
+              <option value="1242" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1328" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
+          <line>21</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="21" containingFunctionPresentation="Method 'SetEnterData'">
+            <startOffsets>
+              <option value="931" />
+            </startOffsets>
+            <endOffsets>
+              <option value="954" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="32" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
+          <line>36</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="36" containingFunctionPresentation="Method 'Execute'">
+            <startOffsets>
+              <option value="1614" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1657" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
+          <line>27</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="27" containingFunctionPresentation="Method 'ResolveDependencies'">
+            <startOffsets>
+              <option value="1072" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1130" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
+          <line>28</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="28" containingFunctionPresentation="Method 'ResolveDependencies'">
+            <startOffsets>
+              <option value="1143" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1215" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="40" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
+          <line>29</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="29" containingFunctionPresentation="Method 'ResolveDependencies'">
+            <startOffsets>
+              <option value="1228" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1282" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
+          <line>30</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="30" containingFunctionPresentation="Method 'ResolveDependencies'">
+            <startOffsets>
+              <option value="1295" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1377" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
