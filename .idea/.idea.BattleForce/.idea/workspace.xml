@@ -5,27 +5,274 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c1e12e0-c131-4b63-94f5-2f0c8aa9c131" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/GameStepDTO.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/GameStepDTO/PlayerStepDTO.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/GameStepDTO/PlayerStepDTO.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/NetworkManager/BFNetworkServerMessagesListener.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/NetworkManager/BFNetworkServerMessagesListener.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/NetworkManager/BFTransport.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/NetworkManager/BFTransport.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/NetworkManager/BattleForceTransport.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/NetworkManager/BattleForceTransport.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/PlayerModel.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/PlayerModel.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/PlayerView.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/PlayerView.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Player/PlayerModel.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Player/PlayerModel.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/PlayerBullet.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/PlayerBullet/PlayerBulletModel.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Both.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Both/Player.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Both/Player/PlayerTransformModel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Both/Player/PlayerTransformModel.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client/Player.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client/Player/PlayerController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client/Player/PlayerController.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client/Player/PlayerView.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Client/Player/PlayerView.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Server.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Server/ServerStepper.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Domains/GamePlay/Server/ServerStepper.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/SimulationStepper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/SimulationStepper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Mirror/Examples/_Common/Textures/(Public Domain) Dirt Hand Painted Texture/Dirt.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Mirror/Examples/_Common/Textures/(Public Domain) Dirt Hand Painted Texture/Dirt.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Assets/Scenes/CoreScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Assets/Scenes/CoreScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Assets/GameScene.unity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Assets/GameScene.unity.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/LightingData.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/LightingData.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-0_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-0_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-0_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-0_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-10_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-10_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-10_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-10_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-11_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-11_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-11_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-11_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-12_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-12_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-12_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-12_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-13_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-13_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-13_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-13_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-14_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-14_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-14_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-14_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-15_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-15_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-15_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-15_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-16_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-16_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-16_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-16_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-17_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-17_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-17_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-17_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-18_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-18_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-18_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-18_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-19_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-19_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-19_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-19_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-1_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-1_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-1_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-1_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-20_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-20_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-20_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-20_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-21_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-21_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-21_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-21_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-22_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-22_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-22_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-22_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-23_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-23_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-23_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-23_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-24_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-24_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-24_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-24_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-25_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-25_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-25_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-25_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-26_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-26_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-26_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-26_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-27_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-27_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-27_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-27_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-28_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-28_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-28_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-28_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-29_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-29_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-29_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-29_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-2_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-2_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-2_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-2_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-30_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-30_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-30_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-30_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-31_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-31_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-31_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-31_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-32_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-32_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-32_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-32_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-33_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-33_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-33_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-33_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-34_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-34_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-34_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-34_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-35_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-35_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-35_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-35_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-36_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-36_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-36_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-36_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-37_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-37_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-37_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-37_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-38_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-38_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-38_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-38_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-39_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-39_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-39_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-39_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-3_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-3_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-3_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-3_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-40_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-40_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-40_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-40_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-41_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-41_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-41_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-41_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-42_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-42_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-42_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-42_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-43_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-43_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-43_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-43_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-44_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-44_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-44_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-44_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-45_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-45_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-45_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-45_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-46_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-46_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-46_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-46_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-47_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-47_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-47_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-47_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-48_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-48_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-48_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-48_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-49_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-49_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-49_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-49_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-4_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-4_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-4_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-4_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-50_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-50_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-50_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-50_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-5_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-5_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-5_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-5_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-6_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-6_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-6_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-6_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-7_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-7_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-7_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-7_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-8_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-8_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-8_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-8_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-9_comp_dir.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-9_comp_dir.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-9_comp_light.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/Lightmap-9_comp_light.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/ReflectionProbe-0.exr" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene/ReflectionProbe-0.exr.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/GameInputActions/GameInputActionsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/GameInputActions/GameInputActionsController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/GameInputActions/IGameInputActionsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/GameInputActions/IGameInputActionsController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/Scripts.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/Scripts/GamePlayInitiator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/GamePlayInitiator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/Scripts/GamePlayInitiator.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/GamePlayInitiator.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/Scripts/IGamePlayInitiator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/IGamePlayInitiator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/Scripts/IGamePlayInitiator.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/IGamePlayInitiator.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Player.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Player/PlayerController.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Player/PlayerController.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Player/PlayerView.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Player/PlayerView.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/PresentationAssembly.asmdef" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/PresentationAssembly.asmdef.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/ZenjectInstallers/GamePlayInstaller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/ZenjectInstallers/GamePlayInstaller.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Player.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Player.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Player/PlayerTransformModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/PlayerBullet/PlayerBulletModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Player/PlayerTransformModel.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/SimulationStepper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/SimulationStepper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/SimulationStepper.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/SimulationStepper.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/InputSystem/GameInputActions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/InputSystem/GameInputActions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/InputSystem/GameInputActions.inputactions" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/InputSystem/GameInputActions.inputactions" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Editor/DefaultSceneSelector/DefaultSceneSelector.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Editor/DefaultSceneSelector/DefaultSceneSelector.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Services/Logger/Base/LogTopicType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/Logger/Base/LogTopicType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Mirror/Examples/Basic/Scenes/MirrorBasic.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Mirror/Examples/Basic/Scenes/MirrorBasic.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Mirror/Examples/Basic/Scenes/MirrorBasic/LightingData.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Mirror/Examples/Basic/Scenes/MirrorBasic/LightingData.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Mirror/Examples/BilliardsPredicted/Player/PlayerPredicted.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Mirror/Examples/BilliardsPredicted/Player/PlayerPredicted.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Plugins.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Plugins/ParrelSync.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Plugins/ParrelSync/ScriptableObjects.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Plugins/ParrelSync/ScriptableObjects/ParrelSyncProjectSettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Plugins/ParrelSync/ScriptableObjects/ParrelSyncProjectSettings.asset.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
@@ -40,9 +287,21 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.multiplayer.center/Common/SelectedSolutionsData.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.render-pipelines.core/Runtime/Settings/IncludeRenderPipelineAsset.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0a59fff794604187b34e26c62bb2389989e00/5d/dc2d9e2e/PhysicsCallbacks.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f983fe377b2489e8ed44032915da13e1df600/22/201ed8a9/Awaitable.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/SimulationStepper.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/8a522b806eac9bb894e6e4c5fe87f353457535e769447e79c6b396beecb5d0/System.Threading.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/Library/Unity/cache/packages/packages.unity.com/com.unity.2d.pixel-perfect@5.0.3/Editor/AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/Library/Unity/cache/packages/packages.unity.com/com.unity.2d.pixel-perfect@5.0.3/Runtime/PixelPerfectCamera.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/Library/Unity/cache/packages/packages.unity.com/com.unity.2d.pixel-perfect@5.0.3/Tests/Editor/PlaceholderTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/NetworkManager/BFNetworkManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Cross4/PlayerCircle.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/PlayerView.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIView.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/Inputs/MoveInputInvokedCommand.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/Inputs/ShootInputInvokedCommand.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/GamePlayInitiator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Scripts/ZenjectInstallers/GameInstaller.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -68,6 +327,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.General&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -126,7 +386,10 @@
       <updated>1762381762439</updated>
       <workItem from="1762381763857" duration="2358000" />
       <workItem from="1762894963721" duration="6528000" />
-      <workItem from="1763127788268" duration="151000" />
+      <workItem from="1763127788268" duration="4731000" />
+      <workItem from="1763207970768" duration="462000" />
+      <workItem from="1763209104805" duration="1581000" />
+      <workItem from="1763210838836" duration="7299000" />
     </task>
     <servers />
   </component>
@@ -182,13 +445,13 @@
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs</url>
-          <line>76</line>
+          <line>77</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" initialLine="75" containingFunctionPresentation="Method 'LoadGameScene'">
             <startOffsets>
-              <option value="2832" />
+              <option value="2880" />
             </startOffsets>
             <endOffsets>
-              <option value="2947" />
+              <option value="2995" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="7" />
@@ -235,27 +498,13 @@
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs</url>
           <line>30</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs" initialLine="30" containingFunctionPresentation="Method 'Execute'">
-            <startOffsets>
-              <option value="1121" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1122" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs" initialLine="30" containingFunctionPresentation="Method 'Execute'" />
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs</url>
           <line>19</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs" initialLine="19" containingFunctionPresentation="Method 'SetEnterData'">
-            <startOffsets>
-              <option value="739" />
-            </startOffsets>
-            <endOffsets>
-              <option value="762" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs" initialLine="19" containingFunctionPresentation="Method 'SetEnterData'" />
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
@@ -443,82 +692,44 @@
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
           <line>21</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="21" containingFunctionPresentation="Method 'SetEnterData'">
-            <startOffsets>
-              <option value="931" />
-            </startOffsets>
-            <endOffsets>
-              <option value="954" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="21" containingFunctionPresentation="Method 'SetEnterData'" />
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
           <line>36</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="36" containingFunctionPresentation="Method 'Execute'">
-            <startOffsets>
-              <option value="1614" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1657" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="36" containingFunctionPresentation="Method 'Execute'" />
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
           <line>27</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="27" containingFunctionPresentation="Method 'ResolveDependencies'">
-            <startOffsets>
-              <option value="1072" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1130" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="27" containingFunctionPresentation="Method 'ResolveDependencies'" />
           <option name="timeStamp" value="39" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
           <line>28</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="28" containingFunctionPresentation="Method 'ResolveDependencies'">
-            <startOffsets>
-              <option value="1143" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1215" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="28" containingFunctionPresentation="Method 'ResolveDependencies'" />
           <option name="timeStamp" value="40" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
           <line>29</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="29" containingFunctionPresentation="Method 'ResolveDependencies'">
-            <startOffsets>
-              <option value="1228" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1282" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="29" containingFunctionPresentation="Method 'ResolveDependencies'" />
           <option name="timeStamp" value="41" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs</url>
           <line>30</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="30" containingFunctionPresentation="Method 'ResolveDependencies'">
-            <startOffsets>
-              <option value="1295" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1377" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/StartGamePlayStateCommand.cs" initialLine="30" containingFunctionPresentation="Method 'ResolveDependencies'" />
           <option name="timeStamp" value="42" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

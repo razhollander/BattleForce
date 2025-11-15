@@ -1,4 +1,5 @@
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Features.UI;
 using CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Mvc.GameInputActions;
 using CoreDomain.GameDomain.Scripts.States.GamePlayState;
 using CoreDomain.Scripts.Mvc.WorldCamera;
@@ -14,6 +15,7 @@ namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Commands.
         private IWorldCameraController _worldCameraController;
         private IAudioService _audioService;
         private IGameInputActionsController _gameInputActionsController;
+        private IChooseNetworkRoleUIController _chooseNetworkRoleUIController;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -29,12 +31,14 @@ namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Commands.
             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
             _audioService = _diContainer.Resolve<IAudioService>();
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
+            _chooseNetworkRoleUIController = _diContainer.Resolve<IChooseNetworkRoleUIController>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
             //_audioService.PlayAudio(AudioClipType.GamePlayBGMusic, AudioChannelType.Master, AudioPlayType.Loop);
             _gameInputActionsController.EnableInputs();
+            _chooseNetworkRoleUIController.InitEntryPoint();
         }
     }
 }

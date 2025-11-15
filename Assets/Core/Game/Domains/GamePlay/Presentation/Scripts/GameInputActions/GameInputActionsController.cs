@@ -1,4 +1,5 @@
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs;
 using CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Commands;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -40,14 +41,14 @@ namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Mvc.GameI
         public void RegisterAllInputListeners()
         {
             LogService.LogTopic("Register all input listeners", LogTopicType.Inputs);
-            _gameInputActions.GamePlay.Jump.started += OnJumpInput;
+            _gameInputActions.GamePlay.Movement.started += OnMoveInput;
             _gameInputActions.GamePlay.Shoot.performed += OnShootInput;
         }
         
         public void UnregisterAllInputListeners()
         {
             LogService.LogTopic("Unregister all input listeners", LogTopicType.Inputs);
-            _gameInputActions.GamePlay.Jump.started -= OnJumpInput;
+            _gameInputActions.GamePlay.Movement.started -= OnMoveInput;
             _gameInputActions.GamePlay.Shoot.performed -= OnShootInput;
         }
         
@@ -59,22 +60,22 @@ namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Mvc.GameI
             }
 
             LogService.LogTopic("Shoot input was triggered", LogTopicType.Inputs);
-            //_commandFactory.CreateCommandVoid<ShootInputInvokedCommand>().Execute();
+            _commandFactory.CreateCommandVoid<ShootInputInvokedCommand>().Execute();
         }
 
-        public bool IsJumpInputPressed()
+        public bool IsMovementInputPressed()
         {
-            return !IsOverUiOnMobile() && _gameInputActions.GamePlay.Jump.IsPressed();
+            return /*!IsOverUiOnMobile() && */_gameInputActions.GamePlay.Movement.IsPressed();
         }
 
-        private void OnJumpInput(InputAction.CallbackContext context)
+        private void OnMoveInput(InputAction.CallbackContext context)
         {
-            if (IsOverUiOnMobile())
-            {
-                return;
-            }
-            
-            LogService.LogTopic("Jump input was triggered", LogTopicType.Inputs);
+            // if (IsOverUiOnMobile())
+            // {
+            //     return;
+            // }
+            _commandFactory.CreateCommandVoid<MoveInputInvokedCommand>().SetMoveValue(context.ReadValue<Vector2>()).Execute();
+            LogService.LogTopic("Move input was triggered", LogTopicType.Inputs);
         }
 
         public async Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui = false)

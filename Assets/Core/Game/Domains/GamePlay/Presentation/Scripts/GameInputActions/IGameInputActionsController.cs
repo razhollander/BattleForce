@@ -9,7 +9,7 @@ namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Mvc.GameI
         void DisableInputs();
         void RegisterAllInputListeners();
         void UnregisterAllInputListeners();
-        bool IsJumpInputPressed();
+        bool IsMovementInputPressed();
         Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui);
     }
 }

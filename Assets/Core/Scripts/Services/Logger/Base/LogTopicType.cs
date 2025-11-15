@@ -4,6 +4,7 @@ namespace CoreDomain.Scripts.Services.Logger.Base
     {
         Temp,
         Inputs,
+        Network,
         Arrow,
         Balloon,
         Bubble,

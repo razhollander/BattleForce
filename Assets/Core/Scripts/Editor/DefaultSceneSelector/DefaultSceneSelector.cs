@@ -11,11 +11,11 @@ namespace CoreDomain.Scripts.Editor.DefaultSceneSelector
         private const string DEFAULT_SCENE_PATH_KEY = "DefaultScenePathKey";
         private const string HAS_OPENED_PROJECT_BEFORE_KEY = "HasOpenedProjectBeforeKey";
         
-        private const string CORE_SCENE_FILE = "Assets/CoreDomain/Assets/Scenes/CoreScene.unity";
-        private const string GAME_SCENE_FILE = "Assets/CoreDomain/GameDomain/Assets/Scenes/GameScene.unity";
-        private const string GAMEPLAY_SCENE_FILE = "Assets/CoreDomain/GameDomain/GameStateDomain/GamePlayDomain/Assets/Scenes/GamePlayScene.unity";
-        private const string LOBBY_SCENE_FILE = "Assets/CoreDomain/GameDomain/GameStateDomain/LobbyDomain/Assets/Scenes/LobbyScene.unity";
-    
+        private const string CORE_SCENE_FILE = "Assets/Core/Assets/Scenes/CoreScene.unity";
+        private const string GAME_SCENE_FILE = "Assets/Core/Game/Assets/Scenes/GameScene.unity";
+        private const string GAMEPLAY_SCENE_FILE = "Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene.unity";
+        private const string LOBBY_SCENE_FILE = "Assets/Core/Game/GameState/Lobby/Assets/Scenes/LobbyScene.unity";
+           
         static DefaultSceneSelector()
         {
             EditorApplication.delayCall += OnLoad;

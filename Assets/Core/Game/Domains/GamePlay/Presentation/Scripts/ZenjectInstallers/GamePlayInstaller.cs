@@ -1,3 +1,5 @@
+using Core.Game.Domains.GamePlay.Both.NetworkManager;
+using Core.Game.Domains.GamePlay.Presentation.Features.UI;
 using CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Initiator;
 using CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Mvc.GameInputActions;
 using UnityEngine;
@@ -9,6 +11,7 @@ namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.ZenjectIn
     public class GamePlayInstaller : MonoInstaller
     {
         [SerializeField] private Volume _postProcessVolume;
+        [SerializeField] private ChooseNetworkRoleUIView _chooseNetworkRoleUIView;
 
         public override void InstallBindings()
         {
@@ -24,6 +27,8 @@ namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.ZenjectIn
         private void BindControllers()
         {
             Container.BindInterfacesTo<GameInputActionsController>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<ChooseNetworkRoleUIController>().AsSingle().WithArguments(_chooseNetworkRoleUIView).NonLazy();
+            Container.BindInterfacesTo<BFNetworkManager>().AsSingle().NonLazy();
         }
     }
 }

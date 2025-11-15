@@ -63,6 +63,7 @@ namespace CoreDomain.Scripts.CoreInitiator
         {
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Application.targetFrameRate = 60;
+            Application.runInBackground = true;
         }
 
         private void InitializeServices()
