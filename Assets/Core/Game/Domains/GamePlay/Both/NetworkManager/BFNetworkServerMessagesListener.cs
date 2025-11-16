@@ -48,7 +48,16 @@ namespace Core.Game.Domains.GamePlay.Both.NetworkManager
                 return;
             }
             
-            NetworkServer.AddPlayerForConnection(conn, player);
+            LogService.LogTopic("Add player", LogTopicType.Network);
+            //NetworkServer.AddPlayerForConnection(conn, player);
+        }
+        
+        void OnServerReadyMessageInternal(NetworkConnectionToClient conn, ReadyMessage msg)
+        {
+            LogService.LogTopic("Player Ready", LogTopicType.Network);
+            conn.isReady = true;
+            conn.Send(new ObjectSpawnStartedMessage());
+            conn.Send(new ObjectSpawnFinishedMessage());
         }
     }
 }
