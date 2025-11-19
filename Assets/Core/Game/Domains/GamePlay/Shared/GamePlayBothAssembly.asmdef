@@ -1,0 +1,20 @@
+{
+    "name": "GamePlayBothAssembly",
+    "rootNamespace": "",
+    "references": [
+        "GUID:30817c1a0e6d646d99c048fc403f5979",
+        "GUID:f2b6c7fcef93c469e982a640a50f422d",
+        "GUID:627104647b9c04b4ebb8978a92ecac63",
+        "GUID:6806a62c384838046a3c66c44f06d75f",
+        "GUID:ec34a38cd6987469fb186013c4d9da54"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

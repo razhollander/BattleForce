@@ -9,7 +9,7 @@ namespace Mirror
     {
         // keep the local connections setup in one function.
         // makes host setup easier to follow.
-        internal static void SetupConnections()
+        public static void SetupConnections()
         {
             // create local connections pair, both are connected
             Utils.CreateLocalConnections(

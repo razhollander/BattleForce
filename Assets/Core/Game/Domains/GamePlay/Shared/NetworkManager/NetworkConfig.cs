@@ -1,0 +1,12 @@
+using UnityEngine;
+
+namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
+{
+    [CreateAssetMenu(fileName = "NetworkConfig", menuName = "BF/Network/Network Config")]
+    public class NetworkConfig : ScriptableObject
+    {
+        public int MaxConnectedPlayers = 8;
+        public int TicksPerSeconds = 60;
+        public int Port = 7777;
+    }
+}

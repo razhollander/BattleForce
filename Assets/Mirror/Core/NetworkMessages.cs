@@ -113,7 +113,7 @@ namespace Mirror
 
         // version for handlers with channelId
         // inline! only exists for 20-30 messages and they call it all the time.
-        internal static NetworkMessageDelegate WrapHandler<T, C>(Action<C, T, int> handler, bool requireAuthentication, bool exceptionsDisconnect)
+        public static NetworkMessageDelegate WrapHandler<T, C>(Action<C, T, int> handler, bool requireAuthentication, bool exceptionsDisconnect)
             where T : struct, NetworkMessage
             where C : NetworkConnection
             => (conn, reader, channelId) =>
@@ -198,7 +198,7 @@ namespace Mirror
         // TODO obsolete this some day to always use the channelId version.
         //      all handlers in this version are wrapped with 1 extra action.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static NetworkMessageDelegate WrapHandler<T, C>(Action<C, T> handler, bool requireAuthentication, bool exceptionsDisconnect)
+        public static NetworkMessageDelegate WrapHandler<T, C>(Action<C, T> handler, bool requireAuthentication, bool exceptionsDisconnect)
             where T : struct, NetworkMessage
             where C : NetworkConnection
         {

@@ -15,7 +15,7 @@ using Debug = UnityEngine.Debug;
 namespace Mirror
 {
     // buffered events for main thread
-    enum ClientMainEventType
+    public enum ClientMainEventType
     {
         OnClientConnected,
         OnClientSent,
@@ -24,7 +24,7 @@ namespace Mirror
         OnClientDisconnected,
     }
 
-    enum ServerMainEventType
+    public enum ServerMainEventType
     {
         OnServerConnected,
         OnServerSent,
@@ -34,7 +34,7 @@ namespace Mirror
     }
 
     // buffered events for worker thread
-    enum ThreadEventType
+    public enum ThreadEventType
     {
         DoServerStart,
         DoServerSend,
@@ -51,7 +51,7 @@ namespace Mirror
         DoShutdown
     }
 
-    struct ClientMainEvent
+    public struct ClientMainEvent
     {
         public ClientMainEventType type;
         public object        param;
@@ -74,7 +74,7 @@ namespace Mirror
         }
     }
 
-    struct ServerMainEvent
+    public struct ServerMainEvent
     {
         public ServerMainEventType type;
         public object        param;
@@ -100,7 +100,7 @@ namespace Mirror
         }
     }
 
-    struct ThreadEvent
+    public struct ThreadEvent
     {
         public ThreadEventType type;
         public object          param;
