@@ -1,60 +1,75 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-using UnityEngine;
+using System.Threading.Tasks;
 
-namespace Core.Game.Domains.GamePlay.Shared
+public class FixedTimer
 {
-    public class FixedTimer
+    private readonly float _fixedDelta;
+    private double _accumulator;
+    private long _lastTime;
+
+    private readonly Stopwatch _stopwatch;
+    private readonly Action _onTickAction;
+    private CancellationTokenSource _cancellationTokenSource;
+    private Task _timerTask;
+
+    public float LerpAlpha => (float)_accumulator / _fixedDelta;
+
+    public FixedTimer(int ticksPerSecond, Action onTickAction)
     {
-        private readonly float _fixedDelta;
+        _fixedDelta = 1.0f / ticksPerSecond;
+        _stopwatch = new Stopwatch();
+        _onTickAction = onTickAction;
+    }
 
-        private double _accumulator;
-        private long _lastTime;
+    public void Start(CancellationTokenSource cancellationTokenSource)
+    {
+        _cancellationTokenSource = cancellationTokenSource;
+        _lastTime = 0;
+        _accumulator = 0.0;
+        _stopwatch.Restart();
 
-        private readonly Stopwatch _stopwatch;
-        private readonly Action _onTickAction;
-        private CancellationTokenSource _cancellationTokenSource;
+        _timerTask = Task.Run(RunTimer, _cancellationTokenSource.Token);
+    }
 
-        public float LerpAlpha => (float)_accumulator / _fixedDelta;
+    public void Stop()
+    {
+        _cancellationTokenSource?.Cancel();
+        _stopwatch.Stop();
 
-        public FixedTimer(int ticksPerSecond, Action onTickAction)
+        try
         {
-            _fixedDelta = 1.0f / ticksPerSecond;
-            _stopwatch = new Stopwatch();
-            _onTickAction = onTickAction;
+            _timerTask?.Wait();
         }
-
-        public void Start(CancellationTokenSource cancellationTokenSource)
+        catch (AggregateException)
         {
-            _cancellationTokenSource = cancellationTokenSource;
-            _lastTime = 0;
-            _accumulator = 0.0;
-            _stopwatch.Restart();
-            _ = RunTimer();
         }
+    }
 
-        public void Stop()
-        {
-            _stopwatch.Stop();
-        }
+    private async Task RunTimer()
+    {
+        var token = _cancellationTokenSource.Token;
 
-        private async Awaitable RunTimer()
+        try
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
                 var elapsedTicks = _stopwatch.ElapsedTicks;
                 _accumulator += (double)(elapsedTicks - _lastTime) / Stopwatch.Frequency;
                 _lastTime = elapsedTicks;
 
-                if (_accumulator >= _fixedDelta)
+                while (_accumulator >= _fixedDelta)
                 {
                     _onTickAction();
                     _accumulator -= _fixedDelta;
                 }
 
-                await Awaitable.NextFrameAsync(_cancellationTokenSource.Token);
+                await Task.Delay(1, token);
             }
+        }
+        catch (TaskCanceledException)
+        {
         }
     }
 }

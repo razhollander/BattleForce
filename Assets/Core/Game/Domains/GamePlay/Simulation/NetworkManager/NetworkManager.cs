@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Simulation;
 using CoreDomain.Scripts.Services.Logger.Base;
+using CoreDomain.Scripts.Services.StateMachineService;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
@@ -12,12 +13,14 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         private NetPacketProcessor _packetProcessor;
         private NetDataWriter _cachedWriter;
         private readonly NetworkConfig _networkConfig;
+        private readonly IStateMachineService _stateMachineService;
         private readonly NetworkTickProcessor _networkTickProcessor;
         private readonly ServerPlayersInputListener _serverPlayersInputListener;
 
-        public NetworkManager(NetworkConfig networkConfig)
+        public NetworkManager(NetworkConfig networkConfig, IStateMachineService stateMachineService)
         {
             _networkConfig = networkConfig;
+            _stateMachineService = stateMachineService;
             _networkC2SPacketsListener = new NetworkC2SPacketsListener();
             _serverPlayersInputListener = new ServerPlayersInputListener(_networkC2SPacketsListener);
             _cachedWriter = new NetDataWriter();
@@ -40,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
             }
             
             _netManager.Start(_networkConfig.Port);
-            _networkTickProcessor.StartTick(_networkConfig.TicksPerSeconds);
+            _networkTickProcessor.StartTick(_networkConfig.TicksPerSeconds, _stateMachineService.CurrentState().CancellationTokenSource);
         }
         
         public void InitExitPoint()

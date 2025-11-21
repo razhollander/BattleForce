@@ -1,3 +1,4 @@
+using System.Threading;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -6,7 +7,7 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
 {
-    public class NetworkTickProcessor : INetworkTickProcessor
+    public class NetworkTickProcessor
     {
         public int CurrentTick;
         
@@ -17,17 +18,16 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         private FixedTimer _fixedTimer;
         private NetworkStateSimulator _networkStateSimulator;
 
-        public NetworkTickProcessor(INetworkC2SPacketsListener networkC2SPacketsListener, IServerPlayersInputListener serverPlayersInputListener, IStateMachineService stateMachineService)
+        public NetworkTickProcessor(INetworkC2SPacketsListener networkC2SPacketsListener, IServerPlayersInputListener serverPlayersInputListener)
         {
             _networkC2SPacketsListener = networkC2SPacketsListener;
             _serverPlayersInputListener = serverPlayersInputListener;
-            _stateMachineService = stateMachineService;
         }
 
-        public void StartTick(int ticksPerSecond)
+        public void StartTick(int ticksPerSecond, CancellationTokenSource cancellationTokenSource)
         {
             _fixedTimer = new FixedTimer(ticksPerSecond, OnTick);
-            _fixedTimer.Start(_stateMachineService.CurrentState().CancellationTokenSource);
+            _fixedTimer.Start(cancellationTokenSource);
         }
         
         public void StopTick()
