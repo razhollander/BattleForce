@@ -14,8 +14,8 @@ namespace CoreDomain.Scripts.Editor.DefaultSceneSelector
         private const string CORE_SCENE_FILE = "Assets/Core/Assets/Scenes/CoreScene.unity";
         private const string GAME_SCENE_FILE = "Assets/Core/Game/Assets/Scenes/GameScene.unity";
         private const string GAMEPLAY_SCENE_FILE = "Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene.unity";
-        private const string LOBBY_SCENE_FILE = "Assets/Core/Game/GameState/Lobby/Assets/Scenes/LobbyScene.unity";
-           
+        //private const string LOBBY_SCENE_FILE = "Assets/Core/Game/GameState/Lobby/Assets/Scenes/LobbyScene.unity";
+        private const string SERVER_SCENE_FILE = "Assets/Core/Game/Domains/GamePlay/Simulation/Scene/ServerScene.unity";
         static DefaultSceneSelector()
         {
             EditorApplication.delayCall += OnLoad;
@@ -99,11 +99,11 @@ namespace CoreDomain.Scripts.Editor.DefaultSceneSelector
             EditorSceneManager.OpenScene(GAMEPLAY_SCENE_FILE);
         }
         
-        [MenuItem("PracticAPI/Scene/Open/Lobby &5", false, 5)]
+        [MenuItem("PracticAPI/Scene/Open/Server &5", false, 5)]
         private static void OpenLobbyScene()
         {
             EditorApplication.ExitPlaymode();
-            EditorSceneManager.OpenScene(LOBBY_SCENE_FILE);
+            EditorSceneManager.OpenScene(SERVER_SCENE_FILE);
         }
 
         private static string GetProjectRelativePath(string absolutePath)

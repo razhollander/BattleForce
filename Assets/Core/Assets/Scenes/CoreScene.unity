@@ -381,6 +381,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1100640593
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1100640595}
+  - component: {fileID: 1100640594}
+  m_Layer: 0
+  m_Name: ApplicationSubscriptionService
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1100640594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1100640593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfb26241a723456da76e7311f257a95a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1100640595
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1100640593}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.1165771, y: 3.4289856, z: -0.37820223}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1251148517 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2099423973304085153, guid: bcb2923a1d40f4613af4b69cb4a9d6b1, type: 3}
@@ -571,6 +615,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _coreAudioClipsScriptableObject: {fileID: 11400000, guid: 625ad7a174dbd41fca0dad700597edb9, type: 2}
   _updateSubscriptionService: {fileID: 874522569}
+  _applicationSubscriptionService: {fileID: 1100640594}
   _audioService: {fileID: 1251148517}
   _loadingScreenView: {fileID: 1909928554}
   _uiCameraView: {fileID: 2130148136}
@@ -872,6 +917,7 @@ SceneRoots:
   - {fileID: 1064205951}
   - {fileID: 2130148134}
   - {fileID: 874522568}
+  - {fileID: 1100640595}
   - {fileID: 4800716718374294523}
   - {fileID: 2079734860}
   - {fileID: 1909928553}

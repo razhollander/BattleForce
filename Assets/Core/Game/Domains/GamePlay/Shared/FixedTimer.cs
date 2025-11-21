@@ -14,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Shared
 
         private readonly Stopwatch _stopwatch;
         private readonly Action _onTickAction;
-        private readonly CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public float LerpAlpha => (float)_accumulator / _fixedDelta;
 
@@ -25,8 +25,9 @@ namespace Core.Game.Domains.GamePlay.Shared
             _onTickAction = onTickAction;
         }
 
-        public void Start()
+        public void Start(CancellationTokenSource cancellationTokenSource)
         {
+            _cancellationTokenSource = cancellationTokenSource;
             _lastTime = 0;
             _accumulator = 0.0;
             _stopwatch.Restart();
@@ -36,7 +37,6 @@ namespace Core.Game.Domains.GamePlay.Shared
         public void Stop()
         {
             _stopwatch.Stop();
-            _cancellationTokenSource.Cancel();
         }
 
         private async Awaitable RunTimer()

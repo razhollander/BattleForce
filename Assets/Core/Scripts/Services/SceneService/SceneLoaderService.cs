@@ -56,7 +56,6 @@ namespace CoreDomain.Scripts.Services.SceneService
             }
            
             await _sceneInitiatorsService.InvokeInitiatorLoadEntryPoint(sceneType, enterData, cancellationTokenSource);
-            int b = 0;
             return true;
         }
 
