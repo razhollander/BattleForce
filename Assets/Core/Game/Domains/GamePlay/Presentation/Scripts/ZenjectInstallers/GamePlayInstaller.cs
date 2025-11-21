@@ -28,14 +28,14 @@ namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.ZenjectIn
         private void BindServices()
         {
             Container.Bind<IGamePlayInitiator>().To<GamePlayInitiator>().AsSingle().NonLazy();
-            Container.Bind<INetworkManager>().To<INetworkManager>().AsSingle().NonLazy();
+            //Container.Bind<INetworkManager>().To<INetworkManager>().AsSingle().NonLazy();
         }
 
         private void BindControllers()
         {
             Container.BindInterfacesTo<GameInputActionsController>().AsSingle().NonLazy();
             Container.BindInterfacesTo<ChooseNetworkRoleUIController>().AsSingle().WithArguments(_chooseNetworkRoleUIView).NonLazy();
-            Container.BindInterfacesTo<NetworkManager>().AsSingle().WithArguments(_networkConfig).NonLazy();
+            //Container.BindInterfacesTo<NetworkManager>().AsSingle().WithArguments(_networkConfig).NonLazy();
             // Container.BindInterfacesTo<BFNetworkClient>().AsSingle().NonLazy();
             // Container.BindInterfacesTo<BFNetworkServer>().AsSingle().NonLazy();
             // Container.BindInterfacesTo<BFNetworkManager>().AsSingle().NonLazy();

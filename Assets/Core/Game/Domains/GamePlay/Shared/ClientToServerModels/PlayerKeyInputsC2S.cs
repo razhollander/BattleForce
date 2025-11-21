@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Shared.ClientToServerModels
         }
     }
 
-    public struct PlayerInputC2S : IComparable<PlayerInputC2S>
+    public struct PlayerKeyInputsC2S : IComparable<PlayerKeyInputsC2S>
     {
         public NetPacketSerializable NetPacketSerializable;
         public int Tick;
@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Shared.ClientToServerModels
             writer.Put(InputKeysCount);
             for (int i = 0; i < InputKeysCount; i++)
             {
-                writer.Put((byte)InputKeys[i]);
+                writer.Put((byte)InputKeys[i]); 
             }
             writer.Put(AimDirection);
         }
@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Shared.ClientToServerModels
             AimDirection = reader.GetFloat();
         }
         
-        public int CompareTo(PlayerInputC2S other)
+        public int CompareTo(PlayerKeyInputsC2S other)
         {
             return Tick.CompareTo(other.Tick);
         }
@@ -74,7 +74,6 @@ namespace Core.Game.Domains.GamePlay.Shared.ClientToServerModels
     public enum PacketTypeC2S : byte
     {
         PlayerInput = 1 << 1,
-        Spawn = 1 << 2,
-        Shoot = 1 << 3
+        Spawn = 1 << 2
     }
 }

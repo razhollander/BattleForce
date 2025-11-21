@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Net.Sockets;
 using Core.Game.Domains.GamePlay.Shared.ClientToServerModels;
@@ -9,37 +10,31 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
 {
-    public class NetworkPacketsListener : INetEventListener, INetworkPacketsListener
+    public class NetworkC2SPacketsListener : INetEventListener, INetworkC2SPacketsListener
     {
         private NetManager _netManager;
         private NetPacketProcessor _packetProcessor;
-
-        private readonly FixedTimer _fixedTimer;
-        private readonly NetDataWriter _cachedWriter = new NetDataWriter();
         
-        // private ServerPlayerManager _playerManager;
-        //
-        // private PlayerInputPacket _cachedCommand = new PlayerInputPacket();
+        public event Action<NetPacketReader, NetPeer> InputReceivedEvent;
 
-        public NetworkPacketsListener(int ticksPerSecond)
+        public NetworkC2SPacketsListener()
         {
-            //_fixedTimer = new FixedTimer(ticksPerSecond, OnLogicUpdate);
             _packetProcessor = new NetPacketProcessor();
-           // _playerManager = new ServerPlayerManager(this);
-            
-            //register auto serializable vector2
-            _packetProcessor.RegisterNestedType((w, v) => w.Put(v), r => r.GetVector2());
-
+            RegisterAutoSerializedPackets();
             _netManager = new NetManager(this) { AutoRecycle = true };
+        }
+
+        private void RegisterAutoSerializedPackets()
+        {
+            _packetProcessor.RegisterNestedType((w, v) => w.Put(v), r => r.GetVector2());
         }
 
         public void PollPackets()
         {
             _netManager.PollEvents();
         }
-        public void InitializeEntryPoint()
+        public void StartListening()
         {
-            _fixedTimer.Start();
             //_packetProcessor.RegisterNestedType((w, v) => w.Put(v), r => r.GetVector2());
            
             //register auto serializable PlayerState
@@ -51,7 +46,6 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         private void OnDestroy()
         {
             _netManager.Stop();
-            _fixedTimer.Stop();
         }
 
         // private void OnJoinReceived(JoinPacket joinPacket, NetPeer peer)
@@ -127,28 +121,12 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
             switch (pt)
             {
                 case PacketTypeC2S.PlayerInput:
-                    OnInputReceived(reader, peer);
+                    InputReceivedEvent?.Invoke(reader, peer);
                     break;
-                // case PacketType.Serialized:
-                //     _packetProcessor.ReadAllPackets(reader, peer);
-                //     break;
-                // default:
-                //     LogService.Log("Unhandled packet: " + pt);
-                //     break;
+                default:
+                    LogService.Log("Unhandled packet: " + pt);
+                    break;
             }
-        }
-        
-        private void OnInputReceived(NetPacketReader reader, NetPeer peer)
-        {
-            if (peer.Tag == null)
-                return;
-            _cachedCommand.Deserialize(reader);
-            var player = (ServerPlayer) peer.Tag;
-            
-            bool antilagApplied = _playerManager.EnableAntilag(player);
-            player.ApplyInput(_cachedCommand, LogicTimer.FixedDelta);
-            if(antilagApplied)
-                _playerManager.DisableAntilag();
         }
 
         void INetEventListener.OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader,
@@ -172,8 +150,9 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         }
     }
 
-    public interface INetworkPacketsListener
+    public interface INetworkC2SPacketsListener
     {
         void PollPackets();
+        event Action<NetPacketReader, NetPeer> InputReceivedEvent;
     }
 }

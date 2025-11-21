@@ -5,6 +5,7 @@
         CoreScene,
         GamePlayScene,
         GameScene,
-        LobbyScene
+        LobbyScene,
+        ServerScene
     }
 }
