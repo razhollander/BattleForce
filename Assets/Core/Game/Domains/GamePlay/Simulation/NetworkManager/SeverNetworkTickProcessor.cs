@@ -1,23 +1,24 @@
 using System.Threading;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using CoreDomain.Scripts.Services.StateMachineService;
+using LiteNetLib;
 
 namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 {
     public class SeverNetworkTickProcessor
     {
         public int CurrentTick;
-        
-        private readonly NetworkC2SPacketsListener _networkC2SPacketsListener;
+
+        private readonly NetManager _netManager;
         private readonly IServerPlayersInputListener _serverPlayersInputListener;
         private readonly IStateMachineService _stateMachineService;
 
         private FixedTimer _fixedTimer;
         private NetworkStateSimulator _networkStateSimulator;
 
-        public SeverNetworkTickProcessor(NetworkC2SPacketsListener networkC2SPacketsListener, IServerPlayersInputListener serverPlayersInputListener)
+        public SeverNetworkTickProcessor(NetManager netManager, IServerPlayersInputListener serverPlayersInputListener)
         {
-            _networkC2SPacketsListener = networkC2SPacketsListener;
+            _netManager = netManager;
             _serverPlayersInputListener = serverPlayersInputListener;
         }
 
@@ -35,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private void OnTick()
         {
             CurrentTick++;
-            _networkC2SPacketsListener.PollPackets();
+            _netManager.PollEvents();
             var inputsPerPlayerForCurrentTick = _serverPlayersInputListener.GetSortedInputsPerPlayerForTick(CurrentTick); 
             // Pass inputs to Simulator and update Current State
             //_serverState.Tick = CurrentTick;

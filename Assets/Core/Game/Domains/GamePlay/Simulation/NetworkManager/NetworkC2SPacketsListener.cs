@@ -26,7 +26,6 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
             _networkConfig = networkConfig;
             _packetProcessor = packetProcessor;
             RegisterAutoSerializedTypes();
-            _netManager = new NetManager(this) { AutoRecycle = true };
         }
 
         private void RegisterAutoSerializedTypes()
@@ -98,11 +97,6 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         //     // if(player != null)
         //     //     LogService.Log($"[C] Player leaved: {player.Name}");
         // }
-
-        public void PollPackets()
-        {
-            _netManager.PollEvents();
-        }
 
         public void RegisterListeners()
         {

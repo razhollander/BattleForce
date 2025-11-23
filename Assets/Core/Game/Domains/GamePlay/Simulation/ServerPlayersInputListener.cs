@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation
 
         public void InitEntryPoint()
         {
-            //_networkC2SPacketsListener.PlayerInputReceivedEvent += OnInputReceived;
+           // _networkC2SPacketsListener.PlayerInputReceivedEvent += OnInputReceived;
         }
 
         private void OnInputReceived(PlayerKeyInputsC2S playerInput, ushort playerId)

@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
             _networkC2SPacketsListener = new NetworkC2SPacketsListener(_packetProcessor, _networkConfig);
             _serverPlayersInputListener = new ServerPlayersInputListener(_networkC2SPacketsListener);
             _netManager = new NetManager(_networkC2SPacketsListener) { AutoRecycle = true };
-            _severNetworkTickProcessor = new SeverNetworkTickProcessor(_networkC2SPacketsListener, _serverPlayersInputListener);
+            _severNetworkTickProcessor = new SeverNetworkTickProcessor(_netManager, _serverPlayersInputListener);
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
 
