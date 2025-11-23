@@ -1,5 +1,6 @@
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint;
+using Core.Scripts.Services.ApplicationSubscriptionService;
 using CoreDomain.GameDomain.Scripts.States.GamePlayState;
 using CoreDomain.Scripts.CoreInitiator.Base;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -10,18 +11,21 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Initiator
 {
-    public class GamePlayInitiator : ISceneInitiator, IGamePlayInitiator
+    public class GamePlayInitiator : ISceneInitiator, IGamePlayInitiator, IApplicationObserver
     {
         private readonly ICommandFactory _commandFactory;
         private readonly ISceneInitiatorsService _sceneInitiatorsService;
+        private readonly IApplicationSubscriptionService _applicationSubscriptionService;
 
         public SceneType SceneType => SceneType.GamePlayScene;
 
-        public GamePlayInitiator(ICommandFactory commandFactory, ISceneInitiatorsService sceneInitiatorsService)
+        public GamePlayInitiator(ICommandFactory commandFactory, ISceneInitiatorsService sceneInitiatorsService, IApplicationSubscriptionService applicationSubscriptionService)
         {
             _commandFactory = commandFactory;
             _sceneInitiatorsService = sceneInitiatorsService;
             _sceneInitiatorsService.RegisterInitiator(this);
+            _applicationSubscriptionService = applicationSubscriptionService;
+            _applicationSubscriptionService.RegisterObserver(this);
         }
 
         public async Awaitable LoadEntryPoint(IInitiatorEnterData enterDataObject, CancellationTokenSource cancellationTokenSource)
@@ -38,9 +42,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Initiator
 
         public Awaitable InitExitPoint(CancellationTokenSource cancellationTokenSource)
         {
-            _sceneInitiatorsService.UnregisterInitiator(this);
-            _commandFactory.CreateCommandVoid<ExitGamePlayStateCommand>().Execute();
+            InitExitPoint();
             return AwaitableUtils.CompletedTask;
+        }
+
+        private void InitExitPoint()
+        {
+            _sceneInitiatorsService.UnregisterInitiator(this);
+            _applicationSubscriptionService.UnregisterObserver(this);
+            _commandFactory.CreateCommandVoid<ExitGamePlayStateCommand>().Execute();
+        }
+
+        public void OnApplicationQuit()
+        {
+            InitExitPoint();
+        }
+
+        public void OnApplicationFocus(bool hasFocus)
+        {
+            
         }
     }
 }

@@ -1,21 +1,24 @@
+using System;
 using System.Threading;
+using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
+using LiteNetLib;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
     public class ClientNetworkTickProcessor
     {
         public int CurrentTick;
-        
-        private readonly NetworkS2CPacketsListener _networkC2SPacketsListener;
+
+        private readonly NetManager _netManager;
         private readonly ClientSimulationStateHandler _clientSimulationStateHandler;
         private readonly IStateMachineService _stateMachineService;
 
         private FixedTimer _fixedTimer;
 
-        public ClientNetworkTickProcessor(NetworkS2CPacketsListener networkC2SPacketsListener, ClientSimulationStateHandler clientSimulationStateHandler)
+        public ClientNetworkTickProcessor(NetManager netManager , ClientSimulationStateHandler clientSimulationStateHandler)
         {
-            _networkC2SPacketsListener = networkC2SPacketsListener;
+            _netManager = netManager;
             _clientSimulationStateHandler = clientSimulationStateHandler;
         }
 
@@ -32,9 +35,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         
         private void OnTick()
         {
-            CurrentTick++;
-            _networkC2SPacketsListener.PollPackets();
-            var SimulationStateForCurrentTick = _clientSimulationStateHandler.GetSortedStates(CurrentTick); 
+            try
+            {
+                LogService.LogTopic("on tick", LogTopicType.ClientNetwork);
+                CurrentTick++;
+                _netManager.PollEvents();
+                var SimulationStateForCurrentTick = _clientSimulationStateHandler.GetSortedStates(CurrentTick);
+            }
+            catch (Exception e)
+            {
+                LogService.LogError("Got error! " + e.ToString());
+                throw;
+            }
+           
             // Pass inputs to Simulator and update Current State
             //_serverState.Tick = CurrentTick;
             // Send current state to all players

@@ -32,11 +32,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 return;
             }
             
-            _writer.Reset();
-            _writer.Put((byte)type);
-            packet.Serialize(_writer);
+            // _writer.Reset();
+            // _writer.Put((byte)type);
+            //packet.Serialize(_writer);
             LogService.LogTopic($"Send packet {packet.ToJson()}", LogTopicType.ClientNetwork);
-            _peer.Send(_writer, deliveryMethod);
+            _packetProcessor.SendNetSerializable(_peer, packet, deliveryMethod);
+            // _peer.Send(_writer, deliveryMethod);
         }
         
         // public void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new()

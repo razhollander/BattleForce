@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
     public class NetworkS2CPacketsSender
     {
         private readonly NetDataWriter _writer;
-        private Dictionary<int, NetPeer> _peerPerPlayerId;
+        private Dictionary<int, NetPeer> _peerPerPlayerId = new();
         private readonly NetPacketProcessor _packetProcessor;
 
         public NetworkS2CPacketsSender(NetPacketProcessor packetProcessor)
@@ -65,11 +65,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 return;
             }
             
-            _writer.Reset();
+            /*_writer.Reset();
             _writer.Put((byte)type);
-            packet.Serialize(_writer);
-            LogService.LogTopic($"Send packet {packet.ToJson()}", LogTopicType.ClientNetwork);
-            _peerPerPlayerId.ForEach(x => x.Value.Send(_writer, deliveryMethod));
+            packet.Serialize(_writer);*/
+            LogService.LogTopic($"Send packet {packet.ToJson()}", LogTopicType.ServerNetwork);
+            _peerPerPlayerId.ForEach(x => _packetProcessor.SendNetSerializable(x.Value, packet, deliveryMethod));
         }
         
         // public void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new()

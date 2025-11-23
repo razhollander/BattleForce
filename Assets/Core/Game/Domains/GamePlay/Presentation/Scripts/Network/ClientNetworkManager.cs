@@ -2,6 +2,7 @@ using System;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
+using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using LiteNetLib;
@@ -16,9 +17,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly NetworkConfig _networkConfig;
         private readonly IStateMachineService _stateMachineService;
         private readonly ClientNetworkTickProcessor _clientNetworkTickProcessor;
-        private readonly ClientSimulationStateHandler _simulationStateHandler;
         private readonly NetworkC2SPacketsSender _packetsSender;
-
+        private readonly ClientSimulationStateHandler _simulationStateHandler;
+        public event Action OnClientStarted;
         public ClientNetworkManager(NetworkConfig networkConfig, IStateMachineService stateMachineService)
         {
             _networkConfig = networkConfig;
@@ -32,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 AutoRecycle = true,
                 IPv6Enabled = IPv6Mode.Disabled
             };
-            _clientNetworkTickProcessor = new ClientNetworkTickProcessor(_packetsListener, _simulationStateHandler); 
+            _clientNetworkTickProcessor = new ClientNetworkTickProcessor(_netManager, _simulationStateHandler); 
         }
 
         public void StartClient()
@@ -48,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _clientNetworkTickProcessor.StartTick(_networkConfig.TicksPerSeconds, _stateMachineService.CurrentState().CancellationTokenSource);
             _netManager.Connect(_networkConfig.IpAddress, _networkConfig.Port, _networkConfig.ConntectionKey);
+            OnClientStarted?.Invoke();
         }
 
         private void OnServerPeerReceived(NetPeer peerToServer)

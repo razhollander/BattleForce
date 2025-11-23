@@ -2,7 +2,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
 {
     public interface IPlayerJoinPacketsHandler
     {
-        void InitEntryPoint();
+        void RegisterListeners();
+        void UnregisterListeners();
         void InitExitPoint();
     }
 }

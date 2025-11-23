@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
+using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -28,10 +29,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
             _networkManager.RemoveSubscription<JoinRequestPacketC2S>();
         }
 
-        private void OnJoinReceived(JoinRequestPacketC2S joinRequestPacketC2S, NetPeer peer)
+        private void OnJoinReceived(JoinRequestPacketC2S joinRequestPacket, NetPeer peer)
         {
-            LogService.LogTopic("Join packet received: " + joinRequestPacketC2S.UserName, LogTopicType.ServerNetwork);
-            var playerModel = _matchDataService.AddPlayer(joinRequestPacketC2S.UserName);
+            LogService.LogTopic("Join packet received: " + joinRequestPacket.UserName, LogTopicType.ServerNetwork);
+            var playerModel = _matchDataService.AddPlayer(joinRequestPacket.UserName);
             var playerId = playerModel.PlayerId;
             peer.Tag = playerId;
             _networkManager.AddPlayerPeer(playerId, peer);

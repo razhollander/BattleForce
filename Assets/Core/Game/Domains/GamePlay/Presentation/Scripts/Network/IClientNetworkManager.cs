@@ -9,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
     public interface IClientNetworkManager
     {
         void StartClient();
+        event Action OnClientStarted;
         void InitExitPoint();
         //void SubscribeReusable<T>(Action<T> onReceive) where T : class, new();
         //void SubscribeReusable<T, TUserData>(Action<T, TUserData> onReceive) where T : class, new();

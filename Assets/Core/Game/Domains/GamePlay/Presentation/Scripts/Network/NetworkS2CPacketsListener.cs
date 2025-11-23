@@ -13,8 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
     public class NetworkS2CPacketsListener : INetEventListener
     {
-        private NetManager _netManager;
-        private NetPacketProcessor _packetProcessor;
+        private readonly NetPacketProcessor _packetProcessor;
         
         public event Action<NetPeer> OnPeerConnected;
         public event Action<NetPeer, DisconnectInfo> OnPeerDisconnected;
@@ -24,7 +23,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             _packetProcessor = packetProcessor;
             RegisterAutoSerializedTypes();
-            _netManager = new NetManager(this) { AutoRecycle = true };
         }
         
         private void RegisterAutoSerializedTypes()
@@ -59,11 +57,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             //         LogService.Log("Unhandled packet: " + pt);
             //         break;
             // }
-        }
-        
-        public void PollPackets()
-        {
-            _netManager.PollEvents();
         }
         
         public void RegisterListeners()

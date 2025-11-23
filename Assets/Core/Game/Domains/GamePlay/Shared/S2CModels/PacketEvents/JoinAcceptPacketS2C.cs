@@ -1,6 +1,6 @@
 using LiteNetLib.Utils;
 
-namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
+namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
 {
     public class JoinAcceptPacketS2C : INetSerializable
     {

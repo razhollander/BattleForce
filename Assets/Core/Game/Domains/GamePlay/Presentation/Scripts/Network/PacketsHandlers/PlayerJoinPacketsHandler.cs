@@ -1,12 +1,11 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
-using Core.Game.Domains.GamePlay.Shared;
-using Core.Game.Domains.GamePlay.Shared.NetworkManager;
+using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
+using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 
-namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers
 {
     public class PlayerJoinPacketsHandler : IPlayerJoinPacketsHandler
     {
@@ -17,16 +16,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
+            _networkManager.OnClientStarted += RegisterListeners;
         }
 
-        public void InitEntryPoint()
+        public void RegisterListeners()
         {
             _networkManager.SubscribeNetSerializable<JoinAcceptPacketS2C, NetPeer>(OnJoinAccept);
         }
 
-        public void InitExitPoint()
+        public void UnregisterListeners()
         {
             _networkManager.RemoveSubscription<JoinAcceptPacketS2C>();
+        }
+
+        public void InitExitPoint()
+        {
+            UnregisterListeners();
+            _networkManager.OnClientStarted -= RegisterListeners;
         }
 
         private void OnJoinAccept(JoinAcceptPacketS2C joinPacketS2C, NetPeer _) // needed netPeer?

@@ -35,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
 
         void INetEventListener.OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
+            LogService.LogTopic("OnNetworkReceive! ", LogTopicType.ServerNetwork);
             _packetProcessor.ReadAllPackets(reader, peer);
 
             // var packetTypeByte = reader.GetByte();
@@ -248,6 +249,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
 
         void INetEventListener.OnConnectionRequest(ConnectionRequest request)
         {
+            LogService.LogTopic("ConnectionRequest", LogTopicType.ServerNetwork);
             request.AcceptIfKey(_networkConfig.ConntectionKey);
         }
     }

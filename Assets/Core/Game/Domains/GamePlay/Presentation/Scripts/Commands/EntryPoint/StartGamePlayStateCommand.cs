@@ -34,7 +34,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _audioService = _diContainer.Resolve<IAudioService>();
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
             _chooseNetworkRoleUIController = _diContainer.Resolve<IChooseNetworkRoleUIController>();
-            _playerJoinPacketsHandler = _diContainer.Resolve<IPlayerJoinPacketsHandler>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -42,7 +41,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             //_audioService.PlayAudio(AudioClipType.GamePlayBGMusic, AudioChannelType.Master, AudioPlayType.Loop);
             _gameInputActionsController.EnableInputs();
             _chooseNetworkRoleUIController.InitEntryPoint();
-            _playerJoinPacketsHandler.InitExitPoint();
         }
     }
 }

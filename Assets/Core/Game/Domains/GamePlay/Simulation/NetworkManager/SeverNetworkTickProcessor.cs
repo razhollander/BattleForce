@@ -1,5 +1,7 @@
+using System;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
+using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using LiteNetLib;
 
@@ -35,9 +37,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         
         private void OnTick()
         {
-            CurrentTick++;
-            _netManager.PollEvents();
-            var inputsPerPlayerForCurrentTick = _serverPlayersInputListener.GetSortedInputsPerPlayerForTick(CurrentTick); 
+            try
+            {
+                LogService.LogTopic("on tick", LogTopicType.ServerNetwork);
+                CurrentTick++;
+                _netManager.PollEvents();
+                var inputsPerPlayerForCurrentTick = _serverPlayersInputListener.GetSortedInputsPerPlayerForTick(CurrentTick); 
+            }
+            catch (Exception e)
+            {
+                LogService.LogError("Got error! " + e.ToString());
+                throw;
+            }
+          
             // Pass inputs to Simulator and update Current State
             //_serverState.Tick = CurrentTick;
             // Send current state to all players

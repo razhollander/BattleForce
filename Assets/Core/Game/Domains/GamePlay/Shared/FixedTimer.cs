@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 public class FixedTimer
 {
@@ -29,6 +30,7 @@ public class FixedTimer
         _lastTime = 0;
         _accumulator = 0.0;
         _stopwatch.Restart();
+        LogService.LogTopic("start tick");
 
         _timerTask = Task.Run(RunTimer, _cancellationTokenSource.Token);
     }
