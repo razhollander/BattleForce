@@ -1,12 +1,15 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Initiator;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
-using CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Initiator;
-using CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Mvc.GameInputActions;
+using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Zenject;
 
-namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.ZenjectInstallers
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
 {
     public class GamePlayInstaller : MonoInstaller
     {
@@ -28,6 +31,9 @@ namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.ZenjectIn
         private void BindServices()
         {
             Container.Bind<IGamePlayInitiator>().To<GamePlayInitiator>().AsSingle().NonLazy();
+            Container.Bind<IClientNetworkManager>().To<ClientNetworkManager>().AsSingle().WithArguments(_networkConfig).NonLazy();
+            Container.Bind<IPlayerJoinPacketsHandler>().To<PlayerJoinPacketsHandler>().AsSingle().NonLazy();
+            Container.Bind<IMatchDataService>().To<MatchDataService>().AsSingle().WithArguments(_networkConfig).NonLazy();
             //Container.Bind<INetworkManager>().To<INetworkManager>().AsSingle().NonLazy();
         }
 

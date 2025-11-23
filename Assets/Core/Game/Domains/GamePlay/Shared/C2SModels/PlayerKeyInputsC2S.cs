@@ -1,4 +1,5 @@
 using System;
+using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.ClientToServerModels
@@ -68,12 +69,5 @@ namespace Core.Game.Domains.GamePlay.Shared.ClientToServerModels
         // Special1 = 1 << 4,
         // Special2 = 1 << 5,
         // Force = 1 << 5,
-    }
-    
-    [Flags]
-    public enum PacketTypeC2S : byte
-    {
-        PlayerInput = 1 << 1,
-        Spawn = 1 << 2
     }
 }

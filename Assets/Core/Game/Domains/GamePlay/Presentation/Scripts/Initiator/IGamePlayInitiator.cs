@@ -1,4 +1,4 @@
-namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Initiator
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Initiator
 {
     public interface IGamePlayInitiator
     {

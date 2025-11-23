@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.ClientToServerModels;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -18,30 +19,13 @@ namespace Core.Game.Domains.GamePlay.Simulation
 
         public void InitEntryPoint()
         {
-            _networkC2SPacketsListener.InputReceivedEvent += OnInputReceived;
+            //_networkC2SPacketsListener.PlayerInputReceivedEvent += OnInputReceived;
         }
 
-        private void OnInputReceived(NetPacketReader reader, NetPeer peer)
+        private void OnInputReceived(PlayerKeyInputsC2S playerInput, ushort playerId)
         {
-            var packetType = (PacketTypeC2S)reader.GetByte();
-            switch (packetType)
-            {
-                case PacketTypeC2S.PlayerInput:
-                {
-                    HandlePlayerInput(reader, peer);
-                    break;
-                }
-                default: LogService.LogError($"Packet type not supported {packetType}"); break;
-            }
-        }
-
-        private void HandlePlayerInput(NetPacketReader reader, NetPeer peer)
-        {
-            var input = new PlayerKeyInputsC2S();
-            input.Deserialize(reader);
-            var playerId = (ushort)peer.Tag;
             _inputsByPlayer.TryAdd(playerId, new List<PlayerKeyInputsC2S>());
-            _inputsByPlayer[playerId].Add(input);
+            _inputsByPlayer[playerId].Add(playerInput);        
         }
 
         public Dictionary<ushort, List<PlayerKeyInputsC2S>> GetSortedInputsPerPlayerForTick(int tick)
@@ -56,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation
 
         public void InitExitPoint()
         {
-            _networkC2SPacketsListener.InputReceivedEvent -= OnInputReceived;
+            //_networkC2SPacketsListener.PlayerInputReceivedEvent -= OnInputReceived;
         }
     }
 

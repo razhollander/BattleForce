@@ -8,5 +8,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         public int MaxConnectedPlayers = 8;
         public int TicksPerSeconds = 60;
         public int Port = 7777;
+        public string IpAddress = "localhost";
+        public string ConntectionKey = "BattleForceGame";
     }
 }

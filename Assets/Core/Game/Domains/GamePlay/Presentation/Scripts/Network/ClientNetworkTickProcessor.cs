@@ -1,27 +1,22 @@
 using System.Threading;
-using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
-using Core.Game.Domains.GamePlay.Simulation;
 using CoreDomain.Scripts.Services.StateMachineService;
-using LiteNetLib;
-using LiteNetLib.Utils;
 
-namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
-    public class NetworkTickProcessor
+    public class ClientNetworkTickProcessor
     {
         public int CurrentTick;
         
-        private readonly INetworkC2SPacketsListener _networkC2SPacketsListener;
-        private readonly IServerPlayersInputListener _serverPlayersInputListener;
+        private readonly NetworkS2CPacketsListener _networkC2SPacketsListener;
+        private readonly ClientSimulationStateHandler _clientSimulationStateHandler;
         private readonly IStateMachineService _stateMachineService;
 
         private FixedTimer _fixedTimer;
-        private NetworkStateSimulator _networkStateSimulator;
 
-        public NetworkTickProcessor(INetworkC2SPacketsListener networkC2SPacketsListener, IServerPlayersInputListener serverPlayersInputListener)
+        public ClientNetworkTickProcessor(NetworkS2CPacketsListener networkC2SPacketsListener, ClientSimulationStateHandler clientSimulationStateHandler)
         {
             _networkC2SPacketsListener = networkC2SPacketsListener;
-            _serverPlayersInputListener = serverPlayersInputListener;
+            _clientSimulationStateHandler = clientSimulationStateHandler;
         }
 
         public void StartTick(int ticksPerSecond, CancellationTokenSource cancellationTokenSource)
@@ -39,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         {
             CurrentTick++;
             _networkC2SPacketsListener.PollPackets();
-            var inputsPerPlayerForCurrentTick = _serverPlayersInputListener.GetSortedInputsPerPlayerForTick(CurrentTick); 
+            var SimulationStateForCurrentTick = _clientSimulationStateHandler.GetSortedStates(CurrentTick); 
             // Pass inputs to Simulator and update Current State
             //_serverState.Tick = CurrentTick;
             // Send current state to all players

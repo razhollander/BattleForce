@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace CoreDomain.Scripts.Extensions
 {
     public static class StringExtension
@@ -5,6 +7,11 @@ namespace CoreDomain.Scripts.Extensions
         public static bool IsNullOrEmpty(this string str)
         {
             return string.IsNullOrEmpty(str);
+        }
+
+        public static string ToJson(this object obj)
+        {
+            return JsonConvert.SerializeObject(obj);
         }
         
         public static string Format(this string formatString, params object[] args)

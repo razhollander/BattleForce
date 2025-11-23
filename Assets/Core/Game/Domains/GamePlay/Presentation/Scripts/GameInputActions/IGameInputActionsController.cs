@@ -1,7 +1,7 @@
 using System.Threading;
 using UnityEngine;
 
-namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Mvc.GameInputActions
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 {
     public interface IGameInputActionsController
     {

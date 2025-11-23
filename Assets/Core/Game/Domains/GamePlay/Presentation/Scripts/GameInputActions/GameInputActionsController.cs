@@ -1,17 +1,16 @@
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs;
-using CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Commands;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Utils;
 using UnityEngine;
+using UnityEngine.InputSystem;
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 #endif
-using UnityEngine.InputSystem;
 
-namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Mvc.GameInputActions
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 {
     public class GameInputActionsController : IGameInputActionsController
     {

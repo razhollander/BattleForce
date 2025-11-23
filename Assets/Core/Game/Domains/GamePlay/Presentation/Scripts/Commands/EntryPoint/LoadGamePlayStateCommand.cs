@@ -5,7 +5,7 @@ using CoreDomain.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
 
-namespace CoreDomain.GameDomain.GameStateDomain.GamePlayDomain.Scripts.Commands.EntryPoint
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
 {
     public class LoadGamePlayStateCommand : BaseCommand, ICommandAsync
     {
