@@ -86,27 +86,30 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
     public struct PlayerTransformStateS2C : INetSerializable
     {
         public Vector2 CurrentPosition;
-        public float CurrentRotation;
         public Vector2 CurrentVelocity;
-        public float CurrentAimRotation;
-
-        public Vector2 Velocity;
-        public Vector2 AngularVelocity;
+        public Vector2 CurrentAcceleration;
+        public float CurrentRotationAngle;
+        public float CurrentAngularVelocity;
+        public float CurrentAimAngle;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(CurrentPosition);
-            writer.Put(CurrentRotation);
             writer.Put(CurrentVelocity);
-            writer.Put(CurrentAimRotation);
+            writer.Put(CurrentAcceleration);
+            writer.Put(CurrentRotationAngle);
+            writer.Put(CurrentAngularVelocity);
+            writer.Put(CurrentAimAngle);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             CurrentPosition = reader.GetVector2();
-            CurrentRotation = reader.GetFloat();
             CurrentVelocity = reader.GetVector2();
-            CurrentAimRotation = reader.GetFloat();
+            CurrentAcceleration = reader.GetVector2();
+            CurrentRotationAngle = reader.GetFloat();
+            CurrentAngularVelocity = reader.GetFloat();
+            CurrentAimAngle = reader.GetFloat();
         }
     }
 

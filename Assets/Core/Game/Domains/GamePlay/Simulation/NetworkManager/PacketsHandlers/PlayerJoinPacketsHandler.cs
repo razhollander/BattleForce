@@ -2,9 +2,11 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
+using Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
 {
@@ -12,11 +14,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
     {
         private readonly IServerNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
+        private readonly GamePlayConfig _gamePlayConfig;
 
-        public PlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService)
+        public PlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService, GamePlayConfig gamePlayConfig)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
+            _gamePlayConfig = gamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -37,7 +41,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
             peer.Tag = playerId;
             _networkManager.AddPlayerPeer(playerId, peer);
             _networkManager.SendPacketSerialized(PacketTypeS2C.JoinAccepted,
-                new JoinAcceptPacketS2C { PlayerId = playerId, PlayerName = playerModel.PlayerName },
+                new JoinAcceptPacketS2C
+                {
+                    PlayerId = playerId, PlayerName = playerModel.PlayerName, PlayerTransform =
+                        new PlayerTransformStateS2C
+                        {
+                            CurrentAcceleration = Vector2.zero, 
+                            CurrentAimAngle = 0,
+                            CurrentAngularVelocity = 0,
+                            CurrentPosition = Vector2.left,
+                            CurrentRotationAngle = 90,
+                            CurrentVelocity = Vector2.one * _gamePlayConfig.PlayerSpaceship.MovementSpeed
+                        }
+                },
                 DeliveryMethod.ReliableOrdered);
         }
     }
