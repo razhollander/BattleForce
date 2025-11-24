@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         private NetPacketProcessor _packetProcessor;
         private readonly NetworkConfig _networkConfig;
         private readonly IStateMachineService _stateMachineService;
-        private readonly SeverNetworkTickProcessor _severNetworkTickProcessor;
+        private readonly ServerNetworkTickProcessor _serverNetworkTickProcessor;
         private readonly ServerPlayersInputListener _serverPlayersInputListener;
         private readonly NetworkS2CPacketsSender _packetsSender;
 
@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
             _networkC2SPacketsListener = new NetworkC2SPacketsListener(_packetProcessor, _networkConfig);
             _serverPlayersInputListener = new ServerPlayersInputListener(_networkC2SPacketsListener);
             _netManager = new NetManager(_networkC2SPacketsListener) { AutoRecycle = true };
-            _severNetworkTickProcessor = new SeverNetworkTickProcessor(_netManager, _serverPlayersInputListener);
+            _serverNetworkTickProcessor = new ServerNetworkTickProcessor(_netManager, _serverPlayersInputListener);
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
 
@@ -49,13 +49,13 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
             
             //_networkC2SPacketsListener.RegisterListeners();
             _netManager.Start(_networkConfig.Port);
-            _severNetworkTickProcessor.StartTick(_networkConfig.TicksPerSeconds, _stateMachineService.CurrentState().CancellationTokenSource);
+            _serverNetworkTickProcessor.StartTick(_networkConfig.TicksPerSeconds, _stateMachineService.CurrentState().CancellationTokenSource);
         }
 
         public void InitExitPoint()
         {
             _netManager.Stop();
-            _severNetworkTickProcessor.StopTick();
+            _serverNetworkTickProcessor.StopTick();
         }
 
         // public void SubscribeReusable<T>(Action<T> onReceive) where T : class, new()

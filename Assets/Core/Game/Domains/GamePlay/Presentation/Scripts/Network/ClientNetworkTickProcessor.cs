@@ -37,7 +37,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             try
             {
-                LogService.LogTopic("on tick", LogTopicType.ClientNetwork);
                 CurrentTick++;
                 _netManager.PollEvents();
                 var SimulationStateForCurrentTick = _clientSimulationStateHandler.GetSortedStates(CurrentTick);

@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using UnityEngine;
@@ -10,6 +11,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
     public class ServerSceneInstaller : MonoInstaller
     {
         [SerializeField] private NetworkConfig _networkConfig;
+        [SerializeField] private PlayerBulletConfig _playerBulletConfig;
+        [SerializeField] private PlayerSpaceshipConfig _playerSpaceshipConfig;
         
         public override void InstallBindings()
         {
@@ -17,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<IServerNetworkManager>().To<ServerNetworkManager>().AsSingle().WithArguments(_networkConfig).NonLazy();
             Container.Bind<IPlayerJoinPacketsHandler>().To<PlayerJoinPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IMatchDataService>().To<MatchDataService>().AsSingle().WithArguments(_networkConfig).NonLazy();
+            Container.Bind<ITickProcessor>().To<ServerNetworkTickProcessor>().AsSingle().WithArguments(_networkConfig).NonLazy();
         }
     }
 }

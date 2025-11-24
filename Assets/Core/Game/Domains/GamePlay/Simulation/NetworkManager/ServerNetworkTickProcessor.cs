@@ -7,9 +7,9 @@ using LiteNetLib;
 
 namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 {
-    public class SeverNetworkTickProcessor
+    public class ServerNetworkTickProcessor : ITickProcessor
     {
-        public int CurrentTick;
+        public int CurrentTick { get; private set; }
 
         private readonly NetManager _netManager;
         private readonly IServerPlayersInputListener _serverPlayersInputListener;
@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private FixedTimer _fixedTimer;
         private NetworkStateSimulator _networkStateSimulator;
 
-        public SeverNetworkTickProcessor(NetManager netManager, IServerPlayersInputListener serverPlayersInputListener)
+        public ServerNetworkTickProcessor(NetManager netManager, IServerPlayersInputListener serverPlayersInputListener)
         {
             _netManager = netManager;
             _serverPlayersInputListener = serverPlayersInputListener;
@@ -39,7 +39,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         {
             try
             {
-                LogService.LogTopic("on tick", LogTopicType.ServerNetwork);
                 CurrentTick++;
                 _netManager.PollEvents();
                 var inputsPerPlayerForCurrentTick = _serverPlayersInputListener.GetSortedInputsPerPlayerForTick(CurrentTick); 
@@ -96,5 +95,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         //     _packetProcessor.Write(_cachedWriter, packet);
         //     return _cachedWriter;
         // }
+    }
+
+    public interface ITickProcessor
+    {
+        int CurrentTick { get; }
+        void StartTick(int ticksPerSecond, CancellationTokenSource cancellationTokenSource);
+        void StopTick();
     }
 }
