@@ -164,6 +164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _networkConfig: {fileID: 11400000, guid: b7e0e344763e24e639529857dcf51380, type: 2}
+  _gamePlayConfig: {fileID: 11400000, guid: 322d4f0f32b31486db5e8892412642a8, type: 2}
 --- !u!1 &1631379501
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,6 @@
+using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
 {

@@ -237,9 +237,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1064205951}
-  - component: {fileID: 1064205946}
   - component: {fileID: 1064205950}
   - component: {fileID: 1064205949}
+  - component: {fileID: 1064205952}
   m_Layer: 7
   m_Name: WorldCamera
   m_TagString: MainCamera
@@ -247,29 +247,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1064205946
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1064205945}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74e031c7ba37c4910bdd3fe85f20228a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _distanceToTarget: 21.26
-  _distanceToTargetDamping: 4
-  _heightAboveTarget: 7.7
-  _heightAboveTargetDamping: 4
-  _viewRotationAngle: 43.4
-  _viewRotationDamping: 3
-  _offsetFromTarget: {x: 0, y: 0.85, z: -1}
-  _animationDurationInSeconds: 2
-  _startPosition: {x: 1.8, y: 18.5, z: -8}
-  _startRotationEular: {x: 23.6, y: 73.182, z: 3.319}
-  _animationEase: 10
 --- !u!114 &1064205949
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,7 +259,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RenderShadows: 1
+  m_RenderShadows: 0
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
@@ -347,10 +324,10 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 10
   field of view: 30
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 25
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -375,12 +352,24 @@ Transform:
   m_GameObject: {fileID: 1064205945}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1064205952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064205945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74e031c7ba37c4910bdd3fe85f20228a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1100640593
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,6 +440,10 @@ PrefabInstance:
     - target: {fileID: 1270843664138159029, guid: 687149b3e91c440d6897f2cec11e5089, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3616711027219860706, guid: 687149b3e91c440d6897f2cec11e5089, type: 3}
+      propertyPath: m_BlockingMask.m_Bits
+      value: 55
       objectReference: {fileID: 0}
     - target: {fileID: 4476975607311991461, guid: 687149b3e91c440d6897f2cec11e5089, type: 3}
       propertyPath: m_Pivot.x
@@ -619,7 +612,8 @@ MonoBehaviour:
   _audioService: {fileID: 1251148517}
   _loadingScreenView: {fileID: 1909928554}
   _uiCameraView: {fileID: 2130148136}
-  _worldCameraView: {fileID: 1064205946}
+  _worldCameraView: {fileID: 1064205952}
+  _networkConfig: {fileID: 11400000, guid: b7e0e344763e24e639529857dcf51380, type: 2}
 --- !u!1 &2079734857
 GameObject:
   m_ObjectHideFlags: 0
@@ -731,7 +725,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RenderShadows: 1
+  m_RenderShadows: 0
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 1
@@ -796,10 +790,10 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 10
   field of view: 30
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 25
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
@@ -824,7 +818,7 @@ Transform:
   m_GameObject: {fileID: 2130148126}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.4899902, z: -4.83}
+  m_LocalPosition: {x: 0, y: 0, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.ClientToServerModels;
-using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 

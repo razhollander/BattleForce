@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using LiteNetLib;
@@ -18,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         private NetPacketProcessor _packetProcessor;
         private readonly NetworkConfig _networkConfig;
         private readonly IStateMachineService _stateMachineService;
-        private readonly ServerNetworkTickProcessor _serverNetworkTickProcessor;
+        private readonly ITickProcessor _serverNetworkTickProcessor;
         private readonly ServerPlayersInputListener _serverPlayersInputListener;
         private readonly NetworkS2CPacketsSender _packetsSender;
 

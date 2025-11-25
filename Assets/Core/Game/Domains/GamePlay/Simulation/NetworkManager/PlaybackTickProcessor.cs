@@ -7,11 +7,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
     public class PlaybackTickProcessor : ITickProcessor
     {
         public int CurrentTick { get; private set; }
-        private FixedTimer _fixedTimer;
+        private TimerFixedThreaded _fixedTimer;
 
         public void StartTick(int ticksPerSecond, CancellationTokenSource cancellationTokenSource)
         {
-            _fixedTimer = new FixedTimer(ticksPerSecond, OnTick);
+            _fixedTimer = new TimerFixedThreaded(ticksPerSecond, OnTick);
             _fixedTimer.Start(cancellationTokenSource);
         }
 

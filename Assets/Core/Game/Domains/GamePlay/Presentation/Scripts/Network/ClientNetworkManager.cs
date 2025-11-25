@@ -1,10 +1,11 @@
 using System;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
-using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
+using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
@@ -20,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly NetworkC2SPacketsSender _packetsSender;
         private readonly ClientSimulationStateHandler _simulationStateHandler;
         public event Action OnClientStarted;
-        public ClientNetworkManager(NetworkConfig networkConfig, IStateMachineService stateMachineService)
+        public ClientNetworkManager(NetworkConfig networkConfig, IStateMachineService stateMachineService, IUpdateSubscriptionService updateSubscriptionService)
         {
             _networkConfig = networkConfig;
             _stateMachineService = stateMachineService;
@@ -33,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 AutoRecycle = true,
                 IPv6Enabled = IPv6Mode.Disabled
             };
-            _clientNetworkTickProcessor = new ClientNetworkTickProcessor(_netManager, _simulationStateHandler); 
+            _clientNetworkTickProcessor = new ClientNetworkTickProcessor(_netManager, _simulationStateHandler, updateSubscriptionService); 
         }
 
         public void StartClient()

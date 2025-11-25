@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CoreDomain.Scripts.Services.Logger.Base;
 
-public class FixedTimer
+public class TimerFixedThreaded
 {
     private readonly float _fixedDelta;
     private double _accumulator;
@@ -17,7 +17,7 @@ public class FixedTimer
 
     public float LerpAlpha => (float)_accumulator / _fixedDelta;
 
-    public FixedTimer(int ticksPerSecond, Action onTickAction)
+    public TimerFixedThreaded(int ticksPerSecond, Action onTickAction)
     {
         _fixedDelta = 1.0f / ticksPerSecond;
         _stopwatch = new Stopwatch();

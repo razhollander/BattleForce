@@ -166,6 +166,7 @@ MonoBehaviour:
   _postProcessVolume: {fileID: 831192775}
   _chooseNetworkRoleUIView: {fileID: 1745409692}
   _networkConfig: {fileID: 11400000, guid: b7e0e344763e24e639529857dcf51380, type: 2}
+  _playerViewPrefab: {fileID: 3197719174041810226, guid: 62780855e77504170a719c539f4d7be9, type: 3}
 --- !u!1 &831192774
 GameObject:
   m_ObjectHideFlags: 0

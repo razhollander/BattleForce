@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Audio;
 using CoreDomain.Scripts.Mvc.LoadingScreen;
 using CoreDomain.Scripts.Services.AudioService;
@@ -17,16 +18,18 @@ namespace CoreDomain.Scripts.CoreInitiator
         private IAudioService _audioService;
         private ILoadingScreenController _loadingScreenController;
         private CoreAudioClipsScriptableObject _coreAudioClipsScriptableObject;
+        private NetworkConfig _networkConfig;
 
         [Inject]
         private void Setup(GameInputActions gameInputActions, ISceneLoaderService sceneLoaderService, IAudioService audioService, ILoadingScreenController loadingScreenController,
-            CoreAudioClipsScriptableObject coreAudioClipsScriptableObject)
+            CoreAudioClipsScriptableObject coreAudioClipsScriptableObject, NetworkConfig networkConfig)
         {
             _gameInputActions = gameInputActions;
             _sceneLoaderService = sceneLoaderService;
             _audioService = audioService;
             _loadingScreenController = loadingScreenController;
             _coreAudioClipsScriptableObject = coreAudioClipsScriptableObject;
+            _networkConfig = networkConfig;
         }
 
         private void Start()
@@ -62,8 +65,9 @@ namespace CoreDomain.Scripts.CoreInitiator
         private void UpdateApplicationSettings()
         {
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = _networkConfig.TicksPerSeconds;
             Application.runInBackground = true;
+            Time.fixedDeltaTime = 1f / _networkConfig.TicksPerSeconds;
         }
 
         private void InitializeServices()

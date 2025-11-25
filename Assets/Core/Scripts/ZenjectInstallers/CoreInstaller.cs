@@ -1,3 +1,4 @@
+using Core.Scripts.Network;
 using Core.Scripts.Services.ApplicationSubscriptionService;
 using CoreDomain.Scripts.Audio;
 using CoreDomain.Scripts.Mvc.LoadingScreen;
@@ -28,10 +29,12 @@ namespace CoreDomain.Scripts.ZenjectInstallers
         [SerializeField] private LoadingScreenView _loadingScreenView;
         [SerializeField] private UICameraView _uiCameraView;
         [SerializeField] private WorldCameraView _worldCameraView;
+        [SerializeField] private NetworkConfig _networkConfig;
 
         public override void InstallBindings()
         {
             Container.BindInterfacesTo<UnityLogger>().AsSingle().NonLazy();
+            Container.BindInstance(_networkConfig).AsSingle().NonLazy();
             Container.BindInterfacesTo<SceneLoaderService>().AsSingle().NonLazy();
             Container.BindInterfacesTo<AddressablesLoaderService>().AsSingle().NonLazy();
             Container.BindInterfacesTo<ResourcesLoaderService>().AsSingle().NonLazy();

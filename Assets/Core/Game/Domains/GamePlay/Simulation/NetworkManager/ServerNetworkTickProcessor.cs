@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private readonly IServerPlayersInputListener _serverPlayersInputListener;
         private readonly IStateMachineService _stateMachineService;
 
-        private FixedTimer _fixedTimer;
+        private TimerFixedThreaded _fixedTimer;
         private NetworkStateSimulator _networkStateSimulator;
 
         public ServerNetworkTickProcessor(NetManager netManager, IServerPlayersInputListener serverPlayersInputListener)
@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         public void StartTick(int ticksPerSecond, CancellationTokenSource cancellationTokenSource)
         {
-            _fixedTimer = new FixedTimer(ticksPerSecond, OnTick);
+            _fixedTimer = new TimerFixedThreaded(ticksPerSecond, OnTick);
             _fixedTimer.Start(cancellationTokenSource);
         }
         

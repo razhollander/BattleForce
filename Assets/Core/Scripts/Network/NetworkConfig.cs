@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
+namespace Core.Scripts.Network
 {
     [CreateAssetMenu(fileName = "NetworkConfig", menuName = "BF/Network/Network Config")]
     public class NetworkConfig : ScriptableObject

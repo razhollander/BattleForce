@@ -1,11 +1,12 @@
+using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
-using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
+using Core.Scripts.Network;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Zenject;
@@ -16,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
     {
         [SerializeField] private Volume _postProcessVolume;
         [SerializeField] private ChooseNetworkRoleUIView _chooseNetworkRoleUIView;
-        [SerializeField] private NetworkConfig _networkConfig;
+        [SerializeField] private PlayerView _playerViewPrefab;
 
         public override void InstallBindings()
         {
@@ -32,9 +33,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
         private void BindServices()
         {
             Container.Bind<IGamePlayInitiator>().To<GamePlayInitiator>().AsSingle().NonLazy();
-            Container.Bind<IClientNetworkManager>().To<ClientNetworkManager>().AsSingle().WithArguments(_networkConfig).NonLazy();
+            Container.Bind<IClientNetworkManager>().To<ClientNetworkManager>().AsSingle().NonLazy();
             Container.Bind<IPlayerJoinPacketsHandler>().To<PlayerJoinPacketsHandler>().AsSingle().NonLazy();
-            Container.Bind<IMatchDataService>().To<MatchDataService>().AsSingle().WithArguments(_networkConfig).NonLazy();
+            Container.Bind<IMatchDataService>().To<MatchDataService>().AsSingle().NonLazy();
             //Container.Bind<INetworkManager>().To<INetworkManager>().AsSingle().NonLazy();
         }
 
@@ -42,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
         {
             Container.BindInterfacesTo<GameInputActionsController>().AsSingle().NonLazy();
             Container.BindInterfacesTo<ChooseNetworkRoleUIController>().AsSingle().WithArguments(_chooseNetworkRoleUIView).NonLazy();
+            Container.BindInterfacesTo<PlayerControllers>().AsSingle().WithArguments(_playerViewPrefab).NonLazy();
             //Container.BindInterfacesTo<NetworkManager>().AsSingle().WithArguments(_networkConfig).NonLazy();
             // Container.BindInterfacesTo<BFNetworkClient>().AsSingle().NonLazy();
             // Container.BindInterfacesTo<BFNetworkServer>().AsSingle().NonLazy();

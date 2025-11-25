@@ -1,10 +1,8 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using Core.Game.Domains.GamePlay.Shared.C2SModels;
-using Core.Game.Domains.GamePlay.Shared.ClientToServerModels;
+using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
-using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -27,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         
         private void RegisterAutoSerializedTypes()
         {
-            _packetProcessor.RegisterNestedType((w, v) => w.Put(v), r => r.GetVector2());
+            _packetProcessor.RegisterNestedType<Vector2>((w, v) => w.Put(v), r => r.GetVector2());
         }
 
         public void SubscribeNetSerializable<T, TUserData>(
