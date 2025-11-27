@@ -1,7 +1,11 @@
 namespace CoreDomain.Scripts.Services.UpdateService
 {
-    public interface IFixedUpdatable
+    public interface IClientNetworkTickProcessor
     {
-        void ManagedFixedUpdate();
+    }
+
+    public interface IFixedUpdatable : IClientNetworkTickProcessor
+    {
+        public void ManagedFixedUpdate();
     }
 }

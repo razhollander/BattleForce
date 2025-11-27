@@ -1,8 +1,8 @@
 using System;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
-using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
-using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using CoreDomain.Scripts.Services.UpdateService;
@@ -17,14 +17,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly NetManager _netManager;
         private readonly NetworkConfig _networkConfig;
         private readonly IStateMachineService _stateMachineService;
-        private readonly ClientNetworkTickProcessor _clientNetworkTickProcessor;
+        private readonly ICommandFactory _commandFactory;
         private readonly NetworkC2SPacketsSender _packetsSender;
         private readonly ClientSimulationStateHandler _simulationStateHandler;
-        public event Action OnClientStarted;
-        public ClientNetworkManager(NetworkConfig networkConfig, IStateMachineService stateMachineService, IUpdateSubscriptionService updateSubscriptionService)
+        public bool IsPeerConnected { get; private set; }
+
+        public ClientNetworkManager(NetworkConfig networkConfig, IStateMachineService stateMachineService, ICommandFactory commandFactory)
         {
             _networkConfig = networkConfig;
             _stateMachineService = stateMachineService;
+            _commandFactory = commandFactory;
             var packetProcessor = new NetPacketProcessor();
             _packetsListener = new NetworkS2CPacketsListener(packetProcessor);
             _simulationStateHandler = new ClientSimulationStateHandler(_packetsListener);
@@ -34,7 +36,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 AutoRecycle = true,
                 IPv6Enabled = IPv6Mode.Disabled
             };
-            _clientNetworkTickProcessor = new ClientNetworkTickProcessor(_netManager, _simulationStateHandler, updateSubscriptionService); 
         }
 
         public void StartClient()
@@ -48,15 +49,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _netManager.Start();
             //_packetsListener.RegisterListeners();
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
-            _clientNetworkTickProcessor.StartTick(_networkConfig.TicksPerSeconds, _stateMachineService.CurrentState().CancellationTokenSource);
             _netManager.Connect(_networkConfig.IpAddress, _networkConfig.Port, _networkConfig.ConntectionKey);
-            OnClientStarted?.Invoke();
         }
 
         private void OnServerPeerReceived(NetPeer peerToServer)
         {
             _packetsSender.SetPeer(peerToServer);
-            _packetsSender.SendPacketSerialized(PacketTypeC2S.JoinRequest, new JoinRequestPacketC2S { UserName = "RazPlayer" }, DeliveryMethod.ReliableOrdered);
+            _commandFactory.CreateCommandVoid<HandleClientConnectedToPeerCommand>();
+            IsPeerConnected = true;
         }
 
         // public void SubscribeReusable<T>(Action<T> onReceive) where T : class, new()
@@ -89,12 +89,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             _packetsListener.RemoveSubscription<T>();
         }
-        
+
+        public void PollEvents()
+        {
+            _netManager.PollEvents();
+        }
+
         public void InitExitPoint()
         {
             _netManager.Stop();
             _packetsListener.OnPeerConnected -= OnServerPeerReceived;
-            _clientNetworkTickProcessor.StopTick();
         }
     }
 }

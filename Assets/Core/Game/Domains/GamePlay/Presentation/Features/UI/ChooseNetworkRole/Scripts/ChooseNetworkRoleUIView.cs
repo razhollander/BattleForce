@@ -29,5 +29,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
         {
             _onHostClicked?.Invoke();
         }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+        }
     }
 }

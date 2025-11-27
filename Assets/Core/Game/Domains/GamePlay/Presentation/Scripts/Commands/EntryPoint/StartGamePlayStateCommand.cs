@@ -2,6 +2,7 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using CoreDomain.GameDomain.Scripts.States.GamePlayState;
 using CoreDomain.Scripts.Mvc.WorldCamera;
@@ -20,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private IChooseNetworkRoleUIController _chooseNetworkRoleUIController;
         private IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
         private IPlayerControllers _playerControllers;
+        private ITickProcessor _tickProcessor;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -37,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
             _chooseNetworkRoleUIController = _diContainer.Resolve<IChooseNetworkRoleUIController>();
             _playerControllers = _diContainer.Resolve<IPlayerControllers>();
+            _tickProcessor = _diContainer.Resolve<ITickProcessor>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -44,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             //_audioService.PlayAudio(AudioClipType.GamePlayBGMusic, AudioChannelType.Master, AudioPlayType.Loop);
             _gameInputActionsController.EnableInputs();
             _chooseNetworkRoleUIController.InitEntryPoint();
+            _tickProcessor.InitEntryPoint();
             _playerControllers.InitEntryPoint();
         }
     }

@@ -36,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
             Container.Bind<IClientNetworkManager>().To<ClientNetworkManager>().AsSingle().NonLazy();
             Container.Bind<IPlayerJoinPacketsHandler>().To<PlayerJoinPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IMatchDataService>().To<MatchDataService>().AsSingle().NonLazy();
+            Container.Bind<ITickProcessor>().To<ClientNetworkTickProcessor>().AsSingle().NonLazy();
             //Container.Bind<INetworkManager>().To<INetworkManager>().AsSingle().NonLazy();
         }
 

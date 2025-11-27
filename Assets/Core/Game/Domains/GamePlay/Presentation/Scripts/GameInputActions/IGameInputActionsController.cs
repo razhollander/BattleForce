@@ -9,7 +9,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         void DisableInputs();
         void RegisterAllInputListeners();
         void UnregisterAllInputListeners();
-        bool IsMovementInputPressed();
+        bool IsMoveLeftInputPressed();
+        bool IsMoveRightInputPressed();
+        bool IsShootInputPressed();
         Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui);
     }
 }

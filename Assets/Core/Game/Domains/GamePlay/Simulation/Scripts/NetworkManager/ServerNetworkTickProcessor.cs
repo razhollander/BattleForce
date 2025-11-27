@@ -1,52 +1,77 @@
 using System;
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Shared.NetworkManager;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
-using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
+namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 {
-    public class ClientNetworkTickProcessor : IFixedUpdatable
+    public class ServerNetworkTickProcessor : ITickProcessor
     {
-        public int CurrentTick;
+        public int CurrentTick { get; private set; }
 
-        private readonly NetManager _netManager;
-        private readonly ClientSimulationStateHandler _clientSimulationStateHandler;
-        private readonly IUpdateSubscriptionService _updateSubscriptionService;
+        private readonly NetworkConfig _networkConfig;
+        private readonly IServerNetworkManager _networkManager;
+
+        //private readonly IServerPlayersInputListener _serverPlayersInputListener;
+
         private readonly IStateMachineService _stateMachineService;
 
         private TimerFixedThreaded _fixedTimer;
 
-        public ClientNetworkTickProcessor(NetManager netManager , ClientSimulationStateHandler clientSimulationStateHandler, IUpdateSubscriptionService updateSubscriptionService)
+        private NetworkStateSimulator _networkStateSimulator;
+
+        public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager, IStateMachineService stateMachineService)
         {
-            _netManager = netManager;
-            _clientSimulationStateHandler = clientSimulationStateHandler;
-            _updateSubscriptionService = updateSubscriptionService;
+            _networkConfig = networkConfig;
+            _networkManager = networkManager;
+            //_serverPlayersInputListener = serverPlayersInputListener;
         }
 
-        public void StartTick(int ticksPerSecond, CancellationTokenSource cancellationTokenSource)
+        public void InitEntryPoint()
         {
-            _updateSubscriptionService.RegisterFixedUpdatable(this);
-            // _fixedTimer = new TimerFixedThreaded(ticksPerSecond, OnTick);
-            // _fixedTimer.Start(cancellationTokenSource);
-        }
-        
-        public void StopTick()
-        {
-            _updateSubscriptionService.UnregisterFixedUpdatable(this);
+            StartTick();
         }
 
-        public void ManagedFixedUpdate()
+        private void StartTick()
         {
-            CurrentTick++;
-            _netManager.PollEvents();
-            var SimulationStateForCurrentTick = _clientSimulationStateHandler.GetSortedStates(CurrentTick);
+            var cancellationTokenSource = new CancellationTokenSource();
+            _fixedTimer = new TimerFixedThreaded(_networkConfig.TicksPerSeconds, OnTick);
+            _fixedTimer.Start(cancellationTokenSource/*_stateMachineService.CurrentState().CancellationTokenSource*/);
+        }
+
+        public void InitExitPoint()
+        {
+            StopTick();
+        }
+
+        private void StopTick()
+        {
+            _fixedTimer.Stop();
         }
 
         private void OnTick()
         {
-            
+            try
+            {
+                CurrentTick++;
+                _networkManager.PollEvents();
+                //ProccesEvents();
+                //Move1Tick(); // only velocities
+                //Simulation.Step();//check collisions
+                //ProcessCollisions();
+                //SendCurrentTickStateToAllClients();
+                //var inputsPerPlayerForCurrentTick = _serverPlayersInputListener.GetSortedInputsPerPlayerForTick(CurrentTick); 
+            }
+            catch (Exception e)
+            {
+                LogService.LogError("Got error! " + e.ToString());
+                throw;
+            }
+          
             // Pass inputs to Simulator and update Current State
             //_serverState.Tick = CurrentTick;
             // Send current state to all players
@@ -64,62 +89,34 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         }
 
         // private void SendStateToPlayer(ServerPlayer p, int pCount)
-
         // {
-
         //     int statesMax = p.AssociatedPeer.GetMaxSinglePacketSize(DeliveryMethod.Unreliable) - ServerState.HeaderSize;
-
         //     statesMax /= PlayerState.Size;
-
         //         
-
         //     for (int s = 0; s < (pCount-1)/statesMax + 1; s++)
-
         //     {
-
         //         //TODO: divide
-
         //         _serverState.LastProcessedCommand = p.LastProcessedCommandId;
-
         //         _serverState.PlayerStatesCount = pCount;
-
         //         _serverState.StartState = s * statesMax;
-
         //         p.AssociatedPeer.Send(WriteSerializable(PacketType.ServerState, _serverState), DeliveryMethod.Unreliable);
-
         //     }
-
         // }
-
-
+        
         // private NetDataWriter WriteSerializable<T>(PacketType type, T packet) where T : struct, INetSerializable
-
         // {
-
         //     _cachedWriter.Reset();
-
         //     _cachedWriter.Put((byte) type);
-
         //     packet.Serialize(_cachedWriter);
-
         //     return _cachedWriter;
-
         // }
-
         //
-
         // private NetDataWriter WritePacket<T>(T packet) where T : class, new()
-
         // {
-
         //     _cachedWriter.Reset();
-
         //     _cachedWriter.Put((byte) PacketType.Serialized);
-
         //     _packetProcessor.Write(_cachedWriter, packet);
-
         //     return _cachedWriter;
-
         // }
     }
 }

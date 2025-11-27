@@ -19,7 +19,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _playerControllers = playerControllers;
-            _networkManager.OnClientStarted += RegisterListeners;
         }
 
         public void RegisterListeners()
@@ -35,7 +34,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         public void InitExitPoint()
         {
             UnregisterListeners();
-            _networkManager.OnClientStarted -= RegisterListeners;
         }
 
         private void OnJoinAccept(JoinAcceptPacketS2C joinPacketS2C, NetPeer _) // needed netPeer?

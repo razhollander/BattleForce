@@ -7,6 +7,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
     public class PlaybackTickProcessor : ITickProcessor
     {
         public int CurrentTick { get; private set; }
+        public void InitEntryPoint()
+        {
+           // StartTick();
+        }
+
+        public void InitExitPoint()
+        {
+            //throw new NotImplementedException();
+        }
+
         private TimerFixedThreaded _fixedTimer;
 
         public void StartTick(int ticksPerSecond, CancellationTokenSource cancellationTokenSource)

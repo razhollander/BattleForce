@@ -1,0 +1,41 @@
+using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Shared.C2SModels;
+using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
+using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
+using LiteNetLib;
+
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
+{
+    public class SendInputsToServerCommand : BaseCommand, ICommandVoid
+    {
+        private IClientNetworkManager _clientNetworkManager;
+        private IGameInputActionsController _gameInputActionsController;
+        private ITickProcessor _tickProcessor;
+
+        public override void ResolveDependencies()
+        {
+             _clientNetworkManager = _diContainer.Resolve<IClientNetworkManager>();
+             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
+             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
+        }
+
+        public void Execute()
+        {
+            var isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
+            var isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
+            var isShootInputPressed = _gameInputActionsController.IsShootInputPressed();
+            LogService.Log($"Sending: isMoveRightInputPressed:{isMoveRightInputPressed},isMoveLeftInputPressed:{isMoveLeftInputPressed},isShootInputPressed:{isShootInputPressed}");
+            var playerInputPacket = new PlayerInputPacketC2S
+            {
+                Tick = _tickProcessor.CurrentTick,
+                IsMoveLeftInputPressed = isMoveLeftInputPressed,
+                IsMoveRightInputPressed = isMoveRightInputPressed,
+                IsShootInputPressed = isShootInputPressed
+            };
+            
+            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.PlayerInput, playerInputPacket, DeliveryMethod.Sequenced);
+        }
+    }
+}

@@ -21,5 +21,6 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         void SendPacketSerializedOnlyToPlayer<T>(PacketTypeS2C type, T packet, int playerId, DeliveryMethod deliveryMethod) where T : INetSerializable;
         void RemoveSubscription<T>();
         void AddPlayerPeer(int playerId, NetPeer peer);
+        void PollEvents();
     }
 }

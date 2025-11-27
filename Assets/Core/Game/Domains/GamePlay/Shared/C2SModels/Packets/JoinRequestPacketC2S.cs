@@ -1,8 +1,8 @@
 using LiteNetLib.Utils;
 
-namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
+namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 {
-    public class JoinRequestPacketC2S: INetSerializable
+    public class JoinRequestPacketC2S : INetSerializable
     {
         public string UserName { get; set; }
         

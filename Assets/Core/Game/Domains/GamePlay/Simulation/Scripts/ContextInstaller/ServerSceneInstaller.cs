@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<IServerNetworkManager>().To<ServerNetworkManager>().AsSingle().NonLazy();
             Container.Bind<IPlayerJoinPacketsHandler>().To<PlayerJoinPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IMatchDataService>().To<MatchDataService>().AsSingle().NonLazy();
+            Container.Bind<ITickProcessor>().To<ServerNetworkTickProcessor>().AsSingle().NonLazy();
         }
     }
 }

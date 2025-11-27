@@ -1,7 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
+using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.SceneService;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
@@ -14,13 +16,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
         private readonly ISceneLoaderService _sceneLoaderService;
         private readonly IStateMachineService _stateMachineService;
         private readonly IClientNetworkManager _clientNetworkManager;
+        private readonly IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
 
-        public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService, IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager)
+        public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, IPlayerJoinPacketsHandler playerJoinPacketsHandler)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
             _stateMachineService = stateMachineService;
             _clientNetworkManager = clientNetworkManager;
+            _playerJoinPacketsHandler = playerJoinPacketsHandler;
         }
 
         public void InitEntryPoint()
@@ -43,13 +48,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
 
         private async Awaitable StartServer(ServerInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
         {
+            LogService.LogTopic("Starting Server", LogTopicType.ClientNetwork);
             await _sceneLoaderService.TryLoadScene(SceneType.ServerScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.ServerScene, enterData, cancellationTokenSource);
+            LogService.LogTopic("Finished starting Server", LogTopicType.ClientNetwork);
         }
 
         private void StartClient()
         {
+            LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             _clientNetworkManager.StartClient();
+            _playerJoinPacketsHandler.RegisterListeners();
+            _uiView.Hide();
+            LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
 
         private void OnClientClicked()
