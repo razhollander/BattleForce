@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -17,15 +18,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
         private readonly IStateMachineService _stateMachineService;
         private readonly IClientNetworkManager _clientNetworkManager;
         private readonly IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
+        private readonly ISimulationStatePacketsHandler _simulationStatePacketsHandler;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, IPlayerJoinPacketsHandler playerJoinPacketsHandler)
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, IPlayerJoinPacketsHandler playerJoinPacketsHandler, ISimulationStatePacketsHandler simulationStatePacketsHandler)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
             _stateMachineService = stateMachineService;
             _clientNetworkManager = clientNetworkManager;
             _playerJoinPacketsHandler = playerJoinPacketsHandler;
+            _simulationStatePacketsHandler = simulationStatePacketsHandler;
         }
 
         public void InitEntryPoint()
@@ -59,6 +62,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             _clientNetworkManager.StartClient();
             _playerJoinPacketsHandler.RegisterListeners();
+            _simulationStatePacketsHandler.RegisterListeners();
             _uiView.Hide();
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }

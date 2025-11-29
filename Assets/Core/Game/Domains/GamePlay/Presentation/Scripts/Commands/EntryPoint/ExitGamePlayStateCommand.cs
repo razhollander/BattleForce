@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using CoreDomain.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private IAudioService _audioService;
         private IClientNetworkManager _clientNetworkManager;
         private IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
+        private ISimulationStatePacketsHandler _simulationStatePacketsHandler;
 
         public override void ResolveDependencies()
         {
@@ -21,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _audioService = _diContainer.Resolve<IAudioService>();
             _clientNetworkManager = _diContainer.Resolve<IClientNetworkManager>();
             _playerJoinPacketsHandler = _diContainer.Resolve<IPlayerJoinPacketsHandler>();
+            _simulationStatePacketsHandler = _diContainer.Resolve<ISimulationStatePacketsHandler>();
         }
 
         public void Execute()
@@ -30,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             //_commandFactory.CreateCommandVoid<DisposeLevelCommand>().SetShouldReleaseAssetsFromMemory(true).Execute();
             _gameInputActionsController.DisableInputs();
             _playerJoinPacketsHandler.InitExitPoint();
+            _simulationStatePacketsHandler.InitExitPoint();
             //_gamePlayUiController.InitExitPoint();
         }
     }

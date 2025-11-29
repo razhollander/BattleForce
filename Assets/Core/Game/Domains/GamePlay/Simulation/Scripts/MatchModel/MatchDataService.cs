@@ -1,3 +1,4 @@
+using System.Linq;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
@@ -7,26 +8,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 {
     public class MatchDataService : IMatchDataService
     {
-        public MatchPlayerModel[] Players { get; private set; }
-        public int PlayersCount { get; private set; }
-        public MatchPlayerModel LocalPlayer { get; private set; }
+        private SimulationStateS2C _simulationState;
+        public SimulationStateS2C SimulationState => _simulationState;
 
         public MatchDataService(NetworkConfig networkConfig)
         {
-            Players = new MatchPlayerModel[networkConfig.MaxConnectedPlayers];
+            _simulationState = new SimulationStateS2C();
+            _simulationState.Players = new PlayerStateS2C[networkConfig.MaxConnectedPlayers];
+            _simulationState.Bullets = new PlayerBulletS2C[networkConfig.MaxConcurrentBullets];
         }
 
-        public MatchPlayerModel AddPlayer(string playerName, PlayerTransformStateS2C playerTransformStateS2C)
+        public PlayerStateS2C AddPlayer(string playerName, PlayerTransformStateS2C playerTransformStateS2C, int health, float shootCooldown)
         {
-            var newPlayer = new MatchPlayerModel(PlayersCount, playerName, playerTransformStateS2C);
-            Players[PlayersCount] = newPlayer;
-            PlayersCount++;
+            var playerSpaceship = new PlayerSpaceshipStateS2C(playerTransformStateS2C, shootCooldown, health);
+            var playersCount = _simulationState.PlayersCount;
+            var newPlayer = new PlayerStateS2C(playersCount, playerName, playerSpaceship);
+            _simulationState.Players[playersCount] = newPlayer;
+            _simulationState.PlayersCount++;
             return newPlayer;
         }
 
-        public void SetLocalPlayer(MatchPlayerModel matchPlayerModel)
+        public PlayerStateS2C GetPlayer(int playerId)
         {
-            LocalPlayer = matchPlayerModel;
+            return _simulationState.Players.First(x => x.Id == playerId);
         }
     }
 }

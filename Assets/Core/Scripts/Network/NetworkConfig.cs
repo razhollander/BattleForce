@@ -6,7 +6,9 @@ namespace Core.Scripts.Network
     public class NetworkConfig : ScriptableObject
     {
         public int MaxConnectedPlayers = 8;
+        public int MaxConcurrentBullets = 256;
         public int TicksPerSeconds = 60;
+        public float DeltaTime = 1/60f;
         public int Port = 7777;
         public string IpAddress = "localhost";
         public string ConntectionKey = "BattleForceGame";

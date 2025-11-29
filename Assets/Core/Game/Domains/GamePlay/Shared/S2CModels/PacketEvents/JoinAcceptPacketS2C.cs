@@ -5,22 +5,25 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
 {
     public class JoinAcceptPacketS2C : INetSerializable
     {
+        public int TickOnServer { get; set; }
         public int PlayerId { get; set; }
         public string PlayerName { get; set; }
-        public PlayerTransformStateS2C PlayerTransform { get; set; }
+        public PlayerSpaceshipStateS2C SpaceshipState { get; set; }
 
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put(TickOnServer);
             writer.Put((byte)PlayerId);
             writer.Put(PlayerName);
-            PlayerTransform.Serialize(writer);
+            SpaceshipState.Serialize(writer);
         }
 
         public void Deserialize(NetDataReader reader)
         {
+            TickOnServer = reader.GetInt();
             PlayerId = reader.GetByte();
             PlayerName = reader.GetString();
-            PlayerTransform.Deserialize(reader);
+            SpaceshipState.Deserialize(reader);
         }
     }
 }

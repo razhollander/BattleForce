@@ -11,8 +11,10 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         void InitEntryPoint();
         void InitExitPoint();
 
-        public void SubscribeNetSerializable<T, TUserData>(
-            Action<T, TUserData> onReceive) where T : INetSerializable, new();
+        public void SubscribeNetSerializable<T>(
+            Action<T, int> onReceive) where T : INetSerializable, new();
+        public void SubscribeNetSerializable<T>(
+            Action<T, NetPeer> onReceive) where T : INetSerializable, new();
         //void SubscribeReusable<T>(Action<T> onReceive) where T : class, new();
       //  void SubscribeReusable<T, TUserData>(Action<T, TUserData> onReceive) where T : class, new();
         // void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new();

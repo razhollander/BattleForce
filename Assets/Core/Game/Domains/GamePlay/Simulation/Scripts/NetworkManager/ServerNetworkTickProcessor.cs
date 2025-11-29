@@ -1,7 +1,11 @@
 using System;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
+using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -15,6 +19,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         private readonly NetworkConfig _networkConfig;
         private readonly IServerNetworkManager _networkManager;
+        private readonly IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
+        private readonly IMatchDataService _matchDataService;
 
         //private readonly IServerPlayersInputListener _serverPlayersInputListener;
 
@@ -24,10 +30,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         private NetworkStateSimulator _networkStateSimulator;
 
-        public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager, IStateMachineService stateMachineService)
+        public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
+            IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
+            _playerInputsPacketsHandler = playerInputsPacketsHandler;
+            _matchDataService = matchDataService;
             //_serverPlayersInputListener = serverPlayersInputListener;
         }
 
@@ -59,11 +68,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             {
                 CurrentTick++;
                 _networkManager.PollEvents();
+                _playerInputsPacketsHandler.ProcessInputsInTick(CurrentTick);
                 //ProccesEvents();
                 //Move1Tick(); // only velocities
                 //Simulation.Step();//check collisions
                 //ProcessCollisions();
-                //SendCurrentTickStateToAllClients();
+                SendCurrentTickStateToAllClients();
                 //var inputsPerPlayerForCurrentTick = _serverPlayersInputListener.GetSortedInputsPerPlayerForTick(CurrentTick); 
             }
             catch (Exception e)
@@ -86,6 +96,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             //         SendStateToPlayer(p, pCount);
             //     }
             // }
+        }
+
+        private void SendCurrentTickStateToAllClients()
+        {
+            var packet = _matchDataService.SimulationState;
+            packet.Tick = CurrentTick;
+            _networkManager.SendPacketSerialized(PacketTypeS2C.SimulationState, packet, DeliveryMethod.Sequenced);
         }
 
         // private void SendStateToPlayer(ServerPlayer p, int pCount)

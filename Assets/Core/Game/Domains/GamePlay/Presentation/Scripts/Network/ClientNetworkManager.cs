@@ -19,7 +19,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly IStateMachineService _stateMachineService;
         private readonly ICommandFactory _commandFactory;
         private readonly NetworkC2SPacketsSender _packetsSender;
-        private readonly ClientSimulationStateHandler _simulationStateHandler;
         public bool IsPeerConnected { get; private set; }
 
         public ClientNetworkManager(NetworkConfig networkConfig, IStateMachineService stateMachineService, ICommandFactory commandFactory)
@@ -29,7 +28,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _commandFactory = commandFactory;
             var packetProcessor = new NetPacketProcessor();
             _packetsListener = new NetworkS2CPacketsListener(packetProcessor);
-            _simulationStateHandler = new ClientSimulationStateHandler(_packetsListener);
             _packetsSender = new NetworkC2SPacketsSender(packetProcessor);
             _netManager = new NetManager(_packetsListener)
             {

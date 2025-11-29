@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Scripts.Extensions;
+using CoreDomain.Scripts.Extensions;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
@@ -22,7 +23,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             _playerView = Object.Instantiate(playerViewPrefab, parent);
             _playerView.name = "Player_" + PlayerId;
-            _playerView.SetPositionAndRotation(playerModel.TransformState.CurrentPosition.ToUnity(), playerModel.TransformState.CurrentRotationAngle.AngleToQuaternion());
+            var playerTransform = playerModel.Spaceship.Transform;
+            _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),
+                playerTransform.RotationVector.ToUnityVector2().ToQuaternion());
         }
     }
 }

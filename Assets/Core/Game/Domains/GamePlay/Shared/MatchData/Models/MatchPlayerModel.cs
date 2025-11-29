@@ -6,13 +6,13 @@ namespace Core.Game.Domains.GamePlay.Shared
     {
         public int PlayerId;
         public string PlayerName;
-        public PlayerTransformStateS2C TransformState;
+        public PlayerSpaceshipStateS2C Spaceship;
 
-        public MatchPlayerModel(int playerId, string playerName, PlayerTransformStateS2C transformStateS2C)
+        public MatchPlayerModel(int playerId, string playerName, PlayerSpaceshipStateS2C spaceship)
         {
             PlayerId = playerId;
             PlayerName = playerName;
-            TransformState = transformStateS2C;
+            Spaceship = spaceship;
         }
     }
 }

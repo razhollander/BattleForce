@@ -18,17 +18,13 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         private NetManager _netManager;
         private NetPacketProcessor _packetProcessor;
         private readonly NetworkConfig _networkConfig;
-        private readonly IStateMachineService _stateMachineService;
-        private readonly ServerPlayersInputListener _serverPlayersInputListener;
         private readonly NetworkS2CPacketsSender _packetsSender;
 
-        public ServerNetworkManager(NetworkConfig networkConfig, IStateMachineService stateMachineService)
+        public ServerNetworkManager(NetworkConfig networkConfig)
         {
             _networkConfig = networkConfig;
-            _stateMachineService = stateMachineService;
             _packetProcessor = new NetPacketProcessor();
             _networkC2SPacketsListener = new NetworkC2SPacketsListener(_packetProcessor, _networkConfig);
-            _serverPlayersInputListener = new ServerPlayersInputListener(_networkC2SPacketsListener);
             _netManager = new NetManager(_networkC2SPacketsListener) { AutoRecycle = true };
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
@@ -65,10 +61,16 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         //     _packetProcessor.SubscribeReusable(onReceive);
         // }
         
-        public void SubscribeNetSerializable<T, TUserData>(
-            Action<T, TUserData> onReceive) where T : INetSerializable, new()
+        public void SubscribeNetSerializable<T>(
+            Action<T, NetPeer> onReceive) where T : INetSerializable, new()
         {
             _packetProcessor.SubscribeNetSerializable(onReceive);
+        }
+        
+        public void SubscribeNetSerializable<T>(
+            Action<T, int> onReceive) where T : INetSerializable, new()
+        {
+            _packetProcessor.SubscribeNetSerializable<T, NetPeer>((t, peer) => onReceive(t, (int)peer.Tag));
         }
 
         // public void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new()

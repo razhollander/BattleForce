@@ -4,6 +4,11 @@ namespace CoreDomain.Scripts.Extensions
 {
     public static class VectorExtensions
     {
+        public static Vector2 ToUnityVector2(this System.Numerics.Vector2 vec)
+        {
+            return new Vector2(vec.X, vec.Y);
+        }
+        
         public static Vector2 ToVector2XY(this Vector3 vec)
         {
             return new Vector2(vec.x, vec.y);
@@ -14,9 +19,27 @@ namespace CoreDomain.Scripts.Extensions
             return new Vector2(vec.x, vec.z);
         }
         
-        public static Vector2 Rotate(this Vector2 v, float degrees)
+        public static Vector2 Rotate(this Vector2 direction, float degrees)
         {
-            return Quaternion.Euler(0, 0, degrees) * v;
+            return Quaternion.Euler(0, 0, degrees) * direction;
+        }
+        
+        public static System.Numerics.Vector2 Rotate(this System.Numerics.Vector2 direction, float degrees)
+        {
+            var rad = degrees * Mathf.Deg2Rad;
+            var sin = Mathf.Sin(rad);
+            var cos = Mathf.Cos(rad);
+
+            return new System.Numerics.Vector2(
+                direction.X * cos - direction.Y * sin,
+                direction.X * sin + direction.Y * cos
+            );
+        }
+
+        
+        public static Quaternion ToQuaternion(this Vector2 direction)
+        {
+            return Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
         }
     }
 }

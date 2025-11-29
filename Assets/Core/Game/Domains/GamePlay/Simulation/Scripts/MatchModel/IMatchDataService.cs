@@ -6,9 +6,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 {
     public interface IMatchDataService 
     {
-        MatchPlayerModel[] Players { get; }
-        MatchPlayerModel LocalPlayer { get; }
-        MatchPlayerModel AddPlayer(string playerName, PlayerTransformStateS2C playerTransformStateS2C);
-        void SetLocalPlayer(MatchPlayerModel matchPlayerModel);
+        SimulationStateS2C SimulationState { get; }
+        PlayerStateS2C AddPlayer(string playerName, PlayerTransformStateS2C playerTransformStateS2C, int health,
+            float shootCooldown);
+
+        PlayerStateS2C GetPlayer(int playerId);
     }
 }

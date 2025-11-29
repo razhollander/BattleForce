@@ -26,20 +26,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _networkManager.SubscribeNetSerializable<JoinAcceptPacketS2C, NetPeer>(OnJoinAccept);
         }
 
-        public void UnregisterListeners()
-        {
-            _networkManager.RemoveSubscription<JoinAcceptPacketS2C>();
-        }
-
         public void InitExitPoint()
         {
             UnregisterListeners();
         }
 
+        private void UnregisterListeners()
+        {
+            _networkManager.RemoveSubscription<JoinAcceptPacketS2C>();
+        }
+
         private void OnJoinAccept(JoinAcceptPacketS2C joinPacketS2C, NetPeer _) // needed netPeer?
         {
             LogService.LogTopic("Join packet accepted received, player id: " + joinPacketS2C.PlayerId, LogTopicType.ClientNetwork);
-            var playerModel = _matchDataService.AddPlayer(joinPacketS2C.PlayerId, joinPacketS2C.PlayerName, joinPacketS2C.PlayerTransform);
+            var playerModel = _matchDataService.AddPlayer(joinPacketS2C.PlayerId, joinPacketS2C.PlayerName, joinPacketS2C.SpaceshipState);
             _matchDataService.SetLocalPlayer(playerModel);
             _playerControllers.CreatePlayer(playerModel.PlayerId);
         }

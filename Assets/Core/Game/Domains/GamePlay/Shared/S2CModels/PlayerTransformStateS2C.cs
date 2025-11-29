@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
@@ -41,6 +42,11 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
                 Bullets[i].Deserialize(reader);
             }
         }
+
+        public PlayerStateS2C GetPlayer(int playerId)
+        {
+            return Players.First(x => x.Id == playerId);
+        }
     }
 
     public struct PlayerStateS2C : INetSerializable
@@ -48,6 +54,13 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
         public int Id;
         public string Name;
         public PlayerSpaceshipStateS2C Spaceship;
+
+        public PlayerStateS2C(int id, string name, PlayerSpaceshipStateS2C spaceship)
+        {
+            Id = id;
+            Name = name;
+            Spaceship = spaceship;
+        }
 
         public void Serialize(NetDataWriter writer)
         {
@@ -68,6 +81,13 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
         public PlayerShootStateS2C Shoot;
         public PlayerHealthS2C Health;
 
+        public PlayerSpaceshipStateS2C(PlayerTransformStateS2C transform, float shootCooldown, int health)
+        {
+            Transform = transform;
+            Shoot = new PlayerShootStateS2C(shootCooldown);
+            Health = new PlayerHealthS2C(health);
+        }
+
         public void Serialize(NetDataWriter writer)
         {
             Transform.Serialize(writer);
@@ -85,37 +105,44 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
 
     public struct PlayerTransformStateS2C : INetSerializable
     {
-        public Vector2 CurrentPosition;
-        public Vector2 CurrentVelocity;
-        public Vector2 CurrentAcceleration;
-        public float CurrentRotationAngle;
-        public float CurrentAngularVelocity;
-        public float CurrentAimAngle;
+        public Vector2 Position;
+        public Vector2 Velocity;
+        public Vector2 Acceleration;
+        public Vector2 RotationVector;
+        public float AngularVelocity;
+        public Vector2 AimVector;
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(CurrentPosition);
-            writer.Put(CurrentVelocity);
-            writer.Put(CurrentAcceleration);
-            writer.Put(CurrentRotationAngle);
-            writer.Put(CurrentAngularVelocity);
-            writer.Put(CurrentAimAngle);
+            writer.Put(Position);
+            writer.Put(Velocity);
+            writer.Put(Acceleration);
+            writer.Put(RotationVector);
+            writer.Put(AngularVelocity);
+            writer.Put(AimVector);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            CurrentPosition = reader.GetVector2();
-            CurrentVelocity = reader.GetVector2();
-            CurrentAcceleration = reader.GetVector2();
-            CurrentRotationAngle = reader.GetFloat();
-            CurrentAngularVelocity = reader.GetFloat();
-            CurrentAimAngle = reader.GetFloat();
+            Position = reader.GetVector2();
+            Velocity = reader.GetVector2();
+            Acceleration = reader.GetVector2();
+            RotationVector = reader.GetVector2();
+            AngularVelocity = reader.GetFloat();
+            AimVector = reader.GetVector2();
         }
     }
 
     public struct PlayerShootStateS2C : INetSerializable
     {
         public float ShootLoadingSecondsLeft;
+        public float ShootCooldown;
+
+        public PlayerShootStateS2C(float shootCooldown)
+        {
+            ShootCooldown = shootCooldown;
+            ShootLoadingSecondsLeft = ShootCooldown;
+        }
 
         public void Serialize(NetDataWriter writer)
         {
@@ -132,6 +159,12 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
     {
         public int MaxHealth;
         public int CurrentHealth;
+
+        public PlayerHealthS2C(int maxHealth) : this()
+        {
+            MaxHealth = maxHealth;
+            CurrentHealth = MaxHealth;
+        }
 
         public void Serialize(NetDataWriter writer)
         {

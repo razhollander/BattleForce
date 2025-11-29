@@ -21,9 +21,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             return Players.Find(x => x.PlayerId == playerId);
         }
 
-        public MatchPlayerModel AddPlayer(int playerId, string playerName, PlayerTransformStateS2C transformState)
+        public MatchPlayerModel AddPlayer(int playerId, string playerName, PlayerSpaceshipStateS2C spaceshipState)
         {
-            var newPlayer = new MatchPlayerModel(playerId, playerName, transformState);
+            var newPlayer = new MatchPlayerModel(playerId, playerName, spaceshipState);
             Players.Add(newPlayer);
             return newPlayer;
         }

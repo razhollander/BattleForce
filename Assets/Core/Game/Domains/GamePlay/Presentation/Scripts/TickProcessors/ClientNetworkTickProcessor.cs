@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.StateMachineService;
 using CoreDomain.Scripts.Services.UpdateService;
@@ -12,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         //private readonly ClientSimulationStateHandler _clientSimulationStateHandler;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ICommandFactory _commandFactory;
+        private readonly ISimulationStatePacketsHandler _simulationStatePacketsHandler;
         private readonly IStateMachineService _stateMachineService;
         private SendInputsToServerCommand _saveInputsToServerCommand;
         private readonly IClientNetworkManager _networkManager;
@@ -20,12 +22,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         public ClientNetworkTickProcessor(IClientNetworkManager networkManager,
             //ClientSimulationStateHandler clientSimulationStateHandler,
-            IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory)
+            IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory, ISimulationStatePacketsHandler simulationStatePacketsHandler)
         {
             _networkManager = networkManager;
             //_clientSimulationStateHandler = clientSimulationStateHandler;
             _updateSubscriptionService = updateSubscriptionService;
             _commandFactory = commandFactory;
+            _simulationStatePacketsHandler = simulationStatePacketsHandler;
         }
 
         public void InitEntryPoint()
@@ -51,15 +54,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             {
                 return;
             }
-            CurrentTick++;
-            //ProccesEvents();
-            //UpdateGameStateView();
+            _simulationStatePacketsHandler.ProcessStateLatestTick();
             SendCurrentTickInputsToServer();
-            //var SimulationStateForCurrentTick = _clientSimulationStateHandler.GetSortedStates(CurrentTick);
         }
 
         private void SendCurrentTickInputsToServer()
         {
+            CurrentTick++;
             _saveInputsToServerCommand.Execute();
         }
 
