@@ -9,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
     public interface IClientNetworkManager
     {
         bool IsPeerConnected { get; }
+        int Ping { get; }
         void StartClient();
         void InitExitPoint();
 

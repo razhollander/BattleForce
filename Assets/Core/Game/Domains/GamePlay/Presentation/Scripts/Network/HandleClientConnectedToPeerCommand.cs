@@ -9,12 +9,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
     public class HandleClientConnectedToPeerCommand : BaseCommand, ICommandVoid
     {
         private IClientNetworkManager _networkManager;
-        private ITickProcessor _tickProcessor;
 
         public override void ResolveDependencies()
         {
             _networkManager = _diContainer.Resolve<IClientNetworkManager>();
-            _tickProcessor = _diContainer.Resolve<ITickProcessor>();
         }
 
         public void Execute()

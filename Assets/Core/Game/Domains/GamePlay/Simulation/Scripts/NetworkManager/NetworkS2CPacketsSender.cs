@@ -28,20 +28,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             }
         }
         
-        public void SendPacketSerializedOnlyToPlayer<T>(PacketTypeS2C type, T packet, int playerId, DeliveryMethod deliveryMethod) where T : INetSerializable
-        {
-            if (_peerPerPlayerId == null)
-            {
-                LogService.LogError("NetPeer is null! Must have a peer to send packets to!");
-                return;
-            }
-            
-            _writer.Reset();
-            _writer.Put((byte)type);
-            packet.Serialize(_writer);
-            LogService.LogTopic($"Send packet {packet.ToJson()}", LogTopicType.ClientNetwork);
-            _peerPerPlayerId[playerId].Send(_writer, deliveryMethod);
-        }
+        // public void SendPacketSerializedOnlyToPlayer<T>(PacketTypeS2C type, T packet, int playerId, DeliveryMethod deliveryMethod) where T : INetSerializable
+        // {
+        //     if (_peerPerPlayerId == null)
+        //     {
+        //         LogService.LogError("NetPeer is null! Must have a peer to send packets to!");
+        //         return;
+        //     }
+        //     
+        //     _writer.Reset();
+        //     _writer.Put((byte)type);
+        //     packet.Serialize(_writer);
+        //     LogService.LogTopic($"Send packet {type}, json: {packet.ToJson()}", LogTopicType.ClientNetwork);
+        //     _peerPerPlayerId[playerId].Send(_writer, deliveryMethod);
+        // }
         
         // public void SendPacketOnlyToPlayer<T>(T packet, DeliveryMethod deliveryMethod, int playerId) where T : class, new()
         // {
@@ -68,8 +68,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             /*_writer.Reset();
             _writer.Put((byte)type);
             packet.Serialize(_writer);*/
-            LogService.LogTopic($"Send packet {packet.ToJson()}", LogTopicType.ServerNetwork);
-            var a = new List<int>();
+            LogService.LogTopic($"Send packet type {type}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
             
             _peerPerPlayerId.ForEach(x => _packetProcessor.SendNetSerializable(x.Value, packet, deliveryMethod));
         }

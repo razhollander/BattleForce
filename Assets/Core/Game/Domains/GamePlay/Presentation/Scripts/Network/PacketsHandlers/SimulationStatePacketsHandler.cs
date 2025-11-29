@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
+using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 
@@ -27,6 +28,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
 
         public void ProcessStateLatestTick()
         {
+            if (_statesPerTIck.IsNullOrEmpty())
+            {
+                return;
+            }
+            
             var latestTickReceivedFromServer = _statesPerTIck.Keys.Max();
             if (latestTickReceivedFromServer <= LatestTickProcessedFromServer)
             {

@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
 {
     public class ServerSceneInstaller : MonoInstaller
     {
-        [SerializeField] private GamePlayConfig _gamePlayConfig;
+        [SerializeField] private SimulationGamePlayConfig _gamePlayConfig;
         
         public override void InstallBindings()
         {

@@ -9,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         List<MatchPlayerModel> Players { get; }
         MatchPlayerModel GetPlayer(int playerId);
         MatchPlayerModel LocalPlayer { get; }
+        bool IsPlayerJoined { get; }
         MatchPlayerModel AddPlayer(int playerId, string playerName, PlayerSpaceshipStateS2C spaceshipState);
         void SetLocalPlayer(MatchPlayerModel matchPlayerModel);
     }

@@ -67,11 +67,15 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
             _packetProcessor.SubscribeNetSerializable(onReceive);
         }
         
-        public void SubscribeNetSerializable<T>(
-            Action<T, int> onReceive) where T : INetSerializable, new()
-        {
-            _packetProcessor.SubscribeNetSerializable<T, NetPeer>((t, peer) => onReceive(t, (int)peer.Tag));
-        }
+        // public void SubscribeNetSerializable<T>(
+        //     Action<T, int> onReceive) where T : INetSerializable, new()
+        // {
+        //     _packetProcessor.SubscribeNetSerializable<T, NetPeer>((t, peer) =>
+        //     {
+        //         var PlyaerID = (int)peer.Tag; 
+        //         onReceive(t, (int)peer.Tag);
+        //     });
+        // }
 
         // public void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new()
         // {
@@ -89,11 +93,11 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         //     _packetsSender.SendPacketOnlyToPlayer(packet, deliveryMethod, playerId);
         // }
 
-        public void SendPacketSerializedOnlyToPlayer<T>(PacketTypeS2C type, T packet, int playerId,
-            DeliveryMethod deliveryMethod) where T : INetSerializable
-        {
-            _packetsSender.SendPacketSerializedOnlyToPlayer(type, packet, playerId, deliveryMethod);
-        }
+        // public void SendPacketSerializedOnlyToPlayer<T>(PacketTypeS2C type, T packet, int playerId,
+        //     DeliveryMethod deliveryMethod) where T : INetSerializable
+        // {
+        //     _packetsSender.SendPacketSerializedOnlyToPlayer(type, packet, playerId, deliveryMethod);
+        // }
 
         public void RemoveSubscription<T>()
         {

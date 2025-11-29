@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly ICommandFactory _commandFactory;
         private readonly NetworkC2SPacketsSender _packetsSender;
         public bool IsPeerConnected { get; private set; }
+        public int Ping => _packetsSender.Peer.Ping;
 
         public ClientNetworkManager(NetworkConfig networkConfig, IStateMachineService stateMachineService, ICommandFactory commandFactory)
         {
@@ -53,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private void OnServerPeerReceived(NetPeer peerToServer)
         {
             _packetsSender.SetPeer(peerToServer);
-            _commandFactory.CreateCommandVoid<HandleClientConnectedToPeerCommand>();
+            _commandFactory.CreateCommandVoid<HandleClientConnectedToPeerCommand>().Execute();
             IsPeerConnected = true;
         }
 

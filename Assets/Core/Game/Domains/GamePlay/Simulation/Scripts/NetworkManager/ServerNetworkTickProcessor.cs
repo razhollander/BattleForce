@@ -67,13 +67,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             try
             {
                 CurrentTick++;
+                var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
                 _networkManager.PollEvents();
-                _playerInputsPacketsHandler.ProcessInputsInTick(CurrentTick);
+                _playerInputsPacketsHandler.ProcessInputsInTick(processedTick);
                 //ProccesEvents();
                 //Move1Tick(); // only velocities
                 //Simulation.Step();//check collisions
                 //ProcessCollisions();
-                SendCurrentTickStateToAllClients();
+                SendCurrentTickStateToAllClients(processedTick);
                 //var inputsPerPlayerForCurrentTick = _serverPlayersInputListener.GetSortedInputsPerPlayerForTick(CurrentTick); 
             }
             catch (Exception e)
@@ -98,10 +99,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             // }
         }
 
-        private void SendCurrentTickStateToAllClients()
+        private void SendCurrentTickStateToAllClients(int processedTick)
         {
             var packet = _matchDataService.SimulationState;
-            packet.Tick = CurrentTick;
+            packet.Tick = processedTick;
             _networkManager.SendPacketSerialized(PacketTypeS2C.SimulationState, packet, DeliveryMethod.Sequenced);
         }
 

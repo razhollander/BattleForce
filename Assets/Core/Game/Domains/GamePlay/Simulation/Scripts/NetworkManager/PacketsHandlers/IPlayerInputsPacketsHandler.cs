@@ -5,7 +5,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHa
 {
     public interface IPlayerInputsPacketsHandler
     {
-        void InitEntryPoint();
+        void RegisterListeners();
         Dictionary<int, PlayerInputPacketC2S> ProcessInputsInTick(int tick);
         void InitExitPoint();
     }

@@ -1,9 +1,11 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using CoreDomain.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.UpdateService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
 {
@@ -15,6 +17,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private IClientNetworkManager _clientNetworkManager;
         private IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
         private ISimulationStatePacketsHandler _simulationStatePacketsHandler;
+        private IClientPresentationTickProcessor _clientPresentationTickProcessor;
+        private ITickProcessor _tickProcessor;
 
         public override void ResolveDependencies()
         {
@@ -24,6 +28,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _clientNetworkManager = _diContainer.Resolve<IClientNetworkManager>();
             _playerJoinPacketsHandler = _diContainer.Resolve<IPlayerJoinPacketsHandler>();
             _simulationStatePacketsHandler = _diContainer.Resolve<ISimulationStatePacketsHandler>();
+            _clientPresentationTickProcessor = _diContainer.Resolve<IClientPresentationTickProcessor>();
+            _tickProcessor = _diContainer.Resolve<ITickProcessor>();
         }
 
         public void Execute()
@@ -34,6 +40,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _gameInputActionsController.DisableInputs();
             _playerJoinPacketsHandler.InitExitPoint();
             _simulationStatePacketsHandler.InitExitPoint();
+            _clientPresentationTickProcessor.StopTick();
+            _tickProcessor.StopTick();
             //_gamePlayUiController.InitExitPoint();
         }
     }

@@ -1,4 +1,3 @@
-using Core.Game.Domains.GamePlay.Shared;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
 {
@@ -6,5 +5,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
     {
         void InitEntryPoint();
         void CreatePlayer(int playerId);
+        void UpdatePlayersTransform();
     }
 }

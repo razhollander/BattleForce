@@ -4,6 +4,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 {
     public class PlayerInputPacketC2S : INetSerializable
     {
+        // todo: add inputs from client unprocessed ticks
         public int Tick { get; set; }
         public bool IsMoveRightInputPressed { get; set; }
         public bool IsMoveLeftInputPressed { get; set; }

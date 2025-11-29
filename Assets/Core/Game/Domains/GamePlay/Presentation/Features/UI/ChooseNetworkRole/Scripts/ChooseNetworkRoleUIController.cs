@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -19,9 +20,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
         private readonly IClientNetworkManager _clientNetworkManager;
         private readonly IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
         private readonly ISimulationStatePacketsHandler _simulationStatePacketsHandler;
+        private readonly IClientPresentationTickProcessor _clientPresentationTickProcessor;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, IPlayerJoinPacketsHandler playerJoinPacketsHandler, ISimulationStatePacketsHandler simulationStatePacketsHandler)
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, IPlayerJoinPacketsHandler playerJoinPacketsHandler, ISimulationStatePacketsHandler simulationStatePacketsHandler, IClientPresentationTickProcessor clientPresentationTickProcessor)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
@@ -29,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
             _clientNetworkManager = clientNetworkManager;
             _playerJoinPacketsHandler = playerJoinPacketsHandler;
             _simulationStatePacketsHandler = simulationStatePacketsHandler;
+            _clientPresentationTickProcessor = clientPresentationTickProcessor;
         }
 
         public void InitEntryPoint()

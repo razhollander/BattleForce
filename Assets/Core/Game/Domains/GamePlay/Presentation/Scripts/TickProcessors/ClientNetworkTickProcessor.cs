@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -8,12 +9,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
     public class ClientNetworkTickProcessor : ITickProcessor, IFixedUpdatable
     {
+        public void SetTick(int tickOnServer)
+        {
+            CurrentTick = tickOnServer;
+        }
+
         public int CurrentTick { get; private set; }
 
         //private readonly ClientSimulationStateHandler _clientSimulationStateHandler;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ICommandFactory _commandFactory;
         private readonly ISimulationStatePacketsHandler _simulationStatePacketsHandler;
+        private readonly IMatchDataService _matchDataService;
         private readonly IStateMachineService _stateMachineService;
         private SendInputsToServerCommand _saveInputsToServerCommand;
         private readonly IClientNetworkManager _networkManager;
@@ -22,13 +29,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         public ClientNetworkTickProcessor(IClientNetworkManager networkManager,
             //ClientSimulationStateHandler clientSimulationStateHandler,
-            IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory, ISimulationStatePacketsHandler simulationStatePacketsHandler)
+            IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
+            ISimulationStatePacketsHandler simulationStatePacketsHandler, IMatchDataService matchDataService)
         {
             _networkManager = networkManager;
             //_clientSimulationStateHandler = clientSimulationStateHandler;
             _updateSubscriptionService = updateSubscriptionService;
             _commandFactory = commandFactory;
             _simulationStatePacketsHandler = simulationStatePacketsHandler;
+            _matchDataService = matchDataService;
         }
 
         public void InitEntryPoint()
@@ -50,10 +59,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         public void ManagedFixedUpdate()
         {
             _networkManager.PollEvents();
-            if (!_networkManager.IsPeerConnected)
+            if (!_matchDataService.IsPlayerJoined) 
             {
                 return;
             }
+            
             _simulationStatePacketsHandler.ProcessStateLatestTick();
             SendCurrentTickInputsToServer();
         }

@@ -10,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         public List<MatchPlayerModel> Players { get; private set; }
 
         public MatchPlayerModel LocalPlayer { get; private set; }
+        public bool IsPlayerJoined => LocalPlayer != null;
 
         public MatchDataService(NetworkConfig networkConfig)
         {

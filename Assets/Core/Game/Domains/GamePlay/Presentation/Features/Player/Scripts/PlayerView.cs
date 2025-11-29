@@ -26,4 +26,11 @@ public class PlayerView : MonoBehaviour
     {
         _healthBar.UpdateBar(health, maxHealth);
     }
+
+    public void InterpolateTransform(Vector2 playerPosition, Quaternion playerRotation, float interpolationFactor)
+    {
+        var lerpedPosition = Vector2.Lerp(transform.position, playerPosition, interpolationFactor);
+        var lerpedRotation = Quaternion.Lerp(transform.rotation, playerRotation, interpolationFactor);
+        transform.SetPositionAndRotation(lerpedPosition, lerpedRotation);
+    }
 }
