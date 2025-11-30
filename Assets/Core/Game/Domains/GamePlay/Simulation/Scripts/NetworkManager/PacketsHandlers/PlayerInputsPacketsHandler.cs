@@ -48,31 +48,37 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHa
                 _inputsByTick.Add(tick, inputsInTick);
             }
 
-            foreach (var player in _matchDataService.SimulationState.Players)
+            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
             {
+                var player = _matchDataService.SimulationState.Players[i];
                 var playerId = player.Id;
                 if (!TryGetInputForPlayerInTick(tick, playerId, out var playerInputPacket))
                 {
                     if (!TryGetCachedInputForPlayer(playerId, out playerInputPacket))
                     {
-                        LogService.Log($"Didn't find any last cached inputs for player {playerId}! for tick {tick}");
+                        LogService.LogTopic(
+                            $"Didn't find any last cached inputs for player {playerId}! for tick {tick}",
+                            LogTopicType.ServerNetwork);
                         continue;
                     }
 
                     inputsInTick.Add(playerId, playerInputPacket);
-                    LogService.Log($"Using last cached inputs for player {playerId}! for tick {tick}");
+                    LogService.LogTopic($"Using last cached inputs for player {playerId}! for tick {tick}",
+                        LogTopicType.ServerNetwork);
                 }
-
 
                 var playerModel = _matchDataService.GetPlayer(playerId);
                 var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
                 var rotationAngle =
                     (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
                      playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
-                playerModel.Spaceship.Transform.RotationVector.Rotate(rotationAngle);
+                var rotatedVector = playerModel.Spaceship.Transform.RotationVector.Rotate(rotationAngle);
+                LogService.LogTopic($"rotatedVector {rotatedVector} rotationAngle {rotationAngle} playerInputPacket.IsMoveLeftInputPressed {playerInputPacket.IsMoveLeftInputPressed} playerInputPacket.IsMoveRightInputPressed.ToInt() {playerInputPacket.IsMoveRightInputPressed} rotationDelta {rotationDelta}");
+                playerModel.Spaceship.Transform.RotationVector = rotatedVector;
                 playerModel.Spaceship.Transform.Position += playerModel.Spaceship.Transform.RotationVector *
                                                             _gamePlayConfig.PlayerSpaceship.MovementSpeed *
                                                             _networkConfig.DeltaTime;
+                _matchDataService.SetPlayer(playerId, playerModel);
                 _cachedLastProcessedInput[playerId] = playerInputPacket;
             }
 
@@ -89,8 +95,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHa
                 var tickOfInputs = kvp.Key;
                 if (tickOfInputs < maxTickExclusive)
                 {
-                    ticksToRemove.Add(maxTickExclusive);
-                    LogService.Log($"Remove inputs of tick {ticksToRemove}");
+                    ticksToRemove.Add(tickOfInputs);
+                    LogService.LogTopic($"Remove inputs of tick {tickOfInputs}", LogTopicType.ServerNetwork);
                 }
             }
             

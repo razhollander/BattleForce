@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Network;
 using Core.Scripts.Services.ApplicationSubscriptionService;
+using Core.Scripts.Services.Logger;
 using CoreDomain.Scripts.Audio;
 using CoreDomain.Scripts.Mvc.LoadingScreen;
 using CoreDomain.Scripts.Mvc.UICamera;
@@ -35,7 +36,7 @@ namespace CoreDomain.Scripts.ZenjectInstallers
 
         public override void InstallBindings()
         {
-            Container.BindInterfacesTo<UnityLogger>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<EmptyLogger>().AsSingle().NonLazy();
             Container.BindInstance(_networkConfig).AsSingle().NonLazy();
             Container.BindInstance(_gamePlayConfig).AsSingle().NonLazy();
             Container.BindInterfacesTo<SceneLoaderService>().AsSingle().NonLazy();

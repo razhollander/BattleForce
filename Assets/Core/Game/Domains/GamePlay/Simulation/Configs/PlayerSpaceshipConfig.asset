@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   StartHealth: 5
   MovementSpeed: 5
-  RotationSpeed: 5
+  RotationSpeed: 150
   ShootCooldown: 0.7

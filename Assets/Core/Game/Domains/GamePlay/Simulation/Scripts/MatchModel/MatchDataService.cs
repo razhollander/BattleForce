@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Scripts.Network;
+using ModestTree;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 {
@@ -31,6 +32,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         public PlayerStateS2C GetPlayer(int playerId)
         {
             return _simulationState.Players.First(x => x.Id == playerId);
+        }
+
+        public void SetPlayer(int playerId, PlayerStateS2C playerModel)
+        {
+            for (int i = 0; i < _simulationState.Players.Length; i++)
+            {
+                if (_simulationState.Players[i].Id == playerId)
+                {
+                    _simulationState.Players[i] = playerModel;
+                    return;
+                }
+            }
         }
     }
 }

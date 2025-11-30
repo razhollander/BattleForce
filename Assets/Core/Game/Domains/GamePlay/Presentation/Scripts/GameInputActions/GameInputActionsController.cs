@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         {
             LogService.LogTopic("EnableInputs", LogTopicType.Inputs);
             _gameInputActions.Enable();
+            RegisterAllInputListeners();
         }
 
         public void DisableInputs()
@@ -40,25 +41,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         public void RegisterAllInputListeners()
         {
             LogService.LogTopic("Register all input listeners", LogTopicType.Inputs);
-            // _gameInputActions.GamePlay.Shoot.performed += OnShootInput;
+             _gameInputActions.GamePlay.MoveRight.performed += OnShootInput;
         }
 
         public void UnregisterAllInputListeners()
         {
             LogService.LogTopic("Unregister all input listeners", LogTopicType.Inputs);
-            // _gameInputActions.GamePlay.Shoot.performed -= OnShootInput;
+             _gameInputActions.GamePlay.MoveRight.performed -= OnShootInput;
         }
         
-        // private void OnShootInput(InputAction.CallbackContext obj)
-        // {
-        //     if (IsOverUiOnMobile())
-        //     {
-        //         return;
-        //     }
-        //
-        //     LogService.LogTopic("Shoot input was triggered", LogTopicType.Inputs);
-        //     _commandFactory.CreateCommandVoid<ShootInputInvokedCommand>().Execute();
-        // }
+        private void OnShootInput(InputAction.CallbackContext obj)
+        {
+         LogService.LogTopic("Shoot input was triggered", LogTopicType.Inputs);
+            _commandFactory.CreateCommandVoid<ShootInputInvokedCommand>().Execute();
+        }
 
         public bool IsMoveLeftInputPressed()
         {
@@ -67,6 +63,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         
         public bool IsMoveRightInputPressed()
         {
+            var ispressed = _gameInputActions.GamePlay.MoveRight.IsPressed();
+            LogService.LogTopic("ispressed: "+ispressed);
             return _gameInputActions.GamePlay.MoveRight.IsPressed();
         }
         

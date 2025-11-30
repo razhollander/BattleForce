@@ -12,6 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85659b4438124d4498e9c7442bc65799, type: 3}
   m_Name: NetworkConfig
   m_EditorClassIdentifier: 
-  MaxConnectedPlayers: 8
+  MaxConnectedPlayers: 2
+  MaxConcurrentBullets: 1
   TicksPerSeconds: 60
+  DeltaTime: 0.016666668
+  ServerTicksBuffer: 10
   Port: 7777
+  IpAddress: localhost
+  ConntectionKey: BattleForceGame

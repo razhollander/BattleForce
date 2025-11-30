@@ -11,5 +11,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             float shootCooldown);
 
         PlayerStateS2C GetPlayer(int playerId);
+        void SetPlayer(int playerId, PlayerStateS2C playerModel);
     }
 }
