@@ -1,8 +1,9 @@
+using System;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 {
-    public class PlayerInputPacketC2S : INetSerializable
+    public class PlayerInputPacketC2S : INetSerializable,IComparable<PlayerInputPacketC2S>
     {
         // todo: add inputs from client unprocessed ticks
         public int Tick { get; set; }
@@ -40,6 +41,11 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
             right = (data & (1 << 0)) != 0;
             left  = (data & (1 << 1)) != 0;
             shoot = (data & (1 << 2)) != 0;
+        }
+
+        public int CompareTo(PlayerInputPacketC2S other)
+        {
+            return Tick.CompareTo(other.Tick);
         }
     }
 }

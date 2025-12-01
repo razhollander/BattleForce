@@ -1,0 +1,121 @@
+using System.Collections.Generic;
+using System.Linq;
+using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
+using Core.Game.Domains.GamePlay.Shared.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
+using Core.Scripts.Extensions;
+using Core.Scripts.Network;
+using CoreDomain.Scripts.Extensions;
+using CoreDomain.Scripts.Services.Logger.Base;
+using LiteNetLib;
+
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers
+{
+    public class PlayerInputsPacketsHandler : IPlayerInputsPacketsHandler
+    {
+        private readonly IServerNetworkManager _networkManager;
+        private readonly IMatchDataService _matchDataService;
+        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly NetworkConfig _networkConfig;
+        // private readonly Dictionary<int, Dictionary<int, PlayerInputPacketC2S>> _inputsByTick = new ();
+        private readonly Dictionary<int, List<PlayerInputPacketC2S>> _inputsPerPlayer = new();
+        private readonly Dictionary<int,PlayerInputPacketC2S> _cachedLastProcessedInput = new ();
+
+        public PlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
+        {
+            _networkManager = networkManager;
+            _matchDataService = matchDataService;
+            _gamePlayConfig = gamePlayConfig;
+            _networkConfig = networkConfig;
+        }
+
+        public void RegisterListeners()
+        {
+            _networkManager.SubscribeNetSerializable<PlayerInputPacketC2S>(OnPlayerInputReceived);
+        }
+
+        public void InitExitPoint()
+        {
+            _networkManager.RemoveSubscription<PlayerInputPacketC2S>();
+        }
+
+        public Dictionary<int, PlayerInputPacketC2S> ProcessInputsInTick(int tick)
+        {
+            var earliestInputPerPlayers = PopEarliestInputsOfEachPlayer();            
+            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            {
+                var player = _matchDataService.SimulationState.Players[i];
+                var playerId = player.Id;
+                if (!earliestInputPerPlayers.ContainsKey(playerId))
+                {
+                    LogService.LogTopic($"Didn't find any last cached inputs for player {playerId}!", LogTopicType.ServerNetwork);
+                    continue;
+                }
+
+                var playerInputPacket = earliestInputPerPlayers[playerId];
+                var playerModel = _matchDataService.GetPlayer(playerId);
+                var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
+                var rotationAngle =
+                    (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
+                     playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
+                var rotatedVector = playerModel.Spaceship.Transform.RotationVector.Rotate(rotationAngle);
+                LogService.LogTopic($"rotatedVector {rotatedVector} rotationAngle {rotationAngle} playerInputPacket.IsMoveLeftInputPressed {playerInputPacket.IsMoveLeftInputPressed} playerInputPacket.IsMoveRightInputPressed.ToInt() {playerInputPacket.IsMoveRightInputPressed} rotationDelta {rotationDelta}");
+                playerModel.Spaceship.Transform.RotationVector = rotatedVector;
+                playerModel.Spaceship.Transform.Position += playerModel.Spaceship.Transform.RotationVector *
+                                                            _gamePlayConfig.PlayerSpaceship.MovementSpeed *
+                                                            _networkConfig.DeltaTime;
+                _matchDataService.SetPlayer(playerId, playerModel);
+                _cachedLastProcessedInput[playerId] = playerInputPacket;
+            }
+
+            return earliestInputPerPlayers;
+        }
+
+        private Dictionary<int, PlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()
+        {
+            var earliestInputsPerPlayer = new Dictionary<int, PlayerInputPacketC2S>();
+
+            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            {
+                var playerState = _matchDataService.SimulationState.Players[i];
+                var playerId = playerState.Id;
+                PlayerInputPacketC2S earliestPlayerInput;
+                if (_inputsPerPlayer.TryGetValue(playerId, out var playerInputs))
+                {
+                    playerInputs.Sort();
+                    earliestPlayerInput = playerInputs[0];
+                    _inputsPerPlayer[playerId].Remove(earliestPlayerInput);
+                    if (_inputsPerPlayer[playerId].Count == 0)
+                    {
+                        _inputsPerPlayer.Remove(playerId);
+                    }
+                }
+                else
+                {
+                    if (!TryGetCachedInputForPlayer(playerId, out earliestPlayerInput))
+                    {
+                        continue;
+                    }
+                }
+
+                earliestInputsPerPlayer.Add(playerId, earliestPlayerInput);
+            }
+
+            return earliestInputsPerPlayer;
+        }
+
+        private bool TryGetCachedInputForPlayer(int playerId, out PlayerInputPacketC2S playerInputPacket)
+        {
+            return _cachedLastProcessedInput.TryGetValue(playerId, out playerInputPacket);
+        }
+
+        private void OnPlayerInputReceived(PlayerInputPacketC2S playerInputPacket, NetPeer peer)
+        {
+            var playerId = (int)peer.Tag;
+            _inputsPerPlayer.TryAdd(playerId, new List<PlayerInputPacketC2S>());
+            _inputsPerPlayer[playerId].Add(playerInputPacket);
+            LogService.LogTopic("Input packet received from player id" + playerId, LogTopicType.ServerNetwork);
+        }
+    }
+}

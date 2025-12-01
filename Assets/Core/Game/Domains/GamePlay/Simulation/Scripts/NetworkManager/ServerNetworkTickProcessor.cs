@@ -47,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         private void StartTick()
         {
+            CurrentTick = 0;
             var cancellationTokenSource = new CancellationTokenSource();
             _fixedTimer = new TimerFixedThreaded(_networkConfig.TicksPerSeconds, OnTick);
             _fixedTimer.Start(cancellationTokenSource/*_stateMachineService.CurrentState().CancellationTokenSource*/);
@@ -74,7 +75,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 //Move1Tick(); // only velocities
                 //Simulation.Step();//check collisions
                 //ProcessCollisions();
-                SendCurrentTickStateToAllClients(processedTick);
+                if (_matchDataService.SimulationState.PlayersCount > 0)
+                {
+                    SendCurrentTickStateToAllClients(processedTick);
+                }
                 //var inputsPerPlayerForCurrentTick = _serverPlayersInputListener.GetSortedInputsPerPlayerForTick(CurrentTick); 
             }
             catch (Exception e)
@@ -103,7 +107,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         {
             var packet = _matchDataService.SimulationState;
             packet.Tick = processedTick;
-            _networkManager.SendPacketSerialized(PacketTypeS2C.SimulationState, packet, DeliveryMethod.Sequenced);
+            _networkManager.SendPacketSerialized(PacketTypeS2C.SimulationState, packet, DeliveryMethod.Unreliable);
         }
 
         // private void SendStateToPlayer(ServerPlayer p, int pCount)
