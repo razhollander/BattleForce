@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             var playerTransformState = playerModel.Spaceship.Transform;
             var playerPosition = playerTransformState.Position.ToUnity();
             var playerRotation = playerTransformState.RotationVector.ToUnityVector2().ToQuaternion();
-            var interpolationFactor = _gamePlayConfig.InterpolationFactor * Time.deltaTime;
+            var interpolationFactor = _gamePlayConfig.InterpolationFactor;
             _playerView.InterpolateTransform(playerPosition, playerRotation, interpolationFactor);
         }
     }
