@@ -1,6 +1,5 @@
 using System;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
-using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -8,25 +7,26 @@ using CoreDomain.Scripts.Services.StateMachineService;
 using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
-    public class ClientNetworkManager : IClientNetworkManager
+    public class ClientNetworkManager : IClientNetworkManager, IGUIUpdatable
     {
         private readonly NetworkS2CPacketsListener _packetsListener;
         private readonly NetManager _netManager;
         private readonly NetworkConfig _networkConfig;
-        private readonly IStateMachineService _stateMachineService;
         private readonly ICommandFactory _commandFactory;
+        private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkC2SPacketsSender _packetsSender;
         public bool IsPeerConnected { get; private set; }
         public int Ping => _packetsSender.Peer.Ping;
 
-        public ClientNetworkManager(NetworkConfig networkConfig, IStateMachineService stateMachineService, ICommandFactory commandFactory)
+        public ClientNetworkManager(NetworkConfig networkConfig, ICommandFactory commandFactory, IUpdateSubscriptionService updateSubscriptionService)
         {
             _networkConfig = networkConfig;
-            _stateMachineService = stateMachineService;
             _commandFactory = commandFactory;
+            _updateSubscriptionService = updateSubscriptionService;
             var packetProcessor = new NetPacketProcessor();
             _packetsListener = new NetworkS2CPacketsListener(packetProcessor);
             _packetsSender = new NetworkC2SPacketsSender(packetProcessor);
@@ -49,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             //_packetsListener.RegisterListeners();
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Connect(_networkConfig.IpAddress, _networkConfig.Port, _networkConfig.ConntectionKey);
+            _updateSubscriptionService.RegisterGuiUpdatable(this);
         }
 
         private void OnServerPeerReceived(NetPeer peerToServer)
@@ -98,6 +99,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             _netManager.Stop();
             _packetsListener.OnPeerConnected -= OnServerPeerReceived;
+            _updateSubscriptionService.UnregisterGuiUpdatable(this);
+        }
+
+        public void ManagedOnGUI()
+        {
+            GUIStyle style = new GUIStyle(GUI.skin.label);
+            style.fontSize = 10;
+            style.normal.textColor = Color.white;
+            GUI.Label(new Rect(10, 10, 400, 30), "Local Host Ping: "+_packetsListener.PingToLocalHost, style);
         }
     }
 }

@@ -7,6 +7,7 @@ namespace CoreDomain.Scripts.Services.UpdateService
     public class UpdateSubscriptionService : MonoBehaviour, IUpdateSubscriptionService
     {
         private static readonly List<IUpdatable> _updateObservers = new List<IUpdatable>();
+        private static readonly List<IGUIUpdatable> _guiUpdateObservers = new List<IGUIUpdatable>();
 
         private static readonly List<IFixedUpdatable> _fixedUpdateObservers = new List<IFixedUpdatable>();
         private static readonly List<IFixedUpdatable> _pendingAddFixedUpdateObservers = new List<IFixedUpdatable>();
@@ -16,6 +17,8 @@ namespace CoreDomain.Scripts.Services.UpdateService
         private static readonly List<ILateUpdatable> _pendingAddLateUpdateObservers = new List<ILateUpdatable>();
         private static readonly List<ILateUpdatable> _pendingRemoveLateUpdateObservers = new List<ILateUpdatable>();
         private static int _currentUpdateIndex;
+        private static int _currentGuiUpdateIndex;
+        
         private void Update()
         {
             for (_currentUpdateIndex = _updateObservers.Count - 1; _currentUpdateIndex >= 0; _currentUpdateIndex--)
@@ -24,7 +27,16 @@ namespace CoreDomain.Scripts.Services.UpdateService
                 observer.ManagedUpdate();
             }
         }
-        
+
+        private void OnGUI()
+        {
+            for (_currentGuiUpdateIndex = _guiUpdateObservers.Count - 1; _currentGuiUpdateIndex >= 0; _currentGuiUpdateIndex--)
+            {
+                var observer = _guiUpdateObservers[_currentGuiUpdateIndex];
+                observer.ManagedOnGUI();
+            }
+        }
+
         private void LateUpdate()
         {
             _lateUpdateObservers.AddRange(_pendingAddLateUpdateObservers);
@@ -82,6 +94,40 @@ namespace CoreDomain.Scripts.Services.UpdateService
             else
             {
                 _updateObservers.Remove(observer);
+            }
+        }
+        
+        public void RegisterGuiUpdatable(IGUIUpdatable observer)
+        {
+            var isCurrentlyIterating = _currentGuiUpdateIndex>0;
+            if (isCurrentlyIterating)
+            {
+                _guiUpdateObservers.Insert(0, observer);
+                _currentGuiUpdateIndex++;
+            }
+            else
+            {
+                _guiUpdateObservers.Add(observer);
+            }
+        }
+
+        public void UnregisterGuiUpdatable(IGUIUpdatable observer)
+        {
+            var isCurrentlyIterating = _currentGuiUpdateIndex > 0;
+            if (isCurrentlyIterating)
+            {
+                var indexOfObserver = _guiUpdateObservers.IndexOf(observer);
+                _guiUpdateObservers.Remove(observer);
+
+                var wasObserverAlreadyIteratedThisFrame = indexOfObserver >= _currentGuiUpdateIndex;
+                if (!wasObserverAlreadyIteratedThisFrame)
+                {
+                    _currentGuiUpdateIndex--;
+                }
+            }
+            else
+            {
+                _guiUpdateObservers.Remove(observer);
             }
         }
         

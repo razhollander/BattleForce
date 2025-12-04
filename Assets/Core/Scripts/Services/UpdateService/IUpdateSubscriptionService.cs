@@ -2,6 +2,8 @@ namespace CoreDomain.Scripts.Services.UpdateService
 {
     public interface IUpdateSubscriptionService
     {
+        void RegisterGuiUpdatable(IGUIUpdatable updatable);
+        void UnregisterGuiUpdatable(IGUIUpdatable updatable);
         void RegisterUpdatable(IUpdatable updatable);
         void UnregisterUpdatable(IUpdatable updatable);
         void RegisterLateUpdatable(ILateUpdatable updatable);

@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
     {
         private readonly NetPacketProcessor _packetProcessor;
         
+        public int PingToLocalHost { get; private set; }
         public event Action<NetPeer> OnPeerConnected;
         public event Action<NetPeer, DisconnectInfo> OnPeerDisconnected;
         //public event Action<JoinAcceptPacketS2C> OnPlayerJoinedAccepted;
@@ -68,11 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         void INetEventListener.OnNetworkLatencyUpdate(NetPeer peer, int latency)
         {
-            // if (peer.Tag != null)
-            // {
-            //     var p = (ServerPlayer) peer.Tag;
-            //     p.Ping = latency;
-            // }
+            PingToLocalHost = latency;
         }
 
         void INetEventListener.OnConnectionRequest(ConnectionRequest request)
