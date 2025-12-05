@@ -40,5 +40,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
                 playerController.UpdateTransform();
             }
         }
+
+        public void UpdatePlayersBulletCooldowns()
+        {
+            foreach (var playerController in _playerControllers)
+            {
+                playerController.UpdateBulletCooldown();
+            }
+        }
     }
 }

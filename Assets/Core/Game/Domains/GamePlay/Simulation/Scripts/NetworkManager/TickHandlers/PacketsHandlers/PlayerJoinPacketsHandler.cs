@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
                 AimVector = Vector2.Zero,
                 AngularVelocity = 0,
                 Position = Vector2.One,
-                RotationVector = Vector2.One,
+                Direction = Vector2.One,
                 Velocity = Vector2.One * _gamePlayConfig.PlayerSpaceship.MovementSpeed
             };
             var playerState = _matchDataService.AddPlayer(joinRequestPacket.UserName, playerTransform,

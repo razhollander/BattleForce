@@ -27,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
         public void ManagedUpdate()
         {
             _playerControllers.UpdatePlayersTransform();
+            _playerControllers.UpdatePlayersBulletCooldowns();
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
@@ -11,12 +12,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
     {
         private SimulationStateS2C _simulationState;
         public SimulationStateS2C SimulationState => _simulationState;
-
+        private int _bulletsCreatedCounter = 0;
         public MatchDataService(NetworkConfig networkConfig)
         {
             _simulationState = new SimulationStateS2C();
             _simulationState.Players = new PlayerStateS2C[networkConfig.MaxConnectedPlayers];
-            _simulationState.Bullets = new PlayerBulletS2C[networkConfig.MaxConcurrentBullets];
+            _simulationState.Bullets = new StructPool<PlayerBulletS2C>(networkConfig.MaxConcurrentBullets);
         }
 
         public PlayerStateS2C AddPlayer(string playerName, PlayerTransformStateS2C playerTransformStateS2C, int health, float shootCooldown)
@@ -44,6 +45,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
                     return;
                 }
             }
+        }
+
+        public PlayerBulletS2C AddBullet(int playerId, Vector2 position, Vector2 direction, float moveSpeed)
+        {
+            _simulationState.Bullets.Rent(out var index);
+            ref PlayerBulletS2C playerBullet = ref _simulationState.Bullets[index];
+            var bulletId = _bulletsCreatedCounter++ % int.MaxValue;
+            playerBullet.Id = bulletId;
+            playerBullet.BelongToPlayerId = playerId;
+            playerBullet.Position = position;
+            playerBullet.Direction = direction;
+            playerBullet.MoveSpeed = moveSpeed;
+            return playerBullet;
         }
     }
 }

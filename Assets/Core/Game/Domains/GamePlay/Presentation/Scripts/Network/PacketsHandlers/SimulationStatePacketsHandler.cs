@@ -45,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             {
                 var playerState = simulationState.GetPlayer(player.PlayerId);
                 player.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
-                player.Spaceship.Transform.RotationVector = playerState.Spaceship.Transform.RotationVector;
+                player.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
                 LogService.LogTopic(player.Spaceship.Transform.ToString());
             }
 

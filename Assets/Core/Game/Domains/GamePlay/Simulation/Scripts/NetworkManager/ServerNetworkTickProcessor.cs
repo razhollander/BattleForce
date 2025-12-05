@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -21,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private readonly IServerNetworkManager _networkManager;
         private readonly IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private readonly IMatchDataService _matchDataService;
+        private readonly IPlayerBulletsTransformHandler _playerBulletsTransformHandler;
 
         //private readonly IServerPlayersInputListener _serverPlayersInputListener;
 
@@ -31,12 +33,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private NetworkStateSimulator _networkStateSimulator;
 
         public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
-            IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService)
+            IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService, IPlayerBulletsTransformHandler playerBulletsTransformHandler)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _playerInputsPacketsHandler = playerInputsPacketsHandler;
             _matchDataService = matchDataService;
+            _playerBulletsTransformHandler = playerBulletsTransformHandler;
             //_serverPlayersInputListener = serverPlayersInputListener;
         }
 
@@ -70,7 +73,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 CurrentTick++;
                 var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
                 _networkManager.PollEvents();
-                _playerInputsPacketsHandler.ProcessInputsInTick(processedTick);
+                _playerInputsPacketsHandler.ProcessInputs();
+                _playerBulletsTransformHandler.UpdateBulletsTransform();
                 //ProccesEvents();
                 //Move1Tick(); // only velocities
                 //Simulation.Step();//check collisions

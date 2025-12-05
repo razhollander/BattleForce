@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
 using UnityEngine;
 using Zenject;
 
@@ -22,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<IPlayerInputsPacketsHandler>().To<PlayerInputsPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IMatchDataService>().To<MatchDataService>().AsSingle().NonLazy();
             Container.Bind<ITickProcessor>().To<ServerNetworkTickProcessor>().AsSingle().NonLazy();
+            Container.Bind<IPlayerBulletsTransformHandler>().To<PlayerBulletsTransformHandler>().AsSingle().NonLazy();
         }
     }
 }

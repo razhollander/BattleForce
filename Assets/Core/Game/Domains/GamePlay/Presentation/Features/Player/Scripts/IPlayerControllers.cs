@@ -6,5 +6,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         void InitEntryPoint();
         void CreatePlayer(int playerId);
         void UpdatePlayersTransform();
+        void UpdatePlayersBulletCooldowns();
     }
 }

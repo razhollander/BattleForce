@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 
@@ -12,5 +13,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 
         PlayerStateS2C GetPlayer(int playerId);
         void SetPlayer(int playerId, PlayerStateS2C playerModel);
+        PlayerBulletS2C AddBullet(int playerId, Vector2 position, Vector2 direction, float moveSpeed);
     }
 }

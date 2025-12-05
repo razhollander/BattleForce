@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             _playerView.name = "Player_" + PlayerId;
             var playerTransform = playerModel.Spaceship.Transform;
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),
-                playerTransform.RotationVector.ToUnityVector2().ToQuaternion());
+                playerTransform.Direction.ToUnityVector2().ToQuaternion());
         }
 
         public void UpdateTransform()
@@ -38,9 +38,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             var playerTransformState = playerModel.Spaceship.Transform;
             var playerPosition = playerTransformState.Position.ToUnity();
-            var playerRotation = playerTransformState.RotationVector.ToUnityVector2().ToQuaternion();
+            var playerRotation = playerTransformState.Direction.ToUnityVector2().ToQuaternion();
             var interpolationFactor = _gamePlayConfig.InterpolationFactor;
             _playerView.InterpolateTransform(playerPosition, playerRotation, interpolationFactor);
+        }
+
+        public void UpdateBulletCooldown()
+        {
+            var playerModel = _matchDataService.GetPlayer(PlayerId);
+            var playerShootState = playerModel.Spaceship.Shoot;
+            var maxShootCooldown = playerShootState.MaxCooldown;
+            var cooldownSecondsLeft = playerShootState.CooldownSecondsLeft;
+            var interpolationFactor = _gamePlayConfig.InterpolationFactor;
+            _playerView.InterpolateBulletLoading(cooldownSecondsLeft, maxShootCooldown, interpolationFactor);
         }
     }
 }

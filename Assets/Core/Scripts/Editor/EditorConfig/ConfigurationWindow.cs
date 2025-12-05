@@ -7,6 +7,7 @@ namespace Core.Scripts.Editor.EditorConfig
     {
         private const string LogsDefineSymbol = "Logs";
         private bool _areLogsEnabled;
+        private bool _simulateNetworkLatency;
 
         [MenuItem("PracticAPI/Config")]
         public static void ShowWindow()

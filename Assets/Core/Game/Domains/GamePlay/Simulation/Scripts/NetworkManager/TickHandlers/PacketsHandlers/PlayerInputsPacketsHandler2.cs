@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
+using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Scripts.Extensions;
@@ -40,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHa
             _networkManager.RemoveSubscription<PlayerInputPacketC2S>();
         }
 
-        public Dictionary<int, PlayerInputPacketC2S> ProcessInputsInTick(int tick)
+        public Dictionary<int, PlayerInputPacketC2S> ProcessInputs()
         {
             var earliestInputPerPlayers = PopEarliestInputsOfEachPlayer();            
             for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
@@ -55,21 +56,57 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHa
 
                 var playerInputPacket = earliestInputPerPlayers[playerId];
                 var playerModel = _matchDataService.GetPlayer(playerId);
-                var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
-                var rotationAngle =
-                    (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
-                     playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
-                var rotatedVector = playerModel.Spaceship.Transform.RotationVector.Rotate(rotationAngle);
-                LogService.LogTopic($"rotatedVector {rotatedVector} rotationAngle {rotationAngle} playerInputPacket.IsMoveLeftInputPressed {playerInputPacket.IsMoveLeftInputPressed} playerInputPacket.IsMoveRightInputPressed.ToInt() {playerInputPacket.IsMoveRightInputPressed} rotationDelta {rotationDelta}");
-                playerModel.Spaceship.Transform.RotationVector = rotatedVector;
-                playerModel.Spaceship.Transform.Position += playerModel.Spaceship.Transform.RotationVector *
-                                                            _gamePlayConfig.PlayerSpaceship.MovementSpeed *
-                                                            _networkConfig.DeltaTime;
+                UpdatePlayerTransform(playerInputPacket, ref playerModel);
+                UpdatePlayerShoot(playerInputPacket.IsShootInputPressed, ref playerModel);
                 _matchDataService.SetPlayer(playerId, playerModel);
                 _cachedLastProcessedInput[playerId] = playerInputPacket;
             }
 
             return earliestInputPerPlayers;
+        }
+
+        private void UpdatePlayerShoot(bool isShootInputPressed, ref PlayerStateS2C playerModel)
+        {
+            var shootState = playerModel.Spaceship.Shoot;
+            var isCurrentlyOnCooldown = shootState.CooldownSecondsLeft < shootState.MaxCooldown;
+            if (isCurrentlyOnCooldown)
+            {
+                shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
+            }
+
+            if (shootState.CooldownSecondsLeft < 0)
+            {
+                shootState.CooldownSecondsLeft = shootState.MaxCooldown;
+            }
+
+            var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
+            if (shouldShoot)
+            {
+                shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
+                CreateBulletForPlayer(playerModel);
+            }
+
+            playerModel.Spaceship.Shoot = shootState;
+        }
+
+        private void CreateBulletForPlayer(PlayerStateS2C playerModel)
+        {
+            _matchDataService.AddBullet(playerModel.Id, playerModel.Spaceship.Transform.Position,
+                playerModel.Spaceship.Transform.Direction, _gamePlayConfig.PlayerBullet.MoveSpeed);
+        }
+
+        private void UpdatePlayerTransform(PlayerInputPacketC2S playerInputPacket, ref PlayerStateS2C playerModel)
+        {
+            var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
+            var rotationAngle =
+                (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
+                 playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
+            var rotatedVector = playerModel.Spaceship.Transform.Direction.Rotate(rotationAngle);
+            LogService.LogTopic($"rotatedVector {rotatedVector} rotationAngle {rotationAngle} playerInputPacket.IsMoveLeftInputPressed {playerInputPacket.IsMoveLeftInputPressed} playerInputPacket.IsMoveRightInputPressed.ToInt() {playerInputPacket.IsMoveRightInputPressed} rotationDelta {rotationDelta}");
+            playerModel.Spaceship.Transform.Direction = rotatedVector;
+            playerModel.Spaceship.Transform.Position += playerModel.Spaceship.Transform.Direction *
+                                                        _gamePlayConfig.PlayerSpaceship.MovementSpeed *
+                                                        _networkConfig.DeltaTime;
         }
 
         private Dictionary<int, PlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()

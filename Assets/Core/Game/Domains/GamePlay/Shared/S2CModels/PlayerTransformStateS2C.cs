@@ -10,8 +10,9 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
         public int Tick;
         public int PlayersCount;
         public PlayerStateS2C[] Players;
-        public int BulletsCount;
-        public PlayerBulletS2C[] Bullets;
+        //public int BulletsCount;
+        //public PlayerBulletS2C[] Bullets;
+        public StructPool<PlayerBulletS2C> Bullets;
 
         public void Serialize(NetDataWriter writer)
         {
@@ -21,10 +22,12 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
             {
                 Players[i].Serialize(writer);
             }
-            writer.Put((byte)BulletsCount);
-            for (int i = 0; i < BulletsCount; i++)
+
+            var bulletsCount = Bullets.UsedCount;
+            writer.Put((byte)bulletsCount);
+            foreach (var bulletIndex in Bullets.UsedIndices())
             {
-                Bullets[i].Serialize(writer);
+                Bullets[bulletIndex].Serialize(writer);
             }
         }
 
@@ -35,11 +38,12 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
             Players = new PlayerStateS2C[PlayersCount];
             for (int i = 0; i < PlayersCount; i++)
                 Players[i].Deserialize(reader);
-            BulletsCount = reader.GetByte();
-            Bullets = new PlayerBulletS2C[BulletsCount];
-            for (int i = 0; i < BulletsCount; i++)
+            var bulletsCount = (int)reader.GetByte();
+            Bullets = new StructPool<PlayerBulletS2C>(bulletsCount);
+            for (int i = 0; i < bulletsCount; i++)
             {
-                Bullets[i].Deserialize(reader);
+                Bullets.Rent(out int index);
+                Bullets[index].Deserialize(reader);
             }
         }
 
@@ -108,7 +112,7 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
         public Vector2 Position;
         public Vector2 Velocity;
         public Vector2 Acceleration;
-        public Vector2 RotationVector;
+        public Vector2 Direction;
         public float AngularVelocity;
         public Vector2 AimVector;
 
@@ -117,7 +121,7 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
             writer.Put(Position);
             writer.Put(Velocity);
             writer.Put(Acceleration);
-            writer.Put(RotationVector);
+            writer.Put(Direction);
             writer.Put(AngularVelocity);
             writer.Put(AimVector);
         }
@@ -127,7 +131,7 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
             Position = reader.GetVector2();
             Velocity = reader.GetVector2();
             Acceleration = reader.GetVector2();
-            RotationVector = reader.GetVector2();
+            Direction = reader.GetVector2();
             AngularVelocity = reader.GetFloat();
             AimVector = reader.GetVector2();
         }
@@ -135,23 +139,23 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
 
     public struct PlayerShootStateS2C : INetSerializable
     {
-        public float ShootLoadingSecondsLeft;
-        public float ShootCooldown;
+        public float CooldownSecondsLeft;
+        public float MaxCooldown;
 
-        public PlayerShootStateS2C(float shootCooldown)
+        public PlayerShootStateS2C(float maxCooldown)
         {
-            ShootCooldown = shootCooldown;
-            ShootLoadingSecondsLeft = ShootCooldown;
+            MaxCooldown = maxCooldown;
+            CooldownSecondsLeft = MaxCooldown;
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(ShootLoadingSecondsLeft);
+            writer.Put(CooldownSecondsLeft);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            ShootLoadingSecondsLeft = reader.GetFloat();
+            CooldownSecondsLeft = reader.GetFloat();
         }
     }
 
@@ -181,20 +185,22 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
     {
         public int Id;
         public int BelongToPlayerId;
-        public Vector2 CurrentPosition;
+        public Vector2 Position;
+        public float MoveSpeed;
+        public Vector2 Direction;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)Id);
             writer.Put((byte)BelongToPlayerId);
-            writer.Put(CurrentPosition);
+            writer.Put(Position);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             Id = reader.GetByte();
             BelongToPlayerId = reader.GetByte();
-            CurrentPosition = reader.GetVector2();
+            Position = reader.GetVector2();
         }
     }
 
