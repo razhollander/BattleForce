@@ -293,8 +293,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spriteRenderer: {fileID: 7171694270474295135}
-  BulletLoadingTime: 0.7
-  PowerUpLoadingTime: 10
 --- !u!1 &8218143705077051413
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,6 +341,7 @@ MonoBehaviour:
   _spriteRenderer: {fileID: 5887557028104628595}
   _availableBulletSpriteRenderer: {fileID: 7171694270474295135}
   _healthBar: {fileID: 3898459118037589145}
+  _playerLoadingRing: {fileID: 8547893950400930377}
 --- !u!1 &8969142055974948290
 GameObject:
   m_ObjectHideFlags: 0

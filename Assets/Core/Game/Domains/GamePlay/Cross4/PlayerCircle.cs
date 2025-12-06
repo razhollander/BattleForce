@@ -74,15 +74,15 @@ public class PlayerCircle : MonoBehaviour
 
     private void OnDownClick()
     {
-        if (playerLoadingRing.IsBulletLoadingReady)
-        {
-            var newBulletGO = Instantiate(_bullet.gameObject);
-            newBulletGO.transform.position = _bullet.transform.position;
-            var newBullet = newBulletGO.GetComponent<Bullet>();
-            newBullet.Fire(LookDirection);
-            _bullet.gameObject.SetActive(false);
-            playerLoadingRing.DoBulletLoading(ShowBulletBack);
-        }
+        // if (playerLoadingRing.IsBulletLoadingReady)
+        // {
+        //     var newBulletGO = Instantiate(_bullet.gameObject);
+        //     newBulletGO.transform.position = _bullet.transform.position;
+        //     var newBullet = newBulletGO.GetComponent<Bullet>();
+        //     newBullet.Fire(LookDirection);
+        //     _bullet.gameObject.SetActive(false);
+        //     playerLoadingRing.DoBulletLoading(ShowBulletBack);
+        // }
     }
 
     private void ShowBulletBack()
@@ -128,23 +128,23 @@ public class PlayerCircle : MonoBehaviour
     [ContextMenu("Die")]
     private void Die()
     {
-        IsDead = true;
-        _rigidbody.bodyType = RigidbodyType2D.Static;
-        _healthBarGO.SetActive(false);
-        playerLoadingRing.BulletLoadingTime = 2f;
-        _scoreService.IncrementAllPlayersAliveScore();
-        CheckForWinner();
+        // IsDead = true;
+        // _rigidbody.bodyType = RigidbodyType2D.Static;
+        // _healthBarGO.SetActive(false);
+        // playerLoadingRing.BulletLoadingTime = 2f;
+        // _scoreService.IncrementAllPlayersAliveScore();
+        // CheckForWinner();
     }
 
     private void OnUpButtonClicked()
     {
-        if(!playerLoadingRing.IsPowerUpLoadingReady) return;
-        
-        var closetPayer = GetClosetPayer();
-        
-        SwapPositionWithPlayer(closetPayer);
-        SwapLookDirectionWithPlayer(closetPayer);
-        playerLoadingRing.DoPowerUpLoading();
+        // if(!playerLoadingRing.IsPowerUpLoadingReady) return;
+        //
+        // var closetPayer = GetClosetPayer();
+        //
+        // SwapPositionWithPlayer(closetPayer);
+        // SwapLookDirectionWithPlayer(closetPayer);
+        // playerLoadingRing.DoPowerUpLoading();
     }
 
     private void SwapLookDirectionWithPlayer(PlayerCircle closetPayer)

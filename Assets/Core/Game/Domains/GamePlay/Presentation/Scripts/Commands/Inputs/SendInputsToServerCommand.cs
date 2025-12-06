@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
                 IsShootInputPressed = isShootInputPressed
             };
             
-            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.PlayerInput, playerInputPacket, DeliveryMethod.Sequenced);
+            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.PlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
         }
     }
 }
