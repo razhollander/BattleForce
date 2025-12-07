@@ -5,13 +5,16 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
+using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
+using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 
-namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsHandlers
 {
     public class PlayerJoinPacketsHandler : IPlayerJoinPacketsHandler
     {
@@ -55,16 +58,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
             };
             var playerState = _matchDataService.AddPlayer(joinRequestPacket.UserName, playerTransform,
                 _gamePlayConfig.PlayerSpaceship.StartHealth, _gamePlayConfig.PlayerSpaceship.ShootCooldown);
+
+            // Log everything in playerState
+            LogService.LogTopic("PlayerState: " + playerState.Spaceship.ToJson(), LogTopicType.ServerNetwork);
+
             var playerId = playerState.Id;
             peer.Tag = playerId;
             _playerInputsPacketsHandler.RegisterListeners();
             _networkManager.AddPlayerPeer(playerId, peer);
-            _networkManager.SendPacketSerialized(PacketTypeS2C.JoinAccepted,
-                new JoinAcceptPacketS2C
-                {
-                    TickOnServer = _tickProcessor.CurrentTick, PlayerId = playerId, PlayerName = playerState.Name, SpaceshipState = playerState.Spaceship
-                },
-                DeliveryMethod.ReliableOrdered);
+            var joinPacket = new JoinAcceptPacketS2C
+            {
+                TickOnServer = _tickProcessor.CurrentTick,
+                PlayerId = playerId,
+                PlayerName = playerState.Name,
+                SpaceshipState = playerState.Spaceship
+            };
+            _networkManager.SendPacketSerialized(PacketTypeS2C.JoinAccepted, joinPacket, DeliveryMethod.ReliableOrdered);
         }
     }
 }

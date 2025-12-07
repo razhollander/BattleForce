@@ -13,7 +13,9 @@ public sealed class StructPool<T> where T : struct
     public StructPool(int capacity)
     {
         if (capacity <= 0)
-            throw new ArgumentOutOfRangeException(nameof(capacity));
+        {
+            return;
+        }
 
         _items = new T[capacity];
         _inUse = new bool[capacity];

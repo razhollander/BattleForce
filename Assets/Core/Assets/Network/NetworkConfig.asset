@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NetworkConfig
   m_EditorClassIdentifier: 
   MaxConnectedPlayers: 2
-  MaxConcurrentBullets: 1
+  MaxConcurrentBullets: 10
   TicksPerSeconds: 120
   DeltaTime: 0.008333334
   ServerTicksBuffer: 2

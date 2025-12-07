@@ -11,22 +11,22 @@
         Unreliable = 4,
 
         /// <summary>
-        /// Reliable. Packets won't be dropped, won't be duplicated, can arrive without order.
+        /// Reliable. Packets won't be dropped, won't be duplicated, can arrive without order. no delay of acknowledgment, packet are re-sent if didn't receive acknowledgment
         /// </summary>
         ReliableUnordered = 0,
 
         /// <summary>
-        /// Unreliable. Packets can be dropped, won't be duplicated, will arrive in order.
+        /// Unreliable. Packets can be dropped, won't be duplicated, will arrive in order. no delay of acknowledgment. only newest matters, older packets are ignored
         /// </summary>
         Sequenced = 1,
 
         /// <summary>
-        /// Reliable and ordered. Packets won't be dropped, won't be duplicated, will arrive in order.
+        /// Reliable and ordered. Packets won't be dropped, won't be duplicated, will arrive in order. has delay in case a packet N+2 is received and N+1 haven't arrived yet.
         /// </summary>
         ReliableOrdered = 2,
 
         /// <summary>
-        /// Reliable only last packet. Packets can be dropped (except the last one), won't be duplicated, will arrive in order.
+        /// Reliable only last packet. Packets can be dropped (except the last one), won't be duplicated, will arrive in order. good for sending hp for example
         /// </summary>
         ReliableSequenced = 3
     }

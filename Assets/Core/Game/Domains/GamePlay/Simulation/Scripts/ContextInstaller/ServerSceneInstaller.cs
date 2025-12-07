@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsHandlers;
 using UnityEngine;
 using Zenject;
 

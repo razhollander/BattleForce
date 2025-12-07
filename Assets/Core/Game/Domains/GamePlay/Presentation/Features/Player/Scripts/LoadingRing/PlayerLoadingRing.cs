@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
 
         //private Material _material;
         //private int _currentArcValue = ArcFullValue;
-        private float _currentScale;
+        private float _currentScale = 1;
 
         public void InitEntryPoint()
         {

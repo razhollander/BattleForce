@@ -25,9 +25,12 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
 
             var bulletsCount = Bullets.UsedCount;
             writer.Put((byte)bulletsCount);
-            foreach (var bulletIndex in Bullets.UsedIndices())
+            if (bulletsCount > 0)
             {
-                Bullets[bulletIndex].Serialize(writer);
+                foreach (var bulletIndex in Bullets.UsedIndices())
+                {
+                    Bullets[bulletIndex].Serialize(writer);
+                }
             }
         }
 
@@ -40,10 +43,13 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
                 Players[i].Deserialize(reader);
             var bulletsCount = (int)reader.GetByte();
             Bullets = new StructPool<PlayerBulletS2C>(bulletsCount);
-            for (int i = 0; i < bulletsCount; i++)
+            if (bulletsCount > 0)
             {
-                Bullets.Rent(out int index);
-                Bullets[index].Deserialize(reader);
+                for (int i = 0; i < bulletsCount; i++)
+                {
+                    Bullets.Rent(out int index);
+                    Bullets[index].Deserialize(reader);
+                }
             }
         }
 
@@ -151,11 +157,13 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(CooldownSecondsLeft);
+            writer.Put(MaxCooldown);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             CooldownSecondsLeft = reader.GetFloat();
+            MaxCooldown = reader.GetFloat();
         }
     }
 

@@ -111,7 +111,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         {
             var packet = _matchDataService.SimulationState;
             packet.Tick = processedTick;
-            _networkManager.SendPacketSerialized(PacketTypeS2C.SimulationState, packet, DeliveryMethod.Unreliable);
+            _networkManager.SendPacketSerialized(PacketTypeS2C.SimulationState, packet, DeliveryMethod.Sequenced);
         }
 
         // private void SendStateToPlayer(ServerPlayer p, int pCount)
