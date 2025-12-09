@@ -10,17 +10,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
     public struct SimulationStateS2C : INetSerializable
     {
-        public int Tick;
         public int PlayersCount;
         public PlayerStateS2C[] Players;
         //public int BulletsCount;
         //public PlayerBulletS2C[] Bullets;
         public StructPool<PlayerBulletS2C> Bullets;
-        public List<BulletSpawnNetEventS2C> BulletSpawnNetEvents; // todo: remove events related to bullet when bullet id destroyed
         
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(Tick);
             writer.Put((byte)PlayersCount);
             for (int i = 0; i < PlayersCount; i++)
             {
@@ -37,23 +34,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 }
             }
 
-            if (!BulletSpawnNetEvents.IsNullOrEmpty())
-            {
-                writer.Put((ushort)BulletSpawnNetEvents.Count);
-                foreach (var bulletSpawnEvent in BulletSpawnNetEvents)
-                {
-                    bulletSpawnEvent.Serialize(writer);
-                }
-            }
-            else
-            {
-                writer.Put((ushort)0);
-            }
+            
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            Tick = reader.GetInt();
             PlayersCount = reader.GetByte();
             Players = new PlayerStateS2C[PlayersCount];
             for (int i = 0; i < PlayersCount; i++)
@@ -67,17 +52,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                     Bullets.Rent(out int index);
                     Bullets[index].Deserialize(reader);
                 }
-            }
-            var bulletSpawnNetEventsCount = reader.GetUShort();
-            if (bulletSpawnNetEventsCount > 0)
-            {
-                var bulletSpawnNetEventsArray = new BulletSpawnNetEventS2C[bulletSpawnNetEventsCount];
-                for (int i = 0; i < bulletSpawnNetEventsCount; i++)
-                {
-                    bulletSpawnNetEventsArray[i].Deserialize(reader);
-                }
-
-                BulletSpawnNetEvents = bulletSpawnNetEventsArray.ToList();
             }
         }
 

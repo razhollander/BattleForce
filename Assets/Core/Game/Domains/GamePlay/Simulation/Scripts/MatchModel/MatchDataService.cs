@@ -13,15 +13,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
     public class MatchDataService : IMatchDataService
     {
         private SimulationStateS2C _simulationState;
+        private SimulationStateS2C _previousSimulationState;
         public SimulationStateS2C SimulationState => _simulationState;
-        private ushort _bulletsCreatedCounter = 0;
+        public SimulationStateS2C PreviousSimulationState => _previousSimulationState;
+        private ushort _lastBulletCreatedId = 0;
+        private readonly MatchNetEventsDataService _matchNetEventsDataService;
+        public MatchNetEventsDataService EventsData => _matchNetEventsDataService;
         public MatchDataService(NetworkConfig networkConfig)
         {
             _simulationState = new SimulationStateS2C();
             _simulationState.Players = new PlayerStateS2C[networkConfig.MaxConnectedPlayers];
             _simulationState.Bullets = new StructPool<PlayerBulletS2C>(networkConfig.MaxConcurrentBullets);
+            _matchNetEventsDataService = new();
         }
 
+        public void CopySimulationStateIntoPrevious()
+        {
+            _previousSimulationState = _simulationState;
+        }
+        
         public PlayerStateS2C AddPlayer(string playerName, PlayerTransformStateS2C playerTransformStateS2C, int health, float shootCooldown)
         {
             var playerSpaceship = new PlayerSpaceshipStateS2C(playerTransformStateS2C, shootCooldown, health);
@@ -53,18 +63,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         {
             _simulationState.Bullets.Rent(out var index);
             ref PlayerBulletS2C playerBullet = ref _simulationState.Bullets[index];
-            var bulletId =(ushort) (_bulletsCreatedCounter++ % ushort.MaxValue);
+            var bulletId =(ushort) (_lastBulletCreatedId++ % ushort.MaxValue);
             playerBullet.Id = bulletId;
             playerBullet.BelongToPlayerId = playerId;
             playerBullet.Position = position;
             playerBullet.Direction = direction;
             playerBullet.MoveSpeed = moveSpeed;
-            if (_simulationState.BulletSpawnNetEvents == null)
-            {
-                _simulationState.BulletSpawnNetEvents = new List<BulletSpawnNetEventS2C>();
-            }
-            SimulationState.BulletSpawnNetEvents.Add(new BulletSpawnNetEventS2C(EventsSequenceCounters.BulletSpawnNetEventCounter++, bulletId, position));
-
+            _matchNetEventsDataService.AddBulletSpawnNetEvent(bulletId, position);
             return playerBullet;
         }
     }

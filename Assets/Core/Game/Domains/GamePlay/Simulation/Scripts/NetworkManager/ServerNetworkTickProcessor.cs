@@ -3,6 +3,7 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
@@ -83,6 +84,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 {
                     SendCurrentTickStateToAllClients(processedTick);
                 }
+
+                _matchDataService.CopySimulationStateIntoPrevious();
                 //var inputsPerPlayerForCurrentTick = _serverPlayersInputListener.GetSortedInputsPerPlayerForTick(CurrentTick); 
             }
             catch (Exception e)
@@ -109,9 +112,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         private void SendCurrentTickStateToAllClients(int processedTick)
         {
-            var packet = _matchDataService.SimulationState;
-            packet.Tick = processedTick;
-            _networkManager.SendPacketSerialized(PacketTypeS2C.SimulationState, packet, DeliveryMethod.Unreliable);
+            var packet = new FullTickPacket(processedTick, _matchDataService.PreviousSimulationState,
+                _matchDataService.SimulationState, _matchDataService.EventsData.BulletSpawnNetEvents);
+            _networkManager.SendPacketSerialized(PacketTypeS2C.FullTick, packet, DeliveryMethod.Unreliable);
         }
 
         // private void SendStateToPlayer(ServerPlayer p, int pCount)
