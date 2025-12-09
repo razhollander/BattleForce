@@ -9,10 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e86b0b155d584114940d1f5769902cd0, type: 3}
-  m_Name: PlayerSpaceshipConfig
+  m_Script: {fileID: 11500000, guid: ebb89e21ce374e298e4791dc8fe6462e, type: 3}
+  m_Name: SimulationGamePlayConfig
   m_EditorClassIdentifier: 
-  StartHealth: 5
-  MovementSpeed: 5
-  RotationSpeed: 150
-  ShootCooldown: 0.7
+  PlayerSpaceship: {fileID: 11400000, guid: c964300775f8143bf8b7d9a0c7273e68, type: 2}
+  PlayerBullet: {fileID: 11400000, guid: f6bddc38f7ff94ca4ba008329fdc7743, type: 2}

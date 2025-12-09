@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad4af88b350d49528f8c69ffeffb00f6, type: 3}
   m_Name: PresentationGamePlayConfig
   m_EditorClassIdentifier: 
-  InterpolationFactor: 1
+  InterpolationFactor: 0.9

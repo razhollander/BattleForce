@@ -9,5 +9,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations
         public float MovementSpeed = 5f;
         public float RotationSpeed = 5f;
         public float ShootCooldown = 0.7f;
+        public float DefaultPlayerRadius = 0.7f;
     }
 }

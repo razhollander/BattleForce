@@ -54,8 +54,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 AimVector = Vector2.Zero,
                 AngularVelocity = 0,
                 Position = Vector2.One,
-                Direction = Vector2.One,
-                Velocity = Vector2.One * _gamePlayConfig.PlayerSpaceship.MovementSpeed
+                Direction = new Vector2(0,1),
+                Velocity = Vector2.One * _gamePlayConfig.PlayerSpaceship.MovementSpeed,
+                Radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius
             };
             var playerState = _matchDataService.AddPlayer(joinRequestPacket.UserName, playerTransform,
                 _gamePlayConfig.PlayerSpaceship.StartHealth, _gamePlayConfig.PlayerSpaceship.ShootCooldown);

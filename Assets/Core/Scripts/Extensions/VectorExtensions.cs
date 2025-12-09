@@ -39,6 +39,7 @@ namespace CoreDomain.Scripts.Extensions
         
         public static Quaternion ToQuaternion(this Vector2 direction)
         {
+            // note: in math the angle of (1,0) is 0, then going anti-clockwise
             return Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
         }
     }

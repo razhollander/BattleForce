@@ -92,7 +92,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHa
 
         private void CreateBulletForPlayer(PlayerStateS2C playerModel)
         {
-            var bullet = _matchDataService.AddBullet(playerModel.Id, playerModel.Spaceship.Transform.Position,
+            var bullet = _matchDataService.AddBullet(playerModel.Id, playerModel.Spaceship.Transform.GetHeadPosition(),
                 playerModel.Spaceship.Transform.Direction, _gamePlayConfig.PlayerBullet.MoveSpeed);
             LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);
         }
