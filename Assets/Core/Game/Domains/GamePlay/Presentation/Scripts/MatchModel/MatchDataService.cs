@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared;
-using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
+using Core.Game.Domains.GamePlay.Shared.MatchData.Models;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
@@ -8,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
     public class MatchDataService : IMatchDataService
     {
         public List<MatchPlayerModel> Players { get; private set; }
+        public List<MatchPlayerBulletModel> Bullets { get; private set; }
 
         public MatchPlayerModel LocalPlayer { get; private set; }
         public bool IsPlayerJoined => LocalPlayer != null;
@@ -15,6 +18,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         public MatchDataService(NetworkConfig networkConfig)
         {
             Players = new List<MatchPlayerModel>(networkConfig.MaxConnectedPlayers);
+            Bullets = new List<MatchPlayerBulletModel>(networkConfig.MaxConcurrentBullets);
+        }
+
+        public MatchPlayerBulletModel GetBullet(int bulletId)
+        {
+            return Bullets.Find(x => x.Id == bulletId);
         }
 
         public MatchPlayerModel GetPlayer(int playerId)
@@ -27,6 +36,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             var newPlayer = new MatchPlayerModel(playerId, playerName, spaceshipState);
             Players.Add(newPlayer);
             return newPlayer;
+        }
+        
+        public MatchPlayerBulletModel AddBullet(int bulletId, int belongToPlayerId, Vector2 position)
+        {
+            var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, position);
+            Bullets.Add(newBullet);
+            return newBullet;
         }
 
         public void SetLocalPlayer(MatchPlayerModel matchPlayerModel)

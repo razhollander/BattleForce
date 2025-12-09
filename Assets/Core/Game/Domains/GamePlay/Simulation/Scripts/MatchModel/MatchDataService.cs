@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Scripts.Network;
 using ModestTree;
@@ -12,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
     {
         private SimulationStateS2C _simulationState;
         public SimulationStateS2C SimulationState => _simulationState;
-        private int _bulletsCreatedCounter = 0;
+        private ushort _bulletsCreatedCounter = 0;
         public MatchDataService(NetworkConfig networkConfig)
         {
             _simulationState = new SimulationStateS2C();
@@ -29,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             _simulationState.PlayersCount++;
             return newPlayer;
         }
-
+        
         public PlayerStateS2C GetPlayer(int playerId)
         {
             return _simulationState.Players.First(x => x.Id == playerId);
@@ -51,12 +53,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         {
             _simulationState.Bullets.Rent(out var index);
             ref PlayerBulletS2C playerBullet = ref _simulationState.Bullets[index];
-            var bulletId = _bulletsCreatedCounter++ % int.MaxValue;
+            var bulletId =(ushort) (_bulletsCreatedCounter++ % ushort.MaxValue);
             playerBullet.Id = bulletId;
             playerBullet.BelongToPlayerId = playerId;
             playerBullet.Position = position;
             playerBullet.Direction = direction;
             playerBullet.MoveSpeed = moveSpeed;
+            if (_simulationState.BulletSpawnNetEvents == null)
+            {
+                _simulationState.BulletSpawnNetEvents = new List<BulletSpawnNetEventS2C>();
+            }
+            SimulationState.BulletSpawnNetEvents.Add(new BulletSpawnNetEventS2C(EventsSequenceCounters.BulletSpawnNetEventCounter++, bulletId, position));
+
             return playerBullet;
         }
     }

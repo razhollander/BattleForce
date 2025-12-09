@@ -1,4 +1,5 @@
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
         private IPlayerControllers _playerControllers;
         private ITickProcessor _tickProcessor;
+        private IBulletControllers _bulletControllers;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -41,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _chooseNetworkRoleUIController = _diContainer.Resolve<IChooseNetworkRoleUIController>();
             _playerControllers = _diContainer.Resolve<IPlayerControllers>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
+            _bulletControllers = _diContainer.Resolve<IBulletControllers>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -50,6 +53,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _chooseNetworkRoleUIController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _playerControllers.InitEntryPoint();
+            _bulletControllers.InitEntryPoint();
         }
     }
 }

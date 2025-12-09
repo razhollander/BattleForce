@@ -69,7 +69,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _writer.Put((byte)type);
             packet.Serialize(_writer);*/
             LogService.LogTopic($"Send packet type {type}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
-            
             _peerPerPlayerId.ForEach(x => _packetProcessor.SendNetSerializable(x.Value, packet, deliveryMethod));
         }
         

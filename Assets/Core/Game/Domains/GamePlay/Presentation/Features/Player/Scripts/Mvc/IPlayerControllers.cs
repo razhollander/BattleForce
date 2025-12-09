@@ -7,5 +7,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         void CreatePlayer(int playerId);
         void UpdatePlayersTransform();
         void UpdatePlayersBulletCooldowns();
+        void ShootBulletEffectForPlayer(int playerId);
     }
 }

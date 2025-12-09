@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
@@ -19,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
         [SerializeField] private Volume _postProcessVolume;
         [SerializeField] private ChooseNetworkRoleUIView _chooseNetworkRoleUIView;
         [SerializeField] private PlayerView _playerViewPrefab;
+        [SerializeField] private BulletView _bulletViewPrefab;
 
         public override void InstallBindings()
         {
@@ -37,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
             Container.Bind<IClientNetworkManager>().To<ClientNetworkManager>().AsSingle().NonLazy();
             Container.Bind<IPlayerJoinPacketsHandler>().To<PlayerJoinPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IMatchDataService>().To<MatchDataService>().AsSingle().NonLazy();
+            Container.Bind<IMatchNetEventsDataService>().To<MatchNetEventsDataService>().AsSingle().NonLazy();
             Container.Bind<ITickProcessor>().To<ClientNetworkTickProcessor>().AsSingle().NonLazy();
             Container.Bind<ISimulationStatePacketsHandler>().To<SimulationStatePacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IClientPresentationTickProcessor>().To<ClientPresentationTickProcessor>().AsSingle().NonLazy();
@@ -48,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
             Container.BindInterfacesTo<GameInputActionsController>().AsSingle().NonLazy();
             Container.BindInterfacesTo<ChooseNetworkRoleUIController>().AsSingle().WithArguments(_chooseNetworkRoleUIView).NonLazy();
             Container.BindInterfacesTo<PlayerControllers>().AsSingle().WithArguments(_playerViewPrefab).NonLazy();
+            Container.BindInterfacesTo<BulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
             //Container.BindInterfacesTo<NetworkManager>().AsSingle().WithArguments(_networkConfig).NonLazy();
             // Container.BindInterfacesTo<BFNetworkClient>().AsSingle().NonLazy();
             // Container.BindInterfacesTo<BFNetworkServer>().AsSingle().NonLazy();

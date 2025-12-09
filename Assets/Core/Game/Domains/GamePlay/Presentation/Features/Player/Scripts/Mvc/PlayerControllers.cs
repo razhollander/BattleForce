@@ -48,5 +48,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
                 playerController.UpdateBulletCooldown();
             }
         }
+
+        public void ShootBulletEffectForPlayer(int playerId)
+        {
+            _playerControllers.Find(x => x.PlayerId == playerId).DoShootEffect();
+        }
+        
+        public void RestoreBulletEffectForPlayer(int playerId)
+        {
+            _playerControllers.Find(x => x.PlayerId == playerId).RestoreBulletEffect();
+        }
     }
 }

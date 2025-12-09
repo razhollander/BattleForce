@@ -52,5 +52,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             var interpolationFactor = _gamePlayConfig.InterpolationFactor;
             _playerView.InterpolateBulletLoading(cooldownSecondsLeft, maxShootCooldown, interpolationFactor);
         }
+
+        public void RestoreBulletEffect()
+        {
+            _playerView.ShowIsBulletAvailable(true);
+        }
+        
+        public void DoShootEffect()
+        {
+            _playerView.ShowIsBulletAvailable(false);
+        }
     }
 }

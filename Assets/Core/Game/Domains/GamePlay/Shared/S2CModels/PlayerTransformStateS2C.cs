@@ -1,9 +1,12 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
+using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
+using Sirenix.Utilities;
 
-namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
+namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
     public struct SimulationStateS2C : INetSerializable
     {
@@ -13,7 +16,8 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
         //public int BulletsCount;
         //public PlayerBulletS2C[] Bullets;
         public StructPool<PlayerBulletS2C> Bullets;
-
+        public List<BulletSpawnNetEventS2C> BulletSpawnNetEvents; // todo: remove events related to bullet when bullet id destroyed
+        
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(Tick);
@@ -31,6 +35,19 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
                 {
                     Bullets[bulletIndex].Serialize(writer);
                 }
+            }
+
+            if (!BulletSpawnNetEvents.IsNullOrEmpty())
+            {
+                writer.Put((ushort)BulletSpawnNetEvents.Count);
+                foreach (var bulletSpawnEvent in BulletSpawnNetEvents)
+                {
+                    bulletSpawnEvent.Serialize(writer);
+                }
+            }
+            else
+            {
+                writer.Put((ushort)0);
             }
         }
 
@@ -51,11 +68,37 @@ namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
                     Bullets[index].Deserialize(reader);
                 }
             }
+            var bulletSpawnNetEventsCount = reader.GetUShort();
+            if (bulletSpawnNetEventsCount > 0)
+            {
+                var bulletSpawnNetEventsArray = new BulletSpawnNetEventS2C[bulletSpawnNetEventsCount];
+                for (int i = 0; i < bulletSpawnNetEventsCount; i++)
+                {
+                    bulletSpawnNetEventsArray[i].Deserialize(reader);
+                }
+
+                BulletSpawnNetEvents = bulletSpawnNetEventsArray.ToList();
+            }
         }
 
         public PlayerStateS2C GetPlayer(int playerId)
         {
             return Players.First(x => x.Id == playerId);
+        }
+        
+        public PlayerBulletS2C GetBullet(int bulletId)
+        {
+            foreach (var index in Bullets.UsedIndices())
+            {
+                var playerBullet = Bullets[index];
+                if (playerBullet.Id == bulletId)
+                {
+                    return playerBullet;
+                }
+            }
+
+            LogService.LogError($"No bullet for id {bulletId}!");
+            return default;
         }
     }
 

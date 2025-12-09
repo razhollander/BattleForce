@@ -1,4 +1,7 @@
+using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.UpdateService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
@@ -7,11 +10,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
     {
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly IPlayerControllers _playerControllers;
+        private readonly ICommandFactory _commandFactory;
+        private readonly IBulletControllers _bulletControllers;
 
-        public ClientPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IPlayerControllers playerControllers)
+        public ClientPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IPlayerControllers playerControllers, ICommandFactory commandFactory, IBulletControllers bulletControllers)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
+            _bulletControllers = bulletControllers;
+            _commandFactory = commandFactory;
         }
         
         public void StartTick()
@@ -26,8 +33,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
 
         public void ManagedUpdate()
         {
+            _commandFactory.CreateCommandVoid<BulletSpawnNetEventCommand>().Execute();
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();
+            _bulletControllers.UpdateBulletsTransform();
         }
     }
 }
