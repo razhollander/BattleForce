@@ -19,18 +19,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
         private readonly IStateMachineService _stateMachineService;
         private readonly IClientNetworkManager _clientNetworkManager;
         private readonly IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
-        private readonly ISimulationStatePacketsHandler _simulationStatePacketsHandler;
+        private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
         private readonly IClientPresentationTickProcessor _clientPresentationTickProcessor;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, IPlayerJoinPacketsHandler playerJoinPacketsHandler, ISimulationStatePacketsHandler simulationStatePacketsHandler, IClientPresentationTickProcessor clientPresentationTickProcessor)
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, IPlayerJoinPacketsHandler playerJoinPacketsHandler, IFullTickPacketsHandler fullTickPacketsHandler, IClientPresentationTickProcessor clientPresentationTickProcessor)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
             _stateMachineService = stateMachineService;
             _clientNetworkManager = clientNetworkManager;
             _playerJoinPacketsHandler = playerJoinPacketsHandler;
-            _simulationStatePacketsHandler = simulationStatePacketsHandler;
+            _fullTickPacketsHandler = fullTickPacketsHandler;
             _clientPresentationTickProcessor = clientPresentationTickProcessor;
         }
 
@@ -65,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             _clientNetworkManager.StartClient();
             _playerJoinPacketsHandler.RegisterListeners();
-            _simulationStatePacketsHandler.RegisterListeners();
+            _fullTickPacketsHandler.RegisterListeners();
             _uiView.Hide();
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }

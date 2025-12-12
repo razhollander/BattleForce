@@ -151,7 +151,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHa
 
         private void OnPlayerInputReceived(PlayerInputPacketC2S playerInputPacket, NetPeer peer)
         {
-            var playerId = (int)peer.Tag;
+            var playerId = (ushort)peer.Tag;
             _inputsPerPlayer.TryAdd(playerId, new List<PlayerInputPacketC2S>());
             _inputsPerPlayer[playerId].Add(playerInputPacket);
             LogService.LogTopic("Input packet received from player id" + playerId, LogTopicType.ServerNetwork);

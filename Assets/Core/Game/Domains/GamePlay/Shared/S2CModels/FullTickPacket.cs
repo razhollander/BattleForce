@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CoreDomain.Scripts.Extensions;
+using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
@@ -8,14 +9,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     public struct FullTickPacket : INetSerializable
     {
         public int Tick;
-        public SimulationStateS2C PreviousSimulationState;
+        //public SimulationStateS2C PreviousSimulationState; // not sure if gonna need this
         public SimulationStateS2C CurrentSimulationState;
         public List<BulletSpawnNetEventS2C> BulletSpawnNetEvents; // todo: remove events related to bullet when bullet id destroyed
 
         public FullTickPacket(int tick, SimulationStateS2C previousSimulationState, SimulationStateS2C currentSimulationState, List<BulletSpawnNetEventS2C> bulletSpawnNetEvents)
         {
             Tick = tick;
-            PreviousSimulationState = previousSimulationState;
+            //PreviousSimulationState = previousSimulationState;
             CurrentSimulationState = currentSimulationState;
             BulletSpawnNetEvents = bulletSpawnNetEvents;
         }
@@ -23,25 +24,41 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(Tick);
-            CurrentSimulationState.Serialize(PreviousSimulationState, writer);
-            if (!BulletSpawnNetEvents.IsNullOrEmpty())
+            CurrentSimulationState.SerializeTransforms(writer);
+            SerializedBulletSpawnedEvents(writer);
+        }
+
+        private void SerializedBulletSpawnedEvents(NetDataWriter writer)
+        {
+            if (BulletSpawnNetEvents.IsNullOrEmpty())
             {
-                writer.Put((ushort)BulletSpawnNetEvents.Count);
+                writer.Put((ushort)0);
+            }
+            else
+            {
+                var bulletSpawnedAmount = BulletSpawnNetEvents.Count;
+                if (bulletSpawnedAmount > 255)
+                {
+                    LogService.LogError($"Too many bullet were spawned! Amount {bulletSpawnedAmount}");
+                }
+            
+                writer.Put((ushort)bulletSpawnedAmount);
                 foreach (var bulletSpawnEvent in BulletSpawnNetEvents)
                 {
                     bulletSpawnEvent.Serialize(writer);
                 }
-            }
-            else
-            {
-                writer.Put((ushort)0);
             }
         }
 
         public void Deserialize(NetDataReader reader)
         {
             Tick = reader.GetInt();
+            CurrentSimulationState.DeserializeTransforms(reader);
+            DeserializedBulletSpawnedEvents(reader);
+        }
 
+        private void DeserializedBulletSpawnedEvents(NetDataReader reader)
+        {
             var bulletSpawnNetEventsCount = reader.GetUShort();
             if (bulletSpawnNetEventsCount > 0)
             {

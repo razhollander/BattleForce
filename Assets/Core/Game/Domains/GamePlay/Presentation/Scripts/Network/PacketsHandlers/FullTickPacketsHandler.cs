@@ -8,15 +8,15 @@ using LiteNetLib;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers
 {
-    public class SimulationStatePacketsHandler : ISimulationStatePacketsHandler
+    public class FullTickPacketsHandler : IFullTickPacketsHandler
     {
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
-        private readonly Dictionary<int, SimulationStateS2C> _statesPerTIck = new();
+        private readonly Dictionary<int, FullTickPacket> _fullTickPackets = new();
+        private readonly SimulationNetEventsHandler _simulationNetEventsHandler;
         public int LatestTickProcessedFromServer { get; private set; }
-        private SimulationNetEventsHandler _simulationNetEventsHandler;
         
-        public SimulationStatePacketsHandler(IClientNetworkManager networkManager, IMatchDataService matchDataService, IMatchNetEventsDataService matchNetEventsDataService)
+        public FullTickPacketsHandler(IClientNetworkManager networkManager, IMatchDataService matchDataService, IMatchNetEventsDataService matchNetEventsDataService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -25,18 +25,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
 
         public void RegisterListeners()
         {
-            _networkManager.SubscribeNetSerializable<SimulationStateS2C, NetPeer>(OnSimulationStateReceived);
+            _networkManager.SubscribeNetSerializable<FullTickPacket, NetPeer>(OnFullTickReceived);
         }
 
         public void ProcessStateLatestTick()
         {
-            if (_statesPerTIck.IsNullOrEmpty())
+            if (_fullTickPackets.IsNullOrEmpty())
             {
                 return;
             }
             
-            var latestTickReceivedFromServer = _statesPerTIck.Keys.Max();
-            var simulationState = _statesPerTIck[latestTickReceivedFromServer];
+            var latestTickReceivedFromServer = _fullTickPackets.Keys.Max();
+            var latestFullTickPacket = _fullTickPackets[latestTickReceivedFromServer];
 
             if (latestTickReceivedFromServer <= LatestTickProcessedFromServer)
             {
@@ -44,12 +44,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
                 return;
             }
 
-            _simulationNetEventsHandler.ProcessBulletSpawnEvents(simulationState.Bullets, simulationState.BulletSpawnNetEvents);
+            var simulationState = latestFullTickPacket.CurrentSimulationState;
+            _simulationNetEventsHandler.ProcessBulletSpawnEvents(latestFullTickPacket.BulletSpawnNetEvents);
             UpdatePlayersTransform(simulationState);
             UpdateBulletsTransform(simulationState);
 
             LatestTickProcessedFromServer = latestTickReceivedFromServer;
-            _statesPerTIck.Clear();
+            _fullTickPackets.Clear();
         }
 
         private void UpdatePlayersTransform(SimulationStateS2C simulationState)
@@ -71,11 +72,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             }
         }
         
-        private void OnSimulationStateReceived(SimulationStateS2C simulationState, NetPeer _)
+        private void OnFullTickReceived(FullTickPacket fullTickPacket, NetPeer _)
         {
-            LogService.LogTopic("Simulation state packet accepted received", LogTopicType.ClientNetwork);
-            var tick = simulationState.Tick;
-            _statesPerTIck.Add(tick, simulationState);
+            LogService.LogTopic("FullTickPacket accepted received", LogTopicType.ClientNetwork);
+            var tick = fullTickPacket.Tick;
+            _fullTickPackets.Add(tick, fullTickPacket);
         }
 
         public void InitExitPoint()
@@ -85,7 +86,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
 
         private void UnregisterListeners()
         {
-            _networkManager.RemoveSubscription<SimulationStateS2C>();
+            _networkManager.RemoveSubscription<FullTickPacket>();
         }
     }
 }

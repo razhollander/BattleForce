@@ -31,8 +31,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         private TimerFixedThreaded _fixedTimer;
 
-        private NetworkStateSimulator _networkStateSimulator;
-
         public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService, IPlayerBulletsTransformHandler playerBulletsTransformHandler)
         {

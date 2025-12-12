@@ -14,9 +14,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             BulletSpawnNetEvents = new List<BulletSpawnNetEventS2C>();
         }
 
-        public void AddBulletSpawnNetEvent(ushort bulletId, Vector2 position)
+        public void AddBulletSpawnNetEvent(ushort bulletId, ushort belongToPlayerId, Vector2 position)
         {
-            BulletSpawnNetEvents.Add(new BulletSpawnNetEventS2C(_bulletSpawnNetEventCounter++, bulletId, position));
+            BulletSpawnNetEvents.Add(new BulletSpawnNetEventS2C(_bulletSpawnNetEventCounter++, bulletId, belongToPlayerId, position));
         }
     }
 }

@@ -1,17 +1,12 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
-using Core.Game.Domains.GamePlay.Shared.C2SModels;
-using Core.Game.Domains.GamePlay.Shared.ClientToServerModels;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
-using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
-
-namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
     public class NetworkC2SPacketsListener : INetEventListener
     {

@@ -33,12 +33,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             bulletsSpawnEvents.Sort();
             foreach (var bulletsSpawnEvent in bulletsSpawnEvents)
             {
-                if (bulletsSpawnEvent.SequenceId <= _matchNetEventsDataService.HighestBulletSpawnEventSequenceId)
-                {
-                    LogService.LogTopic($"Bullet of seqId already processed {bulletsSpawnEvent.SequenceId}");
-                    continue;
-                }
-                
                 var bulletState = _matchDataService.GetBullet(bulletsSpawnEvent.BulletId);
                 _bulletControllers.CreateBullet(bulletState.Id);
                 _playerControllers.ShootBulletEffectForPlayer(bulletState.BelongToPlayerId);

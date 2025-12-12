@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         //private readonly ClientSimulationStateHandler _clientSimulationStateHandler;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ICommandFactory _commandFactory;
-        private readonly ISimulationStatePacketsHandler _simulationStatePacketsHandler;
+        private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
         private readonly IMatchDataService _matchDataService;
         private readonly IStateMachineService _stateMachineService;
         private SendInputsToServerCommand _saveInputsToServerCommand;
@@ -30,13 +30,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         public ClientNetworkTickProcessor(IClientNetworkManager networkManager,
             //ClientSimulationStateHandler clientSimulationStateHandler,
             IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            ISimulationStatePacketsHandler simulationStatePacketsHandler, IMatchDataService matchDataService)
+            IFullTickPacketsHandler fullTickPacketsHandler, IMatchDataService matchDataService)
         {
             _networkManager = networkManager;
             //_clientSimulationStateHandler = clientSimulationStateHandler;
             _updateSubscriptionService = updateSubscriptionService;
             _commandFactory = commandFactory;
-            _simulationStatePacketsHandler = simulationStatePacketsHandler;
+            _fullTickPacketsHandler = fullTickPacketsHandler;
             _matchDataService = matchDataService;
         }
 
@@ -64,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 return;
             }
             
-            _simulationStatePacketsHandler.ProcessStateLatestTick();
+            _fullTickPacketsHandler.ProcessStateLatestTick();
             SendCurrentTickInputsToServer();
         }
 

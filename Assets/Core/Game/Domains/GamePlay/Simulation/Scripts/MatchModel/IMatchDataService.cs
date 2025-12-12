@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             float shootCooldown);
         PlayerStateS2C GetPlayer(int playerId);
         void SetPlayer(int playerId, PlayerStateS2C playerModel);
-        PlayerBulletS2C AddBullet(int playerId, Vector2 position, Vector2 direction, float moveSpeed);
+        PlayerBulletS2C AddBullet(ushort playerId, Vector2 position, Vector2 direction, float moveSpeed);
         void CopySimulationStateIntoPrevious();
     }
 }

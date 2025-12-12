@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             }
         }
 
-        public PlayerBulletS2C AddBullet(int playerId, Vector2 position, Vector2 direction, float moveSpeed)
+        public PlayerBulletS2C AddBullet(ushort playerId, Vector2 position, Vector2 direction, float moveSpeed)
         {
             _simulationState.Bullets.Rent(out var index);
             ref PlayerBulletS2C playerBullet = ref _simulationState.Bullets[index];
@@ -69,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             playerBullet.Position = position;
             playerBullet.Direction = direction;
             playerBullet.MoveSpeed = moveSpeed;
-            _matchNetEventsDataService.AddBulletSpawnNetEvent(bulletId, position);
+            _matchNetEventsDataService.AddBulletSpawnNetEvent(bulletId, playerId, position);
             return playerBullet;
         }
     }

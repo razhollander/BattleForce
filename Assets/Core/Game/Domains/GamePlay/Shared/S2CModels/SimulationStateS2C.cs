@@ -1,59 +1,53 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
-using Sirenix.Utilities;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
-    public struct SimulationStateS2C : INetSerializable
+    public struct SimulationStateS2C
     {
-        public int PlayersCount;
+        public ushort PlayersCount;
         public PlayerStateS2C[] Players;
-        //public int BulletsCount;
-        //public PlayerBulletS2C[] Bullets;
         public StructPool<PlayerBulletS2C> Bullets;
         
-        public void Serialize(NetDataWriter writer)
-        {
-            writer.Put((byte)PlayersCount);
-            for (int i = 0; i < PlayersCount; i++)
-            {
-                Players[i].Serialize(writer);
-            }
-
-            var bulletsCount = Bullets.UsedCount;
-            writer.Put((byte)bulletsCount);
-            if (bulletsCount > 0)
-            {
-                foreach (var bulletIndex in Bullets.UsedIndices())
-                {
-                    Bullets[bulletIndex].Serialize(writer);
-                }
-            }
-
-            
-        }
-
-        public void Deserialize(NetDataReader reader)
-        {
-            PlayersCount = reader.GetByte();
-            Players = new PlayerStateS2C[PlayersCount];
-            for (int i = 0; i < PlayersCount; i++)
-                Players[i].Deserialize(reader);
-            var bulletsCount = (int)reader.GetByte();
-            Bullets = new StructPool<PlayerBulletS2C>(bulletsCount);
-            if (bulletsCount > 0)
-            {
-                for (int i = 0; i < bulletsCount; i++)
-                {
-                    Bullets.Rent(out int index);
-                    Bullets[index].Deserialize(reader);
-                }
-            }
-        }
+        // public void Serialize(NetDataWriter writer)
+        // {
+        //     writer.Put((byte)PlayersCount);
+        //     for (int i = 0; i < PlayersCount; i++)
+        //     {
+        //         Players[i].Serialize(writer);
+        //     }
+        //
+        //     var bulletsCount = Bullets.UsedCount;
+        //     writer.Put((byte)bulletsCount);
+        //     if (bulletsCount > 0)
+        //     {
+        //         foreach (var bulletIndex in Bullets.UsedIndices())
+        //         {
+        //             Bullets[bulletIndex].Serialize(writer);
+        //         }
+        //     }
+        // }
+        //
+        // public void Deserialize(NetDataReader reader)
+        // {
+        //     PlayersCount = reader.GetByte();
+        //     Players = new PlayerStateS2C[PlayersCount];
+        //     for (int i = 0; i < PlayersCount; i++)
+        //         Players[i].Deserialize(reader);
+        //     var bulletsCount = (int)reader.GetByte();
+        //     Bullets = new StructPool<PlayerBulletS2C>(bulletsCount);
+        //     if (bulletsCount > 0)
+        //     {
+        //         for (int i = 0; i < bulletsCount; i++)
+        //         {
+        //             Bullets.Rent(out int index);
+        //             Bullets[index].Deserialize(reader);
+        //         }
+        //     }
+        // }
 
         public PlayerStateS2C GetPlayer(int playerId)
         {
@@ -74,31 +68,83 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             LogService.LogError($"No bullet for id {bulletId}!");
             return default;
         }
+
+        public void SerializeTransforms(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayersCount);
+            for (var i = 0; i < PlayersCount; i++)
+            {
+                Players[i].SerializeTransforms(writer);
+            }
+
+            var bulletsCount = Bullets.UsedCount;
+            writer.Put((byte)bulletsCount);
+            if (bulletsCount > 0)
+            {
+                foreach (var bulletIndex in Bullets.UsedIndices())
+                {
+                    Bullets[bulletIndex].SerializeTransforms(writer);
+                }
+            }
+        }
+
+        public void DeserializeTransforms(NetDataReader reader)
+        {
+            PlayersCount = reader.GetByte();
+            Players = new PlayerStateS2C[PlayersCount];
+            for (var i = 0; i < PlayersCount; i++)
+            {
+                Players[i].DeserializeTransforms(reader);
+            }
+
+            var bulletsCount = (int)reader.GetByte();
+            Bullets = new StructPool<PlayerBulletS2C>(bulletsCount);
+            if (bulletsCount > 0)
+            {
+                for (int i = 0; i < bulletsCount; i++)
+                {
+                    Bullets.Rent(out int index);
+                    Bullets[index].DeserializeTransforms(reader);
+                }
+            }
+        }
     }
 
-    public struct PlayerStateS2C : INetSerializable
+    public struct PlayerStateS2C
     {
-        public int Id;
+        public ushort Id;
         public string Name;
         public PlayerSpaceshipStateS2C Spaceship;
 
-        public PlayerStateS2C(int id, string name, PlayerSpaceshipStateS2C spaceship)
+        public PlayerStateS2C(ushort id, string name, PlayerSpaceshipStateS2C spaceship)
         {
             Id = id;
             Name = name;
             Spaceship = spaceship;
         }
 
-        public void Serialize(NetDataWriter writer)
+        // public void Serialize(NetDataWriter writer)
+        // {
+        //     writer.Put((byte)Id);
+        //     Spaceship.Serialize(writer);
+        // }
+        //
+        // public void Deserialize(NetDataReader reader)
+        // {
+        //     Id = reader.GetByte();
+        //     Spaceship.Deserialize(reader);
+        // }
+
+        public void SerializeTransforms(NetDataWriter writer)
         {
             writer.Put((byte)Id);
-            Spaceship.Serialize(writer);
+            Spaceship.SerializeTransforms(writer);
         }
 
-        public void Deserialize(NetDataReader reader)
+        public void DeserializeTransforms(NetDataReader reader)
         {
             Id = reader.GetByte();
-            Spaceship.Deserialize(reader);
+            Spaceship.DeserializeTransforms(reader);
         }
     }
 
@@ -127,6 +173,18 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Transform.Deserialize(reader);
             Shoot.Deserialize(reader);
             Health.Deserialize(reader);
+        }
+
+        public void SerializeTransforms(NetDataWriter writer)
+        {
+            Transform.SerializeTransforms(writer);
+            Shoot.SerializeTransforms(writer);
+        }
+
+        public void DeserializeTransforms(NetDataReader reader)
+        {
+            Transform.DeserializeTransforms(reader);
+            Shoot.DeserializeTransforms(reader);
         }
     }
 
@@ -164,6 +222,18 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             // AngularVelocity = reader.GetFloat();
             // AimVector = reader.GetVector2();
         }
+
+        public void SerializeTransforms(NetDataWriter writer)
+        {
+            writer.Put(Position);
+            writer.Put(Direction);
+        }
+
+        public void DeserializeTransforms(NetDataReader reader)
+        {
+            Position = reader.GetVector2();
+            Direction = reader.GetVector2();
+        }
     }
 
     public struct PlayerShootStateS2C : INetSerializable
@@ -187,6 +257,16 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             CooldownSecondsLeft = reader.GetFloat();
             MaxCooldown = reader.GetFloat();
+        }
+
+        public void SerializeTransforms(NetDataWriter writer)
+        {
+            writer.Put(CooldownSecondsLeft);
+        }
+
+        public void DeserializeTransforms(NetDataReader reader)
+        {
+            CooldownSecondsLeft = reader.GetFloat();
         }
     }
 
@@ -231,6 +311,18 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             Id = reader.GetByte();
             BelongToPlayerId = reader.GetByte();
+            Position = reader.GetVector2();
+        }
+
+        public void SerializeTransforms(NetDataWriter writer)
+        {
+            writer.Put((byte)Id);
+            writer.Put(Position);
+        }
+
+        public void DeserializeTransforms(NetDataReader reader)
+        {
+            Id = reader.GetByte();
             Position = reader.GetVector2();
         }
     }

@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;

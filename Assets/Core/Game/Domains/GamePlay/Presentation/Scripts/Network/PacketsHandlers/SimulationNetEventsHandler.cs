@@ -16,27 +16,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _matchNetEventsDataService = matchNetEventsDataService;
         }
 
-        public void ProcessBulletSpawnEvents(StructPool<PlayerBulletS2C> bullets, List<BulletSpawnNetEventS2C> bulletSpawnNetEvents)
+        public void ProcessBulletSpawnEvents(List<BulletSpawnNetEventS2C> bulletSpawnNetEvents)
         {
             if (bulletSpawnNetEvents.IsNullOrEmpty())
             {
                 return;
             }
-            
-            _matchNetEventsDataService.BulletSpawnNetEvents.AddRange(bulletSpawnNetEvents);
-            
+
             foreach (var bulletSpawnNetEvent in bulletSpawnNetEvents)
             {
-                var spawnedBulletId = bulletSpawnNetEvent.BulletId;
-                foreach (var index in bullets.UsedIndices())
+                if (bulletSpawnNetEvent.SequenceId > _matchNetEventsDataService.HighestBulletSpawnEventSequenceId)
                 {
-                    var currentBullet = bullets[index];
-                    if (currentBullet.Id == spawnedBulletId)
-                    {
-                        var bullet = currentBullet;
-                        _matchDataService.AddBullet(bulletSpawnNetEvent.BulletId, bullet.BelongToPlayerId,
-                            bulletSpawnNetEvent.Position);
-                    }
+                    _matchDataService.AddBullet(bulletSpawnNetEvent.BulletId, bulletSpawnNetEvent.BelongToPlayerId,
+                        bulletSpawnNetEvent.Position);
+                    _matchNetEventsDataService.BulletSpawnNetEvents.Add(bulletSpawnNetEvent);
+                    _matchNetEventsDataService.HighestBulletSpawnEventSequenceId = bulletSpawnNetEvent.SequenceId;
                 }
             }
         }
