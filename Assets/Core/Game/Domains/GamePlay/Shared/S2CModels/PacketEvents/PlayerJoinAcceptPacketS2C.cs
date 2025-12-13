@@ -3,16 +3,18 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
 {
-    public class JoinAcceptPacketS2C : INetSerializable
+    public struct PlayerJoinAcceptPacketS2C : INetSerializable
     {
-        public int TickOnServer;
-        public int PlayerId;
+        public int OccuredOnTick;
+        public int NetPeerId;
+        public ushort PlayerId;
         public string PlayerName;
         public PlayerSpaceshipStateS2C SpaceshipState;
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(TickOnServer);
+            writer.Put(OccuredOnTick);
+            writer.Put(NetPeerId);
             writer.Put((byte)PlayerId);
             writer.Put(PlayerName);
             SpaceshipState.Serialize(writer);
@@ -20,7 +22,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
 
         public void Deserialize(NetDataReader reader)
         {
-            TickOnServer = reader.GetInt();
+            OccuredOnTick = reader.GetInt();
+            NetPeerId = reader.GetInt();
             PlayerId = reader.GetByte();
             PlayerName = reader.GetString();
             SpaceshipState.Deserialize(reader);

@@ -21,7 +21,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private IAudioService _audioService;
         private IGameInputActionsController _gameInputActionsController;
         private IChooseNetworkRoleUIController _chooseNetworkRoleUIController;
-        private IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
         private IPlayerControllers _playerControllers;
         private ITickProcessor _tickProcessor;
         private IBulletControllers _bulletControllers;

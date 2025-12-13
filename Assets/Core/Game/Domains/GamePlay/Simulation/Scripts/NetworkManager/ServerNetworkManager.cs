@@ -119,5 +119,10 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         {
             _netManager.PollEvents();
         }
+
+        public int GetPlayerPeerId(ushort playerId)
+        {
+            return _packetsSender.GetPlayerPeerId(playerId);
+        }
     }
 }

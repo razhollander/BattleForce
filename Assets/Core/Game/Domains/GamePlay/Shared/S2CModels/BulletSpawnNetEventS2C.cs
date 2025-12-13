@@ -7,12 +7,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
     public struct BulletSpawnNetEventS2C : INetSerializable
     {
-        public ushort OccuredOnTick;
-        public ushort BulletId;
+        public int OccuredOnTick;
+        public int BulletId;
         public ushort BelongToPlayerId;
         public Vector2 Position;
         
-        public BulletSpawnNetEventS2C(ushort occuredOnTick, ushort bulletId, ushort belongToPlayerId, Vector2 position)
+        public BulletSpawnNetEventS2C(int occuredOnTick, int bulletId, ushort belongToPlayerId, Vector2 position)
         {
             OccuredOnTick = occuredOnTick;
             BulletId = bulletId;
@@ -24,15 +24,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             writer.Put(OccuredOnTick);
             writer.Put(BulletId);
-            writer.Put(BelongToPlayerId);
+            writer.Put((byte)BelongToPlayerId);
             writer.Put(Position);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            OccuredOnTick = reader.GetUShort();
-            BulletId = reader.GetUShort();
-            BelongToPlayerId = reader.GetUShort();
+            OccuredOnTick = reader.GetInt();
+            BulletId = reader.GetInt();
+            BelongToPlayerId = reader.GetByte();
             Position = reader.GetVector2();
         }
     }

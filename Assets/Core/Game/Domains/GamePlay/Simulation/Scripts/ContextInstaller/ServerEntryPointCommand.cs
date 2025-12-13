@@ -11,17 +11,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private IServerNetworkManager _serverNetworkManager;
         private IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
         private ITickProcessor _tickProcessor;
+        private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
 
         public override void ResolveDependencies()
         {
             _serverNetworkManager = _diContainer.Resolve<IServerNetworkManager>();
             _playerJoinPacketsHandler = _diContainer.Resolve<IPlayerJoinPacketsHandler>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
+            _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
         }
 
         public void Execute()
         {
             _serverNetworkManager.InitEntryPoint();
+            _playerInputsPacketsHandler.InitEntryPoint();
             _playerJoinPacketsHandler.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
         }

@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
 
@@ -12,24 +13,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         public SimulationStateS2C SimulationState => _simulationState;
         public SimulationStateS2C PreviousSimulationState => _previousSimulationState;
         private ushort _lastBulletCreatedId = 0;
-        private readonly MatchNetEventsDataService _matchNetEventsDataService;
-        public MatchNetEventsDataService EventsData => _matchNetEventsDataService;
+   
         public MatchDataService(NetworkConfig networkConfig)
         {
             _simulationState = new SimulationStateS2C();
             _simulationState.Players = new PlayerStateS2C[networkConfig.MaxConnectedPlayers];
             _simulationState.Bullets = new StructPool<PlayerBulletS2C>(networkConfig.MaxConcurrentBullets);
-            _matchNetEventsDataService = new();
         }
 
         public void CopySimulationStateIntoPrevious()
         {
             _previousSimulationState = _simulationState;
-        }
-
-        public void RemoveAllEventsOlderThanTick(ushort playerId, int tick)
-        {
-            _matchNetEventsDataService.RemoveAllEventsOlderThanTick(playerId, tick);
         }
 
         public PlayerStateS2C AddPlayer(string playerName, PlayerTransformStateS2C playerTransformStateS2C, int health, float shootCooldown)
@@ -39,7 +33,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             var newPlayer = new PlayerStateS2C(playerId, playerName, playerSpaceship);
             _simulationState.Players[playerId] = newPlayer;
             _simulationState.PlayersCount++;
-            _matchNetEventsDataService.StartSavingPlayerEvents(playerId);
             return newPlayer;
         }
         
@@ -60,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             }
         }
 
-        public PlayerBulletS2C AddBullet(int processedTick, ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed)
+        public PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed)
         {
             _simulationState.Bullets.Rent(out var index);
             ref PlayerBulletS2C playerBullet = ref _simulationState.Bullets[index];
@@ -70,7 +63,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             playerBullet.Position = position;
             playerBullet.Direction = direction;
             playerBullet.MoveSpeed = moveSpeed;
-            _matchNetEventsDataService.AddBulletSpawnNetEvent((ushort)processedTick, bulletId, belongToPlayerId, position);
             return playerBullet;
         }
     }

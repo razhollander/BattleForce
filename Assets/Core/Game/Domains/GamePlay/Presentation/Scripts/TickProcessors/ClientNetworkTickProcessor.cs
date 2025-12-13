@@ -59,18 +59,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         public void ManagedFixedUpdate()
         {
             _networkManager.PollEvents();
-            if (!_matchDataService.IsPlayerJoined) 
-            {
-                return;
-            }
+            CurrentTick = _fullTickPacketsHandler.ProcessStateLatestTick(CurrentTick);
             
-            _fullTickPacketsHandler.ProcessStateLatestTick();
-            SendCurrentTickInputsToServer();
+            if (_matchDataService.IsPlayerJoined) 
+            {
+                SendCurrentTickInputsToServer();
+            }
         }
 
         private void SendCurrentTickInputsToServer()
         {
-            CurrentTick++;
             _sendInputsToServerCommand.Execute();
         }
 

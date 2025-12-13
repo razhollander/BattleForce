@@ -4,7 +4,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
     {
         int LastProcessedTickFromServer { get; }
         void RegisterListeners();
-        void ProcessStateLatestTick();
+        int ProcessStateLatestTick(int clientTick);
         void InitExitPoint();
     }
 }

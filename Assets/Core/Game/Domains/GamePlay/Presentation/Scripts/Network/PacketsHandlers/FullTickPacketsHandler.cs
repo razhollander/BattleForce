@@ -1,7 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
+using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
@@ -15,12 +20,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         private readonly Dictionary<int, FullTickPacket> _fullTickPackets = new();
         private readonly SimulationNetEventsHandler _simulationNetEventsHandler;
         public int LastProcessedTickFromServer { get; private set; }
-        
-        public FullTickPacketsHandler(IClientNetworkManager networkManager, IMatchDataService matchDataService, IMatchNetEventsDataService matchNetEventsDataService)
+
+        public FullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
+            IMatchDataService matchDataService, IMatchNetEventsDataService matchNetEventsDataService,
+            IPlayerControllers playerControllers, IClientPresentationTickProcessor clientPresentationTickProcessor)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
-            _simulationNetEventsHandler = new SimulationNetEventsHandler(matchDataService, matchNetEventsDataService);
+            _simulationNetEventsHandler = new SimulationNetEventsHandler(matchDataService, matchNetEventsDataService, networkManager, playerControllers, networkConfig, clientPresentationTickProcessor);
         }
 
         public void RegisterListeners()
@@ -28,11 +35,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _networkManager.SubscribeNetSerializable<FullTickPacket, NetPeer>(OnFullTickReceived);
         }
 
-        public void ProcessStateLatestTick()
+        public int ProcessStateLatestTick(int clientTick)
         {
+            clientTick++;
             if (_fullTickPackets.IsNullOrEmpty())
             {
-                return;
+                return clientTick;
             }
 
             var latestTickReceivedFromServer = _fullTickPackets.Keys.Max();
@@ -41,27 +49,45 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             if (latestTickReceivedFromServer <= LastProcessedTickFromServer)
             {
                 LogService.LogTopic("Didn't receive any state since last tick", LogTopicType.ClientNetwork);
-                return;
+                return clientTick;
             }
 
             var simulationState = latestFullTickPacket.CurrentSimulationState;
-            ProcessBulletSpawnedEvents(latestFullTickPacket);
+            ProcessPlayerJoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents, ref clientTick);
+            ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
             UpdatePlayersTransform(simulationState);
             UpdateBulletsTransform(simulationState);
 
             LastProcessedTickFromServer = latestTickReceivedFromServer;
             _fullTickPackets.Clear();
+            return clientTick;
         }
 
-        private void ProcessBulletSpawnedEvents(FullTickPacket latestFullTickPacket)
+        private void ProcessPlayerJoinedEvents(List<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
         {
-            if (latestFullTickPacket.BulletSpawnNetEvents.IsNullOrEmpty())
+            if (playerJoinAcceptNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+            if (playerJoinAcceptNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var unProcessedPlayerJoinedEvents = 
+                playerJoinAcceptNetEvents.FindAll(x => x.OccuredOnTick > LastProcessedTickFromServer);
+            _simulationNetEventsHandler.ProcessPlayerJoinedEvents(unProcessedPlayerJoinedEvents, ref clientTick);
+        }
+
+        private void ProcessBulletSpawnedEvents(List<BulletSpawnNetEventS2C> bulletSpawnNetEvents)
+        {
+            if (bulletSpawnNetEvents.IsNullOrEmpty())
             {
                 return;
             }
 
             var unProcessedBulletSpawnedEvents =
-                latestFullTickPacket.BulletSpawnNetEvents.FindAll(x => x.OccuredOnTick > LastProcessedTickFromServer);
+                bulletSpawnNetEvents.FindAll(x => x.OccuredOnTick > LastProcessedTickFromServer);
             _simulationNetEventsHandler.ProcessBulletSpawnEvents(unProcessedBulletSpawnedEvents);
         }
 

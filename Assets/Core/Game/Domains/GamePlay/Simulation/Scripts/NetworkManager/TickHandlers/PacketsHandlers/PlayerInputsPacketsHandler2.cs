@@ -19,19 +19,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly IMatchDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
+
+        private readonly IMatchNetEventsDataService _matchNetEventsDataService;
+
         // private readonly Dictionary<int, Dictionary<int, PlayerInputPacketC2S>> _inputsByTick = new ();
         private readonly Dictionary<int, List<PlayerInputPacketC2S>> _inputsPerPlayer = new();
         private readonly Dictionary<int,PlayerInputPacketC2S> _cachedLastProcessedInput = new ();
 
-        public PlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
+        public PlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
+            SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, IMatchNetEventsDataService matchNetEventsDataService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
+            _matchNetEventsDataService = matchNetEventsDataService;
         }
 
-        public void RegisterListeners()
+        public void InitEntryPoint()
         {
             _networkManager.SubscribeNetSerializable<PlayerInputPacketC2S>(OnPlayerInputReceived);
         }
@@ -91,8 +96,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         private void CreateBulletForPlayer(int processedTick, PlayerStateS2C playerModel)
         {
-            var bullet = _matchDataService.AddBullet(processedTick, playerModel.Id, playerModel.Spaceship.Transform.GetHeadPosition(),
+            var bullet = _matchDataService.AddBullet(playerModel.Id, playerModel.Spaceship.Transform.GetHeadPosition(),
                 playerModel.Spaceship.Transform.Direction, _gamePlayConfig.PlayerBullet.MoveSpeed);
+            _matchNetEventsDataService.AddBulletSpawnNetEvent(processedTick, bullet.Id, bullet.BelongToPlayerId, bullet.Position);
+
             LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);
         }
 

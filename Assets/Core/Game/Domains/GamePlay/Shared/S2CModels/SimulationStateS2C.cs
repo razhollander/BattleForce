@@ -283,10 +283,22 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put((byte)MaxHealth);
             writer.Put((byte)CurrentHealth);
         }
 
         public void Deserialize(NetDataReader reader)
+        {
+            MaxHealth = reader.GetByte();
+            CurrentHealth = reader.GetByte();
+        }
+        
+        public void SerializeCurrentHealth(NetDataWriter writer)
+        {
+            writer.Put((byte)CurrentHealth);
+        }
+
+        public void DeserializeCurrentHealth(NetDataReader reader)
         {
             CurrentHealth = reader.GetByte();
         }
@@ -295,7 +307,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     public struct PlayerBulletS2C : INetSerializable
     {
         public int Id;
-        public int BelongToPlayerId;
+        public ushort BelongToPlayerId;
         public Vector2 Position;
         public float MoveSpeed;
         public Vector2 Direction;

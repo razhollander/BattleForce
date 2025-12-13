@@ -21,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly NetworkC2SPacketsSender _packetsSender;
         public bool IsPeerConnected { get; private set; }
         public int Ping => _packetsSender.Peer.Ping;
+        public int LocalPeerId => _packetsSender.Peer.Id;
 
         public ClientNetworkManager(NetworkConfig networkConfig, ICommandFactory commandFactory, IUpdateSubscriptionService updateSubscriptionService)
         {
@@ -104,10 +105,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         public void ManagedOnGUI()
         {
-            GUIStyle style = new GUIStyle(GUI.skin.label);
-            style.fontSize = 10;
-            style.normal.textColor = Color.white;
-            GUI.Label(new Rect(10, 10, 400, 30), "Local Host Ping: "+_packetsListener.PingToLocalHost, style);
+            // GUIStyle style = new GUIStyle(GUI.skin.label);
+            // style.fontSize = 10;
+            // style.normal.textColor = Color.white;
+            // GUI.Label(new Rect(10, 10, 400, 30), "Local Host Ping: "+_packetsListener.PingToLocalHost, style);
         }
     }
 }

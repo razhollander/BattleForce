@@ -15,7 +15,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private ICommandFactory _commandFactory;
         private IAudioService _audioService;
         private IClientNetworkManager _clientNetworkManager;
-        private IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private IClientPresentationTickProcessor _clientPresentationTickProcessor;
         private ITickProcessor _tickProcessor;
@@ -26,7 +25,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _audioService = _diContainer.Resolve<IAudioService>();
             _clientNetworkManager = _diContainer.Resolve<IClientNetworkManager>();
-            _playerJoinPacketsHandler = _diContainer.Resolve<IPlayerJoinPacketsHandler>();
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
             _clientPresentationTickProcessor = _diContainer.Resolve<IClientPresentationTickProcessor>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
@@ -38,7 +36,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             //_audioService.RemoveAudioClips(_gamePlayAudioClipsScriptableObject);
             //_commandFactory.CreateCommandVoid<DisposeLevelCommand>().SetShouldReleaseAssetsFromMemory(true).Execute();
             _gameInputActionsController.DisableInputs();
-            _playerJoinPacketsHandler.InitExitPoint();
             _fullTickPacketsHandler.InitExitPoint();
             _clientPresentationTickProcessor.StopTick();
             _tickProcessor.StopTick();

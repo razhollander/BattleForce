@@ -97,5 +97,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         //     _packetProcessor.Write(_writer, packet);
         //     _peerPerPlayerId.ForEach(x => x.Value.Send(_writer, deliveryMethod));
         // }
+        public int GetPlayerPeerId(ushort playerId)
+        {
+            return _peerPerPlayerId[playerId].Id;
+        }
     }
 }

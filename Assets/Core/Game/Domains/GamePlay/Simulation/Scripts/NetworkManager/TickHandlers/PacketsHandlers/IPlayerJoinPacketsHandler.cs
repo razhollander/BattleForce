@@ -4,5 +4,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
     {
         void InitEntryPoint();
         void InitExitPoint();
+        void ProcessPlayersJoined(int processedTick);
     }
 }

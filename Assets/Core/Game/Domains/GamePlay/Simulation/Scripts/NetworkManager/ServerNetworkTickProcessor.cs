@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
+using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
@@ -24,6 +25,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private readonly IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private readonly IMatchDataService _matchDataService;
         private readonly IPlayerBulletsTransformHandler _playerBulletsTransformHandler;
+        private readonly IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
+        private readonly IMatchNetEventsDataService _matchNetEventsDataService;
 
         //private readonly IServerPlayersInputListener _serverPlayersInputListener;
 
@@ -32,13 +35,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private TimerFixedThreaded _fixedTimer;
 
         public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
-            IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService, IPlayerBulletsTransformHandler playerBulletsTransformHandler)
+            IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
+            IPlayerBulletsTransformHandler playerBulletsTransformHandler,
+            IPlayerJoinPacketsHandler playerJoinPacketsHandler, IMatchNetEventsDataService matchNetEventsDataService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _playerInputsPacketsHandler = playerInputsPacketsHandler;
             _matchDataService = matchDataService;
             _playerBulletsTransformHandler = playerBulletsTransformHandler;
+            _playerJoinPacketsHandler = playerJoinPacketsHandler;
+            _matchNetEventsDataService = matchNetEventsDataService;
             //_serverPlayersInputListener = serverPlayersInputListener;
         }
 
@@ -72,6 +79,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 CurrentTick++;
                 var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
                 _networkManager.PollEvents();
+                _playerJoinPacketsHandler.ProcessPlayersJoined(processedTick);
                 _playerInputsPacketsHandler.ProcessInputs(processedTick);
                 _playerBulletsTransformHandler.UpdateBulletsTransform();
                 //ProccesEvents();
@@ -116,19 +124,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             {
                 var player = _matchDataService.SimulationState.Players[i];
                 var playerId = player.Id;
-                _matchDataService.RemoveAllEventsOlderThanTick(playerId, processedTick);
+                _matchNetEventsDataService.RemoveAllEventsOlderThanTick(playerId, processedTick);
             }
         }
 
         private void SendCurrentTickStateToAllClients(int processedTick)
         {
             var simulationState = _matchDataService.SimulationState;
-            var packet = new FullTickPacket(processedTick, _matchDataService.PreviousSimulationState, simulationState, null);
+            var packet = new FullTickPacket(processedTick, _matchDataService.PreviousSimulationState, simulationState, null, null);
             for (var i = 0; i < simulationState.PlayersCount; i++)
             {
                 var playerState = simulationState.Players[i];
                 var playerId = playerState.Id;
-                packet.BulletSpawnNetEvents = _matchDataService.EventsData.BulletSpawnNetEventsPerPlayer[playerId];
+                packet.BulletSpawnNetEvents = _matchNetEventsDataService.BulletSpawnNetEventsPerPlayer[playerId];
+                packet.PlayerJoinAcceptNetEvents = _matchNetEventsDataService.JoinAcceptNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.FullTick, packet,
                     DeliveryMethod.Unreliable);
             }

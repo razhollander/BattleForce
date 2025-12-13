@@ -26,5 +26,6 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         void RemoveSubscription<T>();
         void AddPlayerPeer(ushort playerId, NetPeer peer);
         void PollEvents();
+        int GetPlayerPeerId(ushort playerId);
     }
 }

@@ -22,17 +22,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly IServerNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
-        private readonly ITickProcessor _tickProcessor;
         private readonly Dictionary<int, (JoinRequestPacketC2S, NetPeer)> _packetsPerTick;
         private readonly IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
+        private readonly IMatchNetEventsDataService _matchNetEventsDataService;
+        private readonly Dictionary<NetPeer, JoinRequestPacketC2S> _playerJoinedPacketsPerPeer;
 
-        public PlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, ITickProcessor tickProcessor, IPlayerInputsPacketsHandler playerInputsPacketsHandler)
+        public PlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
+            SimulationGamePlayConfig gamePlayConfig, IPlayerInputsPacketsHandler playerInputsPacketsHandler,
+            IMatchNetEventsDataService matchNetEventsDataService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
-            _tickProcessor = tickProcessor;
             _playerInputsPacketsHandler = playerInputsPacketsHandler;
+            _matchNetEventsDataService = matchNetEventsDataService;
+            _playerJoinedPacketsPerPeer = new Dictionary<NetPeer, JoinRequestPacketC2S>();
         }
 
         public void InitEntryPoint()
@@ -40,42 +44,45 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             _networkManager.SubscribeNetSerializable<JoinRequestPacketC2S>(OnJoinReceived);
         }
 
-        public void InitExitPoint()
+        public void ProcessPlayersJoined(int processedTick)
         {
-            _networkManager.RemoveSubscription<JoinRequestPacketC2S>();
+            foreach (var kvp in _playerJoinedPacketsPerPeer)
+            {
+                var playerTransform = new PlayerTransformStateS2C
+                {
+                    Acceleration = Vector2.Zero,
+                    AimVector = Vector2.Zero,
+                    AngularVelocity = 0,
+                    Position = Vector2.One,
+                    Direction = new Vector2(0, 1),
+                    Velocity = Vector2.One * _gamePlayConfig.PlayerSpaceship.MovementSpeed,
+                    Radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius
+                };
+
+                var playerName = kvp.Value.UserName;
+                var playerState = _matchDataService.AddPlayer(playerName, playerTransform,
+                    _gamePlayConfig.PlayerSpaceship.StartHealth, _gamePlayConfig.PlayerSpaceship.ShootCooldown);
+                var playerId = playerState.Id;
+                var peer = kvp.Key;
+                peer.Tag = playerId;
+                _networkManager.AddPlayerPeer(playerId, peer);
+                _matchNetEventsDataService.StartSavingPlayerEvents(playerId);
+                _matchNetEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, _networkManager.GetPlayerPeerId(playerId), playerName, playerState.Spaceship, playerId);
+                LogService.LogTopic("Processed player joined: " + playerState.ToJson(), LogTopicType.ServerNetwork);
+            }
+            
+            _playerJoinedPacketsPerPeer.Clear();
         }
 
         private void OnJoinReceived(JoinRequestPacketC2S joinRequestPacket, NetPeer peer)
         {
             LogService.LogTopic("Join packet received: " + joinRequestPacket.UserName, LogTopicType.ServerNetwork);
-            var playerTransform = new PlayerTransformStateS2C
-            {
-                Acceleration = Vector2.Zero,
-                AimVector = Vector2.Zero,
-                AngularVelocity = 0,
-                Position = Vector2.One,
-                Direction = new Vector2(0,1),
-                Velocity = Vector2.One * _gamePlayConfig.PlayerSpaceship.MovementSpeed,
-                Radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius
-            };
-            var playerState = _matchDataService.AddPlayer(joinRequestPacket.UserName, playerTransform,
-                _gamePlayConfig.PlayerSpaceship.StartHealth, _gamePlayConfig.PlayerSpaceship.ShootCooldown);
+            _playerJoinedPacketsPerPeer.Add(peer, joinRequestPacket);
+        }
 
-            // Log everything in playerState
-            LogService.LogTopic("PlayerState: " + playerState.Spaceship.ToJson(), LogTopicType.ServerNetwork);
-
-            var playerId = playerState.Id;
-            peer.Tag = playerId;
-            _playerInputsPacketsHandler.RegisterListeners();
-            _networkManager.AddPlayerPeer(playerId, peer);
-            var joinPacket = new JoinAcceptPacketS2C
-            {
-                TickOnServer = _tickProcessor.CurrentTick,
-                PlayerId = playerId,
-                PlayerName = playerState.Name,
-                SpaceshipState = playerState.Spaceship
-            };
-            _networkManager.SendToAllPlayersPacketSerialized(PacketTypeS2C.JoinAccepted, joinPacket, DeliveryMethod.ReliableOrdered);
+        public void InitExitPoint()
+        {
+            _networkManager.RemoveSubscription<JoinRequestPacketC2S>();
         }
     }
 }
