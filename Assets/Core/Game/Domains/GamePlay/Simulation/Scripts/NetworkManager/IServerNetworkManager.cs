@@ -18,11 +18,13 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         //void SubscribeReusable<T>(Action<T> onReceive) where T : class, new();
       //  void SubscribeReusable<T, TUserData>(Action<T, TUserData> onReceive) where T : class, new();
         // void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new();
-        void SendPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
+        void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
+
+        public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
         // void SendPacketOnlyToPlayer<T>(T packet, DeliveryMethod deliveryMethod, int playerId) where T : class, new();
         //void SendPacketSerializedOnlyToPlayer<T>(PacketTypeS2C type, T packet, int playerId, DeliveryMethod deliveryMethod) where T : INetSerializable;
         void RemoveSubscription<T>();
-        void AddPlayerPeer(int playerId, NetPeer peer);
+        void AddPlayerPeer(ushort playerId, NetPeer peer);
         void PollEvents();
     }
 }

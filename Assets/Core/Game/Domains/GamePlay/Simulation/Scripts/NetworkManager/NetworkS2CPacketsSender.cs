@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
     public class NetworkS2CPacketsSender
     {
         private readonly NetDataWriter _writer;
-        private Dictionary<int, NetPeer> _peerPerPlayerId = new();
+        private Dictionary<ushort, NetPeer> _peerPerPlayerId = new();
         private readonly NetPacketProcessor _packetProcessor;
 
         public NetworkS2CPacketsSender(NetPacketProcessor packetProcessor)
@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _packetProcessor = packetProcessor;
         }
 
-        public void AddPlayerPeer(int playerId, NetPeer peer)
+        public void AddPlayerPeer(ushort playerId, NetPeer peer)
         {
             if (!_peerPerPlayerId.TryAdd(playerId, peer))
             {
@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         //     _peerPerPlayerId[playerId].Send(_writer, deliveryMethod);
         // }
         
-        public void SendPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        public void SendPacketToAllPlayersSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
         {
             if (_peerPerPlayerId == null)
             {
@@ -70,6 +70,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             packet.Serialize(_writer);*/
             LogService.LogTopic($"Send packet type {type}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
             _peerPerPlayerId.ForEach(x => _packetProcessor.SendNetSerializable(x.Value, packet, deliveryMethod));
+        }
+        
+        public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        {
+            if (_peerPerPlayerId == null || !_peerPerPlayerId.TryGetValue(playerId, out var peer))
+            {
+                LogService.LogError("NetPeer is null! Must have a peer to send packets to!");
+                return;
+            }
+
+            LogService.LogTopic($"Send packet type {type} to player {playerId}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
+            _packetProcessor.SendNetSerializable(peer, packet, deliveryMethod);
         }
         
         // public void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new()

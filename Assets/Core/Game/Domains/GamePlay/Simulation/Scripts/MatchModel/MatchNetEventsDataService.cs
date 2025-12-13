@@ -1,22 +1,46 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 {
     public class MatchNetEventsDataService
     {
-        private ushort _bulletSpawnNetEventCounter = 0;
-        public List<BulletSpawnNetEventS2C> BulletSpawnNetEvents; // todo: remove events related to bullet when bullet id destroyed
+        public Dictionary<ushort, List<BulletSpawnNetEventS2C>> BulletSpawnNetEventsPerPlayer; // todo: remove events related to bullet when bullet id destroyed
 
         public MatchNetEventsDataService()
         {
-            BulletSpawnNetEvents = new List<BulletSpawnNetEventS2C>();
+            BulletSpawnNetEventsPerPlayer = new Dictionary<ushort, List<BulletSpawnNetEventS2C>>();
         }
 
-        public void AddBulletSpawnNetEvent(ushort bulletId, ushort belongToPlayerId, Vector2 position)
+        public void StartSavingPlayerEvents(ushort playerId)
         {
-            BulletSpawnNetEvents.Add(new BulletSpawnNetEventS2C(_bulletSpawnNetEventCounter++, bulletId, belongToPlayerId, position));
+            if (!BulletSpawnNetEventsPerPlayer.TryAdd(playerId, new List<BulletSpawnNetEventS2C>()))
+            {
+                LogService.LogError($"Player already exists! {playerId}");
+            }
+        }
+        
+        public void StopSavingPlayerEvents(ushort playerId)
+        {
+            BulletSpawnNetEventsPerPlayer.Remove(playerId);
+        }
+        
+        public void AddBulletSpawnNetEvent(ushort onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position)
+        {
+            foreach (var kvp in BulletSpawnNetEventsPerPlayer)
+            {
+                kvp.Value.Add(new BulletSpawnNetEventS2C(onTick, bulletId, belongToPlayerId, position));
+            }
+        }
+
+        public void RemoveAllEventsOlderThanTick(ushort playerId, int tick)
+        {
+            if (BulletSpawnNetEventsPerPlayer.TryGetValue(playerId, out var bulletSpawnNetEvents))
+            {
+                bulletSpawnNetEvents.RemoveAll(x => x.OccuredOnTick < tick);
+            }
         }
     }
 }

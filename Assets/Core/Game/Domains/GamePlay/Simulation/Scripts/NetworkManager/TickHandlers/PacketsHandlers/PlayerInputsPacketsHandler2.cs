@@ -1,18 +1,17 @@
 using System.Collections.Generic;
-using System.Linq;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsHandlers
 {
     public class PlayerInputsPacketsHandler : IPlayerInputsPacketsHandler
     {
@@ -42,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHa
             _networkManager.RemoveSubscription<PlayerInputPacketC2S>();
         }
 
-        public Dictionary<int, PlayerInputPacketC2S> ProcessInputs()
+        public Dictionary<int, PlayerInputPacketC2S> ProcessInputs(int processedTick)
         {
             var earliestInputPerPlayers = PopEarliestInputsOfEachPlayer();            
             for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
@@ -58,15 +57,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHa
                 var playerInputPacket = earliestInputPerPlayers[playerId];
                 var playerModel = _matchDataService.GetPlayer(playerId);
                 UpdatePlayerTransform(playerInputPacket, ref playerModel);
-                UpdatePlayerShoot(playerInputPacket.IsShootInputPressed, ref playerModel);
+                UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, ref playerModel);
                 _matchDataService.SetPlayer(playerId, playerModel);
                 _cachedLastProcessedInput[playerId] = playerInputPacket;
             }
-
+            
             return earliestInputPerPlayers;
         }
 
-        private void UpdatePlayerShoot(bool isShootInputPressed, ref PlayerStateS2C playerModel)
+        private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, ref PlayerStateS2C playerModel)
         {
             var shootState = playerModel.Spaceship.Shoot;
             var isCurrentlyOnCooldown = shootState.CooldownSecondsLeft < shootState.MaxCooldown;
@@ -84,15 +83,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHa
             if (shouldShoot)
             {
                 shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
-                CreateBulletForPlayer(playerModel);
+                CreateBulletForPlayer(processedTick, playerModel);
             }
 
             playerModel.Spaceship.Shoot = shootState;
         }
 
-        private void CreateBulletForPlayer(PlayerStateS2C playerModel)
+        private void CreateBulletForPlayer(int processedTick, PlayerStateS2C playerModel)
         {
-            var bullet = _matchDataService.AddBullet(playerModel.Id, playerModel.Spaceship.Transform.GetHeadPosition(),
+            var bullet = _matchDataService.AddBullet(processedTick, playerModel.Id, playerModel.Spaceship.Transform.GetHeadPosition(),
                 playerModel.Spaceship.Transform.Direction, _gamePlayConfig.PlayerBullet.MoveSpeed);
             LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);
         }

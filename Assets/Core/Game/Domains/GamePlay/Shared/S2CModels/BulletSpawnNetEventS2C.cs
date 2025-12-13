@@ -5,16 +5,16 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
-    public struct BulletSpawnNetEventS2C : INetSerializable, IComparable<BulletSpawnNetEventS2C>
+    public struct BulletSpawnNetEventS2C : INetSerializable
     {
-        public ushort SequenceId;
+        public ushort OccuredOnTick;
         public ushort BulletId;
         public ushort BelongToPlayerId;
         public Vector2 Position;
         
-        public BulletSpawnNetEventS2C(ushort sequenceId, ushort bulletId, ushort belongToPlayerId, Vector2 position)
+        public BulletSpawnNetEventS2C(ushort occuredOnTick, ushort bulletId, ushort belongToPlayerId, Vector2 position)
         {
-            SequenceId = sequenceId;
+            OccuredOnTick = occuredOnTick;
             BulletId = bulletId;
             BelongToPlayerId = belongToPlayerId;
             Position = position;
@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(SequenceId);
+            writer.Put(OccuredOnTick);
             writer.Put(BulletId);
             writer.Put(BelongToPlayerId);
             writer.Put(Position);
@@ -30,15 +30,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
         public void Deserialize(NetDataReader reader)
         {
-            SequenceId = reader.GetUShort();
+            OccuredOnTick = reader.GetUShort();
             BulletId = reader.GetUShort();
             BelongToPlayerId = reader.GetUShort();
             Position = reader.GetVector2();
-        }
-
-        public int CompareTo(BulletSpawnNetEventS2C other)
-        {
-            return SequenceId.CompareTo(other.SequenceId);
         }
     }
 }

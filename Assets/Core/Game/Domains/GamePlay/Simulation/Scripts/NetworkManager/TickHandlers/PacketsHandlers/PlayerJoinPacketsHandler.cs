@@ -75,7 +75,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 PlayerName = playerState.Name,
                 SpaceshipState = playerState.Spaceship
             };
-            _networkManager.SendPacketSerialized(PacketTypeS2C.JoinAccepted, joinPacket, DeliveryMethod.ReliableOrdered);
+            _networkManager.SendToAllPlayersPacketSerialized(PacketTypeS2C.JoinAccepted, joinPacket, DeliveryMethod.ReliableOrdered);
         }
     }
 }

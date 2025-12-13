@@ -7,6 +7,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
     {
         // todo: add inputs from client unprocessed ticks
         public int Tick { get; set; }
+        public int LastProcessedTickFromServer { get; set; }
         public bool IsMoveRightInputPressed { get; set; }
         public bool IsMoveLeftInputPressed { get; set; }
         public bool IsShootInputPressed { get; set; }
@@ -14,12 +15,14 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(Tick);
+            writer.Put(LastProcessedTickFromServer);
             writer.Put(ConvertInputsToByte(IsMoveRightInputPressed, IsMoveLeftInputPressed, IsShootInputPressed));
         }
         
         public void Deserialize(NetDataReader reader)
         {
             Tick = reader.GetInt();
+            LastProcessedTickFromServer = reader.GetInt();
             ConvertByteToInputs(reader.GetByte(), out var isMoveRightInputPressed, out var isMoveLeftInputPressed, out var isShootInputPressed);
             IsMoveRightInputPressed = isMoveRightInputPressed;
             IsMoveLeftInputPressed = isMoveLeftInputPressed;

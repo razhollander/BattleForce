@@ -30,16 +30,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             {
                 return;
             }
-            bulletsSpawnEvents.Sort();
+            
             foreach (var bulletsSpawnEvent in bulletsSpawnEvents)
             {
                 var bulletState = _matchDataService.GetBullet(bulletsSpawnEvent.BulletId);
                 _bulletControllers.CreateBullet(bulletState.Id);
                 _playerControllers.ShootBulletEffectForPlayer(bulletState.BelongToPlayerId);
-                _matchNetEventsDataService.HighestBulletSpawnEventSequenceId = bulletsSpawnEvent.SequenceId;
             }
             
-            _matchNetEventsDataService.BulletSpawnNetEvents.Clear();
+            bulletsSpawnEvents.Clear();
         }
     }
 }

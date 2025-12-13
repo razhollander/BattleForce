@@ -83,11 +83,16 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         //     _packetsSender.SendPacket(packet, deliveryMethod);
         // }
         
-        public void SendPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        public void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
         {
-            _packetsSender.SendPacketSerialized(type, packet, deliveryMethod);
+            _packetsSender.SendPacketToAllPlayersSerialized(type, packet, deliveryMethod);
         }
 
+        public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet,
+            DeliveryMethod deliveryMethod) where T : INetSerializable
+        {
+            _packetsSender.SendPacketToPlayerSerialized(playerId, type, packet, deliveryMethod);
+        }
         // public void SendPacketOnlyToPlayer<T>(T packet, DeliveryMethod deliveryMethod, int playerId)
         //     where T : class, new()
         // {
@@ -105,7 +110,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
             _packetProcessor.RemoveSubscription<T>();
         }
 
-        public void AddPlayerPeer(int playerId, NetPeer peer)
+        public void AddPlayerPeer(ushort playerId, NetPeer peer)
         {
             _packetsSender.AddPlayerPeer(playerId, peer);
         }

@@ -72,12 +72,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 CurrentTick++;
                 var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
                 _networkManager.PollEvents();
-                _playerInputsPacketsHandler.ProcessInputs();
+                _playerInputsPacketsHandler.ProcessInputs(processedTick);
                 _playerBulletsTransformHandler.UpdateBulletsTransform();
                 //ProccesEvents();
                 //Move1Tick(); // only velocities
                 //Simulation.Step();//check collisions
                 //ProcessCollisions();
+                RemoveOlderThanTickEventsPerPlayer(processedTick);
+                
                 if (_matchDataService.SimulationState.PlayersCount > 0)
                 {
                     SendCurrentTickStateToAllClients(processedTick);
@@ -108,11 +110,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             // }
         }
 
+        private void RemoveOlderThanTickEventsPerPlayer(int processedTick)
+        {
+            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            {
+                var player = _matchDataService.SimulationState.Players[i];
+                var playerId = player.Id;
+                _matchDataService.RemoveAllEventsOlderThanTick(playerId, processedTick);
+            }
+        }
+
         private void SendCurrentTickStateToAllClients(int processedTick)
         {
-            var packet = new FullTickPacket(processedTick, _matchDataService.PreviousSimulationState,
-                _matchDataService.SimulationState, _matchDataService.EventsData.BulletSpawnNetEvents);
-            _networkManager.SendPacketSerialized(PacketTypeS2C.FullTick, packet, DeliveryMethod.Unreliable);
+            var simulationState = _matchDataService.SimulationState;
+            var packet = new FullTickPacket(processedTick, _matchDataService.PreviousSimulationState, simulationState, null);
+            for (var i = 0; i < simulationState.PlayersCount; i++)
+            {
+                var playerState = simulationState.Players[i];
+                var playerId = playerState.Id;
+                packet.BulletSpawnNetEvents = _matchDataService.EventsData.BulletSpawnNetEventsPerPlayer[playerId];
+                _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.FullTick, packet,
+                    DeliveryMethod.Unreliable);
+            }
         }
 
         // private void SendStateToPlayer(ServerPlayer p, int pCount)

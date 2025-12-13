@@ -14,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         private readonly IMatchDataService _matchDataService;
         private readonly Dictionary<int, FullTickPacket> _fullTickPackets = new();
         private readonly SimulationNetEventsHandler _simulationNetEventsHandler;
-        public int LatestTickProcessedFromServer { get; private set; }
+        public int LastProcessedTickFromServer { get; private set; }
         
         public FullTickPacketsHandler(IClientNetworkManager networkManager, IMatchDataService matchDataService, IMatchNetEventsDataService matchNetEventsDataService)
         {
@@ -34,23 +34,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             {
                 return;
             }
-            
+
             var latestTickReceivedFromServer = _fullTickPackets.Keys.Max();
             var latestFullTickPacket = _fullTickPackets[latestTickReceivedFromServer];
 
-            if (latestTickReceivedFromServer <= LatestTickProcessedFromServer)
+            if (latestTickReceivedFromServer <= LastProcessedTickFromServer)
             {
                 LogService.LogTopic("Didn't receive any state since last tick", LogTopicType.ClientNetwork);
                 return;
             }
 
             var simulationState = latestFullTickPacket.CurrentSimulationState;
-            _simulationNetEventsHandler.ProcessBulletSpawnEvents(latestFullTickPacket.BulletSpawnNetEvents);
+            ProcessBulletSpawnedEvents(latestFullTickPacket);
             UpdatePlayersTransform(simulationState);
             UpdateBulletsTransform(simulationState);
 
-            LatestTickProcessedFromServer = latestTickReceivedFromServer;
+            LastProcessedTickFromServer = latestTickReceivedFromServer;
             _fullTickPackets.Clear();
+        }
+
+        private void ProcessBulletSpawnedEvents(FullTickPacket latestFullTickPacket)
+        {
+            if (latestFullTickPacket.BulletSpawnNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var unProcessedBulletSpawnedEvents =
+                latestFullTickPacket.BulletSpawnNetEvents.FindAll(x => x.OccuredOnTick > LastProcessedTickFromServer);
+            _simulationNetEventsHandler.ProcessBulletSpawnEvents(unProcessedBulletSpawnedEvents);
         }
 
         private void UpdatePlayersTransform(SimulationStateS2C simulationState)

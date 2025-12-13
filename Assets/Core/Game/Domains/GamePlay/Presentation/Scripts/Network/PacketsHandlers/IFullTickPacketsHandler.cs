@@ -2,7 +2,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
 {
     public interface IFullTickPacketsHandler
     {
-        int LatestTickProcessedFromServer { get; }
+        int LastProcessedTickFromServer { get; }
         void RegisterListeners();
         void ProcessStateLatestTick();
         void InitExitPoint();

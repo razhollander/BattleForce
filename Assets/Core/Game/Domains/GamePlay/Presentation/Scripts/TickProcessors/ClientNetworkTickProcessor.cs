@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
         private readonly IMatchDataService _matchDataService;
         private readonly IStateMachineService _stateMachineService;
-        private SendInputsToServerCommand _saveInputsToServerCommand;
+        private SendInputsToServerCommand _sendInputsToServerCommand;
         private readonly IClientNetworkManager _networkManager;
 
         private TimerFixedThreaded _fixedTimer;
@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         public void InitEntryPoint()
         {
-            _saveInputsToServerCommand = _commandFactory.CreateCommandVoid<SendInputsToServerCommand>();
+            _sendInputsToServerCommand = _commandFactory.CreateCommandVoid<SendInputsToServerCommand>();
             StartTick();
         }
 
@@ -71,7 +71,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private void SendCurrentTickInputsToServer()
         {
             CurrentTick++;
-            _saveInputsToServerCommand.Execute();
+            _sendInputsToServerCommand.Execute();
         }
 
         private void OnTick()

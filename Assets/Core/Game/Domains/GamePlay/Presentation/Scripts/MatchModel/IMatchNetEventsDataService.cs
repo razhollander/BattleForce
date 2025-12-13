@@ -6,6 +6,5 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
     public interface IMatchNetEventsDataService
     {
         List<BulletSpawnNetEventS2C> BulletSpawnNetEvents { get; set; }
-        int HighestBulletSpawnEventSequenceId { get; set; }
     }
 }

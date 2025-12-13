@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -13,12 +14,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
         private IClientNetworkManager _clientNetworkManager;
         private IGameInputActionsController _gameInputActionsController;
         private ITickProcessor _tickProcessor;
+        private IFullTickPacketsHandler _fullTickPacketsHandler;
 
         public override void ResolveDependencies()
         {
              _clientNetworkManager = _diContainer.Resolve<IClientNetworkManager>();
              _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
              _tickProcessor = _diContainer.Resolve<ITickProcessor>();
+             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
         }
 
         public void Execute()
@@ -32,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             var playerInputPacket = new PlayerInputPacketC2S
             {
                 Tick = _tickProcessor.CurrentTick,
+                LastProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer,
                 IsMoveLeftInputPressed = isMoveLeftInputPressed,
                 IsMoveRightInputPressed = isMoveRightInputPressed,
                 IsShootInputPressed = isShootInputPressed

@@ -25,13 +25,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
 
             foreach (var bulletSpawnNetEvent in bulletSpawnNetEvents)
             {
-                if (bulletSpawnNetEvent.SequenceId > _matchNetEventsDataService.HighestBulletSpawnEventSequenceId)
-                {
-                    _matchDataService.AddBullet(bulletSpawnNetEvent.BulletId, bulletSpawnNetEvent.BelongToPlayerId,
-                        bulletSpawnNetEvent.Position);
-                    _matchNetEventsDataService.BulletSpawnNetEvents.Add(bulletSpawnNetEvent);
-                    _matchNetEventsDataService.HighestBulletSpawnEventSequenceId = bulletSpawnNetEvent.SequenceId;
-                }
+                _matchDataService.AddBullet(bulletSpawnNetEvent.BulletId, bulletSpawnNetEvent.BelongToPlayerId,
+                    bulletSpawnNetEvent.Position);
+                _matchNetEventsDataService.BulletSpawnNetEvents.Add(bulletSpawnNetEvent);
             }
         }
     }

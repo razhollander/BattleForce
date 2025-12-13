@@ -6,7 +6,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHa
     public interface IPlayerInputsPacketsHandler
     {
         void RegisterListeners();
-        Dictionary<int, PlayerInputPacketC2S> ProcessInputs();
+        Dictionary<int, PlayerInputPacketC2S> ProcessInputs(int processedTick);
         void InitExitPoint();
     }
 }
