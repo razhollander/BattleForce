@@ -23,8 +23,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly IMatchNetEventsDataService _matchNetEventsDataService;
 
         // private readonly Dictionary<int, Dictionary<int, PlayerInputPacketC2S>> _inputsByTick = new ();
-        private readonly Dictionary<int, List<PlayerInputPacketC2S>> _inputsPerPlayer = new();
-        private readonly Dictionary<int,PlayerInputPacketC2S> _cachedLastProcessedInput = new ();
+        // Changed from int to ushort because playerId is defined as ushort in OnPlayerInputReceived
+        private readonly Dictionary<ushort, List<PlayerInputPacketC2S>> _inputsPerPlayer = new();
+        private readonly Dictionary<ushort,PlayerInputPacketC2S> _cachedLastProcessedInput = new ();
 
         public PlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, IMatchNetEventsDataService matchNetEventsDataService)
@@ -46,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             _networkManager.RemoveSubscription<PlayerInputPacketC2S>();
         }
 
-        public Dictionary<int, PlayerInputPacketC2S> ProcessInputs(int processedTick)
+        public Dictionary<ushort, PlayerInputPacketC2S> ProcessInputs(int processedTick)
         {
             var earliestInputPerPlayers = PopEarliestInputsOfEachPlayer();            
             for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
@@ -116,9 +117,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                                                         _networkConfig.DeltaTime;
         }
 
-        private Dictionary<int, PlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()
+        private Dictionary<ushort, PlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()
         {
-            var earliestInputsPerPlayer = new Dictionary<int, PlayerInputPacketC2S>();
+            var earliestInputsPerPlayer = new Dictionary<ushort, PlayerInputPacketC2S>();
 
             for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
             {
@@ -129,8 +130,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 {
                     playerInputs.Sort();
                     earliestPlayerInput = playerInputs[0];
-                    _inputsPerPlayer[playerId].Remove(earliestPlayerInput);
-                    if (_inputsPerPlayer[playerId].Count == 0)
+                    playerInputs.RemoveAt(0);
+                    if (playerInputs.Count == 0)
                     {
                         _inputsPerPlayer.Remove(playerId);
                     }
@@ -143,13 +144,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                     }
                 }
 
+                if (earliestPlayerInput.IsMoveRightInputPressed)
+                {
+                    int a = 0;
+                }
                 earliestInputsPerPlayer.Add(playerId, earliestPlayerInput);
             }
 
             return earliestInputsPerPlayer;
         }
 
-        private bool TryGetCachedInputForPlayer(int playerId, out PlayerInputPacketC2S playerInputPacket)
+        private bool TryGetCachedInputForPlayer(ushort playerId, out PlayerInputPacketC2S playerInputPacket)
         {
             return _cachedLastProcessedInput.TryGetValue(playerId, out playerInputPacket);
         }
@@ -159,7 +164,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             var playerId = (ushort)peer.Tag;
             _inputsPerPlayer.TryAdd(playerId, new List<PlayerInputPacketC2S>());
             _inputsPerPlayer[playerId].Add(playerInputPacket);
-            LogService.LogTopic("Input packet received from player id" + playerId, LogTopicType.ServerNetwork);
+            LogService.LogTopic($"Input packet received from player id {playerId}, input: {playerInputPacket.ToJson()}, inputs per player: {_inputsPerPlayer.ToJson()}", LogTopicType.ServerNetwork);
         }
     }
 }

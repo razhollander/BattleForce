@@ -32,6 +32,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             LogService.LogTopic(
                 $"Sending: isMoveRightInputPressed:{isMoveRightInputPressed},isMoveLeftInputPressed:{isMoveLeftInputPressed},isShootInputPressed:{isShootInputPressed}",
                 LogTopicType.ClientNetwork);
+            if (isMoveRightInputPressed)
+            {
+                LogService.LogTopic("right!");
+            }
             var playerInputPacket = new PlayerInputPacketC2S
             {
                 Tick = _tickProcessor.CurrentTick,

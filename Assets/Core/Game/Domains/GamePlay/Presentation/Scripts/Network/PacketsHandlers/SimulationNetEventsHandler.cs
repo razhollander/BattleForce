@@ -43,7 +43,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             {
                 var playerId = playerJoinAcceptNetEvent.PlayerState.Id;
                 var isLocalPlayer = playerJoinAcceptNetEvent.IsLocal;
-                LogService.LogTopic($"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerId);
+                LogService.LogTopic(
+                    $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerId,
+                    LogTopicType.ClientNetwork);
                 
                 if (isLocalPlayer)
                 {

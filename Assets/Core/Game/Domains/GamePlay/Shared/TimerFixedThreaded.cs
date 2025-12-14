@@ -30,7 +30,7 @@ public class TimerFixedThreaded
         _lastTime = 0;
         _accumulator = 0.0;
         _stopwatch.Restart();
-        LogService.LogTopic("start tick");
+        LogService.LogTopic("start tick", LogTopicType.ServerNetwork);
 
         _timerTask = Task.Run(RunTimer, _cancellationTokenSource.Token);
     }

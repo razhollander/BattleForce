@@ -3,14 +3,14 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 {
-    public class PlayerInputPacketC2S : INetSerializable,IComparable<PlayerInputPacketC2S>
+    public struct PlayerInputPacketC2S : INetSerializable,IComparable<PlayerInputPacketC2S>
     {
         // todo: add inputs from client unprocessed ticks
-        public int Tick { get; set; }
-        public int LastProcessedTickFromServer { get; set; }
-        public bool IsMoveRightInputPressed { get; set; }
-        public bool IsMoveLeftInputPressed { get; set; }
-        public bool IsShootInputPressed { get; set; }
+        public int Tick;
+        public int LastProcessedTickFromServer;
+        public bool IsMoveRightInputPressed;
+        public bool IsMoveLeftInputPressed;
+        public bool IsShootInputPressed;
         
         public void Serialize(NetDataWriter writer)
         {
