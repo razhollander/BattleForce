@@ -67,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 peer.Tag = playerId;
                 _networkManager.AddPlayerPeer(playerId, peer);
                 _matchNetEventsDataService.StartSavingPlayerEvents(playerId);
-                _matchNetEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, _networkManager.GetPlayerPeerId(playerId), playerName, playerState.Spaceship, playerId);
+                _matchNetEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);
                 LogService.LogTopic("Processed player joined: " + playerState.ToJson(), LogTopicType.ServerNetwork);
             }
             

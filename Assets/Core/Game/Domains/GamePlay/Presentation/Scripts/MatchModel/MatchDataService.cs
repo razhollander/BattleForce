@@ -31,9 +31,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             return Players.Find(x => x.PlayerId == playerId);
         }
 
-        public MatchPlayerModel AddPlayer(int playerId, string playerName, PlayerSpaceshipStateS2C spaceshipState)
+        public MatchPlayerModel AddPlayer(PlayerStateS2C playerState)
         {
-            var newPlayer = new MatchPlayerModel(playerId, playerName, spaceshipState);
+            var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerState.Spaceship);
             Players.Add(newPlayer);
             return newPlayer;
         }
@@ -45,9 +45,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             return newBullet;
         }
 
-        public void SetLocalPlayer(MatchPlayerModel matchPlayerModel)
+        public void SetLocalPlayer(int playerId)
         {
-            LocalPlayer = matchPlayerModel;
+            LocalPlayer = Players.Find(x => x.PlayerId == playerId);
         }
     }
 }

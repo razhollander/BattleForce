@@ -13,8 +13,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         MatchPlayerModel GetPlayer(int playerId);
         MatchPlayerModel LocalPlayer { get; }
         bool IsPlayerJoined { get; }
-        MatchPlayerModel AddPlayer(int playerId, string playerName, PlayerSpaceshipStateS2C spaceshipState);
-        void SetLocalPlayer(MatchPlayerModel matchPlayerModel);
+        MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
+        void SetLocalPlayer(int playerId);
         MatchPlayerBulletModel AddBullet(int bulletId, int belongToPlayerId, Vector2 position);
         MatchPlayerBulletModel GetBullet(int bulletId);
     }

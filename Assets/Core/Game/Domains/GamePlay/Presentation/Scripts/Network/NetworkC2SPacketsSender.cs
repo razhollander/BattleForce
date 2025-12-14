@@ -9,13 +9,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
     public class NetworkC2SPacketsSender
     {
-        private NetDataWriter _writer;
         private NetPeer _peer;
         private readonly NetPacketProcessor _packetProcessor;
 
         public NetworkC2SPacketsSender(NetPacketProcessor packetProcessor)
         {
-            _writer = new NetDataWriter();
             _packetProcessor = packetProcessor;
         }
 

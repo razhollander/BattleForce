@@ -14,7 +14,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         void AddBulletSpawnNetEvent(int onTick, int bulletId, ushort belongToPlayerId, Vector2 position);
         void RemoveAllEventsOlderThanTick(ushort playerId, int tick);
 
-        void AddPlayerJoinAcceptedEvent(int onTick, int netPeerId, string playerName,
-            PlayerSpaceshipStateS2C playerSpaceshipState, ushort playerId);
+        void AddPlayerJoinAcceptedEvent(int onTick, PlayerStateS2C playerState, SimulationStateS2C simulationState);
     }
 }

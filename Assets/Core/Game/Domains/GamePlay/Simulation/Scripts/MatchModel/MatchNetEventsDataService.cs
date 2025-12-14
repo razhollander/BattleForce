@@ -50,17 +50,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             }
         }
 
-        public void AddPlayerJoinAcceptedEvent(int onTick, int netPeerId, string playerName, PlayerSpaceshipStateS2C playerSpaceshipState, ushort playerId)
+        public void AddPlayerJoinAcceptedEvent(int onTick, PlayerStateS2C playerState, SimulationStateS2C simulationState)
         {
             foreach (var kvp in JoinAcceptNetEventsPerPlayer)
             {
                 kvp.Value.Add(new PlayerJoinAcceptPacketS2C
                 {
                     OccuredOnTick = onTick,
-                    NetPeerId = netPeerId,
-                    PlayerId = playerId,
-                    PlayerName = playerName,
-                    SpaceshipState = playerSpaceshipState
+                    IsLocal = playerState.Id == kvp.Key,
+                    PlayerState = playerState,
+                    SimulationState = simulationState
                 });
             }
         }

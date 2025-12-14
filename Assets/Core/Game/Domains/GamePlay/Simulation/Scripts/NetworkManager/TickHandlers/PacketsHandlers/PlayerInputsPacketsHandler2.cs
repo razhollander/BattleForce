@@ -110,7 +110,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
                  playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
             var rotatedVector = playerModel.Spaceship.Transform.Direction.Rotate(rotationAngle);
-            LogService.LogTopic($"rotatedVector {rotatedVector} rotationAngle {rotationAngle} playerInputPacket.IsMoveLeftInputPressed {playerInputPacket.IsMoveLeftInputPressed} playerInputPacket.IsMoveRightInputPressed.ToInt() {playerInputPacket.IsMoveRightInputPressed} rotationDelta {rotationDelta}");
             playerModel.Spaceship.Transform.Direction = rotatedVector;
             playerModel.Spaceship.Transform.Position += playerModel.Spaceship.Transform.Direction *
                                                         _gamePlayConfig.PlayerSpaceship.MovementSpeed *

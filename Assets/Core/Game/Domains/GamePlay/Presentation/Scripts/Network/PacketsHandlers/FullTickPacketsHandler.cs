@@ -8,6 +8,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Extensions;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 
@@ -23,11 +24,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
 
         public FullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
             IMatchDataService matchDataService, IMatchNetEventsDataService matchNetEventsDataService,
-            IPlayerControllers playerControllers, IClientPresentationTickProcessor clientPresentationTickProcessor)
+            IPlayerControllers playerControllers, IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
-            _simulationNetEventsHandler = new SimulationNetEventsHandler(matchDataService, matchNetEventsDataService, networkManager, playerControllers, networkConfig, clientPresentationTickProcessor);
+            _simulationNetEventsHandler = new SimulationNetEventsHandler(matchDataService, matchNetEventsDataService,
+                networkManager, playerControllers, networkConfig, clientPresentationTickProcessor, commandFactory);
         }
 
         public void RegisterListeners()

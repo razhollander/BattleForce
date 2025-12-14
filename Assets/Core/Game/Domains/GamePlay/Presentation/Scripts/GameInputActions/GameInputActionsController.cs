@@ -63,8 +63,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         
         public bool IsMoveRightInputPressed()
         {
-            var ispressed = _gameInputActions.GamePlay.MoveRight.IsPressed();
-            LogService.LogTopic("ispressed: "+ispressed);
             return _gameInputActions.GamePlay.MoveRight.IsPressed();
         }
         

@@ -12,42 +12,42 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public PlayerStateS2C[] Players;
         public StructPool<PlayerBulletS2C> Bullets;
         
-        // public void Serialize(NetDataWriter writer)
-        // {
-        //     writer.Put((byte)PlayersCount);
-        //     for (int i = 0; i < PlayersCount; i++)
-        //     {
-        //         Players[i].Serialize(writer);
-        //     }
-        //
-        //     var bulletsCount = Bullets.UsedCount;
-        //     writer.Put((byte)bulletsCount);
-        //     if (bulletsCount > 0)
-        //     {
-        //         foreach (var bulletIndex in Bullets.UsedIndices())
-        //         {
-        //             Bullets[bulletIndex].Serialize(writer);
-        //         }
-        //     }
-        // }
-        //
-        // public void Deserialize(NetDataReader reader)
-        // {
-        //     PlayersCount = reader.GetByte();
-        //     Players = new PlayerStateS2C[PlayersCount];
-        //     for (int i = 0; i < PlayersCount; i++)
-        //         Players[i].Deserialize(reader);
-        //     var bulletsCount = (int)reader.GetByte();
-        //     Bullets = new StructPool<PlayerBulletS2C>(bulletsCount);
-        //     if (bulletsCount > 0)
-        //     {
-        //         for (int i = 0; i < bulletsCount; i++)
-        //         {
-        //             Bullets.Rent(out int index);
-        //             Bullets[index].Deserialize(reader);
-        //         }
-        //     }
-        // }
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayersCount);
+            for (int i = 0; i < PlayersCount; i++)
+            {
+                Players[i].Serialize(writer);
+            }
+        
+            var bulletsCount = Bullets.UsedCount;
+            writer.Put((byte)bulletsCount);
+            if (bulletsCount > 0)
+            {
+                foreach (var bulletIndex in Bullets.UsedIndices())
+                {
+                    Bullets[bulletIndex].Serialize(writer);
+                }
+            }
+        }
+        
+        public void Deserialize(NetDataReader reader)
+        {
+            PlayersCount = reader.GetByte();
+            Players = new PlayerStateS2C[PlayersCount];
+            for (int i = 0; i < PlayersCount; i++)
+                Players[i].Deserialize(reader);
+            var bulletsCount = (int)reader.GetByte();
+            Bullets = new StructPool<PlayerBulletS2C>(bulletsCount);
+            if (bulletsCount > 0)
+            {
+                for (int i = 0; i < bulletsCount; i++)
+                {
+                    Bullets.Rent(out int index);
+                    Bullets[index].Deserialize(reader);
+                }
+            }
+        }
 
         public PlayerStateS2C GetPlayer(int playerId)
         {
@@ -123,17 +123,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Spaceship = spaceship;
         }
 
-        // public void Serialize(NetDataWriter writer)
-        // {
-        //     writer.Put((byte)Id);
-        //     Spaceship.Serialize(writer);
-        // }
-        //
-        // public void Deserialize(NetDataReader reader)
-        // {
-        //     Id = reader.GetByte();
-        //     Spaceship.Deserialize(reader);
-        // }
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.Put((byte)Id);
+            writer.Put(Name);
+            Spaceship.Serialize(writer);
+        }
+        
+        public void Deserialize(NetDataReader reader)
+        {
+            Id = reader.GetByte();
+            Name = reader.GetString();
+            Spaceship.Deserialize(reader);
+        }
 
         public void SerializeTransforms(NetDataWriter writer)
         {
@@ -209,6 +211,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             // writer.Put(Velocity);
             // writer.Put(Acceleration);
             writer.Put(Direction);
+            writer.Put(Radius);
             // writer.Put(AngularVelocity);
             // writer.Put(AimVector);
         }
@@ -219,6 +222,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             // Velocity = reader.GetVector2();
             // Acceleration = reader.GetVector2();
             Direction = reader.GetVector2();
+            Radius = reader.GetFloat();
             // AngularVelocity = reader.GetFloat();
             // AimVector = reader.GetVector2();
         }
