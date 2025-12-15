@@ -1,7 +1,9 @@
 {
-    "name": "ASoliman.Utils.EditableRefs",
-    "rootNamespace": "ASoliman.Utils.EditableRefs",
-    "references": [],
+    "name": "PresentationEditorAssembly",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8dd05db5d9e73475bb59f3701604ee31"
+    ],
     "includePlatforms": [
         "Editor"
     ],
