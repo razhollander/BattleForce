@@ -47,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
             var enterData = new ServerInitiatorEnterData();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             await StartServer(enterData, cancellationTokenSource);
+            await Awaitable.WaitForSecondsAsync(2, cancellationToken:cancellationTokenSource.Token);
             StartClient();
         }
 

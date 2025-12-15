@@ -192,7 +192,7 @@ namespace FlyingWormConsole3.LiteNetLib
         /// <summary>
         /// Enable nat punch messages
         /// </summary>
-        public bool NatPunchEnabled = false;
+        public bool NatPunchEnabled = true;
 
         /// <summary>
         /// Library logic update and send period in milliseconds

@@ -42,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         
         void INetEventListener.OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
+            LogService.LogTopic("OnNetworkReceive", LogTopicType.ClientNetwork);
             _packetProcessor.ReadAllPackets(reader);
         }
 
@@ -64,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         void INetEventListener.OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader,
             UnconnectedMessageType messageType)
         {
-
+            LogService.LogTopic("OnNetworkReceiveUnconnected", LogTopicType.ClientNetwork);
         }
 
         void INetEventListener.OnNetworkLatencyUpdate(NetPeer peer, int latency)
@@ -74,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         void INetEventListener.OnConnectionRequest(ConnectionRequest request)
         {
+            LogService.LogTopic("OnConnectionRequest", LogTopicType.ClientNetwork);
             request.Reject();
         }
     }

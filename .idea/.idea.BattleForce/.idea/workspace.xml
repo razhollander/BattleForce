@@ -6,13 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="3c1e12e0-c131-4b63-94f5-2f0c8aa9c131" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/ScriptableObjects.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Editor/ReferenceFieldTweaker/Attributes/ASoliman.Utils.EditableRefs.asmdef" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Editor/ReferenceFieldTweaker/Attributes/ASoliman.Utils.EditableRefs.asmdef.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Editor/ReferenceFieldTweaker/Editor/ASoliman.Utils.EditableRefs.asmref" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Editor/ReferenceFieldTweaker/Editor/ASoliman.Utils.EditableRefs.asmref.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/UniversalRP.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/UniversalRP.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/UniversalRenderPipelineGlobalSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/UniversalRenderPipelineGlobalSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ConsolePro/Remote/LiteNetLib/NetManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ConsolePro/Remote/LiteNetLib/NetManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/NetworkS2CPacketsListener.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/NetworkS2CPacketsListener.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/NetworkC2SPacketsListener.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/NetworkC2SPacketsListener.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPeer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPeer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetSocket.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetSocket.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -47,6 +48,28 @@
     <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.test-framework/Samples~/2_ActArrangeAssert/MyExercise_2/StringFormatter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.test-framework/Tests/TestNewCustomAssembly/NewPlayModeTest.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.ugui/Editor/TMP/TMP_SerializedPropertyHolder.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///PlayerInputsPacketsHandler2.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///SimulationStateS2C.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0a59fff794604187b34e26c62bb2389989e00/5d/dc2d9e2e/PhysicsCallbacks.cs" root0="SKIP_HIGHLIGHTING" />
@@ -56,11 +79,16 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f983fe377b2489e8ed44032915da13e1df600/04/43042ec2/Vector2.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f983fe377b2489e8ed44032915da13e1df600/11/0a508be6/MonoBehaviour.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f983fe377b2489e8ed44032915da13e1df600/22/201ed8a9/Awaitable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f983fe377b2489e8ed44032915da13e1df600/a2/f7e21b40/SerializeField.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f983fe377b2489e8ed44032915da13e1df600/c9/782b5dcd/Awaitable`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/fe/f35a0f23/AddressFamily.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6db092d11a2c42b684a7eb3cc9c0740e71000/ea/9a36b9d7/Socket.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b876d199716247a6b00c69cd29b3dd4c40c00/61/b0366dbe/INetworkPipelineStage.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b876d199716247a6b00c69cd29b3dd4c40c00/6e/a3a06e59/NetworkEvent.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d7676df0b0794764ae1cc5b9199b1d7e6600/b0/8012fbf3/LiveActivityBuilder.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d7676df0b0794764ae1cc5b9199b1d7e6600/b0/8012fbf3/LiveActivityBuilder.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3ea01e77be99618395f448b16bd7cc2bd4248bd9e5d8474964b2d97f39c5d74/System.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/82ae89a7af3fc5315f70cd7ee4616f482bcc56af244bd11c8e5cdc41c7f62e/System.Net.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/873cb98bd7b6d9e3d289b4092a3736f854992bfff4d3bc2cfe6504213203974/System.Net.Sockets.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/8a522b806eac9bb894e6e4c5fe87f353457535e769447e79c6b396beecb5d0/System.Threading.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/cca89918937e838503d883f1aa1784c57493a1cacd61b1f5fe1ebf5a1e3567a/System.Numerics.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d44b17e136d09081da1e8fd0e8c83fde60e11818b9f2442d7ed8cb733fae895e/System.Collections.Generic.cs" root0="SKIP_HIGHLIGHTING" />
@@ -89,8 +117,8 @@
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Scripts/ZenjectInstallers/GameInstaller.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Plugins/box2d-netstandard-2.4/examples/Box2D.WorldTests/TestBox2D.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/Network/NetworkConfig.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/ReferenceFieldTweaker/Editor/EditableRefAttributePropertyDrawer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/Services/Logger/EmptyLogger.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/LiveActivityKit/MyGame.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.inputsystem@7fe8299111a7/InputSystem/Actions/InputAction.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.transport@6e74a0e6481d/Runtime/NetworkDriver.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.transport@6e74a0e6481d/Runtime/NetworkPipeline.cs" root0="SKIP_HIGHLIGHTING" />
@@ -137,6 +165,14 @@
   }
 }</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
+    <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../Builds/1.app/Contents/MacOS/BattleForce2" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../Builds/1.app/Contents/MacOS" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <method v="2" />
+    </configuration>
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="/Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/MacOS/Unity" />
       <option name="PROGRAM_PARAMETERS" value="-projectPath $PROJECT_DIR$ -debugCodeOptimization" />
@@ -193,7 +229,7 @@
       <workItem from="1764181182052" duration="36198000" />
       <workItem from="1765312741050" duration="3774000" />
       <workItem from="1765551957503" duration="1447000" />
-      <workItem from="1765553426954" duration="30476000" />
+      <workItem from="1765553426954" duration="34098000" />
     </task>
     <servers />
   </component>
@@ -627,13 +663,13 @@
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs</url>
-          <line>63</line>
+          <line>64</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" initialLine="51" containingFunctionPresentation="Method 'StartClient'">
             <startOffsets>
-              <option value="3069" />
+              <option value="3170" />
             </startOffsets>
             <endOffsets>
-              <option value="3105" />
+              <option value="3206" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="71" />
@@ -695,7 +731,7 @@
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs</url>
-          <line>56</line>
+          <line>73</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" initialLine="55" containingFunctionPresentation="Method 'OnServerPeerReceived'">
             <startOffsets>
               <option value="2416" />
@@ -734,7 +770,7 @@
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs</url>
-          <line>51</line>
+          <line>52</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" initialLine="49" containingFunctionPresentation="Method 'StartClient'">
             <startOffsets>
               <option value="2220" />
@@ -747,7 +783,7 @@
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs</url>
-          <line>50</line>
+          <line>48</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" initialLine="48" containingFunctionPresentation="Method 'StartClient'">
             <startOffsets>
               <option value="2150" />
@@ -760,7 +796,7 @@
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs</url>
-          <line>48</line>
+          <line>50</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" initialLine="46" containingFunctionPresentation="Method 'StartClient'">
             <startOffsets>
               <option value="2065" />
@@ -771,13 +807,13 @@
           </properties>
           <option name="timeStamp" value="102" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/PacketsHandlers/PlayerInputsPacketsHandler.cs</url>
           <line>115</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/PacketsHandlers/PlayerInputsPacketsHandler.cs" initialLine="108" containingFunctionPresentation="Method 'OnPlayerInputReceived'" />
           <option name="timeStamp" value="106" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkManager.cs</url>
           <line>75</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkManager.cs" initialLine="74" containingFunctionPresentation="Lambda expression inside Method 'SubscribeNetSerializable'">
@@ -790,7 +826,7 @@
           </properties>
           <option name="timeStamp" value="108" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/GameInputActions/GameInputActionsController.cs</url>
           <line>54</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/GameInputActions/GameInputActionsController.cs" initialLine="53" containingFunctionPresentation="Method 'OnShootInput'">
@@ -803,7 +839,7 @@
           </properties>
           <option name="timeStamp" value="111" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetPacketProcessor.cs</url>
           <line>52</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetPacketProcessor.cs" initialLine="52" containingFunctionPresentation="Method 'GetCallbackFromData'">
@@ -816,7 +852,7 @@
           </properties>
           <option name="timeStamp" value="112" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerInputsPacketsHandler2.cs</url>
           <line>148</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerInputsPacketsHandler2.cs" initialLine="148" containingFunctionPresentation="Method 'PopEarliestInputsOfEachPlayer'">
@@ -829,7 +865,7 @@
           </properties>
           <option name="timeStamp" value="113" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerInputsPacketsHandler2.cs</url>
           <line>153</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerInputsPacketsHandler2.cs" initialLine="153" containingFunctionPresentation="Method 'PopEarliestInputsOfEachPlayer'">
@@ -841,6 +877,110 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="114" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs</url>
+          <line>40</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs" initialLine="40" containingFunctionPresentation="Method 'ResolveAddress'">
+            <startOffsets>
+              <option value="1125" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1189" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="115" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs</url>
+          <line>37</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs" initialLine="37" containingFunctionPresentation="Method 'ResolveAddress'">
+            <startOffsets>
+              <option value="952" />
+            </startOffsets>
+            <endOffsets>
+              <option value="978" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="116" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs</url>
+          <line>35</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs" initialLine="35" containingFunctionPresentation="Method 'ResolveAddress'">
+            <startOffsets>
+              <option value="873" />
+            </startOffsets>
+            <endOffsets>
+              <option value="921" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="117" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs</url>
+          <line>45</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs" initialLine="45" containingFunctionPresentation="Method 'ResolveAddress'">
+            <startOffsets>
+              <option value="1328" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1345" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="118" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPeer.cs</url>
+          <line>284</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPeer.cs" initialLine="283" containingFunctionPresentation="Constructor 'NetPeer'">
+            <startOffsets>
+              <option value="9390" />
+            </startOffsets>
+            <endOffsets>
+              <option value="9498" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="119" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs</url>
+          <line>1445</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs" initialLine="1445" containingFunctionPresentation="Method 'Connect'">
+            <startOffsets>
+              <option value="56104" />
+            </startOffsets>
+            <endOffsets>
+              <option value="56188" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="120" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs</url>
+          <line>476</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs" initialLine="476" containingFunctionPresentation="Method 'SendRaw'">
+            <startOffsets>
+              <option value="15574" />
+            </startOffsets>
+            <endOffsets>
+              <option value="15653" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="121" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs</url>
+          <line>471</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs" initialLine="471" containingFunctionPresentation="Method 'SendRaw'">
+            <startOffsets>
+              <option value="15360" />
+            </startOffsets>
+            <endOffsets>
+              <option value="15457" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="122" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

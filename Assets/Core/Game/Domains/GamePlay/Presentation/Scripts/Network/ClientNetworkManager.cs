@@ -46,15 +46,33 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 return;
             }
             
+            _packetsListener.OnPeerConnected += OnServerPeerReceived;
+            _updateSubscriptionService.RegisterGuiUpdatable(this);
             _netManager.Start();
             //_packetsListener.RegisterListeners();
-            _packetsListener.OnPeerConnected += OnServerPeerReceived;
-            _netManager.Connect(_networkConfig.IpAddress, _networkConfig.Port, _networkConfig.ConntectionKey);
-            _updateSubscriptionService.RegisterGuiUpdatable(this);
+            var peerToServer = _netManager.Connect(_networkConfig.IpAddress, _networkConfig.Port, _networkConfig.ConntectionKey);
+            _packetsSender.SetPeer(peerToServer);
+           // bool canReachServer = CanPing(_networkConfig.IpAddress);
+            //Console.WriteLine("Can reach server: " + canReachServer);
         }
+        
+        // public static bool CanPing(string address)
+        // {
+        //     try
+        //     {
+        //         Ping ping = new Ping();
+        //         PingReply reply = ping.Send(address);
+        //         return (reply.Status == IPStatus.Success);
+        //     }
+        //     catch (Exception)
+        //     {
+        //         return false;
+        //     }
+        // }
 
         private void OnServerPeerReceived(NetPeer peerToServer)
         {
+            LogService.LogTopic("Server peer received!", LogTopicType.ClientNetwork);
             _packetsSender.SetPeer(peerToServer);
             _commandFactory.CreateCommandVoid<HandleClientConnectedToPeerCommand>().Execute();
             IsPeerConnected = true;

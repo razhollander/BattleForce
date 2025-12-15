@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using LiteNetLib.Utils;
+using Debug = UnityEngine.Debug;
 
 namespace LiteNetLib
 {
@@ -285,7 +286,8 @@ namespace LiteNetLib
             _connectRequestPacket.ConnectionNumber = connectNum;
 
             //Send request
-            NetManager.SendRaw(_connectRequestPacket, EndPoint);
+            var result = NetManager.SendRaw(_connectRequestPacket, EndPoint);
+            Debug.LogError($"got result: {result}");
 
             NetDebug.Write(NetLogLevel.Trace, "[CC] ConnectId: {0}, ConnectNum: {1}", _connectTime, connectNum);
         }

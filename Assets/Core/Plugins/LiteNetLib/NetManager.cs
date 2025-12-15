@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Threading;
 using LiteNetLib.Layers;
 using LiteNetLib.Utils;
+using Debug = UnityEngine.Debug;
 
 namespace LiteNetLib
 {
@@ -1382,8 +1383,9 @@ namespace LiteNetLib
             {
                 ep = NetUtils.MakeEndPoint(address, port);
             }
-            catch
+            catch(Exception e)
             {
+                Debug.LogError($"Can't connect to {address} because: {e}");
                 CreateEvent(NetEvent.EType.Disconnect, disconnectReason: DisconnectReason.UnknownHost);
                 return null;
             }

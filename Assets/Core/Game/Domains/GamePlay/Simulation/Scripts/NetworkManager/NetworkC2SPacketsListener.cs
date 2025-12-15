@@ -231,6 +231,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void INetEventListener.OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader,
             UnconnectedMessageType messageType)
         {
+            LogService.LogTopic("OnNetworkReceiveUnconnected! ", LogTopicType.ServerNetwork);
 
         }
 

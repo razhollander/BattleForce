@@ -12,6 +12,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using UnityEngine;
 
 namespace LiteNetLib
 {
@@ -425,7 +426,8 @@ namespace LiteNetLib
                 if (remoteEndPoint.AddressFamily == AddressFamily.InterNetworkV6 && IPv6Support)
                     socket = _udpSocketv6;
                 int result = socket.SendTo(data, offset, size, SocketFlags.None, remoteEndPoint);
-                NetDebug.Write(NetLogLevel.Trace, "[S]Send packet to {0}, result: {1}", remoteEndPoint, result);
+                //NetDebug.Write(NetLogLevel.Trace, "[S]Send packet to {0}, result: {1}", remoteEndPoint, result);
+                Debug.LogError($"[S]Send packet to {remoteEndPoint}, result: {result}");
                 return result;
             }
             catch (SocketException ex)
