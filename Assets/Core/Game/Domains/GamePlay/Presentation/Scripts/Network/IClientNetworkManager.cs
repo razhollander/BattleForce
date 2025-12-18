@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         bool IsPeerConnected { get; }
         int Ping { get; }
         int LocalPeerId { get; }
-        void StartClient();
+        void StartClient(bool isHost);
         void InitExitPoint();
 
 

@@ -38,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             };
         }
 
-        public void StartClient()
+        public void StartClient(bool isHost)
         {
             if (_netManager.IsRunning)
             {
@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _updateSubscriptionService.RegisterGuiUpdatable(this);
             _netManager.Start();
             //_packetsListener.RegisterListeners();
-            var peerToServer = _netManager.Connect(_networkConfig.IpAddress, _networkConfig.Port, _networkConfig.ConntectionKey);
+            var peerToServer = _netManager.Connect(isHost ?"localhost" :_networkConfig.IpAddress, _networkConfig.HostPort, _networkConfig.ConntectionKey);
             _packetsSender.SetPeer(peerToServer);
            // bool canReachServer = CanPing(_networkConfig.IpAddress);
             //Console.WriteLine("Can reach server: " + canReachServer);
@@ -123,10 +123,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         public void ManagedOnGUI()
         {
-            // GUIStyle style = new GUIStyle(GUI.skin.label);
-            // style.fontSize = 10;
-            // style.normal.textColor = Color.white;
-            // GUI.Label(new Rect(10, 10, 400, 30), "Local Host Ping: "+_packetsListener.PingToLocalHost, style);
+            GUIStyle style = new GUIStyle(GUI.skin.label);
+            style.fontSize = 10;
+            style.normal.textColor = Color.white;
+            GUI.Label(new Rect(10, 10, 400, 30), "Local Host Ping: "+_packetsListener.PingToLocalHost, style);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
             _networkConfig = networkConfig;
             _packetProcessor = new NetPacketProcessor();
             _networkC2SPacketsListener = new NetworkC2SPacketsListener(_packetProcessor, _networkConfig);
-            _netManager = new NetManager(_networkC2SPacketsListener) { AutoRecycle = true };
+            _netManager = new NetManager(_networkC2SPacketsListener) { AutoRecycle = true, BroadcastReceiveEnabled = true, IPv6Enabled = IPv6Mode.Disabled};
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
 
@@ -43,8 +43,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
                 return;
             }
             
-            //_networkC2SPacketsListener.RegisterListeners();
-            _netManager.Start(_networkConfig.Port);
+            _netManager.Start(_networkConfig.HostPort);
         }
 
         public void InitExitPoint()

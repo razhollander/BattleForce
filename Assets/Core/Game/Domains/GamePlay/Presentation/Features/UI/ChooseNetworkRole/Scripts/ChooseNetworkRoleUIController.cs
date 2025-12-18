@@ -47,8 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
             var enterData = new ServerInitiatorEnterData();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             await StartServer(enterData, cancellationTokenSource);
-            await Awaitable.WaitForSecondsAsync(2, cancellationToken:cancellationTokenSource.Token);
-            StartClient();
+            StartClient(true);
         }
 
         private async Awaitable StartServer(ServerInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
@@ -59,10 +58,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
             LogService.LogTopic("Finished starting Server", LogTopicType.ClientNetwork);
         }
 
-        private void StartClient()
+        private void StartClient(bool isHost)
         {
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
-            _clientNetworkManager.StartClient();
+            _clientNetworkManager.StartClient(isHost);
             _fullTickPacketsHandler.RegisterListeners();
             _uiView.Hide();
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
@@ -70,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
 
         private void OnClientClicked()
         {
-            StartClient();
+            StartClient(false);
         }
     }
 }
