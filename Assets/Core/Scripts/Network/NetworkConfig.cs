@@ -10,7 +10,7 @@ namespace Core.Scripts.Network
         public int TicksPerSeconds = 60;
         public float DeltaTime = 1/60f;
         public int ServerTicksBuffer = 2;
-        public int Port = 7777;
+        public int HostPort = 49153;
         public string IpAddress = "localhost";
         public string ConntectionKey = "BattleForceGame";
     }

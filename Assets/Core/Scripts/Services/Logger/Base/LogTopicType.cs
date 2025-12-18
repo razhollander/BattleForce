@@ -6,6 +6,7 @@ namespace CoreDomain.Scripts.Services.Logger.Base
         Inputs,
         ServerNetwork,
         ClientNetwork,
+        NatMasterNetwork,
         Arrow,
         Balloon,
         Bubble,
@@ -17,6 +18,6 @@ namespace CoreDomain.Scripts.Services.Logger.Base
         Audio,
         GamePlayData,
         LevelsData,
-        GameState
+        GameState,
     }
 }

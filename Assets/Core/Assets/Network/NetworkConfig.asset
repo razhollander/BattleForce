@@ -17,6 +17,6 @@ MonoBehaviour:
   TicksPerSeconds: 60
   DeltaTime: 0.016666668
   ServerTicksBuffer: 2
-  Port: 7777
-  IpAddress: localhost
+  HostPort: 49153
+  IpAddress: 109.67.156.134
   ConntectionKey: BattleForceGame
