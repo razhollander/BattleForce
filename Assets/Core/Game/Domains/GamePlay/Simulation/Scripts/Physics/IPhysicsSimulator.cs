@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 {
@@ -12,5 +13,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void AddPlayer(int id, Vector2 position, Vector2 velocity, float radius);
         public IReadOnlyList<PhysicsCollisionEvent> GetCachedCollisions();
         public void ClearCachedCollisions();
+        void InitExitPoint();
+        void CopyDataToSimulation(SimulationStateS2C simulationState);
     }
 }

@@ -62,7 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             playerBullet.BelongToPlayerId = belongToPlayerId;
             playerBullet.Position = position;
             playerBullet.Direction = direction;
-            playerBullet.MoveSpeed = moveSpeed;
+            playerBullet.Velocity = direction * moveSpeed;
             return playerBullet;
         }
     }

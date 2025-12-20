@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
@@ -12,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
         private ITickProcessor _tickProcessor;
         private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
+        private IPhysicsSimulator _physicsSimulator;
 
         public override void ResolveDependencies()
         {
@@ -19,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _playerJoinPacketsHandler = _diContainer.Resolve<IPlayerJoinPacketsHandler>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
+            _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
         }
 
         public void Execute()
@@ -27,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _playerJoinPacketsHandler.InitExitPoint();
             _tickProcessor.InitExitPoint();
             _playerInputsPacketsHandler.InitExitPoint();
+            _physicsSimulator.InitExitPoint();
         }
     }
 }

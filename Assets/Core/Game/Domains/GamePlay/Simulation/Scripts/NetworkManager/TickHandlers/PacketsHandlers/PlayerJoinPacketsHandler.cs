@@ -11,6 +11,7 @@ using Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
@@ -22,19 +23,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly IServerNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly IPhysicsSimulator _physicsSimulator;
         private readonly Dictionary<int, (JoinRequestPacketC2S, NetPeer)> _packetsPerTick;
-        private readonly IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private readonly IMatchNetEventsDataService _matchNetEventsDataService;
         private readonly Dictionary<NetPeer, JoinRequestPacketC2S> _playerJoinedPacketsPerPeer;
 
         public PlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
-            SimulationGamePlayConfig gamePlayConfig, IPlayerInputsPacketsHandler playerInputsPacketsHandler,
+            SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
             IMatchNetEventsDataService matchNetEventsDataService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
-            _playerInputsPacketsHandler = playerInputsPacketsHandler;
+            _physicsSimulator = physicsSimulator;
             _matchNetEventsDataService = matchNetEventsDataService;
             _playerJoinedPacketsPerPeer = new Dictionary<NetPeer, JoinRequestPacketC2S>();
         }
@@ -46,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         public void ProcessPlayersJoined(int processedTick)
         {
+            var startingDirection = new Vector2(0, 1);
             foreach (var kvp in _playerJoinedPacketsPerPeer)
             {
                 var playerTransform = new PlayerTransformStateS2C
@@ -54,8 +56,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                     AimVector = Vector2.Zero,
                     AngularVelocity = 0,
                     Position = Vector2.One,
-                    Direction = new Vector2(0, 1),
-                    Velocity = Vector2.One * _gamePlayConfig.PlayerSpaceship.MovementSpeed,
+                    Direction = startingDirection,
+                    Velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.MovementSpeed,
                     Radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius
                 };
 
@@ -65,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 var playerId = playerState.Id;
                 var peer = kvp.Key;
                 peer.Tag = playerId;
+                _physicsSimulator.AddPlayer(playerId, playerTransform.Position, playerTransform.Direction, playerTransform.Radius);
                 _networkManager.AddPlayerPeer(playerId, peer);
                 _matchNetEventsDataService.StartSavingPlayerEvents(playerId);
                 _matchNetEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);

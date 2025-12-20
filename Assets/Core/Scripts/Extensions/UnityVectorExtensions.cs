@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace CoreDomain.Scripts.Extensions
 {
-    public static class VectorExtensions
+    public static class UnityVectorExtensions
     {
         public static Vector2 ToUnityVector2(this System.Numerics.Vector2 vec)
         {

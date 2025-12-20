@@ -37,6 +37,15 @@ namespace CoreDomain.Scripts.Services.UpdateService
             }
         }
 
+        private void OnDrawGizmos()
+        {
+            for (_currentGuiUpdateIndex = _guiUpdateObservers.Count - 1; _currentGuiUpdateIndex >= 0; _currentGuiUpdateIndex--)
+            {
+                var observer = _guiUpdateObservers[_currentGuiUpdateIndex];
+                observer.ManagedOnDrawGizmos();
+            }
+        }
+        
         private void LateUpdate()
         {
             _lateUpdateObservers.AddRange(_pendingAddLateUpdateObservers);

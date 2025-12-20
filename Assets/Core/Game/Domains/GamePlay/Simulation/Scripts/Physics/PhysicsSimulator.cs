@@ -4,21 +4,101 @@ using Box2D.NetStandard.Collision.Shapes;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Fixtures;
 using Box2D.NetStandard.Dynamics.World;
+using Box2D.NetStandard.Dynamics.World.Callbacks;
+using Box2D.WorldTests;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Extensions;
+using CoreDomain.Scripts.Services.UpdateService;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 {
-    public class PhysicsSimulator : IPhysicsSimulator
+    public class PhysicsSimulator : IPhysicsSimulator, IGUIUpdatable
     {
+        private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private World _world;
         private CollisionEventCacheListener _collisionEventCacheListener;
+
+        public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService)
+        {
+            _updateSubscriptionService = updateSubscriptionService;
+        }
 
         public void InitEntryPoint()
         {
             _world = CreateWorld();
             _collisionEventCacheListener = new CollisionEventCacheListener();
             _world.SetContactListener(_collisionEventCacheListener);
+            var testDebugDrawer = new TestDebugDrawer();
+            testDebugDrawer.AppendFlags(DrawFlags.Aabb);
+            testDebugDrawer.AppendFlags(DrawFlags.Joint);
+            testDebugDrawer.AppendFlags(DrawFlags.Pair);
+            testDebugDrawer.AppendFlags(DrawFlags.Shape);
+            testDebugDrawer.AppendFlags(DrawFlags.CenterOfMass);
+            _world.SetDebugDraw(testDebugDrawer);
+            _updateSubscriptionService.RegisterGuiUpdatable(this);
         }
-        
+
+        public void InitExitPoint()
+        {
+            _updateSubscriptionService.UnregisterGuiUpdatable(this);
+        }
+
+        public void CopyDataToSimulation(SimulationStateS2C simulationState)
+        {
+            CopyPlayersStates(simulationState);
+            CopyBulletsStates(simulationState);
+        }
+
+        private void CopyPlayersStates(SimulationStateS2C simulationState)
+        {
+            var players = simulationState.Players;
+
+            for (int i = 0; i < simulationState.PlayersCount; i++)
+            {
+                var playerState = players[i];
+                var currentBody = _world.GetBodyList();
+
+                while (currentBody != null)
+                {
+                    var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerState.Id)
+                    {
+                        currentBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngle());
+                        currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
+
+                        break;
+                    }
+
+                    currentBody = currentBody.GetNext();
+                }
+            }
+        }
+
+        private void CopyBulletsStates(SimulationStateS2C simulationState)
+        {
+            foreach (var bulletIndex in simulationState.Bullets.UsedIndices())
+            {
+                var bulletBody = _world.GetBodyList();
+                var bullet = simulationState.Bullets[bulletIndex];
+
+                while (bulletBody != null)
+                {
+                    var bodyData = (PhysicsBodyData) bulletBody.UserData;
+
+                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerBullet && bodyData.Id == bullet.Id)
+                    {
+                        bulletBody.SetTransform(bullet.Position, bullet.Direction.ToAngle());
+                        bulletBody.SetLinearVelocity(bullet.Velocity);
+
+                        break;
+                    }
+
+                    bulletBody = bulletBody.GetNext();
+                }
+            }
+        }
+
         public void Step(float deltaTime, int velocityIterations, int positionIterations)
         {
             _world.Step(deltaTime, velocityIterations, positionIterations);
@@ -117,6 +197,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             };
 
             body.CreateFixture(fixtureDef);
+        }
+
+        public void ManagedOnGUI()
+        {
+            
+        }
+
+        public void ManagedOnDrawGizmos()
+        {
+            _world?.DrawDebugData();
         }
     }
 }

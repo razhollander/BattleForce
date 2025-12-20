@@ -24,9 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 var player = _matchDataService.SimulationState.Players[i];
                 var playerId = player.Id;
                 var playerModel = _matchDataService.GetPlayer(playerId);
-                playerModel.Spaceship.Transform.Position += playerModel.Spaceship.Transform.Direction *
-                                                            _gamePlayConfig.PlayerSpaceship.MovementSpeed *
-                                                            _networkConfig.DeltaTime;
+                playerModel.Spaceship.Transform.Position += playerModel.Spaceship.Transform.Velocity * _networkConfig.DeltaTime;
                 _matchDataService.SetPlayer(playerId, playerModel);
             }
         }

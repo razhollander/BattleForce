@@ -9,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public int Id;
         public ushort BelongToPlayerId;
         public Vector2 Position;
-        public float MoveSpeed;
+        public Vector2 Velocity;
         public Vector2 Direction;
 
         public void Serialize(NetDataWriter writer)

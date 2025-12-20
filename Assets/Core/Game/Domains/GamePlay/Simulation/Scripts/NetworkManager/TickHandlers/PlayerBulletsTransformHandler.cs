@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             foreach (var bulletIndex in _matchDataService.SimulationState.Bullets.UsedIndices())
             {
                 ref PlayerBulletS2C bulletState = ref _matchDataService.SimulationState.Bullets[bulletIndex];
-                bulletState.Position += bulletState.Direction * bulletState.MoveSpeed * _networkConfig.DeltaTime;
+                bulletState.Position += bulletState.Velocity * _networkConfig.DeltaTime;
             }
         }
     }

@@ -3,7 +3,6 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
-using CoreDomain.Scripts.Services.StateMachineService;
 using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -127,6 +126,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             style.fontSize = 10;
             style.normal.textColor = Color.white;
             GUI.Label(new Rect(10, 10, 400, 30), "Local Host Ping: "+_packetsListener.PingToLocalHost, style);
+        }
+
+        public void ManagedOnDrawGizmos()
+        {
+            
         }
     }
 }

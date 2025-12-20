@@ -102,6 +102,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         {
             _playersTransformHandler.UpdatePlayerTransform();
             _playerBulletsTransformHandler.UpdateBulletsTransform();
+            _physicsSimulator.CopyDataToSimulation(_matchDataService.SimulationState);
         }
 
         private void ProcessPackets(int processedTick)

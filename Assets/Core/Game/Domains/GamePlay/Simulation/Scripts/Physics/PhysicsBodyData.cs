@@ -17,6 +17,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
     {
         PlayerSpaceship = 0,
         Wall = 1,
-        Bullet = 2
+        PlayerBullet = 2
     }
 }

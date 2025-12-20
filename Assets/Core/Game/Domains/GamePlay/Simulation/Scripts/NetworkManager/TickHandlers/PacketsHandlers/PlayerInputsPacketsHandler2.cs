@@ -113,6 +113,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                  playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
             var rotatedVector = playerModel.Spaceship.Transform.Direction.Rotate(rotationAngle);
             playerModel.Spaceship.Transform.Direction = rotatedVector;
+            playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
         }
 
         private Dictionary<ushort, PlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()
