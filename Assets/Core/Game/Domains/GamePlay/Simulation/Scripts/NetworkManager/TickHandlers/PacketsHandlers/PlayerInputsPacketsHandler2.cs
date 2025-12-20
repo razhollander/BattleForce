@@ -10,6 +10,7 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsHandlers
 {

@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing;
+using Core.Scripts.Extensions;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
@@ -27,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
 
         public void ShowIsBulletAvailable(bool isAvailable)
         {
-            _availableBulletSpriteRenderer.gameObject.SetActive(isAvailable);
+            _availableBulletSpriteRenderer.gameObject.TrySetActive(isAvailable);
         }
 
         public void UpdateHealthBar(int health, int maxHealth)

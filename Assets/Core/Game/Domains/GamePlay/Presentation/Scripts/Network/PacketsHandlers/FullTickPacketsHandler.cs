@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             ProcessPlayerJoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents, ref clientTick);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
-            UpdatePlayersTransform(simulationState);
+            UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
 
             LastProcessedTickFromServer = latestTickReceivedFromServer;
@@ -93,13 +93,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _simulationNetEventsHandler.ProcessBulletSpawnEvents(unProcessedBulletSpawnedEvents);
         }
 
-        private void UpdatePlayersTransform(SimulationStateS2C simulationState)
+        private void UpdatePlayersDeltas(SimulationStateS2C simulationState)
         {
             foreach (var player in _matchDataService.Players)
             {
                 var playerState = simulationState.GetPlayer(player.PlayerId);
                 player.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
                 player.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
+                player.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
             }
         }
 

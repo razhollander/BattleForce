@@ -74,7 +74,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((byte)PlayersCount);
             for (var i = 0; i < PlayersCount; i++)
             {
-                Players[i].SerializeTransforms(writer);
+                Players[i].SerializeDeltas(writer);
             }
 
             var bulletsCount = Bullets.UsedCount;
@@ -94,7 +94,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Players = new PlayerStateS2C[PlayersCount];
             for (var i = 0; i < PlayersCount; i++)
             {
-                Players[i].DeserializeTransforms(reader);
+                Players[i].DeserializeDeltas(reader);
             }
 
             var bulletsCount = (int)reader.GetByte();
@@ -137,16 +137,16 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Spaceship.Deserialize(reader);
         }
 
-        public void SerializeTransforms(NetDataWriter writer)
+        public void SerializeDeltas(NetDataWriter writer)
         {
             writer.Put((byte)Id);
-            Spaceship.SerializeTransforms(writer);
+            Spaceship.SerializeDeltas(writer);
         }
 
-        public void DeserializeTransforms(NetDataReader reader)
+        public void DeserializeDeltas(NetDataReader reader)
         {
             Id = reader.GetByte();
-            Spaceship.DeserializeTransforms(reader);
+            Spaceship.DeserializeDeltas(reader);
         }
     }
 
@@ -177,16 +177,16 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Health.Deserialize(reader);
         }
 
-        public void SerializeTransforms(NetDataWriter writer)
+        public void SerializeDeltas(NetDataWriter writer)
         {
-            Transform.SerializeTransforms(writer);
-            Shoot.SerializeTransforms(writer);
+            Transform.SerializeDeltas(writer);
+            Shoot.SerializeDeltas(writer);
         }
 
-        public void DeserializeTransforms(NetDataReader reader)
+        public void DeserializeDeltas(NetDataReader reader)
         {
-            Transform.DeserializeTransforms(reader);
-            Shoot.DeserializeTransforms(reader);
+            Transform.DeserializeDeltas(reader);
+            Shoot.DeserializeDeltas(reader);
         }
     }
 
@@ -227,13 +227,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             // AimVector = reader.GetVector2();
         }
 
-        public void SerializeTransforms(NetDataWriter writer)
+        public void SerializeDeltas(NetDataWriter writer)
         {
             writer.Put(Position);
             writer.Put(Direction);
         }
 
-        public void DeserializeTransforms(NetDataReader reader)
+        public void DeserializeDeltas(NetDataReader reader)
         {
             Position = reader.GetVector2();
             Direction = reader.GetVector2();
@@ -263,12 +263,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             MaxCooldown = reader.GetFloat();
         }
 
-        public void SerializeTransforms(NetDataWriter writer)
+        public void SerializeDeltas(NetDataWriter writer)
         {
             writer.Put(CooldownSecondsLeft);
         }
 
-        public void DeserializeTransforms(NetDataReader reader)
+        public void DeserializeDeltas(NetDataReader reader)
         {
             CooldownSecondsLeft = reader.GetFloat();
         }

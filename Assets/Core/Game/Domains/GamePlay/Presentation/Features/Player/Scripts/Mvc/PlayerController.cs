@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Extensions;
+using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
@@ -51,6 +52,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             var cooldownSecondsLeft = playerShootState.CooldownSecondsLeft;
             var interpolationFactor = _gamePlayConfig.InterpolationFactor;
             _playerView.InterpolateBulletLoading(cooldownSecondsLeft, maxShootCooldown, interpolationFactor);
+            if (cooldownSecondsLeft == maxShootCooldown)
+            {
+                RestoreBulletEffect();
+            }
         }
 
         public void RestoreBulletEffect()

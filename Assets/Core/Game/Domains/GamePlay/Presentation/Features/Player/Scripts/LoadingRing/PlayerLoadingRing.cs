@@ -1,3 +1,4 @@
+using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing
@@ -47,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
                 _currentScale = scale;
             }
 
+            
             transform.localScale = Vector3.one * _currentScale;
             // if (Mathf.Approximately(scale, MAX_SCALE))
             // {
