@@ -5,9 +5,9 @@ namespace Core.Scripts.Extensions
 {
     public static class SystemVectorExtensions
     {
-        public static float ToAngle(this Vector2 direction)
+        public static float ToAngleRadians(this Vector2 direction)
         {
-            return Mathf.Atan2(direction.Y, direction.X) * Mathf.Rad2Deg;
+            return Mathf.Atan2(direction.Y, direction.X);
         }
         
         public static Vector2 ReflectFromWall(this Vector2 direction, Vector2 wallNormal)

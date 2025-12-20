@@ -49,6 +49,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             CopyBulletsStates(simulationState);
         }
 
+        public Body GetPlayer(ushort playerId)
+        {
+            var currentBody = _world.GetBodyList();
+
+            while (currentBody != null)
+            {
+                var bodyData = (PhysicsBodyData)currentBody.UserData;
+
+                if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerId)
+                {
+                    return currentBody;
+                }
+
+                currentBody = currentBody.GetNext();
+            }
+
+            return null;
+        }
+
         private void CopyPlayersStates(SimulationStateS2C simulationState)
         {
             var players = simulationState.Players;
@@ -64,7 +83,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
                     if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerState.Id)
                     {
-                        currentBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngle());
+                        currentBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
                         currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
 
                         break;
@@ -88,7 +107,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
                     if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerBullet && bodyData.Id == bullet.Id)
                     {
-                        bulletBody.SetTransform(bullet.Position, bullet.Direction.ToAngle());
+                        bulletBody.SetTransform(bullet.Position, bullet.Direction.ToAngleRadians());
                         bulletBody.SetLinearVelocity(bullet.Velocity);
 
                         break;
@@ -122,22 +141,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return world;
         }
 
-        public void SetPlayerVelocity(int playerId, Vector2 velocity)
+        public void SetPlayerVelocity(ushort playerId, Vector2 velocity)
         {
-            var currentBody = _world.GetBodyList();
-
-            while (currentBody != null)
-            {
-                var bodyData = (PhysicsBodyData)currentBody.UserData;
-                bool isPlayer = bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerId;
-                if (isPlayer)
-                {
-                    currentBody.SetLinearVelocity(velocity);
-                    return;
-                }
-
-                currentBody = currentBody.GetNext();
-            }
+            GetPlayer(playerId).SetLinearVelocity(velocity);
         }
 
         public void AddWall(int id, Vector2[] points)
@@ -169,7 +175,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.CreateFixture(fixtureDef);
         }
         
-        public void AddPlayer(int id, Vector2 position, Vector2 velocity, float radius)
+        public void AddPlayer(ushort id, Vector2 position, Vector2 velocity, float radius)
         {
             BodyDef bodyDef = new BodyDef
             {

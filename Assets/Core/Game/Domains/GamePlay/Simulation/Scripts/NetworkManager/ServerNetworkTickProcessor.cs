@@ -89,6 +89,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 UpdateTransforms();
                 _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
                 ProcessCollisions();
+                ApplyPhysicsSimulationTransformsToMatchModel();
                 RemoveOlderThanTickEventsPerPlayer(processedTick);
                 SendCurrentTickStateToAllClients(processedTick);
                 _matchDataService.CopySimulationStateIntoPrevious();
@@ -101,9 +102,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             }
         }
 
+        private void ApplyPhysicsSimulationTransformsToMatchModel()
+        {
+            for (int i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            {
+                var playerModel = _matchDataService.SimulationState.Players[i];
+                playerModel.Spaceship.Transform.Position = _physicsSimulator.GetPlayer(playerModel.Id).Position;
+                _matchDataService.SetPlayer(playerModel.Id, playerModel);
+            }
+        }
+
         private void UpdateTransforms()
         {
-            _playersTransformHandler.UpdatePlayerTransform();
             _playerBulletsTransformHandler.UpdateBulletsTransform();
             _physicsSimulator.CopyDataToSimulation(_matchDataService.SimulationState);
         }
@@ -117,13 +127,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private void ProcessCollisions()
         {
             var cachedCollisions = _physicsSimulator.GetCachedCollisions();
+
             foreach (var collisionEvent in cachedCollisions)
             {
                 if (collisionEvent.Type != EventType.Begin)
                 {
                     continue;
                 }
-                
+
                 var objectA = (PhysicsBodyData) collisionEvent.FixtureA.Body.UserData;
                 var objectB = (PhysicsBodyData) collisionEvent.FixtureB.Body.UserData;
                 bool isPlayerToWallCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
@@ -131,15 +142,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 var isCollision = isPlayerToWallCollision || isWallToPlayerCollision;
                 PlayerStateS2C playerModel = default;
                 Body playerBody = default;
+
                 if (isPlayerToWallCollision)
                 {
                     playerModel = _matchDataService.GetPlayer(objectA.Id);
-                    playerBody = collisionEvent.FixtureA.Body;
                 }
                 else if (isWallToPlayerCollision)
                 {
                     playerModel = _matchDataService.GetPlayer(objectB.Id);
-                    playerBody = collisionEvent.FixtureB.Body;
                 }
 
                 if (!isCollision)
@@ -151,18 +161,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 collisionEvent.Contact.GetWorldManifold(out var worldManifold);
                 var collisionNormal = worldManifold.normal;
                 var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
-                // var normalVelocityComponent = System.Numerics.Vector2.Dot(relativeVelocity, collisionNormal);
-                // if (normalVelocityComponent < 0)
-                // {
-                  //  var reflectedVelocity = relativeVelocity - 2 * normalVelocityComponent * collisionNormal;
-                    playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
-                    playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0
-                        ? System.Numerics.Vector2.Normalize(reflectedVelocity)
-                        : System.Numerics.Vector2.Zero;
-                //}
+                playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
+                //Debug.Log($"new pos {_physicsSimulator.GetPlayer(playerModel.Id).Position}, prev pos: {playerModel.Spaceship.Transform.Position} ");
+                playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0
+                    ? System.Numerics.Vector2.Normalize(reflectedVelocity)
+                    : System.Numerics.Vector2.Zero;
+
                 Debug.Log("Collision!");
                 _matchDataService.SetPlayer(playerModel.Id, playerModel);
             }
+
             _physicsSimulator.ClearCachedCollisions();
         }
 
