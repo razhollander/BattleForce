@@ -9,6 +9,7 @@ using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -27,17 +28,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private readonly IPlayerBulletsTransformHandler _playerBulletsTransformHandler;
         private readonly IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
         private readonly IMatchNetEventsDataService _matchNetEventsDataService;
-
-        //private readonly IServerPlayersInputListener _serverPlayersInputListener;
-
         private readonly IStateMachineService _stateMachineService;
-
+        private readonly IPhysicsSimulator _physicsSimulator;
+        
         private TimerFixedThreaded _fixedTimer;
 
         public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IPlayerBulletsTransformHandler playerBulletsTransformHandler,
-            IPlayerJoinPacketsHandler playerJoinPacketsHandler, IMatchNetEventsDataService matchNetEventsDataService)
+            IPlayerJoinPacketsHandler playerJoinPacketsHandler, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -46,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             _playerBulletsTransformHandler = playerBulletsTransformHandler;
             _playerJoinPacketsHandler = playerJoinPacketsHandler;
             _matchNetEventsDataService = matchNetEventsDataService;
-            //_serverPlayersInputListener = serverPlayersInputListener;
+            _physicsSimulator = physicsSimulator;
         }
 
         public void InitEntryPoint()
@@ -82,11 +81,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 _playerJoinPacketsHandler.ProcessPlayersJoined(processedTick);
                 _playerInputsPacketsHandler.ProcessInputs(processedTick);
                 _playerBulletsTransformHandler.UpdateBulletsTransform();
-                
+                _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
+                ProcessCollisions();
                 //ProccesEvents();
                 //Move1Tick(); // only velocities
                 //Simulation.Step();//check collisions
-                //ProcessCollisions();
                 RemoveOlderThanTickEventsPerPlayer(processedTick);
                 
                 if (_matchDataService.SimulationState.PlayersCount > 0)

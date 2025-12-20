@@ -6,7 +6,7 @@ using Box2D.NetStandard.Dynamics.World;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 {
-    public class PhysicsSimulator
+    public class PhysicsSimulator : IPhysicsSimulator
     {
         private World _world;
 
@@ -64,7 +64,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             {
                 shape = wallShape,
                 density = 0,       // Static objects don't need density
-                friction = 0  
+                friction = 0,
+                filter = new Filter
+                {
+                    categoryBits = PhysicsBodyType.Wall.GetCollisionsCategory(),
+                    maskBits     = PhysicsBodyType.Wall.GetCollisionMask(),
+                }
             };
 
             body.CreateFixture(fixtureDef);
@@ -89,7 +94,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             {
                 shape = circleShape,
                 density = 1.0f,
-                friction = 0
+                friction = 0,
+                filter = new Filter
+                {
+                    categoryBits = PhysicsBodyType.PlayerSpaceship.GetCollisionsCategory(),
+                    maskBits     = PhysicsBodyType.PlayerSpaceship.GetCollisionMask(),
+                }
             };
 
             body.CreateFixture(fixtureDef);

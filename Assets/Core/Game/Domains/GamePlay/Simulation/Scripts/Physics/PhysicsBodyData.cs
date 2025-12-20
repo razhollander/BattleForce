@@ -12,10 +12,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         }
     }
 
+    [System.Flags]
     public enum PhysicsBodyType
     {
-        PlayerSpaceship,
-        Wall,
-        Bullet
+        PlayerSpaceship = 0,
+        Wall = 1,
+        Bullet = 2
     }
 }

@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using UnityEngine;
 using Zenject;
 
@@ -26,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<IMatchNetEventsDataService>().To<MatchNetEventsDataService>().AsSingle().NonLazy();
             Container.Bind<ITickProcessor>().To<ServerNetworkTickProcessor>().AsSingle().NonLazy();
             Container.Bind<IPlayerBulletsTransformHandler>().To<PlayerBulletsTransformHandler>().AsSingle().NonLazy();
+            Container.Bind<IPhysicsSimulator>().To<PhysicsSimulator>().AsSingle().NonLazy();
         }
     }
 }
