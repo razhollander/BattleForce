@@ -12,13 +12,8 @@ public enum EventType
     End
 }
 
-// Adjust the base class + types to your Box2D C# port if needed.
-// This version only caches BeginContact & EndContact.
 public class CollisionEventCacheListener : ContactListener
 {
-    /// <summary>
-    /// Dedup key: (fixtureA, fixtureB, eventType), order-independent for the fixture pair.
-    /// </summary>
     private readonly struct EventKey : IEquatable<EventKey>
     {
         private readonly int _low;
@@ -63,11 +58,7 @@ public class CollisionEventCacheListener : ContactListener
     /// Cached events since last Clear().
     /// </summary>
     public IReadOnlyList<PhysicsCollisionEvent> Events => _events;
-
-    /// <summary>
-    /// Call this after you finished processing all events.
-    /// (Safe to call once per frame.)
-    /// </summary>
+    
     public void Clear()
     {
         _events.Clear();
@@ -77,8 +68,16 @@ public class CollisionEventCacheListener : ContactListener
 
     public override void BeginContact(in Contact contact) => Cache(EventType.Begin, contact);
     public override void EndContact(in Contact contact) => Cache(EventType.End, contact);
-    public override void PreSolve(in Contact contact, in Manifold oldManifold) { }
-    public override void PostSolve(in Contact contact, in ContactImpulse impulse) { }
+
+    public override void PreSolve(in Contact contact, in Manifold oldManifold)
+    {
+        
+    }
+
+    public override void PostSolve(in Contact contact, in ContactImpulse impulse)
+    {
+        
+    }
 
     private void Cache(EventType type, Contact contact)
     {
@@ -87,7 +86,6 @@ public class CollisionEventCacheListener : ContactListener
         // Others: contact.FixtureA / contact.FixtureB
         Fixture a = contact.GetFixtureA();
         Fixture b = contact.GetFixtureB();
-
         int idA = GetId(a);
         int idB = GetId(b);
 

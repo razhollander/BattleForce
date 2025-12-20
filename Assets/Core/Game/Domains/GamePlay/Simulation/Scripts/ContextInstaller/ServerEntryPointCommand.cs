@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _tickProcessor.InitEntryPoint();
             _physicsSimulator.InitEntryPoint();
 
-            var wallScale = 3;
+            var wallScale = 10;
             _physicsSimulator.AddWall(0, new []
             {
                 new Vector2(0, wallScale),  

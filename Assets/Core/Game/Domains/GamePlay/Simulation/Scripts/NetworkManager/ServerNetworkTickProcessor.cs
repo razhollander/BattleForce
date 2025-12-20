@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Box2D.NetStandard.Dynamics.Bodies;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
@@ -10,10 +11,12 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using LiteNetLib;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 {
@@ -114,6 +117,52 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private void ProcessCollisions()
         {
             var cachedCollisions = _physicsSimulator.GetCachedCollisions();
+            foreach (var collisionEvent in cachedCollisions)
+            {
+                if (collisionEvent.Type != EventType.Begin)
+                {
+                    continue;
+                }
+                
+                var objectA = (PhysicsBodyData) collisionEvent.FixtureA.Body.UserData;
+                var objectB = (PhysicsBodyData) collisionEvent.FixtureB.Body.UserData;
+                bool isPlayerToWallCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
+                bool isWallToPlayerCollision = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+                var isCollision = isPlayerToWallCollision || isWallToPlayerCollision;
+                PlayerStateS2C playerModel = default;
+                Body playerBody = default;
+                if (isPlayerToWallCollision)
+                {
+                    playerModel = _matchDataService.GetPlayer(objectA.Id);
+                    playerBody = collisionEvent.FixtureA.Body;
+                }
+                else if (isWallToPlayerCollision)
+                {
+                    playerModel = _matchDataService.GetPlayer(objectB.Id);
+                    playerBody = collisionEvent.FixtureB.Body;
+                }
+
+                if (!isCollision)
+                {
+                    continue;
+                }
+
+                var relativeVelocity = playerModel.Spaceship.Transform.Velocity;
+                collisionEvent.Contact.GetWorldManifold(out var worldManifold);
+                var collisionNormal = worldManifold.normal;
+                var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
+                // var normalVelocityComponent = System.Numerics.Vector2.Dot(relativeVelocity, collisionNormal);
+                // if (normalVelocityComponent < 0)
+                // {
+                  //  var reflectedVelocity = relativeVelocity - 2 * normalVelocityComponent * collisionNormal;
+                    playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
+                    playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0
+                        ? System.Numerics.Vector2.Normalize(reflectedVelocity)
+                        : System.Numerics.Vector2.Zero;
+                //}
+                Debug.Log("Collision!");
+                _matchDataService.SetPlayer(playerModel.Id, playerModel);
+            }
             _physicsSimulator.ClearCachedCollisions();
         }
 
