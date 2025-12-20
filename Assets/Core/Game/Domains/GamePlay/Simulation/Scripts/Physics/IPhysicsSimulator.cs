@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
@@ -9,5 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void SetPlayerVelocity(int playerId, Vector2 velocity);
         void AddWall(int id, Vector2[] points);
         void AddPlayer(int id, Vector2 position, Vector2 velocity, float radius);
+        public IReadOnlyList<PhysicsCollisionEvent> GetCachedCollisions();
+        public void ClearCachedCollisions();
     }
 }

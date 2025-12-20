@@ -63,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
                 var playerInputPacket = earliestInputPerPlayers[playerId];
                 var playerModel = _matchDataService.GetPlayer(playerId);
-                UpdatePlayerTransform(playerInputPacket, ref playerModel);
+                UpdatePlayerDirection(playerInputPacket, ref playerModel);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, ref playerModel);
                 _matchDataService.SetPlayer(playerId, playerModel);
                 _cachedLastProcessedInput[playerId] = playerInputPacket;
@@ -105,7 +105,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);
         }
 
-        private void UpdatePlayerTransform(PlayerInputPacketC2S playerInputPacket, ref PlayerStateS2C playerModel)
+        private void UpdatePlayerDirection(PlayerInputPacketC2S playerInputPacket, ref PlayerStateS2C playerModel)
         {
             var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
             var rotationAngle =
@@ -113,9 +113,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                  playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
             var rotatedVector = playerModel.Spaceship.Transform.Direction.Rotate(rotationAngle);
             playerModel.Spaceship.Transform.Direction = rotatedVector;
-            playerModel.Spaceship.Transform.Position += playerModel.Spaceship.Transform.Direction *
-                                                        _gamePlayConfig.PlayerSpaceship.MovementSpeed *
-                                                        _networkConfig.DeltaTime;
         }
 
         private Dictionary<ushort, PlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()

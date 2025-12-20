@@ -27,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<IMatchNetEventsDataService>().To<MatchNetEventsDataService>().AsSingle().NonLazy();
             Container.Bind<ITickProcessor>().To<ServerNetworkTickProcessor>().AsSingle().NonLazy();
             Container.Bind<IPlayerBulletsTransformHandler>().To<PlayerBulletsTransformHandler>().AsSingle().NonLazy();
+            Container.Bind<IPlayersTransformHandler>().To<PlayersTransformHandler>().AsSingle().NonLazy();
             Container.Bind<IPhysicsSimulator>().To<PhysicsSimulator>().AsSingle().NonLazy();
         }
     }

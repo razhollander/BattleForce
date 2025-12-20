@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using Box2D.NetStandard.Collision.Shapes;
 using Box2D.NetStandard.Dynamics.Bodies;
@@ -9,15 +10,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
     public class PhysicsSimulator : IPhysicsSimulator
     {
         private World _world;
+        private CollisionEventCacheListener _collisionEventCacheListener;
 
         public void InitEntryPoint()
         {
             _world = CreateWorld();
+            _collisionEventCacheListener = new CollisionEventCacheListener();
+            _world.SetContactListener(_collisionEventCacheListener);
         }
         
         public void Step(float deltaTime, int velocityIterations, int positionIterations)
         {
             _world.Step(deltaTime, velocityIterations, positionIterations);
+        }
+
+        public IReadOnlyList<PhysicsCollisionEvent> GetCachedCollisions()
+        {
+            return _collisionEventCacheListener.Events;
+        }
+        
+        public void ClearCachedCollisions()
+        {
+            _collisionEventCacheListener.Clear();
         }
         
         private World CreateWorld()
