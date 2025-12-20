@@ -82,6 +82,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 _playerJoinPacketsHandler.ProcessPlayersJoined(processedTick);
                 _playerInputsPacketsHandler.ProcessInputs(processedTick);
                 _playerBulletsTransformHandler.UpdateBulletsTransform();
+                
                 //ProccesEvents();
                 //Move1Tick(); // only velocities
                 //Simulation.Step();//check collisions
