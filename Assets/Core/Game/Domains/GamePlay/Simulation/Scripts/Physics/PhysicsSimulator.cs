@@ -8,6 +8,7 @@ using Box2D.NetStandard.Dynamics.World.Callbacks;
 using Box2D.WorldTests;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
+using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
@@ -65,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 currentBody = currentBody.GetNext();
             }
 
+            LogService.LogError($"Couldn't find player {playerId}");
             return null;
         }
 
@@ -85,7 +87,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     {
                         currentBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
                         currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
-
                         break;
                     }
 
@@ -127,12 +128,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             return _collisionEventCacheListener.Events;
         }
-        
+
         public void ClearCachedCollisions()
         {
             _collisionEventCacheListener.Clear();
         }
-        
+
         private World CreateWorld()
         {
             var gravity = new Vector2(0f, 0f);
@@ -174,7 +175,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             body.CreateFixture(fixtureDef);
         }
-        
+
         public void AddPlayer(ushort id, Vector2 position, Vector2 velocity, float radius)
         {
             BodyDef bodyDef = new BodyDef
@@ -203,6 +204,59 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             };
 
             body.CreateFixture(fixtureDef);
+        }
+
+        public void AddPlayerBullet(int bulletId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius)
+        {
+            BodyDef bodyDef = new BodyDef
+            {
+                position = bulletPosition,
+                linearVelocity = bulletVelocity,
+                type = BodyType.Dynamic,
+                bullet = true,
+                userData = new PhysicsBodyData(bulletId, PhysicsBodyType.PlayerBullet)
+            };
+            
+            Body bulletBody = _world.CreateBody(bodyDef);
+            
+            CircleShape circleShape = new CircleShape
+            {
+                Radius = bulletRadius
+            };
+            
+            FixtureDef fixtureDef = new FixtureDef
+            {
+                shape = circleShape,
+                density = 0.3f,
+                friction = 0.0f,
+                filter = new Filter
+                {
+                    categoryBits = PhysicsBodyType.PlayerBullet.GetCollisionsCategory(),
+                    maskBits = PhysicsBodyType.PlayerBullet.GetCollisionMask()
+                }
+            };
+            
+            bulletBody.CreateFixture(fixtureDef);
+        }
+
+        public Body GetBullet(ushort bulletId)
+        {
+            var currentBody = _world.GetBodyList();
+
+            while (currentBody != null)
+            {
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerBullet && bodyData.Id == bulletId)
+                {
+                    return currentBody;
+                }
+
+                currentBody = currentBody.GetNext();
+            }
+            
+            LogService.LogError($"Couldn't find bullet {bulletId}");
+            return default;
         }
 
         public void ManagedOnGUI()

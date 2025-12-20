@@ -17,5 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void InitExitPoint();
         void CopyDataToSimulation(SimulationStateS2C simulationState);
         Body GetPlayer(ushort playerId);
+        void AddPlayerBullet(int bulletId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
+        Body GetBullet(ushort bulletId);
     }
 }

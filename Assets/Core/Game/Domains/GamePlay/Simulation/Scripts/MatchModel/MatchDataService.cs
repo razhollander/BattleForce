@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             _simulationState.PlayersCount++;
             return newPlayer;
         }
-        
+
         public PlayerStateS2C GetPlayer(int playerId)
         {
             return _simulationState.Players.First(x => x.Id == playerId);
@@ -53,7 +53,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             }
         }
 
-        public PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed)
+        public void SetBullet(ushort bulletModelId, PlayerBulletS2C bulletModel)
+        {
+            foreach (var usedIndex in _simulationState.Bullets.UsedIndices())
+            {
+                if (_simulationState.Bullets[usedIndex].Id == bulletModelId)
+                {
+                    _simulationState.Bullets[usedIndex] = bulletModel;
+                    return;
+                }
+            }
+        }
+
+        public PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed, float radius)
         {
             _simulationState.Bullets.Rent(out var index);
             ref PlayerBulletS2C playerBullet = ref _simulationState.Bullets[index];
@@ -62,6 +74,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             playerBullet.BelongToPlayerId = belongToPlayerId;
             playerBullet.Position = position;
             playerBullet.Direction = direction;
+            playerBullet.Radius = radius;
             playerBullet.Velocity = direction * moveSpeed;
             return playerBullet;
         }

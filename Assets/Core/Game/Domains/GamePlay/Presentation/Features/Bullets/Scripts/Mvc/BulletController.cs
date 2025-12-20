@@ -28,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
             _bulletView = Object.Instantiate(bulletViewPrefab, parent);
             _bulletView.name = "Bullet_" + BulletId;
             _bulletView.SetPosition(bulletModel.Position.ToUnity());
+            _bulletView.SetRadius(bulletModel.Radius);
         }
 
         public void InterpolatePosition(float interpolationFactor)

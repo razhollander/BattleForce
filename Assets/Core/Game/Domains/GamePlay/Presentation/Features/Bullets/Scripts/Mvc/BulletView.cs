@@ -16,5 +16,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
         {
             transform.position = position;
         }
+
+        public void SetRadius(float radius)
+        {
+            var diameter = radius * 2;
+            transform.localScale = new Vector3(diameter, diameter, 1);
+        }
     }
 }

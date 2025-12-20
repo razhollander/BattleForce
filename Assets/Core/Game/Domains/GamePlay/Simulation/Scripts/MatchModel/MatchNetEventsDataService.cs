@@ -30,11 +30,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             JoinAcceptNetEventsPerPlayer.Remove(playerId);
         }
         
-        public void AddBulletSpawnNetEvent(int onTick, int bulletId, ushort belongToPlayerId, Vector2 position)
+        public void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius)
         {
             foreach (var kvp in BulletSpawnNetEventsPerPlayer)
             {
-                kvp.Value.Add(new BulletSpawnNetEventS2C(onTick, bulletId, belongToPlayerId, position));
+                kvp.Value.Add(new BulletSpawnNetEventS2C(onTick, bulletId, belongToPlayerId, position, bulletRadius));
             }
         }
 

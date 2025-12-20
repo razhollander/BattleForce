@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             {
                 var bulletState = _simulationState.Bullets[index];
                 _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId,
-                    bulletState.Position);
+                    bulletState.Position, bulletState.Radius);
                 _bulletControllers.CreateBullet(bulletState.Id);
             }
         }

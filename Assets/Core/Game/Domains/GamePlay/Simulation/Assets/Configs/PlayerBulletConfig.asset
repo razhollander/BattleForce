@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: PlayerBulletConfig
   m_EditorClassIdentifier: 
   MoveSpeed: 10
+  Radius: 1

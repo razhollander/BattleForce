@@ -38,9 +38,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             return newPlayer;
         }
         
-        public MatchPlayerBulletModel AddBullet(int bulletId, int belongToPlayerId, Vector2 position)
+        public MatchPlayerBulletModel AddBullet(int bulletId, int belongToPlayerId, Vector2 position, float radius)
         {
-            var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, position);
+            var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, position, radius);
             Bullets.Add(newBullet);
             return newBullet;
         }

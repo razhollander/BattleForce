@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         bool IsPlayerJoined { get; }
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
         void SetLocalPlayer(int playerId);
-        MatchPlayerBulletModel AddBullet(int bulletId, int belongToPlayerId, Vector2 position);
+        MatchPlayerBulletModel AddBullet(int bulletId, int belongToPlayerId, Vector2 position, float radius);
         MatchPlayerBulletModel GetBullet(int bulletId);
     }
 }

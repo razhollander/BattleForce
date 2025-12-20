@@ -86,10 +86,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
                 _networkManager.PollEvents();
                 ProcessPackets(processedTick);
-                UpdateTransforms();
+                ApplyMatchModelToPhysicsSimulation();
                 _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
                 ProcessCollisions();
-                ApplyPhysicsSimulationTransformsToMatchModel();
+                ApplyPhysicsSimulationToMatchModel();
                 RemoveOlderThanTickEventsPerPlayer(processedTick);
                 SendCurrentTickStateToAllClients(processedTick);
                 _matchDataService.CopySimulationStateIntoPrevious();
@@ -102,7 +102,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             }
         }
 
-        private void ApplyPhysicsSimulationTransformsToMatchModel()
+        private void ApplyPhysicsSimulationToMatchModel()
         {
             for (int i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
             {
@@ -110,11 +110,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 playerModel.Spaceship.Transform.Position = _physicsSimulator.GetPlayer(playerModel.Id).Position;
                 _matchDataService.SetPlayer(playerModel.Id, playerModel);
             }
+
+            foreach (int usedIndex in _matchDataService.SimulationState.Bullets.UsedIndices())
+            {
+                var bulletModel = _matchDataService.SimulationState.Bullets[usedIndex];
+                bulletModel.Position = _physicsSimulator.GetBullet(bulletModel.Id).Position;
+                _matchDataService.SetBullet(bulletModel.Id, bulletModel);
+            }
         }
 
-        private void UpdateTransforms()
+        private void ApplyMatchModelToPhysicsSimulation()
         {
-            _playerBulletsTransformHandler.UpdateBulletsTransform();
             _physicsSimulator.CopyDataToSimulation(_matchDataService.SimulationState);
         }
 

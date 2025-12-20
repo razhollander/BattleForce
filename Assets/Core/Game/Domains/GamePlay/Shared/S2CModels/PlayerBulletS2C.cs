@@ -6,17 +6,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
     public struct PlayerBulletS2C : INetSerializable
     {
-        public int Id;
+        public ushort Id;
         public ushort BelongToPlayerId;
         public Vector2 Position;
         public Vector2 Velocity;
         public Vector2 Direction;
+        public float Radius;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)Id);
             writer.Put((byte)BelongToPlayerId);
             writer.Put(Position);
+            writer.Put(Radius);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Id = reader.GetByte();
             BelongToPlayerId = reader.GetByte();
             Position = reader.GetVector2();
+            Radius = reader.GetFloat();
         }
 
         public void SerializeTransforms(NetDataWriter writer)
