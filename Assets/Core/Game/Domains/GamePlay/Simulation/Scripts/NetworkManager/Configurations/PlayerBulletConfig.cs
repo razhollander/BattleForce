@@ -6,6 +6,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations
     public class PlayerBulletConfig : ScriptableObject
     {
         public float MoveSpeed = 10;
-        public float Radius = 0.28308f;
+        public float Radius = 0.14154f;
     }
 }
