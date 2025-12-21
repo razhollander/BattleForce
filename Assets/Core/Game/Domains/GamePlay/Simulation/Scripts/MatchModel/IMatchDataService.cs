@@ -15,5 +15,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         void CopySimulationStateIntoPrevious();
         void SetBullet(ushort bulletModelId, PlayerBulletS2C bulletModel);
         PlayerBulletS2C GetBullet(int bulletId);
+        void RemoveBullet(ushort bulletModelId);
     }
 }

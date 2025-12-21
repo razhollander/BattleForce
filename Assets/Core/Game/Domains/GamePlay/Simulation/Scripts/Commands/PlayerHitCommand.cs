@@ -11,6 +11,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         private int _hitDamage;
         private ushort _playerId;
         private IMatchDataService _matchDataService;
+        private IMatchNetEventsDataService _matchNetEventsDataService;
+        private int _processedTick;
 
         public PlayerHitCommand SetHitDamage(int hitDamage)
         {
@@ -22,30 +24,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         public PlayerHitCommand SetPlayerId(ushort playerId)
         {
             _playerId = playerId;
-
+            return this;
+        }
+        
+        public PlayerHitCommand SetProcessedTick(int processedTick)
+        {
+            _processedTick = processedTick;
             return this;
         }
 
         public override void ResolveDependencies()
         {
             _matchDataService =_diContainer.Resolve<IMatchDataService>();
+            _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
         }
 
         public void Execute()
         {
             var playerState = _matchDataService.GetPlayer(_playerId);
-            playerState.Spaceship.Health.CurrentHealth = Math.Max(DEAD_HEALTH_AMOUNT, playerState.Spaceship.Health.CurrentHealth - _hitDamage);
-            var isPlayerDead = playerState.Spaceship.Health.CurrentHealth == DEAD_HEALTH_AMOUNT;
+            var newHealth = Math.Max(DEAD_HEALTH_AMOUNT, playerState.Spaceship.Health.CurrentHealth - _hitDamage);
+            playerState.Spaceship.Health.CurrentHealth = newHealth;
+            var isPlayerAlive = newHealth > DEAD_HEALTH_AMOUNT;
 
-            if (isPlayerDead)
+            if (!isPlayerAlive)
             {
                 playerState.IsAlive = false;
             }
             
             _matchDataService.SetPlayer(playerState.Id, playerState);
-            // Creating and dispatching PlayerHitEvent
-            var playerHitEvent = new PlayerHitEvent(_playerId, _hitDamage);
-            _diContainer.Resolve<IEventSystem>().Dispatch(playerHitEvent);
+            _matchNetEventsDataService.AddPlayerTakeDamageNetEvent(_processedTick, _playerId, newHealth, _hitDamage, isPlayerAlive);
         }
     }
 }

@@ -261,6 +261,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return default;
         }
 
+        public void RemoveBody(Body body)
+        {
+            _world.DestroyBody(body);
+        }
+
         public void ManagedOnGUI()
         {
             

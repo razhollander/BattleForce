@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         public Dictionary<ushort, List<PlayerJoinAcceptPacketS2C>> JoinAcceptNetEventsPerPlayer { get; private set; } = new (); // todo: remove events related to player when player is destroyed
         
         public Dictionary<ushort, List<PlayerTakeDamageNetEventS2C>> PlayerTakeDamageNetEventsPerPlayer { get; private set; } = new(); // todo: remove events related to player hit when player is destroyed
+        public Dictionary<ushort, List<BulletDestroyedNetEventS2C>> BulletDestroyedNetEventsPerPlayer { get; private set; } = new(); // todo: remove events related to player hit when player is destroyed
 
         public void StartSavingPlayerEvents(ushort playerId)
         {
@@ -30,6 +31,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
+            
+            if (!BulletDestroyedNetEventsPerPlayer.TryAdd(playerId, new List<BulletDestroyedNetEventS2C>()))
+            {
+                LogService.LogError($"Player already exists! {playerId}");
+            }
         }
         
         public void StopSavingPlayerEvents(ushort playerId)
@@ -37,13 +43,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             JoinAcceptNetEventsPerPlayer.Remove(playerId);
             PlayerTakeDamageNetEventsPerPlayer.Remove(playerId);
+            BulletDestroyedNetEventsPerPlayer.Remove(playerId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, int playerHealth, int hitDamage, bool isAlive)
         {
-            if (PlayerTakeDamageNetEventsPerPlayer.TryGetValue(damagedPlayerId, out var playerDamageEvents))
+            foreach (var kvp in PlayerTakeDamageNetEventsPerPlayer)
             {
-                playerDamageEvents.Add(new PlayerTakeDamageNetEventS2C
+                kvp.Value.Add(new PlayerTakeDamageNetEventS2C
                 {
                     OccuredOnTick = onTick,
                     PlayerId = damagedPlayerId,
@@ -52,17 +59,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
                     IsAlive = isAlive
                 });
             }
-            else
+        }
+
+        public void AddBulletDestroyedNetEvent(int onTick, ushort bulletId, Vector2 position)
+        {
+            foreach (var kvp in BulletDestroyedNetEventsPerPlayer)
             {
-                LogService.LogError($"Player {damagedPlayerId} does not exist to record damage.");
+                kvp.Value.Add(new BulletDestroyedNetEventS2C(onTick, bulletId, position));
             }
         }
-        
+
         public void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius)
         {
             foreach (var kvp in BulletSpawnNetEventsPerPlayer)
             {
                 kvp.Value.Add(new BulletSpawnNetEventS2C(onTick, bulletId, belongToPlayerId, position, bulletRadius));
+            }
+        }
+
+        public void AddPlayerJoinAcceptedEvent(int onTick, PlayerStateS2C playerState, SimulationStateS2C simulationState)
+        {
+            foreach (var kvp in JoinAcceptNetEventsPerPlayer)
+            {
+                kvp.Value.Add(new PlayerJoinAcceptPacketS2C
+                {
+                    OccuredOnTick = onTick,
+                    IsLocal = playerState.Id == kvp.Key,
+                    PlayerState = playerState,
+                    SimulationState = simulationState
+                });
             }
         }
 
@@ -80,19 +105,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             {
                 playerTakeDamageNetEvents.RemoveAll(x => x.OccuredOnTick < tick);
             }
-        }
-
-        public void AddPlayerJoinAcceptedEvent(int onTick, PlayerStateS2C playerState, SimulationStateS2C simulationState)
-        {
-            foreach (var kvp in JoinAcceptNetEventsPerPlayer)
+            if (BulletDestroyedNetEventsPerPlayer.TryGetValue(playerId, out var bulletDestroyedNetEvents))
             {
-                kvp.Value.Add(new PlayerJoinAcceptPacketS2C
-                {
-                    OccuredOnTick = onTick,
-                    IsLocal = playerState.Id == kvp.Key,
-                    PlayerState = playerState,
-                    SimulationState = simulationState
-                });
+                bulletDestroyedNetEvents.RemoveAll(x => x.OccuredOnTick < tick);
             }
         }
     }

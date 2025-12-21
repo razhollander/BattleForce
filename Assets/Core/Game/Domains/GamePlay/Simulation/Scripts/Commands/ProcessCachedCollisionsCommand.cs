@@ -1,6 +1,7 @@
 using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Contacts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
@@ -14,19 +15,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         private IPhysicsSimulator _physicsSimulator;
         private IMatchDataService _matchDataService;
         private ICommandFactory _commandFactory;
+        private SimulationGamePlayConfig _gamePlayConfig;
+        private IMatchNetEventsDataService _matchNetEventsDataService;
+        
+        private int _processedTick;
+        private PlayerHitCommand _playerHitCommand;
+
+        public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
+        {
+            _processedTick = processedTick;
+            return this;
+        }
 
         public override void ResolveDependencies()
         {
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
+            _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
         }
 
         public void Execute()
         {
             ProcessCollisions();
         }
-        
+
         private void ProcessCollisions()
         {
             var cachedCollisions = _physicsSimulator.GetCachedCollisions();
@@ -56,29 +71,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 return;
             }
             
-            PlayerStateS2C playerModel = default;
-            PlayerBulletS2C bulletModel = default;
+            PlayerStateS2C playerModel;
+            PlayerBulletS2C bulletModel;
+            Body bulletBody;
 
             if (isPlayerToBulletCollision)
             {
                 playerModel = _matchDataService.GetPlayer(objectA.Id);
                 bulletModel = _matchDataService.GetBullet(objectB.Id);
+                bulletBody = contact.FixtureB.Body;
             }
-            else if (isBulletToPlayerCollision)
+            else
             {
                 playerModel = _matchDataService.GetPlayer(objectB.Id);
                 bulletModel = _matchDataService.GetBullet(objectA.Id);
+                bulletBody = contact.FixtureA.Body;
             }
+
+            _playerHitCommand
+                .SetPlayerId(playerModel.Id)
+                .SetHitDamage(_gamePlayConfig.PlayerBullet.HitDamage)
+                .SetProcessedTick(_processedTick)
+                .Execute();
             
-            _commandFactory.CreateCommandVoid<PlayerHitCommand>()
-            playerModel.Health -= 1;
-            _matchDataService.SetPlayer(playerData.Id, playerModel);
-
-            _matchDataService.RemoveBullet(bulletData.Id);
-            _physicsSimulator.RemoveBody(bulletData.Id);
-
-            var playerHitByBulletEvent = new PlayerHitByBulletEvent(playerModel.Id, bulletData.Id, contact);
-            _eventSystem.Dispatch(playerHitByBulletEvent);
+            _matchDataService.RemoveBullet(bulletModel.Id);
+            _physicsSimulator.RemoveBody(bulletBody);
+            _matchNetEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
         }
 
         private void HandlePlayerWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

@@ -19,5 +19,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         Body GetPlayer(ushort playerId);
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
         Body GetBullet(ushort bulletId);
+        void RemoveBody(Body body);
     }
 }

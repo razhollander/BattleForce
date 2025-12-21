@@ -79,6 +79,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             return default;
         }
 
+        public void RemoveBullet(ushort bulletModelId)
+        {
+            foreach (var usedIndex in _simulationState.Bullets.UsedIndices())
+            {
+                if (_simulationState.Bullets[usedIndex].Id == bulletModelId)
+                {
+                    _simulationState.Bullets.Return(usedIndex);
+                    return;
+                }
+            }
+        }
+
         public PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed, float radius)
         {
             _simulationState.Bullets.Rent(out var index);

@@ -94,7 +94,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 ProcessPackets(processedTick);
                 ApplyMatchModelToPhysicsSimulation();
                 _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
-                _processCachedCollisionsCommand.Execute();
+                _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
                 ApplyPhysicsSimulationToMatchModel();
                 RemoveOlderThanTickEventsPerPlayer(processedTick);
                 SendCurrentTickStateToAllClients(processedTick);
@@ -154,13 +154,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             }
 
             var simulationState = _matchDataService.SimulationState;
-            var packet = new FullTickPacket(processedTick, _matchDataService.PreviousSimulationState, simulationState, null, null);
+            var packet = new FullTickPacket(processedTick, _matchDataService.PreviousSimulationState, simulationState, null, null, null, null);
             for (var i = 0; i < simulationState.PlayersCount; i++)
             {
                 var playerState = simulationState.Players[i];
                 var playerId = playerState.Id;
                 packet.BulletSpawnNetEvents = _matchNetEventsDataService.BulletSpawnNetEventsPerPlayer[playerId];
                 packet.PlayerJoinAcceptNetEvents = _matchNetEventsDataService.JoinAcceptNetEventsPerPlayer[playerId];
+                packet.PlayerTakeDamageNetEvents = _matchNetEventsDataService.PlayerTakeDamageNetEventsPerPlayer[playerId];
+                packet.BulletDestroyedNetEvents = _matchNetEventsDataService.BulletDestroyedNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.FullTick, packet,
                     DeliveryMethod.Unreliable);
             }
