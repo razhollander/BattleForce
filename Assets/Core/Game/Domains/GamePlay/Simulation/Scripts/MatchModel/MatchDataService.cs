@@ -29,9 +29,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         public PlayerStateS2C AddPlayer(string playerName, PlayerTransformStateS2C playerTransformStateS2C, int health, float shootCooldown)
         {
             var playerSpaceship = new PlayerSpaceshipStateS2C(playerTransformStateS2C, shootCooldown, health);
-            var playerId = _simulationState.PlayersCount;
+            var playerId = (ushort)(_simulationState.PlayersCount + 1);
             var newPlayer = new PlayerStateS2C(playerId, playerName, playerSpaceship);
-            _simulationState.Players[playerId] = newPlayer;
+            _simulationState.Players[_simulationState.PlayersCount] = newPlayer;
             _simulationState.PlayersCount++;
             return newPlayer;
         }

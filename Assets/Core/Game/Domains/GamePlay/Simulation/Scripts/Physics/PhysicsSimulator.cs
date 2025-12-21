@@ -26,16 +26,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         public void InitEntryPoint()
         {
-            _world = CreateWorld();
             _collisionEventCacheListener = new CollisionEventCacheListener();
-            _world.SetContactListener(_collisionEventCacheListener);
-            var testDebugDrawer = new TestDebugDrawer();
-            testDebugDrawer.AppendFlags(DrawFlags.Aabb);
-            testDebugDrawer.AppendFlags(DrawFlags.Joint);
-            testDebugDrawer.AppendFlags(DrawFlags.Pair);
-            testDebugDrawer.AppendFlags(DrawFlags.Shape);
-            testDebugDrawer.AppendFlags(DrawFlags.CenterOfMass);
-            _world.SetDebugDraw(testDebugDrawer);
+            _world = CreateWorld();
             _updateSubscriptionService.RegisterGuiUpdatable(this);
         }
 
@@ -138,7 +130,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var gravity = new Vector2(0f, 0f);
             var world = new World(gravity);
-
+            var testDebugDrawer = new TestDebugDrawer();
+            testDebugDrawer.AppendFlags(DrawFlags.Aabb);
+            testDebugDrawer.AppendFlags(DrawFlags.Joint);
+            testDebugDrawer.AppendFlags(DrawFlags.Pair);
+            testDebugDrawer.AppendFlags(DrawFlags.Shape);
+            testDebugDrawer.AppendFlags(DrawFlags.CenterOfMass);
+            world.SetDebugDraw(testDebugDrawer);
+            world.SetContactListener(_collisionEventCacheListener);
             return world;
         }
 

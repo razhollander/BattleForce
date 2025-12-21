@@ -62,6 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         public void InitEntryPoint()
         {
             StartTick();
+            _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
         }
 
         private void StartTick()
@@ -75,7 +76,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         public void InitExitPoint()
         {
             StopTick();
-            _processCachedCollisionsCommand =  _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
         }
 
         private void StopTick()
