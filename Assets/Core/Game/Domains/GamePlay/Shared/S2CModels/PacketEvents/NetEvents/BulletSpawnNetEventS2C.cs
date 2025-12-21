@@ -1,9 +1,8 @@
-using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
-namespace Core.Game.Domains.GamePlay.Shared.S2CModels
+namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
     public struct BulletSpawnNetEventS2C : INetSerializable
     {
@@ -21,8 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Position = position;
             BulletRadius = bulletRadius;
         }
-
-
+        
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);

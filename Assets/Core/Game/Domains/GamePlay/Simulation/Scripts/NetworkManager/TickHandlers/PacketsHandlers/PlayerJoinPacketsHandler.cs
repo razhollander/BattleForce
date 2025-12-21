@@ -67,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 var playerId = playerState.Id;
                 var peer = kvp.Key;
                 peer.Tag = playerId;
-                _physicsSimulator.AddPlayer(playerId, playerTransform.Position, playerTransform.Direction, playerTransform.Radius);
+                _physicsSimulator.AddPlayer(playerId, playerState.TeamId, playerTransform.Position, playerTransform.Direction, playerTransform.Radius);
                 _networkManager.AddPlayerPeer(playerId, peer);
                 _matchNetEventsDataService.StartSavingPlayerEvents(playerId);
                 _matchNetEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);

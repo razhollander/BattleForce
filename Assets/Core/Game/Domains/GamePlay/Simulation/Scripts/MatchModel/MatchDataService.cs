@@ -65,6 +65,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             }
         }
 
+        public PlayerBulletS2C GetBullet(int bulletId)
+        {
+            foreach (var index in _simulationState.Bullets.UsedIndices())
+            {
+                var bullet = _simulationState.Bullets[index];
+                if (bullet.Id == bulletId)
+                {
+                    return bullet;
+                }
+            }
+
+            return default;
+        }
+
         public PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed, float radius)
         {
             _simulationState.Bullets.Rent(out var index);

@@ -1,8 +1,5 @@
-using System.Collections.Generic;
 using System.Numerics;
-using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 {
@@ -17,5 +14,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed, float radius);
         void CopySimulationStateIntoPrevious();
         void SetBullet(ushort bulletModelId, PlayerBulletS2C bulletModel);
+        PlayerBulletS2C GetBullet(int bulletId);
     }
 }

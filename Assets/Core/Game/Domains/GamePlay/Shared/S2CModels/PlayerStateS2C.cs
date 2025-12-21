@@ -7,18 +7,23 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public ushort Id;
         public string Name;
         public PlayerSpaceshipStateS2C Spaceship;
+        public ushort TeamId;
+        public bool IsAlive;
         
         public PlayerStateS2C(ushort id, string name, PlayerSpaceshipStateS2C spaceship)
         {
             Id = id;
             Name = name;
             Spaceship = spaceship;
+            TeamId = id;
+            IsAlive = true;
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)Id);
             writer.Put(Name);
+            writer.Put((byte)TeamId);
             Spaceship.Serialize(writer);
         }
         
@@ -26,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             Id = reader.GetByte();
             Name = reader.GetString();
+            TeamId = reader.GetByte();
             Spaceship.Deserialize(reader);
         }
 

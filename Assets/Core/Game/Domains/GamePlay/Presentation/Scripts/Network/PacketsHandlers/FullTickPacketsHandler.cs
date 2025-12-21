@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
+using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;

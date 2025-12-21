@@ -7,12 +7,14 @@ using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using LiteNetLib;
@@ -34,14 +36,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private readonly IStateMachineService _stateMachineService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly IPlayersTransformHandler _playersTransformHandler;
+        private readonly ICommandFactory _commandFactory;
 
         private TimerFixedThreaded _fixedTimer;
+        private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
 
         public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IPlayerBulletsTransformHandler playerBulletsTransformHandler,
             IPlayerJoinPacketsHandler playerJoinPacketsHandler, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            IPlayersTransformHandler playersTransformHandler)
+            IPlayersTransformHandler playersTransformHandler, ICommandFactory commandFactory)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -52,6 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             _matchNetEventsDataService = matchNetEventsDataService;
             _physicsSimulator = physicsSimulator;
             _playersTransformHandler = playersTransformHandler;
+            _commandFactory = commandFactory;
         }
 
         public void InitEntryPoint()
@@ -70,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         public void InitExitPoint()
         {
             StopTick();
+            _processCachedCollisionsCommand =  _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
         }
 
         private void StopTick()
@@ -88,7 +94,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 ProcessPackets(processedTick);
                 ApplyMatchModelToPhysicsSimulation();
                 _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
-                ProcessCollisions();
+                _processCachedCollisionsCommand.Execute();
                 ApplyPhysicsSimulationToMatchModel();
                 RemoveOlderThanTickEventsPerPlayer(processedTick);
                 SendCurrentTickStateToAllClients(processedTick);
@@ -128,56 +134,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         {
             _playerJoinPacketsHandler.ProcessPlayersJoined(processedTick);
             _playerInputsPacketsHandler.ProcessInputs(processedTick);
-        }
-
-        private void ProcessCollisions()
-        {
-            var cachedCollisions = _physicsSimulator.GetCachedCollisions();
-
-            foreach (var collisionEvent in cachedCollisions)
-            {
-                if (collisionEvent.Type != EventType.Begin)
-                {
-                    continue;
-                }
-
-                var objectA = (PhysicsBodyData) collisionEvent.FixtureA.Body.UserData;
-                var objectB = (PhysicsBodyData) collisionEvent.FixtureB.Body.UserData;
-                bool isPlayerToWallCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
-                bool isWallToPlayerCollision = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
-                var isCollision = isPlayerToWallCollision || isWallToPlayerCollision;
-                PlayerStateS2C playerModel = default;
-                Body playerBody = default;
-
-                if (isPlayerToWallCollision)
-                {
-                    playerModel = _matchDataService.GetPlayer(objectA.Id);
-                }
-                else if (isWallToPlayerCollision)
-                {
-                    playerModel = _matchDataService.GetPlayer(objectB.Id);
-                }
-
-                if (!isCollision)
-                {
-                    continue;
-                }
-
-                var relativeVelocity = playerModel.Spaceship.Transform.Velocity;
-                collisionEvent.Contact.GetWorldManifold(out var worldManifold);
-                var collisionNormal = worldManifold.normal;
-                var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
-                playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
-                //Debug.Log($"new pos {_physicsSimulator.GetPlayer(playerModel.Id).Position}, prev pos: {playerModel.Spaceship.Transform.Position} ");
-                playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0
-                    ? System.Numerics.Vector2.Normalize(reflectedVelocity)
-                    : System.Numerics.Vector2.Zero;
-
-                Debug.Log("Collision!");
-                _matchDataService.SetPlayer(playerModel.Id, playerModel);
-            }
-
-            _physicsSimulator.ClearCachedCollisions();
         }
 
         private void RemoveOlderThanTickEventsPerPlayer(int processedTick)

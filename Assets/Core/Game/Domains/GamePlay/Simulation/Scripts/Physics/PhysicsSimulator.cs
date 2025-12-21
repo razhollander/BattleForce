@@ -176,7 +176,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.CreateFixture(fixtureDef);
         }
 
-        public void AddPlayer(ushort id, Vector2 position, Vector2 velocity, float radius)
+        public void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius)
         {
             BodyDef bodyDef = new BodyDef
             {
@@ -200,13 +200,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 {
                     categoryBits = PhysicsBodyType.PlayerSpaceship.GetCollisionsCategory(),
                     maskBits     = PhysicsBodyType.PlayerSpaceship.GetCollisionMask(),
+                    groupIndex = (short)-teamId,
                 }
             };
 
             body.CreateFixture(fixtureDef);
         }
 
-        public void AddPlayerBullet(int bulletId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius)
+        public void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius)
         {
             BodyDef bodyDef = new BodyDef
             {
@@ -232,7 +233,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 filter = new Filter
                 {
                     categoryBits = PhysicsBodyType.PlayerBullet.GetCollisionsCategory(),
-                    maskBits = PhysicsBodyType.PlayerBullet.GetCollisionMask()
+                    maskBits = PhysicsBodyType.PlayerBullet.GetCollisionMask(),
+                    groupIndex = (short)-teamId,
                 }
             };
             

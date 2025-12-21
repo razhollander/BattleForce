@@ -11,13 +11,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void Step(float deltaTime, int velocityIterations, int positionIterations);
         void SetPlayerVelocity(ushort playerId, Vector2 velocity);
         void AddWall(int id, Vector2[] points);
-        void AddPlayer(ushort id, Vector2 position, Vector2 velocity, float radius);
+        void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius);
         public IReadOnlyList<PhysicsCollisionEvent> GetCachedCollisions();
         public void ClearCachedCollisions();
         void InitExitPoint();
         void CopyDataToSimulation(SimulationStateS2C simulationState);
         Body GetPlayer(ushort playerId);
-        void AddPlayerBullet(int bulletId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
+        void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
         Body GetBullet(ushort bulletId);
     }
 }

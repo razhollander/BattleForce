@@ -25,14 +25,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             CurrentHealth = reader.GetByte();
         }
         
-        public void SerializeCurrentHealth(NetDataWriter writer)
-        {
-            writer.Put((byte)CurrentHealth);
-        }
-
-        public void DeserializeCurrentHealth(NetDataReader reader)
-        {
-            CurrentHealth = reader.GetByte();
-        }
+        // public void SerializeCurrentHealth(NetDataWriter writer)
+        // {
+        //     writer.Put((byte)CurrentHealth);
+        // }
+        //
+        // public void DeserializeCurrentHealth(NetDataReader reader)
+        // {
+        //     CurrentHealth = reader.GetByte();
+        // }
     }
 }
