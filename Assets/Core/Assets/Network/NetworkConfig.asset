@@ -16,7 +16,9 @@ MonoBehaviour:
   MaxConcurrentBullets: 10
   TicksPerSeconds: 60
   DeltaTime: 0.016666668
+  PhysicsVelocityIterations: 8
+  PositionIterations: 8
   ServerTicksBuffer: 2
   HostPort: 49153
-  IpAddress: 109.67.156.134
+  IpAddress: localhost
   ConntectionKey: BattleForceGame

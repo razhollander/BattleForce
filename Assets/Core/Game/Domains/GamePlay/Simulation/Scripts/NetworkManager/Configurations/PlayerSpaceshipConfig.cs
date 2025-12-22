@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations
 {
     [CreateAssetMenu(fileName = "PlayerSpaceshipConfig", menuName = "BF/Network/Player Spaceship Config")]
     public class PlayerSpaceshipConfig : ScriptableObject

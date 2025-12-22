@@ -1,5 +1,5 @@
-using Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers
