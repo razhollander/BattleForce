@@ -4,12 +4,12 @@ namespace Core.Game.Domains.GamePlay.Shared.MatchData.Models
 {
     public class MatchPlayerBulletModel
     {
-        public int Id;
-        public int BelongToPlayerId;
+        public ushort Id;
+        public ushort BelongToPlayerId;
         public Vector2 Position;
         public float Radius;
 
-        public MatchPlayerBulletModel(int id, int belongToPlayerId, Vector2 position, float radius)
+        public MatchPlayerBulletModel(ushort id, ushort belongToPlayerId, Vector2 position, float radius)
         {
             Id = id;
             BelongToPlayerId = belongToPlayerId;

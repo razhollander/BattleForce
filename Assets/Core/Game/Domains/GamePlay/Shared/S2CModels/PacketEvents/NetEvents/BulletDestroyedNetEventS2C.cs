@@ -4,7 +4,7 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public class BulletDestroyedNetEventS2C : INetSerializable
+    public struct BulletDestroyedNetEventS2C : INetSerializable
     {
         public int OccuredOnTick;
         public ushort BulletId;

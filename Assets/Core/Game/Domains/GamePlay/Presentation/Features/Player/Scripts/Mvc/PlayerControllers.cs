@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
-using Core.Game.Domains.GamePlay.Shared;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 {
     public class PlayerControllers : IPlayerControllers
     {
@@ -26,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             _playersParent = new GameObject("PlayersParent");
         }
 
-        public void CreatePlayer(int playerId)
+        public void CreatePlayer(ushort playerId)
         {
             var playerController = new PlayerController(playerId, _matchDataService, _gamePlayConfig);
             playerController.CreatePlayerView(_playerViewPrefab, _playersParent.transform);
@@ -49,9 +48,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             }
         }
 
-        public void ShootBulletEffectForPlayer(int playerId)
+        public void ShootBulletEffectForPlayer(ushort playerId)
         {
-            _playerControllers.Find(x => x.PlayerId == playerId).DoShootEffect();
+            GetPlayer(playerId).DoShootEffect();
+        }
+
+        private PlayerController GetPlayer(ushort playerId)
+        {
+            return _playerControllers.Find(x => x.PlayerId == playerId);
+        }
+
+        public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)
+        {
+            GetPlayer(playerId).SetHealth(currentHealth, maxHealth);
         }
     }
 }

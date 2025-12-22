@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
@@ -87,6 +89,36 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
                 _matchDataService.AddBullet(bulletSpawnNetEvent.BulletId, bulletSpawnNetEvent.BelongToPlayerId,
                     bulletSpawnNetEvent.Position, bulletSpawnNetEvent.BulletRadius);
                 _matchNetEventsDataService.BulletSpawnNetEvents.Add(bulletSpawnNetEvent);
+            }
+        }
+
+        public void ProcessPlayerTakeDamageEvents(List<PlayerTakeDamageNetEventS2C> playerTakeDamageEvents)
+        {
+            if (playerTakeDamageEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerTakeDamageEvent in playerTakeDamageEvents)
+            {
+                var playerModel = _matchDataService.GetPlayer(playerTakeDamageEvent.PlayerId);
+                playerModel.Spaceship.Health.CurrentHealth = Math.Min(playerModel.Spaceship.Health.CurrentHealth, playerTakeDamageEvent.PlayerHealth);// we do Min because the player may get hit multiple times the same frame
+                LogService.LogTopic($"Player lose {playerTakeDamageEvent.HitDamage} health, and now has {playerModel.Spaceship.Health.CurrentHealth}");
+                _matchNetEventsDataService.PlayerTakeDamageNetEvents.Add(playerTakeDamageEvent);
+            }
+        }
+
+        public void ProcessBulletDestroyedEvents(List<BulletDestroyedNetEventS2C> bulletDestroyedEvents)
+        {
+            if (bulletDestroyedEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var bulletDestroyedEvent in bulletDestroyedEvents)
+            {
+                _matchDataService.RemoveBullet(bulletDestroyedEvent.BulletId);
+                _matchNetEventsDataService.BulletDestroyedNetEvents.Add(bulletDestroyedEvent);
             }
         }
     }

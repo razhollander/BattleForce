@@ -14,10 +14,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
     {
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
-        public readonly int PlayerId;
+        public readonly ushort PlayerId;
         private PlayerView _playerView;
         
-        public PlayerController(int playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig)
+        public PlayerController(ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
@@ -66,6 +66,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         public void DoShootEffect()
         {
             _playerView.ShowIsBulletAvailable(false);
+        }
+
+        public void SetHealth(ushort currentHealth, ushort maxHealth)
+        {
+            _playerView.UpdateHealthBar(currentHealth, maxHealth);
         }
     }
 }

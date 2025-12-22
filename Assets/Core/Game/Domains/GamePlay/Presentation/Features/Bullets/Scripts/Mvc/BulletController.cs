@@ -13,9 +13,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
 
         private readonly PresentationGamePlayConfig _gamePlayConfig;
 
-        public readonly int BulletId;
+        public readonly ushort BulletId;
 
-         public BulletController(int bulletId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig)
+         public BulletController(ushort bulletId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig)
          {
              _matchDataService = matchDataService;
              _gamePlayConfig = gamePlayConfig;
@@ -36,6 +36,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
             var bulletModel = _matchDataService.GetBullet(BulletId);
             var bulletPosition = bulletModel.Position.ToUnity();
             _bulletView.InterpolatePosition(bulletPosition, interpolationFactor);
+        }
+
+        public void Destroy()
+        {
+            Object.Destroy(_bulletView.gameObject);
         }
     }
 }

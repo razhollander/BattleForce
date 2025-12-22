@@ -146,7 +146,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             GetPlayer(playerId).SetLinearVelocity(velocity);
         }
 
-        public void AddWall(int id, Vector2[] points)
+        public void AddWall(ushort id, Vector2[] points)
         {
             BodyDef bodyDef = new BodyDef 
             {

@@ -7,6 +7,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.Configurations
     {
         public float MoveSpeed = 10;
         public float Radius = 0.14154f;
-        public int HitDamage = 1;
+        public ushort HitDamage = 1;
     }
 }

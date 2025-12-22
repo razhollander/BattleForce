@@ -25,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
             _bulletsParent = new GameObject("BulletsParent");
         }
 
-        public void CreateBullet(int bulletId)
+        public void CreateBullet(ushort bulletId)
         {
             var bulletController = new BulletController(bulletId, _matchDataService, _gamePlayConfig);
             bulletController.CreateBulletView(_bulletViewPrefab, _bulletsParent.transform);
@@ -38,6 +38,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
             {
                 bulletController.InterpolatePosition(_gamePlayConfig.InterpolationFactor);
             }
+        }
+        
+        private BulletController GetBullet(ushort bulletId)
+        {
+            return _bulletControllers.Find(x => x.BulletId == bulletId);
+        }
+
+        public void DestroyBullet(ushort bulletId)
+        {
+            var bulletController= GetBullet(bulletId);
+            bulletController.Destroy();
+            _bulletControllers.Remove(bulletController);
         }
     }
 }

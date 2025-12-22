@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
@@ -98,6 +99,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             
             _matchDataService.RemoveBullet(bulletModel.Id);
             _physicsSimulator.RemoveBody(bulletBody);
+            Debug.Log($"Bullet destroyed! {bulletModel.Id}");
             _matchNetEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
         }
 
@@ -133,7 +135,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 ? System.Numerics.Vector2.Normalize(reflectedVelocity)
                 : System.Numerics.Vector2.Zero;
 
-            Debug.Log("Collision!");
             _matchDataService.SetPlayer(playerModel.Id, playerModel);
         }
     }

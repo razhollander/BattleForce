@@ -4,10 +4,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
     public struct PlayerHealthS2C : INetSerializable
     {
-        public int MaxHealth;
-        public int CurrentHealth;
+        public ushort MaxHealth;
+        public ushort CurrentHealth;
 
-        public PlayerHealthS2C(int maxHealth) : this()
+        public PlayerHealthS2C(ushort maxHealth) : this()
         {
             MaxHealth = maxHealth;
             CurrentHealth = MaxHealth;

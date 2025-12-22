@@ -1,12 +1,13 @@
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 {
     public interface IPlayerControllers
     {
         void InitEntryPoint();
-        void CreatePlayer(int playerId);
+        void CreatePlayer(ushort playerId);
         void UpdatePlayersTransform();
         void UpdatePlayersBulletCooldowns();
-        void ShootBulletEffectForPlayer(int playerId);
+        void ShootBulletEffectForPlayer(ushort playerId);
+        void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth);
     }
 }

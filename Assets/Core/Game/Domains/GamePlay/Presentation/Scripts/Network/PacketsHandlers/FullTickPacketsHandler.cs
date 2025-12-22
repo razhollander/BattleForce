@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
 using Core.Game.Domains.GamePlay.Shared;
@@ -55,9 +56,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
                 return clientTick;
             }
 
-            var simulationState = latestFullTickPacket.CurrentSimulationState;
             ProcessPlayerJoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents, ref clientTick);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
+            ProcessPlayerTakeDamageEvents(latestFullTickPacket.PlayerTakeDamageNetEvents);
+            ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
+            var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
 
@@ -66,12 +69,33 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             return clientTick;
         }
 
-        private void ProcessPlayerJoinedEvents(List<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
+        private void ProcessBulletDestroyedEvents(List<BulletDestroyedNetEventS2C> bulletDestroyedNetEvents)
         {
-            if (playerJoinAcceptNetEvents.IsNullOrEmpty())
+            if (bulletDestroyedNetEvents.IsNullOrEmpty())
             {
                 return;
             }
+
+            var unProcessedBulletDestroyedEvents =
+                bulletDestroyedNetEvents.FindAll(x => x.OccuredOnTick > LastProcessedTickFromServer);
+            _simulationNetEventsHandler.ProcessBulletDestroyedEvents(unProcessedBulletDestroyedEvents);
+        }
+
+        private void ProcessPlayerTakeDamageEvents(List<PlayerTakeDamageNetEventS2C> playerTakeDamageNetEvents)
+        {
+            
+            if (playerTakeDamageNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var unProcessedPlayerDamageEvents =
+                playerTakeDamageNetEvents.FindAll(x => x.OccuredOnTick > LastProcessedTickFromServer);
+            _simulationNetEventsHandler.ProcessPlayerTakeDamageEvents(unProcessedPlayerDamageEvents);
+        }
+
+        private void ProcessPlayerJoinedEvents(List<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
+        {
             if (playerJoinAcceptNetEvents.IsNullOrEmpty())
             {
                 return;

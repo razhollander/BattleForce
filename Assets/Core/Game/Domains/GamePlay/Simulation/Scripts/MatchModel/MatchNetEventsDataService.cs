@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             BulletDestroyedNetEventsPerPlayer.Remove(playerId);
         }
         
-        public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, int playerHealth, int hitDamage, bool isAlive)
+        public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
         {
             foreach (var kvp in PlayerTakeDamageNetEventsPerPlayer)
             {

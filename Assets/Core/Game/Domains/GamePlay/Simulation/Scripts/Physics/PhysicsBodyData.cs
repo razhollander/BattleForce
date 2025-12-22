@@ -2,10 +2,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 {
     public struct PhysicsBodyData
     {
-        public int Id;
+        public ushort Id;
         public PhysicsBodyType PhysicsBodyType;
 
-        public PhysicsBodyData(int id, PhysicsBodyType physicsBodyType)
+        public PhysicsBodyData(ushort id, PhysicsBodyType physicsBodyType)
         {
             Id = id;
             PhysicsBodyType = physicsBodyType;

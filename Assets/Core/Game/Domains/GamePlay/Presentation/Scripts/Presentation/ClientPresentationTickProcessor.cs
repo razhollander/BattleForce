@@ -1,5 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.UpdateService;
@@ -33,7 +33,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
 
         public void ManagedUpdate()
         {
-            _commandFactory.CreateCommandVoid<BulletSpawnNetEventCommand>().Execute();
+            _commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>().Execute();
+            _commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>().Execute();
+            _commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>().Execute();
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();

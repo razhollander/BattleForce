@@ -2,12 +2,12 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public class PlayerTakeDamageNetEventS2C : INetSerializable
+    public struct PlayerTakeDamageNetEventS2C : INetSerializable
     {
         public int OccuredOnTick;
         public ushort PlayerId;
-        public int PlayerHealth;
-        public int HitDamage;
+        public ushort PlayerHealth;
+        public ushort HitDamage;
         public bool IsAlive;
 
         public void Serialize(NetDataWriter writer)

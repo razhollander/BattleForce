@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Numerics;
-using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
 
@@ -26,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             _previousSimulationState = _simulationState;
         }
 
-        public PlayerStateS2C AddPlayer(string playerName, PlayerTransformStateS2C playerTransformStateS2C, int health, float shootCooldown)
+        public PlayerStateS2C AddPlayer(string playerName, PlayerTransformStateS2C playerTransformStateS2C, ushort health, float shootCooldown)
         {
             var playerSpaceship = new PlayerSpaceshipStateS2C(playerTransformStateS2C, shootCooldown, health);
             var playerId = (ushort)(_simulationState.PlayersCount + 1);
@@ -36,12 +35,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             return newPlayer;
         }
 
-        public PlayerStateS2C GetPlayer(int playerId)
+        public PlayerStateS2C GetPlayer(ushort playerId)
         {
             return _simulationState.Players.First(x => x.Id == playerId);
         }
 
-        public void SetPlayer(int playerId, PlayerStateS2C playerModel)
+        public void SetPlayer(ushort playerId, PlayerStateS2C playerModel)
         {
             for (int i = 0; i < _simulationState.Players.Length; i++)
             {
@@ -65,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             }
         }
 
-        public PlayerBulletS2C GetBullet(int bulletId)
+        public PlayerBulletS2C GetBullet(ushort bulletId)
         {
             foreach (var index in _simulationState.Bullets.UsedIndices())
             {
@@ -95,7 +94,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         {
             _simulationState.Bullets.Rent(out var index);
             ref PlayerBulletS2C playerBullet = ref _simulationState.Bullets[index];
-            var bulletId =(ushort) (_lastBulletCreatedId++ % ushort.MaxValue);
+            var bulletId =(ushort) (++_lastBulletCreatedId % ushort.MaxValue);
             playerBullet.Id = bulletId;
             playerBullet.BelongToPlayerId = belongToPlayerId;
             playerBullet.Position = position;
