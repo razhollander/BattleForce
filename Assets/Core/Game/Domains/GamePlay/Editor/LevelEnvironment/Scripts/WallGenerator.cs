@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 
@@ -8,17 +10,9 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
     {
         [SerializeField] private ProBuilderMesh _proBuilderMesh;
 
-        public List<System.Numerics.Vector2> GetPoints()
+        public System.Numerics.Vector2[] GetPoints()
         {
-            var points = new List<System.Numerics.Vector2>();
-
-            foreach (var vertex in _proBuilderMesh.positions)
-            {
-                var point = new System.Numerics.Vector2(vertex.x, vertex.z);
-                points.Add(point);
-            }
-
-            return points;
+            return ProBuilderVertexUtils.GetVerticesCCW_XY(_proBuilderMesh);
         }
     }
 }

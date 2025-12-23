@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             for (int i = 0; i < cachedCollisions.Count; i++) // this must stay for, since if we destroy and object an event 'ContactEnd' will be added
             {
                 var collisionEvent = cachedCollisions[i];
-                if (collisionEvent.Type != EventType.Begin)
+                if (collisionEvent.Type != PhysicsEventEventType.Begin)
                 {
                     continue;
                 }

@@ -2,6 +2,7 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -15,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ITickProcessor _tickProcessor;
         private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private IPhysicsSimulator _physicsSimulator;
+        private SimulationGamePlayConfig _simulationGamePlayConfig;
 
         public override void ResolveDependencies()
         {
@@ -23,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
+            _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
         }
 
         public void Execute()
@@ -32,15 +35,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _playerJoinPacketsHandler.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _physicsSimulator.InitEntryPoint();
+            
+            CreateWalls();
+        }
 
-            var wallScale = 10;
-            _physicsSimulator.AddWall(0, new []
+        private void CreateWalls()
+        {
+            foreach (var wallConfig in _simulationGamePlayConfig.Environment.Walls)
             {
-                new Vector2(0, wallScale),  
-                new Vector2(-wallScale, 0), 
-                new Vector2(0, -wallScale), 
-                new Vector2(wallScale, 0)   
-            });
+                _physicsSimulator.AddWall(wallConfig.Id, wallConfig.Points);
+            }
         }
     }
 }

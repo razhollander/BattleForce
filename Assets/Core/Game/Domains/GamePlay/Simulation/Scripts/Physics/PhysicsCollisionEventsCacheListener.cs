@@ -6,7 +6,7 @@ using Box2D.NetStandard.Dynamics.Fixtures;
 using Box2D.NetStandard.Dynamics.World;
 using Box2D.NetStandard.Dynamics.World.Callbacks;
 
-public enum EventType
+public enum PhysicsEventEventType
 {
     Begin,
     End
@@ -18,9 +18,9 @@ public class CollisionEventCacheListener : ContactListener
     {
         private readonly int _low;
         private readonly int _high;
-        private readonly EventType _type;
+        private readonly PhysicsEventEventType _type;
 
-        public EventKey(int idA, int idB, EventType type)
+        public EventKey(int idA, int idB, PhysicsEventEventType type)
         {
             if (idA <= idB) { _low = idA; _high = idB; }
             else { _low = idB; _high = idA; }
@@ -66,8 +66,8 @@ public class CollisionEventCacheListener : ContactListener
         // Note: we intentionally do NOT clear _ids so fixture IDs stay stable across frames.
     }
 
-    public override void BeginContact(in Contact contact) => Cache(EventType.Begin, contact);
-    public override void EndContact(in Contact contact) => Cache(EventType.End, contact);
+    public override void BeginContact(in Contact contact) => Cache(PhysicsEventEventType.Begin, contact);
+    public override void EndContact(in Contact contact) => Cache(PhysicsEventEventType.End, contact);
 
     public override void PreSolve(in Contact contact, in Manifold oldManifold)
     {
@@ -79,7 +79,7 @@ public class CollisionEventCacheListener : ContactListener
         
     }
 
-    private void Cache(EventType type, Contact contact)
+    private void Cache(PhysicsEventEventType type, Contact contact)
     {
         // Adjust based on your port:
         // Some ports: contact.GetFixtureA()/GetFixtureB()

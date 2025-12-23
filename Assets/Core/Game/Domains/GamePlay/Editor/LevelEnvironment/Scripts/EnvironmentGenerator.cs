@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
+using CoreDomain.Scripts.Extensions;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -9,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
     {
         private const int MIN_BOX2D_ID = 1;
         [SerializeField] private EnvironmentConfig _environmentConfig;
-        private List<WallGenerator> _walls;
+        private List<PolygonPath2D> _walls;
 
         [Button]
         public void RefreshConfig()
@@ -20,16 +22,16 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
             for (int i = 0; i < _walls.Count; i++)
             {
                 var wallGenerator = _walls[i];
-                var wallConfig = new WallConfig((ushort) (i + MIN_BOX2D_ID), wallGenerator.GetPoints().ToArray());
+                var wallConfig = new WallConfig((ushort) (i + MIN_BOX2D_ID), wallGenerator.GetPointsRelativeToObject().Select(x=>x.ToNumericsVector2()).ToArray());
                 wallsConfigs[i] = wallConfig;
             }
 
             _environmentConfig.SetWalls(wallsConfigs);
         }
 
-        private List<WallGenerator> GetWalls()
+        private List<PolygonPath2D> GetWalls()
         {
-            return new List<WallGenerator>(GetComponentsInChildren<WallGenerator>());
+            return new List<PolygonPath2D>(GetComponentsInChildren<PolygonPath2D>());
         }
     }
 }

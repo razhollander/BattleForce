@@ -9,6 +9,11 @@ namespace CoreDomain.Scripts.Extensions
             return new Vector2(vec.X, vec.Y);
         }
         
+        public static System.Numerics.Vector2 ToNumericsVector2(this Vector2 vec)
+        {
+            return new System.Numerics.Vector2(vec.x, vec.y);
+        }
+        
         public static Vector2 ToVector2XY(this Vector3 vec)
         {
             return new Vector2(vec.x, vec.y);
