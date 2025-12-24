@@ -11,8 +11,8 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
     {
         private const int MIN_BOX2D_ID = 1;
         [SerializeField] private EnvironmentConfig _environmentConfig;
-        private List<PolygonPath2D> _walls;
-
+        [SerializeField] private List<PolygonPath2D> _walls;
+        
         [Button]
         public void RefreshConfig()
         {

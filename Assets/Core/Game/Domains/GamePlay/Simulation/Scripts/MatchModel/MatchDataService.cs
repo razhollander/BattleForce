@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
@@ -13,11 +14,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         public SimulationStateS2C PreviousSimulationState => _previousSimulationState;
         private ushort _lastBulletCreatedId = 0;
    
-        public MatchDataService(NetworkConfig networkConfig)
+        public MatchDataService(NetworkConfig networkConfig, SimulationGamePlayConfig gamePlayConfig)
         {
             _simulationState = new SimulationStateS2C();
             _simulationState.Players = new PlayerStateS2C[networkConfig.MaxConnectedPlayers];
             _simulationState.Bullets = new StructPool<PlayerBulletS2C>(networkConfig.MaxConcurrentBullets);
+            SetupWalls(gamePlayConfig.Environment.Walls);
+        }
+
+        private void SetupWalls(WallConfig[] wallConfigs)
+        {
+            _simulationState.Walls = new EnvironmentWallStateS2C[wallConfigs.Length];
+
+            for (int i = 0; i < wallConfigs.Length; i++)
+            {
+                var wallConfig = wallConfigs[i];
+                _simulationState.Walls[i] = new EnvironmentWallStateS2C(wallConfig.Id, wallConfig.Points);
+            }
         }
 
         public void CopySimulationStateIntoPrevious()

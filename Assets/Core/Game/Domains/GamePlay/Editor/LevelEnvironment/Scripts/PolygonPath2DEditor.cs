@@ -16,6 +16,7 @@ public class PolygonPath2DEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        base.OnInspectorGUI();
         serializedObject.Update();
 
         EditorGUILayout.LabelField("Scene Controls", EditorStyles.boldLabel);

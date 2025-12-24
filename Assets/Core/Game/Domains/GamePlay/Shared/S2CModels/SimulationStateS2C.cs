@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Numerics;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
 
@@ -9,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     {
         public ushort PlayersCount;
         public PlayerStateS2C[] Players;
+        public EnvironmentWallStateS2C[] Walls;
         public StructPool<PlayerBulletS2C> Bullets;
         
         public void Serialize(NetDataWriter writer)
@@ -28,6 +28,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                     Bullets[bulletIndex].Serialize(writer);
                 }
             }
+            
+            writer.Put((byte)Walls.Length);
+            foreach (var wall in Walls)
+            {
+                wall.Serialize(writer);
+            }
         }
         
         public void Deserialize(NetDataReader reader)
@@ -46,6 +52,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                     Bullets[index].Deserialize(reader);
                 }
             }
+            var wallsCount = reader.GetByte();
+            Walls = new EnvironmentWallStateS2C[wallsCount];
+            for (int i = 0; i < wallsCount; i++)
+                Walls[i].Deserialize(reader);
         }
 
         public PlayerStateS2C GetPlayer(int playerId)

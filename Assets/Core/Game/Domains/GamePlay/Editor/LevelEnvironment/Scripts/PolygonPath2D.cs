@@ -8,7 +8,8 @@ public class PolygonPath2D : MonoBehaviour
 {
     [SerializeField] private List<Vector2> points = new();
     [SerializeField] private bool closed = true;
-
+    [SerializeField] public MeshFilter MeshFilter;
+    [SerializeField] public MeshRenderer MeshRenderer;
     public List<Vector2> Points => points;
 
     public List<Vector2> GetPointsRelativeToObject()

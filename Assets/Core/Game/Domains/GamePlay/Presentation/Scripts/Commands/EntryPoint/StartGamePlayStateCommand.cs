@@ -1,5 +1,6 @@
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
@@ -25,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private IPlayerControllers _playerControllers;
         private ITickProcessor _tickProcessor;
         private IBulletControllers _bulletControllers;
+        private IEnvironmentWallsControllers _environmentWallsControllers;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -44,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _playerControllers = _diContainer.Resolve<IPlayerControllers>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _bulletControllers = _diContainer.Resolve<IBulletControllers>();
+            _environmentWallsControllers = _diContainer.Resolve<IEnvironmentWallsControllers>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -54,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _tickProcessor.InitEntryPoint();
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
+            _environmentWallsControllers.InitEntryPoint();
         }
     }
 }
