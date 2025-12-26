@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CoreDomain.Scripts.Extensions
+namespace Core.Scripts.Extensions
 {
     public static class CollectionExtensions
     {

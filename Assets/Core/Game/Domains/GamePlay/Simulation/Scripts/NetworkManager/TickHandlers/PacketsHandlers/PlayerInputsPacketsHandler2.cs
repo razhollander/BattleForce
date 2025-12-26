@@ -10,7 +10,6 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandle
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
-using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using UnityEngine;
@@ -52,10 +51,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         {
             _networkManager.RemoveSubscription<PlayerInputPacketC2S>();
         }
-
         public Dictionary<ushort, PlayerInputPacketC2S> ProcessInputs(int processedTick)
         {
-            var earliestInputPerPlayers = /*PopLastInputsOfEachPlayer();*/PopEarliestInputsOfEachPlayer();            
+            var earliestInputPerPlayers = PopEarliestInputsOfEachPlayer();            
             for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
             {
                 var player = _matchDataService.SimulationState.Players[i];
@@ -78,6 +76,37 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             
             return earliestInputPerPlayers;
         }
+//         public Dictionary<ushort, PlayerInputPacketC2S> ProcessInputs(int processedTick)
+//         {
+//             var earliestInputPerPlayers = PopExceptLastInputsOfEachPlayer();//PopEarliestInputsOfEachPlayer();            
+//             for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+//             {
+//                 var player = _matchDataService.SimulationState.Players[i];
+//                 var playerId = player.Id;
+//                 if (!earliestInputPerPlayers.ContainsKey(playerId))
+//                 {
+// #if Logs
+//                     LogService.LogTopic($"Didn't find any last cached inputs for player {playerId}!", LogTopicType.ServerNetwork);
+// #endif
+//                     continue;
+//                 }
+//
+//                 var inputs = earliestInputPerPlayers[playerId];
+//                 foreach (var playerInputPacket in inputs)
+//                 {
+//                     //var playerInputPacket = earliestInputPerPlayers[playerId];
+//                     var playerModel = _matchDataService.GetPlayer(playerId);
+//                     UpdatePlayerDirection(playerInputPacket, ref playerModel);
+//                     UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, ref playerModel);
+//                     _matchDataService.SetPlayer(playerId, playerModel);
+//                     _cachedLastProcessedInput[playerId] = playerInputPacket;
+//                     
+//                 }
+//             }
+//             
+//             //return earliestInputPerPlayers;
+//             return null;
+//         }
 
         private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, ref PlayerStateS2C playerModel)
         {
@@ -152,16 +181,56 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                     }
                 }
 
-                if (earliestPlayerInput.IsShootInputPressed)
-                {
-                    var amountOfInputs = _inputsPerPlayer.ContainsKey(playerId) ? _inputsPerPlayer[playerId].Count : 0;
-                    string time = DateTime.Now.ToString("HH:mm:ss.fff");
-                    Debug.Log($"{time} Shoot processed!! earliestPlayerInput:{earliestPlayerInput.ToJson()}, {amountOfInputs}, {_inputsPerPlayer.ToJson()}");
-                }
+                // if (earliestPlayerInput.IsShootInputPressed)
+                // {
+                //     var amountOfInputs = _inputsPerPlayer.ContainsKey(playerId) ? _inputsPerPlayer[playerId].Count : 0;
+                //     string time = DateTime.Now.ToString("HH:mm:ss.fff");
+                //     Debug.Log($"{time} Shoot processed!! earliestPlayerInput:{earliestPlayerInput.ToJson()}, {amountOfInputs}, {_inputsPerPlayer.ToJson()}");
+                // }
                 earliestInputsPerPlayer.Add(playerId, earliestPlayerInput);
             }
 
             return earliestInputsPerPlayer;
+        }
+        
+        private Dictionary<ushort, List<PlayerInputPacketC2S>> PopExceptLastInputsOfEachPlayer()
+        {
+            var exceptLastInputsPerPlayer = new Dictionary<ushort, List<PlayerInputPacketC2S>>();
+
+            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            {
+                var playerState = _matchDataService.SimulationState.Players[i];
+                var playerId = playerState.Id;
+                List<PlayerInputPacketC2S> exceptLastPlayerInputs =new List<PlayerInputPacketC2S>();
+                if (_inputsPerPlayer.TryGetValue(playerId, out var playerInputs))
+                {
+                    playerInputs.Sort();
+                    exceptLastPlayerInputs = new List<PlayerInputPacketC2S>();
+                    var count = playerInputs.Count;
+                    for (int j = 0; j < count; j++)
+                    {
+                        exceptLastPlayerInputs.Add(playerInputs[0]);
+                        playerInputs.RemoveAt(0);
+                    }
+                    
+                    if (count == 0)
+                    {
+                        _inputsPerPlayer.Remove(playerId);
+                    }
+                }
+                else
+                {
+                    if (!TryGetCachedInputForPlayer(playerId, out var lastCachedPlayerInput))
+                    {
+                        continue;
+                    }
+                    exceptLastPlayerInputs.Add(lastCachedPlayerInput);
+                }
+
+                exceptLastInputsPerPlayer.Add(playerId, exceptLastPlayerInputs);
+            }
+
+            return exceptLastInputsPerPlayer;
         }
         
         private Dictionary<ushort, PlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()
@@ -191,12 +260,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                     }
                 }
 
-                if (earliestPlayerInput.IsShootInputPressed)
-                {
-                    var amountOfInputs = _inputsPerPlayer.ContainsKey(playerId) ? _inputsPerPlayer[playerId].Count : 0;
-                    string time = DateTime.Now.ToString("HH:mm:ss.fff");
-                    Debug.Log($"{time} Shoot processed!! earliestPlayerInput:{earliestPlayerInput.ToJson()}, {amountOfInputs}, {_inputsPerPlayer.ToJson()}");
-                }
+                // if (earliestPlayerInput.IsShootInputPressed)
+                // {
+                //     var amountOfInputs = _inputsPerPlayer.ContainsKey(playerId) ? _inputsPerPlayer[playerId].Count : 0;
+                //     string time = DateTime.Now.ToString("HH:mm:ss.fff");
+                //     Debug.Log($"{time} Shoot processed!! earliestPlayerInput:{earliestPlayerInput.ToJson()}, {amountOfInputs}, {_inputsPerPlayer.ToJson()}");
+                // }
                 earliestInputsPerPlayer.Add(playerId, earliestPlayerInput);
             }
 

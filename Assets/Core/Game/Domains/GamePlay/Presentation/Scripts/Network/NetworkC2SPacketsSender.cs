@@ -1,6 +1,5 @@
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
-using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;

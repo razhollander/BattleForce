@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using CoreDomain.Scripts.Extensions;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 

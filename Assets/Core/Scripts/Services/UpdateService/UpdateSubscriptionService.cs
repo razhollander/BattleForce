@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using CoreDomain.Scripts.Extensions;
+using Core.Scripts.Extensions;
 using UnityEngine;
 
 namespace CoreDomain.Scripts.Services.UpdateService

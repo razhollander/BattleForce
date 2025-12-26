@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
-using CoreDomain.Scripts.Extensions;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
 

@@ -3,7 +3,6 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
-using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;

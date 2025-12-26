@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         void INetEventListener.OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
-            string time = DateTime.Now.ToString("HH:mm:ss.fff");
+            //string time = DateTime.Now.ToString("HH:mm:ss.fff");
 
             // Debug.Log($"{time} OnNetworkReceive!  {deliveryMethod.ToString()}");
 #if Logs

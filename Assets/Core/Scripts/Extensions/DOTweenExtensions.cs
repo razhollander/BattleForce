@@ -3,7 +3,7 @@ using CoreDomain.Scripts.Utils;
 using DG.Tweening;
 using UnityEngine;
 
-namespace CoreDomain.Scripts.Extensions
+namespace Core.Scripts.Extensions
 {
     public static class DOTweenExtensions
     {

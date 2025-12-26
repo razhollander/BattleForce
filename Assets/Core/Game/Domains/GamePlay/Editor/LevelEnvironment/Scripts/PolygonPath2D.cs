@@ -1,7 +1,7 @@
 // PolygonPath2D.cs
 using System.Collections.Generic;
 using System.Linq;
-using CoreDomain.Scripts.Extensions;
+using Core.Scripts.Extensions;
 using UnityEngine;
 
 public class PolygonPath2D : MonoBehaviour

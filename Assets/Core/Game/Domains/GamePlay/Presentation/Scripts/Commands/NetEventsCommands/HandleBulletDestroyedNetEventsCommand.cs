@@ -1,6 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
-using CoreDomain.Scripts.Extensions;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands

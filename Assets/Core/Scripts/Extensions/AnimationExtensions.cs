@@ -3,7 +3,7 @@ using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Utils;
 using UnityEngine;
 
-namespace CoreDomain.Scripts.Extensions
+namespace Core.Scripts.Extensions
 {
     public static class AnimationExtensions
     {

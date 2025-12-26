@@ -19,7 +19,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         public PlayerHitCommand SetHitDamage(ushort hitDamage)
         {
             _hitDamage = hitDamage;
-
             return this;
         }
 

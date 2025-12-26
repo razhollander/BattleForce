@@ -35,6 +35,7 @@ public sealed class StructPool<T> where T : struct
         {
             index = -1;
             LogService.LogError("Not enough available bullets!");
+            return;
         }
         
         index = _freeSlots.Pop();
@@ -89,12 +90,50 @@ public sealed class StructPool<T> where T : struct
     /// <summary>
     /// Enumerate all indices that are currently in use.
     /// </summary>
-    public IEnumerable<int> UsedIndices()
+    // public IEnumerable<int> UsedIndices()
+    // {
+    //     for (int i = 0; i < _items.Length; i++)
+    //     {
+    //         if (_inUse[i])
+    //             yield return i;
+    //     }
+    // }
+    //
+    public UsedIndexEnumerable UsedIndices() => new UsedIndexEnumerable(_inUse);
+
+    public readonly struct UsedIndexEnumerable
     {
-        for (int i = 0; i < _items.Length; i++)
+        private readonly bool[] _inUse;
+        public UsedIndexEnumerable(bool[] inUse) => _inUse = inUse;
+        public UsedIndexEnumerator GetEnumerator() => new UsedIndexEnumerator(_inUse);
+    }
+
+    public struct UsedIndexEnumerator
+    {
+        private readonly bool[] _inUse;
+        private int _index;
+
+        public UsedIndexEnumerator(bool[] inUse)
         {
-            if (_inUse[i])
-                yield return i;
+            _inUse = inUse;
+            _index = -1;
+            Current = default;
+        }
+
+        public int Current { get; private set; }
+
+        public bool MoveNext()
+        {
+            while (++_index < _inUse.Length)
+            {
+                if (_inUse[_index])
+                {
+                    Current = _index;
+                    return true;
+                }
+            }
+            return false;
         }
     }
+
 }

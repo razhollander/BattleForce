@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace CoreDomain.Scripts.Extensions
+namespace Core.Scripts.Extensions
 {
     public static class StringExtension
     {

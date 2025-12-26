@@ -1,7 +1,7 @@
-using System.Linq;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
+using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 
         public PlayerStateS2C GetPlayer(ushort playerId)
         {
-            return _simulationState.Players.First(x => x.Id == playerId);
+            return _simulationState.Players.FirstOrDefault(x => x.Id == playerId);
         }
 
         public void SetPlayer(ushort playerId, PlayerStateS2C playerModel)

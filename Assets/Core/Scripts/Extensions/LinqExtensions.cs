@@ -2,12 +2,224 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CoreDomain.Scripts.Extensions
+namespace Core.Scripts.Extensions
 {
     /// <summary>Various LinQ extensions.</summary>
     /// <footer><a href="https://www.google.com/search?q=Sirenix.Utilities.LinqExtensions">`LinqExtensions` on google.com</a></footer>
-    public static class LinqExtensions
+    public static partial class LinqExtensions
     {
+        public static bool Any<T>(this T[] source)
+        {
+            return source.Length > 0;
+        }
+
+        public static bool Any<T>(this T[] source, Func<T, bool> predicate)
+        {
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (predicate(source[i]))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        public static bool All<T>(this T[] source, Func<T, bool> predicate)
+        {
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (!predicate(source[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        public static int Count<T>(T[] source, Func<T, bool> predicate)
+        {
+            var count = 0;
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (predicate(source[i]))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+        
+        public static T FirstOrDefault<T>(this T[] source, Func<T, bool> predicate)
+        {
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (predicate(source[i]))
+                {
+                    return source[i];
+                }
+            }
+            return default;
+        }
+        
+        
+        private static void QuickSort<T, TKey>(T[] arr, Func<T, TKey> keySelector, int low, int high) where TKey : IComparable<TKey>
+        {
+            if (low >= high)
+            {
+                return;
+            }
+            var pi = Partition(arr, keySelector, low, high);
+            QuickSort(arr, keySelector, low, pi - 1);
+            QuickSort(arr, keySelector, pi + 1, high);
+        }
+
+        private static int Partition<T, TKey>(T[] arr, Func<T, TKey> keySelector, int low, int high) where TKey : IComparable<TKey>
+        {
+            var pivot = keySelector(arr[high]);
+            var i = (low - 1);
+            for (var j = low; j <= high - 1; j++)
+            {
+                if (keySelector(arr[j]).CompareTo(pivot) >= 0)
+                {
+                    continue;
+                }
+                
+                i++;
+                (arr[i], arr[j]) = (arr[j], arr[i]);
+            }
+            (arr[i + 1], arr[high]) = (arr[high], arr[i + 1]);
+            return i + 1;
+        }
+        
+        public static T[] OrderBy<T, TKey>(this T[] source, Func<T, TKey> keySelector) where TKey : IComparable<TKey>
+        { 
+            var arr = (T[])source.Clone();
+            QuickSort(arr, keySelector, 0, arr.Length - 1);
+            return arr;
+        }
+
+        
+        public static List<T> ToList<T>(this T[] source)
+        {
+            var result = new List<T>(source.Length);
+
+            for (var i = 0; i < source.Length; i++)
+            {
+                result.Add(source[i]);
+            }
+
+            return result;
+        }
+
+        public static TResult[] Select<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector)
+        {
+            var result = new TResult[source.Length];
+        
+            for (var i = 0; i < source.Length; i++)
+            {
+                result[i] = selector(source[i]);
+            }
+        
+            return result;
+        }
+        
+        public static TResult[] Select<TSource, TResult>(
+            this TSource[] source,
+            Func<TSource, int, TResult> selector)
+        {
+            var result = new TResult[source.Length];
+
+            for (var i = 0; i < source.Length; i++)
+            {
+                result[i] = selector(source[i], i);
+            }
+
+            return result;
+        }
+        
+        public static T[] Where<T>(this T[] source, Func<T, bool> predicate)
+        {
+            var count = 0;
+
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (predicate(source[i]))
+                {
+                    count++;
+                }
+            }
+
+            var result = new T[count];
+            var index = 0;
+
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (predicate(source[i]))
+                {
+                    result[index] = source[i];
+                    index++;
+                }
+            }
+
+            return result;
+        }
+        
+        public static bool Contains<T>(this T[] source, T target)
+        {
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (EqualityComparer<T>.Default.Equals(source[i], target))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static int IndexOf<T>(this T[] source, Func<T, bool> condition)
+        {
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (condition(source[i]))
+                {
+                    return i;
+                }
+            }
+            
+            return -1;
+        }
+        
+        public static int[] IndicesWhere<T>(this T[] source, Func<T, bool> predicate)
+        {
+            var count = 0;
+
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (predicate(source[i]))
+                {
+                    count++;
+                }
+            }
+
+            var result = new int[count];
+            var index = 0;
+
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (!predicate(source[i]))
+                {
+                    continue;
+                }
+
+                result[index] = i;
+                index++;
+            }
+
+            return result;
+        }
+        
         /// <summary>Calls an action on each item before yielding them.</summary>
         /// <param name="source">The collection.</param>
         /// <param name="action">The action to call for each item.</param>

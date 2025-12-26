@@ -5,26 +5,45 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c1e12e0-c131-4b63-94f5-2f0c8aa9c131" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/Utils/FixedOrderedList.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/Utils/FixedOrderedList.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/Utils/FixedUnorderedList.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/Utils/FixedUnorderedList.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/Inputs/SendInputsToServerCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/Inputs/SendInputsToServerCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/GameInputActions/GameInputActionsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/GameInputActions/GameInputActionsController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Cross4/PlayerCircle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Cross4/PlayerCircle.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Cross4/ScorePanel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Cross4/ScorePanel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Editor/LevelEnvironment/Scripts/EnvironmentGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Editor/LevelEnvironment/Scripts/EnvironmentGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Editor/LevelEnvironment/Scripts/PolygonPath2D.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Editor/LevelEnvironment/Scripts/PolygonPath2D.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/NetEventsCommands/HandleBulletDestroyedNetEventsCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/NetEventsCommands/HandleBulletDestroyedNetEventsCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/NetEventsCommands/HandlePlayerTakeDamangeNetEventsCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/NetEventsCommands/HandlePlayerTakeDamangeNetEventsCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/MatchModel/MatchDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/MatchModel/MatchDataService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/HandleClientConnectedToPeerCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/HandleClientConnectedToPeerCommand.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/NetworkC2SPacketsSender.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/NetworkC2SPacketsSender.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/NetworkS2CPacketsListener.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/NetworkS2CPacketsListener.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/PacketsHandlers/FullTickPacketsHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/PacketsHandlers/FullTickPacketsHandler.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/PacketsHandlers/SimulationNetEventsHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/PacketsHandlers/SimulationNetEventsHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/TimerFixedThreaded.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/TimerFixedThreaded.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/S2CModels/FullTickPacket.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/S2CModels/FullTickPacket.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/Utils/StructPool/StructPool.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/Utils/StructPool/StructPool.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/PlayerHitCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/PlayerHitCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/MatchDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/MatchDataService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/NetworkC2SPacketsListener.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/NetworkC2SPacketsListener.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/NetworkS2CPacketsSender.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/NetworkS2CPacketsSender.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkTickProcessor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkTickProcessor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerInputsPacketsHandler2.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerInputsPacketsHandler2.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerJoinPacketsHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerJoinPacketsHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Editor/UnitTests/CollectionExtensionsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Editor/UnitTests/CollectionExtensionsTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/AnimationExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/AnimationExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/CollectionExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/CollectionExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/DOTweenExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/DOTweenExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/LinqExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/LinqExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/StringExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/StringExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/UnityVectorExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/UnityVectorExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Helpers/AnimatedSliderView.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Helpers/AnimatedSliderView.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Mvc/WorldCamera/WorldCameraView.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Mvc/WorldCamera/WorldCameraView.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Network/NetworkConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Network/NetworkConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Services/Logger/UnityLogger.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/Logger/UnityLogger.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Services/UpdateService/UpdateSubscriptionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/UpdateService/UpdateSubscriptionService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Utils/AwaitableUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Utils/AwaitableUtils.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,9 +88,12 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f983fe377b2489e8ed44032915da13e1df600/c0/fca81ecf/Awaitable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f983fe377b2489e8ed44032915da13e1df600/ec/e015db4b/Awaitable`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/57f88a49909d457c8449f3caf1d3207a1fbe00/47/440c5fed/RenderChain.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6db092d11a2c42b684a7eb3cc9c0740e71000/32/24232bec/Stack`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c1a70634a79d406bb4527b41a813f1561c000/9d/77e5ec65/Enumerable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c26969b5c90c4d9e97105dcd995362fa2f200/7f/03c36fe1/BoxCollider2D.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c26969b5c90c4d9e97105dcd995362fa2f200/fc/11e92cbb/Collider2D.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3ea01e77be99618395f448b16bd7cc2bd4248bd9e5d8474964b2d97f39c5d74/System.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4a91f199aff8e0e187cfc4b284b295c84c1a6afbec11c6f1d4115fe816212/System.Runtime.CompilerServices.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/8a522b806eac9bb894e6e4c5fe87f353457535e769447e79c6b396beecb5d0/System.Threading.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/Library/Unity/cache/packages/packages.unity.com/com.unity.2d.pixel-perfect@5.0.3/Editor/AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/Library/Unity/cache/packages/packages.unity.com/com.unity.2d.pixel-perfect@5.0.3/Editor/CinemachinePixelPerfectEditor.cs" root0="SKIP_HIGHLIGHTING" />
@@ -925,13 +947,13 @@
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerInputsPacketsHandler2.cs</url>
-          <line>202</line>
+          <line>271</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerInputsPacketsHandler2.cs" containingFunctionPresentation="Method 'PopEarliestInputsOfEachPlayer'">
             <startOffsets>
-              <option value="9691" />
+              <option value="12912" />
             </startOffsets>
             <endOffsets>
-              <option value="9722" />
+              <option value="12943" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="114" />
@@ -1029,26 +1051,26 @@
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerController.cs</url>
-          <line>48</line>
+          <line>47</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerController.cs" containingFunctionPresentation="Method 'UpdateBulletCooldown'">
             <startOffsets>
-              <option value="2134" />
+              <option value="2097" />
             </startOffsets>
             <endOffsets>
-              <option value="2190" />
+              <option value="2153" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="124" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerController.cs</url>
-          <line>53</line>
+          <line>52</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerController.cs" containingFunctionPresentation="Method 'UpdateBulletCooldown'">
             <startOffsets>
-              <option value="2483" />
+              <option value="2446" />
             </startOffsets>
             <endOffsets>
-              <option value="2580" />
+              <option value="2543" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="125" />

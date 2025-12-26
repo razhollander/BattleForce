@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using CoreDomain.Scripts.Extensions;
+using Core.Scripts.Extensions;
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
 

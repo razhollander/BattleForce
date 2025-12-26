@@ -1,5 +1,4 @@
 using System.Threading;
-using CoreDomain.Scripts.Extensions;
 using DG.Tweening;
 using UnityEngine;
 

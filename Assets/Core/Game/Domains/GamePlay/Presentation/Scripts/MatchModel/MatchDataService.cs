@@ -4,8 +4,8 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.MatchData.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
-using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
