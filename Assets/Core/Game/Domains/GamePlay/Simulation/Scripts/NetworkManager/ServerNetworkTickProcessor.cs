@@ -88,18 +88,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             try
             {
                 CurrentTick++;
-                
+                // string time = DateTime.Now.ToString("HH:mm:ss.fff");
+
+                // Debug.Log($"{time} OnTick!");
+
                 var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
                 _networkManager.PollEvents();
                 ProcessPackets(processedTick);
-                ApplyMatchModelToPhysicsSimulation();
-                _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
-                _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
-                ApplyPhysicsSimulationToMatchModel();
-                RemoveOlderThanTickEventsPerPlayer(processedTick);
-                SendCurrentTickStateToAllClients(processedTick);
-                _matchDataService.CopySimulationStateIntoPrevious();
-                //var inputsPerPlayerForCurrentTick = _serverPlayersInputListener.GetSortedInputsPerPlayerForTick(CurrentTick); 
+                // ApplyMatchModelToPhysicsSimulation();
+                // _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
+                // _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
+                // ApplyPhysicsSimulationToMatchModel();
+                 RemoveOlderThanTickEventsPerPlayer(processedTick);
+                 SendCurrentTickStateToAllClients(processedTick);
+                // _matchDataService.CopySimulationStateIntoPrevious();
             }
             catch (Exception e)
             {

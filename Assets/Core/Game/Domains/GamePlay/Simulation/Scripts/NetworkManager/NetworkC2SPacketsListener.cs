@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Net.Sockets;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
@@ -5,6 +6,7 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
@@ -31,7 +33,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         void INetEventListener.OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
-            LogService.LogTopic("OnNetworkReceive! ", LogTopicType.ServerNetwork);
+            string time = DateTime.Now.ToString("HH:mm:ss.fff");
+
+            // Debug.Log($"{time} OnNetworkReceive!  {deliveryMethod.ToString()}");
+#if Logs
+            LogService.LogTopic($"OnNetworkReceive!  {deliveryMethod.ToString()}", LogTopicType.ServerNetwork);
+#endif
             _packetProcessor.ReadAllPackets(reader, peer);
 
             // var packetTypeByte = reader.GetByte();
@@ -205,7 +212,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         void INetEventListener.OnPeerConnected(NetPeer peer)
         {
+#if Logs
             LogService.LogTopic("Player connected: " + peer.EndPoint, LogTopicType.ServerNetwork);
+#endif
         }
 
         void INetEventListener.OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -231,7 +240,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void INetEventListener.OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader,
             UnconnectedMessageType messageType)
         {
+#if Logs
             LogService.LogTopic("OnNetworkReceiveUnconnected! ", LogTopicType.ServerNetwork);
+#endif
 
         }
 
@@ -246,7 +257,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         void INetEventListener.OnConnectionRequest(ConnectionRequest request)
         {
+#if Logs
             LogService.LogTopic("ConnectionRequest", LogTopicType.ServerNetwork);
+#endif
             request.AcceptIfKey(_networkConfig.ConntectionKey);
         }
     }

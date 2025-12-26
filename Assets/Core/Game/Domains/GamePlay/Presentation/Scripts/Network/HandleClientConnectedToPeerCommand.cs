@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         public void Execute()
         {
             _networkManager.SendPacketSerialized(PacketTypeC2S.JoinRequest,
-                new JoinRequestPacketC2S { UserName = "RazPlayer" }, DeliveryMethod.ReliableUnordered);
+                new JoinRequestPacketC2S { UserName = "RazPlayer" }, DeliveryMethod.Unreliable);
         }
     }
 }

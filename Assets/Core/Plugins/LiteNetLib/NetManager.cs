@@ -630,6 +630,10 @@ namespace LiteNetLib
                     _deliveryEventListener.OnMessageDelivered(evt.Peer, evt.UserData);
                     break;
             }
+
+            // string time = DateTime.Now.ToString("HH:mm:ss.fff");
+            // Debug.Log($"{time} ProcessEvent! {evt.Type}");
+
             //Recycle if not message
             if (emptyData)
                 RecycleEvent(evt);
@@ -1351,6 +1355,9 @@ namespace LiteNetLib
                 NetEvent evt;
                 lock (_netEventsQueue)
                     evt = _netEventsQueue.Dequeue();
+                // string time = DateTime.Now.ToString("HH:mm:ss.fff");
+                // Debug.Log($"{time} ProcessEvent!");
+
                 ProcessEvent(evt);
             }
         }

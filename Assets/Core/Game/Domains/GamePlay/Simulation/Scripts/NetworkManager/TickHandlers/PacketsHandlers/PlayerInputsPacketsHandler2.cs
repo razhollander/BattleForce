@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
@@ -53,14 +55,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         public Dictionary<ushort, PlayerInputPacketC2S> ProcessInputs(int processedTick)
         {
-            var earliestInputPerPlayers = PopEarliestInputsOfEachPlayer();            
+            var earliestInputPerPlayers = /*PopLastInputsOfEachPlayer();*/PopEarliestInputsOfEachPlayer();            
             for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
             {
                 var player = _matchDataService.SimulationState.Players[i];
                 var playerId = player.Id;
                 if (!earliestInputPerPlayers.ContainsKey(playerId))
                 {
+#if Logs
                     LogService.LogTopic($"Didn't find any last cached inputs for player {playerId}!", LogTopicType.ServerNetwork);
+#endif
                     continue;
                 }
 
@@ -105,8 +109,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 playerModel.Spaceship.Transform.Direction, _gamePlayConfig.PlayerBullet.MoveSpeed, _gamePlayConfig.PlayerBullet.Radius);
             _matchNetEventsDataService.AddBulletSpawnNetEvent(processedTick, bullet.Id, bullet.BelongToPlayerId, bullet.Position, bullet.Radius);
             _physicsSimulator.AddPlayerBullet(bullet.Id, playerModel.TeamId, bullet.Position, bullet.Velocity, bullet.Radius);
-
+#if Logs
             LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);
+#endif
         }
 
         private void UpdatePlayerDirection(PlayerInputPacketC2S playerInputPacket, ref PlayerStateS2C playerModel)
@@ -120,6 +125,45 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
         }
 
+        private Dictionary<ushort, PlayerInputPacketC2S> PopLastInputsOfEachPlayer()
+        {
+            var earliestInputsPerPlayer = new Dictionary<ushort, PlayerInputPacketC2S>();
+
+            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            {
+                var playerState = _matchDataService.SimulationState.Players[i];
+                var playerId = playerState.Id;
+                PlayerInputPacketC2S earliestPlayerInput;
+                if (_inputsPerPlayer.TryGetValue(playerId, out var playerInputs))
+                {
+                    playerInputs.Sort();
+                    earliestPlayerInput = playerInputs.Last();
+                    playerInputs.Clear();
+                    if (playerInputs.Count == 0)
+                    {
+                        _inputsPerPlayer.Remove(playerId);
+                    }
+                }
+                else
+                {
+                    if (!TryGetCachedInputForPlayer(playerId, out earliestPlayerInput))
+                    {
+                        continue;
+                    }
+                }
+
+                if (earliestPlayerInput.IsShootInputPressed)
+                {
+                    var amountOfInputs = _inputsPerPlayer.ContainsKey(playerId) ? _inputsPerPlayer[playerId].Count : 0;
+                    string time = DateTime.Now.ToString("HH:mm:ss.fff");
+                    Debug.Log($"{time} Shoot processed!! earliestPlayerInput:{earliestPlayerInput.ToJson()}, {amountOfInputs}, {_inputsPerPlayer.ToJson()}");
+                }
+                earliestInputsPerPlayer.Add(playerId, earliestPlayerInput);
+            }
+
+            return earliestInputsPerPlayer;
+        }
+        
         private Dictionary<ushort, PlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()
         {
             var earliestInputsPerPlayer = new Dictionary<ushort, PlayerInputPacketC2S>();
@@ -147,9 +191,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                     }
                 }
 
-                if (earliestPlayerInput.IsMoveRightInputPressed)
+                if (earliestPlayerInput.IsShootInputPressed)
                 {
-                    int a = 0;
+                    var amountOfInputs = _inputsPerPlayer.ContainsKey(playerId) ? _inputsPerPlayer[playerId].Count : 0;
+                    string time = DateTime.Now.ToString("HH:mm:ss.fff");
+                    Debug.Log($"{time} Shoot processed!! earliestPlayerInput:{earliestPlayerInput.ToJson()}, {amountOfInputs}, {_inputsPerPlayer.ToJson()}");
                 }
                 earliestInputsPerPlayer.Add(playerId, earliestPlayerInput);
             }
@@ -167,7 +213,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             var playerId = (ushort)peer.Tag;
             _inputsPerPlayer.TryAdd(playerId, new List<PlayerInputPacketC2S>());
             _inputsPerPlayer[playerId].Add(playerInputPacket);
+            
+            if (playerInputPacket.IsShootInputPressed)
+            {
+                //string time = DateTime.Now.ToString("HH:mm:ss.fff");
+
+      //          Debug.Log($"{time} Shoot Received!! playerInputPacket:{playerInputPacket.ToJson()}, {_inputsPerPlayer[playerId].Count}, {_inputsPerPlayer.ToJson()}");
+            }
+#if Logs
             LogService.LogTopic($"Input packet received from player id {playerId}, input: {playerInputPacket.ToJson()}, inputs per player: {_inputsPerPlayer.ToJson()}", LogTopicType.ServerNetwork);
+#endif
         }
     }
 }

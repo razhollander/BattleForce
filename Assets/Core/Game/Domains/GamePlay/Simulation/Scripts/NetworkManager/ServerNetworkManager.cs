@@ -1,15 +1,12 @@
 using System;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
-using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
-using Core.Game.Domains.GamePlay.Simulation;
-using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
-using CoreDomain.Scripts.Services.StateMachineService;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
 {
@@ -116,6 +113,9 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
 
         public void PollEvents()
         {
+            // string time = DateTime.Now.ToString("HH:mm:ss.fff");
+            //
+            // Debug.Log($"{time} PollEvents!");
             _netManager.PollEvents();
         }
 

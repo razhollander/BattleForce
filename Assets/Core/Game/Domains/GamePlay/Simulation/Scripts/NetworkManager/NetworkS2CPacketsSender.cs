@@ -68,7 +68,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             /*_writer.Reset();
             _writer.Put((byte)type);
             packet.Serialize(_writer);*/
+#if Logs
             LogService.LogTopic($"Send packet type {type}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
+#endif
             _peerPerPlayerId.ForEach(x => _packetProcessor.SendNetSerializable(x.Value, packet, deliveryMethod));
         }
         
@@ -80,7 +82,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 return;
             }
 
+#if Logs
             LogService.LogTopic($"Send packet type {type} to player {playerId}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
+#endif
             _packetProcessor.SendNetSerializable(peer, packet, deliveryMethod);
         }
         

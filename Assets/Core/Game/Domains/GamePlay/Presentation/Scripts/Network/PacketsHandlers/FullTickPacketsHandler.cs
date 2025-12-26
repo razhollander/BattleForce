@@ -13,6 +13,7 @@ using CoreDomain.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers
 {
@@ -52,7 +53,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
 
             if (latestTickReceivedFromServer <= LastProcessedTickFromServer)
             {
+#if Logs
                 LogService.LogTopic("Didn't receive any state since last tick", LogTopicType.ClientNetwork);
+#endif
                 return clientTick;
             }
 
@@ -140,7 +143,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         
         private void OnFullTickReceived(FullTickPacket fullTickPacket, NetPeer _)
         {
+#if Logs
             LogService.LogTopic("FullTickPacket accepted received", LogTopicType.ClientNetwork);
+#endif
             var tick = fullTickPacket.Tick;
             _fullTickPackets.Add(tick, fullTickPacket);
         }

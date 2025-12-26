@@ -35,7 +35,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             // _writer.Reset();
             // _writer.Put((byte)type);
             //packet.Serialize(_writer);
+#if Logs
             LogService.LogTopic($"Send packet type: {type}, json {packet.ToJson()}", LogTopicType.ClientNetwork);
+#endif
             _packetProcessor.SendNetSerializable(_peer, packet, deliveryMethod);
             // _peer.Send(_writer, deliveryMethod);
         }

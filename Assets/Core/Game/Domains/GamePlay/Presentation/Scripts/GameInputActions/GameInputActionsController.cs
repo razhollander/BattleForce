@@ -27,32 +27,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 
         public void EnableInputs()
         {
+#if Logs
             LogService.LogTopic("EnableInputs", LogTopicType.Inputs);
+#endif
             _gameInputActions.Enable();
             RegisterAllInputListeners();
         }
 
         public void DisableInputs()
         {
+#if Logs
             LogService.LogTopic("DisableInputs", LogTopicType.Inputs);
+#endif
             _gameInputActions.Disable();
         }
         
         public void RegisterAllInputListeners()
         {
+#if Logs
             LogService.LogTopic("Register all input listeners", LogTopicType.Inputs);
+#endif
              _gameInputActions.GamePlay.MoveRight.performed += OnShootInput;
         }
 
         public void UnregisterAllInputListeners()
         {
+#if Logs
             LogService.LogTopic("Unregister all input listeners", LogTopicType.Inputs);
+#endif
              _gameInputActions.GamePlay.MoveRight.performed -= OnShootInput;
         }
         
         private void OnShootInput(InputAction.CallbackContext obj)
         {
-         LogService.LogTopic("Shoot input was triggered", LogTopicType.Inputs);
+#if Logs
+            LogService.LogTopic("Shoot input was triggered", LogTopicType.Inputs);
+#endif
             _commandFactory.CreateCommandVoid<ShootInputInvokedCommand>().Execute();
         }
 

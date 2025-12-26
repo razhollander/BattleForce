@@ -71,7 +71,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 _networkManager.AddPlayerPeer(playerId, peer);
                 _matchNetEventsDataService.StartSavingPlayerEvents(playerId);
                 _matchNetEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);
+#if Logs
                 LogService.LogTopic("Processed player joined: " + playerState.ToJson(), LogTopicType.ServerNetwork);
+#endif
             }
             
             _playerJoinedPacketsPerPeer.Clear();
@@ -79,7 +81,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         private void OnJoinReceived(JoinRequestPacketC2S joinRequestPacket, NetPeer peer)
         {
+#if Logs
             LogService.LogTopic("Join packet received: " + joinRequestPacket.UserName, LogTopicType.ServerNetwork);
+#endif
             _playerJoinedPacketsPerPeer.Add(peer, joinRequestPacket);
         }
 
