@@ -8,12 +8,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     {
         public ushort Id;
         public Vector2[] Points;
-        
-        public EnvironmentWallStateS2C(ushort id, Vector2[] points)
-        {
-            Id = id;
-            Points = points;
-        }
 
         public void Serialize(NetDataWriter writer)
         {

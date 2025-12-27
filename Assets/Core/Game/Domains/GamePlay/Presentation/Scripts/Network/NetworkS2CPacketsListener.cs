@@ -54,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             var packetType = (PacketTypeS2C)reader.GetByte();
             _packetsObservers[packetType].OnPacketReceived(reader);
-            LogService.LogTopic($"OnNetworkReceive", LogTopicType.ClientNetwork);
+            LogService.LogTopic($"OnNetworkReceive {packetType}", LogTopicType.ClientNetwork);
             //_packetProcessor.ReadAllPackets(reader);
         }
 

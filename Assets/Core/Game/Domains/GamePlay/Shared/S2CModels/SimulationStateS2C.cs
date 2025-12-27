@@ -18,7 +18,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             for (int i = 0; i < Walls.Count; i++)
             {
-                Walls.AddAndGet().Points = new Vector2[maxPointsInWall];
+                ref var wall = ref Walls.AddAndGet();
+                wall.Points = new Vector2[maxPointsInWall];
             }
         }
 
@@ -52,21 +53,24 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Players.Clear();
             for (var i = 0; i < playersCount; i++)
             {
-                Players.AddAndGet().Deserialize(reader);;
+                ref var player = ref Players.AddAndGet();
+                player.Deserialize(reader);;
             }
           
             var bulletsCount = reader.GetByte();
             Bullets.Clear();
             for (var i = 0; i < bulletsCount; i++)
             {
-                Bullets.AddAndGet().Deserialize(reader);;
+                ref var bullet = ref Bullets.AddAndGet();
+                bullet.Deserialize(reader);
             }
             
             var wallsCount = reader.GetByte();
             Walls.Clear();
             for (var i = 0; i < wallsCount; i++)
             {
-                Walls.AddAndGet().Deserialize(reader);;
+                ref var wall = ref Walls.AddAndGet();
+                wall.Deserialize(reader);
             }
         }
 
@@ -147,15 +151,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public void DeserializeTransforms(NetDataReader reader)
         {
             var playersCount = reader.GetByte();
+            Players.Clear();
             for (var i = 0; i < playersCount; i++)
             {
-                Players.GetByIndex(i).DeserializeDeltas(reader);
+                ref var player = ref Players.AddAndGet();
+                player.DeserializeDeltas(reader);
             }
 
             var bulletsCount = reader.GetByte();
+            Bullets.Clear();
             for (int i = 0; i < bulletsCount; i++)
             {
-                Bullets.GetByIndex(i).DeserializeTransforms(reader);
+                ref var bullet = ref Bullets.AddAndGet();
+                bullet.DeserializeTransforms(reader);
             }
         }
     }

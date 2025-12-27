@@ -79,7 +79,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             var playerTakeDamageEventsCount = reader.GetByte();
             for (var i = 0; i < playerTakeDamageEventsCount; i++)
             {
-                PlayerTakeDamageNetEvents.AddAndGet().Deserialize(reader);
+                ref var playerTakeDamageEvent = ref PlayerTakeDamageNetEvents.AddAndGet();
+                playerTakeDamageEvent.Deserialize(reader);
             }
         }
 
@@ -98,7 +99,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             var bulletDestroyedEventsCount = reader.GetByte();
             for (var i = 0; i < bulletDestroyedEventsCount; i++)
             {
-                BulletDestroyedNetEvents.AddAndGet().Deserialize(reader);
+                ref var bulletDestroyedEvent = ref BulletDestroyedNetEvents.AddAndGet();
+                bulletDestroyedEvent.Deserialize(reader);
             }
         }
 
@@ -138,7 +140,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             var bulletSpawnNetEventsCount = reader.GetByte();
             for (var i = 0; i < bulletSpawnNetEventsCount; i++)
             {
-                BulletSpawnNetEvents.AddAndGet().Deserialize(reader);
+                ref var bulletSpawnEvent = ref BulletSpawnNetEvents.AddAndGet();
+                bulletSpawnEvent.Deserialize(reader);
             }
         }
     }

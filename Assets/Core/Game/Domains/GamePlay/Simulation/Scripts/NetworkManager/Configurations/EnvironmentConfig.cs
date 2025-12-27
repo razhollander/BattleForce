@@ -18,6 +18,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configura
         public void SetWalls(WallConfig[] wallConfigs)
         {
             _wallsJson = wallConfigs.ToJson();
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
         }
     }
     

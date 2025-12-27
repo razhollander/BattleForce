@@ -98,5 +98,11 @@ namespace Core.Scripts.Editor.Utils
                 yield return value;
             }
         }
+        
+        public static void SaveScriptableObject(ScriptableObject so)
+        {
+            EditorUtility.SetDirty(so);
+            AssetDatabase.SaveAssets();
+        }
     }
 }
