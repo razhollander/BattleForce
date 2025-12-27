@@ -14,6 +14,11 @@ namespace Core.Scripts.Extensions
             return JsonConvert.SerializeObject(obj);
         }
         
+        public static T FromJson<T>(this string json)
+        {
+            return JsonConvert.DeserializeObject<T>(json);
+        }
+        
         public static string Format(this string formatString, params object[] args)
         {
             return string.Format(formatString, args);

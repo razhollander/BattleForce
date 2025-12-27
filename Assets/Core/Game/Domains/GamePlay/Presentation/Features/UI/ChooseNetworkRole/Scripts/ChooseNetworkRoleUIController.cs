@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
@@ -46,8 +47,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
         {
             var enterData = new ServerInitiatorEnterData();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
-            await StartServer(enterData, cancellationTokenSource);
-            StartClient(true);
+
+            try
+            {
+                await StartServer(enterData, cancellationTokenSource);
+                StartClient(true);
+            }
+            catch (OperationCanceledException)
+            {
+                LogService.LogTopic("OperationCanceledException", LogTopicType.ClientNetwork);
+            }
+            catch (Exception e)
+            {
+                LogService.LogException(e);
+            }
         }
 
         private async Awaitable StartServer(ServerInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)

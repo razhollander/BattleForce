@@ -44,7 +44,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
 
         private void CreateWalls()
         {
-            foreach (var wallConfig in _simulationGamePlayConfig.Environment.Walls)
+            var wallConfigs = _simulationGamePlayConfig.Environment.GetWalls();
+
+            foreach (var wallConfig in wallConfigs)
             {
                 var wallId = wallConfig.Id;
                 var wallPoints = wallConfig.Points;

@@ -1,3 +1,4 @@
+using Core.Scripts.Extensions;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
@@ -7,11 +8,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configura
     [CreateAssetMenu(fileName = "EnvironmentConfig", menuName = "BF/Network/Environment Config")]
     public class EnvironmentConfig : SerializedScriptableObject
     {
-        public WallConfig[] Walls;
+        [SerializeField] string _wallsJson;
 
+        public WallConfig[] GetWalls()
+        {
+            return _wallsJson.FromJson<WallConfig[]>();
+        }
+        
         public void SetWalls(WallConfig[] wallConfigs)
         {
-            Walls = wallConfigs;
+            _wallsJson = wallConfigs.ToJson();
         }
     }
     
