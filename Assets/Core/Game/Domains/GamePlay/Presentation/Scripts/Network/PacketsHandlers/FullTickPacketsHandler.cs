@@ -1,19 +1,17 @@
-using System.Collections.Generic;
 using System.Linq;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
-using Core.Game.Domains.GamePlay.Shared;
+using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers
 {
@@ -21,8 +19,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
     {
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
-        private readonly Dictionary<int, FullTickPacket> _fullTickPackets = new();
         private readonly SimulationNetEventsHandler _simulationNetEventsHandler;
+        private readonly CapacityDict<int, FullTickPacket> _fullTickPackets;
+        private readonly CapacityList<PlayerJoinAcceptPacketS2C> _cachedUnprocessedPlayerJoinedEvents;
+        private readonly CapacityList<BulletSpawnNetEventS2C> _cachedUnprocessedBulletSpawnedEvents;
+        private readonly CapacityList<PlayerTakeDamageNetEventS2C> _cachedUnprocessedPlayerTakeDamageEvents;
+        private readonly CapacityList<BulletDestroyedNetEventS2C> _cachedUnprocessedBulletDestroyedEvents;
+        private readonly ConcurrentPool<FullTickPacket> _fullTickPacketsPool;
+        public PacketTypeS2C PacketType => PacketTypeS2C.FullTick;
         public int LastProcessedTickFromServer { get; private set; }
 
         public FullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
@@ -31,18 +35,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
+
             _simulationNetEventsHandler = new SimulationNetEventsHandler(matchDataService, matchNetEventsDataService,
                 networkManager, playerControllers, networkConfig, clientPresentationTickProcessor, commandFactory);
+            _fullTickPackets = new CapacityDict<int, FullTickPacket>(networkConfig.MaxCap.FullTickPacketsNetEvents);
+            _cachedUnprocessedPlayerJoinedEvents = new CapacityList<PlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
+            _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
+            _cachedUnprocessedPlayerTakeDamageEvents = new CapacityList<PlayerTakeDamageNetEventS2C>(networkConfig.MaxCap.PlayerTakeDamageNetEvents);
+            _cachedUnprocessedBulletDestroyedEvents = new CapacityList<BulletDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents);
+            _fullTickPacketsPool = new ConcurrentPool<FullTickPacket>(() => new FullTickPacket(networkConfig.MaxCap), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
         public void RegisterListeners()
         {
-            _networkManager.SubscribeNetSerializable<FullTickPacket, NetPeer>(OnFullTickReceived);
+            _networkManager.RegisterPacketsObserver(this);
         }
 
         public int ProcessStateLatestTick(int clientTick)
         {
             clientTick++;
+
             if (_fullTickPackets.IsNullOrEmpty())
             {
                 return clientTick;
@@ -53,9 +65,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
 
             if (latestTickReceivedFromServer <= LastProcessedTickFromServer)
             {
-#if Logs
                 LogService.LogTopic("Didn't receive any state since last tick", LogTopicType.ClientNetwork);
-#endif
                 return clientTick;
             }
 
@@ -68,64 +78,95 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             UpdateBulletsTransform(simulationState);
 
             LastProcessedTickFromServer = latestTickReceivedFromServer;
+
+            foreach (var kvp in _fullTickPackets)
+            {
+                _fullTickPacketsPool.Return(kvp.Value);
+            }
+
             _fullTickPackets.Clear();
+
             return clientTick;
         }
 
-        private void ProcessBulletDestroyedEvents(List<BulletDestroyedNetEventS2C> bulletDestroyedNetEvents)
+        private void ProcessBulletDestroyedEvents(FixedUnorderedList<BulletDestroyedNetEventS2C> bulletDestroyedNetEvents)
         {
-            if (bulletDestroyedNetEvents.IsNullOrEmpty())
+            _cachedUnprocessedBulletDestroyedEvents.Clear();
+
+            foreach (var netEvent in bulletDestroyedNetEvents.AsSpan())
             {
-                return;
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedBulletDestroyedEvents.Add(netEvent);
+                }
             }
 
-            var unProcessedBulletDestroyedEvents =
-                bulletDestroyedNetEvents.FindAll(x => x.OccuredOnTick > LastProcessedTickFromServer);
-            _simulationNetEventsHandler.ProcessBulletDestroyedEvents(unProcessedBulletDestroyedEvents);
+            if (!_cachedUnprocessedBulletDestroyedEvents.IsNullOrEmpty())
+            {
+                _simulationNetEventsHandler.ProcessBulletDestroyedEvents(_cachedUnprocessedBulletDestroyedEvents);
+            }
         }
 
-        private void ProcessPlayerTakeDamageEvents(List<PlayerTakeDamageNetEventS2C> playerTakeDamageNetEvents)
+        private void ProcessPlayerTakeDamageEvents(FixedUnorderedList<PlayerTakeDamageNetEventS2C> playerTakeDamageNetEvents)
         {
-            
-            if (playerTakeDamageNetEvents.IsNullOrEmpty())
+            _cachedUnprocessedPlayerTakeDamageEvents.Clear();
+
+            foreach (var netEvent in playerTakeDamageNetEvents.AsSpan())
             {
-                return;
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPlayerTakeDamageEvents.Add(netEvent);
+                }
             }
 
-            var unProcessedPlayerDamageEvents =
-                playerTakeDamageNetEvents.FindAll(x => x.OccuredOnTick > LastProcessedTickFromServer);
-            _simulationNetEventsHandler.ProcessPlayerTakeDamageEvents(unProcessedPlayerDamageEvents);
+            if (!_cachedUnprocessedPlayerTakeDamageEvents.IsNullOrEmpty())
+            {
+                _simulationNetEventsHandler.ProcessPlayerTakeDamageEvents(_cachedUnprocessedPlayerTakeDamageEvents);
+            }
         }
 
-        private void ProcessPlayerJoinedEvents(List<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
+
+        private void ProcessPlayerJoinedEvents(FixedUnorderedList<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
         {
-            if (playerJoinAcceptNetEvents.IsNullOrEmpty())
+            _cachedUnprocessedPlayerJoinedEvents.Clear();
+
+            foreach (var netEvent in playerJoinAcceptNetEvents.AsSpan())
             {
-                return;
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPlayerJoinedEvents.Add(netEvent);
+                }
             }
 
-            var unProcessedPlayerJoinedEvents = 
-                playerJoinAcceptNetEvents.FindAll(x => x.OccuredOnTick > LastProcessedTickFromServer);
-            _simulationNetEventsHandler.ProcessPlayerJoinedEvents(unProcessedPlayerJoinedEvents, ref clientTick);
+            if (!_cachedUnprocessedPlayerJoinedEvents.IsNullOrEmpty())
+            {
+                _simulationNetEventsHandler.ProcessPlayerJoinedEvents(_cachedUnprocessedPlayerJoinedEvents, ref clientTick);
+            }
         }
 
-        private void ProcessBulletSpawnedEvents(List<BulletSpawnNetEventS2C> bulletSpawnNetEvents)
+        private void ProcessBulletSpawnedEvents(FixedUnorderedList<BulletSpawnNetEventS2C> bulletSpawnNetEvents)
         {
-            if (bulletSpawnNetEvents.IsNullOrEmpty())
+            _cachedUnprocessedBulletSpawnedEvents.Clear();
+
+            foreach (var netEvent in bulletSpawnNetEvents.AsSpan())
             {
-                return;
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedBulletSpawnedEvents.Add(netEvent);
+                }
             }
 
-            var unProcessedBulletSpawnedEvents =
-                bulletSpawnNetEvents.FindAll(x => x.OccuredOnTick > LastProcessedTickFromServer);
-            _simulationNetEventsHandler.ProcessBulletSpawnEvents(unProcessedBulletSpawnedEvents);
+            if (!_cachedUnprocessedBulletSpawnedEvents.IsNullOrEmpty())
+            {
+                _simulationNetEventsHandler.ProcessBulletSpawnEvents(_cachedUnprocessedBulletSpawnedEvents);
+            }
         }
 
         private void UpdatePlayersDeltas(SimulationStateS2C simulationState)
         {
             foreach (var player in _matchDataService.Players)
             {
-                var playerState = simulationState.GetPlayer(player.PlayerId);
+                var playerState = simulationState.GetPlayerById(player.PlayerId);
                 player.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
                 player.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
                 player.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
@@ -136,16 +177,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         {
             foreach (var bullet in _matchDataService.Bullets)
             {
-                var bulletState = simulationState.GetBullet(bullet.Id);
+                var bulletState = simulationState.GetBulletById(bullet.Id);
                 bullet.Position = bulletState.Position;
             }
         }
         
-        private void OnFullTickReceived(FullTickPacket fullTickPacket, NetPeer _)
+        public void OnPacketReceived(NetPacketReader reader)
         {
-#if Logs
+            var newPacket = _fullTickPacketsPool.Get();
+            newPacket.Deserialize(reader);
+            OnFullTickReceived(newPacket);
+        }
+        
+        private void OnFullTickReceived(FullTickPacket fullTickPacket)
+        {
             LogService.LogTopic("FullTickPacket accepted received", LogTopicType.ClientNetwork);
-#endif
             var tick = fullTickPacket.Tick;
             _fullTickPackets.Add(tick, fullTickPacket);
         }
@@ -157,7 +203,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
 
         private void UnregisterListeners()
         {
-            _networkManager.RemoveSubscription<FullTickPacket>();
+            _networkManager.UnregisterPacketsObserver(this);
         }
     }
 }

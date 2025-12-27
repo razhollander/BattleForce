@@ -9,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
     public class HandleClientConnectedToPeerCommand : BaseCommand, ICommandVoid
     {
         private IClientNetworkManager _networkManager;
+        private readonly JoinRequestPacketC2S _cachedJoinRequest = new();
 
         public override void ResolveDependencies()
         {
@@ -17,8 +18,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         public void Execute()
         {
-            _networkManager.SendPacketSerialized(PacketTypeC2S.JoinRequest,
-                new JoinRequestPacketC2S { UserName = "RazPlayer" }, DeliveryMethod.ReliableOrdered);
+            _cachedJoinRequest.UserName = "RazPlayer";
+            _networkManager.SendPacketSerialized(PacketTypeC2S.JoinRequest, _cachedJoinRequest, DeliveryMethod.ReliableOrdered);
         }
     }
 }

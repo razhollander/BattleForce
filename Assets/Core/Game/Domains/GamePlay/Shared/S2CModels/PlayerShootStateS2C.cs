@@ -7,11 +7,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public float CooldownSecondsLeft;
         public float MaxCooldown;
 
-        public PlayerShootStateS2C(float maxCooldown)
-        {
-            MaxCooldown = maxCooldown;
-            CooldownSecondsLeft = MaxCooldown;
-        }
+        // public PlayerShootStateS2C(float maxCooldown)
+        // {
+        //     MaxCooldown = maxCooldown;
+        //     CooldownSecondsLeft = MaxCooldown;
+        // }
 
         public void Serialize(NetDataWriter writer)
         {

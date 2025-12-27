@@ -3,36 +3,56 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Scripts.Network;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 {
     public class MatchNetEventsDataService : IMatchNetEventsDataService
     {
-        public Dictionary<ushort, List<BulletSpawnNetEventS2C>> BulletSpawnNetEventsPerPlayer { get; private set; } = new (); // todo: remove events related to bullet when bullet is destroyed
-        public Dictionary<ushort, List<PlayerJoinAcceptPacketS2C>> JoinAcceptNetEventsPerPlayer { get; private set; } = new (); // todo: remove events related to player when player is destroyed
-        
-        public Dictionary<ushort, List<PlayerTakeDamageNetEventS2C>> PlayerTakeDamageNetEventsPerPlayer { get; private set; } = new(); // todo: remove events related to player hit when player is destroyed
-        public Dictionary<ushort, List<BulletDestroyedNetEventS2C>> BulletDestroyedNetEventsPerPlayer { get; private set; } = new(); // todo: remove events related to player hit when player is destroyed
+        private readonly NetworkConfig _networkConfig;
+        public Dictionary<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>> BulletSpawnNetEventsPerPlayer { get; private set; } // todo: remove events related to bullet when bullet is destroyed
+        public Dictionary<ushort, FixedUnorderedList<PlayerJoinAcceptPacketS2C>> JoinAcceptNetEventsPerPlayer { get; private set; } // todo: remove events related to player when player is destroyed
+        public Dictionary<ushort, FixedUnorderedList<PlayerTakeDamageNetEventS2C>> PlayerTakeDamageNetEventsPerPlayer { get; private set; } // todo: remove events related to player hit when player is destroyed
+        public Dictionary<ushort, FixedUnorderedList<BulletDestroyedNetEventS2C>> BulletDestroyedNetEventsPerPlayer { get; private set; } // todo: remove events related to player hit when player is destroyed
+        private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerJoinAcceptPacketS2C>> _joinAcceptListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerTakeDamageNetEventS2C>> _playerTakeDamageListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<BulletDestroyedNetEventS2C>> _bulletDestroyedListPool;
 
+        public MatchNetEventsDataService(NetworkConfig networkConfig)
+        {
+            _networkConfig = networkConfig;
+            var maxConcurrentPlayers = _networkConfig.MaxCap.ConcurrentPlayers;
+            BulletSpawnNetEventsPerPlayer = new Dictionary<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>>(maxConcurrentPlayers);
+            JoinAcceptNetEventsPerPlayer = new Dictionary<ushort, FixedUnorderedList<PlayerJoinAcceptPacketS2C>>(maxConcurrentPlayers);
+            PlayerTakeDamageNetEventsPerPlayer = new Dictionary<ushort, FixedUnorderedList<PlayerTakeDamageNetEventS2C>>(maxConcurrentPlayers);
+            BulletDestroyedNetEventsPerPlayer = new Dictionary<ushort, FixedUnorderedList<BulletDestroyedNetEventS2C>>(maxConcurrentPlayers);
+            _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(_networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
+            _joinAcceptListPool = new ConcurrentPool<FixedUnorderedList<PlayerJoinAcceptPacketS2C>>(() => new FixedUnorderedList<PlayerJoinAcceptPacketS2C>(_networkConfig.MaxCap.PlayerJoinAcceptNetEvents), maxConcurrentPlayers);
+            _playerTakeDamageListPool = new ConcurrentPool<FixedUnorderedList<PlayerTakeDamageNetEventS2C>>(() => new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(_networkConfig.MaxCap.PlayerTakeDamageNetEvents), maxConcurrentPlayers);
+            _bulletDestroyedListPool = new ConcurrentPool<FixedUnorderedList<BulletDestroyedNetEventS2C>>(() => new FixedUnorderedList<BulletDestroyedNetEventS2C>(_networkConfig.MaxCap.BulletDestroyedNetEvents), maxConcurrentPlayers);
+        }
+        
         public void StartSavingPlayerEvents(ushort playerId)
         {
-            if (!BulletSpawnNetEventsPerPlayer.TryAdd(playerId, new List<BulletSpawnNetEventS2C>()))
+            if (!BulletSpawnNetEventsPerPlayer.TryAdd(playerId, _bulletSpawnListPool.Get()))
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
             
-            if (!JoinAcceptNetEventsPerPlayer.TryAdd(playerId, new List<PlayerJoinAcceptPacketS2C>()))
+            if (!JoinAcceptNetEventsPerPlayer.TryAdd(playerId, _joinAcceptListPool.Get()))
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
             
-            if (!PlayerTakeDamageNetEventsPerPlayer.TryAdd(playerId, new List<PlayerTakeDamageNetEventS2C>()))
+            if (!PlayerTakeDamageNetEventsPerPlayer.TryAdd(playerId, _playerTakeDamageListPool.Get()))
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
             
-            if (!BulletDestroyedNetEventsPerPlayer.TryAdd(playerId, new List<BulletDestroyedNetEventS2C>()))
+            if (!BulletDestroyedNetEventsPerPlayer.TryAdd(playerId, _bulletDestroyedListPool.Get()))
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
@@ -40,6 +60,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         
         public void StopSavingPlayerEvents(ushort playerId)
         {
+            var bulletSpawnedList = BulletSpawnNetEventsPerPlayer[playerId];
+            bulletSpawnedList.Clear();
+            _bulletSpawnListPool.Return(bulletSpawnedList);
+            var joinAcceptedList = JoinAcceptNetEventsPerPlayer[playerId];
+            joinAcceptedList.Clear();
+            _joinAcceptListPool.Return(joinAcceptedList);
+            var playerTakeDamageedList = PlayerTakeDamageNetEventsPerPlayer[playerId];
+            playerTakeDamageedList.Clear();
+            _playerTakeDamageListPool.Return(playerTakeDamageedList);
+            var bulletDestroyededList = BulletDestroyedNetEventsPerPlayer[playerId];
+            bulletDestroyededList.Clear();
+            _bulletDestroyedListPool.Return(bulletDestroyededList);
+            
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             JoinAcceptNetEventsPerPlayer.Remove(playerId);
             PlayerTakeDamageNetEventsPerPlayer.Remove(playerId);
@@ -95,19 +128,46 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         {
             if (BulletSpawnNetEventsPerPlayer.TryGetValue(playerId, out var bulletSpawnNetEvents))
             {
-                bulletSpawnNetEvents.RemoveAll(x => x.OccuredOnTick < tick);
+                for (int i = bulletSpawnNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if(bulletSpawnNetEvents[i].OccuredOnTick<tick)
+                    {
+                        bulletSpawnNetEvents.RemoveAt(i);
+                    }
+                }
             }
+            
             if (JoinAcceptNetEventsPerPlayer.TryGetValue(playerId, out var joinAcceptNetEvents))
             {
-                joinAcceptNetEvents.RemoveAll(x => x.OccuredOnTick < tick);
+                for (int i = joinAcceptNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if(joinAcceptNetEvents[i].OccuredOnTick < tick)
+                    {
+                        joinAcceptNetEvents.RemoveAt(i);
+                    }
+                }
             }
+
             if (PlayerTakeDamageNetEventsPerPlayer.TryGetValue(playerId, out var playerTakeDamageNetEvents))
             {
-                playerTakeDamageNetEvents.RemoveAll(x => x.OccuredOnTick < tick);
+                for (int i = playerTakeDamageNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if(playerTakeDamageNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerTakeDamageNetEvents.RemoveAt(i);
+                    }
+                }
             }
+
             if (BulletDestroyedNetEventsPerPlayer.TryGetValue(playerId, out var bulletDestroyedNetEvents))
             {
-                bulletDestroyedNetEvents.RemoveAll(x => x.OccuredOnTick < tick);
+                for (int i = bulletDestroyedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if(bulletDestroyedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        bulletDestroyedNetEvents.RemoveAt(i);
+                    }
+                }
             }
         }
     }

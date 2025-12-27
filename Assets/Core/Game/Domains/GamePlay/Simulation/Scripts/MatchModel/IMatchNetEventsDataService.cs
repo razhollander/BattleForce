@@ -8,10 +8,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 {
     public interface IMatchNetEventsDataService
     {
-        Dictionary<ushort, List<BulletSpawnNetEventS2C>> BulletSpawnNetEventsPerPlayer { get; }
-        Dictionary<ushort, List<PlayerJoinAcceptPacketS2C>> JoinAcceptNetEventsPerPlayer { get; }
-        Dictionary<ushort, List<BulletDestroyedNetEventS2C>> BulletDestroyedNetEventsPerPlayer { get; }
-        Dictionary<ushort, List<PlayerTakeDamageNetEventS2C>> PlayerTakeDamageNetEventsPerPlayer { get; }
+        Dictionary<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>> BulletSpawnNetEventsPerPlayer { get; }
+        Dictionary<ushort, FixedUnorderedList<PlayerJoinAcceptPacketS2C>> JoinAcceptNetEventsPerPlayer { get; }
+        Dictionary<ushort, FixedUnorderedList<BulletDestroyedNetEventS2C>> BulletDestroyedNetEventsPerPlayer { get; }
+        Dictionary<ushort, FixedUnorderedList<PlayerTakeDamageNetEventS2C>> PlayerTakeDamageNetEventsPerPlayer { get; }
         void StartSavingPlayerEvents(ushort playerId);
         void StopSavingPlayerEvents(ushort playerId);
         void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius);

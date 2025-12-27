@@ -52,27 +52,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
 
         private async Awaitable StartServer(ServerInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
         {
-#if Logs
             LogService.LogTopic("Starting Server", LogTopicType.ClientNetwork);
-#endif
             await _sceneLoaderService.TryLoadScene(SceneType.ServerScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.ServerScene, enterData, cancellationTokenSource);
-#if Logs
             LogService.LogTopic("Finished starting Server", LogTopicType.ClientNetwork);
-#endif
         }
 
         private void StartClient(bool isHost)
         {
-#if Logs
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
-#endif
-            // _clientNetworkManager.StartClient(isHost);
-            // _fullTickPacketsHandler.RegisterListeners();
+            _clientNetworkManager.StartClient(isHost);
+            _fullTickPacketsHandler.RegisterListeners();
             _uiView.Hide();
-#if Logs
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
-#endif
         }
 
         private void OnClientClicked()

@@ -8,12 +8,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public PlayerShootStateS2C Shoot;
         public PlayerHealthS2C Health;
 
-        public PlayerSpaceshipStateS2C(PlayerTransformStateS2C transform, float shootCooldown, ushort health)
-        {
-            Transform = transform;
-            Shoot = new PlayerShootStateS2C(shootCooldown);
-            Health = new PlayerHealthS2C(health);
-        }
+        // public PlayerSpaceshipStateS2C(PlayerTransformStateS2C transform, float shootCooldown, ushort health)
+        // {
+        //     Transform = transform;
+        //     Shoot = new PlayerShootStateS2C(shootCooldown);
+        //     Health = new PlayerHealthS2C(health);
+        // }
 
         public void Serialize(NetDataWriter writer)
         {

@@ -1,5 +1,4 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers
@@ -7,25 +6,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
     public class PlayersTransformHandler : IPlayersTransformHandler
     {
         private readonly IMatchDataService _matchDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
 
-        public PlayersTransformHandler(IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
+        public PlayersTransformHandler(IMatchDataService matchDataService, NetworkConfig networkConfig)
         {
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
         }
         
         public void UpdatePlayerTransform()
         {
-            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
-                var player = _matchDataService.SimulationState.Players[i];
-                var playerId = player.Id;
-                var playerModel = _matchDataService.GetPlayer(playerId);
+                ref var playerModel = ref _matchDataService.SimulationState.GetPlayerByIndex(i);
                 playerModel.Spaceship.Transform.Position += playerModel.Spaceship.Transform.Velocity * _networkConfig.DeltaTime;
-                _matchDataService.SetPlayer(playerId, playerModel);
             }
         }
     }

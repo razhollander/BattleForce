@@ -2,6 +2,7 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -17,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private IPhysicsSimulator _physicsSimulator;
         private SimulationGamePlayConfig _simulationGamePlayConfig;
+        private IMatchDataService _matchDataService;
 
         public override void ResolveDependencies()
         {
@@ -26,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _matchDataService = _diContainer.Resolve<IMatchDataService>();
         }
 
         public void Execute()
@@ -43,7 +46,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         {
             foreach (var wallConfig in _simulationGamePlayConfig.Environment.Walls)
             {
-                _physicsSimulator.AddWall(wallConfig.Id, wallConfig.Points);
+                var wallId = wallConfig.Id;
+                var wallPoints = wallConfig.Points;
+                _matchDataService.SimulationState.AddWall(wallId, wallPoints);
+                _physicsSimulator.AddWall(wallId, wallPoints);
             }
         }
     }

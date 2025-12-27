@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace CoreDomain.Scripts.Services.Logger.Base
 {

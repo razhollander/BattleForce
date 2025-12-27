@@ -1,6 +1,7 @@
 using System;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
+using Core.Game.Domains.GamePlay.Shared.Extensions;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -12,9 +13,9 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
 {
     public class ServerNetworkManager : IServerNetworkManager
     {
-        private NetworkC2SPacketsListener _networkC2SPacketsListener;
-        private NetManager _netManager;
-        private NetPacketProcessor _packetProcessor;
+        private readonly NetworkC2SPacketsListener _packetsListener;
+        private readonly NetManager _netManager;
+        private readonly NetPacketProcessor _packetProcessor;
         private readonly NetworkConfig _networkConfig;
         private readonly NetworkS2CPacketsSender _packetsSender;
 
@@ -22,14 +23,20 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         {
             _networkConfig = networkConfig;
             _packetProcessor = new NetPacketProcessor();
-            _networkC2SPacketsListener = new NetworkC2SPacketsListener(_packetProcessor, _networkConfig);
-            _netManager = new NetManager(_networkC2SPacketsListener) { AutoRecycle = true, BroadcastReceiveEnabled = true, IPv6Enabled = IPv6Mode.Disabled};
+            _packetsListener = new NetworkC2SPacketsListener(_networkConfig);
+            _netManager = new NetManager(_packetsListener) { AutoRecycle = true, BroadcastReceiveEnabled = true, IPv6Enabled = IPv6Mode.Disabled};
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
 
         public void InitEntryPoint()
         {
+            RegisterAutoSerializedTypes();
             StartServer();
+        }
+        
+        private void RegisterAutoSerializedTypes()
+        {
+            _packetProcessor.RegisterNestedType((w, v) => w.Put(v), r => r.GetVector2());
         }
         
         private void StartServer()
@@ -57,12 +64,6 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         // {
         //     _packetProcessor.SubscribeReusable(onReceive);
         // }
-        
-        public void SubscribeNetSerializable<T>(
-            Action<T, NetPeer> onReceive) where T : INetSerializable, new()
-        {
-            _packetProcessor.SubscribeNetSerializable(onReceive);
-        }
         
         // public void SubscribeNetSerializable<T>(
         //     Action<T, int> onReceive) where T : INetSerializable, new()
@@ -101,10 +102,10 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         //     _packetsSender.SendPacketSerializedOnlyToPlayer(type, packet, playerId, deliveryMethod);
         // }
 
-        public void RemoveSubscription<T>()
-        {
-            _packetProcessor.RemoveSubscription<T>();
-        }
+        // public void RemoveSubscription<T>()
+        // {
+        //     _packetProcessor.RemoveSubscription<T>();
+        // }
 
         public void AddPlayerPeer(ushort playerId, NetPeer peer)
         {
@@ -122,6 +123,16 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         public int GetPlayerPeerId(ushort playerId)
         {
             return _packetsSender.GetPlayerPeerId(playerId);
+        }
+
+        public void RegisterPacketsObserver(IPacketsObserver packetsObserver)
+        {
+            _packetsListener.RegisterObserver(packetsObserver);
+        }
+        
+        public void UnregisterPacketsObserver(IPacketsObserver packetsObserver)
+        {
+            _packetsListener.UnregisterObserver(packetsObserver);
         }
     }
 }

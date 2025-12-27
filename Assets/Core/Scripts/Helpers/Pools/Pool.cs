@@ -16,7 +16,7 @@ namespace CoreDomain.Scripts.Helpers.Pools
 
         public virtual void InitPool()
         {
-            _pool = new();
+            _pool = new(_initialAmount);
             AddInstancesToQueue(_initialAmount);
         }
 

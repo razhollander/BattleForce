@@ -64,11 +64,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         private void CopyPlayersStates(SimulationStateS2C simulationState)
         {
-            var players = simulationState.Players;
-
-            for (int i = 0; i < simulationState.PlayersCount; i++)
+            foreach (var playerState in simulationState.Players.AsSpan())
             {
-                var playerState = players[i];
                 var currentBody = _world.GetBodyList();
 
                 while (currentBody != null)
@@ -89,10 +86,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         private void CopyBulletsStates(SimulationStateS2C simulationState)
         {
-            foreach (var bulletIndex in simulationState.Bullets.UsedIndices())
+            foreach (var bullet in simulationState.Bullets.AsSpan())
             {
                 var bulletBody = _world.GetBodyList();
-                var bullet = simulationState.Bullets[bulletIndex];
 
                 while (bulletBody != null)
                 {

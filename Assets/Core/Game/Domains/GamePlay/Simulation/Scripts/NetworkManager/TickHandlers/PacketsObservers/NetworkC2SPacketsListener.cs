@@ -1,19 +1,13 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
-using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
-using Core.Game.Domains.GamePlay.Shared.Extensions;
 using Core.Scripts.Network;
-using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
-using LiteNetLib.Utils;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
-    public class NetworkC2SPacketsBroadcaster : INetEventListener
+    public class NetworkC2SPacketsListener : INetEventListener
     {
         private readonly NetworkConfig _networkConfig;
         private NetManager _netManager;
@@ -23,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         // public event Action<PlayerKeyInputsC2S, ushort> PlayerInputReceivedEvent;
         // public event Action<JoinRequestPacketC2S, ushort> PlayerJoinReceivedEvent;
 
-        public NetworkC2SPacketsBroadcaster(NetworkConfig networkConfig)
+        public NetworkC2SPacketsListener(NetworkConfig networkConfig)
         {
             _networkConfig = networkConfig;
             _packetsObservers = new CapacityDict<PacketTypeC2S, IPacketsObserver>(networkConfig.MaxCap.PacketTypes);
@@ -66,9 +60,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             //string time = DateTime.Now.ToString("HH:mm:ss.fff");
 
             // Debug.Log($"{time} OnNetworkReceive!  {deliveryMethod.ToString()}");
-#if Logs
             LogService.LogTopic($"OnNetworkReceive!  {deliveryMethod.ToString()}", LogTopicType.ServerNetwork);
-#endif
             //_packetProcessor.ReadAllPackets(reader, peer);
 
             // var packetTypeByte = reader.GetByte();
@@ -242,9 +234,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         void INetEventListener.OnPeerConnected(NetPeer peer)
         {
-#if Logs
             LogService.LogTopic("Player connected: " + peer.EndPoint, LogTopicType.ServerNetwork);
-#endif
         }
 
         void INetEventListener.OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -270,10 +260,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void INetEventListener.OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader,
             UnconnectedMessageType messageType)
         {
-#if Logs
             LogService.LogTopic("OnNetworkReceiveUnconnected! ", LogTopicType.ServerNetwork);
-#endif
-
         }
 
         void INetEventListener.OnNetworkLatencyUpdate(NetPeer peer, int latency)
@@ -287,9 +274,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         void INetEventListener.OnConnectionRequest(ConnectionRequest request)
         {
-#if Logs
             LogService.LogTopic("ConnectionRequest", LogTopicType.ServerNetwork);
-#endif
             request.AcceptIfKey(_networkConfig.ConntectionKey);
         }
     }

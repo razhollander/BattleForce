@@ -40,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         private TimerFixedThreaded _fixedTimer;
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
+        private FullTickPacket _fullTickPacket;
 
         public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
@@ -62,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         public void InitEntryPoint()
         {
             StartTick();
+            _fullTickPacket = new FullTickPacket(_networkConfig.MaxCap);
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
         }
 
@@ -101,7 +103,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 ApplyPhysicsSimulationToMatchModel();
                  RemoveOlderThanTickEventsPerPlayer(processedTick);
                  SendCurrentTickStateToAllClients(processedTick);
-                 _matchDataService.CopySimulationStateIntoPrevious();
+                 //_matchDataService.CopySimulationStateIntoPrevious();
             }
             catch (Exception e)
             {
@@ -112,18 +114,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         private void ApplyPhysicsSimulationToMatchModel()
         {
-            for (int i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            for (int i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
-                var playerModel = _matchDataService.SimulationState.Players[i];
-                playerModel.Spaceship.Transform.Position = _physicsSimulator.GetPlayer(playerModel.Id).Position;
-                _matchDataService.SetPlayer(playerModel.Id, playerModel);
+                ref var playerState = ref _matchDataService.SimulationState.Players.GetByIndex(i);
+                playerState.Spaceship.Transform.Position = _physicsSimulator.GetPlayer(playerState.Id).Position;
             }
 
-            foreach (int usedIndex in _matchDataService.SimulationState.Bullets.UsedIndices())
+            for (int i = 0; i < _matchDataService.SimulationState.Bullets.Count; i++)
             {
-                var bulletModel = _matchDataService.SimulationState.Bullets[usedIndex];
-                bulletModel.Position = _physicsSimulator.GetBullet(bulletModel.Id).Position;
-                _matchDataService.SetBullet(bulletModel.Id, bulletModel);
+                ref var bulletState = ref _matchDataService.SimulationState.Bullets.GetByIndex(i);
+                bulletState.Position = _physicsSimulator.GetBullet(bulletState.Id).Position;
             }
         }
 
@@ -140,32 +140,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         private void RemoveOlderThanTickEventsPerPlayer(int processedTick)
         {
-            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())        
             {
-                var player = _matchDataService.SimulationState.Players[i];
-                var playerId = player.Id;
+                var playerId = playerState.Id;
                 _matchNetEventsDataService.RemoveAllEventsOlderThanTick(playerId, processedTick);
             }
         }
 
         private void SendCurrentTickStateToAllClients(int processedTick)
         {
-            if (_matchDataService.SimulationState.PlayersCount == 0)
+            if (_matchDataService.SimulationState.Players.Count == 0)
             {
                 return;
             }
 
-            var simulationState = _matchDataService.SimulationState;
-            var packet = new FullTickPacket(processedTick, _matchDataService.PreviousSimulationState, simulationState, null, null, null, null);
-            for (var i = 0; i < simulationState.PlayersCount; i++)
+            var currentSimulationState = _matchDataService.SimulationState;
+            _fullTickPacket.Tick = processedTick;
+            _fullTickPacket.CurrentSimulationState = currentSimulationState;
+            //_fullTickPacket.PreviousSimulationState = _matchDataService.PreviousSimulationState;
+            foreach (var playerState in currentSimulationState.Players.AsSpan())
             {
-                var playerState = simulationState.Players[i];
                 var playerId = playerState.Id;
-                packet.BulletSpawnNetEvents = _matchNetEventsDataService.BulletSpawnNetEventsPerPlayer[playerId];
-                packet.PlayerJoinAcceptNetEvents = _matchNetEventsDataService.JoinAcceptNetEventsPerPlayer[playerId];
-                packet.PlayerTakeDamageNetEvents = _matchNetEventsDataService.PlayerTakeDamageNetEventsPerPlayer[playerId];
-                packet.BulletDestroyedNetEvents = _matchNetEventsDataService.BulletDestroyedNetEventsPerPlayer[playerId];
-                _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.FullTick, packet,
+                _fullTickPacket.BulletSpawnNetEvents = _matchNetEventsDataService.BulletSpawnNetEventsPerPlayer[playerId];
+                _fullTickPacket.PlayerJoinAcceptNetEvents = _matchNetEventsDataService.JoinAcceptNetEventsPerPlayer[playerId];
+                _fullTickPacket.PlayerTakeDamageNetEvents = _matchNetEventsDataService.PlayerTakeDamageNetEventsPerPlayer[playerId];
+                _fullTickPacket.BulletDestroyedNetEvents = _matchNetEventsDataService.BulletDestroyedNetEventsPerPlayer[playerId];
+                _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.FullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }
         }

@@ -2,7 +2,6 @@ using System;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 {
@@ -42,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 
         public void Execute()
         {
-            var playerState = _matchDataService.GetPlayer(_playerId);
+            ref var playerState = ref _matchDataService.SimulationState.GetPlayerById(_playerId);
             var newHealth = (ushort)Math.Max(DEAD_HEALTH_AMOUNT, playerState.Spaceship.Health.CurrentHealth - _hitDamage);
             playerState.Spaceship.Health.CurrentHealth = newHealth;
             var isPlayerAlive = newHealth > DEAD_HEALTH_AMOUNT;
@@ -51,8 +50,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             {
                 playerState.IsAlive = false;
             }
-            Debug.Log($"Player Hit! Id {_playerId} hit with damage {_hitDamage}, new health: {newHealth}, is alive: {isPlayerAlive}");
-            _matchDataService.SetPlayer(playerState.Id, playerState);
+
+            LogService.LogTopic($"Player Hit! Id {_playerId} hit with damage {_hitDamage}, new health: {newHealth}, is alive: {isPlayerAlive}", LogTopicType.ServerNetwork);
             _matchNetEventsDataService.AddPlayerTakeDamageNetEvent(_processedTick, _playerId, newHealth, _hitDamage, isPlayerAlive);
         }
     }

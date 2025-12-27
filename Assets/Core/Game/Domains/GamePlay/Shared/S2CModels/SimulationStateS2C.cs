@@ -1,36 +1,46 @@
-using System.Linq;
+using System.Numerics;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
-    public struct SimulationStateS2C
+    public class SimulationStateS2C
     {
-        public ushort PlayersCount;
-        public PlayerStateS2C[] Players;
-        public EnvironmentWallStateS2C[] Walls;
-        public StructPool<PlayerBulletS2C> Bullets;
-        
+        public FixedUnorderedList<PlayerStateS2C> Players;
+        public FixedUnorderedList<PlayerBulletS2C> Bullets;
+        public FixedUnorderedList<EnvironmentWallStateS2C> Walls;
+
+        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxWalls, int maxPointsInWall)
+        {
+            Players = new FixedUnorderedList<PlayerStateS2C>(maxPlayers);
+            Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
+            Walls = new FixedUnorderedList<EnvironmentWallStateS2C>(maxWalls);
+
+            for (int i = 0; i < Walls.Count; i++)
+            {
+                Walls.AddAndGet().Points = new Vector2[maxPointsInWall];
+            }
+        }
+
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)PlayersCount);
-            for (int i = 0; i < PlayersCount; i++)
+            var playerCount = Players.Count;
+            writer.Put((byte)playerCount);
+            foreach (var player in Players.AsSpan())
             {
-                Players[i].Serialize(writer);
+                player.Serialize(writer);
             }
         
-            var bulletsCount = Bullets.UsedCount;
+            var bulletsCount = Bullets.Count;
             writer.Put((byte)bulletsCount);
-            if (bulletsCount > 0)
+            foreach (var bullet in Bullets.AsSpan())
             {
-                foreach (var bulletIndex in Bullets.UsedIndices())
-                {
-                    Bullets[bulletIndex].Serialize(writer);
-                }
+                bullet.Serialize(writer);
             }
             
-            writer.Put((byte)Walls.Length);
-            foreach (var wall in Walls)
+            var wallsCount = Walls.Count;
+            writer.Put((byte)wallsCount);
+            foreach (var wall in Walls.AsSpan())
             {
                 wall.Serialize(writer);
             }
@@ -38,83 +48,114 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         
         public void Deserialize(NetDataReader reader)
         {
-            PlayersCount = reader.GetByte();
-            Players = new PlayerStateS2C[PlayersCount];
-            for (int i = 0; i < PlayersCount; i++)
-                Players[i].Deserialize(reader);
-            var bulletsCount = (int)reader.GetByte();
-            Bullets = new StructPool<PlayerBulletS2C>(bulletsCount);
-            if (bulletsCount > 0)
+            var playersCount = reader.GetByte();
+            Players.Clear();
+            for (var i = 0; i < playersCount; i++)
             {
-                for (int i = 0; i < bulletsCount; i++)
-                {
-                    Bullets.Rent(out int index);
-                    Bullets[index].Deserialize(reader);
-                }
+                Players.AddAndGet().Deserialize(reader);;
             }
+          
+            var bulletsCount = reader.GetByte();
+            Bullets.Clear();
+            for (var i = 0; i < bulletsCount; i++)
+            {
+                Bullets.AddAndGet().Deserialize(reader);;
+            }
+            
             var wallsCount = reader.GetByte();
-            Walls = new EnvironmentWallStateS2C[wallsCount];
-            for (int i = 0; i < wallsCount; i++)
-                Walls[i].Deserialize(reader);
+            Walls.Clear();
+            for (var i = 0; i < wallsCount; i++)
+            {
+                Walls.AddAndGet().Deserialize(reader);;
+            }
         }
 
-        public PlayerStateS2C GetPlayer(int playerId)
+        public ref PlayerStateS2C GetPlayerById(ushort playerId)
         {
-            return Players.First(x => x.Id == playerId);
+            for (int i = 0; i < Players.Count; i++)
+            {
+                if (Players[i].Id == playerId)
+                {
+                    return ref Players.GetByIndex(i);
+                } 
+            }
+
+            throw new System.Exception($"No player for id {playerId}!");
+        }
+
+        public ref PlayerStateS2C GetPlayerByIndex(int index)
+        {
+            return ref Players.GetByIndex(index);
+        }
+
+        public void RemoveBulletById(ushort bulletId)
+        {
+            for (int i = 0; i < Bullets.Count; i++)
+            {
+                if (Bullets[i].Id == bulletId)
+                {
+                    Bullets.RemoveAt(i);
+                    return;
+                } 
+            }
+            
+            throw new System.Exception($"No bullet for id {bulletId}!");
+        }
+
+        public ref PlayerBulletS2C GetBulletById(ushort bulletId)
+        {
+            for (int i = 0; i < Bullets.Count; i++)
+            {
+                if (Bullets[i].Id == bulletId)
+                {
+                    return ref Bullets.GetByIndex(i);
+                } 
+            }
+            
+            throw new System.Exception("No bullet for id {playerId}!");
+        }
+
+        public ref PlayerBulletS2C GetBulletByIndex(int index)
+        {
+            return ref Bullets.GetByIndex(index);
+        }
+
+        public void AddWall(ushort wallId, Vector2[] wallPoints)
+        {
+            ref var wallState = ref Walls.AddAndGet();
+            wallState.Id = wallId;
+            wallState.Points = wallPoints;
         }
         
-        public PlayerBulletS2C GetBullet(int bulletId)
-        {
-            foreach (var index in Bullets.UsedIndices())
-            {
-                var playerBullet = Bullets[index];
-                if (playerBullet.Id == bulletId)
-                {
-                    return playerBullet;
-                }
-            }
-
-            LogService.LogError($"No bullet for id {bulletId}!");
-            return default;
-        }
-
         public void SerializeTransforms(NetDataWriter writer)
         {
-            writer.Put((byte)PlayersCount);
-            for (var i = 0; i < PlayersCount; i++)
+            var playerCount = Players.Count;
+            writer.Put((byte) playerCount);
+            foreach (var player in Players.AsSpan())
             {
-                Players[i].SerializeDeltas(writer);
+                player.SerializeDeltas(writer);
             }
 
-            var bulletsCount = Bullets.UsedCount;
-            writer.Put((byte)bulletsCount);
-            if (bulletsCount > 0)
+            var bulletsCount = Bullets.Count;
+            writer.Put((byte) bulletsCount);
+            foreach (var bullet in Bullets.AsSpan())
             {
-                foreach (var bulletIndex in Bullets.UsedIndices())
-                {
-                    Bullets[bulletIndex].SerializeTransforms(writer);
-                }
+                bullet.SerializeTransforms(writer);
             }
         }
 
         public void DeserializeTransforms(NetDataReader reader)
         {
-            PlayersCount = reader.GetByte();
-            Players = new PlayerStateS2C[PlayersCount];
-            for (var i = 0; i < PlayersCount; i++)
+            var playersCount = reader.GetByte();
+            for (var i = 0; i < playersCount; i++)
             {
-                Players[i].DeserializeDeltas(reader);
+                Players.GetByIndex(i).DeserializeDeltas(reader);
             }
 
-            var bulletsCount = (int)reader.GetByte();
-            Bullets = new StructPool<PlayerBulletS2C>(bulletsCount);
-            if (bulletsCount > 0)
+            var bulletsCount = reader.GetByte();
+            for (int i = 0; i < bulletsCount; i++)
             {
-                for (int i = 0; i < bulletsCount; i++)
-                {
-                    Bullets.Rent(out int index);
-                    Bullets[index].DeserializeTransforms(reader);
-                }
+                Bullets.GetByIndex(i).DeserializeTransforms(reader);
             }
         }
     }

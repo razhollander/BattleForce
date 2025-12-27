@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -23,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _peer = peer;
         }
         
-        public void SendPacketSerialized<T>(PacketTypeC2S type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        public void SendPacketSerialized<T>(PacketTypeC2S packetType, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
         {
             if (_peer == null)
             {
@@ -34,11 +35,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             // _writer.Reset();
             // _writer.Put((byte)type);
             //packet.Serialize(_writer);
-#if Logs
-            LogService.LogTopic($"Send packet type: {type}, json {packet.ToJson()}", LogTopicType.ClientNetwork);
-#endif
-            _packetProcessor.SendNetSerializable(_peer, packet, deliveryMethod);
-            // _peer.Send(_writer, deliveryMethod);
+            LogService.LogTopic($"Send packet type: {packetType}, json {packet.ToJson()}", LogTopicType.ClientNetwork);
+            _packetProcessor.SendNetSerializable((byte)packetType, _peer, packet, deliveryMethod);
+            // _cachedWriter.Reset();
+            // _cachedWriter.Put((byte)packetType);
+            // packet.Serialize(_cachedWriter);
+            // _peer.Send(_cachedWriter, deliveryMethod);
         }
         
         // public void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new()

@@ -1,6 +1,8 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
+
 namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers
 {
-    public interface IPlayerJoinPacketsHandler
+    public interface IPlayerJoinPacketsHandler : IPacketsObserver
     {
         void InitEntryPoint();
         void InitExitPoint();

@@ -39,9 +39,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
 
         private void CreatePlayers()
         {
-            for (int i = 0; i < _simulationState.PlayersCount; i++)
+            foreach (var playerState in _simulationState.Players.AsSpan())
             {
-                var playerState = _simulationState.Players[i];
                 var playerModel = _matchDataService.AddPlayer(playerState);
                 _playerControllers.CreatePlayer(playerModel.PlayerId);
             }
@@ -49,14 +48,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
 
         private void CreateBullets()
         {
-            if (_simulationState.Bullets.UsedCount == 0)
+            foreach (var bulletState in _simulationState.Bullets.AsSpan())
             {
-                return;
-            }
-            
-            foreach (var index in _simulationState.Bullets.UsedIndices())
-            {
-                var bulletState = _simulationState.Bullets[index];
                 _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId,
                     bulletState.Position, bulletState.Radius);
                 _bulletControllers.CreateBullet(bulletState.Id);
@@ -65,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
 
         private void CreateWalls()
         {
-            foreach (var wallState in _simulationState.Walls)
+            foreach (var wallState in _simulationState.Walls.AsSpan())
             {
                 var wallModel = _matchDataService.AddWall(wallState);
                 _environmentWallsControllers.CreateWall(wallModel.Id);

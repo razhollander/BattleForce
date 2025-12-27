@@ -2,7 +2,7 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
 {
-    public struct PlayerJoinAcceptPacketS2C : INetSerializable
+    public class PlayerJoinAcceptPacketS2C : INetSerializable
     {
         public int OccuredOnTick;
         public bool IsLocal;

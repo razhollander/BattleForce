@@ -36,11 +36,7 @@ namespace CoreDomain.Scripts.ZenjectInstallers
 
         public override void InstallBindings()
         {
-#if Logs
             Container.BindInterfacesTo<UnityLogger>().AsSingle().NonLazy();
-#else
-            Container.BindInterfacesTo<EmptyLogger>().AsSingle().NonLazy();
-#endif
             Container.BindInstance(_networkConfig).AsSingle().NonLazy();
             Container.BindInstance(_gamePlayConfig).AsSingle().NonLazy();
             Container.BindInterfacesTo<SceneLoaderService>().AsSingle().NonLazy();

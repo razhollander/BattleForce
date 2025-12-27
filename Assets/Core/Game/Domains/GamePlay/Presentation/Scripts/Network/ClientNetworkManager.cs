@@ -1,4 +1,5 @@
 using System;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -28,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _commandFactory = commandFactory;
             _updateSubscriptionService = updateSubscriptionService;
             var packetProcessor = new NetPacketProcessor();
-            _packetsListener = new NetworkS2CPacketsListener(packetProcessor);
+            _packetsListener = new NetworkS2CPacketsListener(packetProcessor, networkConfig);
             _packetsSender = new NetworkC2SPacketsSender(packetProcessor);
             _netManager = new NetManager(_packetsListener)
             {
@@ -71,9 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         private void OnServerPeerReceived(NetPeer peerToServer)
         {
-#if Logs
             LogService.LogTopic("Server peer received!", LogTopicType.ClientNetwork);
-#endif
             _packetsSender.SetPeer(peerToServer);
             _commandFactory.CreateCommandVoid<HandleClientConnectedToPeerCommand>().Execute();
             IsPeerConnected = true;
@@ -84,11 +83,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         //     _packetsListener.SubscribeReusable(onReceive);
         // }
         
-        public void SubscribeNetSerializable<T, TUserData>(
-            Action<T, TUserData> onReceive) where T : INetSerializable, new()
-        {
-            _packetsListener.SubscribeNetSerializable(onReceive);
-        }
+        // public void SubscribeNetSerializable<T, TUserData>(
+        //     Action<T, TUserData> onReceive) where T : INetSerializable, new()
+        // {
+        //     _packetsListener.SubscribeNetSerializable(onReceive);
+        // }
         
         // public void SubscribeReusable<T, TUserData>(Action<T, TUserData> onReceive) where T : class, new()
         // {
@@ -105,14 +104,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _packetsSender.SendPacketSerialized(type, packet, deliveryMethod);
         }
 
-        public void RemoveSubscription<T>()
-        {
-            _packetsListener.RemoveSubscription<T>();
-        }
-
         public void PollEvents()
         {
             _netManager.PollEvents();
+        }
+
+        public void RegisterPacketsObserver(IPacketsObserver packetsObserver)
+        {
+            _packetsListener.RegisterObserver(packetsObserver);
+        }
+
+        public void UnregisterPacketsObserver(IPacketsObserver packetsObserver)
+        {
+            _packetsListener.UnregisterObserver(packetsObserver);
         }
 
         public void InitExitPoint()

@@ -1,36 +1,48 @@
-using System.Collections.Generic;
-using System.Linq;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
-using Core.Scripts.Extensions;
-using CoreDomain.Scripts.Services.Logger.Base;
+using Core.Scripts.Network;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
-    public struct FullTickPacket : INetSerializable
+    public class FullTickPacket : INetSerializable
     {
         public int Tick;
         //public SimulationStateS2C PreviousSimulationState; // not sure if gonna need this
         public SimulationStateS2C CurrentSimulationState;
-        public List<BulletSpawnNetEventS2C> BulletSpawnNetEvents; // todo: remove events related to bullet when bullet id destroyed
-        public List<PlayerJoinAcceptPacketS2C> PlayerJoinAcceptNetEvents;
-        public List<PlayerTakeDamageNetEventS2C> PlayerTakeDamageNetEvents;
-        public List<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents;
+        public FixedUnorderedList<BulletSpawnNetEventS2C> BulletSpawnNetEvents; // todo: remove events related to bullet when bullet id destroyed
+        public FixedUnorderedList<PlayerJoinAcceptPacketS2C> PlayerJoinAcceptNetEvents;
+        public FixedUnorderedList<PlayerTakeDamageNetEventS2C> PlayerTakeDamageNetEvents;
+        public FixedUnorderedList<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents;
 
-        public FullTickPacket(int tick, SimulationStateS2C previousSimulationState,
-            SimulationStateS2C currentSimulationState, List<BulletSpawnNetEventS2C> bulletSpawnNetEvents,
-            List<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, List<PlayerTakeDamageNetEventS2C> playerTakeDamageNetEvents,
-            List<BulletDestroyedNetEventS2C> bulletDestroyedNetEvents)
+        public FullTickPacket(MaxCap maxCap)
         {
-            Tick = tick;
-            //PreviousSimulationState = previousSimulationState;
-            CurrentSimulationState = currentSimulationState;
-            BulletSpawnNetEvents = bulletSpawnNetEvents;
-            PlayerJoinAcceptNetEvents = playerJoinAcceptNetEvents;
-            PlayerTakeDamageNetEvents = playerTakeDamageNetEvents;
-            BulletDestroyedNetEvents = bulletDestroyedNetEvents;
+            CurrentSimulationState = new SimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxCap.ConcurrentEvironmentWalls, maxCap.PointsInEvironmentWall);
+            BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
+            PlayerJoinAcceptNetEvents = new FixedUnorderedList<PlayerJoinAcceptPacketS2C>(maxCap.PlayerJoinAcceptNetEvents);
+            
+            for (int i = 0; i < PlayerJoinAcceptNetEvents.RawArray.Length; i++)
+            {
+                PlayerJoinAcceptNetEvents.RawArray[i] = new PlayerJoinAcceptPacketS2C() {SimulationState = new SimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxCap.ConcurrentEvironmentWalls, maxCap.PointsInEvironmentWall)};
+            }
+
+            PlayerTakeDamageNetEvents = new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(maxCap.PlayerTakeDamageNetEvents);
+            BulletDestroyedNetEvents = new FixedUnorderedList<BulletDestroyedNetEventS2C>(maxCap.BulletDestroyedNetEvents);
         }
+        
+        // public FullTickPacket(int tick, SimulationStateS2C previousSimulationState,
+        //     SimulationStateS2C currentSimulationState, List<BulletSpawnNetEventS2C> bulletSpawnNetEvents,
+        //     List<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, List<PlayerTakeDamageNetEventS2C> playerTakeDamageNetEvents,
+        //     List<BulletDestroyedNetEventS2C> bulletDestroyedNetEvents)
+        // {
+        //     Tick = tick;
+        //     //PreviousSimulationState = previousSimulationState;
+        //     CurrentSimulationState = currentSimulationState;
+        //     BulletSpawnNetEvents = bulletSpawnNetEvents;
+        //     PlayerJoinAcceptNetEvents = playerJoinAcceptNetEvents;
+        //     PlayerTakeDamageNetEvents = playerTakeDamageNetEvents;
+        //     BulletDestroyedNetEvents = bulletDestroyedNetEvents;
+        // }
 
         public void Serialize(NetDataWriter writer)
         {
@@ -51,134 +63,82 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             DeserializedPlayerTakeDamageEvents(reader);
             DeserializedBulletDestroyedEvents(reader);
         }
-        
+
         private void SerializedPlayerTakeDamageEvents(NetDataWriter writer)
         {
-            if (PlayerTakeDamageNetEvents.IsNullOrEmpty())
+            writer.Put((byte) PlayerTakeDamageNetEvents.Count);
+            foreach (var playerTakeDamageEvent in PlayerTakeDamageNetEvents.AsSpan())
             {
-                writer.Put((byte)0);
-            }
-            else
-            {
-                writer.Put((byte)PlayerTakeDamageNetEvents.Count);
-                foreach (var playerTakeDamageEvent in PlayerTakeDamageNetEvents)
-                {
-                    playerTakeDamageEvent.Serialize(writer);
-                }
+                playerTakeDamageEvent.Serialize(writer);
             }
         }
 
         private void DeserializedPlayerTakeDamageEvents(NetDataReader reader)
         {
+            PlayerTakeDamageNetEvents.Clear();
             var playerTakeDamageEventsCount = reader.GetByte();
-            if (playerTakeDamageEventsCount > 0)
+            for (var i = 0; i < playerTakeDamageEventsCount; i++)
             {
-                var array = new PlayerTakeDamageNetEventS2C[playerTakeDamageEventsCount];
-                for (var i = 0; i < playerTakeDamageEventsCount; i++)
-                {
-                    array[i].Deserialize(reader);
-                }
-                
-                PlayerTakeDamageNetEvents = array.ToList();
+                PlayerTakeDamageNetEvents.AddAndGet().Deserialize(reader);
             }
         }
 
         private void SerializedBulletDestroyedEvents(NetDataWriter writer)
         {
-            if (BulletDestroyedNetEvents.IsNullOrEmpty())
+            writer.Put((byte) BulletDestroyedNetEvents.Count);
+            foreach (var bulletDestroyedEvent in BulletDestroyedNetEvents.AsSpan())
             {
-                writer.Put((byte)0);
-            }
-            else
-            {
-                writer.Put((byte)BulletDestroyedNetEvents.Count);
-                foreach (var bulletDestroyedEvent in BulletDestroyedNetEvents)
-                {
-                    bulletDestroyedEvent.Serialize(writer);
-                }
+                bulletDestroyedEvent.Serialize(writer);
             }
         }
 
         private void DeserializedBulletDestroyedEvents(NetDataReader reader)
         {
+            BulletDestroyedNetEvents.Clear();
             var bulletDestroyedEventsCount = reader.GetByte();
-            if (bulletDestroyedEventsCount > 0)
+            for (var i = 0; i < bulletDestroyedEventsCount; i++)
             {
-                var array = new BulletDestroyedNetEventS2C[bulletDestroyedEventsCount];
-                for (var i = 0; i < bulletDestroyedEventsCount; i++)
-                {
-                    array[i].Deserialize(reader);
-                }
-                
-                BulletDestroyedNetEvents = array.ToList();
+                BulletDestroyedNetEvents.AddAndGet().Deserialize(reader);
             }
         }
-        
+
         private void SerializedPlayerJoinedEvents(NetDataWriter writer)
         {
-            if (PlayerJoinAcceptNetEvents.IsNullOrEmpty())
+            writer.Put((byte) PlayerJoinAcceptNetEvents.Count);
+            foreach (var playerJoinAcceptNetEvent in PlayerJoinAcceptNetEvents.AsSpan())
             {
-                writer.Put((byte)0);
-            }
-            else
-            {
-                writer.Put((byte)PlayerJoinAcceptNetEvents.Count);
-                foreach (var playerJoinAcceptNetEvent in PlayerJoinAcceptNetEvents)
-                {
-                    playerJoinAcceptNetEvent.Serialize(writer);
-                }
+                playerJoinAcceptNetEvent.Serialize(writer);
             }
         }
 
         private void DeserializedPlayerJoinedEvents(NetDataReader reader)
         {
+            PlayerJoinAcceptNetEvents.Clear();
             var playerJoinedNetEventsCount = reader.GetByte();
-            if (playerJoinedNetEventsCount > 0)
+            for (var i = 0; i < playerJoinedNetEventsCount; i++)
             {
-                var array = new PlayerJoinAcceptPacketS2C[playerJoinedNetEventsCount];
-                for (var i = 0; i < playerJoinedNetEventsCount; i++)
-                {
-                    array[i].Deserialize(reader);
-                }
-
-                PlayerJoinAcceptNetEvents = array.ToList();
+                ref var playerJoinAcceptPacket = ref PlayerJoinAcceptNetEvents.AddAndGet();
+                playerJoinAcceptPacket.Deserialize(reader);
             }
         }
-        
+
         private void SerializedBulletSpawnedEvents(NetDataWriter writer)
         {
-            if (BulletSpawnNetEvents.IsNullOrEmpty())
+            var bulletSpawnedAmount = BulletSpawnNetEvents.Count;
+            writer.Put((byte) bulletSpawnedAmount);
+            foreach (var bulletSpawnEvent in BulletSpawnNetEvents.AsSpan())
             {
-                writer.Put((byte)0);
-            }
-            else
-            {
-                var bulletSpawnedAmount = BulletSpawnNetEvents.Count;
-                if (bulletSpawnedAmount > 255)
-                {
-                    LogService.LogError($"Too many bullet were spawned! Amount {bulletSpawnedAmount}");
-                }
-            
-                writer.Put((byte)bulletSpawnedAmount);
-                foreach (var bulletSpawnEvent in BulletSpawnNetEvents)
-                {
-                    bulletSpawnEvent.Serialize(writer);
-                }
+                bulletSpawnEvent.Serialize(writer);
             }
         }
 
         private void DeserializedBulletSpawnedEvents(NetDataReader reader)
         {
+            BulletSpawnNetEvents.Clear();
             var bulletSpawnNetEventsCount = reader.GetByte();
-            if (bulletSpawnNetEventsCount > 0)
+            for (var i = 0; i < bulletSpawnNetEventsCount; i++)
             {
-                var bulletSpawnNetEventsArray = new BulletSpawnNetEventS2C[bulletSpawnNetEventsCount];
-                for (int i = 0; i < bulletSpawnNetEventsCount; i++)
-                {
-                    bulletSpawnNetEventsArray[i].Deserialize(reader);
-                }
-
-                BulletSpawnNetEvents = bulletSpawnNetEventsArray.ToList();
+                BulletSpawnNetEvents.AddAndGet().Deserialize(reader);
             }
         }
     }

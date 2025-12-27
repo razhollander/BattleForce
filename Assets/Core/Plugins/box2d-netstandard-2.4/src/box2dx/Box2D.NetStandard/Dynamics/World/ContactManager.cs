@@ -55,7 +55,7 @@ namespace Box2D.NetStandard.Dynamics.World
             m_broadPhase = new BroadPhase();
         }
 
-        internal void Destroy(Contact c)
+        internal void Destroy(Contact c) 
         {
             Fixture fixtureA = c.FixtureA;
             Fixture fixtureB = c.FixtureB;
@@ -115,7 +115,8 @@ namespace Box2D.NetStandard.Dynamics.World
                 bodyB.m_contactList = c.m_nodeB.next;
             }
 
-            // provided all the above removes all references, it'll be picked up by the GC
+            // todo pool this
+            // provided all the above removes all references, it'll be picked up by the GC 
 
             --m_contactCount;
         }

@@ -29,11 +29,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             var isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
             var isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
             var isShootInputPressed = _gameInputActionsController.IsShootInputPressed();
-#if Logs
             LogService.LogTopic(
                 $"Sending: isMoveRightInputPressed:{isMoveRightInputPressed},isMoveLeftInputPressed:{isMoveLeftInputPressed},isShootInputPressed:{isShootInputPressed}",
                 LogTopicType.ClientNetwork);
-#endif
             var playerInputPacket = new PlayerInputPacketC2S
             {
                 Tick = _tickProcessor.CurrentTick,

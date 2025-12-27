@@ -66,12 +66,14 @@ public sealed class FixedUnorderedList<T>
             throw new InvalidOperationException($"FixedList<{typeof(T).Name}> is full (Capacity={Capacity}).");
 
         int index = _count++;
-        _items[index] = default;  // optional, safety
         return ref _items[index];
     }
     
     public ref T GetByIndex(int index)
     {
+        if (_count >= _items.Length)
+            throw new InvalidOperationException($"FixedList<{typeof(T).Name}> is full (Capacity={Capacity}).");
+        
         return ref _items[index];
     }
 
@@ -111,8 +113,8 @@ public sealed class FixedUnorderedList<T>
         if (index != _count)
             _items[index] = _items[_count];
 
-        if (clearReferences && RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-            _items[_count] = default;
+        // if (clearReferences && RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+        //     _items[_count] = default;
     }
 
     /// <summary>
@@ -124,7 +126,7 @@ public sealed class FixedUnorderedList<T>
     /// <summary>
     /// Returns the raw internal array (do NOT modify beyond Count).
     /// </summary>
-    //public T[] RawArray => _items;
+    public T[] RawArray => _items;
 
     // ---------- Non-alloc enumeration ----------
     //public Enumerator GetEnumerator() => new Enumerator(_items, _count);

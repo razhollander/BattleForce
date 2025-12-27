@@ -68,13 +68,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             /*_writer.Reset();
             _writer.Put((byte)type);
             packet.Serialize(_writer);*/
-#if Logs
             LogService.LogTopic($"Send packet type {type}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
-#endif
             _peerPerPlayerId.ForEach(x => _packetProcessor.SendNetSerializable(x.Value, packet, deliveryMethod));
         }
         
-        public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C packetType, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
         {
             if (_peerPerPlayerId == null || !_peerPerPlayerId.TryGetValue(playerId, out var peer))
             {
@@ -82,10 +80,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 return;
             }
 
-#if Logs
-            LogService.LogTopic($"Send packet type {type} to player {playerId}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
-#endif
-            _packetProcessor.SendNetSerializable(peer, packet, deliveryMethod);
+            LogService.LogTopic($"Send packet type {packetType} to player {playerId}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
+            _packetProcessor.SendNetSerializable((byte)packetType, peer, packet, deliveryMethod);
         }
         
         // public void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new()

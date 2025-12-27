@@ -100,8 +100,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller.Utils
 
             _count--;
 
-            if (clearReferences && RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-                _items[_count] = default;
+            // if (clearReferences && RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+            //     _items[_count] = default;
         }
 
         /// <summary>

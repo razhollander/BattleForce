@@ -7,11 +7,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public ushort MaxHealth;
         public ushort CurrentHealth;
 
-        public PlayerHealthS2C(ushort maxHealth) : this()
-        {
-            MaxHealth = maxHealth;
-            CurrentHealth = MaxHealth;
-        }
+        // public PlayerHealthS2C(ushort maxHealth) : this()
+        // {
+        //     MaxHealth = maxHealth;
+        //     CurrentHealth = MaxHealth;
+        // }
 
         public void Serialize(NetDataWriter writer)
         {

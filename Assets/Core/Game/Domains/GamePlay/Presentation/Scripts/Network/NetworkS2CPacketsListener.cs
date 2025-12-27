@@ -5,13 +5,14 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
-    public class NetworkS2CPacketsBroadcaster : INetEventListener
+    public class NetworkS2CPacketsListener : INetEventListener
     {
         private readonly NetPacketProcessor _packetProcessor;
         
@@ -19,12 +20,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         public event Action<NetPeer> OnPeerConnected;
         public event Action<NetPeer, DisconnectInfo> OnPeerDisconnected;
         //public event Action<JoinAcceptPacketS2C> OnPlayerJoinedAccepted;
-        private readonly CapacityDict<PacketTypeC2S, IPacketsObserver> _packetsObservers;
+        private readonly CapacityDict<PacketTypeS2C, IPacketsObserver> _packetsObservers;
 
-        public NetworkS2CPacketsBroadcaster(NetPacketProcessor packetProcessor)
+        public NetworkS2CPacketsListener(NetPacketProcessor packetProcessor, NetworkConfig networkConfig)
         {
             _packetProcessor = packetProcessor;
             RegisterAutoSerializedTypes();
+            _packetsObservers = new CapacityDict<PacketTypeS2C, IPacketsObserver>(networkConfig.MaxCap.PacketTypes);
+        }
+        
+        public void RegisterObserver(IPacketsObserver PacketsObserver)
+        {
+            _packetsObservers.Add(PacketsObserver.PacketType, PacketsObserver);
+        }
+        
+        public void UnregisterObserver(IPacketsObserver PacketsObserver)
+        {
+            _packetsObservers.Remove(PacketsObserver.PacketType);
         }
         
         private void RegisterAutoSerializedTypes()
@@ -32,30 +44,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _packetProcessor.RegisterNestedType<Vector2>((w, v) => w.Put(v), r => r.GetVector2());
         }
 
-        public void SubscribeNetSerializable<T, TUserData>(
-            Action<T, TUserData> onReceive) where T : INetSerializable, new()
-        {
-            _packetProcessor.SubscribeNetSerializable(onReceive);
-        }
-        
-        public void RemoveSubscription<T>()
-        {
-            _packetProcessor.RemoveSubscription<T>();
-        }
+        // public void SubscribeNetSerializable<T, TUserData>(
+        //     Action<T, TUserData> onReceive) where T : INetSerializable, new()
+        // {
+        //     _packetProcessor.SubscribeNetSerializable(onReceive);
+        // }
         
         void INetEventListener.OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
-#if Logs
+            var packetType = (PacketTypeS2C)reader.GetByte();
+            _packetsObservers[packetType].OnPacketReceived(reader);
             LogService.LogTopic($"OnNetworkReceive", LogTopicType.ClientNetwork);
-#endif
-            _packetProcessor.ReadAllPackets(reader);
+            //_packetProcessor.ReadAllPackets(reader);
         }
 
         void INetEventListener.OnPeerConnected(NetPeer peer)
         {
-#if Logs
             LogService.LogTopic("Player connected: " + peer.EndPoint, LogTopicType.ClientNetwork);
-#endif
             OnPeerConnected?.Invoke(peer);
         }
 
@@ -72,9 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         void INetEventListener.OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader,
             UnconnectedMessageType messageType)
         {
-#if Logs
             LogService.LogTopic("OnNetworkReceiveUnconnected", LogTopicType.ClientNetwork);
-#endif
         }
 
         void INetEventListener.OnNetworkLatencyUpdate(NetPeer peer, int latency)
@@ -84,9 +87,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         void INetEventListener.OnConnectionRequest(ConnectionRequest request)
         {
-#if Logs
             LogService.LogTopic("OnConnectionRequest", LogTopicType.ClientNetwork);
-#endif
             request.Reject();
         }
     }

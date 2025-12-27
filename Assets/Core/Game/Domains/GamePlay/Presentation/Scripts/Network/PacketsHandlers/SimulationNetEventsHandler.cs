@@ -39,17 +39,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _commandFactory = commandFactory;
         }
 
-        public void ProcessPlayerJoinedEvents(List<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
+        public void ProcessPlayerJoinedEvents(CapacityList<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
         {
             foreach (var playerJoinAcceptNetEvent in playerJoinAcceptNetEvents)
             {
                 var playerId = playerJoinAcceptNetEvent.PlayerState.Id;
                 var isLocalPlayer = playerJoinAcceptNetEvent.IsLocal;
-#if Logs
                 LogService.LogTopic(
                     $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerId,
                     LogTopicType.ClientNetwork);
-#endif
                 
                 if (isLocalPlayer)
                 {
@@ -79,7 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _clientPresentationTickProcessor.StartTick();
         }
         
-        public void ProcessBulletSpawnEvents(List<BulletSpawnNetEventS2C> bulletSpawnNetEvents)
+        public void ProcessBulletSpawnEvents(CapacityList<BulletSpawnNetEventS2C> bulletSpawnNetEvents)
         {
             if (bulletSpawnNetEvents.IsNullOrEmpty())
             {
@@ -94,7 +92,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             }
         }
 
-        public void ProcessPlayerTakeDamageEvents(List<PlayerTakeDamageNetEventS2C> playerTakeDamageEvents)
+        public void ProcessPlayerTakeDamageEvents(CapacityList<PlayerTakeDamageNetEventS2C> playerTakeDamageEvents)
         {
             if (playerTakeDamageEvents.IsNullOrEmpty())
             {
@@ -110,7 +108,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             }
         }
 
-        public void ProcessBulletDestroyedEvents(List<BulletDestroyedNetEventS2C> bulletDestroyedEvents)
+        public void ProcessBulletDestroyedEvents(CapacityList<BulletDestroyedNetEventS2C> bulletDestroyedEvents)
         {
             if (bulletDestroyedEvents.IsNullOrEmpty())
             {

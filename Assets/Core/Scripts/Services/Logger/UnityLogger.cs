@@ -1,8 +1,9 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
-using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace CoreDomain.Scripts.Services.Logger
 {
@@ -27,7 +28,7 @@ namespace CoreDomain.Scripts.Services.Logger
         {
             Debug.LogError(GetTimeStamp() + message);
         }
-
+        
         public override void LogException(Exception exception)
         {
             Debug.LogException(exception);

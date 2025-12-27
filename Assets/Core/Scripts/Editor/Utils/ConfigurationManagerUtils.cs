@@ -35,6 +35,27 @@ namespace Core.Scripts.Editor.Utils
             }
         }
 
+        public static void UpdateCompileDefines(List<string> addDefines, List<string> removeDefines)
+        {
+            foreach (var targetGroup in GetAllBuildTargetGroups())
+            {
+                var namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(targetGroup);
+                var defines = PlayerSettings.GetScriptingDefineSymbols(namedBuildTarget).Split(';').ToHashSet();
+        
+                foreach (var define in addDefines)
+                {
+                    defines.Add(define);
+                }
+
+                foreach (var define in removeDefines)
+                {
+                    defines.Remove(define);
+                }
+        
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, string.Join(";", defines));
+            }
+        }
+        
         public static void RemoveCompileDefine(string define)
         {
             foreach (var targetGroup in GetAllBuildTargetGroups())

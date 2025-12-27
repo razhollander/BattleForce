@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Core.Scripts.Network
@@ -5,8 +6,7 @@ namespace Core.Scripts.Network
     [CreateAssetMenu(fileName = "NetworkConfig", menuName = "BF/Network/Network Config")]
     public class NetworkConfig : ScriptableObject
     {
-        public int MaxConnectedPlayers = 8;
-        public int MaxConcurrentBullets = 256;
+        public MaxCap MaxCap;
         public int TicksPerSeconds = 60;
         public float DeltaTime = 1/60f;
         public int PhysicsVelocityIterations = 8;
@@ -15,5 +15,26 @@ namespace Core.Scripts.Network
         public int HostPort = 49153;
         public string IpAddress = "109.67.156.134";
         public string ConntectionKey = "BattleForceGame";
+    }
+
+    [Serializable]
+    public class MaxCap
+    {
+        public int ConcurrentPlayers = 8;
+        public int ConcurrentBullets = 256;
+        public int ConcurrentEvironmentWalls = 64;
+        public int PointsInEvironmentWall = 8;
+        public int PacketTypes = 256; // if one day this is changed to a bigger number, need to parse packet types as ushort instead of byte
+        
+        // packets receiived *all players combined*
+        public int PlayersInputsPackets = 24000; // 5 seconds of packets
+        public int JoinRequestPackets = 30; // 30 to stay on the same side, maybe should be ConcurrentPlayers
+        
+        // events received *per player*
+        public int FullTickPacketsNetEvents = 1000;
+        public int PlayerJoinAcceptNetEvents = 32;
+        public int PlayerTakeDamageNetEvents = 128;
+        public int BulletSpawnNetEvents = 512;
+        public int BulletDestroyedNetEvents = 512;
     }
 }

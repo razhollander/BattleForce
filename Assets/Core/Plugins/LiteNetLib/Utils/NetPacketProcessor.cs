@@ -133,7 +133,16 @@ namespace LiteNetLib.Utils
             WriteNetSerializable(_netDataWriter, packet);
             peer.Send(_netDataWriter, options);
         }
-
+        
+        public void SendNetSerializable<T>(byte packetType, NetPeer peer, T packet, DeliveryMethod options) where T : INetSerializable
+        {
+            _netDataWriter.Reset();
+            _netDataWriter.Put(packetType);
+            //WriteNetSerializable(_netDataWriter, packet);
+            packet.Serialize(_netDataWriter);
+            peer.Send(_netDataWriter, options);
+        }
+        
         public void Send<T>(NetManager manager, T packet, DeliveryMethod options) where T : class, new()
         {
             _netDataWriter.Reset();

@@ -1,5 +1,3 @@
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Scripts.Network;
 
@@ -18,9 +16,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         
         public void UpdateBulletsTransform()
         {
-            foreach (var bulletIndex in _matchDataService.SimulationState.Bullets.UsedIndices())
+            for (int i = 0; i < _matchDataService.SimulationState.Bullets.Count; i++)
             {
-                ref PlayerBulletS2C bulletState = ref _matchDataService.SimulationState.Bullets[bulletIndex];
+                ref var bulletState = ref _matchDataService.SimulationState.GetBulletByIndex(i);
                 bulletState.Position += bulletState.Velocity * _networkConfig.DeltaTime;
             }
         }

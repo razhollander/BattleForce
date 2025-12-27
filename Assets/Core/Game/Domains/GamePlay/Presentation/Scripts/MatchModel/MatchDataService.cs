@@ -21,9 +21,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
 
         public MatchDataService(NetworkConfig networkConfig)
         {
-            Players = new List<MatchPlayerModel>(networkConfig.MaxConnectedPlayers);
-            Bullets = new List<MatchPlayerBulletModel>(networkConfig.MaxConcurrentBullets);
-            EnvironmentWalls = new List<MatchEnvironmentWallModel>();
+            Players = new List<MatchPlayerModel>(networkConfig.MaxCap.ConcurrentPlayers);
+            Bullets = new List<MatchPlayerBulletModel>(networkConfig.MaxCap.ConcurrentBullets);
+            EnvironmentWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)

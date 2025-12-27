@@ -47,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         {
             var cachedCollisions = _physicsSimulator.GetCachedCollisions();
 
-            for (int i = 0; i < cachedCollisions.Count; i++) // this must stay for, since if we destroy and object an event 'ContactEnd' will be added
+            for (int i = 0; i < cachedCollisions.Count; i++) // this must stay for and not forearch, since if we destroy and object an event 'ContactEnd' will be added
             {
                 var collisionEvent = cachedCollisions[i];
                 if (collisionEvent.Type != PhysicsEventEventType.Begin)
@@ -74,30 +74,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 return;
             }
             
-            PlayerStateS2C playerModel;
+            ushort playerId;
             PlayerBulletS2C bulletModel;
             Body bulletBody;
 
             if (isPlayerToBulletCollision)
             {
-                playerModel = _matchDataService.GetPlayer(objectA.Id);
-                bulletModel = _matchDataService.GetBullet(objectB.Id);
+                playerId = objectA.Id;
+                bulletModel = _matchDataService.SimulationState.GetBulletById(objectB.Id);
                 bulletBody = contact.FixtureB.Body;
             }
             else
             {
-                playerModel = _matchDataService.GetPlayer(objectB.Id);
-                bulletModel = _matchDataService.GetBullet(objectA.Id);
+                playerId = objectB.Id;
+                bulletModel = _matchDataService.SimulationState.GetBulletById(objectA.Id);
                 bulletBody = contact.FixtureA.Body;
             }
 
             _playerHitCommand
-                .SetPlayerId(playerModel.Id)
+                .SetPlayerId(playerId)
                 .SetHitDamage(_gamePlayConfig.PlayerBullet.HitDamage)
                 .SetProcessedTick(_processedTick)
                 .Execute();
             
-            _matchDataService.RemoveBullet(bulletModel.Id);
+            _matchDataService.SimulationState.RemoveBulletById(bulletModel.Id);
             _physicsSimulator.RemoveBody(bulletBody);
             Debug.Log($"Bullet destroyed! {bulletModel.Id}");
             _matchNetEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
@@ -112,19 +112,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             {
                 return;
             }
-            
-            PlayerStateS2C playerModel = default;
-            Body playerBody = default;
 
-            if (isPlayerToWallCollision)
-            {
-                playerModel = _matchDataService.GetPlayer(objectA.Id);
-            }
-            else if (isWallToPlayerCollision)
-            {
-                playerModel = _matchDataService.GetPlayer(objectB.Id);
-            }
-
+            ref var playerModel = ref GetPlayerFromCollision(objectA, objectB, isPlayerToWallCollision, isWallToPlayerCollision);
             var relativeVelocity = playerModel.Spaceship.Transform.Velocity;
             contact.GetWorldManifold(out var worldManifold);
             var collisionNormal = worldManifold.normal;
@@ -134,8 +123,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0
                 ? System.Numerics.Vector2.Normalize(reflectedVelocity)
                 : System.Numerics.Vector2.Zero;
+        }
 
-            _matchDataService.SetPlayer(playerModel.Id, playerModel);
+        private ref PlayerStateS2C GetPlayerFromCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, bool isPlayerToWallCollision, bool isWallToPlayerCollision)
+        {
+            if (isPlayerToWallCollision)
+            {
+                return ref _matchDataService.SimulationState.GetPlayerById(objectA.Id);
+            }
+            if (isWallToPlayerCollision)
+            {
+                return ref _matchDataService.SimulationState.GetPlayerById(objectB.Id);
+            }
+            
+            throw new System.Exception("No collision!");
         }
     }
 }
