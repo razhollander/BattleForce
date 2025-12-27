@@ -1,8 +1,11 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using Core.Game.Domains.GamePlay.Shared.C2SModels;
+using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using Core.Scripts.Network;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -10,36 +13,63 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
-    public class NetworkC2SPacketsListener : INetEventListener
+    public class NetworkC2SPacketsBroadcaster : INetEventListener
     {
         private readonly NetworkConfig _networkConfig;
         private NetManager _netManager;
-        private NetPacketProcessor _packetProcessor;
+
+        private readonly CapacityDict<PacketTypeC2S, IPacketsObserver> _packetsObservers;
 
         // public event Action<PlayerKeyInputsC2S, ushort> PlayerInputReceivedEvent;
         // public event Action<JoinRequestPacketC2S, ushort> PlayerJoinReceivedEvent;
 
-        public NetworkC2SPacketsListener(NetPacketProcessor packetProcessor, NetworkConfig networkConfig)
+        public NetworkC2SPacketsBroadcaster(NetworkConfig networkConfig)
         {
             _networkConfig = networkConfig;
-            _packetProcessor = packetProcessor;
-            RegisterAutoSerializedTypes();
+            _packetsObservers = new CapacityDict<PacketTypeC2S, IPacketsObserver>(networkConfig.MaxCap.PacketTypes);
         }
 
-        private void RegisterAutoSerializedTypes()
+        public void RegisterObserver(IPacketsObserver PacketsObserver)
         {
-            _packetProcessor.RegisterNestedType((w, v) => w.Put(v), r => r.GetVector2());
+            _packetsObservers.Add(PacketsObserver.PacketType, PacketsObserver);
         }
-
+        
+        public void UnregisterObserver(IPacketsObserver PacketsObserver)
+        {
+            _packetsObservers.Remove(PacketsObserver.PacketType);
+        }
+        
         void INetEventListener.OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
+            var packetType = (PacketTypeC2S)reader.GetByte();
+            _packetsObservers[packetType].OnPacketReceived(reader, peer);
+            // switch (packetType)
+            // {
+            //     case PacketTypeC2S.PlayerInput:
+            //         
+            //         break;
+            //     case PacketType.ServerState:
+            //         _cachedServerState.Deserialize(reader);
+            //         OnServerState();
+            //         break;
+            //     case PacketType.Serialized:
+            //         _packetProcessor.ReadAllPackets(reader);
+            //         break;
+            //     case PacketType.Shoot:
+            //         _cachedShootData.Deserialize(reader);
+            //         OnShoot();
+            //         break;
+            //     default:
+            //         Debug.Log("Unhandled packet: " + packetType);
+            //         break;
+            // }
             //string time = DateTime.Now.ToString("HH:mm:ss.fff");
 
             // Debug.Log($"{time} OnNetworkReceive!  {deliveryMethod.ToString()}");
 #if Logs
             LogService.LogTopic($"OnNetworkReceive!  {deliveryMethod.ToString()}", LogTopicType.ServerNetwork);
 #endif
-            _packetProcessor.ReadAllPackets(reader, peer);
+            //_packetProcessor.ReadAllPackets(reader, peer);
 
             // var packetTypeByte = reader.GetByte();
             // var packetType = (PacketTypeC2S) packetTypeByte;

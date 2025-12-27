@@ -2,6 +2,8 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
@@ -9,7 +11,7 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
-    public class NetworkS2CPacketsListener : INetEventListener
+    public class NetworkS2CPacketsBroadcaster : INetEventListener
     {
         private readonly NetPacketProcessor _packetProcessor;
         
@@ -17,8 +19,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         public event Action<NetPeer> OnPeerConnected;
         public event Action<NetPeer, DisconnectInfo> OnPeerDisconnected;
         //public event Action<JoinAcceptPacketS2C> OnPlayerJoinedAccepted;
+        private readonly CapacityDict<PacketTypeC2S, IPacketsObserver> _packetsObservers;
 
-        public NetworkS2CPacketsListener(NetPacketProcessor packetProcessor)
+        public NetworkS2CPacketsBroadcaster(NetPacketProcessor packetProcessor)
         {
             _packetProcessor = packetProcessor;
             RegisterAutoSerializedTypes();

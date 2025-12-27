@@ -54,10 +54,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         public Dictionary<ushort, PlayerInputPacketC2S> ProcessInputs(int processedTick)
         {
             var earliestInputPerPlayers = PopEarliestInputsOfEachPlayer();            
-            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
-                var player = _matchDataService.SimulationState.Players[i];
-                var playerId = player.Id;
+                ref var playerState = ref _matchDataService.SimulationState.GetPlayerByIndex(i);
+                var playerId = playerState.Id;
                 if (!earliestInputPerPlayers.ContainsKey(playerId))
                 {
 #if Logs
@@ -67,10 +67,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 }
 
                 var playerInputPacket = earliestInputPerPlayers[playerId];
-                var playerModel = _matchDataService.GetPlayer(playerId);
-                UpdatePlayerDirection(playerInputPacket, ref playerModel);
-                UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, ref playerModel);
-                _matchDataService.SetPlayer(playerId, playerModel);
+                UpdatePlayerDirection(playerInputPacket, ref playerState);
+                UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, ref playerState);
                 _cachedLastProcessedInput[playerId] = playerInputPacket;
             }
             
@@ -158,7 +156,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         {
             var earliestInputsPerPlayer = new Dictionary<ushort, PlayerInputPacketC2S>();
 
-            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
                 var playerState = _matchDataService.SimulationState.Players[i];
                 var playerId = playerState.Id;
@@ -197,7 +195,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         {
             var exceptLastInputsPerPlayer = new Dictionary<ushort, List<PlayerInputPacketC2S>>();
 
-            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
                 var playerState = _matchDataService.SimulationState.Players[i];
                 var playerId = playerState.Id;
@@ -237,7 +235,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         {
             var earliestInputsPerPlayer = new Dictionary<ushort, PlayerInputPacketC2S>();
 
-            for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
+            for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
                 var playerState = _matchDataService.SimulationState.Players[i];
                 var playerId = playerState.Id;

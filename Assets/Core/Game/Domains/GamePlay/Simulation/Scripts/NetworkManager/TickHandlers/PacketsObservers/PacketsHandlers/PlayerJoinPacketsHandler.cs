@@ -47,26 +47,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         public void ProcessPlayersJoined(int processedTick)
         {
             var startingDirection = new Vector2(0, 1);
+            var velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
+            var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
+            var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
+            var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
+            var position = Vector2.One;
             foreach (var kvp in _playerJoinedPacketsPerPeer)
             {
-                var playerTransform = new PlayerTransformStateS2C
-                {
-                    Acceleration = Vector2.Zero,
-                    AimVector = Vector2.Zero,
-                    AngularVelocity = 0,
-                    Position = Vector2.One,
-                    Direction = startingDirection,
-                    Velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.MovementSpeed,
-                    Radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius
-                };
+                //var playerTransform = new PlayerTransformStateS2C
+                // {
+                //     Acceleration = Vector2.Zero,
+                //     AimVector = Vector2.Zero,
+                //     AngularVelocity = 0,
+                //     Position = Vector2.One,
+                //     Direction = startingDirection,
+                //     Velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.MovementSpeed,
+                //     Radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius
+                // };
 
                 var playerName = kvp.Value.UserName;
-                var playerState = _matchDataService.AddPlayer(playerName, playerTransform,
-                    _gamePlayConfig.PlayerSpaceship.StartHealth, _gamePlayConfig.PlayerSpaceship.ShootCooldown);
+                ref var playerState = ref _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, health, shootCooldown);
                 var playerId = playerState.Id;
                 var peer = kvp.Key;
                 peer.Tag = playerId;
-                _physicsSimulator.AddPlayer(playerId, playerState.TeamId, playerTransform.Position, playerTransform.Direction, playerTransform.Radius);
+                _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius);
                 _networkManager.AddPlayerPeer(playerId, peer);
                 _matchNetEventsDataService.StartSavingPlayerEvents(playerId);
                 _matchNetEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);

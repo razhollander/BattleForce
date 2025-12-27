@@ -1,5 +1,5 @@
 using System;
-using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;using CoreDomain.Scripts.Helpers.Pools;
 
 /// <summary>
 /// A fixed-capacity, non-alloc list backed by a constant-size array.
@@ -59,6 +59,22 @@ public sealed class FixedUnorderedList<T>
         _items[_count++] = item;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ref T AddAndGet()
+    {
+        if (_count >= _items.Length)
+            throw new InvalidOperationException($"FixedList<{typeof(T).Name}> is full (Capacity={Capacity}).");
+
+        int index = _count++;
+        _items[index] = default;  // optional, safety
+        return ref _items[index];
+    }
+    
+    public ref T GetByIndex(int index)
+    {
+        return ref _items[index];
+    }
+
     // /// <summary>
     // /// Adds an item if there is space, returns false if full (no exception).
     // /// </summary>
@@ -83,29 +99,11 @@ public sealed class FixedUnorderedList<T>
     }
 
     /// <summary>
-    /// Removes element at index by shifting everything left (preserves order).
-    /// O(n).
-    /// </summary>
-    public void RemoveAt(int index, bool clearReferences = false)
-    {
-        if ((uint)index >= (uint)_count) throw new ArgumentOutOfRangeException(nameof(index));
-
-        int moveCount = _count - index - 1;
-        if (moveCount > 0)
-            Array.Copy(_items, index + 1, _items, index, moveCount);
-
-        _count--;
-
-        if (clearReferences && RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-            _items[_count] = default;
-    }
-
-    /// <summary>
     /// Removes element at index by swapping with last (does NOT preserve order).
     /// O(1).
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void RemoveAtSwapBack(int index, bool clearReferences = false)
+    public void RemoveAt(int index, bool clearReferences = false)
     {
         if ((uint)index >= (uint)_count) throw new ArgumentOutOfRangeException(nameof(index));
 
