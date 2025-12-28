@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             var playerInputPacket = new PlayerInputPacketC2S
             {
                 Tick = _tickProcessor.CurrentTick,
-                LastProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer,
+                HeighestProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer,
                 IsMoveLeftInputPressed = isMoveLeftInputPressed,
                 IsMoveRightInputPressed = isMoveRightInputPressed,
                 IsShootInputPressed = isShootInputPressed

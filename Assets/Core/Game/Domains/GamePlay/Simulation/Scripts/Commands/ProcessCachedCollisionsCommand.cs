@@ -99,7 +99,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             
             _matchDataService.SimulationState.RemoveBulletById(bulletModel.Id);
             _physicsSimulator.RemoveBody(bulletBody);
-            Debug.Log($"Bullet destroyed! {bulletModel.Id}");
+            LogService.LogError($"Bullet destroyed! {bulletModel.Id}");
             _matchNetEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
         }
 

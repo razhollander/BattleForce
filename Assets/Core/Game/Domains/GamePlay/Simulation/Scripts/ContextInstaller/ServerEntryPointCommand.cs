@@ -4,7 +4,7 @@ using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using CoreDomain.Scripts.Services.CommandFactory;
 

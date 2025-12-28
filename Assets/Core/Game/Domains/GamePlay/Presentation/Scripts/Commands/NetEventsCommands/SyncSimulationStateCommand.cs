@@ -50,9 +50,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
         {
             foreach (var bulletState in _simulationState.Bullets.AsSpan())
             {
-                _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId,
-                    bulletState.Position, bulletState.Radius);
-                _bulletControllers.CreateBullet(bulletState.Id);
+                _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Position, bulletState.Radius);
+                _bulletControllers.CreateBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Radius, bulletState.Position);
             }
         }
 

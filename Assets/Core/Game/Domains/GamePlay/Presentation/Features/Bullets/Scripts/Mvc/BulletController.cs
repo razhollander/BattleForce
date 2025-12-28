@@ -22,13 +22,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
              BulletId = bulletId;
          }
 
-         public void CreateBulletView(BulletView bulletViewPrefab, Transform parent)
+         public void CreateBulletView(BulletView bulletViewPrefab, System.Numerics.Vector2 position, float radius, Transform parent)
         {
-            var bulletModel = _matchDataService.GetBullet(BulletId);
             _bulletView = Object.Instantiate(bulletViewPrefab, parent);
             _bulletView.name = "Bullet_" + BulletId;
-            _bulletView.SetPosition(bulletModel.Position.ToUnity());
-            _bulletView.SetRadius(bulletModel.Radius);
+            _bulletView.SetPosition(position.ToUnity());
+            _bulletView.SetRadius(radius);
         }
 
         public void InterpolatePosition(float interpolationFactor)

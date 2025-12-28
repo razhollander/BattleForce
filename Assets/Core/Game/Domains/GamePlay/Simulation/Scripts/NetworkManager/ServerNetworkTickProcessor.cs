@@ -9,11 +9,12 @@ using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -96,12 +97,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
                 var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
                 _networkManager.PollEvents();
-                ProcessPackets(processedTick);
+                var processPlayersInputsResult = ProcessPackets(processedTick);
                 ApplyMatchModelToPhysicsSimulation();
                 _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
                 _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
                 ApplyPhysicsSimulationToMatchModel();
-                 RemoveOlderThanTickEventsPerPlayer(processedTick);
+                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                  SendCurrentTickStateToAllClients(processedTick);
                  //_matchDataService.CopySimulationStateIntoPrevious();
             }
@@ -132,18 +133,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             _physicsSimulator.CopyDataToSimulation(_matchDataService.SimulationState);
         }
 
-        private void ProcessPackets(int processedTick)
+        private ProcessPlayersInputsResult ProcessPackets(int processedTick)
         {
             _playerJoinPacketsHandler.ProcessPlayersJoined(processedTick);
-            _playerInputsPacketsHandler.ProcessInputs(processedTick);
+            return _playerInputsPacketsHandler.ProcessInputs(processedTick);
         }
 
-        private void RemoveOlderThanTickEventsPerPlayer(int processedTick)
+        private void RemoveOlderThanTickEventsPerPlayer(CapacityDict<ushort, int> heighestProcessedTickPerPlayer)
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())        
             {
                 var playerId = playerState.Id;
-                _matchNetEventsDataService.RemoveAllEventsOlderThanTick(playerId, processedTick);
+
+                if (heighestProcessedTickPerPlayer.TryGetValue(playerId, out int tickOfPlayer))
+                {
+                    _matchNetEventsDataService.RemoveAllEventsOlderThanTick(playerId, tickOfPlayer);
+                }
             }
         }
 

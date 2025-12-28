@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Scripts.Extensions.Linq;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using Sirenix.Utilities;
@@ -32,11 +33,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
                 return;
             }
             
+            //var areAnyBulletsDestroyed = !_matchNetEventsDataService.BulletDestroyedNetEvents.IsNullOrEmpty();
             foreach (var bulletsSpawnEvent in bulletsSpawnEvents)
             {
-                var bulletState = _matchDataService.GetBullet(bulletsSpawnEvent.BulletId);
-                _bulletControllers.CreateBullet(bulletState.Id);
-                _playerControllers.ShootBulletEffectForPlayer(bulletState.BelongToPlayerId);
+                var bulletId = bulletsSpawnEvent.BulletId;
+                //var isBulletDestroyed = areAnyBulletsDestroyed && _matchNetEventsDataService.BulletDestroyedNetEvents.Any(x => x.BulletId == bulletId);
+                //if (!isBulletDestroyed)
+                //{
+                    _bulletControllers.CreateBullet(bulletId, bulletsSpawnEvent.BelongToPlayerId, bulletsSpawnEvent.BulletRadius, bulletsSpawnEvent.Position);
+                //}
+                
+                _playerControllers.ShootBulletEffectForPlayer(bulletsSpawnEvent.BelongToPlayerId);
             }
             
             bulletsSpawnEvents.Clear();

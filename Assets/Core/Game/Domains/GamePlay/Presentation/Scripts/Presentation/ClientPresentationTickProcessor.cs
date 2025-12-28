@@ -12,6 +12,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
         private readonly IPlayerControllers _playerControllers;
         private readonly ICommandFactory _commandFactory;
         private readonly IBulletControllers _bulletControllers;
+        private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
+        private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
+        private readonly HandleBulletDestroyedNetEventsCommand _handleBulletDestroyedNetEventsCommand;
 
         public ClientPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IPlayerControllers playerControllers, ICommandFactory commandFactory, IBulletControllers bulletControllers)
         {
@@ -19,6 +22,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
             _playerControllers = playerControllers;
             _bulletControllers = bulletControllers;
             _commandFactory = commandFactory;
+            _handleBulletSpawnNetEventsCommand = _commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
+            _handlePlayerTakeDamangeNetEventsCommand = _commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
+            _handleBulletDestroyedNetEventsCommand = _commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>();
         }
         
         public void StartTick()
@@ -33,9 +39,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
 
         public void ManagedUpdate()
         {
-            _commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>().Execute();
-            _commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>().Execute();
-            _commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>().Execute();
+            _handleBulletSpawnNetEventsCommand.Execute();
+            _handlePlayerTakeDamangeNetEventsCommand.Execute();
+            _handleBulletDestroyedNetEventsCommand.Execute();
+         
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();

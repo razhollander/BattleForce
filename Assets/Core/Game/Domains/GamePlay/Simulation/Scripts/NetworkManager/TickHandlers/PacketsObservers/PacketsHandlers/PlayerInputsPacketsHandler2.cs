@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
@@ -7,7 +6,6 @@ using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
@@ -15,9 +13,8 @@ using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
-using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsHandlers
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers
 {
     public class PlayerInputsPacketsHandler : IPlayerInputsPacketsHandler
     {
@@ -36,9 +33,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly CapacityDict<ushort, List<PlayerInputPacketC2S>> _inputsPerPlayer; //= new();
         private readonly CapacityDict<ushort, PlayerInputPacketC2S> _lastProcessedInputPerPlayer; //= new ();
         private readonly ConcurrentPool<PlayerInputPacketC2S> _playerInputPacketsPool;
-        private readonly CapacityDict<ushort,PlayerInputPacketC2S> _cachedEarliestInputsPerPlayer;
         private readonly ConcurrentPool<List<PlayerInputPacketC2S>> _inputsListsPool;
-
+        private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         public PlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator)
         {
@@ -48,11 +44,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             _networkConfig = networkConfig;
             _matchNetEventsDataService = matchNetEventsDataService;
             _physicsSimulator = physicsSimulator;
+            _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, PlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
-            _cachedEarliestInputsPerPlayer = new CapacityDict<ushort, PlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _inputsPerPlayer = new CapacityDict<ushort, List<PlayerInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
             var inputPacketsSavedPerPlayer = networkConfig.MaxCap.PlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
-            _inputsListsPool = new ConcurrentPool<List<PlayerInputPacketC2S>>(() => new List<PlayerInputPacketC2S>(inputPacketsSavedPerPlayer), networkConfig.MaxCap.ConcurrentPlayers);
+            _inputsListsPool = new ConcurrentPool<List<PlayerInputPacketC2S>>(() => new List<PlayerInputPacketC2S>(inputPacketsSavedPerPlayer), networkConfig.MaxCap.PlayersInputsPackets);
             _playerInputPacketsPool = new ConcurrentPool<PlayerInputPacketC2S>(() => new PlayerInputPacketC2S(), networkConfig.MaxCap.PlayersInputsPackets);
         }
 
@@ -66,9 +62,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             _networkManager.UnregisterPacketsObserver(this);
         }
         
-        public CapacityDict<ushort, PlayerInputPacketC2S> ProcessInputs(int processedTick)
+        public ProcessPlayersInputsResult ProcessInputs(int processedTick)
         {
-            var earliestInputPerPlayers = PopEarliestInputsOfEachPlayer();            
+            _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
+            _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
+            return _cachedProcessPlayersInputsResult;
+        }
+
+        private CapacityDict<ushort, PlayerInputPacketC2S> ProcessEarliestInputPerPlayers(int processedTick)
+        {
+            var earliestInputPerPlayers = PopEarliestInputsOfEachPlayer();
+
             for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
                 ref var playerState = ref _matchDataService.SimulationState.GetPlayerByIndex(i);
@@ -89,10 +93,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 }
                 _lastProcessedInputPerPlayer[playerId] = playerInputPacket;
             }
-            
+
             return earliestInputPerPlayers;
         }
-//         public Dictionary<ushort, PlayerInputPacketC2S> ProcessInputs(int processedTick)
+
+        private CapacityDict<ushort, int> GetHeighestProcessedTickFromServerPerPlayer()
+        {
+            _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.Clear();
+            
+            foreach (var inputsOfPlayer in _inputsPerPlayer)
+            {
+                _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.Add(inputsOfPlayer.Key, inputsOfPlayer.Value.Max(input => input.HeighestProcessedTickFromServer));
+            }
+            
+            return _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer;
+        }
+
+        //         public Dictionary<ushort, PlayerInputPacketC2S> ProcessInputs(int processedTick)
 //         {
 //             var earliestInputPerPlayers = PopExceptLastInputsOfEachPlayer();//PopEarliestInputsOfEachPlayer();            
 //             for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
@@ -248,7 +265,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         
         private CapacityDict<ushort, PlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()
         {
-            _cachedEarliestInputsPerPlayer.Clear();
+            _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.Clear();
+            _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Clear();
 
             for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
@@ -280,10 +298,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 //     string time = DateTime.Now.ToString("HH:mm:ss.fff");
                 //     Debug.Log($"{time} Shoot processed!! earliestPlayerInput:{earliestPlayerInput.ToJson()}, {amountOfInputs}, {_inputsPerPlayer.ToJson()}");
                 // }
-                _cachedEarliestInputsPerPlayer.Add(playerId, earliestPlayerInput);
+                _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Add(playerId, earliestPlayerInput);
             }
 
-            return _cachedEarliestInputsPerPlayer;
+            return _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer;
         }
 
         private bool TryGetCachedInputForPlayer(ushort playerId, out PlayerInputPacketC2S playerInputPacket)
@@ -311,6 +329,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
       //          Debug.Log($"{time} Shoot Received!! playerInputPacket:{playerInputPacket.ToJson()}, {_inputsPerPlayer[playerId].Count}, {_inputsPerPlayer.ToJson()}");
             }
             LogService.LogTopic($"Input packet received from player id {playerId}, input: {playerInputPacket.ToJson()}, inputs per player: {_inputsPerPlayer.ToJson()}", LogTopicType.ServerNetwork);
+        }
+    }
+    
+    public class ProcessPlayersInputsResult
+    {
+        public CapacityDict<ushort, int> HeighestProcessedTickPerPlayer;
+        public CapacityDict<ushort, PlayerInputPacketC2S> EarliestInputsPerPlayer;
+        public ProcessPlayersInputsResult(int maxConcurrentPlayers)
+        {
+            HeighestProcessedTickPerPlayer = new CapacityDict<ushort, int>(maxConcurrentPlayers);
+            EarliestInputsPerPlayer = new CapacityDict<ushort, PlayerInputPacketC2S>(maxConcurrentPlayers);
         }
     }
 }
