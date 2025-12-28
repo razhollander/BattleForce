@@ -5,11 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c1e12e0-c131-4b63-94f5-2f0c8aa9c131" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandlerOld.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandlerOld.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerEntryPointCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerEntryPointCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/Configurations/EnvironmentConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/Configurations/EnvironmentConfig.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/StringExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Extensions/StringExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/C2SModels/Packets/PlayerInputPacketC2S.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/C2SModels/Packets/PlayerInputPacketC2S.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerInitiator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerInitiator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/EventsSequenceCounters.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/EventsSequenceCounters.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/MatchDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/MatchDataService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/MatchNetEventsDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/MatchNetEventsDataService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/IPlayerInputsPacketsHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/IPlayerInputsPacketsHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler2.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler2.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPeer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPeer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Utils/CustomCollections/FixedUnorderedList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Utils/CustomCollections/FixedUnorderedList.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -24,8 +36,6 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.2d.sprite/Editor/SpriteEditor/SpriteRect.cs" root0="SKIP_HIGHLIGHTING" />
@@ -51,17 +61,6 @@
     <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.test-framework/Samples~/2_ActArrangeAssert/MyExercise_2/StringFormatter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.test-framework/Tests/TestNewCustomAssembly/NewPlayModeTest.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.ugui/Editor/TMP/TMP_SerializedPropertyHolder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/11a7ac3c905b442eaf1dbb6eb4717e00b7a00/68/500cd6f8/Func`2.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/27bd554a9f0e46179afd19da1336e638469400/c5/a820054f/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f983fe377b2489e8ed44032915da13e1df600/c0/fca81ecf/Awaitable.cs" root0="FORCE_HIGHLIGHTING" />
@@ -196,15 +195,13 @@
       </option>
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="53791">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" value="53791" />
+      <option name="pid" />
       <option name="projectPathOnTarget" />
       <option name="runtimes">
-        <list>
-          <MonoRuntime />
-        </list>
+        <list />
       </option>
       <option name="selectedOptions">
         <list />
@@ -286,6 +283,7 @@
       <workItem from="1766349809418" duration="15043000" />
       <workItem from="1766758581712" duration="5410000" />
       <workItem from="1766827185416" duration="23779000" />
+      <workItem from="1766957174536" duration="1905000" />
     </task>
     <servers />
   </component>
@@ -667,13 +665,13 @@
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerInitiator.cs</url>
-          <line>35</line>
+          <line>39</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerInitiator.cs" containingFunctionPresentation="Method 'StartEntryPoint'">
             <startOffsets>
-              <option value="1651" />
+              <option value="1999" />
             </startOffsets>
             <endOffsets>
-              <option value="1722" />
+              <option value="2034" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="55" />
@@ -750,38 +748,24 @@
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/TimerFixedThreaded.cs</url>
           <line>58</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/FixedTimer.cs" containingFunctionPresentation="Method 'RunTimer'">
-            <startOffsets>
-              <option value="1519" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1562" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/FixedTimer.cs" containingFunctionPresentation="Method 'RunTimer'" />
           <option name="timeStamp" value="78" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/TimerFixedThreaded.cs</url>
           <line>64</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/FixedTimer.cs" containingFunctionPresentation="Method 'RunTimer'">
-            <startOffsets>
-              <option value="1786" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1802" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/FixedTimer.cs" containingFunctionPresentation="Method 'RunTimer'" />
           <option name="timeStamp" value="79" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkTickProcessor.cs</url>
-          <line>54</line>
+          <line>56</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/NetworkManager/SeverNetworkTickProcessor.cs" containingFunctionPresentation="Constructor 'ServerNetworkTickProcessor'">
             <startOffsets>
-              <option value="2943" />
+              <option value="3058" />
             </startOffsets>
             <endOffsets>
-              <option value="3006" />
+              <option value="3121" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="80" />
@@ -789,27 +773,13 @@
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/TimerFixedThreaded.cs</url>
           <line>33</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/FixedTimer.cs" containingFunctionPresentation="Method 'Start'">
-            <startOffsets>
-              <option value="1024" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1088" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/FixedTimer.cs" containingFunctionPresentation="Method 'Start'" />
           <option name="timeStamp" value="86" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/TimerFixedThreaded.cs</url>
           <line>56</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/FixedTimer.cs" containingFunctionPresentation="Method 'RunTimer'">
-            <startOffsets>
-              <option value="1450" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1488" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/FixedTimer.cs" containingFunctionPresentation="Method 'RunTimer'" />
           <option name="timeStamp" value="87" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
@@ -936,14 +906,14 @@
           <option name="timeStamp" value="112" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler2.cs</url>
-          <line>269</line>
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler.cs</url>
+          <line>284</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerInputsPacketsHandler2.cs" containingFunctionPresentation="Method 'PopEarliestInputsOfEachPlayer'">
             <startOffsets>
-              <option value="14159" />
+              <option value="15778" />
             </startOffsets>
             <endOffsets>
-              <option value="14197" />
+              <option value="15779" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="114" />
@@ -1092,27 +1062,14 @@
           <option name="timeStamp" value="127" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs</url>
-          <line>76</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs" containingFunctionPresentation="Method 'HandlePlayerBulletCollision'">
-            <startOffsets>
-              <option value="3410" />
-            </startOffsets>
-            <endOffsets>
-              <option value="3426" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="132" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerEntryPointCommand.cs</url>
           <line>41</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerEntryPointCommand.cs" containingFunctionPresentation="Method 'Execute'">
             <startOffsets>
-              <option value="2107" />
+              <option value="2137" />
             </startOffsets>
             <endOffsets>
-              <option value="2121" />
+              <option value="2151" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="133" />
@@ -1122,28 +1079,15 @@
           <line>48</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerEntryPointCommand.cs" containingFunctionPresentation="Method 'CreateWalls'">
             <startOffsets>
-              <option value="2271" />
+              <option value="2301" />
             </startOffsets>
             <endOffsets>
-              <option value="2310" />
+              <option value="2340" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="134" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/PacketsHandlers/FullTickPacketsHandler.cs</url>
-          <line>168</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/PacketsHandlers/FullTickPacketsHandler.cs" containingFunctionPresentation="Method 'UpdatePlayersDeltas'">
-            <startOffsets>
-              <option value="7911" />
-            </startOffsets>
-            <endOffsets>
-              <option value="7976" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="135" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/PacketsHandlers/FullTickPacketsHandler.cs</url>
           <line>71</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/PacketsHandlers/FullTickPacketsHandler.cs" containingFunctionPresentation="Method 'ProcessStateLatestTick'">
@@ -1155,6 +1099,45 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="136" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs</url>
+          <line>75</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs" containingFunctionPresentation="Method 'HandlePlayerBulletCollision'">
+            <startOffsets>
+              <option value="3391" />
+            </startOffsets>
+            <endOffsets>
+              <option value="3407" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="140" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs</url>
+          <line>76</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs" containingFunctionPresentation="Method 'HandlePlayerBulletCollision'">
+            <startOffsets>
+              <option value="3420" />
+            </startOffsets>
+            <endOffsets>
+              <option value="3448" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="141" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs</url>
+          <line>92</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs" containingFunctionPresentation="Method 'HandlePlayerBulletCollision'">
+            <startOffsets>
+              <option value="3972" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4176" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="143" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

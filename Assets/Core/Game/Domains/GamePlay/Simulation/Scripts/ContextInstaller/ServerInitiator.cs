@@ -14,6 +14,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private readonly ICommandFactory _commandFactory;
         private readonly ISceneInitiatorsService _sceneInitiatorsService;
         private readonly IApplicationSubscriptionService _applicationSubscriptionService;
+        private readonly ServerEntryPointCommand _serverEntryPointCommand;
+        private readonly ServerExitPointCommand _serverExitPointCommand;
 
         public SceneType SceneType => SceneType.ServerScene;
 
@@ -24,6 +26,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _applicationSubscriptionService = applicationSubscriptionService;
             _applicationSubscriptionService.RegisterObserver(this);
             _sceneInitiatorsService.RegisterInitiator(this);
+            _serverEntryPointCommand = _commandFactory.CreateCommandVoid<ServerEntryPointCommand>();
+            _serverExitPointCommand = _commandFactory.CreateCommandVoid<ServerExitPointCommand>();
         }
 
         public Awaitable LoadEntryPoint(IInitiatorEnterData enterDataObject, CancellationTokenSource cancellationTokenSource)
@@ -33,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
 
         public Awaitable StartEntryPoint(IInitiatorEnterData enterDataObject, CancellationTokenSource cancellationTokenSource)
         {
-            _commandFactory.CreateCommandVoid<ServerEntryPointCommand>().Execute();
+            _serverEntryPointCommand.Execute();
             return AwaitableUtils.CompletedTask;
         }
 
@@ -47,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         {
             _sceneInitiatorsService.UnregisterInitiator(this);
             _applicationSubscriptionService.UnregisterObserver(this);
-            _commandFactory.CreateCommandVoid<ServerExitPointCommand>().Execute();
+            _serverExitPointCommand.Execute();
         }
 
         public void OnApplicationQuit()

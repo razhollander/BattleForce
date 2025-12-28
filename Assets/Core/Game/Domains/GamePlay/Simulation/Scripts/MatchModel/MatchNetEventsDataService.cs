@@ -12,7 +12,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 {
     public class MatchNetEventsDataService : IMatchNetEventsDataService
     {
-        private readonly NetworkConfig _networkConfig;
         public Dictionary<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>> BulletSpawnNetEventsPerPlayer { get; private set; } // todo: remove events related to bullet when bullet is destroyed
         public Dictionary<ushort, FixedUnorderedList<PlayerJoinAcceptPacketS2C>> JoinAcceptNetEventsPerPlayer { get; private set; } // todo: remove events related to player when player is destroyed
         public Dictionary<ushort, FixedUnorderedList<PlayerTakeDamageNetEventS2C>> PlayerTakeDamageNetEventsPerPlayer { get; private set; } // todo: remove events related to player hit when player is destroyed
@@ -24,16 +23,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 
         public MatchNetEventsDataService(NetworkConfig networkConfig)
         {
-            _networkConfig = networkConfig;
-            var maxConcurrentPlayers = _networkConfig.MaxCap.ConcurrentPlayers;
+            var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             BulletSpawnNetEventsPerPlayer = new Dictionary<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>>(maxConcurrentPlayers);
             JoinAcceptNetEventsPerPlayer = new Dictionary<ushort, FixedUnorderedList<PlayerJoinAcceptPacketS2C>>(maxConcurrentPlayers);
             PlayerTakeDamageNetEventsPerPlayer = new Dictionary<ushort, FixedUnorderedList<PlayerTakeDamageNetEventS2C>>(maxConcurrentPlayers);
             BulletDestroyedNetEventsPerPlayer = new Dictionary<ushort, FixedUnorderedList<BulletDestroyedNetEventS2C>>(maxConcurrentPlayers);
-            _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(_networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
-            _joinAcceptListPool = new ConcurrentPool<FixedUnorderedList<PlayerJoinAcceptPacketS2C>>(() => new FixedUnorderedList<PlayerJoinAcceptPacketS2C>(_networkConfig.MaxCap.PlayerJoinAcceptNetEvents), maxConcurrentPlayers);
-            _playerTakeDamageListPool = new ConcurrentPool<FixedUnorderedList<PlayerTakeDamageNetEventS2C>>(() => new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(_networkConfig.MaxCap.PlayerTakeDamageNetEvents), maxConcurrentPlayers);
-            _bulletDestroyedListPool = new ConcurrentPool<FixedUnorderedList<BulletDestroyedNetEventS2C>>(() => new FixedUnorderedList<BulletDestroyedNetEventS2C>(_networkConfig.MaxCap.BulletDestroyedNetEvents), maxConcurrentPlayers);
+            _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
+            _joinAcceptListPool = new ConcurrentPool<FixedUnorderedList<PlayerJoinAcceptPacketS2C>>(() => new FixedUnorderedList<PlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents), maxConcurrentPlayers);
+            _playerTakeDamageListPool = new ConcurrentPool<FixedUnorderedList<PlayerTakeDamageNetEventS2C>>(() => new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(networkConfig.MaxCap.PlayerTakeDamageNetEvents), maxConcurrentPlayers);
+            _bulletDestroyedListPool = new ConcurrentPool<FixedUnorderedList<BulletDestroyedNetEventS2C>>(() => new FixedUnorderedList<BulletDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents), maxConcurrentPlayers);
         }
         
         public void StartSavingPlayerEvents(ushort playerId)
@@ -84,14 +82,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         {
             foreach (var kvp in PlayerTakeDamageNetEventsPerPlayer)
             {
-                kvp.Value.Add(new PlayerTakeDamageNetEventS2C
-                {
-                    OccuredOnTick = onTick,
-                    PlayerId = damagedPlayerId,
-                    PlayerHealth = playerHealth,
-                    HitDamage = hitDamage,
-                    IsAlive = isAlive
-                });
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = damagedPlayerId;
+                packet.PlayerHealth = playerHealth;
+                packet.HitDamage = hitDamage;
+                packet.IsAlive = isAlive;
             }
         }
 
@@ -99,7 +95,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         {
             foreach (var kvp in BulletDestroyedNetEventsPerPlayer)
             {
-                kvp.Value.Add(new BulletDestroyedNetEventS2C(onTick, bulletId, position));
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.BulletId = bulletId;
+                packet.Position = position;
             }
         }
 
@@ -107,7 +106,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         {
             foreach (var kvp in BulletSpawnNetEventsPerPlayer)
             {
-                kvp.Value.Add(new BulletSpawnNetEventS2C(onTick, bulletId, belongToPlayerId, position, bulletRadius));
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.BulletId = bulletId;
+                packet.BelongToPlayerId = belongToPlayerId;
+                packet.Position = position;
+                packet.BulletRadius = bulletRadius;
             }
         }
 
@@ -115,13 +119,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         {
             foreach (var kvp in JoinAcceptNetEventsPerPlayer)
             {
-                kvp.Value.Add(new PlayerJoinAcceptPacketS2C
-                {
-                    OccuredOnTick = onTick,
-                    IsLocal = playerState.Id == kvp.Key,
-                    PlayerState = playerState,
-                    SimulationState = simulationState
-                });
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.IsLocal = playerState.Id == kvp.Key;
+                packet.PlayerState = playerState;
+                packet.SimulationState = simulationState;
             }
         }
 
@@ -164,7 +166,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             {
                 for (int i = bulletDestroyedNetEvents.Count - 1; i >= 0; i--)
                 {
-                    if(bulletDestroyedNetEvents[i].OccuredOnTick < tick)
+                    if (bulletDestroyedNetEvents[i].OccuredOnTick < tick)
                     {
                         bulletDestroyedNetEvents.RemoveAt(i);
                     }

@@ -287,8 +287,6 @@ namespace LiteNetLib
 
             //Send request
             var result = NetManager.SendRaw(_connectRequestPacket, EndPoint);
-            Debug.LogError($"got result: {result}");
-
             NetDebug.Write(NetLogLevel.Trace, "[CC] ConnectId: {0}, ConnectNum: {1}", _connectTime, connectNum);
         }
 

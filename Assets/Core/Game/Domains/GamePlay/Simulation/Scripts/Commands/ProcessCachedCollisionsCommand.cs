@@ -7,7 +7,6 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 {
@@ -119,7 +118,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             var collisionNormal = worldManifold.normal;
             var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
             playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
-            //Debug.Log($"new pos {_physicsSimulator.GetPlayer(playerModel.Id).Position}, prev pos: {playerModel.Spaceship.Transform.Position} ");
+            LogService.LogTopic($"new pos {_physicsSimulator.GetPlayer(playerModel.Id).Position}, prev pos: {playerModel.Spaceship.Transform.Position} ", LogTopicType.ServerNetwork);
             playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0
                 ? System.Numerics.Vector2.Normalize(reflectedVelocity)
                 : System.Numerics.Vector2.Zero;

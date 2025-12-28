@@ -7,9 +7,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
     public class MatchDataService : IMatchDataService
     {
         private readonly SimulationStateS2C _simulationState;
-        //private SimulationStateS2C _previousSimulationState;
         public SimulationStateS2C SimulationState => _simulationState;
-        //public SimulationStateS2C PreviousSimulationState => _previousSimulationState;
         private ushort _lastBulletCreatedId = 0;
    
         public MatchDataService(NetworkConfig networkConfig)
@@ -20,11 +18,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
                 networkConfig.MaxCap.ConcurrentEvironmentWalls,
                 networkConfig.MaxCap.PointsInEvironmentWall);
         }
-
-        // public void CopySimulationStateIntoPrevious()
-        // {
-        //     _previousSimulationState = _simulationState;
-        // }
 
         public ref PlayerStateS2C AddPlayer(string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,
             float shootCooldown)

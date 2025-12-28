@@ -45,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
             left  = (data & (1 << 1)) != 0;
             shoot = (data & (1 << 2)) != 0;
         }
-
+        
         public int CompareTo(PlayerInputPacketC2S other)
         {
             return Tick.CompareTo(other.Tick);
