@@ -1,4 +1,6 @@
+using System.Text;
 using Newtonsoft.Json;
+using Sirenix.Serialization;
 
 namespace Core.Scripts.Extensions
 {
@@ -11,7 +13,8 @@ namespace Core.Scripts.Extensions
 
         public static string ToJson(this object obj)
         {
-            return JsonConvert.SerializeObject(obj);
+            var bytes = SerializationUtility.SerializeValue(obj, DataFormat.JSON);
+            return Encoding.UTF8.GetString(bytes);
         }
         
         public static T FromJson<T>(this string json)

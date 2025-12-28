@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller.Utils
+namespace Core.Scripts.Utils.CustomCollections
 {
     /// <summary>
     /// A fixed-capacity, non-alloc list backed by a constant-size array.

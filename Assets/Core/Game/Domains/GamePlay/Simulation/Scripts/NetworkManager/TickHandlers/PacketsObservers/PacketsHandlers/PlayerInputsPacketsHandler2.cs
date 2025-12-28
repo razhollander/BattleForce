@@ -12,6 +12,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
+using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using UnityEngine;
@@ -81,7 +82,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 var playerInputPacket = earliestInputPerPlayers[playerId];
                 UpdatePlayerDirection(playerInputPacket, ref playerState);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, ref playerState);
-                _playerInputPacketsPool.Return(_lastProcessedInputPerPlayer[playerId]);
+
+                if (_lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastPlayerInput))
+                {
+                    _playerInputPacketsPool.Return(lastPlayerInput);
+                }
                 _lastProcessedInputPerPlayer[playerId] = playerInputPacket;
             }
             
