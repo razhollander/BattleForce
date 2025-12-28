@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             int maxCapPlayersInputsPackets = networkConfig.MaxCap.PlayersInputsPackets;
             var inputPacketsSavedPerPlayer = maxCapPlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
             _inputsListsPool = new ConcurrentPool<List<PlayerInputPacketC2S>>(() => new List<PlayerInputPacketC2S>(inputPacketsSavedPerPlayer), maxCapPlayersInputsPackets);
-            _playerInputPacketsPool = new ConcurrentPool<PlayerInputPacketC2S>(() => new PlayerInputPacketC2S(), networkConfig.MaxCap.ConcurrentPlayers);
+            _playerInputPacketsPool = new ConcurrentPool<PlayerInputPacketC2S>(() => new PlayerInputPacketC2S(), networkConfig.MaxCap.ConcurrentInputsProcessed);
         }
 
         public void InitEntryPoint()

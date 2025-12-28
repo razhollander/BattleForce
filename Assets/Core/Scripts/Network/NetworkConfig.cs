@@ -29,6 +29,7 @@ namespace Core.Scripts.Network
         // packets receiived *all players combined*
         public int PlayersInputsPackets = 24000; // 5 seconds of packets
         public int JoinRequestPackets = 30; // 30 to stay on the same side, maybe should be ConcurrentPlayers
+        public int ConcurrentInputsProcessed = 100;
         
         // events received *per player*
         public int FullTickPacketsNetEvents = 1000;
