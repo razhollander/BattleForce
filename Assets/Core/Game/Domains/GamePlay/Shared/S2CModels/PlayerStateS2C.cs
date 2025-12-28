@@ -9,15 +9,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public PlayerSpaceshipStateS2C Spaceship;
         public ushort TeamId;
         public bool IsAlive;
-        //
-        // public PlayerStateS2C(ushort id, string name, PlayerSpaceshipStateS2C spaceship)
-        // {
-        //     Id = id;
-        //     Name = name;
-        //     Spaceship = spaceship;
-        //     TeamId = id;
-        //     IsAlive = true;
-        // }
 
         public void Serialize(NetDataWriter writer)
         {

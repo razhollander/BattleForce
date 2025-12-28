@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             var playerId = (ushort)(_simulationState.Players.Count);
             newPlayer.Id = playerId;
             newPlayer.Name = playerName;
+            newPlayer.TeamId = playerId;
             newPlayer.Spaceship.Health.CurrentHealth = health;
             newPlayer.Spaceship.Health.MaxHealth = health;
             newPlayer.Spaceship.Transform.Position = position;
