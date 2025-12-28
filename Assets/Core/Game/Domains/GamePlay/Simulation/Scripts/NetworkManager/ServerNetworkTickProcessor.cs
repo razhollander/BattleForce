@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;

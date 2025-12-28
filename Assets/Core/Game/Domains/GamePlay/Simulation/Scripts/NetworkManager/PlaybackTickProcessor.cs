@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Core.Game.Domains.GamePlay.Shared;
 using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager

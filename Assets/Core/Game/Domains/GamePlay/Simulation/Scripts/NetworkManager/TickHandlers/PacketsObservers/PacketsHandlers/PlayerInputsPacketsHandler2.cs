@@ -47,9 +47,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, PlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _inputsPerPlayer = new CapacityDict<ushort, List<PlayerInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
-            var inputPacketsSavedPerPlayer = networkConfig.MaxCap.PlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
-            _inputsListsPool = new ConcurrentPool<List<PlayerInputPacketC2S>>(() => new List<PlayerInputPacketC2S>(inputPacketsSavedPerPlayer), networkConfig.MaxCap.PlayersInputsPackets);
-            _playerInputPacketsPool = new ConcurrentPool<PlayerInputPacketC2S>(() => new PlayerInputPacketC2S(), networkConfig.MaxCap.PlayersInputsPackets);
+            int maxCapPlayersInputsPackets = networkConfig.MaxCap.PlayersInputsPackets;
+            var inputPacketsSavedPerPlayer = maxCapPlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
+            _inputsListsPool = new ConcurrentPool<List<PlayerInputPacketC2S>>(() => new List<PlayerInputPacketC2S>(inputPacketsSavedPerPlayer), maxCapPlayersInputsPackets);
+            _playerInputPacketsPool = new ConcurrentPool<PlayerInputPacketC2S>(() => new PlayerInputPacketC2S(), networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void InitEntryPoint()
@@ -77,13 +78,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             {
                 ref var playerState = ref _matchDataService.SimulationState.GetPlayerByIndex(i);
                 var playerId = playerState.Id;
-                if (!earliestInputPerPlayers.ContainsKey(playerId))
+                if (!earliestInputPerPlayers.TryGetValue(playerId, out var playerInputPacket))
                 {
                     LogService.LogTopic($"Didn't find any last cached inputs for player {playerId}!", LogTopicType.ServerNetwork);
                     continue;
                 }
 
-                var playerInputPacket = earliestInputPerPlayers[playerId];
                 UpdatePlayerDirection(playerInputPacket, ref playerState);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, ref playerState);
 
