@@ -35,7 +35,32 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
 
         public void InitEntryPoint()
         {
-            _uiView.Setup(OnClientClicked, OnHostClicked);
+            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked);
+        }
+
+        private void OnServerClicked()
+        {
+            _ = OnServerClickedAsync();
+        }
+
+        private async Awaitable OnServerClickedAsync()
+        {
+            var enterData = new ServerInitiatorEnterData();
+            var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
+
+            try
+            {
+                await StartServer(enterData, cancellationTokenSource);
+                _uiView.Hide();
+            }
+            catch (OperationCanceledException)
+            {
+                LogService.LogTopic("OperationCanceledException", LogTopicType.ClientNetwork);
+            }
+            catch (Exception e)
+            {
+                LogService.LogException(e);
+            }
         }
 
         private void OnHostClicked()
@@ -52,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
             {
                 await StartServer(enterData, cancellationTokenSource);
                 StartClient(true);
+                _uiView.Hide();
             }
             catch (OperationCanceledException)
             {
@@ -76,13 +102,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             _clientNetworkManager.StartClient(isHost);
             _fullTickPacketsHandler.RegisterListeners();
-            _uiView.Hide();
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
 
         private void OnClientClicked()
         {
             StartClient(false);
+            _uiView.Hide();
         }
     }
 }

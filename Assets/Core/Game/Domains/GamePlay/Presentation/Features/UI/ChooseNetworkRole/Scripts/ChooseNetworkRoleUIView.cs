@@ -8,16 +8,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
     {
         [SerializeField] private Button _clientButton;
         [SerializeField] private Button _hostButton;
+        [SerializeField] private Button _serverButton;
         
         private Action _onClientClicked;
         private Action _onHostClicked;
+        private Action _onServerClicked;
 
-        public void Setup(Action onClientClicked, Action onHostClicked)
+        public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked)
         {
             _onClientClicked = onClientClicked;
             _onHostClicked = onHostClicked;
+            _onServerClicked = onServerClicked;
             _clientButton.onClick.AddListener(OnClientClicked);
             _hostButton.onClick.AddListener(OnHostClicked);
+            _serverButton.onClick.AddListener(OnServerClicked);
+        }
+
+        private void OnServerClicked()
+        {
+            _onServerClicked?.Invoke();
         }
 
         private void OnClientClicked()
