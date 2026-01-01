@@ -28,10 +28,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly IMatchNetEventsDataService _matchNetEventsDataService;
         private readonly IPhysicsSimulator _physicsSimulator;
 
-        // private readonly Dictionary<int, Dictionary<int, PlayerInputPacketC2S>> _inputsByTick = new ();
-        // Changed from int to ushort because playerId is defined as ushort in OnPlayerInputReceived
-        private readonly CapacityDict<ushort, FixedUnorderedList<PlayerInputPacketC2S>> _inputsPerPlayer; //= new();
-        private readonly CapacityDict<ushort, PlayerInputPacketC2S> _lastProcessedInputPerPlayer; //= new ();
+        private readonly CapacityDict<ushort, FixedUnorderedList<PlayerInputPacketC2S>> _inputsPerPlayer;
+        private readonly CapacityDict<ushort, PlayerInputPacketC2S> _lastProcessedInputPerPlayer;
         private readonly ConcurrentPool<PlayerInputPacketC2S> _playerInputPacketsPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerInputPacketC2S>> _inputsListsPool;
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;

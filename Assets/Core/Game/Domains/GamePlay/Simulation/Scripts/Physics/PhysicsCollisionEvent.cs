@@ -1,20 +1,17 @@
 using Box2D.NetStandard.Dynamics.Contacts;
 using Box2D.NetStandard.Dynamics.Fixtures;
 
-public readonly struct PhysicsCollisionEvent
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 {
-    public readonly PhysicsEventEventType Type;
-    public readonly Fixture FixtureA;
-    public readonly Fixture FixtureB;
-    public readonly Contact Contact;
-
-    public PhysicsCollisionEvent(PhysicsEventEventType type, Fixture a, Fixture b, Contact contact)
+    public class PhysicsCollisionEvent
     {
-        Type = type;
-        FixtureA = a;
-        FixtureB = b;
-        Contact = contact;
-    }
+        public PhysicsEventEventType Type;
+        public PhysicsBodyData BodyDataA;
+        public PhysicsBodyData BodyDataB;
+        public Fixture FixtureA;
+        public Fixture FixtureB;
+        public Contact Contact;
 
-    public override string ToString() => $"{Type}: {FixtureA} <-> {FixtureB}";
+        public override string ToString() => $"{Type}: {FixtureA} <-> {FixtureB}";
+    }
 }

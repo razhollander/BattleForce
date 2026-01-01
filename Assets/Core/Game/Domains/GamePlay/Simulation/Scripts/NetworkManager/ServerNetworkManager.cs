@@ -54,31 +54,6 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         {
             _netManager.Stop();
         }
-
-        // public void SubscribeReusable<T>(Action<T> onReceive) where T : class, new()
-        // {
-        //     _packetProcessor.SubscribeReusable(onReceive);
-        // }
-
-        // public void SubscribeReusable<T, TUserData>(Action<T, TUserData> onReceive) where T : class, new()
-        // {
-        //     _packetProcessor.SubscribeReusable(onReceive);
-        // }
-        
-        // public void SubscribeNetSerializable<T>(
-        //     Action<T, int> onReceive) where T : INetSerializable, new()
-        // {
-        //     _packetProcessor.SubscribeNetSerializable<T, NetPeer>((t, peer) =>
-        //     {
-        //         var PlyaerID = (int)peer.Tag; 
-        //         onReceive(t, (int)peer.Tag);
-        //     });
-        // }
-
-        // public void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new()
-        // {
-        //     _packetsSender.SendPacket(packet, deliveryMethod);
-        // }
         
         public void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
         {
@@ -90,22 +65,6 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         {
             _packetsSender.SendPacketToPlayerSerialized(playerId, type, packet, deliveryMethod);
         }
-        // public void SendPacketOnlyToPlayer<T>(T packet, DeliveryMethod deliveryMethod, int playerId)
-        //     where T : class, new()
-        // {
-        //     _packetsSender.SendPacketOnlyToPlayer(packet, deliveryMethod, playerId);
-        // }
-
-        // public void SendPacketSerializedOnlyToPlayer<T>(PacketTypeS2C type, T packet, int playerId,
-        //     DeliveryMethod deliveryMethod) where T : INetSerializable
-        // {
-        //     _packetsSender.SendPacketSerializedOnlyToPlayer(type, packet, playerId, deliveryMethod);
-        // }
-
-        // public void RemoveSubscription<T>()
-        // {
-        //     _packetProcessor.RemoveSubscription<T>();
-        // }
 
         public void AddPlayerPeer(ushort playerId, NetPeer peer)
         {
@@ -114,9 +73,6 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
 
         public void PollEvents()
         {
-            // string time = DateTime.Now.ToString("HH:mm:ss.fff");
-            //
-            // Debug.Log($"{time} PollEvents!");
             _netManager.PollEvents();
         }
 

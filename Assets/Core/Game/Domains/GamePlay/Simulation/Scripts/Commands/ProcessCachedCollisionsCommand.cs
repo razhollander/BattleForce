@@ -54,8 +54,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                     continue;
                 }
 
-                var objectA = (PhysicsBodyData) collisionEvent.FixtureA.Body.UserData;
-                var objectB = (PhysicsBodyData) collisionEvent.FixtureB.Body.UserData;
+                var objectA = collisionEvent.BodyDataA;
+                var objectB = collisionEvent.BodyDataB;
                 HandlePlayerWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletCollision(objectA, objectB, collisionEvent.Contact);
             }

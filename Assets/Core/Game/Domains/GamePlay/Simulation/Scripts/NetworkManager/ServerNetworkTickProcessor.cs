@@ -32,12 +32,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private readonly IServerNetworkManager _networkManager;
         private readonly IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private readonly IMatchDataService _matchDataService;
-        private readonly IPlayerBulletsTransformHandler _playerBulletsTransformHandler;
         private readonly IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
         private readonly IMatchNetEventsDataService _matchNetEventsDataService;
         private readonly IStateMachineService _stateMachineService;
         private readonly IPhysicsSimulator _physicsSimulator;
-        private readonly IPlayersTransformHandler _playersTransformHandler;
         private readonly ICommandFactory _commandFactory;
 
         private TimerFixedThreaded _fixedTimer;
@@ -46,19 +44,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
-            IPlayerBulletsTransformHandler playerBulletsTransformHandler,
             IPlayerJoinPacketsHandler playerJoinPacketsHandler, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            IPlayersTransformHandler playersTransformHandler, ICommandFactory commandFactory)
+            ICommandFactory commandFactory)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _playerInputsPacketsHandler = playerInputsPacketsHandler;
             _matchDataService = matchDataService;
-            _playerBulletsTransformHandler = playerBulletsTransformHandler;
             _playerJoinPacketsHandler = playerJoinPacketsHandler;
             _matchNetEventsDataService = matchNetEventsDataService;
             _physicsSimulator = physicsSimulator;
-            _playersTransformHandler = playersTransformHandler;
             _commandFactory = commandFactory;
         }
 
@@ -74,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             CurrentTick = 0;
             var cancellationTokenSource = new CancellationTokenSource();
             _fixedTimer = new TimerFixedThreaded(_networkConfig.TicksPerSeconds, OnTick);
-            _fixedTimer.Start(cancellationTokenSource/*_stateMachineService.CurrentState().CancellationTokenSource*/);
+            _fixedTimer.Start(cancellationTokenSource);
         }
 
         public void InitExitPoint()
@@ -92,10 +87,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             try
             {
                 CurrentTick++;
-                // string time = DateTime.Now.ToString("HH:mm:ss.fff");
-
-                // Debug.Log($"{time} OnTick!");
-
                 var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
                 _networkManager.PollEvents();
                 var processPlayersInputsResult = ProcessPackets(processedTick);
@@ -105,7 +96,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 ApplyPhysicsSimulationToMatchModel();
                  RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                  SendCurrentTickStateToAllClients(processedTick);
-                 //_matchDataService.CopySimulationStateIntoPrevious();
             }
             catch (Exception e)
             {

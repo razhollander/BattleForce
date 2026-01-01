@@ -8,6 +8,8 @@ using Box2D.NetStandard.Dynamics.World.Callbacks;
 using Box2D.WorldTests;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
+using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 
@@ -17,16 +19,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
     {
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private World _world;
-        private CollisionEventCacheListener _collisionEventCacheListener;
+        private readonly CollisionEventCacheListener _collisionEventCacheListener;
 
-        public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService)
+        public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig)
         {
             _updateSubscriptionService = updateSubscriptionService;
+            _collisionEventCacheListener = new CollisionEventCacheListener(networkConfig);
         }
 
         public void InitEntryPoint()
         {
-            _collisionEventCacheListener = new CollisionEventCacheListener();
             _world = CreateWorld();
             _updateSubscriptionService.RegisterGuiUpdatable(this);
         }
@@ -112,7 +114,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _world.Step(deltaTime, velocityIterations, positionIterations);
         }
 
-        public IReadOnlyList<PhysicsCollisionEvent> GetCachedCollisions()
+        public FixedUnorderedList<PhysicsCollisionEvent> GetCachedCollisions()
         {
             return _collisionEventCacheListener.Events;
         }
@@ -126,15 +128,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var gravity = new Vector2(0f, 0f);
             var world = new World(gravity);
+            var testDebugDrawer = CreateTestDebugDrawer();
+            world.SetDebugDraw(testDebugDrawer);
+            world.SetContactListener(_collisionEventCacheListener);
+            return world;
+        }
+
+        private static TestDebugDrawer CreateTestDebugDrawer()
+        {
             var testDebugDrawer = new TestDebugDrawer();
             testDebugDrawer.AppendFlags(DrawFlags.Aabb);
             testDebugDrawer.AppendFlags(DrawFlags.Joint);
             testDebugDrawer.AppendFlags(DrawFlags.Pair);
             testDebugDrawer.AppendFlags(DrawFlags.Shape);
             testDebugDrawer.AppendFlags(DrawFlags.CenterOfMass);
-            world.SetDebugDraw(testDebugDrawer);
-            world.SetContactListener(_collisionEventCacheListener);
-            return world;
+
+            return testDebugDrawer;
         }
 
         public void SetPlayerVelocity(ushort playerId, Vector2 velocity)
@@ -230,7 +239,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     categoryBits = PhysicsBodyType.PlayerBullet.GetCollisionsCategory(),
                     maskBits = PhysicsBodyType.PlayerBullet.GetCollisionMask(),
                     groupIndex = (short)-teamId,
-                }
+                },
             };
             
             bulletBody.CreateFixture(fixtureDef);
