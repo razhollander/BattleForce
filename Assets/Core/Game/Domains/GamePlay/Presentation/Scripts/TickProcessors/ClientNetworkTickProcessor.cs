@@ -72,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             if (_matchDataService.IsPlayerJoined)
             {
                 var prevMs = _deltaMS;
-                _deltaMS = _lastSendTime.Millisecond - DateTime.Now.Millisecond;
+                _deltaMS = DateTime.Now.Millisecond - _lastSendTime.Millisecond;
                 _highestMs = Math.Max(_deltaMS, prevMs);
                 SendCurrentTickInputsToServer();
                 _lastSendTime = DateTime.Now;
