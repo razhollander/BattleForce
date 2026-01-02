@@ -317,16 +317,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 var playerState = _matchDataService.SimulationState.Players[i];
                 var playerId = playerState.Id;
                 PlayerInputPacketC2S earliestPlayerInput;
-                if (_inputsPerPlayer.TryGetValue(playerId, out var playerInputs))
+                if (_inputsPerPlayer.TryGetValue(playerId, out var playerInputs) && playerInputs.Count > 0)
                 {
                     var indexOfEarliestInput = GetIndexOfEarliestInput(playerInputs);
                     earliestPlayerInput = playerInputs[indexOfEarliestInput];
                     playerInputs.RemoveAt(indexOfEarliestInput);
                     if (playerInputs.Count == 0)
                     {
-                        playerInputs.Clear();
-                        _inputsListsPool.Return(playerInputs);
-                        _inputsPerPlayer.Remove(playerId);
+                        //playerInputs.Clear();
+                        //_inputsListsPool.Return(playerInputs);
+                        //_inputsPerPlayer.Remove(playerId);
                     }
                 }
                 else

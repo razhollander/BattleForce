@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -9,9 +10,8 @@ namespace Core.Game.Domains.GamePlay.Shared
     {
         private readonly float _fixedDelta;
         private double _accumulator;
-        private long _lastTime;
+        private long _lastTicksUtc; // DateTime.UtcNow.Ticks
 
-        private readonly Stopwatch _stopwatch;
         private readonly Action _onTickAction;
 
         private CancellationTokenSource _cancellationTokenSource;
@@ -27,7 +27,6 @@ namespace Core.Game.Domains.GamePlay.Shared
                 throw new ArgumentOutOfRangeException(nameof(ticksPerSecond));
 
             _fixedDelta = 1.0f / ticksPerSecond;
-            _stopwatch = new Stopwatch();
             _onTickAction = onTickAction ?? throw new ArgumentNullException(nameof(onTickAction));
         }
 
@@ -43,13 +42,11 @@ namespace Core.Game.Domains.GamePlay.Shared
 
                 _cancellationTokenSource = cancellationTokenSource;
 
-                _lastTime = 0;
                 _accumulator = 0.0;
-                _stopwatch.Restart();
+                _lastTicksUtc = DateTime.UtcNow.Ticks;
 
                 LogService.LogTopic("start tick", LogTopicType.ServerNetwork);
 
-                // ✅ Increase timer resolution on Windows for Sleep(1) accuracy
                 WinTime.Begin1ms();
 
                 _thread = new Thread(RunTimer)
@@ -70,7 +67,6 @@ namespace Core.Game.Domains.GamePlay.Shared
                     return;
 
                 _cancellationTokenSource.Cancel();
-                _stopwatch.Stop();
 
                 if (_thread != null && _thread.IsAlive)
                 {
@@ -83,7 +79,6 @@ namespace Core.Game.Domains.GamePlay.Shared
 
                 _thread = null;
 
-                // ✅ Restore system timer resolution on Windows
                 WinTime.End1ms();
             }
         }
@@ -96,9 +91,24 @@ namespace Core.Game.Domains.GamePlay.Shared
             {
                 while (!token.IsCancellationRequested)
                 {
-                    var elapsedTicks = _stopwatch.ElapsedTicks;
-                    _accumulator += (double)(elapsedTicks - _lastTime) / Stopwatch.Frequency;
-                    _lastTime = elapsedTicks;
+                    long nowTicksUtc = DateTime.UtcNow.Ticks;
+                    long deltaTicks = nowTicksUtc - _lastTicksUtc;
+                    _lastTicksUtc = nowTicksUtc;
+
+                    // DateTime ticks are 100ns => 10,000,000 ticks per second
+                    // Convert to seconds:
+                    double deltaSeconds = deltaTicks * 1e-7;
+
+                    // ✅ Guard against negative delta if system time jumps backward
+                    if (deltaSeconds < 0)
+                        deltaSeconds = 0;
+
+                    // ✅ Optional: clamp huge delta if system freezes / debugger pause / time jump forward
+                    // This prevents "spiral of death" where it tries to simulate too many ticks at once.
+                    if (deltaSeconds > 0.25) // 250ms cap
+                        deltaSeconds = 0.25;
+
+                    _accumulator += deltaSeconds;
 
                     while (_accumulator >= _fixedDelta)
                     {
@@ -109,7 +119,6 @@ namespace Core.Game.Domains.GamePlay.Shared
                             break;
                     }
 
-                    // ✅ With timeBeginPeriod(1), this is much more accurate on Windows
                     Thread.Sleep(1);
                 }
             }
@@ -119,7 +128,6 @@ namespace Core.Game.Domains.GamePlay.Shared
             }
             finally
             {
-                // Safety: if thread exits unexpectedly, ensure we release timer period
                 WinTime.End1ms();
             }
         }
@@ -129,7 +137,6 @@ namespace Core.Game.Domains.GamePlay.Shared
         // ------------------------------------------------------------
         private static class WinTime
         {
-            // Keep this ref-counted so multiple timers can coexist safely.
             private static int _refCount;
 
             [Conditional("UNITY_STANDALONE_WIN")]
@@ -138,30 +145,32 @@ namespace Core.Game.Domains.GamePlay.Shared
             public static void Begin1ms()
             {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || WINDOWS
-            if (Interlocked.Increment(ref _refCount) == 1)
-                timeBeginPeriod(1);
+                if (Interlocked.Increment(ref _refCount) == 1)
+                    timeBeginPeriod(1);
 #endif
             }
 
+            [Conditional("UNITY_STANDALONE_WIN")]
+            [Conditional("UNITY_EDITOR_WIN")]
+            [Conditional("WINDOWS")]
             public static void End1ms()
             {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || WINDOWS
-            int count = Interlocked.Decrement(ref _refCount);
-            if (count == 0)
-                timeEndPeriod(1);
+                int count = Interlocked.Decrement(ref _refCount);
+                if (count == 0)
+                    timeEndPeriod(1);
 
-            // If Stop() called more times than Start(), clamp.
-            if (count < 0)
-                Interlocked.Exchange(ref _refCount, 0);
+                if (count < 0)
+                    Interlocked.Exchange(ref _refCount, 0);
 #endif
             }
 
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || WINDOWS
-        [DllImport("winmm.dll", EntryPoint = "timeBeginPeriod", ExactSpelling = true)]
-        private static extern uint timeBeginPeriod(uint uMilliseconds);
+            [DllImport("winmm.dll", EntryPoint = "timeBeginPeriod", ExactSpelling = true)]
+            private static extern uint timeBeginPeriod(uint uMilliseconds);
 
-        [DllImport("winmm.dll", EntryPoint = "timeEndPeriod", ExactSpelling = true)]
-        private static extern uint timeEndPeriod(uint uMilliseconds);
+            [DllImport("winmm.dll", EntryPoint = "timeEndPeriod", ExactSpelling = true)]
+            private static extern uint timeEndPeriod(uint uMilliseconds);
 #endif
         }
     }

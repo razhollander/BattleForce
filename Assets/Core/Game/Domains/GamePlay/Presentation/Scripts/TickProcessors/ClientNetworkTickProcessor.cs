@@ -1,3 +1,4 @@
+using System;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
@@ -5,10 +6,11 @@ using Core.Game.Domains.GamePlay.Shared;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.StateMachineService;
 using CoreDomain.Scripts.Services.UpdateService;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
-    public class ClientNetworkTickProcessor : ITickProcessor, IFixedUpdatable
+    public class ClientNetworkTickProcessor : ITickProcessor, IFixedUpdatable, IGUIUpdatable
     {
         public void SetTick(int tickOnServer)
         {
@@ -27,6 +29,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly IClientNetworkManager _networkManager;
 
         private TimerFixedThreaded _fixedTimer;
+        private DateTime _lastSendTime;
+        private int _deltaMS;
+        private int _highestMs;
 
         public ClientNetworkTickProcessor(IClientNetworkManager networkManager,
             //ClientSimulationStateHandler clientSimulationStateHandler,
@@ -50,11 +55,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private void StartTick()
         {
             _updateSubscriptionService.RegisterFixedUpdatable(this);
+            _updateSubscriptionService.RegisterGuiUpdatable(this);
         }
         
         public void StopTick()
         {
             _updateSubscriptionService.UnregisterFixedUpdatable(this);
+            _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
 
         public void ManagedFixedUpdate()
@@ -62,9 +69,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _networkManager.PollEvents();
             CurrentTick = _fullTickPacketsHandler.ProcessStateLatestTick(CurrentTick);
             
-            if (_matchDataService.IsPlayerJoined) 
+            if (_matchDataService.IsPlayerJoined)
             {
+                var prevMs = _deltaMS;
+                _deltaMS = _lastSendTime.Millisecond - DateTime.Now.Millisecond;
+                _highestMs = Math.Max(_deltaMS, prevMs);
                 SendCurrentTickInputsToServer();
+                _lastSendTime = DateTime.Now;
             }
         }
 
@@ -150,5 +161,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         //     return _cachedWriter;
 
         // }
+        public void ManagedOnGUI()
+        {
+            GUILayout.Label($"delta from last send to server: {_deltaMS} ms, highest: {_highestMs}");
+        }
+
+        public void ManagedOnDrawGizmos()
+        {
+            
+        }
     }
 }
