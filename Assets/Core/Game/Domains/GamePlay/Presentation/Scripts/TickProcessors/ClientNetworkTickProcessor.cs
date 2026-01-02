@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
-    public class ClientNetworkTickProcessor : ITickProcessor, IFixedUpdatable, IGUIUpdatable, IUpdatable
+    public class ClientNetworkTickProcessor : ITickProcessor, IFixedUpdatable, IGUIUpdatable
     {
         public void SetTick(int tickOnServer)
         {
@@ -56,7 +56,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             _updateSubscriptionService.RegisterFixedUpdatable(this);
             _updateSubscriptionService.RegisterGuiUpdatable(this);
-            _updateSubscriptionService.RegisterUpdatable(this);
             _lastSendTime = DateTime.Now;
         }
         
@@ -64,28 +63,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             _updateSubscriptionService.UnregisterFixedUpdatable(this);
             _updateSubscriptionService.UnregisterGuiUpdatable(this);
-            _updateSubscriptionService.UnregisterUpdatable(this);
         }
 
         public void ManagedFixedUpdate()
         {
+            _networkManager.PollEvents();
             CurrentTick = _fullTickPacketsHandler.ProcessStateLatestTick(CurrentTick);
-
+            
             if (_matchDataService.IsPlayerJoined)
             {
                 SendCurrentTickInputsToServer();
+                _deltaMS = DateTime.Now.Millisecond - _lastSendTime.Millisecond;
+                _highestMs = Mathf.Max(_deltaMS, _highestMs);
+                _lastSendTime = DateTime.Now;
             }
-            // if (_matchDataService.IsPlayerJoined)
-            // {
-            //     SendCurrentTickInputsToServer();
-            //     _deltaMS = DateTime.Now.Millisecond - _lastSendTime.Millisecond;
-            //     _highestMs = Mathf.Max(_deltaMS, _highestMs);
-            //     _lastSendTime = DateTime.Now;
-            // }
-        }
-        public void ManagedUpdate()
-        {
-            _networkManager.PollEvents();
         }
 
         private void SendCurrentTickInputsToServer()
@@ -140,6 +131,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         // }
 
+
         // private NetDataWriter WriteSerializable<T>(PacketType type, T packet) where T : struct, INetSerializable
 
         // {
@@ -169,7 +161,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         //     return _cachedWriter;
 
         // }
-
         public void ManagedOnGUI()
         {
             GUILayout.Label($"delta from last send to server: {_deltaMS} ms, highest: {_highestMs}");
