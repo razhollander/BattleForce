@@ -34,8 +34,8 @@ namespace Core.Scripts.Utils
             {
                 return obj;
             }
-
-            LogService.LogError($"ConcurrentPool: No objects available of type {nameof(T)}, increasing capacity!");
+            
+            LogService.LogError($"ConcurrentPool: No objects available of type {typeof(T)}, increasing capacity by 1!");
             return objectGenerator();
         }
 

@@ -52,22 +52,38 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         
         public void StartSavingPlayerEvents(ushort playerId)
         {
-            if (!BulletSpawnNetEventsPerPlayer.TryAdd(playerId, _bulletSpawnListPool.Get()))
+            if (!BulletSpawnNetEventsPerPlayer.ContainsKey(playerId)) // don't use TryAdd since it will _bulletSpawnListPool.Get() an object from the pool! 
+            {
+                BulletSpawnNetEventsPerPlayer.Add(playerId, _bulletSpawnListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {playerId}");
+            }
+
+            if (!JoinAcceptNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                JoinAcceptNetEventsPerPlayer.Add(playerId, _joinAcceptListPool.Get());
+            }
+            else
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
             
-            if (!JoinAcceptNetEventsPerPlayer.TryAdd(playerId, _joinAcceptListPool.Get()))
+            if (!PlayerTakeDamageNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                PlayerTakeDamageNetEventsPerPlayer.Add(playerId, _playerTakeDamageListPool.Get());
+            }
+            else
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
             
-            if (!PlayerTakeDamageNetEventsPerPlayer.TryAdd(playerId, _playerTakeDamageListPool.Get()))
+            if (!BulletDestroyedNetEventsPerPlayer.ContainsKey(playerId))
             {
-                LogService.LogError($"Player already exists! {playerId}");
+                BulletDestroyedNetEventsPerPlayer.Add(playerId, _bulletDestroyedListPool.Get());
             }
-            
-            if (!BulletDestroyedNetEventsPerPlayer.TryAdd(playerId, _bulletDestroyedListPool.Get()))
+            else
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }

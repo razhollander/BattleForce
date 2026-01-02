@@ -12,11 +12,13 @@ using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
+using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers
 {
-    public class PlayerInputsPacketsHandler : IPlayerInputsPacketsHandler
+    public class PlayerInputsPacketsHandler : IPlayerInputsPacketsHandler, IGUIUpdatable
     {
         public PacketTypeC2S PacketType => PacketTypeC2S.PlayerInput;
 
@@ -27,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         private readonly IMatchNetEventsDataService _matchNetEventsDataService;
         private readonly IPhysicsSimulator _physicsSimulator;
+        private readonly IUpdateSubscriptionService _updateSubscriptionService;
 
         private readonly CapacityDict<ushort, FixedUnorderedList<PlayerInputPacketC2S>> _inputsPerPlayer;
         private readonly CapacityDict<ushort, PlayerInputPacketC2S> _lastProcessedInputPerPlayer;
@@ -34,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly ConcurrentPool<FixedUnorderedList<PlayerInputPacketC2S>> _inputsListsPool;
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         public PlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
-            SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator)
+            SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -42,23 +45,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             _networkConfig = networkConfig;
             _matchNetEventsDataService = matchNetEventsDataService;
             _physicsSimulator = physicsSimulator;
+            _updateSubscriptionService = updateSubscriptionService;
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, PlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _inputsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
-            int maxCapPlayersInputsPackets = networkConfig.MaxCap.PlayersInputsPackets;
-            var inputPacketsSavedPerPlayer = maxCapPlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
-            _inputsListsPool = new ConcurrentPool<FixedUnorderedList<PlayerInputPacketC2S>>(() => new FixedUnorderedList<PlayerInputPacketC2S>(inputPacketsSavedPerPlayer), maxCapPlayersInputsPackets);
+            var inputPacketsSavedPerPlayer = networkConfig.MaxCap.PlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
+            _inputsListsPool = new ConcurrentPool<FixedUnorderedList<PlayerInputPacketC2S>>(() => new FixedUnorderedList<PlayerInputPacketC2S>(inputPacketsSavedPerPlayer), networkConfig.MaxCap.ConcurrentPlayers);
             _playerInputPacketsPool = new ConcurrentPool<PlayerInputPacketC2S>(() => new PlayerInputPacketC2S(), networkConfig.MaxCap.ConcurrentInputsProcessed);
         }
 
         public void InitEntryPoint()
         {
             _networkManager.RegisterPacketsObserver(this);
+            _updateSubscriptionService.RegisterGuiUpdatable(this);
         }
 
         public void InitExitPoint()
         {
             _networkManager.UnregisterPacketsObserver(this);
+            _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
         
         public ProcessPlayersInputsResult ProcessInputs(int processedTick)
@@ -319,7 +324,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                     playerInputs.RemoveAt(indexOfEarliestInput);
                     if (playerInputs.Count == 0)
                     {
-                        _inputsListsPool.Return(_inputsPerPlayer[playerId]);
+                        playerInputs.Clear();
+                        _inputsListsPool.Return(playerInputs);
                         _inputsPerPlayer.Remove(playerId);
                     }
                 }
@@ -358,7 +364,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private void OnPlayerInputReceived(PlayerInputPacketC2S playerInputPacket, NetPeer peer)
         {
             var playerId = (ushort)peer.Tag;
-            _inputsPerPlayer.TryAdd(playerId, _inputsListsPool.Get());
+
+            if (!_inputsPerPlayer.ContainsKey(playerId))
+            {
+                _inputsPerPlayer.Add(playerId, _inputsListsPool.Get());
+            }
             ref var input = ref _inputsPerPlayer[playerId].AddAndGet();
             input = playerInputPacket;
             
@@ -369,6 +379,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
       //          Debug.Log($"{time} Shoot Received!! playerInputPacket:{playerInputPacket.ToJson()}, {_inputsPerPlayer[playerId].Count}, {_inputsPerPlayer.ToJson()}");
             }
             LogService.LogTopic($"Input packet received from player id {playerId}, input: {playerInputPacket.ToJson()}, inputs per player: {_inputsPerPlayer.ToJson()}", LogTopicType.ServerNetwork);
+        }
+
+        public void ManagedOnGUI()
+        {
+            GUILayout.Label("Inputs Per Player:");
+            var playersCount = _inputsPerPlayer.Count;
+
+            foreach (var kvp in _inputsPerPlayer)
+            {
+                GUILayout.Label($"Player ID: {kvp.Key}, Number of Inputs: {kvp.Value.Count}");
+                if (playersCount != _inputsPerPlayer.Count) // added if the dict changes in another thread
+                    return;
+            }
+        }
+
+        public void ManagedOnDrawGizmos()
+        {
+            
         }
     }
     
