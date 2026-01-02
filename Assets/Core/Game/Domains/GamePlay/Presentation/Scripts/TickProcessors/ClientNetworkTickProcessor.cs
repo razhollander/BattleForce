@@ -56,6 +56,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             _updateSubscriptionService.RegisterFixedUpdatable(this);
             _updateSubscriptionService.RegisterGuiUpdatable(this);
+            _lastSendTime = DateTime.Now;
         }
         
         public void StopTick()
