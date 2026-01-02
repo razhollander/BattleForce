@@ -71,9 +71,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             
             if (_matchDataService.IsPlayerJoined)
             {
-                _deltaMS = DateTime.Now.Millisecond - _lastSendTime.Millisecond;
-                _highestMs = Math.Max(_deltaMS, _highestMs);
                 SendCurrentTickInputsToServer();
+                _deltaMS = DateTime.Now.Millisecond - _lastSendTime.Millisecond;
+                _highestMs = Mathf.Max(_deltaMS, _highestMs);
                 _lastSendTime = DateTime.Now;
             }
         }
