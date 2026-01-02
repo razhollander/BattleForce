@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly ICommandFactory _commandFactory;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkC2SPacketsSender _packetsSender;
+        private readonly GUIStyle _guiStyle;
         public bool IsPeerConnected { get; private set; }
         public int Ping => _packetsSender.Peer.Ping;
         public int LocalPeerId => _packetsSender.Peer.Id;
@@ -36,6 +37,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 AutoRecycle = true,
                 IPv6Enabled = IPv6Mode.Disabled
             };
+            _guiStyle = new GUIStyle();
+            _guiStyle.fontSize = 10;
+            _guiStyle.normal.textColor = Color.white;
         }
 
         public void StartClient(bool isHost)
@@ -128,10 +132,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         public void ManagedOnGUI()
         {
-            GUIStyle style = new GUIStyle(GUI.skin.label);
-            style.fontSize = 10;
-            style.normal.textColor = Color.white;
-            GUI.Label(new Rect(10, 10, 400, 30), "Local Host Ping: "+_packetsListener.PingToLocalHost, style);
+//            GUI.Label(new Rect(10, 10, 400, 30), "Local Host Ping: "+_packetsListener.PingToLocalHost, _guiStyle);
         }
 
         public void ManagedOnDrawGizmos()

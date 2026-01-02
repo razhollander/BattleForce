@@ -83,6 +83,10 @@ namespace Box2D.NetStandard.Dynamics.World
         internal bool m_newContacts;
 
         private bool m_stepComplete;
+        private readonly Island _islandTOICached;
+        private readonly Island _islandSolverCached;
+        private Body[] _cachedStack;
+        private int _cachedStackCount;
 
         public World() : this(new Vector2(0, -10))
         { }
@@ -93,7 +97,8 @@ namespace Box2D.NetStandard.Dynamics.World
         /// <param name="worldAABB">A bounding box that completely encompasses all your shapes.</param>
         /// <param name="gravity">The world gravity vector.</param>
         /// <param name="doSleep">Improve performance by not simulating inactive bodies.</param>
-        public World(Vector2 gravity)
+        /// <param name="listener">contact listener</param>
+        public World(Vector2 gravity, ContactListener listener = null, int maxTOIContacts = -1, int bodyCount = 512, int contactCount = 256, int jointCount = 0)
         {
             m_destructionListener = null;
             m_debugDraw = null;
@@ -102,7 +107,7 @@ namespace Box2D.NetStandard.Dynamics.World
             m_jointList = null;
 
             m_bodyCount = 0;
-            m_jointCount = 0;
+            jointCount = 0;
 
             m_warmStarting = true;
             m_continuousPhysics = true;
@@ -117,10 +122,26 @@ namespace Box2D.NetStandard.Dynamics.World
             m_clearForces = true;
 
             m_inv_dt0 = 0.0f;
-
             m_contactManager = new ContactManager();
+            m_contactManager.m_contactListener = listener;
+            maxTOIContacts = maxTOIContacts == -1 ? Settings.MaxTOIContacts : maxTOIContacts;
+            _islandTOICached = new Island(2 * maxTOIContacts, maxTOIContacts, 0,
+                m_contactManager.m_contactListener);
+            _cachedStack = new Body[bodyCount];
+            _islandSolverCached = new Island(bodyCount,
+                contactCount,
+                jointCount,
+                m_contactManager.m_contactListener);
         }
 
+        // /// <summary>
+        // ///  Register a contact event listener
+        // /// </summary>
+        // /// <param name="listener"></param>
+        // public void SetContactListener(ContactListener listener)
+        // {
+        //     m_contactManager.m_contactListener = listener;
+        // }
         /// <summary>
         ///  Get\Set global gravity vector.
         /// </summary>
@@ -207,15 +228,6 @@ namespace Box2D.NetStandard.Dynamics.World
         public void SetContactFilter(ContactFilter filter)
         {
             m_contactManager.m_contactFilter = filter;
-        }
-
-        /// <summary>
-        ///  Register a contact event listener
-        /// </summary>
-        /// <param name="listener"></param>
-        public void SetContactListener(ContactListener listener)
-        {
-            m_contactManager.m_contactListener = listener;
         }
 
         /// <summary>
@@ -543,12 +555,6 @@ namespace Box2D.NetStandard.Dynamics.World
         // Find islands, integrate and solve constraints, solve position constraints
         private void Solve(TimeStep step)
         {
-            // Size the island for the worst case.
-            var island = new Island(m_bodyCount,
-                                    m_contactManager.m_contactCount,
-                                    m_jointCount,
-                                    m_contactManager.m_contactListener);
-
             // Clear all the island flags.
             for (Body b = m_bodyList; b != null; b = b.m_next)
             {
@@ -569,7 +575,7 @@ namespace Box2D.NetStandard.Dynamics.World
             int stackSize = m_bodyCount;
             //Stack<Body> stack = new Stack<Body>(_bodyCount);
             //Body stack     = (b2Body**) m_stackAllocator.Allocate(stackSize * sizeof(b2Body*));
-            var stack = new Body[m_bodyCount];
+            _cachedStackCount = 0;
             for (Body seed = m_bodyList; seed != null; seed = seed.m_next)
             {
                 if (seed.HasFlag(BodyFlags.Island))
@@ -589,18 +595,18 @@ namespace Box2D.NetStandard.Dynamics.World
                 }
 
                 // Reset island and stack.
-                island.Clear();
-                var stackCount = 0;
-                stack[stackCount++] = seed;
+                _islandSolverCached.Clear();
+                _cachedStackCount = 0;
+                _cachedStack[_cachedStackCount++] = seed;
                 seed.SetFlag(BodyFlags.Island);
 
                 // Perform a depth first search (DFS) on the constraint graph.
-                while (stackCount > 0)
+                while (_cachedStackCount > 0)
                 {
                     // Grab the next body off the stack and add it to the island.
-                    Body b = stack[--stackCount];
+                    Body b = _cachedStack[--_cachedStackCount];
                     ////Debug.Assert(b.IsEnabled() == true);
-                    island.Add(b);
+                    _islandSolverCached.Add(b);
 
                     // To keep islands as small as possible, we don't
                     // propagate islands across static bodies.
@@ -638,7 +644,7 @@ namespace Box2D.NetStandard.Dynamics.World
                             continue;
                         }
 
-                        island.Add(contact);
+                        _islandSolverCached.Add(contact);
                         contact.m_flags |= CollisionFlags.Island;
 
                         Body other = ce.other;
@@ -650,7 +656,7 @@ namespace Box2D.NetStandard.Dynamics.World
                         }
 
                         //Debug.Assert(stackCount < stackSize);
-                        stack[stackCount++] = other;
+                        _cachedStack[_cachedStackCount++] = other;
                         other.SetFlag(BodyFlags.Island);
                     }
 
@@ -670,7 +676,7 @@ namespace Box2D.NetStandard.Dynamics.World
                             continue;
                         }
 
-                        island.Add(je.joint);
+                        _islandSolverCached.Add(je.joint);
                         je.joint.m_islandFlag = true;
 
                         if (other.HasFlag(BodyFlags.Island))
@@ -679,18 +685,18 @@ namespace Box2D.NetStandard.Dynamics.World
                         }
 
                         //Debug.Assert(stackCount < stackSize);
-                        stack[stackCount++] = other;
+                        _cachedStack[_cachedStackCount++] = other;
                         other.SetFlag(BodyFlags.Island);
                     }
                 }
 
-                island.Solve(step, m_gravity, m_allowSleep);
+                _islandSolverCached.Solve(step, m_gravity, m_allowSleep);
 
                 // Post solve cleanup.
-                for (var i = 0; i < island.m_bodyCount; ++i)
+                for (var i = 0; i < _islandSolverCached.m_bodyCount; ++i)
                 {
                     // Allow static bodies to participate in other islands.
-                    Body b = island.m_bodies[i];
+                    Body b = _islandSolverCached.m_bodies[i];
                     if (b.m_type == BodyType.Static)
                     {
                         b.UnsetFlag(BodyFlags.Island);
@@ -698,7 +704,7 @@ namespace Box2D.NetStandard.Dynamics.World
                 }
             }
 
-            stack = null;
+            _cachedStackCount = 0;
 
             {
                 // Synchronize fixtures, check for out of range bodies.
@@ -727,9 +733,7 @@ namespace Box2D.NetStandard.Dynamics.World
         // Find TOI contacts and solve them.
         private void SolveTOI(in TimeStep step)
         {
-            var island = new Island(2 * Settings.MaxTOIContacts, Settings.MaxTOIContacts, 0,
-                                    m_contactManager.m_contactListener);
-
+            _islandTOICached.Clear();
             if (m_stepComplete)
             {
                 for (Body b = m_bodyList; b != null; b = b.m_next)
@@ -896,10 +900,10 @@ namespace Box2D.NetStandard.Dynamics.World
                     bB.SetAwake(true);
 
                     // Build the island
-                    island.Clear();
-                    island.Add(bA);
-                    island.Add(bB);
-                    island.Add(minContact);
+                    _islandTOICached.Clear();
+                    _islandTOICached.Add(bA);
+                    _islandTOICached.Add(bB);
+                    _islandTOICached.Add(minContact);
 
                     bA.SetFlag(BodyFlags.Island);
                     bB.SetFlag(BodyFlags.Island);
@@ -915,12 +919,12 @@ namespace Box2D.NetStandard.Dynamics.World
                         {
                             for (ContactEdge ce = body.m_contactList; ce != null; ce = ce.next)
                             {
-                                if (island.m_bodyCount == island.m_bodyCapacity)
+                                if (_islandTOICached.m_bodyCount == _islandTOICached.m_bodyCapacity)
                                 {
                                     break;
                                 }
 
-                                if (island.m_contactCount == island.m_contactCapacity)
+                                if (_islandTOICached.m_contactCount == _islandTOICached.m_contactCapacity)
                                 {
                                     break;
                                 }
@@ -977,7 +981,7 @@ namespace Box2D.NetStandard.Dynamics.World
 
                                 // Add the contact to the island
                                 contact.m_flags |= CollisionFlags.Island;
-                                island.Add(contact);
+                                _islandTOICached.Add(contact);
 
                                 // Has the other body already been added to the island?
                                 if (other.HasFlag(BodyFlags.Island))
@@ -985,7 +989,7 @@ namespace Box2D.NetStandard.Dynamics.World
                                     continue;
                                 }
 
-                                // Add the other body to the island.
+                                // Add the other body to the _islandCached.
                                 other.SetFlag(BodyFlags.Island);
 
                                 if (other.m_type != BodyType.Static)
@@ -993,7 +997,7 @@ namespace Box2D.NetStandard.Dynamics.World
                                     other.SetAwake(true);
                                 }
 
-                                island.Add(other);
+                                _islandTOICached.Add(other);
                             }
                         }
                     }
@@ -1005,12 +1009,12 @@ namespace Box2D.NetStandard.Dynamics.World
                     subStep.positionIterations = 20;
                     subStep.velocityIterations = step.velocityIterations;
                     subStep.warmStarting = false;
-                    island.SolveTOI(in subStep, bA.m_islandIndex, bB.m_islandIndex);
+                    _islandTOICached.SolveTOI(in subStep, bA.m_islandIndex, bB.m_islandIndex);
 
                     // Reset island flags and synchronize broad-phase proxies.
-                    for (var i = 0; i < island.m_bodyCount; ++i)
+                    for (var i = 0; i < _islandTOICached.m_bodyCount; ++i)
                     {
-                        Body body = island.m_bodies[i];
+                        Body body = _islandTOICached.m_bodies[i];
                         body.UnsetFlag(BodyFlags.Island);
 
                         if (body.m_type != BodyType.Dynamic)

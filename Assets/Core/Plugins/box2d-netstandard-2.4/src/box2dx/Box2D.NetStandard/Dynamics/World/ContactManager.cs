@@ -52,7 +52,7 @@ namespace Box2D.NetStandard.Dynamics.World
             m_contactCount = 0;
             m_contactFilter = new ContactFilter();
             m_contactListener = null;
-            m_broadPhase = new BroadPhase();
+            m_broadPhase = new BroadPhase(AddPair);
         }
 
         internal void Destroy(Contact c) 
@@ -190,7 +190,7 @@ namespace Box2D.NetStandard.Dynamics.World
 
         internal void FindNewContacts()
         {
-            m_broadPhase.UpdatePairs(AddPair);
+            m_broadPhase.UpdatePairs();
         }
 
         private void AddPair(object proxyUserDataA, object proxyUserDataB)

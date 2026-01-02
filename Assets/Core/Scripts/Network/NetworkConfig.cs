@@ -26,6 +26,12 @@ namespace Core.Scripts.Network
         public int PointsInEvironmentWall = 8;
         public int PacketTypes = 256; // if one day this is changed to a bigger number, need to parse packet types as ushort instead of byte
         
+        //physics Box2D
+        public int ConcurrentTimeOfImpactContacts = 32;
+        public int ConcurrentBodyCount = 512;
+        public int ConcurrentContactCount = 256;
+        public int ConcurrentJointCount = 0;
+        
         // packets receiived *all players combined*
         public int PlayersInputsPackets = 24000; // 5 seconds of packets
         public int JoinRequestPackets = 30; // 30 to stay on the same side, maybe should be ConcurrentPlayers

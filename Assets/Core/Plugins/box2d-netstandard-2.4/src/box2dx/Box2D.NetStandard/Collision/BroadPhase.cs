@@ -63,14 +63,14 @@ namespace Box2D.NetStandard.Collision
 		private Pair[] m_pairBuffer;
 		private int m_pairCapacity;
 		private int m_pairCount;
-
+		private Action<object, object> _addPairAction;
 		private int m_proxyCount;
 		private int m_queryProxyId;
 
-		public BroadPhase()
+		public BroadPhase(Action<object, object> addPairAction)
 		{
 			m_proxyCount = 0;
-
+			_addPairAction = addPairAction;
 			m_pairCapacity = 16;
 			m_pairCount = 0;
 			m_pairBuffer = new Pair[m_pairCapacity];
@@ -102,7 +102,7 @@ namespace Box2D.NetStandard.Collision
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int GetTreeHeight() => m_tree.Height;
 
-		public void UpdatePairs(Action<object, object> AddPair)
+		public void UpdatePairs()
 		{
 			m_pairCount = 0;
 
@@ -124,7 +124,7 @@ namespace Box2D.NetStandard.Collision
 				Pair primaryPair = m_pairBuffer[i];
 				object userDataA = m_tree.GetUserData(primaryPair.proxyIdA);
 				object userDataB = m_tree.GetUserData(primaryPair.proxyIdB);
-				AddPair(userDataA, userDataB);
+				_addPairAction(userDataA, userDataB);
 			}
 
 			for (var i = 0; i < m_moveCount; ++i)

@@ -27,7 +27,17 @@ namespace Core.Scripts.Utils.CustomCollections
             _dict = new Dictionary<TKey, TValue>(capacity, comparer);
         }
 
-        // -------------------- IDictionary API --------------------
+        // ------------------------------------------------------------
+        // ✅ FOREACH (ZERO GC) SUPPORT
+        // ------------------------------------------------------------
+        // This makes `foreach (var kv in CapacityDict)` use the Dictionary struct enumerator
+        // without boxing / interface allocations.
+        public Dictionary<TKey, TValue>.Enumerator GetEnumerator()
+            => _dict.GetEnumerator();
+
+        // ------------------------------------------------------------
+        // IDictionary API
+        // ------------------------------------------------------------
 
         public int Count => _dict.Count;
         public bool IsReadOnly => ((IDictionary<TKey, TValue>)_dict).IsReadOnly;
@@ -63,12 +73,12 @@ namespace Core.Scripts.Utils.CustomCollections
 
             return _dict.TryAdd(key, value);
 #else
-        if (_dict.ContainsKey(key))
-            return false;
+            if (_dict.ContainsKey(key))
+                return false;
 
-        LogIfInitialCapacityExceeded(_dict.Count + 1);
-        _dict.Add(key, value);
-        return true;
+            LogIfInitialCapacityExceeded(_dict.Count + 1);
+            _dict.Add(key, value);
+            return true;
 #endif
         }
 
@@ -90,18 +100,34 @@ namespace Core.Scripts.Utils.CustomCollections
             _loggedInitialCapacityExceeded = false; // reset warning for next usage cycle
         }
 
-        public bool Contains(KeyValuePair<TKey, TValue> item) => ((IDictionary<TKey, TValue>)_dict).Contains(item);
+        public bool Contains(KeyValuePair<TKey, TValue> item)
+            => ((IDictionary<TKey, TValue>)_dict).Contains(item);
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
             => ((IDictionary<TKey, TValue>)_dict).CopyTo(array, arrayIndex);
 
-        public bool Remove(KeyValuePair<TKey, TValue> item) => ((IDictionary<TKey, TValue>)_dict).Remove(item);
+        public bool Remove(KeyValuePair<TKey, TValue> item)
+            => ((IDictionary<TKey, TValue>)_dict).Remove(item);
 
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => _dict.GetEnumerator();
+        // ------------------------------------------------------------
+        // IEnumerable / Interface enumerators (may allocate if enumerated via interface)
+        // ------------------------------------------------------------
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_dict).GetEnumerator();
+        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
+            => _dict.GetEnumerator();
 
-        // -------------------- Logging --------------------
+        IEnumerator IEnumerable.GetEnumerator()
+            => ((IEnumerable)_dict).GetEnumerator();
+
+        // ------------------------------------------------------------
+        // Optional helper: expose raw dictionary when needed
+        // ------------------------------------------------------------
+
+        public Dictionary<TKey, TValue> Raw => _dict;
+
+        // ------------------------------------------------------------
+        // Logging
+        // ------------------------------------------------------------
 
         private void LogIfInitialCapacityExceeded(int requestedCount)
         {

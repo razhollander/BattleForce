@@ -18,13 +18,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
     public class PhysicsSimulator : IPhysicsSimulator, IGUIUpdatable
     {
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
+        private readonly NetworkConfig _networkConfig;
         private World _world;
         private readonly CollisionEventCacheListener _collisionEventCacheListener;
 
         public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig)
         {
             _updateSubscriptionService = updateSubscriptionService;
-            _collisionEventCacheListener = new CollisionEventCacheListener(networkConfig);
+            _networkConfig = networkConfig;
+            _collisionEventCacheListener = new CollisionEventCacheListener(_networkConfig);
         }
 
         public void InitEntryPoint()
@@ -127,13 +129,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private World CreateWorld()
         {
             var gravity = new Vector2(0f, 0f);
-            var world = new World(gravity);
+            var world = new World(gravity, _collisionEventCacheListener, _networkConfig.MaxCap.ConcurrentTimeOfImpactContacts, _networkConfig.MaxCap.ConcurrentBodyCount, _networkConfig.MaxCap.ConcurrentContactCount, _networkConfig.MaxCap.ConcurrentJointCount);
+#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
             var testDebugDrawer = CreateTestDebugDrawer();
             world.SetDebugDraw(testDebugDrawer);
-            world.SetContactListener(_collisionEventCacheListener);
+#endif
+
             return world;
         }
 
+#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
         private static TestDebugDrawer CreateTestDebugDrawer()
         {
             var testDebugDrawer = new TestDebugDrawer();
@@ -145,6 +150,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             return testDebugDrawer;
         }
+#endif
 
         public void SetPlayerVelocity(ushort playerId, Vector2 velocity)
         {

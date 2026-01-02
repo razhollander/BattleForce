@@ -187,7 +187,7 @@ namespace Box2D.NetStandard.Dynamics.World
             m_velocities = new Velocity[m_bodyCapacity];
             m_positions = new Position[m_bodyCapacity];
         }
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
