@@ -308,7 +308,7 @@ namespace FlyingWormConsole3.LiteNetLib
         /// <summary>
         /// Override MTU for all new peers registered in this NetManager, will ignores MTU Discovery!
         /// </summary>
-        public int MtuOverride = 0;
+        public int MtuOverride = 1200;
 
         /// <summary>
         /// Sets initial MTU to lowest possible value according to RFC1191 (576 bytes)
