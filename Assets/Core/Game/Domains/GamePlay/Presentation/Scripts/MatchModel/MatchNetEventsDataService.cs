@@ -8,5 +8,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         public List<BulletSpawnNetEventS2C> BulletSpawnNetEvents { get; set; } = new ();
         public List<PlayerTakeDamageNetEventS2C> PlayerTakeDamageNetEvents { get; set; } = new();
         public List<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents { get; set; } = new();
+        public List<PlayersSwapNetEventS2C> PlayerSwapNetEvents { get; set; } = new();
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
@@ -10,6 +9,8 @@ using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
@@ -40,9 +41,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _packetsObservers.Remove(PacketsObserver.PacketType);
         }
         
-        private void RegisterAutoSerializedTypes()
+        private void RegisterAutoSerializedTypes() // not sure needed
         {
             _packetProcessor.RegisterNestedType<Vector2>((w, v) => w.Put(v), r => r.GetVector2());
+            _packetProcessor.RegisterNestedType<Color>((w, v) => w.Put(v), r => r.GetColor());
         }
 
         // public void SubscribeNetSerializable<T, TUserData>(

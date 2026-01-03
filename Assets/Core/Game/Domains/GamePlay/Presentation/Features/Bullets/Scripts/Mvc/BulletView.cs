@@ -5,7 +5,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
     public class BulletView : MonoBehaviour
     {
         [SerializeField] private SpriteRenderer _spriteRenderer;
-        
+
+        public void SetColor(Color color)
+        {
+            _spriteRenderer.color = color;
+        }
+
         public void InterpolatePosition(Vector2 position, float lerpFactor)
         {
             var lerpedPosition = Vector2.Lerp(transform.position, position, lerpFactor);

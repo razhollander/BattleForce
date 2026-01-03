@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             _playerView = Object.Instantiate(playerViewPrefab, parent);
             _playerView.name = "Player_" + PlayerId;
             var playerTransform = playerModel.Spaceship.Transform;
+            _playerView.SetColor(playerModel.Spaceship.Color);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
         }
@@ -70,6 +71,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         public void SetHealth(ushort currentHealth, ushort maxHealth)
         {
             _playerView.UpdateHealthBar(currentHealth, maxHealth);
+        }
+
+        public void SetTransform(Vector2 position, Vector2 direction)
+        {
+            _playerView.SetTransform(position.ToUnityVector2(), direction.ToUnityVector2().ToQuaternion());
         }
     }
 }

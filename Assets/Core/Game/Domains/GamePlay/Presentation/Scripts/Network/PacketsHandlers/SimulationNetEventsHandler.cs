@@ -122,5 +122,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
                 _matchNetEventsDataService.BulletDestroyedNetEvents.Add(bulletDestroyedEvent);
             }
         }
+
+        public void ProcessPlayerSwapEvents(CapacityList<PlayersSwapNetEventS2C> playerSwapEvents)
+        {
+            if (playerSwapEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerSwapEvent in playerSwapEvents)
+            {
+                var casterPlayer = _matchDataService.GetPlayer(playerSwapEvent.CasterPlayerId);
+                casterPlayer.Spaceship.Transform.Position = playerSwapEvent.CasterPosition;
+                casterPlayer.Spaceship.Transform.Direction = playerSwapEvent.CasterDirection;
+                var otherPlayer = _matchDataService.GetPlayer(playerSwapEvent.OtherPlayerId);
+                otherPlayer.Spaceship.Transform.Position = playerSwapEvent.OtherPosition;
+                otherPlayer.Spaceship.Transform.Direction = playerSwapEvent.OtherDirection;
+                _matchNetEventsDataService.PlayerSwapNetEvents.Add(playerSwapEvent);
+            }
+        }
     }
 }

@@ -56,7 +56,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             foreach (var kvp in _playerJoinedPacketsPerPeer)
             { 
                 var playerName = kvp.Value.UserName;
-                ref var playerState = ref _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, health, shootCooldown);
+                var playersAmount =_matchDataService.SimulationState.Players.Count;
+                var playerColor = _gamePlayConfig.PlayerSpaceship.PlayerColors[playersAmount % _gamePlayConfig.PlayerSpaceship.PlayerColors.Length];
+                ref var playerState = ref _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, health, shootCooldown, playerColor);
                 var playerId = playerState.Id;
                 var peer = kvp.Key;
                 peer.Tag = playerId;

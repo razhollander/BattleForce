@@ -26,10 +26,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
             _bulletsParent = new GameObject("BulletsParent");
         }
 
-        public void CreateBullet(ushort bulletId, ushort belongToPlayerId, float bulletRadius, Vector2 position)
+        public void CreateBullet(ushort bulletId, ushort belongToPlayerId, float bulletRadius, Vector2 position, Color color)
         {
             var bulletController = new BulletController(bulletId, _matchDataService, _gamePlayConfig);
-            bulletController.CreateBulletView(_bulletViewPrefab, position, bulletRadius, _bulletsParent.transform);
+            bulletController.CreateBulletView(_bulletViewPrefab, position, bulletRadius, _bulletsParent.transform, color);
             _bulletControllers.Add(bulletController);
         }
 

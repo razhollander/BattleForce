@@ -5,6 +5,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configura
     [CreateAssetMenu(fileName = "PlayerSpaceshipConfig", menuName = "BF/Network/Player Spaceship Config")]
     public class PlayerSpaceshipConfig : ScriptableObject
     {
+        public Color[] PlayerColors;
         public ushort StartHealth = 5;
         public float MovementSpeed = 5f;
         public float RotationSpeed = 5f;

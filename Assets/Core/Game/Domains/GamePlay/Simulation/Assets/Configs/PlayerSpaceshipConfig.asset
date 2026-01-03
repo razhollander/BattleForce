@@ -12,6 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e86b0b155d584114940d1f5769902cd0, type: 3}
   m_Name: PlayerSpaceshipConfig
   m_EditorClassIdentifier: 
+  PlayerColors:
+  - {r: 0.15395403, g: 0, b: 1, a: 1}
+  - {r: 1, g: 0.022076197, b: 0, a: 1}
+  - {r: 1, g: 0.5039347, b: 0, a: 1}
+  - {r: 0, g: 0.8301887, b: 0.045312863, a: 1}
+  - {r: 0.65915734, g: 0, b: 0.83137256, a: 1}
+  - {r: 0.83137256, g: 0.7524876, b: 0, a: 1}
+  - {r: 0, g: 0.83137256, b: 0.600374, a: 1}
+  - {r: 0.83137256, g: 0, b: 0.781321, a: 1}
   StartHealth: 5
   MovementSpeed: 5
   RotationSpeed: 150

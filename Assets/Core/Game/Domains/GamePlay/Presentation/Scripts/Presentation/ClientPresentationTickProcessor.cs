@@ -10,21 +10,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
     {
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly IPlayerControllers _playerControllers;
-        private readonly ICommandFactory _commandFactory;
         private readonly IBulletControllers _bulletControllers;
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
         private readonly HandleBulletDestroyedNetEventsCommand _handleBulletDestroyedNetEventsCommand;
+        private readonly HandlePlayerSwapNetEventsCommand _handlePlayerSwapNetEventsCommand;
 
         public ClientPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IPlayerControllers playerControllers, ICommandFactory commandFactory, IBulletControllers bulletControllers)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
             _bulletControllers = bulletControllers;
-            _commandFactory = commandFactory;
-            _handleBulletSpawnNetEventsCommand = _commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
-            _handlePlayerTakeDamangeNetEventsCommand = _commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
-            _handleBulletDestroyedNetEventsCommand = _commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>();
+            _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
+            _handlePlayerTakeDamangeNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
+            _handleBulletDestroyedNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>();
+            _handlePlayerSwapNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerSwapNetEventsCommand>();
         }
         
         public void StartTick()
@@ -42,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
             _handleBulletSpawnNetEventsCommand.Execute();
             _handlePlayerTakeDamangeNetEventsCommand.Execute();
             _handleBulletDestroyedNetEventsCommand.Execute();
+            _handlePlayerSwapNetEventsCommand.Execute();
          
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();

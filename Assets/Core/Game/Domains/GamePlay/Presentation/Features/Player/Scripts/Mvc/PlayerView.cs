@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         public void SetColor(Color color)
         {
             _spriteRenderer.color = color;
+            _availableBulletSpriteRenderer.color = color;
         }
 
         public void InterpolateBulletLoading(float cooldownLeft, float maxCooldown, float lerpFactor)
@@ -40,7 +41,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         {
             var lerpedPosition = Vector2.Lerp(transform.position, playerPosition, lerpFactor);
             var lerpedRotation = Quaternion.Lerp(transform.rotation, playerRotation, lerpFactor);
-            transform.SetPositionAndRotation(lerpedPosition, lerpedRotation);
+            SetTransform(lerpedPosition, lerpedRotation);
+        }
+
+        public void SetTransform(Vector2 playerPosition, Quaternion playerRotation)
+        {
+            transform.SetPositionAndRotation(playerPosition, playerRotation);
         }
     }
 }

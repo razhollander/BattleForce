@@ -40,7 +40,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
                 //var isBulletDestroyed = areAnyBulletsDestroyed && _matchNetEventsDataService.BulletDestroyedNetEvents.Any(x => x.BulletId == bulletId);
                 //if (!isBulletDestroyed)
                 //{
-                    _bulletControllers.CreateBullet(bulletId, bulletsSpawnEvent.BelongToPlayerId, bulletsSpawnEvent.BulletRadius, bulletsSpawnEvent.Position);
+                var bulletColor = _matchDataService.GetPlayer(bulletsSpawnEvent.BelongToPlayerId).Spaceship.Color;
+                _bulletControllers.CreateBullet(bulletId, bulletsSpawnEvent.BelongToPlayerId, bulletsSpawnEvent.BulletRadius, bulletsSpawnEvent.Position, bulletColor);
                 //}
                 
                 _playerControllers.ShootBulletEffectForPlayer(bulletsSpawnEvent.BelongToPlayerId);

@@ -1,6 +1,7 @@
-using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
+using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 {
@@ -20,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         }
 
         public ref PlayerStateS2C AddPlayer(string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,
-            float shootCooldown)
+            float shootCooldown, Color color)
         {
             ref var newPlayer = ref _simulationState.Players.AddAndGet();
             var playerId = (ushort)(_simulationState.Players.Count);
@@ -35,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             newPlayer.Spaceship.Transform.Radius = radius;
             newPlayer.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
             newPlayer.Spaceship.Shoot.MaxCooldown = shootCooldown;
+            newPlayer.Spaceship.Color = color;
             return ref newPlayer;
         }
         
