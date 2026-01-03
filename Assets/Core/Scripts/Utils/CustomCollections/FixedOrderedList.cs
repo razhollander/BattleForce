@@ -53,15 +53,25 @@ namespace Core.Scripts.Utils.CustomCollections
         /// <summary>
         /// Adds an item. Throws if full.
         /// </summary>
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // public void Add(T item)
+        // {
+        //     if (_count >= _items.Length)
+        //         throw new InvalidOperationException($"FixedList<{typeof(T).Name}> is full (Capacity={Capacity}).");
+        //
+        //     _items[_count++] = item;
+        // }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(T item)
+        public ref T AddAndGet()
         {
             if (_count >= _items.Length)
                 throw new InvalidOperationException($"FixedList<{typeof(T).Name}> is full (Capacity={Capacity}).");
 
-            _items[_count++] = item;
+            int index = _count++;
+            return ref _items[index];
         }
-
+        
         // /// <summary>
         // /// Adds an item if there is space, returns false if full (no exception).
         // /// </summary>

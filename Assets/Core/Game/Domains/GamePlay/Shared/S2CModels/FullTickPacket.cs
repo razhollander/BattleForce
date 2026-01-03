@@ -15,7 +15,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<PlayerJoinAcceptPacketS2C> PlayerJoinAcceptNetEvents;
         public FixedUnorderedList<PlayerTakeDamageNetEventS2C> PlayerTakeDamageNetEvents;
         public FixedUnorderedList<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents;
+        public FixedUnorderedList<PlayersSwapNetEventS2C> PlayerSwapNetEvents;
 
+        public FullTickPacket()
+        {
+        }
+        
         public FullTickPacket(MaxCap maxCap)
         {
             CurrentSimulationState = new SimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxCap.ConcurrentEvironmentWalls, maxCap.PointsInEvironmentWall);
@@ -30,7 +35,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             PlayerTakeDamageNetEvents = new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(maxCap.PlayerTakeDamageNetEvents);
             BulletDestroyedNetEvents = new FixedUnorderedList<BulletDestroyedNetEventS2C>(maxCap.BulletDestroyedNetEvents);
         }
-        
+
+
         // public FullTickPacket(int tick, SimulationStateS2C previousSimulationState,
         //     SimulationStateS2C currentSimulationState, List<BulletSpawnNetEventS2C> bulletSpawnNetEvents,
         //     List<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, List<PlayerTakeDamageNetEventS2C> playerTakeDamageNetEvents,
@@ -53,6 +59,16 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             SerializedBulletSpawnedEvents(writer);
             SerializedPlayerTakeDamageEvents(writer);
             SerializedBulletDestroyedEvents(writer);
+            SerializedPlayerSwapEvents(writer);
+        }
+
+        private void SerializedPlayerSwapEvents(NetDataWriter writer)
+        {
+            writer.Put((byte) BulletDestroyedNetEvents.Count);
+            foreach (var bulletDestroyedEvent in BulletDestroyedNetEvents.AsSpan())
+            {
+                bulletDestroyedEvent.Serialize(writer);
+            }
         }
 
         public void Deserialize(NetDataReader reader)
@@ -63,6 +79,18 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             DeserializedBulletSpawnedEvents(reader);
             DeserializedPlayerTakeDamageEvents(reader);
             DeserializedBulletDestroyedEvents(reader);
+            DeserializedPlayerSwapEvents(reader);
+        }
+
+        private void DeserializedPlayerSwapEvents(NetDataReader reader)
+        {
+            PlayerSwapNetEvents.Clear();
+            var playerSwapEventsCount = reader.GetByte();
+            for (var i = 0; i < playerSwapEventsCount; i++)
+            {
+                ref var playersSwapEvent = ref PlayerSwapNetEvents.AddAndGet();
+                playersSwapEvent.Deserialize(reader);
+            }
         }
 
         private void SerializedPlayerTakeDamageEvents(NetDataWriter writer)

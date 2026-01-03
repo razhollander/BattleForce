@@ -43,6 +43,7 @@ namespace Core.Scripts.Network
         public int PlayerTakeDamageNetEvents = 128;
         public int BulletSpawnNetEvents = 512;
         public int BulletDestroyedNetEvents = 512;
+        public int PlayerSwapNetEvents = 64;
         public int MaxCollisionsPerFrame = 256;
     }
 }

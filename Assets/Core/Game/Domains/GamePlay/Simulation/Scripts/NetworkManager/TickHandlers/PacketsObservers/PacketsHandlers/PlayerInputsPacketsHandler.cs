@@ -89,6 +89,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
                 UpdatePlayerDirection(playerInputPacket, ref playerState);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, ref playerState);
+                UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, ref playerState);
 
                 if (_lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastPlayerInput))
                 {
@@ -98,6 +99,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             }
 
             return earliestInputPerPlayers;
+        }
+
+        private void UpdatePlayerTalent(int processedTick, bool isTalentInputPressed, ref PlayerStateS2C playerState)
+        {
+               
         }
 
         private CapacityDict<ushort, int> GetHeighestProcessedTickFromServerPerPlayer()
@@ -322,12 +328,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                     var indexOfEarliestInput = GetIndexOfEarliestInput(playerInputs);
                     earliestPlayerInput = playerInputs[indexOfEarliestInput];
                     playerInputs.RemoveAt(indexOfEarliestInput);
-                    if (playerInputs.Count == 0)
-                    {
+                    // if (playerInputs.Count == 0)
+                    // {
                         //playerInputs.Clear();
                         //_inputsListsPool.Return(playerInputs);
                         //_inputsPerPlayer.Remove(playerId);
-                    }
+                    //}
                 }
                 else
                 {
@@ -336,13 +342,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                         continue;
                     }
                 }
-
-                // if (earliestPlayerInput.IsShootInputPressed)
-                // {
-                //     var amountOfInputs = _inputsPerPlayer.ContainsKey(playerId) ? _inputsPerPlayer[playerId].Count : 0;
-                //     string time = DateTime.Now.ToString("HH:mm:ss.fff");
-                //     Debug.Log($"{time} Shoot processed!! earliestPlayerInput:{earliestPlayerInput.ToJson()}, {amountOfInputs}, {_inputsPerPlayer.ToJson()}");
-                // }
+                
                 _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Add(playerId, earliestPlayerInput);
             }
 

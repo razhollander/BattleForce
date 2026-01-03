@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             var isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
             var isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
             var isShootInputPressed = _gameInputActionsController.IsShootInputPressed();
+            var isTalentInputPressed = _gameInputActionsController.IsTalentInputPressed();
             LogService.LogTopic(
                 $"Sending: isMoveRightInputPressed:{isMoveRightInputPressed},isMoveLeftInputPressed:{isMoveLeftInputPressed},isShootInputPressed:{isShootInputPressed}",
                 LogTopicType.ClientNetwork);
@@ -38,7 +39,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
                 HeighestProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer,
                 IsMoveLeftInputPressed = isMoveLeftInputPressed,
                 IsMoveRightInputPressed = isMoveRightInputPressed,
-                IsShootInputPressed = isShootInputPressed
+                IsShootInputPressed = isShootInputPressed,
+                IsTalentInputPressed = isTalentInputPressed
             };
             
             _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.PlayerInput, playerInputPacket, DeliveryMethod.Unreliable);

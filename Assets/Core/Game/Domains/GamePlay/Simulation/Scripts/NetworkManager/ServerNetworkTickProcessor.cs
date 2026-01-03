@@ -60,7 +60,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         public void InitEntryPoint()
         {
             StartTick();
-            _fullTickPacket = new FullTickPacket(_networkConfig.MaxCap);
+            _fullTickPacket = new FullTickPacket();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
         }
 
@@ -161,6 +161,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 _fullTickPacket.PlayerJoinAcceptNetEvents = _matchNetEventsDataService.JoinAcceptNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerTakeDamageNetEvents = _matchNetEventsDataService.PlayerTakeDamageNetEventsPerPlayer[playerId];
                 _fullTickPacket.BulletDestroyedNetEvents = _matchNetEventsDataService.BulletDestroyedNetEventsPerPlayer[playerId];
+                _fullTickPacket.PlayerSwapNetEvents = _matchNetEventsDataService.PlayerSwapNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.FullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }
