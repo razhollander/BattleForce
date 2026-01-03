@@ -427,7 +427,7 @@ namespace LiteNetLib
                     socket = _udpSocketv6;
                 int result = socket.SendTo(data, offset, size, SocketFlags.None, remoteEndPoint);
                 //NetDebug.Write(NetLogLevel.Trace, "[S]Send packet to {0}, result: {1}", remoteEndPoint, result);
-//                Debug.LogError($"[S]Send packet to {remoteEndPoint}, result: {result}");
+                Debug.LogError($"Send packet to {remoteEndPoint}, result: {result}");
                 return result;
             }
             catch (SocketException ex)
