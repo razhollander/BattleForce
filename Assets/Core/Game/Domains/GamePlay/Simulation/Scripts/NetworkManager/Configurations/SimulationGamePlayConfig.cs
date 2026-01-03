@@ -9,5 +9,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configura
         [EditableRef] public PlayerSpaceshipConfig PlayerSpaceship;
         [EditableRef] public PlayerBulletConfig PlayerBullet;
         [EditableRef] public EnvironmentConfig Environment;
+        [EditableRef] public TalentsConfig Talents;
     }
 }

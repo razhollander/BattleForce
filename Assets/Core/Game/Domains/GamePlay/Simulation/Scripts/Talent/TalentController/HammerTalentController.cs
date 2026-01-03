@@ -1,19 +1,18 @@
 using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentHandler
 {
-    public class SwapTalentController
+    public class HammerTalentController
     {
         private ushort _casterPlayerId;
         
         private readonly IMatchNetEventsDataService _matchNetEventsDataService;
         private readonly IMatchDataService _matchDataService;
 
-        public SwapTalentController(ushort casterPlayerId, IMatchNetEventsDataService matchNetEventsDataService, IMatchDataService matchDataService)
+        public HammerTalentController(ushort casterPlayerId, IMatchNetEventsDataService matchNetEventsDataService, IMatchDataService matchDataService)
         {
             _casterPlayerId = casterPlayerId;
             _matchNetEventsDataService = matchNetEventsDataService;

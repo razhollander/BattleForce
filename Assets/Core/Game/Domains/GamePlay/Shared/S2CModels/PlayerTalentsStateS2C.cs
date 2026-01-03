@@ -5,10 +5,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
     public struct PlayerTalentsStateS2C
     {
+        public int SelectedTalentIndex;
+        public TalentStateS2C SelectedTalent => Talents[SelectedTalentIndex];
         public FixedOrderedList<TalentStateS2C> Talents;
         
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put((byte)SelectedTalentIndex);
             writer.Put((byte)Talents.Count);
 
             foreach (var talent in Talents.AsSpan())
@@ -19,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
         public void Deserialize(NetDataReader reader)
         {
+            SelectedTalentIndex = reader.GetByte();
             var talentsCount = (int)reader.GetByte();
             Talents.Clear();
 
