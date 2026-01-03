@@ -68,7 +68,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         
         public ProcessPlayersInputsResult ProcessInputs(int processedTick)
         {
+            _cachedProcessPlayersInputsResult.Clear();
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
+            Debug.LogError("Razz the count2: " + _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.Count + "");
             _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
             return _cachedProcessPlayersInputsResult;
         }
@@ -110,14 +112,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         {
             foreach (var inputsOfPlayer in _inputsPerPlayer)
             {
+                Debug.LogError("Razz Check if Recevie!");
+
                 var didReceiveAnyInputsFromPlayer = inputsOfPlayer.Value.Count > 0;
                 if (didReceiveAnyInputsFromPlayer)
                 {
                     var heighetsTick = GetMaxHighestProcessedTickFromServer(inputsOfPlayer.Value);
-                    _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer[inputsOfPlayer.Key] = heighetsTick;
+                    _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.TryAdd(inputsOfPlayer.Key,heighetsTick);
+                    Debug.LogError("Razz Yes Recevie!");
                 }
             }
-            
+            Debug.LogError("Razz the count1: " + _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.Count + "");
+
             return _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer;
         }
 
@@ -315,8 +321,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         
         private CapacityDict<ushort, PlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()
         {
-            _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.Clear();
-            _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Clear();
+            //_cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.Clear();
+            //_cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Clear();
 
             for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
@@ -368,6 +374,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             if (!_inputsPerPlayer.ContainsKey(playerId))
             {
                 _inputsPerPlayer.Add(playerId, _inputsListsPool.Get());
+                Debug.LogError($"Razz add {playerId}");
             }
             ref var input = ref _inputsPerPlayer[playerId].AddAndGet();
             input = playerInputPacket;
@@ -408,6 +415,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         {
             HeighestProcessedTickPerPlayer = new CapacityDict<ushort, int>(maxConcurrentPlayers);
             EarliestInputsPerPlayer = new CapacityDict<ushort, PlayerInputPacketC2S>(maxConcurrentPlayers);
+        }
+
+        public void Clear()
+        {
+            HeighestProcessedTickPerPlayer.Clear();
+            EarliestInputsPerPlayer.Clear();
         }
     }
 }
