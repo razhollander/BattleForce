@@ -70,7 +70,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         {
             _cachedProcessPlayersInputsResult.Clear();
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
-            Debug.LogError("Razz the count2: " + _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.Count + "");
             _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
             return _cachedProcessPlayersInputsResult;
         }
@@ -112,17 +111,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         {
             foreach (var inputsOfPlayer in _inputsPerPlayer)
             {
-                Debug.LogError("Razz Check if Recevie!");
-
                 var didReceiveAnyInputsFromPlayer = inputsOfPlayer.Value.Count > 0;
                 if (didReceiveAnyInputsFromPlayer)
                 {
                     var heighetsTick = GetMaxHighestProcessedTickFromServer(inputsOfPlayer.Value);
                     _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.TryAdd(inputsOfPlayer.Key,heighetsTick);
-                    Debug.LogError("Razz Yes Recevie!");
                 }
             }
-            Debug.LogError("Razz the count1: " + _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.Count + "");
 
             return _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer;
         }

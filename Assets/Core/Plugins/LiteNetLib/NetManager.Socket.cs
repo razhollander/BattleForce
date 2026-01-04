@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using LiteNetLib.Utils;
+using UnityEngine;
 
 namespace LiteNetLib
 {
@@ -651,7 +652,7 @@ namespace LiteNetLib
                 Statistics.IncrementPacketsSent();
                 Statistics.AddBytesSent(length);
             }
-
+            Debug.LogError($"Send with bytes: {result}");
             return result;
         }
 

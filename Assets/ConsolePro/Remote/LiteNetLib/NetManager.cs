@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Threading;
 using FlyingWormConsole3.LiteNetLib.Layers;
 using FlyingWormConsole3.LiteNetLib.Utils;
+using Debug = UnityEngine.Debug;
 
 namespace FlyingWormConsole3.LiteNetLib
 {
@@ -525,7 +526,6 @@ namespace FlyingWormConsole3.LiteNetLib
                 Statistics.IncrementPacketsSent();
                 Statistics.AddBytesSent(length);
             }
-
             return result;
         }
 
@@ -657,6 +657,7 @@ namespace FlyingWormConsole3.LiteNetLib
                 RecycleEvent(evt);
             else if (AutoRecycle)
                 evt.DataReader.RecycleInternal();
+            Debug.LogError($"Got from: {evt.RemoteEndPoint}, bytes: {evt.DataReader.RawDataSize}");
         }
 
         internal void RecycleEvent(NetEvent evt)

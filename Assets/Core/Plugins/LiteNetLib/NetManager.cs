@@ -308,7 +308,7 @@ namespace LiteNetLib
         /// <summary>
         /// Override MTU for all new peers registered in this NetManager, will ignores MTU Discovery!
         /// </summary>
-        public int MtuOverride = 0;
+        public int MtuOverride = 1200;
 
         /// <summary>
         /// Automatically discovery mtu starting from. Use at own risk because some routers can break MTU detection
@@ -497,6 +497,14 @@ namespace LiteNetLib
         {
             NetDebug.Write("[NM] Processing event: " + evt.Type);
             bool emptyData = evt.DataReader.IsNull;
+            try
+            {
+                UnityEngine.Debug.LogError($"Got bytes: {evt.DataReader.RawDataSize}");
+            }
+            catch (Exception e)
+            {
+                //ignore
+            }
             switch (evt.Type)
             {
                 case NetEvent.EType.Connect:

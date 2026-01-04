@@ -5,24 +5,70 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c1e12e0-c131-4b63-94f5-2f0c8aa9c131" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandlerOld.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandlerOld.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/C2SModels/Packets/PlayerInputPacketC2S.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/C2SModels/Packets/PlayerInputPacketC2S.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerInitiator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerInitiator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/EventsSequenceCounters.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/EventsSequenceCounters.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/MatchDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/MatchDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/MatchNetEventsDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/MatchModel/MatchNetEventsDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/IPlayerInputsPacketsHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/IPlayerInputsPacketsHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler2.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler2.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/PresentationAssembly.asmdef" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/PresentationAssembly.asmdef" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/NetworkC2SPacketsSender.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/NetworkC2SPacketsSender.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/NetworkS2CPacketsListener.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/NetworkS2CPacketsListener.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/GamePlayBothAssembly.asmdef" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/GamePlayBothAssembly.asmdef" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/IServerNetworkManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/IServerNetworkManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/NetworkS2CPacketsSender.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/NetworkS2CPacketsSender.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/NetworkC2SPacketsListener.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/NetworkC2SPacketsListener.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/SimulationAssembly.asmdef" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/SimulationAssembly.asmdef" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/BaseChannel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/BaseChannel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/BaseChannel.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/BaseChannel.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/ConnectionRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/ConnectionRequest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/ConnectionRequest.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/ConnectionRequest.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/INetEventListener.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/INetEventListener.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/INetEventListener.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/INetEventListener.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/Crc32cLayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/Crc32cLayer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/Crc32cLayer.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/Crc32cLayer.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/PacketLayerBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/PacketLayerBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/PacketLayerBase.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/PacketLayerBase.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/XorEncryptLayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/XorEncryptLayer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/XorEncryptLayer.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Layers/XorEncryptLayer.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NatPunchModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NatPunchModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NatPunchModule.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NatPunchModule.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetConstants.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetConstants.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetConstants.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetConstants.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetDebug.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetDebug.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetDebug.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetDebug.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPacket.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPacket.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPacket.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPacket.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPacketPool.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPacketPool.cs.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPeer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPeer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/Utils/CustomCollections/FixedUnorderedList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Utils/CustomCollections/FixedUnorderedList.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPeer.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetPeer.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetSocket.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetSocket.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetStatistics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetStatistics.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetStatistics.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetStatistics.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/ReliableChannel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/ReliableChannel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/ReliableChannel.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/ReliableChannel.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/SequencedChannel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/SequencedChannel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/SequencedChannel.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/SequencedChannel.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/CRC32C.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/CRC32C.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/CRC32C.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/CRC32C.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/FastBitConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/FastBitConverter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/FastBitConverter.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/FastBitConverter.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/INetSerializable.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/INetSerializable.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetDataReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetDataReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetDataReader.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetDataReader.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetDataWriter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetDataWriter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetDataWriter.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetDataWriter.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetPacketProcessor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetPacketProcessor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetPacketProcessor.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetPacketProcessor.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetSerializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetSerializer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetSerializer.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetSerializer.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NtpPacket.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NtpPacket.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NtpPacket.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NtpPacket.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NtpRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NtpRequest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NtpRequest.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NtpRequest.cs.meta" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -703,12 +749,6 @@
           <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkManager.cs</url>
-          <line>47</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/NetworkManager/ServerNetworkManager.cs" containingFunctionPresentation="Method 'StartServer'" />
-          <option name="timeStamp" value="67" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/PacketsHandlers/PlayerJoinPacketsHandler.cs</url>
           <line>38</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/NetworkManager/PacketsHandlers/PlayerJoinPacketsHandler.cs" containingFunctionPresentation="Method 'OnJoinReceived'" />
@@ -734,18 +774,6 @@
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkManager.cs</url>
-          <line>95</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/NetworkManager/ServerNetworkManager.cs" containingFunctionPresentation="Method 'SendPacketSerializedOnlyToPlayer'" />
-          <option name="timeStamp" value="74" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkManager.cs</url>
-          <line>105</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/NetworkManager/ServerNetworkManager.cs" containingFunctionPresentation="Method 'AddPlayerPeer'" />
-          <option name="timeStamp" value="75" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/TimerFixedThreaded.cs</url>
           <line>58</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/FixedTimer.cs" containingFunctionPresentation="Method 'RunTimer'" />
@@ -762,10 +790,10 @@
           <line>56</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/NetworkManager/SeverNetworkTickProcessor.cs" containingFunctionPresentation="Constructor 'ServerNetworkTickProcessor'">
             <startOffsets>
-              <option value="3058" />
+              <option value="2954" />
             </startOffsets>
             <endOffsets>
-              <option value="3121" />
+              <option value="2987" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="80" />
@@ -796,101 +824,10 @@
           <option name="timeStamp" value="92" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs</url>
-          <line>73</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" containingFunctionPresentation="Method 'OnServerPeerReceived'">
-            <startOffsets>
-              <option value="3088" />
-            </startOffsets>
-            <endOffsets>
-              <option value="3089" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="96" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs</url>
-          <line>29</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" containingFunctionPresentation="Constructor 'ClientNetworkManager'">
-            <startOffsets>
-              <option value="1340" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1395" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="97" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs</url>
-          <line>42</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" containingFunctionPresentation="Method 'StartClient'">
-            <startOffsets>
-              <option value="1875" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1901" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="99" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs</url>
-          <line>52</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" containingFunctionPresentation="Method 'StartClient'">
-            <startOffsets>
-              <option value="2265" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2407" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="100" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs</url>
-          <line>48</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" containingFunctionPresentation="Method 'StartClient'">
-            <startOffsets>
-              <option value="2043" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2100" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="101" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs</url>
-          <line>50</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/ClientNetworkManager.cs" containingFunctionPresentation="Method 'StartClient'">
-            <startOffsets>
-              <option value="2180" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2200" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="102" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/PacketsHandlers/PlayerInputsPacketsHandler.cs</url>
           <line>115</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/PacketsHandlers/PlayerInputsPacketsHandler.cs" containingFunctionPresentation="Method 'OnPlayerInputReceived'" />
           <option name="timeStamp" value="106" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkManager.cs</url>
-          <line>72</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/ServerNetworkManager.cs" containingFunctionPresentation="Lambda expression inside Method 'SubscribeNetSerializable'">
-            <startOffsets>
-              <option value="2620" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2649" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="108" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/Utils/NetPacketProcessor.cs</url>
@@ -904,97 +841,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="112" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/PacketsHandlers/PlayerInputsPacketsHandler.cs</url>
-          <line>284</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsHandlers/PlayerInputsPacketsHandler2.cs" containingFunctionPresentation="Method 'PopEarliestInputsOfEachPlayer'">
-            <startOffsets>
-              <option value="15778" />
-            </startOffsets>
-            <endOffsets>
-              <option value="15779" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="114" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs</url>
-          <line>40</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs" containingFunctionPresentation="Method 'ResolveAddress'">
-            <startOffsets>
-              <option value="1125" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1189" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="115" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs</url>
-          <line>37</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs" containingFunctionPresentation="Method 'ResolveAddress'">
-            <startOffsets>
-              <option value="952" />
-            </startOffsets>
-            <endOffsets>
-              <option value="978" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="116" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs</url>
-          <line>35</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs" containingFunctionPresentation="Method 'ResolveAddress'">
-            <startOffsets>
-              <option value="873" />
-            </startOffsets>
-            <endOffsets>
-              <option value="921" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="117" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs</url>
-          <line>45</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetUtils.cs" containingFunctionPresentation="Method 'ResolveAddress'">
-            <startOffsets>
-              <option value="1328" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1345" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="118" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs</url>
-          <line>476</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs" containingFunctionPresentation="Method 'SendRaw'">
-            <startOffsets>
-              <option value="15574" />
-            </startOffsets>
-            <endOffsets>
-              <option value="15653" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="121" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs</url>
-          <line>471</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/LiteNetLib/NetManager.cs" containingFunctionPresentation="Method 'SendRaw'">
-            <startOffsets>
-              <option value="15360" />
-            </startOffsets>
-            <endOffsets>
-              <option value="15457" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="122" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerControllers.cs</url>
@@ -1086,19 +932,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="134" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/PacketsHandlers/FullTickPacketsHandler.cs</url>
-          <line>71</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Network/PacketsHandlers/FullTickPacketsHandler.cs" containingFunctionPresentation="Method 'ProcessStateLatestTick'">
-            <startOffsets>
-              <option value="4067" />
-            </startOffsets>
-            <endOffsets>
-              <option value="4157" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="136" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Commands/ProcessCachedCollisionsCommand.cs</url>
