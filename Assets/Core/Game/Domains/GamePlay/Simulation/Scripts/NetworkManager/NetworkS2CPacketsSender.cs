@@ -56,21 +56,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         //     _packetProcessor.Write(_writer, packet);
         //     _peerPerPlayerId[playerId].Send(_writer, deliveryMethod);
         // }
-        
-        public void SendPacketToAllPlayersSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
-        {
-            if (_peerPerPlayerId == null)
-            {
-                LogService.LogError("NetPeer is null! Must have a peer to send packets to!");
-                return;
-            }
-            
-            /*_writer.Reset();
-            _writer.Put((byte)type);
-            packet.Serialize(_writer);*/
-            LogService.LogTopic($"Send packet type {type}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
-            _peerPerPlayerId.ForEach(x => _packetProcessor.SendNetSerializable(x.Value, packet, deliveryMethod));
-        }
+        //
+        // public void SendPacketToAllPlayersSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        // {
+        //     if (_peerPerPlayerId == null)
+        //     {
+        //         LogService.LogError("NetPeer is null! Must have a peer to send packets to!");
+        //         return;
+        //     }
+        //     
+        //     /*_writer.Reset();
+        //     _writer.Put((byte)type);
+        //     packet.Serialize(_writer);*/
+        //     LogService.LogTopic($"Send packet type {type}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
+        //     _peerPerPlayerId.ForEach(x => _packetProcessor.SendNetSerializable(x.Value, packet, deliveryMethod));
+        // }
         
         public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C packetType, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
         {
@@ -79,9 +79,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 LogService.LogError("NetPeer is null! Must have a peer to send packets to!");
                 return;
             }
-
+            
+            _writer.Reset();
+            _writer.Put((byte)packetType);
+            packet.Serialize(_writer);
+            peer.Send(_writer, deliveryMethod);
             LogService.LogTopic($"Send packet type {packetType} to player {playerId}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
-            _packetProcessor.SendNetSerializable((byte)packetType, peer, packet, deliveryMethod);
         }
         
         // public void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new()

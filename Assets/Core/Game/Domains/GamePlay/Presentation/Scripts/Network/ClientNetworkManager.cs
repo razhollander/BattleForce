@@ -29,14 +29,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _networkConfig = networkConfig;
             _commandFactory = commandFactory;
             _updateSubscriptionService = updateSubscriptionService;
-            var packetProcessor = new NetPacketProcessor();
-            _packetsListener = new NetworkS2CPacketsListener(packetProcessor, networkConfig);
-            _packetsSender = new NetworkC2SPacketsSender(packetProcessor);
+            _packetsListener = new NetworkS2CPacketsListener(networkConfig);
+            _packetsSender = new NetworkC2SPacketsSender();
             _netManager = new NetManager(_packetsListener)
             {
                 AutoRecycle = true,
-                IPv6Enabled = IPv6Mode.Disabled
+                IPv6Enabled = false
             };
+            
             _guiStyle = new GUIStyle();
             _guiStyle.fontSize = 10;
             _guiStyle.normal.textColor = Color.white;

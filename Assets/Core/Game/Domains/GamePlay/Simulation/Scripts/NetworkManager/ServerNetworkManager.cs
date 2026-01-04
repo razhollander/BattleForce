@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
             _networkConfig = networkConfig;
             _packetProcessor = new NetPacketProcessor();
             _packetsListener = new NetworkC2SPacketsListener(_networkConfig);
-            _netManager = new NetManager(_packetsListener) { AutoRecycle = true, BroadcastReceiveEnabled = true, IPv6Enabled = IPv6Mode.Disabled};
+            _netManager = new NetManager(_packetsListener) { AutoRecycle = true, BroadcastReceiveEnabled = true, IPv6Enabled = false};
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
 
@@ -55,10 +55,10 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
             _netManager.Stop();
         }
         
-        public void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
-        {
-            _packetsSender.SendPacketToAllPlayersSerialized(type, packet, deliveryMethod);
-        }
+        // public void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        // {
+        //     _packetsSender.SendPacketToAllPlayersSerialized(type, packet, deliveryMethod);
+        // }
 
         public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet,
             DeliveryMethod deliveryMethod) where T : INetSerializable

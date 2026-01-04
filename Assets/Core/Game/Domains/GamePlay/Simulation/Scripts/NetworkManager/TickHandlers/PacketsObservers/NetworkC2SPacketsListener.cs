@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _packetsObservers.Remove(PacketsObserver.PacketType);
         }
         
-        void INetEventListener.OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
+        public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
         {
             var packetType = (PacketTypeC2S)reader.GetByte();
             _packetsObservers[packetType].OnPacketReceived(reader, peer);
@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         
         void INetEventListener.OnPeerConnected(NetPeer peer)
         {
-            LogService.LogTopic("Player connected: " + peer.EndPoint, LogTopicType.ServerNetwork);
+            LogService.LogTopic("Player connected: " + peer.Address, LogTopicType.ServerNetwork);
         }
 
         void INetEventListener.OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -62,7 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         {
             LogService.LogError("NetworkError: " + socketError);
         }
-
+        
         void INetEventListener.OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader,
             UnconnectedMessageType messageType)
         {

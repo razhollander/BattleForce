@@ -1,0 +1,18 @@
+{
+    "name": "ConsoleProEditorAssembly",
+    "rootNamespace": "",
+    "references": [
+        "GUID:b5acea1d70a8b4141bf19e1ada9c46be"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

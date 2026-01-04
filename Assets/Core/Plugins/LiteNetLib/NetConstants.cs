@@ -11,22 +11,23 @@
         Unreliable = 4,
 
         /// <summary>
-        /// Reliable. Packets won't be dropped, won't be duplicated, can arrive without order. no delay of acknowledgment, packet are re-sent if didn't receive acknowledgment
+        /// Reliable. Packets won't be dropped, won't be duplicated, can arrive without order.
         /// </summary>
         ReliableUnordered = 0,
 
         /// <summary>
-        /// Unreliable. Packets can be dropped, won't be duplicated, will arrive in order. no delay of acknowledgment. only newest matters, older packets are ignored
+        /// Unreliable. Packets can be dropped, won't be duplicated, will arrive in order.
         /// </summary>
         Sequenced = 1,
 
         /// <summary>
-        /// Reliable and ordered. Packets won't be dropped, won't be duplicated, will arrive in order. has delay in case a packet N+2 is received and N+1 haven't arrived yet.
+        /// Reliable and ordered. Packets won't be dropped, won't be duplicated, will arrive in order.
         /// </summary>
         ReliableOrdered = 2,
 
         /// <summary>
-        /// Reliable only last packet. Packets can be dropped (except the last one), won't be duplicated, will arrive in order. good for sending hp for example
+        /// Reliable only last packet. Packets can be dropped (except the last one), won't be duplicated, will arrive in order.
+        /// Cannot be fragmented
         /// </summary>
         ReliableSequenced = 3
     }
@@ -49,12 +50,16 @@
         public const ushort HalfMaxSequence = MaxSequence / 2;
 
         //protocol
-        internal const int ProtocolId = 11;
+        internal const int ProtocolId = 13;
         internal const int MaxUdpHeaderSize = 68;
+        internal const int ChannelTypeCount = 4;
+        internal const int FragmentedChannelsCount = 2;
+        internal const int MaxFragmentsInWindow = DefaultWindowSize / 2;
 
         internal static readonly int[] PossibleMtu =
         {
-            576  - MaxUdpHeaderSize, //minimal
+            //576  - MaxUdpHeaderSize minimal (RFC 1191)
+            1024,                    //most games standard
             1232 - MaxUdpHeaderSize,
             1460 - MaxUdpHeaderSize, //google cloud
             1472 - MaxUdpHeaderSize, //VPN
@@ -62,11 +67,12 @@
             1500 - MaxUdpHeaderSize  //Ethernet II (RFC 1191)
         };
 
-        internal static readonly int MaxPacketSize = PossibleMtu[PossibleMtu.Length - 1];
+        //Max possible single packet size
+        public static readonly int InitialMtu = PossibleMtu[0];
+        public static readonly int MaxPacketSize = PossibleMtu[PossibleMtu.Length - 1];
+        public static readonly int MaxUnreliableDataSize = MaxPacketSize - HeaderSize;
 
         //peer specific
         public const byte MaxConnectionNumber = 4;
-
-        public const int PacketPoolSize = 1000;
     }
 }

@@ -10,11 +10,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
     public class NetworkC2SPacketsSender
     {
         private NetPeer _peer;
-        private readonly NetPacketProcessor _packetProcessor;
+        private NetDataWriter _writer = new NetDataWriter();
 
-        public NetworkC2SPacketsSender(NetPacketProcessor packetProcessor)
+        public NetworkC2SPacketsSender()
         {
-            _packetProcessor = packetProcessor;
         }
 
         public NetPeer Peer => _peer;
@@ -32,15 +31,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 return;
             }
             
-            // _writer.Reset();
-            // _writer.Put((byte)type);
-            //packet.Serialize(_writer);
+            _writer.Reset();
+            _writer.Put((byte)packetType);
+            packet.Serialize(_writer);
+            _peer.Send(_writer, deliveryMethod);
             LogService.LogTopic($"Send packet type: {packetType}, json {packet.ToJson()}", LogTopicType.ClientNetwork);
-            _packetProcessor.SendNetSerializable((byte)packetType, _peer, packet, deliveryMethod);
-            // _cachedWriter.Reset();
-            // _cachedWriter.Put((byte)packetType);
-            // packet.Serialize(_cachedWriter);
-            // _peer.Send(_cachedWriter, deliveryMethod);
         }
         
         // public void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new()

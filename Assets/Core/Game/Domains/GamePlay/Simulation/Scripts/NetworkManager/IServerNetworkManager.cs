@@ -9,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
     {
         void InitEntryPoint();
         void InitExitPoint();
-        void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
+        //void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
         public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
         void AddPlayerPeer(ushort playerId, NetPeer peer);
         void PollEvents();

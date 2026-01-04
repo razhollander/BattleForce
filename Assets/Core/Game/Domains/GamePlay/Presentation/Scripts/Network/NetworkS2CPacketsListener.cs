@@ -24,9 +24,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         //public event Action<JoinAcceptPacketS2C> OnPlayerJoinedAccepted;
         private readonly CapacityDict<PacketTypeS2C, IPacketsObserver> _packetsObservers;
 
-        public NetworkS2CPacketsListener(NetPacketProcessor packetProcessor, NetworkConfig networkConfig)
+        public NetworkS2CPacketsListener(NetworkConfig networkConfig)
         {
-            _packetProcessor = packetProcessor;
+            _packetProcessor =  new NetPacketProcessor();;
             RegisterAutoSerializedTypes();
             _packetsObservers = new CapacityDict<PacketTypeS2C, IPacketsObserver>(networkConfig.MaxCap.PacketTypes);
         }
@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         //     _packetProcessor.SubscribeNetSerializable(onReceive);
         // }
         
-        void INetEventListener.OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
+        public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
         {
             var packetType = (PacketTypeS2C)reader.GetByte();
             _packetsObservers[packetType].OnPacketReceived(reader);
@@ -63,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         void INetEventListener.OnPeerConnected(NetPeer peer)
         {
-            LogService.LogTopic("Player connected: " + peer.EndPoint, LogTopicType.ClientNetwork);
+            LogService.LogTopic("Player connected: " + peer.Address, LogTopicType.ClientNetwork);
             OnPeerConnected?.Invoke(peer);
         }
 
