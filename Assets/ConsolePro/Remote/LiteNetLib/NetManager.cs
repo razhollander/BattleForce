@@ -657,7 +657,6 @@ namespace FlyingWormConsole3.LiteNetLib
                 RecycleEvent(evt);
             else if (AutoRecycle)
                 evt.DataReader.RecycleInternal();
-            Debug.LogError($"Got from: {evt.RemoteEndPoint}, bytes: {evt.DataReader.RawDataSize}");
         }
 
         internal void RecycleEvent(NetEvent evt)

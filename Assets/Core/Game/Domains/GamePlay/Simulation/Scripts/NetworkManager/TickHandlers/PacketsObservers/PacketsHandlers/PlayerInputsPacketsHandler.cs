@@ -369,7 +369,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             if (!_inputsPerPlayer.ContainsKey(playerId))
             {
                 _inputsPerPlayer.Add(playerId, _inputsListsPool.Get());
-                Debug.LogError($"Razz add {playerId}");
             }
             ref var input = ref _inputsPerPlayer[playerId].AddAndGet();
             input = playerInputPacket;

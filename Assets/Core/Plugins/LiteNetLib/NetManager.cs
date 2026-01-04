@@ -497,14 +497,13 @@ namespace LiteNetLib
         {
             NetDebug.Write("[NM] Processing event: " + evt.Type);
             bool emptyData = evt.DataReader.IsNull;
-            try
-            {
-                UnityEngine.Debug.LogError($"Got bytes: {evt.DataReader.RawDataSize}");
-            }
-            catch (Exception e)
-            {
-                //ignore
-            }
+            // try
+            // {
+            //     UnityEngine.Debug.LogError($"Got bytes: {evt.DataReader.RawDataSize}");
+            // }
+            // catch (Exception e)
+            // {
+            // }
             switch (evt.Type)
             {
                 case NetEvent.EType.Connect:
