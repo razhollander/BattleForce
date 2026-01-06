@@ -18,15 +18,22 @@ MonoBehaviour:
     ConcurrentEvironmentWalls: 64
     PointsInEvironmentWall: 8
     PacketTypes: 256
+    ConcurrentTimeOfImpactContacts: 32
+    ConcurrentBodyCount: 512
+    ConcurrentContactCount: 256
+    ConcurrentJointCount: 0
     PlayersInputsPackets: 12000
     JoinRequestPackets: 30
+    ConcurrentInputsProcessed: 100
     FullTickPacketsNetEvents: 1000
     PlayerJoinAcceptNetEvents: 32
     PlayerTakeDamageNetEvents: 128
     BulletSpawnNetEvents: 512
     BulletDestroyedNetEvents: 512
-  TicksPerSeconds: 60
-  DeltaTime: 0.016666668
+    PlayerSwapNetEvents: 64
+    MaxCollisionsPerFrame: 256
+  TicksPerSeconds: 30
+  DeltaTime: 0.033333335
   PhysicsVelocityIterations: 8
   PositionIterations: 8
   ServerTicksBuffer: 2
