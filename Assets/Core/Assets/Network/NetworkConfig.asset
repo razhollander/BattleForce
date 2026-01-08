@@ -32,8 +32,8 @@ MonoBehaviour:
     BulletDestroyedNetEvents: 512
     PlayerSwapNetEvents: 64
     MaxCollisionsPerFrame: 256
-  TicksPerSeconds: 30
-  DeltaTime: 0.033333335
+  TicksPerSeconds: 60
+  DeltaTime: 0.016666668
   PhysicsVelocityIterations: 8
   PositionIterations: 8
   ServerTicksBuffer: 2
