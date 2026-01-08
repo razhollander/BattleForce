@@ -38,5 +38,5 @@ MonoBehaviour:
   PositionIterations: 8
   ServerTicksBuffer: 2
   HostPort: 49153
-  IpAddress: 104.28.212.21
+  IpAddress: 10.163.64.46
   ConntectionKey: BattleForceGame
