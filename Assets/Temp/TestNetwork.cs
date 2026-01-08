@@ -9,6 +9,8 @@ public class TestNetwork : MonoBehaviour
 {
   [SerializeField] NetworkConfig networkConfig;
   [SerializeField] bool isOn;
+  private bool _didClientConnectToServer;
+  int _tick;
   [ContextMenu("Start Client")]
   private void client()
   {
@@ -17,7 +19,7 @@ public class TestNetwork : MonoBehaviour
     NetManager client = new NetManager(listener);
     client.Start();
     client.Connect(networkConfig.IpAddress, networkConfig.HostPort, "SomeConnectionKey" /* text key or NetDataWriter */);
-    listener.NetworkReceiveEvent += OnReceive;
+    listener.NetworkReceiveEvent += OnClientReceive;
 
     _ = StartClientTick(client);
   }
@@ -32,10 +34,28 @@ public class TestNetwork : MonoBehaviour
     client.Stop();
   }
 
-  private void OnReceive(NetPeer fromPeer, NetPacketReader dataReader, byte channel, DeliveryMethod deliveryMethod)
+  private void OnClientReceive(NetPeer fromPeer, NetPacketReader dataReader, byte channel, DeliveryMethod deliveryMethod)
   {
     Debug.Log($"We got: {dataReader.GetString(100 /* max length of string */)}");
     dataReader.Recycle();
+
+    if (!_didClientConnectToServer)
+    {
+      _didClientConnectToServer = true;
+      _ = StartSendingEveryTick(fromPeer);
+    }
+  }
+
+  private async Awaitable StartSendingEveryTick(NetPeer peer)
+  {
+    while (isOn)
+    {
+      NetDataWriter writer = new NetDataWriter();                 // Create writer class
+      
+      writer.Put($"Hello server! {_tick++}");                                // Put some string
+      peer.Send(writer, DeliveryMethod.Unreliable); 
+      await Awaitable.WaitForSecondsAsync(0.015f);
+    }
   }
 
   [ContextMenu("Start Server")]
@@ -62,9 +82,20 @@ public class TestNetwork : MonoBehaviour
       peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
     };
 
+    listener.NetworkReceiveEvent+= OnServerReceive;
     _ = StartServerTick(server);
   }
 
+  private void OnServerReceive(NetPeer fromPeer, NetPacketReader dataReader, byte channel, DeliveryMethod deliveryMethod)
+  {
+    var str = dataReader.GetString(100 /* max length of string */);
+    Debug.Log($"We got: {str}");
+    dataReader.Recycle();
+    NetDataWriter writer = new NetDataWriter();        
+    writer.Put($"Server got: {str}");                       
+    fromPeer.Send(writer, DeliveryMethod.Unreliable); 
+  }
+  
   private async Awaitable StartServerTick(NetManager server)
   {
     while (isOn)
