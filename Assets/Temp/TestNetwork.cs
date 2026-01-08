@@ -52,7 +52,7 @@ public class TestNetwork : MonoBehaviour
 
     listener.PeerConnectedEvent += peer =>
     {
-      Console.WriteLine("We got connection: {0}", peer.Address); // Show peer ip
+      Debug.Log($"We got connection: {peer.Address}"); // Show peer ip
       NetDataWriter writer = new NetDataWriter();                 // Create writer class
       writer.Put("Hello client!");                                // Put some string
       peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
