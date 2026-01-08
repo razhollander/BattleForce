@@ -19,12 +19,17 @@ public class TestNetwork : MonoBehaviour
     client.Connect(networkConfig.IpAddress, networkConfig.HostPort, "SomeConnectionKey" /* text key or NetDataWriter */);
     listener.NetworkReceiveEvent += OnReceive;
 
+    _ = StartClientTick(client);
+    client.Stop();
+  }
+  
+  private async Awaitable StartClientTick(NetManager client)
+  {
     while (isOn)
     {
       client.PollEvents();
-      Thread.Sleep(15);
+      await Awaitable.WaitForSecondsAsync(0.015f);
     }
-
     client.Stop();
   }
 
@@ -58,10 +63,15 @@ public class TestNetwork : MonoBehaviour
       peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
     };
 
+    _ = StartServerTick(server);
+  }
+
+  private async Awaitable StartServerTick(NetManager server)
+  {
     while (isOn)
     {
       server.PollEvents();
-      Thread.Sleep(15);
+      await Awaitable.WaitForSecondsAsync(0.015f);
     }
     server.Stop();
   }
