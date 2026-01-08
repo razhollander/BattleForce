@@ -20,7 +20,6 @@ public class TestNetwork : MonoBehaviour
     listener.NetworkReceiveEvent += OnReceive;
 
     _ = StartClientTick(client);
-    client.Stop();
   }
   
   private async Awaitable StartClientTick(NetManager client)
