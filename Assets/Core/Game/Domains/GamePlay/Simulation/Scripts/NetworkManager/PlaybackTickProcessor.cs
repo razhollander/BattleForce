@@ -18,11 +18,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             //throw new NotImplementedException();
         }
 
-        private TimerFixedThreaded _fixedTimer;
+        private TimerFixedThreaded2 _fixedTimer;
 
         public void StartTick(int ticksPerSecond, CancellationTokenSource cancellationTokenSource)
         {
-            _fixedTimer = new TimerFixedThreaded(ticksPerSecond, OnTick);
+            _fixedTimer = new TimerFixedThreaded2("BattleFroce Thread",ticksPerSecond, OnTick);
             _fixedTimer.Start(cancellationTokenSource);
         }
 

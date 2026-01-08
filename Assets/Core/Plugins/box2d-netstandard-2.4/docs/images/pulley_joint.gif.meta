@@ -397,7 +397,18 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      pulley_joint_0: -3827399810439261774
+      pulley_joint_1: -3786040971298192026
+      pulley_joint_10: 6711198161161025739
+      pulley_joint_2: -6137387524537246172
+      pulley_joint_3: 1908939208234590540
+      pulley_joint_4: 276431299656536925
+      pulley_joint_5: -6165781154039792324
+      pulley_joint_6: 3138382442768719458
+      pulley_joint_7: -2921269650365661310
+      pulley_joint_8: 4891911481952986807
+      pulley_joint_9: -2521739027008373931
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

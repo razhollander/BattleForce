@@ -322,7 +322,15 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      gear_joint_0: -5152838648446035675
+      gear_joint_1: 8659807972470539806
+      gear_joint_2: 5044672445694872354
+      gear_joint_3: -5100988095429047293
+      gear_joint_4: 3600833796051541623
+      gear_joint_5: 1677293690362305057
+      gear_joint_6: 995961133709042472
+      gear_joint_7: 5807812267750265006
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

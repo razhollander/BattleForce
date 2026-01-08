@@ -297,7 +297,14 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      convex_concave_0: -8539943180074152527
+      convex_concave_1: 4415021845921825512
+      convex_concave_2: -4596456271180527158
+      convex_concave_3: -5549800899420556725
+      convex_concave_4: -313230511713228302
+      convex_concave_5: -5880340262534089118
+      convex_concave_6: -6011734417464268903
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private SendInputsToServerCommand _sendInputsToServerCommand;
         private readonly IClientNetworkManager _networkManager;
 
-        private TimerFixedThreaded _fixedTimer;
+        private TimerFixedThreaded2 _fixedTimer;
         private DateTime _lastSendTime;
         private int _deltaMS;
         private int _highestMs;

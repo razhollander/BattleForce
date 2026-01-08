@@ -172,7 +172,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      revolute_joint_0: -6881386473345888138
+      revolute_joint_1: 1407383370450498460
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

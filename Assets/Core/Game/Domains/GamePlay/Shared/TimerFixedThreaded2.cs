@@ -5,7 +5,7 @@ using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Shared
 {
-    public sealed class TimerFixedThreaded
+    public sealed class TimerFixedThreaded2
     {
         private readonly float _fixedDelta;
         private double _accumulator;
@@ -18,15 +18,12 @@ namespace Core.Game.Domains.GamePlay.Shared
         private Thread _thread;
 
         private readonly object _lock = new object();
+        private readonly string _threadName;
 
-        public float LerpAlpha => (float)(_accumulator / _fixedDelta);
-
-        public TimerFixedThreaded(int ticksPerSecond, Action onTickAction)
+        public TimerFixedThreaded2(string threadName, int ticksPerSecond, Action onTickAction)
         {
-            if (ticksPerSecond <= 0)
-                throw new ArgumentOutOfRangeException(nameof(ticksPerSecond));
-
-            _fixedDelta = 1.0f / ticksPerSecond;
+            _threadName = threadName;
+            _fixedDelta = ticksPerSecond < 0 ? 0 : 1.0f / ticksPerSecond;
             _stopwatch = new Stopwatch();
             _onTickAction = onTickAction ?? throw new ArgumentNullException(nameof(onTickAction));
         }
@@ -55,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Shared
                 _thread = new Thread(RunTimer)
                 {
                     IsBackground = true,
-                    Name = "BattleFroce Thread"
+                    Name = _threadName
                 };
 
                 _thread.Start();
@@ -100,11 +97,20 @@ namespace Core.Game.Domains.GamePlay.Shared
                     _accumulator += (double)(elapsedTicks - _lastTime) / Stopwatch.Frequency;
                     _lastTime = elapsedTicks;
 
-                    while (_accumulator >= _fixedDelta)
+                    if (_fixedDelta > 0)
+                    {
+                        while (_accumulator >= _fixedDelta)
+                        {
+                            _onTickAction();
+                            _accumulator -= _fixedDelta;
+
+                            if (token.IsCancellationRequested)
+                                break;
+                        }
+                    }
+                    else
                     {
                         _onTickAction();
-                        _accumulator -= _fixedDelta;
-
                         if (token.IsCancellationRequested)
                             break;
                     }

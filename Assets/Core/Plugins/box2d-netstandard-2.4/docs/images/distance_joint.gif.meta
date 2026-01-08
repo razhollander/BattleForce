@@ -197,7 +197,10 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      distance_joint_0: 8786871524136976495
+      distance_joint_1: -9042031972718418400
+      distance_joint_2: -7123617406484738191
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

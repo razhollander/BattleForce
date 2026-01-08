@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
@@ -21,6 +22,7 @@ using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using LiteNetLib;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 {
@@ -38,9 +40,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
 
-        private TimerFixedThreaded _fixedTimer;
+        private TimerFixedThreaded2 _fixedTimer;
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
         private FullTickPacket _fullTickPacket;
+        private TimerFixedThreaded2 _pollEventsFixedTimer;
+        private Stopwatch _sw;
+        private long _last;
 
         public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
@@ -68,8 +73,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         {
             CurrentTick = 0;
             var cancellationTokenSource = new CancellationTokenSource();
-            _fixedTimer = new TimerFixedThreaded(_networkConfig.TicksPerSeconds, OnTick);
+            _fixedTimer = new TimerFixedThreaded2("BattleFroce Thread", _networkConfig.TicksPerSeconds, OnTick);
+            _pollEventsFixedTimer = new TimerFixedThreaded2("Poll Events Thread", -1, PollEvents);
+            _pollEventsFixedTimer.Start(cancellationTokenSource);
             _fixedTimer.Start(cancellationTokenSource);
+        }
+
+        private void PollEvents()
+        {
+            _sw = Stopwatch.StartNew();
+            _last = _sw.ElapsedMilliseconds;
+
+                long now = _sw.ElapsedMilliseconds;
+                long dt = now - _last;
+                _last = now;
+
+                //if (dt > 20)
+              //      Debug.LogError($"PollEvents stall: {dt}ms");
+
+            _networkManager.PollEvents();
         }
 
         public void InitExitPoint()
@@ -88,12 +110,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             {
                 CurrentTick++;
                 var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
-                _networkManager.PollEvents();
                 var processPlayersInputsResult = ProcessPackets(processedTick);
-                ApplyMatchModelToPhysicsSimulation();
-                _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
-                _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
-                ApplyPhysicsSimulationToMatchModel();
+                //ApplyMatchModelToPhysicsSimulation();
+                //_physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
+                //_processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
+                //ApplyPhysicsSimulationToMatchModel();
                  RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                  SendCurrentTickStateToAllClients(processedTick);
             }
