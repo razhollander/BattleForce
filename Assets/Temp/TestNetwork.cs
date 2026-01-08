@@ -10,7 +10,7 @@ public class TestNetwork : MonoBehaviour
   [SerializeField] NetworkConfig networkConfig;
   [SerializeField] bool isOn;
   private bool _didClientConnectToServer;
-  int _tick;
+  int _tick = 0;
   [ContextMenu("Start Client")]
   private void client()
   {
@@ -42,12 +42,13 @@ public class TestNetwork : MonoBehaviour
     if (!_didClientConnectToServer)
     {
       _didClientConnectToServer = true;
-      _ = StartSendingEveryTick(fromPeer);
+      _ = StartSendingEveryTickToServer(fromPeer);
     }
   }
 
-  private async Awaitable StartSendingEveryTick(NetPeer peer)
+  private async Awaitable StartSendingEveryTickToServer(NetPeer peer)
   {
+    Debug.Log("start sending every tick to server");
     while (isOn)
     {
       NetDataWriter writer = new NetDataWriter();                 // Create writer class
