@@ -130,7 +130,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         {
             for (int i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
-                ref var playerState = ref _matchDataService.SimulationState.Players.GetByIndex(i);
+                var playerState = _matchDataService.SimulationState.Players.GetByIndex(i);
                 playerState.Spaceship.Transform.Position = _physicsSimulator.GetPlayer(playerState.Id).Position;
             }
 

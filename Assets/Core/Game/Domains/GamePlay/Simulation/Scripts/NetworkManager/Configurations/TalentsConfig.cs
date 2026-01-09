@@ -6,7 +6,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configura
     [CreateAssetMenu(fileName = "TalentsConfig", menuName = "BF/Network/Talents Config")]
     public class TalentsConfig : ScriptableObject
     {
-        public int MaxConcurrentTalentsForPlayer = 3;
         public HammerTalentConfig HammerTalentConfig;
         public SwapTalentConfig SwapTalentConfig;
         public PulseDashConfig PulseDashConfig;

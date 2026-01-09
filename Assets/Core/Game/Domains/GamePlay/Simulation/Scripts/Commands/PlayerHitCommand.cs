@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 
         public void Execute()
         {
-            ref var playerState = ref _matchDataService.SimulationState.GetPlayerById(_playerId);
+            var playerState = _matchDataService.SimulationState.GetPlayerById(_playerId);
             var newHealth = (ushort)Math.Max(DEAD_HEALTH_AMOUNT, playerState.Spaceship.Health.CurrentHealth - _hitDamage);
             playerState.Spaceship.Health.CurrentHealth = newHealth;
             var isPlayerAlive = newHealth > DEAD_HEALTH_AMOUNT;

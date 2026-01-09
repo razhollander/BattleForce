@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Scripts.Network;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
@@ -11,19 +12,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         public SimulationStateS2C SimulationState => _simulationState;
         private ushort _lastBulletCreatedId = 0;
    
-        public MatchDataService(NetworkConfig networkConfig)
+        public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _simulationState = new SimulationStateS2C(
                 networkConfig.MaxCap.ConcurrentPlayers,
                 networkConfig.MaxCap.ConcurrentBullets,
                 networkConfig.MaxCap.ConcurrentEvironmentWalls,
-                networkConfig.MaxCap.PointsInEvironmentWall);
+                networkConfig.MaxCap.PointsInEvironmentWall,
+                sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
         }
 
-        public ref PlayerStateS2C AddPlayer(string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,
+        public PlayerStateS2C AddPlayer(string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,
             float shootCooldown, Color color)
         {
-            ref var newPlayer = ref _simulationState.Players.AddAndGet();
+            var newPlayer = _simulationState.Players.AddAndGet();
             var playerId = (ushort)(_simulationState.Players.Count);
             newPlayer.Id = playerId;
             newPlayer.Name = playerName;
@@ -37,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             newPlayer.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
             newPlayer.Spaceship.Shoot.MaxCooldown = shootCooldown;
             newPlayer.Spaceship.Color = color;
-            return ref newPlayer;
+            return newPlayer;
         }
         
         public PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed, float radius)

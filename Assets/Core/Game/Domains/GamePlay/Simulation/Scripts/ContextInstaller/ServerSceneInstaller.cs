@@ -15,9 +15,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
     public class ServerSceneInstaller : MonoInstaller
     {
         [SerializeField] private SimulationGamePlayConfig _gamePlayConfig;
-        
+        [SerializeField] private SharedGamePlayConfig _sharedGamePlayConfig;
+
         public override void InstallBindings()
         {
+            Container.BindInstance(_sharedGamePlayConfig).AsSingle().NonLazy();
             Container.Bind<IServerInitiator>().To<ServerInitiator>().AsSingle().NonLazy();
             Container.BindInstance(_gamePlayConfig).AsSingle().NonLazy();
             Container.Bind<IServerNetworkManager>().To<ServerNetworkManager>().AsSingle().NonLazy();

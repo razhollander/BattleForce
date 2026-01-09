@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         public PacketTypeS2C PacketType => PacketTypeS2C.FullTick;
         public int LastProcessedTickFromServer { get; private set; }
 
-        public FullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
+        public FullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
             IMatchDataService matchDataService, IMatchNetEventsDataService matchNetEventsDataService,
             IPlayerControllers playerControllers, IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory)
         {
@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _cachedUnprocessedPlayerTakeDamageEvents = new CapacityList<PlayerTakeDamageNetEventS2C>(networkConfig.MaxCap.PlayerTakeDamageNetEvents);
             _cachedUnprocessedBulletDestroyedEvents = new CapacityList<BulletDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents);
             _cachedUnprocessedPlayerSwapEvents = new CapacityList<PlayersSwapNetEventS2C>(networkConfig.MaxCap.PlayerSwapNetEvents);
-            _fullTickPacketsPool = new ConcurrentPool<FullTickPacket>(() => new FullTickPacket(networkConfig.MaxCap), networkConfig.MaxCap.FullTickPacketsNetEvents);
+            _fullTickPacketsPool = new ConcurrentPool<FullTickPacket>(() => new FullTickPacket(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
         public void RegisterListeners()
@@ -148,7 +148,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         }
 
 
-        private void ProcessPlayerJoinedEvents(FixedUnorderedList<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
+        private void ProcessPlayerJoinedEvents(FixedClassUnorderedList<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
         {
             _cachedUnprocessedPlayerJoinedEvents.Clear();
 

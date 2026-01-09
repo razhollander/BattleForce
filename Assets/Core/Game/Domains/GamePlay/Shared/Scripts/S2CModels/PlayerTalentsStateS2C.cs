@@ -3,12 +3,17 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
-    public struct PlayerTalentsStateS2C
+    public class PlayerTalentsStateS2C
     {
         public int SelectedTalentIndex;
-        public TalentStateS2C SelectedTalent => Talents[SelectedTalentIndex];
+
         public FixedOrderedList<TalentStateS2C> Talents;
-        
+
+        public PlayerTalentsStateS2C(int maxTalents)
+        {
+            Talents = new FixedOrderedList<TalentStateS2C>(maxTalents);
+        }
+
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)SelectedTalentIndex);

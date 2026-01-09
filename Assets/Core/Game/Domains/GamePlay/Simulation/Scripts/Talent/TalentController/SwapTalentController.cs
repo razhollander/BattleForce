@@ -22,22 +22,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentHandler
 
         public void OnTick(int tick)
         {
-            ref var casterPlayerState = ref _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            ref var closetPlayerToCaster = ref FindClosestPlayerToCaster(ref casterPlayerState, _matchDataService.SimulationState);
+            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
+            var closetPlayerToCaster = FindClosestPlayerToCaster(casterPlayerState, _matchDataService.SimulationState);
             
-            SwapPlayersMatchData(ref casterPlayerState, ref closetPlayerToCaster);
+            SwapPlayersMatchData(casterPlayerState, closetPlayerToCaster);
            
             _matchNetEventsDataService.AddPlayersSwapEvent(tick, _casterPlayerId, closetPlayerToCaster.Id, casterPlayerState.Spaceship.Transform.Position,
                 closetPlayerToCaster.Spaceship.Transform.Position, casterPlayerState.Spaceship.Transform.Direction, closetPlayerToCaster.Spaceship.Transform.Direction);
         }
 
-        private void SwapPlayersMatchData(ref PlayerStateS2C casterPlayerState, ref PlayerStateS2C closetPlayerToCaster)
+        private void SwapPlayersMatchData(PlayerStateS2C casterPlayerState, PlayerStateS2C closetPlayerToCaster)
         {
             (casterPlayerState.Spaceship.Transform.Position, closetPlayerToCaster.Spaceship.Transform.Position) = (closetPlayerToCaster.Spaceship.Transform.Position, casterPlayerState.Spaceship.Transform.Position);
             (casterPlayerState.Spaceship.Transform.Direction, closetPlayerToCaster.Spaceship.Transform.Direction) = (closetPlayerToCaster.Spaceship.Transform.Direction, casterPlayerState.Spaceship.Transform.Direction);
         }
 
-        private ref PlayerStateS2C FindClosestPlayerToCaster(ref PlayerStateS2C casterPlayerState, SimulationStateS2C simulationStateS2C)
+        private PlayerStateS2C FindClosestPlayerToCaster(PlayerStateS2C casterPlayerState, SimulationStateS2C simulationStateS2C)
         {
             var players = simulationStateS2C.Players;
             var span = players.AsSpan();
@@ -67,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentHandler
             if (closePlayerIndex == -1)
                 throw new InvalidOperationException("No other players found (only caster exists).");
 
-            return ref players.GetByIndex(closePlayerIndex);
+            return players.GetByIndex(closePlayerIndex);
         }
     }
 }

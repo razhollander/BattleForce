@@ -163,8 +163,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80e7fd3ff009046f6a60ad3b702514e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _networkConfig: {fileID: 11400000, guid: b7e0e344763e24e639529857dcf51380, type: 2}
   _gamePlayConfig: {fileID: 11400000, guid: 322d4f0f32b31486db5e8892412642a8, type: 2}
+  _sharedGamePlayConfig: {fileID: 11400000, guid: de964e16c50a04c0a970e0eca290cdfa, type: 2}
 --- !u!1 &1631379501
 GameObject:
   m_ObjectHideFlags: 0

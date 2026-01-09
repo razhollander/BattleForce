@@ -1,3 +1,4 @@
+using Core.Scripts.Network;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
@@ -8,6 +9,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
         public bool IsLocal;
         public PlayerStateS2C PlayerState;
         public SimulationStateS2C SimulationState;
+
+        public PlayerJoinAcceptPacketS2C(MaxCap maxCap, int maxTalents)
+        {
+            PlayerState = new PlayerStateS2C(maxTalents);
+            SimulationState = new SimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxCap.ConcurrentEvironmentWalls, maxCap.PointsInEvironmentWall,
+                maxTalents);
+        }
 
         public void Serialize(NetDataWriter writer)
         {

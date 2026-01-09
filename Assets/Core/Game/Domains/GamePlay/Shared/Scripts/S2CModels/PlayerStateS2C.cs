@@ -2,13 +2,18 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
-    public struct PlayerStateS2C
+    public class PlayerStateS2C
     {
         public ushort Id;
         public string Name;
         public PlayerSpaceshipStateS2C Spaceship;
         public ushort TeamId;
         public bool IsAlive;
+
+        public PlayerStateS2C(int maxTalents)
+        {
+            Spaceship = new PlayerSpaceshipStateS2C(maxTalents);
+        }
 
         public void Serialize(NetDataWriter writer)
         {

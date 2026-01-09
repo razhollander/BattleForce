@@ -112,7 +112,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 return;
             }
 
-            ref var playerModel = ref GetPlayerFromCollision(objectA, objectB, isPlayerToWallCollision, isWallToPlayerCollision);
+            var playerModel = GetPlayerFromCollision(objectA, objectB, isPlayerToWallCollision, isWallToPlayerCollision);
             var relativeVelocity = playerModel.Spaceship.Transform.Velocity;
             contact.GetWorldManifold(out var worldManifold);
             var collisionNormal = worldManifold.normal;
@@ -124,15 +124,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 : System.Numerics.Vector2.Zero;
         }
 
-        private ref PlayerStateS2C GetPlayerFromCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, bool isPlayerToWallCollision, bool isWallToPlayerCollision)
+        private PlayerStateS2C GetPlayerFromCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, bool isPlayerToWallCollision, bool isWallToPlayerCollision)
         {
             if (isPlayerToWallCollision)
             {
-                return ref _matchDataService.SimulationState.GetPlayerById(objectA.Id);
+                return _matchDataService.SimulationState.GetPlayerById(objectA.Id);
             }
             if (isWallToPlayerCollision)
             {
-                return ref _matchDataService.SimulationState.GetPlayerById(objectB.Id);
+                return _matchDataService.SimulationState.GetPlayerById(objectB.Id);
             }
             
             throw new System.Exception("No collision!");

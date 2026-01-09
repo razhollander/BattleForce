@@ -3,6 +3,7 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
@@ -13,40 +14,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
     public class MatchNetEventsDataService : IMatchNetEventsDataService
     {
         public CapacityDict<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>> BulletSpawnNetEventsPerPlayer { get; private set; } // todo: remove events related to bullet when bullet is destroyed
-        public CapacityDict<ushort, FixedUnorderedList<PlayerJoinAcceptPacketS2C>> JoinAcceptNetEventsPerPlayer { get; private set; } // todo: remove events related to player when player is destroyed
+        public CapacityDict<ushort, FixedClassUnorderedList<PlayerJoinAcceptPacketS2C>> JoinAcceptNetEventsPerPlayer { get; private set; } // todo: remove events related to player when player is destroyed
         public CapacityDict<ushort, FixedUnorderedList<PlayerTakeDamageNetEventS2C>> PlayerTakeDamageNetEventsPerPlayer { get; private set; } // todo: remove events related to player hit when player is destroyed
         public CapacityDict<ushort, FixedUnorderedList<BulletDestroyedNetEventS2C>> BulletDestroyedNetEventsPerPlayer { get; private set; } // todo: remove events related to player hit when player is destroyed
         public CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>> PlayerSwapNetEventsPerPlayer { get; private set;} // todo: remove events related to player hit when player is destroyed
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
-        private readonly ConcurrentPool<FixedUnorderedList<PlayerJoinAcceptPacketS2C>> _joinAcceptListPool;
+        private readonly ConcurrentPool<FixedClassUnorderedList<PlayerJoinAcceptPacketS2C>> _joinAcceptListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerTakeDamageNetEventS2C>> _playerTakeDamageListPool;
         private readonly ConcurrentPool<FixedUnorderedList<BulletDestroyedNetEventS2C>> _bulletDestroyedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayersSwapNetEventS2C>> _playerSwapListPool;
 
-        public MatchNetEventsDataService(NetworkConfig networkConfig)
+        public MatchNetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             BulletSpawnNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>>(maxConcurrentPlayers);
-            JoinAcceptNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerJoinAcceptPacketS2C>>(maxConcurrentPlayers);
+            JoinAcceptNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<PlayerJoinAcceptPacketS2C>>(maxConcurrentPlayers);
             PlayerTakeDamageNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerTakeDamageNetEventS2C>>(maxConcurrentPlayers);
             BulletDestroyedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<BulletDestroyedNetEventS2C>>(maxConcurrentPlayers);
             PlayerSwapNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>>(maxConcurrentPlayers);
             
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
-            _joinAcceptListPool = new ConcurrentPool<FixedUnorderedList<PlayerJoinAcceptPacketS2C>>(() =>
+            _joinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerJoinAcceptPacketS2C>>(() =>
             {
-                var list =new FixedUnorderedList<PlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
-
-                for (int i = 0; i < list.Capacity; i++)
-                {
-                    ref var joinPacket = ref list.AddAndGet();
-                    joinPacket = new PlayerJoinAcceptPacketS2C
-                    {
-                        SimulationState = new SimulationStateS2C(networkConfig.MaxCap.ConcurrentPlayers, networkConfig.MaxCap.ConcurrentBullets,
-                            networkConfig.MaxCap.ConcurrentEvironmentWalls, networkConfig.MaxCap.PointsInEvironmentWall)
-                    };
-                }
-                
+                var list =new FixedClassUnorderedList<PlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents, ()=>new PlayerJoinAcceptPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer));
                 list.Clear();
                 return list;
             }, maxConcurrentPlayers);
@@ -169,7 +159,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         {
             foreach (var kvp in JoinAcceptNetEventsPerPlayer)
             {
-                ref var packet = ref kvp.Value.AddAndGet();
+                var packet = kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.IsLocal = playerState.Id == kvp.Key;
                 packet.PlayerState = playerState;

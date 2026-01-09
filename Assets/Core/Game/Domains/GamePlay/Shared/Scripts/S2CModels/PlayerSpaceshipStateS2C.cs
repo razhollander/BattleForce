@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
-    public struct PlayerSpaceshipStateS2C : INetSerializable
+    public class PlayerSpaceshipStateS2C : INetSerializable
     {
         public Color Color;
         public PlayerTransformStateS2C Transform;
@@ -17,6 +17,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         //     Shoot = new PlayerShootStateS2C(shootCooldown);
         //     Health = new PlayerHealthS2C(health);
         // }
+
+        public PlayerSpaceshipStateS2C(int maxTalents)
+        {
+            Talents = new PlayerTalentsStateS2C(maxTalents);
+        }
 
         public void Serialize(NetDataWriter writer)
         {

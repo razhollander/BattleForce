@@ -7,16 +7,16 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
     public class SimulationStateS2C
     {
-        public FixedUnorderedList<PlayerStateS2C> Players;
+        public FixedClassUnorderedList<PlayerStateS2C> Players;
         public FixedUnorderedList<PlayerBulletS2C> Bullets;
         public FixedUnorderedList<EnvironmentWallStateS2C> Walls;
 
-        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxWalls, int maxPointsInWall)
+        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxWalls, int maxPointsInWall, int maxTalents)
         {
-            Players = new FixedUnorderedList<PlayerStateS2C>(maxPlayers);
+            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalents));
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
             Walls = new FixedUnorderedList<EnvironmentWallStateS2C>(maxWalls);
-
+            
             for (int i = 0; i < Walls.Count; i++)
             {
                 ref var wall = ref Walls.AddAndGet();
@@ -54,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Players.Clear();
             for (var i = 0; i < playersCount; i++)
             {
-                ref var player = ref Players.AddAndGet();
+                var player = Players.AddAndGet();
                 player.Deserialize(reader);;
             }
           
@@ -75,22 +75,22 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
         }
 
-        public ref PlayerStateS2C GetPlayerById(ushort playerId)
+        public PlayerStateS2C GetPlayerById(ushort playerId)
         {
             for (int i = 0; i < Players.Count; i++)
             {
                 if (Players[i].Id == playerId)
                 {
-                    return ref Players.GetByIndex(i);
+                    return Players.GetByIndex(i);
                 } 
             }
 
             throw new System.Exception($"No player for id {playerId}!");
         }
 
-        public ref PlayerStateS2C GetPlayerByIndex(int index)
+        public PlayerStateS2C GetPlayerByIndex(int index)
         {
-            return ref Players.GetByIndex(index);
+            return Players.GetByIndex(index);
         }
 
         public void RemoveBulletById(ushort bulletId)
@@ -155,7 +155,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Players.Clear();
             for (var i = 0; i < playersCount; i++)
             {
-                ref var player = ref Players.AddAndGet();
+                var player = Players.AddAndGet();
                 player.DeserializeDeltas(reader);
             }
 

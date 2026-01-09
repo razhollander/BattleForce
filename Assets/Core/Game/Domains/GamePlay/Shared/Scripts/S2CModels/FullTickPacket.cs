@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         //public SimulationStateS2C PreviousSimulationState; // not sure if gonna need this
         public SimulationStateS2C CurrentSimulationState;
         public FixedUnorderedList<BulletSpawnNetEventS2C> BulletSpawnNetEvents; // todo: remove events related to bullet when bullet id destroyed
-        public FixedUnorderedList<PlayerJoinAcceptPacketS2C> PlayerJoinAcceptNetEvents;
+        public FixedClassUnorderedList<PlayerJoinAcceptPacketS2C> PlayerJoinAcceptNetEvents;
         public FixedUnorderedList<PlayerTakeDamageNetEventS2C> PlayerTakeDamageNetEvents;
         public FixedUnorderedList<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents;
         public FixedUnorderedList<PlayersSwapNetEventS2C> PlayerSwapNetEvents;
@@ -21,17 +21,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
         }
         
-        public FullTickPacket(MaxCap maxCap)
+        public FullTickPacket(MaxCap maxCap, SharedGamePlayConfig sharedGamePlayConfig)
         {
-            CurrentSimulationState = new SimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxCap.ConcurrentEvironmentWalls, maxCap.PointsInEvironmentWall);
+            CurrentSimulationState = new SimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxCap.ConcurrentEvironmentWalls, maxCap.PointsInEvironmentWall, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
-            PlayerJoinAcceptNetEvents = new FixedUnorderedList<PlayerJoinAcceptPacketS2C>(maxCap.PlayerJoinAcceptNetEvents);
-            
-            for (int i = 0; i < PlayerJoinAcceptNetEvents.RawArray.Length; i++)
-            {
-                PlayerJoinAcceptNetEvents.RawArray[i] = new PlayerJoinAcceptPacketS2C() {SimulationState = new SimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxCap.ConcurrentEvironmentWalls, maxCap.PointsInEvironmentWall)};
-            }
-
+            PlayerJoinAcceptNetEvents = new FixedClassUnorderedList<PlayerJoinAcceptPacketS2C>(maxCap.PlayerJoinAcceptNetEvents, () => new PlayerJoinAcceptPacketS2C(maxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer));
             PlayerTakeDamageNetEvents = new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(maxCap.PlayerTakeDamageNetEvents);
             BulletDestroyedNetEvents = new FixedUnorderedList<BulletDestroyedNetEventS2C>(maxCap.BulletDestroyedNetEvents);
             PlayerSwapNetEvents = new FixedUnorderedList<PlayersSwapNetEventS2C>(maxCap.PlayerSwapNetEvents);
@@ -65,10 +59,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
         private void SerializedPlayerSwapEvents(NetDataWriter writer)
         {
-            writer.Put((byte) BulletDestroyedNetEvents.Count);
-            foreach (var bulletDestroyedEvent in BulletDestroyedNetEvents.AsSpan())
+            writer.Put((byte) PlayerSwapNetEvents.Count);
+            foreach (var playerSwapNetEvent in PlayerSwapNetEvents.AsSpan())
             {
-                bulletDestroyedEvent.Serialize(writer);
+                playerSwapNetEvent.Serialize(writer);
             }
         }
 
@@ -149,7 +143,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             var playerJoinedNetEventsCount = reader.GetByte();
             for (var i = 0; i < playerJoinedNetEventsCount; i++)
             {
-                ref var playerJoinAcceptPacket = ref PlayerJoinAcceptNetEvents.AddAndGet();
+                var playerJoinAcceptPacket = PlayerJoinAcceptNetEvents.AddAndGet();
                 playerJoinAcceptPacket.Deserialize(reader);
             }
         }

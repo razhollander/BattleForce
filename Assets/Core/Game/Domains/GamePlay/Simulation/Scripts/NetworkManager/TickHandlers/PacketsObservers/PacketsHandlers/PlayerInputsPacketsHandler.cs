@@ -80,7 +80,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
             for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
-                ref var playerState = ref _matchDataService.SimulationState.GetPlayerByIndex(i);
+                var playerState = _matchDataService.SimulationState.GetPlayerByIndex(i);
                 var playerId = playerState.Id;
                 if (!earliestInputPerPlayers.TryGetValue(playerId, out var playerInputPacket))
                 {
@@ -88,9 +88,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                     continue;
                 }
 
-                UpdatePlayerDirection(playerInputPacket, ref playerState);
-                UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, ref playerState);
-                UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, ref playerState);
+                UpdatePlayerDirection(playerInputPacket, playerState);
+                UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
+                UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState);
 
                 if (_lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastPlayerInput))
                 {
@@ -102,7 +102,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             return earliestInputPerPlayers;
         }
 
-        private void UpdatePlayerTalent(int processedTick, bool isTalentInputPressed, ref PlayerStateS2C playerState)
+        private void UpdatePlayerTalent(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState)
         {
                
         }
@@ -192,7 +192,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 //             return null;
 //         }
 
-        private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, ref PlayerStateS2C playerModel)
+        private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, PlayerStateS2C playerModel)
         {
             var shootState = playerModel.Spaceship.Shoot;
             var isCurrentlyOnCooldown = shootState.CooldownSecondsLeft < shootState.MaxCooldown;
@@ -225,7 +225,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);
         }
 
-        private void UpdatePlayerDirection(PlayerInputPacketC2S playerInputPacket, ref PlayerStateS2C playerModel)
+        private void UpdatePlayerDirection(PlayerInputPacketC2S playerInputPacket, PlayerStateS2C playerModel)
         {
             var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
             var rotationAngle =

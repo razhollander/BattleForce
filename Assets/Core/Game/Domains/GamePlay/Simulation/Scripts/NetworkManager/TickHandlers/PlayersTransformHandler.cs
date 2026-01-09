@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         {
             for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
-                ref var playerModel = ref _matchDataService.SimulationState.GetPlayerByIndex(i);
+                var playerModel = _matchDataService.SimulationState.GetPlayerByIndex(i);
                 playerModel.Spaceship.Transform.Position += playerModel.Spaceship.Transform.Velocity * _networkConfig.DeltaTime;
             }
         }
