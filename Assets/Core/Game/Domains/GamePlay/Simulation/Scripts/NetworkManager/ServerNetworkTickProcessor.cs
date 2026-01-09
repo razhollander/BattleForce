@@ -111,16 +111,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 CurrentTick++;
                 var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
                 var processPlayersInputsResult = ProcessPackets(processedTick);
-                //ApplyMatchModelToPhysicsSimulation();
-                //_physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
-                //_processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
-                //ApplyPhysicsSimulationToMatchModel();
-                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
-                 SendCurrentTickStateToAllClients(processedTick);
+                ApplyMatchModelToPhysicsSimulation();
+                _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
+                _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
+                ApplyPhysicsSimulationToMatchModel();
+                RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
+                SendCurrentTickStateToAllClients(processedTick);
             }
             catch (Exception e)
             {
                 LogService.LogError("Got error! " + e);
+
                 throw;
             }
         }
