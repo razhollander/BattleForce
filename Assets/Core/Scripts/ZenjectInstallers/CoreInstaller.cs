@@ -1,7 +1,5 @@
-using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Network;
 using Core.Scripts.Services.ApplicationSubscriptionService;
-using Core.Scripts.Services.Logger;
 using CoreDomain.Scripts.Audio;
 using CoreDomain.Scripts.Mvc.LoadingScreen;
 using CoreDomain.Scripts.Mvc.UICamera;
@@ -32,13 +30,11 @@ namespace CoreDomain.Scripts.ZenjectInstallers
         [SerializeField] private UICameraView _uiCameraView;
         [SerializeField] private WorldCameraView _worldCameraView;
         [SerializeField] private NetworkConfig _networkConfig;
-        [SerializeField] private PresentationGamePlayConfig _gamePlayConfig;
 
         public override void InstallBindings()
         {
             Container.BindInterfacesTo<UnityLogger>().AsSingle().NonLazy();
             Container.BindInstance(_networkConfig).AsSingle().NonLazy();
-            Container.BindInstance(_gamePlayConfig).AsSingle().NonLazy();
             Container.BindInterfacesTo<SceneLoaderService>().AsSingle().NonLazy();
             Container.BindInterfacesTo<AddressablesLoaderService>().AsSingle().NonLazy();
             Container.BindInterfacesTo<ResourcesLoaderService>().AsSingle().NonLazy();

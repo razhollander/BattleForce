@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -11,9 +12,11 @@ using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib;
+using ModestTree;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers
@@ -30,14 +33,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly IMatchNetEventsDataService _matchNetEventsDataService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
+        private readonly ICommandFactory _commandFactory;
 
         private readonly CapacityDict<ushort, FixedUnorderedList<PlayerInputPacketC2S>> _inputsPerPlayer;
         private readonly CapacityDict<ushort, PlayerInputPacketC2S> _lastProcessedInputPerPlayer;
         private readonly ConcurrentPool<PlayerInputPacketC2S> _playerInputPacketsPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerInputPacketC2S>> _inputsListsPool;
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
+        private readonly HandleTalentInputPressedCommand _handleTalentInputPressedCommand;
+
         public PlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
-            SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService)
+            SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -46,6 +52,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             _matchNetEventsDataService = matchNetEventsDataService;
             _physicsSimulator = physicsSimulator;
             _updateSubscriptionService = updateSubscriptionService;
+            _commandFactory = commandFactory;
+            _handleTalentInputPressedCommand = _commandFactory.CreateCommandVoid<HandleTalentInputPressedCommand>();
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, PlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _inputsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -104,7 +112,57 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         private void UpdatePlayerTalent(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState)
         {
-               
+            UpdatePlayerTalentsCooldowns(playerState);
+            UpdatePlayerTalents(processedTick, isTalentInputPressed, playerState);
+        }
+
+        private void UpdatePlayerTalentsCooldowns(PlayerStateS2C playerState)
+        {
+            for (int i = 0; i < playerState.Spaceship.Talents.Talents.Count; i++)
+            {
+                var playerTalent = playerState.Spaceship.Talents.Talents[i];
+                var isCurrentlyOnCooldown = playerTalent.CooldownSecondsLeft < playerTalent.MaxCooldown;
+                if (isCurrentlyOnCooldown)
+                {
+                    playerTalent.CooldownSecondsLeft -= _networkConfig.DeltaTime;
+                }
+
+                if (playerTalent.CooldownSecondsLeft < 0)
+                {
+                    playerTalent.CooldownSecondsLeft = playerTalent.MaxCooldown;
+                }
+                
+                playerState.Spaceship.Talents.Talents[i] = playerTalent;
+            }
+        }
+
+        private void UpdatePlayerTalents(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState)
+        {
+            foreach (var VARIABLE in playerState.Spaceship.Talents.Talents.AsSpan())
+            {
+                
+            }
+            // if (!isTalentInputPressed)
+            // {
+            //     return;
+            // }
+            //
+            // ref var currentSelectedTalent = ref playerState.Spaceship.Talents.GetCurrentSelectedTalent();
+            // var isTalentOnCooldown = currentSelectedTalent.CooldownSecondsLeft < currentSelectedTalent.MaxCooldown;
+            // if (isTalentOnCooldown)
+            // {
+            //     return;
+            // }
+            //
+            // foreach (var VARIABLE in _)
+            // {
+            //     
+            // }
+            // _handleTalentInputPressedCommand
+            //     .SetPlayerState(playerState)
+            //     .SetTalent(currentSelectedTalent)
+            //     .SetTick(processedTick)
+            //     .Execute();
         }
 
         private CapacityDict<ushort, int> GetHeighestProcessedTickFromServerPerPlayer()

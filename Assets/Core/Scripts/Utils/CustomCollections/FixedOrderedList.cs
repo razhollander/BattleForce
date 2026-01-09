@@ -72,6 +72,15 @@ namespace Core.Scripts.Utils.CustomCollections
             return ref _items[index];
         }
         
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ref T Get(int index)
+        {
+            if (index >= _count)
+                throw new InvalidOperationException($"FixedList<{typeof(T).Name}> index {index} is bigger than count (Count={_count}).");
+            return ref _items[index];
+        }
+        
         // /// <summary>
         // /// Adds an item if there is space, returns false if full (no exception).
         // /// </summary>

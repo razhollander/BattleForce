@@ -6,8 +6,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     public class PlayerTalentsStateS2C
     {
         public int SelectedTalentIndex;
-
         public FixedOrderedList<TalentStateS2C> Talents;
+
+        public ref TalentStateS2C GetCurrentSelectedTalent()
+        {
+            return ref Talents.Get(SelectedTalentIndex);
+        }
 
         public PlayerTalentsStateS2C(int maxTalents)
         {
@@ -65,8 +69,23 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     {
         public TalentType TalentType;
         public float CooldownSecondsLeft;
-        public float MaxCooldown;     
-        
+        public float MaxCooldown;
+        public bool IsOnCooldown() => CooldownSecondsLeft < MaxCooldown;
+
+        public TalentStateS2C(TalentType talentType, float cooldownSecondsLeft, float maxCooldown)
+        {
+            TalentType = talentType;
+            CooldownSecondsLeft = cooldownSecondsLeft;
+            MaxCooldown = maxCooldown;
+        }
+
+        public void Setup(TalentType talentType, float maxCooldown)
+        {
+            TalentType = talentType;
+            CooldownSecondsLeft = maxCooldown;
+            MaxCooldown = maxCooldown;
+        }
+
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)TalentType);

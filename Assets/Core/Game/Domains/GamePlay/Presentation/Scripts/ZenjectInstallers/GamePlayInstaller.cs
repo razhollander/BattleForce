@@ -9,6 +9,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Zenject;
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
         [SerializeField] private BulletView _bulletViewPrefab;
         [SerializeField] private EnvironmentWallView _environmentWallViewPrefab;
         [SerializeField] private SharedGamePlayConfig _sharedGamePlayConfig;
+        [SerializeField] private PresentationGamePlayConfig _gamePlayConfig;
 
         public override void InstallBindings()
         {
@@ -34,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
         private void BindAssets()
         {
             Container.BindInstance(_sharedGamePlayConfig).AsSingle().NonLazy();
+            Container.BindInstance(_gamePlayConfig).AsSingle().NonLazy();
         }
 
         private void BindServices()

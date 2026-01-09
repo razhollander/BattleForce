@@ -169,6 +169,7 @@ MonoBehaviour:
   _bulletViewPrefab: {fileID: 5098656257286592944, guid: 6d7e26fd88ce749758e4f78e408ac5ee, type: 3}
   _environmentWallViewPrefab: {fileID: 1848450532861189530, guid: 1636cc9bec8694334b3401f1fbe5547b, type: 3}
   _sharedGamePlayConfig: {fileID: 11400000, guid: de964e16c50a04c0a970e0eca290cdfa, type: 2}
+  _gamePlayConfig: {fileID: 11400000, guid: f1b92700db4714c2ca39f33201118b36, type: 2}
 --- !u!1 &831192774
 GameObject:
   m_ObjectHideFlags: 0

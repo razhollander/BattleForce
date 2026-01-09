@@ -3,6 +3,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configura
     [System.Serializable]
     public class SwapTalentConfig
     {
-        public float CooldownInSeconds = 10f;
+        
     }
 }

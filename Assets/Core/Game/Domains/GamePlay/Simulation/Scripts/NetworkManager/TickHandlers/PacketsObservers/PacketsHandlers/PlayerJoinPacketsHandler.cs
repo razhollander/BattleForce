@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Talent;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
@@ -23,19 +24,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly IMatchNetEventsDataService _matchNetEventsDataService;
+        private readonly IPlayersTalentsManager _playersTalentsManager;
         private readonly CapacityDict<NetPeer, JoinRequestPacketC2S> _playerJoinedPacketsPerPeer;
         private readonly ConcurrentPool<JoinRequestPacketC2S> _joinedRequestPacketsPool;
         public PacketTypeC2S PacketType => PacketTypeC2S.JoinRequest;
 
         public PlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
-            IMatchNetEventsDataService matchNetEventsDataService, NetworkConfig networkConfig)
+            IMatchNetEventsDataService matchNetEventsDataService, NetworkConfig networkConfig, IPlayersTalentsManager playersTalentsManager)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _physicsSimulator = physicsSimulator;
             _matchNetEventsDataService = matchNetEventsDataService;
+            _playersTalentsManager = playersTalentsManager;
             _playerJoinedPacketsPerPeer = new CapacityDict<NetPeer, JoinRequestPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _joinedRequestPacketsPool = new ConcurrentPool<JoinRequestPacketC2S>(() => new JoinRequestPacketC2S(), networkConfig.MaxCap.JoinRequestPackets);
         }
@@ -63,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 var peer = kvp.Key;
                 peer.Tag = playerId;
                 _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius);
+                _playersTalentsManager.AddPlayer(playerId);
                 _networkManager.AddPlayerPeer(playerId, peer);
                 _matchNetEventsDataService.StartSavingPlayerEvents(playerId);
                 _matchNetEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);

@@ -2,10 +2,11 @@ using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentController;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentHandler
 {
-    public class HammerTalentController
+    public class HammerTalentController : ITalentController
     {
         private ushort _casterPlayerId;
         
@@ -67,6 +68,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentHandler
                 throw new InvalidOperationException("No other players found (only caster exists).");
 
             return players.GetByIndex(closePlayerIndex);
+        }
+
+        public TalentType TalentType => TalentType.Hammer;
+        public bool IsCurrentlyActive => true;//todo change this
+        public void OnTick(bool isTalentInputPressed, int tick)
+        {
+            
         }
     }
 }
