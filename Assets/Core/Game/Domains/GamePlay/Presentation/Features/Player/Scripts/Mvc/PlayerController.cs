@@ -75,7 +75,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
 
         public void SetTransform(Vector2 position, Vector2 direction)
         {
-            _playerView.SetTransform(position.ToUnityVector2(), direction.ToUnityVector2().ToQuaternion());
+            _playerView.SetPositionAndRotation(position.ToUnityVector2(), direction.ToUnityVector2().ToQuaternion());
         }
     }
 }

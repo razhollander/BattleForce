@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Scripts.Extensions;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -14,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
         [SerializeField] private List<PolygonPath2D> _walls;
         
         [Button]
-        public void RefreshConfig()
+        public void RefreshConfig(int index)
         {
             _walls = GetWalls();
             var wallsConfigs = new WallConfig[_walls.Count];
@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
                 wallsConfigs[i] = wallConfig;
             }
 
-            _environmentConfig.SetWalls(wallsConfigs);
+            _environmentConfig.SetWalls(wallsConfigs, index);
         }
 
         private List<PolygonPath2D> GetWalls()

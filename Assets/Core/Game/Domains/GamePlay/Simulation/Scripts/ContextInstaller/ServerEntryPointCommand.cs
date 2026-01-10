@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private IPhysicsSimulator _physicsSimulator;
         private SimulationGamePlayConfig _simulationGamePlayConfig;
         private IMatchDataService _matchDataService;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
 
         public override void ResolveDependencies()
         {
@@ -28,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
         }
 
@@ -44,13 +46,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
 
         private void CreateWalls()
         {
-            var wallConfigs = _simulationGamePlayConfig.Environment.GetWalls();
+            var wallConfigs = _sharedGamePlayConfig.Environment.GetWalls(_matchDataService.SimulationState.EnvironmentWallsIndex);
 
             foreach (var wallConfig in wallConfigs)
             {
                 var wallId = wallConfig.Id;
                 var wallPoints = wallConfig.Points;
-                _matchDataService.SimulationState.AddWall(wallId, wallPoints);
+                _matchDataService.AddWall(wallId, wallPoints);
                 _physicsSimulator.AddWall(wallId, wallPoints);
             }
         }

@@ -1,4 +1,4 @@
-using UnityEngine;
+using System.Numerics;
 
 namespace Core.Game.Domains.GamePlay.Shared.MatchData.Models
 {

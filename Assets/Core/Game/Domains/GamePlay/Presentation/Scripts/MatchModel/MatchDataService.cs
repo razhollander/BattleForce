@@ -4,6 +4,7 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.MatchData.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -61,9 +62,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             return newPlayer;
         }
 
-        public MatchEnvironmentWallModel AddWall(EnvironmentWallStateS2C wallState)
+        public MatchEnvironmentWallModel AddWall(WallConfig wallConfig)
         {
-            var newWall = new MatchEnvironmentWallModel(wallState.Id, wallState.Points.Select(x=>x.ToUnityVector2()).ToArray());
+            var newWall = new MatchEnvironmentWallModel(wallConfig.Id, wallConfig.Points);
             EnvironmentWalls.Add(newWall);
             return newWall;
         }

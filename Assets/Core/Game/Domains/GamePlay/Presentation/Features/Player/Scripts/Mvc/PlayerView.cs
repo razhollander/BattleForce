@@ -10,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         [SerializeField] private SpriteRenderer _availableBulletSpriteRenderer;
         [SerializeField] private SimpleHealthBar _healthBar;
         [SerializeField] private PlayerLoadingRing _playerLoadingRing;
+        [SerializeField] private Transform SpaceShipTransform;
         
         public void SetColor(Color color)
         {
@@ -22,9 +23,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             _playerLoadingRing.SetRingScale(cooldownLeft/maxCooldown, lerpFactor);
         }
         
-        public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
+        public void SetPositionAndRotation(Vector2 position, Quaternion rotation)
         {
-            transform.SetPositionAndRotation(position, rotation);
+            transform.position = position;
+            SpaceShipTransform.rotation = rotation;
         }
 
         public void ShowIsBulletAvailable(bool isAvailable)
@@ -40,13 +42,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         public void InterpolateTransform(Vector2 playerPosition, Quaternion playerRotation, float lerpFactor)
         {
             var lerpedPosition = Vector2.Lerp(transform.position, playerPosition, lerpFactor);
-            var lerpedRotation = Quaternion.Lerp(transform.rotation, playerRotation, lerpFactor);
-            SetTransform(lerpedPosition, lerpedRotation);
-        }
-
-        public void SetTransform(Vector2 playerPosition, Quaternion playerRotation)
-        {
-            transform.SetPositionAndRotation(playerPosition, playerRotation);
+            var lerpedRotation = Quaternion.Lerp(SpaceShipTransform.rotation, playerRotation, lerpFactor);
+            SetPositionAndRotation(lerpedPosition, lerpedRotation);
         }
     }
 }

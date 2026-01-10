@@ -15,3 +15,4 @@ MonoBehaviour:
   PlayerSpaceship: {fileID: 11400000, guid: c964300775f8143bf8b7d9a0c7273e68, type: 2}
   PlayerBullet: {fileID: 11400000, guid: f6bddc38f7ff94ca4ba008329fdc7743, type: 2}
   Environment: {fileID: 11400000, guid: 90405d7c9a0274eccb74401e3888aeba, type: 2}
+  Talents: {fileID: 11400000, guid: 08bd0956437f34e4d857566956653f2e, type: 2}

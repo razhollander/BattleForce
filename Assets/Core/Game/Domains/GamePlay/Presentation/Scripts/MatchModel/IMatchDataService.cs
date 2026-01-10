@@ -3,6 +3,7 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.MatchData.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
 {
@@ -14,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         MatchPlayerModel LocalPlayer { get; }
         bool IsPlayerJoined { get; }
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
-        MatchEnvironmentWallModel AddWall(EnvironmentWallStateS2C wallState);
+        MatchEnvironmentWallModel AddWall(WallConfig wallConfig);
         void SetLocalPlayer(int playerId);
         MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius);
         MatchPlayerBulletModel GetBullet(ushort bulletId);

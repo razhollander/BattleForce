@@ -130,27 +130,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var gravity = new Vector2(0f, 0f);
             var world = new World(gravity, _collisionEventCacheListener, _networkConfig.MaxCap.ConcurrentTimeOfImpactContacts, _networkConfig.MaxCap.ConcurrentBodyCount, _networkConfig.MaxCap.ConcurrentContactCount, _networkConfig.MaxCap.ConcurrentJointCount);
-#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
             var testDebugDrawer = CreateTestDebugDrawer();
             world.SetDebugDraw(testDebugDrawer);
-#endif
-
             return world;
         }
 
-#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
         private static TestDebugDrawer CreateTestDebugDrawer()
         {
             var testDebugDrawer = new TestDebugDrawer();
+#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
             testDebugDrawer.AppendFlags(DrawFlags.Aabb);
             testDebugDrawer.AppendFlags(DrawFlags.Joint);
             testDebugDrawer.AppendFlags(DrawFlags.Pair);
             testDebugDrawer.AppendFlags(DrawFlags.Shape);
             testDebugDrawer.AppendFlags(DrawFlags.CenterOfMass);
+#endif
 
             return testDebugDrawer;
         }
-#endif
 
         public void SetPlayerVelocity(ushort playerId, Vector2 velocity)
         {

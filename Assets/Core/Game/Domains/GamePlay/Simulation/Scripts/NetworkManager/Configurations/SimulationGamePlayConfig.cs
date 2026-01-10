@@ -1,4 +1,5 @@
 using ASoliman.Utils.EditableRefs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations
@@ -8,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configura
     {
         [EditableRef] public PlayerSpaceshipConfig PlayerSpaceship;
         [EditableRef] public PlayerBulletConfig PlayerBullet;
-        [EditableRef] public EnvironmentConfig Environment;
         [EditableRef] public TalentsConfig Talents;
+        public int ChosenWallsIndex = 0;
     }
 }

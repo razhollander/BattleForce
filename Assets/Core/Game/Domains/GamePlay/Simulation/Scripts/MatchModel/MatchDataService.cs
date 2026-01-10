@@ -1,6 +1,8 @@
+using Core.Game.Domains.GamePlay.Shared.MatchData.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
@@ -11,15 +13,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         private readonly SimulationStateS2C _simulationState;
         public SimulationStateS2C SimulationState => _simulationState;
         private ushort _lastBulletCreatedId = 0;
-   
-        public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public FixedClassUnorderedList<MatchEnvironmentWallModel> Walls;
+
+        public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
         {
             _simulationState = new SimulationStateS2C(
                 networkConfig.MaxCap.ConcurrentPlayers,
                 networkConfig.MaxCap.ConcurrentBullets,
-                networkConfig.MaxCap.ConcurrentEvironmentWalls,
-                networkConfig.MaxCap.PointsInEvironmentWall,
                 sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
+
+            _simulationState.EnvironmentWallsIndex = gamePlayConfig.ChosenWallsIndex;
+            
+            ushort wallId = 1;
+            Walls = new FixedClassUnorderedList<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls,
+                () => new MatchEnvironmentWallModel(wallId++, new Vector2[networkConfig.MaxCap.PointsInEvironmentWall]));
         }
 
         public PlayerStateS2C AddPlayer(string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,
@@ -53,6 +60,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             playerBullet.Radius = radius;
             playerBullet.Velocity = direction * moveSpeed;
             return playerBullet;
+        }
+        
+        public void AddWall(ushort wallId, Vector2[] wallPoints)
+        {
+            var wallState = Walls.AddAndGet();
+            wallState.Id = wallId;
+            wallState.Points = wallPoints;
         }
     }
 }

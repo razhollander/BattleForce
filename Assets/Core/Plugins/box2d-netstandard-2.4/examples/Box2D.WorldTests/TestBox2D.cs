@@ -14,22 +14,22 @@ namespace Core.Plugins.box2d_netstandard_2._4.examples.Box2D.WorldTests
         void Awake()
         {
             //_world = CarWorld.CreateWorld(out var bodies, out var joints);
-            _world = CollisionTestWorld.CreateWorld();
+            //_world = CollisionTestWorld.CreateWorld();
             //var cotan = new 
             //_world.SetContactListener(new contactl);
-            var testDebugDrawer = new TestDebugDrawer();
-            testDebugDrawer.AppendFlags(DrawFlags.Aabb);
-            testDebugDrawer.AppendFlags(DrawFlags.Joint);
-            testDebugDrawer.AppendFlags(DrawFlags.Pair);
-            testDebugDrawer.AppendFlags(DrawFlags.Shape);
-            testDebugDrawer.AppendFlags(DrawFlags.CenterOfMass);
-            _world.SetDebugDraw(testDebugDrawer);
+            // var testDebugDrawer = new TestDebugDrawer();
+            // testDebugDrawer.AppendFlags(DrawFlags.Aabb);
+            // testDebugDrawer.AppendFlags(DrawFlags.Joint);
+            // testDebugDrawer.AppendFlags(DrawFlags.Pair);
+            // testDebugDrawer.AppendFlags(DrawFlags.Shape);
+            // testDebugDrawer.AppendFlags(DrawFlags.CenterOfMass);
+            // _world.SetDebugDraw(testDebugDrawer);
         }
 
         // Update is called once per frame
         void FixedUpdate()
         {
-            _world.Step(Time.fixedDeltaTime, 8,8);
+           // _world.Step(Time.fixedDeltaTime, 8,8);
         }
 
         private void OnDrawGizmos()

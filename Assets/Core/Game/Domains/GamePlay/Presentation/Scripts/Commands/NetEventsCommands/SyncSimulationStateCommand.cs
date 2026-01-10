@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
         private IPlayerControllers _playerControllers;
         private IBulletControllers _bulletControllers;
         private IEnvironmentWallsControllers _environmentWallsControllers;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
 
         public SyncSimulationStateCommand SetSimulationState(SimulationStateS2C simulationState)
         {
@@ -28,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             _playerControllers = _diContainer.Resolve<IPlayerControllers>();
             _bulletControllers = _diContainer.Resolve<IBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IEnvironmentWallsControllers>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public void Execute()
@@ -58,9 +60,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
 
         private void CreateWalls()
         {
-            foreach (var wallState in _simulationState.Walls.AsSpan())
+            var wals = _sharedGamePlayConfig.Environment.GetWalls(_simulationState.EnvironmentWallsIndex);
+            foreach (var wall in wals)
             {
-                var wallModel = _matchDataService.AddWall(wallState);
+                var wallModel = _matchDataService.AddWall(wall);
                 _environmentWallsControllers.CreateWall(wallModel.Id);
             }
         }

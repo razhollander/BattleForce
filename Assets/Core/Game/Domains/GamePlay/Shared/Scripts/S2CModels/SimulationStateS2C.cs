@@ -9,19 +9,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     {
         public FixedClassUnorderedList<PlayerStateS2C> Players;
         public FixedUnorderedList<PlayerBulletS2C> Bullets;
-        public FixedUnorderedList<EnvironmentWallStateS2C> Walls;
+        public int EnvironmentWallsIndex;
 
-        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxWalls, int maxPointsInWall, int maxTalents)
+        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxTalents)
         {
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalents));
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
-            Walls = new FixedUnorderedList<EnvironmentWallStateS2C>(maxWalls);
-            
-            for (int i = 0; i < Walls.Count; i++)
-            {
-                ref var wall = ref Walls.AddAndGet();
-                wall.Points = new Vector2[maxPointsInWall];
-            }
         }
 
         public void Serialize(NetDataWriter writer)
@@ -40,12 +33,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 bullet.Serialize(writer);
             }
             
-            var wallsCount = Walls.Count;
-            writer.Put((byte)wallsCount);
-            foreach (var wall in Walls.AsSpan())
-            {
-                wall.Serialize(writer);
-            }
+            writer.Put((byte)EnvironmentWallsIndex);
+            // var wallsCount = Walls.Count;
+            // writer.Put((byte)wallsCount);
+            // foreach (var wall in Walls.AsSpan())
+            // {
+            //     wall.Serialize(writer);
+            // }
         }
         
         public void Deserialize(NetDataReader reader)
@@ -65,14 +59,16 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 ref var bullet = ref Bullets.AddAndGet();
                 bullet.Deserialize(reader);
             }
-            
-            var wallsCount = reader.GetByte();
-            Walls.Clear();
-            for (var i = 0; i < wallsCount; i++)
-            {
-                ref var wall = ref Walls.AddAndGet();
-                wall.Deserialize(reader);
-            }
+
+            EnvironmentWallsIndex = reader.GetByte();
+
+            // var wallsCount = reader.GetByte();
+            // Walls.Clear();
+            // for (var i = 0; i < wallsCount; i++)
+            // {
+            //     ref var wall = ref Walls.AddAndGet();
+            //     wall.Deserialize(reader);
+            // }
         }
 
         public PlayerStateS2C GetPlayerById(ushort playerId)
@@ -123,13 +119,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public ref PlayerBulletS2C GetBulletByIndex(int index)
         {
             return ref Bullets.GetByIndex(index);
-        }
-
-        public void AddWall(ushort wallId, Vector2[] wallPoints)
-        {
-            ref var wallState = ref Walls.AddAndGet();
-            wallState.Id = wallId;
-            wallState.Points = wallPoints;
         }
         
         public void SerializeTransforms(NetDataWriter writer)
