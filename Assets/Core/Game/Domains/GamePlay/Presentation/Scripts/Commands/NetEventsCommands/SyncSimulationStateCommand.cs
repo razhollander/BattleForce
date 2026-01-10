@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -15,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
         private IPlayerControllers _playerControllers;
         private IBulletControllers _bulletControllers;
         private IEnvironmentWallsControllers _environmentWallsControllers;
+        private ITalentCardControllers _talentCardControllers;
         private SharedGamePlayConfig _sharedGamePlayConfig;
 
         public SyncSimulationStateCommand SetSimulationState(SimulationStateS2C simulationState)
@@ -29,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             _playerControllers = _diContainer.Resolve<IPlayerControllers>();
             _bulletControllers = _diContainer.Resolve<IBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IEnvironmentWallsControllers>();
+            _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
@@ -37,6 +40,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             CreatePlayers();
             CreateBullets();
             CreateWalls();
+            CreateTalentCards();
+        }
+
+        private void CreateTalentCards()
+        {
+            _talentCardControllers.CreateTalentCards(_simulationState.TalentCards);
         }
 
         private void CreatePlayers()

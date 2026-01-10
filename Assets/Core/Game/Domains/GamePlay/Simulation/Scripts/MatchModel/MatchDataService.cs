@@ -17,12 +17,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
         {
+            var chosenEnvironmentIndex = gamePlayConfig.ChosenWallsIndex;
+            var environmentLayout = sharedGamePlayConfig.Environment.GetEnvironmentLayout(chosenEnvironmentIndex);
+            var talentCardsCount = environmentLayout != null && environmentLayout.TalentCards != null ? environmentLayout.TalentCards.Length : 0;
+
             _simulationState = new SimulationStateS2C(
                 networkConfig.MaxCap.ConcurrentPlayers,
                 networkConfig.MaxCap.ConcurrentBullets,
-                sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
+                sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
+                talentCardsCount);
 
-            _simulationState.EnvironmentWallsIndex = gamePlayConfig.ChosenWallsIndex;
+            _simulationState.EnvironmentWallsIndex = chosenEnvironmentIndex;
+
+            if (environmentLayout != null && environmentLayout.TalentCards != null)
+            {
+                foreach (var talentCard in environmentLayout.TalentCards)
+                {
+                    ref var newCard = ref _simulationState.TalentCards.AddAndGet();
+                    newCard = talentCard;
+                }
+            }
             
             ushort wallId = 1;
             Walls = new FixedClassUnorderedList<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls,
