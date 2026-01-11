@@ -1,0 +1,37 @@
+using System;
+using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.Extensions;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using LiteNetLib.Utils;
+
+namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
+{
+    [Serializable]
+    public struct TalentCardS2C : INetSerializable
+    {
+        public ushort Id;
+        public Vector2 Position;
+        public TalentType TalentType;
+
+        public TalentCardS2C(ushort Id, Vector2 position, TalentType talentType)
+        {
+            this.Id = Id;
+            Position = position;
+            TalentType = talentType;
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.Put((byte)Id);
+            writer.Put(Position);
+            writer.Put((byte)TalentType);
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            Id = reader.GetByte();
+            Position = reader.GetVector2();
+            TalentType = (TalentType)reader.GetByte();
+        }
+    }
+}

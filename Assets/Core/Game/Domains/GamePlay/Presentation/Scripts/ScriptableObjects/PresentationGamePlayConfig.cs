@@ -6,5 +6,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
     public class PresentationGamePlayConfig : ScriptableObject
     {
         public float InterpolationFactor = 0.85f;
+        public TalentCardsConfig TalentCards;
     }
 }

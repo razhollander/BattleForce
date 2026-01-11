@@ -1,4 +1,6 @@
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
@@ -9,12 +11,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     {
         public FixedClassUnorderedList<PlayerStateS2C> Players;
         public FixedUnorderedList<PlayerBulletS2C> Bullets;
-        public int EnvironmentWallsIndex;
+        public FixedUnorderedList<TalentCardS2C> TalentCards;
+        public int EnvironmentLayoutIndex;
 
-        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxTalents)
+        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards)
         {
-            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalents));
+            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer));
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
+            TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -33,13 +37,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 bullet.Serialize(writer);
             }
             
-            writer.Put((byte)EnvironmentWallsIndex);
-            // var wallsCount = Walls.Count;
-            // writer.Put((byte)wallsCount);
-            // foreach (var wall in Walls.AsSpan())
-            // {
-            //     wall.Serialize(writer);
-            // }
+            var talentCardsCount = TalentCards.Count;
+            writer.Put((byte)talentCardsCount);
+            foreach (var talentCard in TalentCards.AsSpan())
+            {
+                talentCard.Serialize(writer);
+            }
+
+            writer.Put((byte)EnvironmentLayoutIndex);
         }
         
         public void Deserialize(NetDataReader reader)
@@ -60,15 +65,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 bullet.Deserialize(reader);
             }
 
-            EnvironmentWallsIndex = reader.GetByte();
+            var talentCardsCount = reader.GetByte();
+            TalentCards.Clear();
+            for (var i = 0; i < talentCardsCount; i++)
+            {
+                ref var talentCard = ref TalentCards.AddAndGet();
+                talentCard.Deserialize(reader);
+            }
 
-            // var wallsCount = reader.GetByte();
-            // Walls.Clear();
-            // for (var i = 0; i < wallsCount; i++)
-            // {
-            //     ref var wall = ref Walls.AddAndGet();
-            //     wall.Deserialize(reader);
-            // }
+            EnvironmentLayoutIndex = reader.GetByte();
         }
 
         public PlayerStateS2C GetPlayerById(ushort playerId)

@@ -1,8 +1,6 @@
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
-using Sirenix.OdinInspector;
 using UnityEngine;
-using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {
@@ -10,31 +8,26 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
     public class EnvironmentConfig : ScriptableObject
     {
         [SerializeField]
-        SerializableDictionary<int, string> _wallsJson = new SerializableDictionary<int, string>();
+        SerializableDictionary<int, EnvironmentLayoutConfig> _environmentLayoutConfigs = new SerializableDictionary<int, EnvironmentLayoutConfig>();
 
-        public WallConfig[] GetWalls(int index)
+        public EnvironmentLayoutConfig GetEnvironmentLayout(int index)
         {
-            return _wallsJson[index].FromJson<WallConfig[]>();
+            return _environmentLayoutConfigs[index];
         }
         
         public void SetWalls(WallConfig[] wallConfigs, int index)
         {
-            _wallsJson[index] = wallConfigs.ToJson();
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetWallsJson(wallConfigs.ToJson());
+            }
+            else
+            {
+                _environmentLayoutConfigs[index] = new EnvironmentLayoutConfig(wallConfigs.ToJson(), "");
+            }
 #if UNITY_EDITOR
             Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
 #endif
-        }
-    }
-    
-    public class WallConfig
-    {
-        public ushort Id;
-        public Vector2[] Points;
-
-        public WallConfig(ushort id, Vector2[] points)
-        {
-            Id = id;
-            Points = points;
         }
     }
 }
