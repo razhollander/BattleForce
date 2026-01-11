@@ -8,5 +8,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentController
         TalentType TalentType { get; }
         bool IsCurrentlyActive { get; }
         void OnTick(bool isTalentInputPressed, int tick);
+        void Stop();
     }
 }

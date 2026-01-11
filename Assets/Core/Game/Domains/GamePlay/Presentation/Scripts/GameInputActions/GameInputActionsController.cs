@@ -76,6 +76,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             return _gameInputActions.GamePlay.Talent.IsPressed();
         }
 
+        public bool IsSwitchTalentInputPressed()
+        {
+            return _gameInputActions.GamePlay.SwitchTalent.IsPressed();
+        }
+
         public async Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui = false)
         {
             await AwaitableUtils.WaitUntil(() => (canPressOverGui || !IsOverUiOnMobile()) && IsAnyInputPressed(),

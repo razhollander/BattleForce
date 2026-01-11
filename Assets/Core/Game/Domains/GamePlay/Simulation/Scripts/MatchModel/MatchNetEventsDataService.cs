@@ -17,11 +17,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         public CapacityDict<ushort, FixedUnorderedList<PlayerTakeDamageNetEventS2C>> PlayerTakeDamageNetEventsPerPlayer { get; private set; } // todo: remove events related to player hit when player is destroyed
         public CapacityDict<ushort, FixedUnorderedList<BulletDestroyedNetEventS2C>> BulletDestroyedNetEventsPerPlayer { get; private set; } // todo: remove events related to player hit when player is destroyed
         public CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>> PlayerSwapNetEventsPerPlayer { get; private set;} // todo: remove events related to player hit when player is destroyed
+        public CapacityDict<ushort, FixedUnorderedList<TalentCardDestroyedNetEventS2C>> TalentCardDestroyedNetEventsPerPlayer { get; private set; } // todo: remove events related to player hit when player is destroyed
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerJoinAcceptPacketS2C>> _joinAcceptListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerTakeDamageNetEventS2C>> _playerTakeDamageListPool;
         private readonly ConcurrentPool<FixedUnorderedList<BulletDestroyedNetEventS2C>> _bulletDestroyedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayersSwapNetEventS2C>> _playerSwapListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<TalentCardDestroyedNetEventS2C>> _talentCardDestroyedListPool;
 
         public MatchNetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -31,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             PlayerTakeDamageNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerTakeDamageNetEventS2C>>(maxConcurrentPlayers);
             BulletDestroyedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<BulletDestroyedNetEventS2C>>(maxConcurrentPlayers);
             PlayerSwapNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>>(maxConcurrentPlayers);
+            TalentCardDestroyedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<TalentCardDestroyedNetEventS2C>>(maxConcurrentPlayers);
             
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _joinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerJoinAcceptPacketS2C>>(() =>
@@ -42,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             _playerTakeDamageListPool = new ConcurrentPool<FixedUnorderedList<PlayerTakeDamageNetEventS2C>>(() => new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(networkConfig.MaxCap.PlayerTakeDamageNetEvents), maxConcurrentPlayers);
             _bulletDestroyedListPool = new ConcurrentPool<FixedUnorderedList<BulletDestroyedNetEventS2C>>(() => new FixedUnorderedList<BulletDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents), maxConcurrentPlayers);
             _playerSwapListPool= new ConcurrentPool<FixedUnorderedList<PlayersSwapNetEventS2C>>(() => new FixedUnorderedList<PlayersSwapNetEventS2C>(networkConfig.MaxCap.PlayerSwapNetEvents), maxConcurrentPlayers);
+            _talentCardDestroyedListPool = new ConcurrentPool<FixedUnorderedList<TalentCardDestroyedNetEventS2C>>(() => new FixedUnorderedList<TalentCardDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents), maxConcurrentPlayers); // reusing bullet destroyed max cap for now
         }
         
         public void StartSavingPlayerEvents(ushort playerId)
@@ -90,6 +94,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
+
+            if (!TalentCardDestroyedNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                TalentCardDestroyedNetEventsPerPlayer.Add(playerId, _talentCardDestroyedListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {playerId}");
+            }
         }
         
         public void StopSavingPlayerEvents(ushort playerId)
@@ -109,12 +122,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             var playerSwapList = PlayerSwapNetEventsPerPlayer[playerId];
             playerSwapList.Clear();
             _playerSwapListPool.Return(playerSwapList);
+            var talentCardDestroyedList = TalentCardDestroyedNetEventsPerPlayer[playerId];
+            talentCardDestroyedList.Clear();
+            _talentCardDestroyedListPool.Return(talentCardDestroyedList);
             
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             JoinAcceptNetEventsPerPlayer.Remove(playerId);
             PlayerTakeDamageNetEventsPerPlayer.Remove(playerId);
             BulletDestroyedNetEventsPerPlayer.Remove(playerId);
             PlayerSwapNetEventsPerPlayer.Remove(playerId);
+            TalentCardDestroyedNetEventsPerPlayer.Remove(playerId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -181,6 +198,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             }
         }
 
+        public void AddTalentCardDestroyedNetEvent(int onTick, ushort cardId)
+        {
+            foreach (var kvp in TalentCardDestroyedNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CardId = cardId;
+            }
+        }
+
         public void RemoveAllEventsOlderThanTick(ushort playerId, int tick)
         {
             if (BulletSpawnNetEventsPerPlayer.TryGetValue(playerId, out var bulletSpawnNetEvents))
@@ -234,6 +261,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
                     if (playerSwapNetEvents[i].OccuredOnTick < tick)
                     {
                         playerSwapNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (TalentCardDestroyedNetEventsPerPlayer.TryGetValue(playerId, out var talentCardDestroyedNetEvents))
+            {
+                for (int i = talentCardDestroyedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (talentCardDestroyedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        talentCardDestroyedNetEvents.RemoveAt(i);
                     }
                 }
             }

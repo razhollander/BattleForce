@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configura
     [CreateAssetMenu(fileName = "TalentsConfig", menuName = "BF/Network/Talents Config")]
     public class TalentsConfig : ScriptableObject
     {
+        public int TalentCardHealth;
         public SerializableDictionary<TalentType, float> CooldownPerTalentType;
         public HammerTalentConfig HammerTalentConfig;
         public SwapTalentConfig SwapTalentConfig;

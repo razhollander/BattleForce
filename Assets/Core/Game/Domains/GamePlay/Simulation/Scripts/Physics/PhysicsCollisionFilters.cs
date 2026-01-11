@@ -14,11 +14,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     break;
                 case PhysicsBodyType.PlayerBullet:
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
-                                    | GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                                    | GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsBodyType.TalentCard);
                     break;
                 case PhysicsBodyType.Wall:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsBodyType.PlayerBullet);
+                    break;
+                case PhysicsBodyType.TalentCard:
+                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerBullet);
                     break;
                 default:
                     collisionMask = 0xFFFF;

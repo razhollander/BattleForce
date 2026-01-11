@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         private ICommandFactory _commandFactory;
         private SimulationGamePlayConfig _gamePlayConfig;
         private IMatchNetEventsDataService _matchNetEventsDataService;
+        private IPlayersTalentsManager _playersTalentsManager;
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
@@ -35,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
             _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
+            _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
         }
 
         public void Execute()
@@ -58,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 var objectB = collisionEvent.BodyDataB;
                 HandlePlayerWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
             }
 
             _physicsSimulator.ClearCachedCollisions();
@@ -100,6 +103,58 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             _physicsSimulator.RemoveBody(bulletBody);
             LogService.LogError($"Bullet destroyed! {bulletModel.Id}");
             _matchNetEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
+        }
+
+        private void HandlePlayerBulletTalentCardCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBulletToCardCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.TalentCard;
+            var isCardToBulletCollision = objectA.PhysicsBodyType == PhysicsBodyType.TalentCard && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+            var isCollision = isBulletToCardCollision || isCardToBulletCollision;
+
+            if (!isCollision)
+            {
+                return;
+            }
+
+            PlayerBulletS2C bulletModel;
+            ushort cardId;
+            Body bulletBody;
+            Body cardBody;
+
+            if (isBulletToCardCollision)
+            {
+                bulletModel = _matchDataService.SimulationState.GetBulletById(objectA.Id);
+                bulletBody = contact.FixtureA.Body;
+                cardId = objectB.Id;
+                cardBody = contact.FixtureB.Body;
+            }
+            else
+            {
+                bulletModel = _matchDataService.SimulationState.GetBulletById(objectB.Id);
+                bulletBody = contact.FixtureB.Body;
+                cardId = objectA.Id;
+                cardBody = contact.FixtureA.Body;
+            }
+
+            // Destroy Bullet
+            _matchDataService.SimulationState.RemoveBulletById(bulletModel.Id);
+            _physicsSimulator.RemoveBody(bulletBody);
+            _matchNetEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
+
+            // Damage Card
+            ref var card = ref _matchDataService.SimulationState.GetTalentCardById(cardId);
+            card.Health -= _gamePlayConfig.PlayerBullet.HitDamage;
+
+            if (card.Health <= 0)
+            {
+                // Obtain Talent
+                _playersTalentsManager.TryAddTalentToPlayer(card.TalentType, bulletModel.BelongToPlayerId);
+
+                // Destroy Card
+                _matchDataService.SimulationState.RemoveTalentCardById(card.Id);
+                _physicsSimulator.RemoveBody(cardBody);
+                _matchNetEventsDataService.AddTalentCardDestroyedNetEvent(_processedTick, card.Id);
+            }
         }
 
         private void HandlePlayerWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

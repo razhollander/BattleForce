@@ -44,6 +44,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentController
             closetPlayerToCaster.Spaceship.Transform.Position, casterPlayerState.Spaceship.Transform.Direction, closetPlayerToCaster.Spaceship.Transform.Direction);
     }
 
+    public void Stop()
+    {
+
+    }
+
     private void SwapPlayersMatchData(PlayerStateS2C casterPlayerState, PlayerStateS2C closetPlayerToCaster)
     {
         (casterPlayerState.Spaceship.Transform.Position, closetPlayerToCaster.Spaceship.Transform.Position) =

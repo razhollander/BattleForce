@@ -41,9 +41,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly ConcurrentPool<FixedUnorderedList<PlayerInputPacketC2S>> _inputsListsPool;
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         private readonly HandleTalentInputPressedCommand _handleTalentInputPressedCommand;
+        private readonly IPlayersTalentsManager _playersTalentsManager;
 
         public PlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
-            SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory)
+            SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
+            IPlayersTalentsManager playersTalentsManager)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -53,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             _physicsSimulator = physicsSimulator;
             _updateSubscriptionService = updateSubscriptionService;
             _commandFactory = commandFactory;
+            _playersTalentsManager = playersTalentsManager;
             _handleTalentInputPressedCommand = _commandFactory.CreateCommandVoid<HandleTalentInputPressedCommand>();
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, PlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -99,6 +102,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 UpdatePlayerDirection(playerInputPacket, playerState);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
                 UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState);
+
+                var wasSwitchTalentInputPressed = _lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastInput) && lastInput.IsSwitchTalentInputPressed;
+                var isSwitchTalentInputPressed = playerInputPacket.IsSwitchTalentInputPressed;
+                if (!wasSwitchTalentInputPressed && isSwitchTalentInputPressed)
+                {
+                    _playersTalentsManager.SwitchTalent(playerId);
+                }
 
                 if (_lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastPlayerInput))
                 {

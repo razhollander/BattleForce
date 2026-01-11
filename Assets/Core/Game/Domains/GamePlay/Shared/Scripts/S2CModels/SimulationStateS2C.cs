@@ -125,6 +125,33 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             return ref Bullets.GetByIndex(index);
         }
+
+        public void RemoveTalentCardById(ushort cardId)
+        {
+            for (int i = 0; i < TalentCards.Count; i++)
+            {
+                if (TalentCards[i].Id == cardId)
+                {
+                    TalentCards.RemoveAt(i);
+                    return;
+                }
+            }
+
+            throw new System.Exception($"No talent card for id {cardId}!");
+        }
+
+        public ref TalentCardS2C GetTalentCardById(ushort cardId)
+        {
+            for (int i = 0; i < TalentCards.Count; i++)
+            {
+                if (TalentCards[i].Id == cardId)
+                {
+                    return ref TalentCards.GetByIndex(i);
+                }
+            }
+
+            throw new System.Exception($"No talent card for id {cardId}!");
+        }
         
         public void SerializeTransforms(NetDataWriter writer)
         {

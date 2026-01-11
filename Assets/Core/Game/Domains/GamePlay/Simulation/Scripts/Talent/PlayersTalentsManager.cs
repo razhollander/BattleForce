@@ -49,6 +49,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent
             return true;
         }
 
+        public void SwitchTalent(ushort playerId)
+        {
+            var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+            var talents = playerState.Spaceship.Talents;
+            if (talents.Talents.Count == 0)
+            {
+                return;
+            }
+
+            talents.SelectedTalentIndex++;
+            if (talents.SelectedTalentIndex >= talents.Talents.Count)
+            {
+                talents.SelectedTalentIndex = 0;
+            }
+        }
+
         private void AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)
         {
             ref var newTalent = ref playerState.Spaceship.Talents.Talents.AddAndGet();
@@ -59,10 +75,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent
         private bool TryReplaceTalentWithCurrentSelectedTalent(TalentType talentType, PlayerStateS2C playerState)
         {
             ref var currentSelectedTalent = ref playerState.Spaceship.Talents.Talents.Get(playerState.Spaceship.Talents.SelectedTalentIndex);
-            bool isCurrentSelectedTalentActive = _talentControllersPerPlayer[playerState.Id].IsTalentCurrentlyActive(currentSelectedTalent.TalentType);
-            if (isCurrentSelectedTalentActive)
+            var talentController = _talentControllersPerPlayer[playerState.Id].GetTalentByType(currentSelectedTalent.TalentType);
+
+            if (talentController != null)
             {
-                return false;
+                talentController.Stop();
             }
             
             var maxCooldown = _gamePlayConfig.Talents.CooldownPerTalentType[talentType];

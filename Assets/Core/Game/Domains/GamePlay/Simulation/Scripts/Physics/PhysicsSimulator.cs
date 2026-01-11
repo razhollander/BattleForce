@@ -248,6 +248,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bulletBody.CreateFixture(fixtureDef);
         }
 
+        public void AddTalentCard(ushort id, Vector2 position, float radius = 0.5f)
+        {
+            BodyDef bodyDef = new BodyDef
+            {
+                type = BodyType.Static,
+                position = position,
+                userData = new PhysicsBodyData(id, PhysicsBodyType.TalentCard)
+            };
+
+            Body body = _world.CreateBody(bodyDef);
+
+            CircleShape shape = new CircleShape();
+            shape.Radius = radius;
+
+            FixtureDef fixtureDef = new FixtureDef
+            {
+                shape = shape,
+                density = 0,
+                friction = 0,
+                filter = new Filter
+                {
+                    categoryBits = PhysicsBodyType.TalentCard.GetCollisionsCategory(),
+                    maskBits     = PhysicsBodyType.TalentCard.GetCollisionMask(),
+                }
+            };
+
+            body.CreateFixture(fixtureDef);
+        }
+
         public Body GetBullet(ushort bulletId)
         {
             var currentBody = _world.GetBodyList();
