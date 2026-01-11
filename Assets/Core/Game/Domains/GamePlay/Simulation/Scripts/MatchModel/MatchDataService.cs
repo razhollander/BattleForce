@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.MatchData.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
@@ -13,12 +14,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         private readonly SimulationStateS2C _simulationState;
         public SimulationStateS2C SimulationState => _simulationState;
         private ushort _lastBulletCreatedId = 0;
-        public FixedClassUnorderedList<MatchEnvironmentWallModel> Walls;
+        public readonly FixedClassUnorderedList<MatchEnvironmentWallModel> Walls;
 
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
         {
             var chosenEnvironmentIndex = gamePlayConfig.ChosenWallsIndex;
-            var environmentLayout = sharedGamePlayConfig.Environment.GetEnvironmentLayout(chosenEnvironmentIndex);
 
             _simulationState = new SimulationStateS2C(
                 networkConfig.MaxCap.ConcurrentPlayers,
@@ -26,17 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
                 sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
                 networkConfig.MaxCap.ConcurrentTalentCards);
 
-            _simulationState.EnvironmentWallsIndex = chosenEnvironmentIndex;
-
-            var talentCards = environmentLayout.GetTalentCards();
-            if (talentCards != null)
-            {
-                foreach (var talentCard in talentCards)
-                {
-                    ref var newCard = ref _simulationState.TalentCards.AddAndGet();
-                    newCard = talentCard;
-                }
-            }
+            _simulationState.EnvironmentLayoutIndex = chosenEnvironmentIndex;
             
             ushort wallId = 1;
             Walls = new FixedClassUnorderedList<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls,
@@ -81,6 +71,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             var wallState = Walls.AddAndGet();
             wallState.Id = wallId;
             wallState.Points = wallPoints;
+        }
+        
+        public TalentCardS2C AddTalentCard(ushort talentCardId, Vector2 position, TalentType talentType)
+        {
+            ref var newCard = ref _simulationState.TalentCards.AddAndGet();
+            newCard.Id = talentCardId;
+            newCard.Position = position;
+            newCard.TalentType = talentType;
+
+            return newCard;
         }
     }
 }

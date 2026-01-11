@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedClassUnorderedList<PlayerStateS2C> Players;
         public FixedUnorderedList<PlayerBulletS2C> Bullets;
         public FixedUnorderedList<TalentCardS2C> TalentCards;
-        public int EnvironmentWallsIndex;
+        public int EnvironmentLayoutIndex;
 
         public SimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards)
         {
@@ -44,7 +44,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 talentCard.Serialize(writer);
             }
 
-            writer.Put((byte)EnvironmentWallsIndex);
+            writer.Put((byte)EnvironmentLayoutIndex);
         }
         
         public void Deserialize(NetDataReader reader)
@@ -73,7 +73,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 talentCard.Deserialize(reader);
             }
 
-            EnvironmentWallsIndex = reader.GetByte();
+            EnvironmentLayoutIndex = reader.GetByte();
         }
 
         public PlayerStateS2C GetPlayerById(ushort playerId)

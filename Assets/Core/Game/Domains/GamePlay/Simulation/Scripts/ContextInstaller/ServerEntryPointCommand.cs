@@ -1,4 +1,3 @@
-using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
@@ -6,6 +5,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
@@ -42,11 +42,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _physicsSimulator.InitEntryPoint();
             
             CreateWalls();
+            CreateTalentCards();
         }
 
         private void CreateWalls()
         {
-            var wallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_matchDataService.SimulationState.EnvironmentWallsIndex).GetWalls();
+            var wallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_matchDataService.SimulationState.EnvironmentLayoutIndex).GetWalls();
 
             foreach (var wallConfig in wallConfigs)
             {
@@ -54,6 +55,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
                 var wallPoints = wallConfig.Points;
                 _matchDataService.AddWall(wallId, wallPoints);
                 _physicsSimulator.AddWall(wallId, wallPoints);
+            }
+        }
+
+        private void CreateTalentCards()
+        {
+            var talentCards = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_matchDataService.SimulationState.EnvironmentLayoutIndex).GetTalentCards();
+            if (talentCards.IsNullOrEmpty())
+            {
+                return;
+            }
+            
+            foreach (var talentCard in talentCards)
+            {
+                _matchDataService.AddTalentCard(talentCard.Id, talentCard.Position, talentCard.TalentType);
             }
         }
     }
