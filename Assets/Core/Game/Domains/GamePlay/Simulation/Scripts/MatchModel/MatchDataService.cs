@@ -19,19 +19,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         {
             var chosenEnvironmentIndex = gamePlayConfig.ChosenWallsIndex;
             var environmentLayout = sharedGamePlayConfig.Environment.GetEnvironmentLayout(chosenEnvironmentIndex);
-            var talentCardsCount = environmentLayout != null && environmentLayout.TalentCards != null ? environmentLayout.TalentCards.Length : 0;
 
             _simulationState = new SimulationStateS2C(
                 networkConfig.MaxCap.ConcurrentPlayers,
                 networkConfig.MaxCap.ConcurrentBullets,
                 sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
-                talentCardsCount);
+                networkConfig.MaxCap.ConcurrentTalentCards);
 
             _simulationState.EnvironmentWallsIndex = chosenEnvironmentIndex;
 
-            if (environmentLayout != null && environmentLayout.TalentCards != null)
+            var talentCards = environmentLayout.GetTalentCards();
+            if (talentCards != null)
             {
-                foreach (var talentCard in environmentLayout.TalentCards)
+                foreach (var talentCard in talentCards)
                 {
                     ref var newCard = ref _simulationState.TalentCards.AddAndGet();
                     newCard = talentCard;

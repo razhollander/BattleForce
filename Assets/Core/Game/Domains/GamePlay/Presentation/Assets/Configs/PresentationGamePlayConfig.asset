@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: PresentationGamePlayConfig
   m_EditorClassIdentifier: 
   InterpolationFactor: 0.9
+  TalentCards: {fileID: 11400000, guid: bc656062d5cec4fdfa7c7c7784cfd7df, type: 2}

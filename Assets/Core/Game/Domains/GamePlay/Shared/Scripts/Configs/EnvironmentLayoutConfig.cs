@@ -1,15 +1,34 @@
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Scripts.Extensions;
+using UnityEngine;
+
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {
     [System.Serializable]
     public class EnvironmentLayoutConfig
     {
-        public WallConfig[] Walls;
-        public TalentCard[] TalentCards;
+        [SerializeField] private string _wallsJson;
+        [SerializeField] private string _talentCardsJson;
 
-        public EnvironmentLayoutConfig(WallConfig[] walls, TalentCard[] talentCards)
+        public WallConfig[] GetWalls()
         {
-            Walls = walls;
-            TalentCards = talentCards;
+            return _wallsJson.FromJson<WallConfig[]>();
+        }
+
+        public void SetWallsJson(string wallsJson)
+        {
+            _wallsJson = wallsJson;
+        }
+
+        public TalentCardS2C[] GetTalentCards()
+        {
+            return _talentCardsJson.FromJson<TalentCardS2C[]>();
+        }
+
+        public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
+        {
+            _wallsJson = wallsJson;
+            _talentCardsJson = talentCardsJson;
         }
     }
 }

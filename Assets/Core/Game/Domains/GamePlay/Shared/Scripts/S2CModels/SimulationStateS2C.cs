@@ -1,5 +1,6 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
@@ -10,14 +11,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     {
         public FixedClassUnorderedList<PlayerStateS2C> Players;
         public FixedUnorderedList<PlayerBulletS2C> Bullets;
-        public FixedUnorderedList<TalentCard> TalentCards;
+        public FixedUnorderedList<TalentCardS2C> TalentCards;
         public int EnvironmentWallsIndex;
 
-        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxTalents, int maxTalentCards)
+        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards)
         {
-            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalents));
+            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer));
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
-            TalentCards = new FixedUnorderedList<TalentCard>(maxTalentCards);
+            TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
         }
 
         public void Serialize(NetDataWriter writer)

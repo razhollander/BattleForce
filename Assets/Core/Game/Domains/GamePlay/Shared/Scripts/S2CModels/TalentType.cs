@@ -6,6 +6,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         Swap = 1,
         Hammer = 2,
         Bomb = 3,
-        SentryGun = 4
+        SentryGun = 4,
+        DashPulse = 5
     }
 }

@@ -1,8 +1,6 @@
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
-using Sirenix.OdinInspector;
 using UnityEngine;
-using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {
@@ -10,56 +8,26 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
     public class EnvironmentConfig : ScriptableObject
     {
         [SerializeField]
-        SerializableDictionary<int, EnvironmentLayoutConfig> _environmentJson = new SerializableDictionary<int, EnvironmentLayoutConfig>();
+        SerializableDictionary<int, EnvironmentLayoutConfig> _environmentLayoutConfigs = new SerializableDictionary<int, EnvironmentLayoutConfig>();
 
-        public WallConfig[] GetWalls(int index)
+        public EnvironmentLayoutConfig GetEnvironmentLayout(int index)
         {
-            return _environmentJson[index].Walls;
+            return _environmentLayoutConfigs[index];
         }
         
         public void SetWalls(WallConfig[] wallConfigs, int index)
         {
-            if (_environmentJson.ContainsKey(index))
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
             {
-                _environmentJson[index].Walls = wallConfigs;
+                environmentLayout.SetWallsJson(wallConfigs.ToJson());
             }
             else
             {
-                _environmentJson[index] = new EnvironmentLayoutConfig(wallConfigs, new TalentCard[0]);
+                _environmentLayoutConfigs[index] = new EnvironmentLayoutConfig(wallConfigs.ToJson(), "");
             }
 #if UNITY_EDITOR
             Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
 #endif
-        }
-
-        public EnvironmentLayoutConfig GetEnvironmentLayout(int index)
-        {
-            if (_environmentJson.ContainsKey(index))
-            {
-                return _environmentJson[index];
-            }
-
-            return null;
-        }
-
-        public void SetEnvironmentLayout(EnvironmentLayoutConfig layout, int index)
-        {
-            _environmentJson[index] = layout;
-#if UNITY_EDITOR
-            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
-#endif
-        }
-    }
-    
-    public class WallConfig
-    {
-        public ushort Id;
-        public Vector2[] Points;
-
-        public WallConfig(ushort id, Vector2[] points)
-        {
-            Id = id;
-            Points = points;
         }
     }
 }

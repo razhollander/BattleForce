@@ -69,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
 
         private void CreateWalls()
         {
-            var wals = _sharedGamePlayConfig.Environment.GetWalls(_simulationState.EnvironmentWallsIndex);
+            var wals = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentWallsIndex).GetWalls();
             foreach (var wall in wals)
             {
                 var wallModel = _matchDataService.AddWall(wall);

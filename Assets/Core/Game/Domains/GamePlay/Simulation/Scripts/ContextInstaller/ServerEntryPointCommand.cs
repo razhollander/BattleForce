@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
 
         private void CreateWalls()
         {
-            var wallConfigs = _sharedGamePlayConfig.Environment.GetWalls(_matchDataService.SimulationState.EnvironmentWallsIndex);
+            var wallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_matchDataService.SimulationState.EnvironmentWallsIndex).GetWalls();
 
             foreach (var wallConfig in wallConfigs)
             {
