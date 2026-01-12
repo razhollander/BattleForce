@@ -12,12 +12,14 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public ushort Id;
         public Vector2 Position;
         public TalentType TalentType;
+        public int Health;
 
         public TalentCardS2C(ushort Id, Vector2 position, TalentType talentType)
         {
             this.Id = Id;
             Position = position;
             TalentType = talentType;
+            Health = 0;
         }
 
         public void Serialize(NetDataWriter writer)
@@ -25,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             writer.Put((byte)Id);
             writer.Put(Position);
             writer.Put((byte)TalentType);
+            writer.Put(Health);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -32,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             Id = reader.GetByte();
             Position = reader.GetVector2();
             TalentType = (TalentType)reader.GetByte();
+            Health = reader.GetInt();
         }
     }
 }

@@ -68,7 +68,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             
             foreach (var talentCard in talentCards)
             {
-                _matchDataService.AddTalentCard(talentCard.Id, talentCard.Position, talentCard.TalentType);
+                var talentCardPosition = talentCard.Position;
+                var talentCardId = talentCard.Id;
+                _matchDataService.AddTalentCard(talentCardId, talentCardPosition, talentCard.TalentType, _simulationGamePlayConfig.Talents.TalentCardHealth);
+                _physicsSimulator.AddTalentCard(talentCardId, talentCardPosition, _simulationGamePlayConfig.Talents.TalentCardWidth, _simulationGamePlayConfig.Talents.TalentCardHeight);
             }
         }
     }

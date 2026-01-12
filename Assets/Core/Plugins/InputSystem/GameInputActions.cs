@@ -126,6 +126,15 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SwitchTalent"",
+                    ""type"": ""Button"",
+                    ""id"": ""d7e84895-5147-5f56-c869-04d380b33050"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -170,6 +179,17 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Talent"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e8f95906-6258-6067-d970-15e491c44161"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""SwitchTalent"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -761,6 +781,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         m_GamePlay_MoveLeft = m_GamePlay.FindAction("MoveLeft", throwIfNotFound: true);
         m_GamePlay_MoveRight = m_GamePlay.FindAction("MoveRight", throwIfNotFound: true);
         m_GamePlay_Talent = m_GamePlay.FindAction("Talent", throwIfNotFound: true);
+        m_GamePlay_SwitchTalent = m_GamePlay.FindAction("SwitchTalent", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -858,6 +879,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_GamePlay_MoveLeft;
     private readonly InputAction m_GamePlay_MoveRight;
     private readonly InputAction m_GamePlay_Talent;
+    private readonly InputAction m_GamePlay_SwitchTalent;
     /// <summary>
     /// Provides access to input actions defined in input action map "GamePlay".
     /// </summary>
@@ -885,6 +907,10 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "GamePlay/Talent".
         /// </summary>
         public InputAction @Talent => m_Wrapper.m_GamePlay_Talent;
+        /// <summary>
+        /// Provides access to the underlying input action "GamePlay/SwitchTalent".
+        /// </summary>
+        public InputAction @SwitchTalent => m_Wrapper.m_GamePlay_SwitchTalent;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -923,6 +949,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @Talent.started += instance.OnTalent;
             @Talent.performed += instance.OnTalent;
             @Talent.canceled += instance.OnTalent;
+            @SwitchTalent.started += instance.OnSwitchTalent;
+            @SwitchTalent.performed += instance.OnSwitchTalent;
+            @SwitchTalent.canceled += instance.OnSwitchTalent;
         }
 
         /// <summary>
@@ -946,6 +975,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @Talent.started -= instance.OnTalent;
             @Talent.performed -= instance.OnTalent;
             @Talent.canceled -= instance.OnTalent;
+            @SwitchTalent.started -= instance.OnSwitchTalent;
+            @SwitchTalent.performed -= instance.OnSwitchTalent;
+            @SwitchTalent.canceled -= instance.OnSwitchTalent;
         }
 
         /// <summary>
@@ -1274,6 +1306,13 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnTalent(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SwitchTalent" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSwitchTalent(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

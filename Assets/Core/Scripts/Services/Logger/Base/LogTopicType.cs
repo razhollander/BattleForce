@@ -5,6 +5,7 @@ namespace CoreDomain.Scripts.Services.Logger.Base
         Temp,
         Inputs,
         ServerNetwork,
+        ServerPhysics,
         ClientNetwork,
         NatMasterNetwork,
         Arrow,

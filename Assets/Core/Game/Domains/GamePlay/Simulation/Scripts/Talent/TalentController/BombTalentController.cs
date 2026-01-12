@@ -10,5 +10,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentController
         {
             
         }
+
+        public void Stop()
+        {
+
+        }
     }
 }
