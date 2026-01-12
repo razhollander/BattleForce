@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using System.Numerics;
 using Box2D.NetStandard.Collision.Shapes;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Fixtures;
 using Box2D.NetStandard.Dynamics.World;
-using Box2D.NetStandard.Dynamics.World.Callbacks;
 using Box2D.WorldTests;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
@@ -248,7 +246,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bulletBody.CreateFixture(fixtureDef);
         }
 
-        public void AddTalentCard(ushort id, Vector2 position, float radius = 0.5f)
+        public void AddTalentCard(ushort id, Vector2 position, float length, float height)
         {
             BodyDef bodyDef = new BodyDef
             {
@@ -259,12 +257,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             Body body = _world.CreateBody(bodyDef);
 
-            CircleShape shape = new CircleShape();
-            shape.Radius = radius;
+            PolygonShape boxShape = new PolygonShape();
+            boxShape.SetAsBox(length * 0.5f, height * 0.5f);
 
             FixtureDef fixtureDef = new FixtureDef
             {
-                shape = shape,
+                shape = boxShape,
                 density = 0,
                 friction = 0,
                 filter = new Filter

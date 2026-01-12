@@ -73,13 +73,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             wallState.Points = wallPoints;
         }
         
-        public TalentCardS2C AddTalentCard(ushort talentCardId, Vector2 position, TalentType talentType)
+        public TalentCardS2C AddTalentCard(ushort talentCardId, Vector2 position, TalentType talentType, int Health)
         {
             ref var newCard = ref _simulationState.TalentCards.AddAndGet();
             newCard.Id = talentCardId;
             newCard.Position = position;
             newCard.TalentType = talentType;
-
+            newCard.Health = Health;
             return newCard;
         }
     }

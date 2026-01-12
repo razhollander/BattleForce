@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         void AddBulletDestroyedNetEvent(int onTick, ushort bulletId, Vector2 position);
         void AddPlayerJoinAcceptedEvent(int onTick, PlayerStateS2C playerState, SimulationStateS2C simulationState);
         void AddPlayersSwapEvent(int onTick, ushort casterPlayerId, ushort otherPlayerId, Vector2 casterPlayerPosition, Vector2 otherPlayerPosition, Vector2 casterPlayerDirection, Vector2 otherPlayerDirection);
-        void AddTalentCardDestroyedNetEvent(int onTick, ushort cardId);
+        void AddTalentCardObtainedNetEvent(int onTick, ushort cardId);
         void RemoveAllEventsOlderThanTick(ushort playerId, int tick);
     }
 }

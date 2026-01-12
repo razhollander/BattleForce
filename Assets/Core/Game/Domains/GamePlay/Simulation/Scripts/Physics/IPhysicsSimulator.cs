@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void CopyDataToSimulation(SimulationStateS2C simulationState);
         Body GetPlayer(ushort playerId);
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
-        void AddTalentCard(ushort id, Vector2 position, float radius = 0.5f);
+        void AddTalentCard(ushort id, Vector2 position, float length, float height);
         Body GetBullet(ushort bulletId);
         void RemoveBody(Body body);
     }

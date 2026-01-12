@@ -1,8 +1,5 @@
-using System.Numerics;
-using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
-using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
@@ -120,7 +117,37 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             
             throw new System.Exception("No bullet for id {playerId}!");
         }
+        
+        public bool TryGetBulletById(ushort bulletId, out PlayerBulletS2C bulletState)
+        {
+            for (int i = 0; i < Bullets.Count; i++)
+            {
+                bulletState = Bullets[i];
+                if (bulletState.Id == bulletId)
+                {
+                    return true;
+                } 
+            }
 
+            bulletState = default;
+            return false;
+        }
+        
+        public bool TryGetBulletIndexById(ushort bulletId, out int  index)
+        {
+            for (int i = 0; i < Bullets.Count; i++)
+            {
+                if (Bullets[i].Id == bulletId)
+                {
+                    index = i;
+                    return true;
+                } 
+            }
+
+            index = -1;
+            return false;
+        }
+        
         public ref PlayerBulletS2C GetBulletByIndex(int index)
         {
             return ref Bullets.GetByIndex(index);
@@ -151,6 +178,36 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
 
             throw new System.Exception($"No talent card for id {cardId}!");
+        }
+        
+        public bool TryGetTalentCardById(ushort cardId, out TalentCardS2C talentCard)
+        {
+            for (int i = 0; i < TalentCards.Count; i++)
+            {
+                talentCard = TalentCards[i];
+                if (talentCard.Id == cardId)
+                {
+                    return true;
+                }
+            }
+
+            talentCard = default;
+            return false;
+        }
+        
+        public bool TryGetTalentCardIndexById(ushort cardId, out int index)
+        {
+            for (int i = 0; i < TalentCards.Count; i++)
+            {
+                if (TalentCards[i].Id == cardId)
+                {
+                    index = i;
+                    return true;
+                }
+            }
+
+            index = -1;
+            return false;
         }
         
         public void SerializeTransforms(NetDataWriter writer)
