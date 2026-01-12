@@ -29,5 +29,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
                 _controllers.Add(controller);
             }
         }
+
+        public void DestroyTalentCard(ushort cardId)
+        {
+            for (var i = _controllers.Count - 1; i >= 0; i--)
+            {
+                if (_controllers[i].TalentCard.Id == cardId)
+                {
+                    _controllers[i].DestroyView();
+                    _controllers.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        public void SetTalentCardDamaged(ushort cardId)
+        {
+            foreach (var controller in _controllers)
+            {
+                if (controller.TalentCard.Id == cardId)
+                {
+                    controller.SetDamaged();
+                    return;
+                }
+            }
+        }
+
+        public bool TryGetCardPosition(ushort cardId, out Vector2 position)
+        {
+            foreach (var controller in _controllers)
+            {
+                if (controller.TalentCard.Id == cardId)
+                {
+                    position = controller.GetPosition();
+                    return true;
+                }
+            }
+            position = Vector2.zero;
+            return false;
+        }
     }
 }

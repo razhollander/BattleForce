@@ -12,6 +12,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
         private readonly TalentCardsConfig _talentCardsConfig;
         private readonly TalentCardS2C _talentCard;
 
+        public TalentCardS2C TalentCard => _talentCard;
+
         public TalentCardController(TalentCardS2C talentCard, TalentCardsConfig talentCardsConfig)
         {
             _talentCard = talentCard;
@@ -27,6 +29,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
             {
                 _talentCardView.SetSprite(sprite);
             }
+
+            _talentCardView.SwapToFullHealthSprite();
+        }
+
+        public void DestroyView()
+        {
+            Object.Destroy(_talentCardView.gameObject);
+        }
+
+        public void SetDamaged()
+        {
+            _talentCardView.SwapToDamagedSprite();
+        }
+
+        public Vector2 GetPosition()
+        {
+            return _talentCardView.transform.position;
         }
     }
 }

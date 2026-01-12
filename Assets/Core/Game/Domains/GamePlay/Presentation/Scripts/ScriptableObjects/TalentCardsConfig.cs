@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
 using UnityEngine;
@@ -9,5 +10,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
     {
         [SerializeField]
         public SerializableDictionary<TalentType, Sprite> TalentSprites = new SerializableDictionary<TalentType, Sprite>();
+
+        [SerializeField] public TalentCardObtainedEffectView TalentCardObtainedEffectPrefab;
     }
 }

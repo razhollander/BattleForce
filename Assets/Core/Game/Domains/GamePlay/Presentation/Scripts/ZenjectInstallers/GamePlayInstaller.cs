@@ -61,6 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
             Container.BindInterfacesTo<BulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
             Container.BindInterfacesTo<TalentCardControllers>().AsSingle().WithArguments(_talentCardViewPrefab).NonLazy();
+            Container.BindInterfacesTo<TalentCardObtainedEffectController>().AsSingle().WithArguments(_gamePlayConfig.TalentCards).NonLazy();
             //Container.BindInterfacesTo<NetworkManager>().AsSingle().WithArguments(_networkConfig).NonLazy();
             // Container.BindInterfacesTo<BFNetworkClient>().AsSingle().NonLazy();
             // Container.BindInterfacesTo<BFNetworkServer>().AsSingle().NonLazy();
