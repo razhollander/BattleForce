@@ -2,31 +2,26 @@ using System.Collections;
 using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 using System;
+using System.Threading;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
 {
     public class TalentCardObtainedEffectView : MonoBehaviour, IPoolable
     {
         [SerializeField] private LineRenderer _lineRenderer;
+        public Action Despawn { get; set; }
 
-        private Action<TalentCardObtainedEffectView> _returnToPoolAction;
-
-        public void Init(Action<TalentCardObtainedEffectView> returnToPoolAction)
-        {
-            _returnToPoolAction = returnToPoolAction;
-        }
-
-        public void Play(Vector2 from, Vector2 to, float duration)
+        public async Awaitable PlayAndDespawn(Vector2 from, Vector2 to, float duration, CancellationTokenSource cancellationTokenSource)
         {
             _lineRenderer.SetPosition(0, from);
             _lineRenderer.SetPosition(1, to);
-            StartCoroutine(ReturnToPoolAfterDelay(duration));
+            await Awaitable.WaitForSecondsAsync(duration, cancellationToken: cancellationTokenSource.Token);
+            Despawn();        
         }
 
-        private IEnumerator ReturnToPoolAfterDelay(float delay)
+        public void OnCreated()
         {
-            yield return new WaitForSeconds(delay);
-            _returnToPoolAction?.Invoke(this);
+            
         }
 
         public void OnSpawned()

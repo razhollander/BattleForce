@@ -11,18 +11,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
     {
         private IPlayerControllers _playerControllers;
         private IMatchDataService _matchDataService;
-        private IMatchNetEventsDataService _matchNetEventsDataService;
+        private ICachedPresentationEventsService _cachedPresentationEventsService;
 
         public override void ResolveDependencies()
         {
             _playerControllers = _diContainer.Resolve<IPlayerControllers>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
-            _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
+            _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
         }
 
         public void Execute()
         {
-            var playerTakeDamageEvents = _matchNetEventsDataService.PlayerTakeDamageNetEvents;
+            var playerTakeDamageEvents = _cachedPresentationEventsService.PlayerTakeDamageNetEvents;
             if (playerTakeDamageEvents.IsNullOrEmpty())
             {
                 return;

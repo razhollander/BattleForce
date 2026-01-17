@@ -8,17 +8,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
     public class HandlePlayerSwapNetEventsCommand: BaseCommand, ICommandVoid
     {
         private IPlayerControllers _playerControllers;
-        private IMatchNetEventsDataService _matchNetEventsDataService;
+        private ICachedPresentationEventsService _cachedPresentationEventsService;
 
         public override void ResolveDependencies()
         {
             _playerControllers = _diContainer.Resolve<IPlayerControllers>();
-            _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
+            _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
         }
 
         public void Execute()
         {
-            var playersSwapEvents = _matchNetEventsDataService.PlayerSwapNetEvents;
+            var playersSwapEvents = _cachedPresentationEventsService.PlayerSwapNetEvents;
             if (playersSwapEvents.IsNullOrEmpty())
             {
                 return;

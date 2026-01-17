@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
@@ -10,24 +11,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
     {
         private TalentCardView _talentCardView;
         private readonly TalentCardsConfig _talentCardsConfig;
-        private readonly TalentCardS2C _talentCard;
+        private readonly IMatchDataService _matchDataService;
+        private readonly PresentationGamePlayConfig _gamePlayConfig;
 
-        public TalentCardS2C TalentCard => _talentCard;
+        public ushort TalentCardId { get; set; }
 
-        public TalentCardController(TalentCardS2C talentCard, TalentCardsConfig talentCardsConfig)
+        public TalentCardController(ushort talentCardId, IMatchDataService matchDataService, TalentCardsConfig talentCardsConfig)
         {
-            _talentCard = talentCard;
+            _matchDataService = matchDataService;
             _talentCardsConfig = talentCardsConfig;
+            TalentCardId = talentCardId;
         }
 
         public void CreateView(TalentCardView talentCardViewPrefab, Transform parent)
         {
             _talentCardView = Object.Instantiate(talentCardViewPrefab, parent);
-            _talentCardView.transform.position = _talentCard.Position.ToUnityVector2();
+            var talentCardModel = _matchDataService.GetTalentCard(TalentCardId);
+            _talentCardView.transform.position = talentCardModel.Position;
 
-            if (_talentCardsConfig.TalentSprites.TryGetValue(_talentCard.TalentType, out var sprite))
+            if (_talentCardsConfig.TalentSprites.TryGetValue(talentCardModel.TalentType, out var sprite))
             {
-                _talentCardView.SetSprite(sprite);
+                _talentCardView.SetTalentSprite(sprite);
             }
 
             _talentCardView.SwapToFullHealthSprite();

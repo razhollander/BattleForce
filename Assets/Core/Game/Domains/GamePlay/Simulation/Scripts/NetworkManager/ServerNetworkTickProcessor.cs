@@ -184,6 +184,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 _fullTickPacket.PlayerTakeDamageNetEvents = _matchNetEventsDataService.PlayerTakeDamageNetEventsPerPlayer[playerId];
                 _fullTickPacket.BulletDestroyedNetEvents = _matchNetEventsDataService.BulletDestroyedNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerSwapNetEvents = _matchNetEventsDataService.PlayerSwapNetEventsPerPlayer[playerId];
+                _fullTickPacket.TalentCardObtainedNetEvents = _matchNetEventsDataService.TalentCardObtainedNetEventsPerPlayer[playerId];
+                _fullTickPacket.TalentCardHitNetEvents = _matchNetEventsDataService.TalentCardHitNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.FullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

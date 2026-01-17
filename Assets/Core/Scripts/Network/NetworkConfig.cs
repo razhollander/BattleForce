@@ -47,5 +47,6 @@ namespace Core.Scripts.Network
         public int PlayerSwapNetEvents = 64;
         public int TalentCardObtainedNetEvent = 64;
         public int MaxCollisionsPerFrame = 256;
+        public int TalentCardHitNetEvents = 128;
     }
 }

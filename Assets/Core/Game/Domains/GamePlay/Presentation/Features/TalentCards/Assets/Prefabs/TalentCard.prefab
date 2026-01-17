@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4921557195634842213}
   - component: {fileID: 694739742130266104}
-  - component: {fileID: 8537525285736028315}
   m_Layer: 0
   m_Name: CardImage
   m_TagString: Untagged
@@ -88,19 +87,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &8537525285736028315
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2145661387351242052}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dafdf70c80e3d4014854cda55c913ad3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spriteRenderer: {fileID: 0}
 --- !u!1 &4285784686667998667
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,4 +220,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dafdf70c80e3d4014854cda55c913ad3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spriteRenderer: {fileID: 1330387983599803050}
+  _talentSpriteRenderer: {fileID: 1330387983599803050}
+  _backgroundSpriteRenderer: {fileID: 694739742130266104}
+  _fullHealthSprite: {fileID: 21300000, guid: 018f91befdce74250b09534011beee23, type: 3}
+  _damagedSprite: {fileID: 21300000, guid: cd01ff3c6dcb342a0a65524b776439b1, type: 3}

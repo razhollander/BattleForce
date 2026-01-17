@@ -14,6 +14,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed, float radius);
         //void CopySimulationStateIntoPrevious();
         void AddWall(ushort wallId, Vector2[] wallPoints);
-        public TalentCardS2C AddTalentCard(ushort talentCardId, Vector2 position, TalentType talentType, int health);
+        public TalentCardS2C AddTalentCard(ushort talentCardId, Vector2 position, TalentType talentType, ushort health);
     }
 }

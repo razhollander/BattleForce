@@ -342,7 +342,7 @@ MonoBehaviour:
   _availableBulletSpriteRenderer: {fileID: 7373953308403036658}
   _healthBar: {fileID: 3898459118037589145}
   _playerLoadingRing: {fileID: 8547893950400930377}
-  SpaceShipTransform: {fileID: 6367321170785206256}
+  _spaceShipTransform: {fileID: 6367321170785206256}
 --- !u!1 &8969142055974948290
 GameObject:
   m_ObjectHideFlags: 0

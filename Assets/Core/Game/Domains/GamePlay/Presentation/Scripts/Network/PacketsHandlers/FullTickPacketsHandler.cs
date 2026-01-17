@@ -1,5 +1,6 @@
 using System.Linq;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
@@ -34,15 +35,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         public int LastProcessedTickFromServer { get; private set; }
 
         public FullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
-            IMatchDataService matchDataService, IMatchNetEventsDataService matchNetEventsDataService,
-            IPlayerControllers playerControllers, IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory,
-            ITalentCardControllers talentCardControllers, ITalentCardObtainedEffectController talentCardObtainedEffectController)
+            IMatchDataService matchDataService, ICachedPresentationEventsService iCachedPresentationEventsService,
+            IPlayerControllers playerControllers, IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
 
-            _simulationNetEventsHandler = new SimulationNetEventsHandler(matchDataService, matchNetEventsDataService,
-                networkManager, playerControllers, networkConfig, clientPresentationTickProcessor, commandFactory, talentCardControllers, talentCardObtainedEffectController);
+            _simulationNetEventsHandler = new SimulationNetEventsHandler(matchDataService, iCachedPresentationEventsService, networkManager, playerControllers, networkConfig, clientPresentationTickProcessor, commandFactory);
             _fullTickPackets = new CapacityDict<int, FullTickPacket>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerJoinedEvents = new CapacityList<PlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
@@ -82,8 +81,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             ProcessPlayerTakeDamageEvents(latestFullTickPacket.PlayerTakeDamageNetEvents);
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
             ProcessPlayerSwapEvents(latestFullTickPacket.PlayerSwapNetEvents);
-            ProcessTalentCardObtainedEvents(latestFullTickPacket.TalentCardObtainedNetEvents);
             ProcessTalentCardHitEvents(latestFullTickPacket.TalentCardHitNetEvents);
+            ProcessTalentCardObtainedEvents(latestFullTickPacket.TalentCardObtainedNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
@@ -114,6 +113,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
 
             if (!_cachedUnprocessedTalentCardHitEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedTalentCardHitEvents.Sort();
                 _simulationNetEventsHandler.ProcessTalentCardHitEvents(_cachedUnprocessedTalentCardHitEvents);
             }
         }

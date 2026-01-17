@@ -10,7 +10,5 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
     {
         [SerializeField]
         public SerializableDictionary<TalentType, Sprite> TalentSprites = new SerializableDictionary<TalentType, Sprite>();
-
-        [SerializeField] public TalentCardObtainedEffectView TalentCardObtainedEffectPrefab;
     }
 }

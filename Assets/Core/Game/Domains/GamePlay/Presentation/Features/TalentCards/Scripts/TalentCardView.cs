@@ -4,23 +4,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
 {
     public class TalentCardView : MonoBehaviour
     {
-        [SerializeField] private SpriteRenderer _spriteRenderer;
+        [SerializeField] private SpriteRenderer _talentSpriteRenderer;
+        [SerializeField] private SpriteRenderer _backgroundSpriteRenderer;
         [SerializeField] private Sprite _fullHealthSprite;
         [SerializeField] private Sprite _damagedSprite;
 
-        public void SetSprite(Sprite sprite)
+        public void SetTalentSprite(Sprite sprite)
         {
-            _spriteRenderer.sprite = sprite;
+            _talentSpriteRenderer.sprite = sprite;
         }
 
         public void SwapToDamagedSprite()
         {
-            _spriteRenderer.sprite = _damagedSprite;
+            _backgroundSpriteRenderer.sprite = _damagedSprite;
         }
 
         public void SwapToFullHealthSprite()
         {
-            _spriteRenderer.sprite = _fullHealthSprite;
+            _backgroundSpriteRenderer.sprite = _fullHealthSprite;
         }
     }
 }

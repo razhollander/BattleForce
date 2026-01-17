@@ -68,5 +68,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             GetPlayer(playerId).SetTransform(position, direction);
         }
+
+        public UnityEngine.Vector2 GetPlayerPosition(ushort playerId)
+        {
+            return GetPlayer(playerId).GetPosition();
+        }
     }
 }
