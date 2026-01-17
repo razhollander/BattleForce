@@ -7,18 +7,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
 {
     public class HandleBulletDestroyedNetEventsCommand: BaseCommand, ICommandVoid
     {
-        private IMatchNetEventsDataService _matchNetEventsDataService;
+        private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IBulletControllers _bulletControllers;
 
         public override void ResolveDependencies()
         {
             _bulletControllers = _diContainer.Resolve<IBulletControllers>();
-            _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
+            _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
         }
 
         public void Execute()
         {
-            var bulletDestroyedNetEvents = _matchNetEventsDataService.BulletDestroyedNetEvents;
+            var bulletDestroyedNetEvents = _cachedPresentationEventsService.BulletDestroyedNetEvents;
             if (bulletDestroyedNetEvents.IsNullOrEmpty())
             {
                 return;

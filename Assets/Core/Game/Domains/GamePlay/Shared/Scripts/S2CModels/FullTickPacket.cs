@@ -16,6 +16,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<PlayerTakeDamageNetEventS2C> PlayerTakeDamageNetEvents;
         public FixedUnorderedList<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents;
         public FixedUnorderedList<PlayersSwapNetEventS2C> PlayerSwapNetEvents;
+        public FixedUnorderedList<TalentCardObtainedNetEventS2C> TalentCardObtainedNetEvents;
+        public FixedUnorderedList<TalentCardHitNetEventS2C> TalentCardHitNetEvents;
 
         public FullTickPacket()
         {
@@ -29,6 +31,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             PlayerTakeDamageNetEvents = new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(maxCap.PlayerTakeDamageNetEvents);
             BulletDestroyedNetEvents = new FixedUnorderedList<BulletDestroyedNetEventS2C>(maxCap.BulletDestroyedNetEvents);
             PlayerSwapNetEvents = new FixedUnorderedList<PlayersSwapNetEventS2C>(maxCap.PlayerSwapNetEvents);
+            TalentCardObtainedNetEvents = new FixedUnorderedList<TalentCardObtainedNetEventS2C>(maxCap.TalentCardObtainedNetEvent);
+            TalentCardHitNetEvents = new FixedUnorderedList<TalentCardHitNetEventS2C>(maxCap.TalentCardHitNetEvents);
         }
 
 
@@ -55,6 +59,17 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             SerializedPlayerTakeDamageEvents(writer);
             SerializedBulletDestroyedEvents(writer);
             SerializedPlayerSwapEvents(writer);
+            SerializedTalentCardObtainedEvents(writer);
+            SerializedTalentCardHitEvents(writer);
+        }
+
+        private void SerializedTalentCardHitEvents(NetDataWriter writer)
+        {
+            writer.Put((byte) TalentCardHitNetEvents.Count);
+            foreach (var talentCardHitNetEvent in TalentCardHitNetEvents.AsSpan())
+            {
+                talentCardHitNetEvent.Serialize(writer);
+            }
         }
 
         private void SerializedPlayerSwapEvents(NetDataWriter writer)
@@ -63,6 +78,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var playerSwapNetEvent in PlayerSwapNetEvents.AsSpan())
             {
                 playerSwapNetEvent.Serialize(writer);
+            }
+        }
+
+        private void SerializedTalentCardObtainedEvents(NetDataWriter writer)
+        {
+            writer.Put((byte) TalentCardObtainedNetEvents.Count);
+            foreach (var talentCardObtained in TalentCardObtainedNetEvents.AsSpan())
+            {
+                talentCardObtained.Serialize(writer);
             }
         }
 
@@ -75,8 +99,32 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             DeserializedPlayerTakeDamageEvents(reader);
             DeserializedBulletDestroyedEvents(reader);
             DeserializedPlayerSwapEvents(reader);
+            DeserializedTalentCardObtainedEvents(reader);
+            DeserializedTalentCardHitEvents(reader);
         }
 
+        private void DeserializedTalentCardHitEvents(NetDataReader reader)
+        {
+            TalentCardHitNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var talentCardHitEvent = ref TalentCardHitNetEvents.AddAndGet();
+                talentCardHitEvent.Deserialize(reader);
+            }
+        }
+        
+        private void DeserializedTalentCardObtainedEvents(NetDataReader reader)
+        {
+            TalentCardObtainedNetEvents.Clear();
+            var talentCardObtainedCount = reader.GetByte();
+            for (var i = 0; i < talentCardObtainedCount; i++)
+            {
+                ref var talentCardObtainedEvent = ref TalentCardObtainedNetEvents.AddAndGet();
+                talentCardObtainedEvent.Deserialize(reader);
+            }
+        }
+        
         private void DeserializedPlayerSwapEvents(NetDataReader reader)
         {
             PlayerSwapNetEvents.Clear();

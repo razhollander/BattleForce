@@ -77,5 +77,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         {
             _playerView.SetPositionAndRotation(position.ToUnityVector2(), direction.ToUnityVector2().ToQuaternion());
         }
+
+        public UnityEngine.Vector2 GetPosition()
+        {
+            return _playerView.GetPosition();
+        }
     }
 }

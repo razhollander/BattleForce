@@ -15,6 +15,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
         private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
         private readonly HandleBulletDestroyedNetEventsCommand _handleBulletDestroyedNetEventsCommand;
         private readonly HandlePlayerSwapNetEventsCommand _handlePlayerSwapNetEventsCommand;
+        private readonly HandleTalentCardObtainedNetEventsCommand _handleTalentCardObtainedNetEventsCommand;
+        private readonly HandleTalentCardHitNetEventsCommand _handleTalentCardHitNetEventsCommand;
 
         public ClientPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IPlayerControllers playerControllers, ICommandFactory commandFactory, IBulletControllers bulletControllers)
         {
@@ -25,6 +27,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
             _handlePlayerTakeDamangeNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
             _handleBulletDestroyedNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>();
             _handlePlayerSwapNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerSwapNetEventsCommand>();
+            _handleTalentCardObtainedNetEventsCommand = commandFactory.CreateCommandVoid<HandleTalentCardObtainedNetEventsCommand>();
+            _handleTalentCardHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleTalentCardHitNetEventsCommand>();
         }
         
         public void StartTick()
@@ -40,13 +44,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
         public void ManagedUpdate()
         {
             _handleBulletSpawnNetEventsCommand.Execute();
-            _handlePlayerTakeDamangeNetEventsCommand.Execute();
             _handleBulletDestroyedNetEventsCommand.Execute();
+            _handlePlayerTakeDamangeNetEventsCommand.Execute();
             _handlePlayerSwapNetEventsCommand.Execute();
-         
+            _handleTalentCardHitNetEventsCommand.Execute();
+            
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
+            
+            _handleTalentCardObtainedNetEventsCommand.Execute();
         }
     }
 }

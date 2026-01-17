@@ -140,9 +140,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             talentCard.Health -= _gamePlayConfig.PlayerBullet.HitDamage;
             if (talentCard.Health > 0)
             {
+                LogService.LogError("Add talent card hit event!");
+                _matchNetEventsDataService.AddTalentCardHitNetEvent(_processedTick, talentCard.Id, talentCard.Health);
                 return;
             }
             
+            LogService.LogError("Add talent card obtained event!");
+            _matchNetEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, bulletModel.BelongToPlayerId);
             DestroyTalentCard(talentCard, cardBody);
         }
 
@@ -196,7 +200,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         {
             _matchDataService.SimulationState.RemoveTalentCardById(card.Id);
             _physicsSimulator.RemoveBody(cardBody);
-            _matchNetEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, card.Id);
         }
 
         private void HandlePlayerWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

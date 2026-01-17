@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         public int OccuredOnTick;
         public ushort CasterPlayerId;
         public ushort OtherPlayerId;
-        public Vector2 CasterPosition;
+        public Vector2 CasterPosition; // check maybe dont need all of these because the client knows them
         public Vector2 OtherPosition;
         public Vector2 CasterDirection;
         public Vector2 OtherDirection;

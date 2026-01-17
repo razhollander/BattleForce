@@ -10,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         [SerializeField] private SpriteRenderer _availableBulletSpriteRenderer;
         [SerializeField] private SimpleHealthBar _healthBar;
         [SerializeField] private PlayerLoadingRing _playerLoadingRing;
-        [SerializeField] private Transform SpaceShipTransform;
+        [SerializeField] private Transform _spaceShipTransform;
         
         public void SetColor(Color color)
         {
@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         public void SetPositionAndRotation(Vector2 position, Quaternion rotation)
         {
             transform.position = position;
-            SpaceShipTransform.rotation = rotation;
+            _spaceShipTransform.rotation = rotation;
         }
 
         public void ShowIsBulletAvailable(bool isAvailable)
@@ -42,8 +42,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         public void InterpolateTransform(Vector2 playerPosition, Quaternion playerRotation, float lerpFactor)
         {
             var lerpedPosition = Vector2.Lerp(transform.position, playerPosition, lerpFactor);
-            var lerpedRotation = Quaternion.Lerp(SpaceShipTransform.rotation, playerRotation, lerpFactor);
+            var lerpedRotation = Quaternion.Lerp(_spaceShipTransform.rotation, playerRotation, lerpFactor);
             SetPositionAndRotation(lerpedPosition, lerpedRotation);
+        }
+
+        public Vector2 GetPosition()
+        {
+            return _spaceShipTransform.position;
         }
     }
 }

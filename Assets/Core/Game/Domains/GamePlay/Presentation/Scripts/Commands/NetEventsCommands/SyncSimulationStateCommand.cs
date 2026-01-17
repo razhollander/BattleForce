@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands
@@ -45,7 +46,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
 
         private void CreateTalentCards()
         {
-            _talentCardControllers.CreateTalentCards(_simulationState.TalentCards);
+            foreach (var talentCard in _simulationState.TalentCards.AsSpan())
+            {
+                _matchDataService.AddTalentCard(talentCard.Id, talentCard.Position.ToUnityVector2(), talentCard.TalentType, talentCard.Health);
+                _talentCardControllers.CreateTalentCard(talentCard.Id);
+            }
         }
 
         private void CreatePlayers()

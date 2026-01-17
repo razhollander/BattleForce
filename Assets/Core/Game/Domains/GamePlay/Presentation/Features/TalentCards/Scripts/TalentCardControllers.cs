@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
-using Core.Scripts.Utils.CustomCollections;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
@@ -10,24 +10,45 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
     {
         private readonly TalentCardView _talentCardViewPrefab;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IMatchDataService _matchDataService;
         private readonly List<TalentCardController> _controllers = new List<TalentCardController>();
-        private GameObject _parent;
+        private readonly GameObject _parent;
 
-        public TalentCardControllers(TalentCardView talentCardViewPrefab, PresentationGamePlayConfig gamePlayConfig)
+        public TalentCardControllers(TalentCardView talentCardViewPrefab, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
         {
             _talentCardViewPrefab = talentCardViewPrefab;
             _gamePlayConfig = gamePlayConfig;
+            _matchDataService = matchDataService;
             _parent = new GameObject("TalentCardsParent");
         }
 
-        public void CreateTalentCards(FixedUnorderedList<TalentCardS2C> talentCards)
+        public void CreateTalentCard(ushort cardId)
         {
-            foreach (var talentCard in talentCards.AsSpan())
-            {
-                var controller = new TalentCardController(talentCard, _gamePlayConfig.TalentCards);
-                controller.CreateView(_talentCardViewPrefab, _parent.transform);
-                _controllers.Add(controller);
-            }
+            var controller = new TalentCardController(cardId, _matchDataService, _gamePlayConfig.TalentCards);
+            controller.CreateView(_talentCardViewPrefab, _parent.transform);
+            _controllers.Add(controller);
+        }
+
+        public void DisplayTalentCardTakeDamaged(ushort cardId)
+        {
+            GetController(cardId).SetDamaged();
+        }
+
+        public Vector2 GetTalentCardPosition(ushort cardId)
+        {
+            return GetController(cardId).GetPosition();
+        }
+
+        public void DestroyTalentCard(ushort cardId)
+        {
+            var cardController = GetController(cardId);
+            cardController.DestroyView();
+            _controllers.Remove(cardController);
+        }
+
+        private TalentCardController GetController(ushort cardId)
+        {
+            return _controllers.Find(x => x.TalentCardId == cardId);
         }
     }
 }

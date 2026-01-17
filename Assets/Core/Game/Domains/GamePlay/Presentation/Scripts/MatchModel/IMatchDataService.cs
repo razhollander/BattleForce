@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.MatchData.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.MatchData.Models;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
 {
@@ -21,5 +22,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         MatchPlayerBulletModel GetBullet(ushort bulletId);
         MatchEnvironmentWallModel GetEnvironmentWall(ushort wallId);
         void RemoveBullet(ushort bulletId);
+        MatchTalentCardModel GetTalentCard(ushort cardId);
+        MatchTalentCardModel AddTalentCard(ushort talentCardId, UnityEngine.Vector2 talentCardPosition, TalentType talentCardTalentType, ushort talentCardHealth);
+        void RemoveTalentCard(ushort cardId);
     }
 }

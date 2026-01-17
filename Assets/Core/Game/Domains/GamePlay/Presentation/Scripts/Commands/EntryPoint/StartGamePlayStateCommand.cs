@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
@@ -27,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private ITickProcessor _tickProcessor;
         private IBulletControllers _bulletControllers;
         private IEnvironmentWallsControllers _environmentWallsControllers;
+        private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -47,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _bulletControllers = _diContainer.Resolve<IBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IEnvironmentWallsControllers>();
+            _talentCardObtainedEffectController = _diContainer.Resolve<ITalentCardObtainedEffectController>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -58,6 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
+            _talentCardObtainedEffectController.InitEntryPoint();
         }
     }
 }

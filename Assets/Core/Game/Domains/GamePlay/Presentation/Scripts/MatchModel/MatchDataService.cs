@@ -5,6 +5,8 @@ using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.MatchData.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.MatchData.Models;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -16,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         public List<MatchPlayerModel> Players { get; private set; }
         public List<MatchPlayerBulletModel> Bullets { get; private set; }
         public List<MatchEnvironmentWallModel> EnvironmentWalls { get; private set; }
+        public List<MatchTalentCardModel> TalentCards { get; private set; }
 
         public MatchPlayerModel LocalPlayer { get; private set; }
         public bool IsPlayerJoined => LocalPlayer != null;
@@ -25,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             Players = new List<MatchPlayerModel>(networkConfig.MaxCap.ConcurrentPlayers);
             Bullets = new List<MatchPlayerBulletModel>(networkConfig.MaxCap.ConcurrentBullets);
             EnvironmentWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
+            TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -48,6 +52,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             }
             
             Bullets.Remove(bullet);
+        }
+
+        public MatchTalentCardModel GetTalentCard(ushort cardId)
+        {
+            return TalentCards.Find(x => x.Id == cardId);
+        }
+
+        public MatchTalentCardModel AddTalentCard(ushort talentCardId, UnityEngine.Vector2 talentCardPosition, TalentType talentCardTalentType, ushort talentCardHealth)
+        {
+            var newTalentCard = new MatchTalentCardModel(talentCardId, talentCardPosition, talentCardTalentType, talentCardHealth);
+            TalentCards.Add(newTalentCard);
+            return newTalentCard;
+        }
+
+        public void RemoveTalentCard(ushort cardId)
+        {
+            var talentCardModel = TalentCards.Find(x => x.Id == cardId);
+
+            if (talentCardModel == null)
+            {
+                LogService.LogError($"No talent card to remove with id {cardId}!");
+                return;
+            }
+            
+            TalentCards.Remove(talentCardModel);
         }
 
         public MatchPlayerModel GetPlayer(ushort playerId)

@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;
@@ -19,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
     public class SimulationNetEventsHandler
     {
         private readonly IMatchDataService _matchDataService;
-        private readonly IMatchNetEventsDataService _matchNetEventsDataService;
+        private readonly ICachedPresentationEventsService _cachedPresentationEventsService;
         private readonly IClientNetworkManager _networkManager;
         private readonly IPlayerControllers _playerControllers;
         private readonly NetworkConfig _networkConfig;
@@ -27,12 +25,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         private readonly ICommandFactory _commandFactory;
 
         public SimulationNetEventsHandler(IMatchDataService matchDataService,
-            IMatchNetEventsDataService matchNetEventsDataService, IClientNetworkManager networkManager,
+            ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager,
             IPlayerControllers playerControllers, NetworkConfig networkConfig,
             IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory)
         {
             _matchDataService = matchDataService;
-            _matchNetEventsDataService = matchNetEventsDataService;
+            _cachedPresentationEventsService = iCachedPresentationEventsService;
             _networkManager = networkManager;
             _playerControllers = playerControllers;
             _networkConfig = networkConfig;
@@ -89,7 +87,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             {
                 _matchDataService.AddBullet(bulletSpawnNetEvent.BulletId, bulletSpawnNetEvent.BelongToPlayerId,
                     bulletSpawnNetEvent.Position, bulletSpawnNetEvent.BulletRadius);
-                _matchNetEventsDataService.BulletSpawnNetEvents.Add(bulletSpawnNetEvent);
+                _cachedPresentationEventsService.BulletSpawnNetEvents.Add(bulletSpawnNetEvent);
             }
         }
 
@@ -105,7 +103,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
                 var playerModel = _matchDataService.GetPlayer(playerTakeDamageEvent.PlayerId);
                 playerModel.Spaceship.Health.CurrentHealth = Math.Min(playerModel.Spaceship.Health.CurrentHealth, playerTakeDamageEvent.PlayerHealth);// we do Min because the player may get hit multiple times the same frame
                 LogService.LogTopic($"Player lose {playerTakeDamageEvent.HitDamage} health, and now has {playerModel.Spaceship.Health.CurrentHealth}");
-                _matchNetEventsDataService.PlayerTakeDamageNetEvents.Add(playerTakeDamageEvent);
+                _cachedPresentationEventsService.PlayerTakeDamageNetEvents.Add(playerTakeDamageEvent);
             }
         }
 
@@ -119,7 +117,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             foreach (var bulletDestroyedEvent in bulletDestroyedEvents)
             {
                 _matchDataService.RemoveBullet(bulletDestroyedEvent.BulletId);
-                _matchNetEventsDataService.BulletDestroyedNetEvents.Add(bulletDestroyedEvent);
+                _cachedPresentationEventsService.BulletDestroyedNetEvents.Add(bulletDestroyedEvent);
             }
         }
 
@@ -138,7 +136,36 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
                 var otherPlayer = _matchDataService.GetPlayer(playerSwapEvent.OtherPlayerId);
                 otherPlayer.Spaceship.Transform.Position = playerSwapEvent.OtherPosition;
                 otherPlayer.Spaceship.Transform.Direction = playerSwapEvent.OtherDirection;
-                _matchNetEventsDataService.PlayerSwapNetEvents.Add(playerSwapEvent);
+                _cachedPresentationEventsService.PlayerSwapNetEvents.Add(playerSwapEvent);
+            }
+        }
+
+        public void ProcessTalentCardObtainedEvents(CapacityList<TalentCardObtainedNetEventS2C> talentCardObtainedNetEvents)
+        {
+            if (talentCardObtainedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var talentCardObtainedNetEvent in talentCardObtainedNetEvents)
+            {
+                var cardId = talentCardObtainedNetEvent.TalentCardId;
+                _matchDataService.RemoveTalentCard(cardId);
+                _cachedPresentationEventsService.TalentCardObtainedNetEvents.Add(talentCardObtainedNetEvent);
+            }
+        }
+
+        public void ProcessTalentCardHitEvents(CapacityList<TalentCardHitNetEventS2C> talentCardHitNetEvents)
+        {
+            if (talentCardHitNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var talentCardHitNetEvent in talentCardHitNetEvents)
+            {
+                _cachedPresentationEventsService.TalentCardHitNetEvents.Add(talentCardHitNetEvent);
+                _matchDataService.GetTalentCard(talentCardHitNetEvent.TalentCardId).Health = talentCardHitNetEvent.TalentCardHealth;
             }
         }
     }

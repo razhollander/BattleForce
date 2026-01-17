@@ -1,5 +1,6 @@
 using System.Linq;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
@@ -27,25 +28,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         private readonly CapacityList<PlayerTakeDamageNetEventS2C> _cachedUnprocessedPlayerTakeDamageEvents;
         private readonly CapacityList<BulletDestroyedNetEventS2C> _cachedUnprocessedBulletDestroyedEvents;
         private readonly CapacityList<PlayersSwapNetEventS2C> _cachedUnprocessedPlayerSwapEvents;
+        private readonly CapacityList<TalentCardObtainedNetEventS2C> _cachedUnprocessedTalentCardObtainedEvents;
+        private readonly CapacityList<TalentCardHitNetEventS2C> _cachedUnprocessedTalentCardHitEvents;
         private readonly ConcurrentPool<FullTickPacket> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.FullTick;
         public int LastProcessedTickFromServer { get; private set; }
 
         public FullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
-            IMatchDataService matchDataService, IMatchNetEventsDataService matchNetEventsDataService,
+            IMatchDataService matchDataService, ICachedPresentationEventsService iCachedPresentationEventsService,
             IPlayerControllers playerControllers, IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
 
-            _simulationNetEventsHandler = new SimulationNetEventsHandler(matchDataService, matchNetEventsDataService,
-                networkManager, playerControllers, networkConfig, clientPresentationTickProcessor, commandFactory);
+            _simulationNetEventsHandler = new SimulationNetEventsHandler(matchDataService, iCachedPresentationEventsService, networkManager, playerControllers, networkConfig, clientPresentationTickProcessor, commandFactory);
             _fullTickPackets = new CapacityDict<int, FullTickPacket>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerJoinedEvents = new CapacityList<PlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
             _cachedUnprocessedPlayerTakeDamageEvents = new CapacityList<PlayerTakeDamageNetEventS2C>(networkConfig.MaxCap.PlayerTakeDamageNetEvents);
             _cachedUnprocessedBulletDestroyedEvents = new CapacityList<BulletDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents);
             _cachedUnprocessedPlayerSwapEvents = new CapacityList<PlayersSwapNetEventS2C>(networkConfig.MaxCap.PlayerSwapNetEvents);
+            _cachedUnprocessedTalentCardObtainedEvents = new CapacityList<TalentCardObtainedNetEventS2C>(networkConfig.MaxCap.TalentCardObtainedNetEvent);
+            _cachedUnprocessedTalentCardHitEvents = new CapacityList<TalentCardHitNetEventS2C>(networkConfig.MaxCap.TalentCardHitNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<FullTickPacket>(() => new FullTickPacket(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -77,6 +81,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             ProcessPlayerTakeDamageEvents(latestFullTickPacket.PlayerTakeDamageNetEvents);
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
             ProcessPlayerSwapEvents(latestFullTickPacket.PlayerSwapNetEvents);
+            ProcessTalentCardHitEvents(latestFullTickPacket.TalentCardHitNetEvents);
+            ProcessTalentCardObtainedEvents(latestFullTickPacket.TalentCardObtainedNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
@@ -91,6 +97,43 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _fullTickPackets.Clear();
 
             return clientTick;
+        }
+
+        private void ProcessTalentCardHitEvents(FixedUnorderedList<TalentCardHitNetEventS2C> talentCardHitNetEvents)
+        {
+            _cachedUnprocessedTalentCardHitEvents.Clear();
+
+            foreach (var netEvent in talentCardHitNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedTalentCardHitEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedTalentCardHitEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedTalentCardHitEvents.Sort();
+                _simulationNetEventsHandler.ProcessTalentCardHitEvents(_cachedUnprocessedTalentCardHitEvents);
+            }
+        }
+
+        private void ProcessTalentCardObtainedEvents(FixedUnorderedList<TalentCardObtainedNetEventS2C> talentCardObtainedNetEvents)
+        {
+            _cachedUnprocessedTalentCardObtainedEvents.Clear();
+
+            foreach (var netEvent in talentCardObtainedNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedTalentCardObtainedEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedTalentCardObtainedEvents.IsNullOrEmpty())
+            {
+                _simulationNetEventsHandler.ProcessTalentCardObtainedEvents(_cachedUnprocessedTalentCardObtainedEvents);
+            }
         }
 
         private void ProcessPlayerSwapEvents(FixedUnorderedList<PlayersSwapNetEventS2C> playerSwapNetEvents)
