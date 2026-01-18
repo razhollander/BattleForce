@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         private SimulationGamePlayConfig _gamePlayConfig;
         private IMatchNetEventsDataService _matchNetEventsDataService;
         private IPlayersTalentsManager _playersTalentsManager;
+        private ILavaManager _lavaManager;
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
@@ -39,10 +40,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
             _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
+            _lavaManager = _diContainer.Resolve<ILavaManager>();
         }
 
         public void Execute()
         {
+            _lavaManager.SetProcessedTick(_processedTick);
             ProcessCollisions();
         }
 
@@ -53,19 +56,42 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             for (int i = 0; i < cachedCollisions.Count; i++) // this must stay for and not forearch, since if we destroy and object an event 'ContactEnd' will be added
             {
                 var collisionEvent = cachedCollisions[i];
+
+                var objectA = collisionEvent.BodyDataA;
+                var objectB = collisionEvent.BodyDataB;
+
+                HandlePlayerLavaCollision(objectA, objectB, collisionEvent.Type);
+
                 if (collisionEvent.Type != PhysicsEventEventType.Begin)
                 {
                     continue;
                 }
 
-                var objectA = collisionEvent.BodyDataA;
-                var objectB = collisionEvent.BodyDataB;
                 HandlePlayerWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandlePlayerLavaCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, PhysicsEventEventType eventType)
+        {
+            bool isPlayerLava = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Lava;
+            bool isLavaPlayer = objectA.PhysicsBodyType == PhysicsBodyType.Lava && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerLava && !isLavaPlayer) return;
+
+            ushort playerId = isPlayerLava ? objectA.Id : objectB.Id;
+
+            if (eventType == PhysicsEventEventType.Begin)
+            {
+                _lavaManager.OnPlayerEnterLava(playerId, _processedTick);
+            }
+            else if (eventType == PhysicsEventEventType.End)
+            {
+                _lavaManager.OnPlayerExitLava(playerId);
+            }
         }
 
         private void HandlePlayerBulletCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

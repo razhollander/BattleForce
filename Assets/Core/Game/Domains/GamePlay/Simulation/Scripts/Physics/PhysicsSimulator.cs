@@ -181,6 +181,36 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.CreateFixture(fixtureDef);
         }
 
+        public void AddLava(ushort id, Vector2[] points)
+        {
+            BodyDef bodyDef = new BodyDef
+            {
+                type = BodyType.Static,
+                position = Vector2.Zero,
+                userData = new PhysicsBodyData(id, PhysicsBodyType.Lava)
+            };
+
+            Body body = _world.CreateBody(bodyDef);
+
+            PolygonShape lavaShape = new PolygonShape();
+            lavaShape.Set(points);
+
+            FixtureDef fixtureDef = new FixtureDef
+            {
+                shape = lavaShape,
+                density = 0,
+                friction = 0,
+                isSensor = true,
+                filter = new Filter
+                {
+                    categoryBits = PhysicsBodyType.Lava.GetCollisionsCategory(),
+                    maskBits     = PhysicsBodyType.Lava.GetCollisionMask(),
+                }
+            };
+
+            body.CreateFixture(fixtureDef);
+        }
+
         public void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius)
         {
             BodyDef bodyDef = new BodyDef
