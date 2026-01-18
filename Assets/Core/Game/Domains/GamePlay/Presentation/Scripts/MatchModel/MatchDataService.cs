@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         public List<MatchPlayerModel> Players { get; private set; }
         public List<MatchPlayerBulletModel> Bullets { get; private set; }
         public List<MatchEnvironmentWallModel> EnvironmentWalls { get; private set; }
+        public List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
 
         public MatchPlayerModel LocalPlayer { get; private set; }
@@ -28,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             Players = new List<MatchPlayerModel>(networkConfig.MaxCap.ConcurrentPlayers);
             Bullets = new List<MatchPlayerBulletModel>(networkConfig.MaxCap.ConcurrentBullets);
             EnvironmentWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
+            EnvironmentLavaWalls = new List<MatchEnvironmentLavaWallModel>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
         }
 
@@ -39,6 +41,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         public MatchEnvironmentWallModel GetEnvironmentWall(ushort wallId)
         {
             return EnvironmentWalls.Find(x => x.Id == wallId);
+        }
+        
+        public MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort wallId)
+        {
+            return EnvironmentLavaWalls.Find(x => x.Id == wallId);
         }
 
         public void RemoveBullet(ushort bulletId)
@@ -95,6 +102,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         {
             var newWall = new MatchEnvironmentWallModel(wallConfig.Id, wallConfig.Points);
             EnvironmentWalls.Add(newWall);
+            return newWall;
+        }
+
+        public MatchEnvironmentLavaWallModel AddLavalWall(WallConfig wallConfig)
+        {
+            var newWall = new MatchEnvironmentLavaWallModel(wallConfig.Id, wallConfig.Points);
+            EnvironmentLavaWalls.Add(newWall);
             return newWall;
         }
 

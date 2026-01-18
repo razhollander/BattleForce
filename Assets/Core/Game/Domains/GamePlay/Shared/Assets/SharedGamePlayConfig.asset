@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: SharedGamePlayConfig
   m_EditorClassIdentifier: 
   MaxConcurrentTalentsForPlayer: 3
-  Environment: {fileID: 11400000, guid: 90405d7c9a0274eccb74401e3888aeba, type: 2}
+  Environment: {fileID: 11400000, guid: c491afc827cee4afbac25f4ed3b7c5b8, type: 2}
