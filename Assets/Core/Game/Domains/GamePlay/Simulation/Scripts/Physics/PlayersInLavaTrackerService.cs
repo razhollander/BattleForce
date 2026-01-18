@@ -37,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 _playersInLava.Add(playerId, playerInLavaData);
             }
 
+            LogService.LogError("Enter lava!");
             _playersInLava[playerId].LavaAmountPlayerIsIn++;
         }
 
@@ -54,6 +55,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             {
                 LogService.LogError($"Player {playerId} exit lava but does not exist in lava");
             }
+            
+            LogService.LogError("Exit lava!");
+
         }
         
         public List<ushort> StepAndGetPlayerIdsToDamage(float deltaTime)

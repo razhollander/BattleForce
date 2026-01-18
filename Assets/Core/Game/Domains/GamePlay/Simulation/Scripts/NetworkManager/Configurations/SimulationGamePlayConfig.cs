@@ -9,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configura
         [EditableRef] public PlayerSpaceshipConfig PlayerSpaceship;
         [EditableRef] public PlayerBulletConfig PlayerBullet;
         [EditableRef] public TalentsConfig Talents;
-        [EditableRef] public LavaGamePlayConfig Lava;
+        [EditableRef] public LavaConfig Lava;
         public int ChosenEnvironmentIndex = 0;
     }
 }

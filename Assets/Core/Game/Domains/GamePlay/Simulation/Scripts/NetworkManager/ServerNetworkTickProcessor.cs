@@ -39,7 +39,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private readonly IStateMachineService _stateMachineService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
-        private readonly IPlayersInLavaTrackerService _playersInLavaTrackerService;
 
         private TimerFixedThreaded2 _fixedTimer;
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
@@ -52,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IPlayerJoinPacketsHandler playerJoinPacketsHandler, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory, IPlayersInLavaTrackerService iPlayersInLavaTrackerService)
+            ICommandFactory commandFactory)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -62,7 +61,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             _matchNetEventsDataService = matchNetEventsDataService;
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
-            _playersInLavaTrackerService = iPlayersInLavaTrackerService;
         }
 
         public void InitEntryPoint()
@@ -118,7 +116,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 ApplyMatchModelToPhysicsSimulation();
                 _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
                 _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
-                _playersInLavaTrackerService.StepAndGetPlayerIdsToDamage(_networkConfig.DeltaTime);
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(processedTick).Execute();
                 ApplyPhysicsSimulationToMatchModel();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);

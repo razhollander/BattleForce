@@ -36,7 +36,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 
             foreach (var playerId in playerIds)
             {
-                _playerHitCommand.SetPlayerId(playerId).SetProcessedTick(_processedTick).SetHitDamage(_gamePlayConfig.Lava.DamageAmount);
+                _playerHitCommand
+                    .SetPlayerId(playerId)
+                    .SetProcessedTick(_processedTick)
+                    .SetHitDamage(_gamePlayConfig.Lava.DamageAmount)
+                    .Execute();
             }
         }
     }
