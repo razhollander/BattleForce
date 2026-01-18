@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
 
         private List<LavaWall> GetLavaWalls()
         {
-            return new List<LavaWall>(GetComponentsInChildren<LavaWall>());
+            return GetComponentsInChildren<LavaWall>().ToList();
         }
     }
 }

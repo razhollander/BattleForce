@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
         {
-            var chosenEnvironmentIndex = gamePlayConfig.ChosenWallsIndex;
+            var chosenEnvironmentIndex = gamePlayConfig.ChosenEnvironmentIndex;
 
             _simulationState = new SimulationStateS2C(
                 networkConfig.MaxCap.ConcurrentPlayers,

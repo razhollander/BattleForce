@@ -19,8 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         private ICommandFactory _commandFactory;
         private SimulationGamePlayConfig _gamePlayConfig;
         private IMatchNetEventsDataService _matchNetEventsDataService;
-        private IPlayersTalentsManager _playersTalentsManager;
-        private ILavaManager _lavaManager;
+        private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
@@ -39,13 +38,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
             _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
-            _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
-            _lavaManager = _diContainer.Resolve<ILavaManager>();
+            _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
         }
 
         public void Execute()
         {
-            _lavaManager.SetProcessedTick(_processedTick);
             ProcessCollisions();
         }
 
@@ -77,20 +74,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 
         private void HandlePlayerLavaCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, PhysicsEventEventType eventType)
         {
-            bool isPlayerLava = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Lava;
-            bool isLavaPlayer = objectA.PhysicsBodyType == PhysicsBodyType.Lava && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            var isPlayerLava = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Lava;
+            var isLavaPlayer = objectA.PhysicsBodyType == PhysicsBodyType.Lava && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
 
-            if (!isPlayerLava && !isLavaPlayer) return;
+            if (!isPlayerLava && !isLavaPlayer)
+            {
+                return;
+            }
 
-            ushort playerId = isPlayerLava ? objectA.Id : objectB.Id;
+            var playerId = isPlayerLava ? objectA.Id : objectB.Id;
 
             if (eventType == PhysicsEventEventType.Begin)
             {
-                _lavaManager.OnPlayerEnterLava(playerId, _processedTick);
+                _playersInLavaTrackerService.OnPlayerEnterLava(playerId);
             }
             else if (eventType == PhysicsEventEventType.End)
             {
-                _lavaManager.OnPlayerExitLava(playerId);
+                _playersInLavaTrackerService.OnPlayerExitLava(playerId);
             }
         }
 

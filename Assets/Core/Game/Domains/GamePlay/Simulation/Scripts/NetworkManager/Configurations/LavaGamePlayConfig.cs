@@ -3,7 +3,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configura
     [System.Serializable]
     public class LavaGamePlayConfig
     {
-        public ushort DamageAmount = 10;
-        public float DamageInterval = 1.0f;
+        public ushort DamageAmount = 1;
+        public float DamageIntervalInSeconds = 1.0f;
     }
 }
