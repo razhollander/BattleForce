@@ -9,10 +9,10 @@
 - Simulation - The server, written in pure C#
 - Shared - Classes used by client and server
 
-## Key Paths
-- Presentation: `Assets/Core/Game/Domains/GamePlay/Presentation`
-- Simulation: `Assets/Core/Game/Domains/GamePlay/Simulation`
-- Shared: `Assets/Core/Game/Domains/GamePlay/Shared`
+## Multiplier
+- Presentation domain, this is where to save the client code, using Unity C#: `Assets/Core/Game/Domains/GamePlay/Presentation`
+- Simulation, this is where to save the Server's code, using plain C#: `Assets/Core/Game/Domains/GamePlay/Simulation`
+- Shared, this is where to save the Server's code, using plain C#: `Assets/Core/Game/Domains/GamePlay/Shared`
 
 ## Critical Rules
 - Never use MonoBehaviour lifecycle methods. 
