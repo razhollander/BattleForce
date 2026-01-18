@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b97d19c0864d45838733a884dd52ea9, type: 3}
-  m_Name: SharedGamePlayConfig
+  m_Script: {fileID: 11500000, guid: e6553233918724897887121b08d78556, type: 3}
+  m_Name: LavaConfig
   m_EditorClassIdentifier: 
-  MaxConcurrentTalentsForPlayer: 3
-  Environment: {fileID: 11400000, guid: c491afc827cee4afbac25f4ed3b7c5b8, type: 2}
+  DamageAmount: 1
+  DamageIntervalInSeconds: 1

@@ -18,9 +18,12 @@
 - Never use MonoBehaviour lifecycle methods. 
 For Awake/Start/OnEnable use InitEntryPoint. 
 For OnDisable/OnDestroy use InitExitPoint.
+For Update on the client side use the ClientPresentationTickProcessor.ManagedUpdate()
+For Update on the server side use the ServerNetworkTickProcessor.OnTick()
 - Use `var` whenever possible
 - No comments unless complex algorithm
 - No Tuples - use Result classes
+- Always wrap condition in {} brackets
 - Awlays prefer Commands over Events, CommandsFactory folder for reference: BattleForce/Assets/Core/Scripts/Services/CommandFactory
 - Composition over Inheritance
 

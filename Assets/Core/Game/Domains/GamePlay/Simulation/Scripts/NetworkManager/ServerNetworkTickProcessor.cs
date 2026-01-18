@@ -42,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         private TimerFixedThreaded2 _fixedTimer;
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
+        private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private FullTickPacket _fullTickPacket;
         private TimerFixedThreaded2 _pollEventsFixedTimer;
         private Stopwatch _sw;
@@ -67,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             StartTick();
             _fullTickPacket = new FullTickPacket();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
+            _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
         }
 
         private void StartTick()
@@ -114,6 +116,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 ApplyMatchModelToPhysicsSimulation();
                 _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
                 _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
+                _tryDamagePlayersInLavaCommand.SetProcessedTick(processedTick).Execute();
                 ApplyPhysicsSimulationToMatchModel();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(processedTick);

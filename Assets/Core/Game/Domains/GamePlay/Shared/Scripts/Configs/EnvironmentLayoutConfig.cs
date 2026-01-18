@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
     public class EnvironmentLayoutConfig
     {
         [SerializeField] private string _wallsJson;
+        [SerializeField] private string _lavaWallsJson;
         [SerializeField] private string _talentCardsJson;
 
         public WallConfig[] GetWalls()
@@ -15,9 +16,19 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             return _wallsJson.FromJson<WallConfig[]>();
         }
 
+        public WallConfig[] GetLavaWalls()
+        {
+            return _lavaWallsJson.FromJson<WallConfig[]>();
+        }
+
         public void SetWallsJson(string wallsJson)
         {
             _wallsJson = wallsJson;
+        }
+
+        public void SetLavaWallsJson(string lavaWallsJson)
+        {
+            _lavaWallsJson = lavaWallsJson;
         }
 
         public TalentCardS2C[] GetTalentCards()

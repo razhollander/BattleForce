@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private IBulletControllers _bulletControllers;
         private IEnvironmentWallsControllers _environmentWallsControllers;
         private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
+        private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -49,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _bulletControllers = _diContainer.Resolve<IBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IEnvironmentWallsControllers>();
+            _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardObtainedEffectController = _diContainer.Resolve<ITalentCardObtainedEffectController>();
         }
 
@@ -61,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
+            _environmentLavaWallsControllers.InitEntryPoint();
             _talentCardObtainedEffectController.InitEntryPoint();
         }
     }

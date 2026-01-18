@@ -12,7 +12,8 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
         private const int MIN_BOX2D_ID = 1;
         [SerializeField] private EnvironmentConfig _environmentConfig;
         [SerializeField] private List<PolygonPath2D> _walls;
-        
+        [SerializeField] private List<LavaWall> _lavaWalls;
+
         [Button]
         public void RefreshConfig(int index)
         {
@@ -27,11 +28,36 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
             }
 
             _environmentConfig.SetWalls(wallsConfigs, index);
+
+            _lavaWalls = GetLavaWalls();
+            var lavaConfigs = new WallConfig[_lavaWalls.Count];
+            // ID numbering should probably continue after walls or be independent?
+            // Existing physics implementation uses ID to identify bodies. If Wall and Lava share ID space?
+            // Box2D bodies have unique IDs or pointers. The UserData has ID.
+            // If we use same ID for a wall and a lava, it might be confusing if we look up by ID.
+            // But they are different types.
+            // Let's offset ID to avoid collision just in case, or continue numbering.
+
+            int lavaStartId = MIN_BOX2D_ID + _walls.Count;
+
+            for (int i = 0; i < _lavaWalls.Count; i++)
+            {
+                var lavaWall = _lavaWalls[i];
+                var lavaConfig = new WallConfig((ushort)(i + lavaStartId), lavaWall.GetPoints().Select(x => x.ToNumericsVector2()).ToArray());
+                lavaConfigs[i] = lavaConfig;
+            }
+
+            _environmentConfig.SetLavaWalls(lavaConfigs, index);
         }
 
         private List<PolygonPath2D> GetWalls()
         {
-            return new List<PolygonPath2D>(GetComponentsInChildren<PolygonPath2D>());
+            return GetComponentsInChildren<PolygonPath2D>().Where(p => p.GetComponent<LavaWall>() == null).ToList();
+        }
+
+        private List<LavaWall> GetLavaWalls()
+        {
+            return GetComponentsInChildren<LavaWall>().ToList();
         }
     }
 }

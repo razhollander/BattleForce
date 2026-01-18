@@ -42,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _physicsSimulator.InitEntryPoint();
             
             CreateWalls();
+            CreateLavaWalls();
             CreateTalentCards();
         }
 
@@ -55,6 +56,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
                 var wallPoints = wallConfig.Points;
                 _matchDataService.AddWall(wallId, wallPoints);
                 _physicsSimulator.AddWall(wallId, wallPoints);
+            }
+        }
+
+        private void CreateLavaWalls()
+        {
+            var lavaWallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_matchDataService.SimulationState.EnvironmentLayoutIndex).GetLavaWalls();
+            if (lavaWallConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var lavaWallConfig in lavaWallConfigs)
+            {
+                var lavaWallId = lavaWallConfig.Id;
+                var lavaWallPoints = lavaWallConfig.Points;
+                _physicsSimulator.AddLava(lavaWallId, lavaWallPoints);
             }
         }
 

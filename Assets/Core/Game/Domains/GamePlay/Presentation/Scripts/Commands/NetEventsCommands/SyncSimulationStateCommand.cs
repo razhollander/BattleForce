@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
         private IEnvironmentWallsControllers _environmentWallsControllers;
         private ITalentCardControllers _talentCardControllers;
         private SharedGamePlayConfig _sharedGamePlayConfig;
+        private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
 
         public SyncSimulationStateCommand SetSimulationState(SimulationStateS2C simulationState)
         {
@@ -32,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             _playerControllers = _diContainer.Resolve<IPlayerControllers>();
             _bulletControllers = _diContainer.Resolve<IBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IEnvironmentWallsControllers>();
+            _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
@@ -41,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             CreatePlayers();
             CreateBullets();
             CreateWalls();
+            CreateLavaWalls();
             CreateTalentCards();
         }
 
@@ -74,11 +77,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
 
         private void CreateWalls()
         {
-            var wals = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetWalls();
-            foreach (var wall in wals)
+            var walls = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetWalls();
+            foreach (var wall in walls)
             {
                 var wallModel = _matchDataService.AddWall(wall);
                 _environmentWallsControllers.CreateWall(wallModel.Id);
+            }
+        }
+        
+        private void CreateLavaWalls()
+        {
+            var lavaWalls = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetLavaWalls();
+            foreach (var lavaWall in lavaWalls)
+            {
+                var lavaWallModel = _matchDataService.AddLavalWall(lavaWall);
+                _environmentLavaWallsControllers.CreateLavaWall(lavaWallModel.Id);
             }
         }
     }

@@ -29,5 +29,22 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
 #endif
         }
+
+        public void SetLavaWalls(WallConfig[] wallConfigs, int index)
+        {
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetLavaWallsJson(wallConfigs.ToJson());
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetLavaWallsJson(wallConfigs.ToJson());
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
     }
 }

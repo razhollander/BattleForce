@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         bool IsPlayerJoined { get; }
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
         MatchEnvironmentWallModel AddWall(WallConfig wallConfig);
+        MatchEnvironmentLavaWallModel AddLavalWall(WallConfig wallConfig);
         void SetLocalPlayer(int playerId);
         MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius);
         MatchPlayerBulletModel GetBullet(ushort bulletId);
@@ -25,5 +26,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         MatchTalentCardModel GetTalentCard(ushort cardId);
         MatchTalentCardModel AddTalentCard(ushort talentCardId, UnityEngine.Vector2 talentCardPosition, TalentType talentCardTalentType, ushort talentCardHealth);
         void RemoveTalentCard(ushort cardId);
+        MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort lavaWallId);
     }
 }
