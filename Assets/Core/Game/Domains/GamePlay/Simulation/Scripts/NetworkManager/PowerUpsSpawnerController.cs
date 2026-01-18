@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly IMatchNetEventsDataService _matchNetEventsDataService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
+        private readonly ITickProcessor _tickProcessor;
 
         private float _timeSinceLastSpawn;
         private ushort _nextId = 0;
@@ -26,13 +27,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             SimulationStateS2C simulationState,
             IMatchNetEventsDataService matchNetEventsDataService,
             IPhysicsSimulator physicsSimulator,
-            IUpdateSubscriptionService updateSubscriptionService)
+            IUpdateSubscriptionService updateSubscriptionService,
+            ITickProcessor tickProcessor)
         {
             _config = config;
             _simulationState = simulationState;
             _matchNetEventsDataService = matchNetEventsDataService;
             _physicsSimulator = physicsSimulator;
             _updateSubscriptionService = updateSubscriptionService;
+            _tickProcessor = tickProcessor;
         }
 
         public void Initialize()
@@ -102,6 +105,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
             _matchNetEventsDataService.AddEvent(new PowerUpSpawnedNetEventsS2C
             {
+                OccuredOnTick = _tickProcessor.CurrentTick,
                 Id = id,
                 Type = _config.PowerUpType,
                 Position = position

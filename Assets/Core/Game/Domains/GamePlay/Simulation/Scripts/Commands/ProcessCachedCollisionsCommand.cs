@@ -317,6 +317,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 
                     _matchNetEventsDataService.AddEvent(new Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents.PowerUpObtainedNetEventS2C
                     {
+                        OccuredOnTick = _processedTick,
                         PowerUpId = powerUpId,
                         PlayerId = bullet.BelongToPlayerId
                     });
