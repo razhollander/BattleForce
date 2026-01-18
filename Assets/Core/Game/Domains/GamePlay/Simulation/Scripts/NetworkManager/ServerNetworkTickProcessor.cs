@@ -39,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private readonly IStateMachineService _stateMachineService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
+        private readonly IPowerUpBallsTransformHandler _powerUpBallsTransformHandler;
 
         private TimerFixedThreaded2 _fixedTimer;
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
@@ -51,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IPlayerJoinPacketsHandler playerJoinPacketsHandler, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory)
+            ICommandFactory commandFactory, IPowerUpBallsTransformHandler powerUpBallsTransformHandler)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -61,6 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             _matchNetEventsDataService = matchNetEventsDataService;
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
+            _powerUpBallsTransformHandler = powerUpBallsTransformHandler;
         }
 
         public void InitEntryPoint()
@@ -115,6 +117,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 var processPlayersInputsResult = ProcessPackets(processedTick);
                 ApplyMatchModelToPhysicsSimulation();
                 _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
+                _powerUpBallsTransformHandler.UpdatePowerUpsTransform();
                 _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(processedTick).Execute();
                 ApplyPhysicsSimulationToMatchModel();
@@ -141,6 +144,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             {
                 ref var bulletState = ref _matchDataService.SimulationState.Bullets.GetByIndex(i);
                 bulletState.Position = _physicsSimulator.GetBullet(bulletState.Id).Position;
+            }
+
+            for (int i = 0; i < _matchDataService.SimulationState.PowerUps.Count; i++)
+            {
+                var powerUp = _matchDataService.SimulationState.PowerUps.GetByIndex(i);
+                var body = _physicsSimulator.GetPowerUp(powerUp.Id);
+                if (body != null)
+                {
+                    powerUp.Position = body.Position;
+                    _matchDataService.SimulationState.PowerUps[i] = powerUp;
+                }
             }
         }
 
@@ -189,6 +203,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 _fullTickPacket.PlayerSwapNetEvents = _matchNetEventsDataService.PlayerSwapNetEventsPerPlayer[playerId];
                 _fullTickPacket.TalentCardObtainedNetEvents = _matchNetEventsDataService.TalentCardObtainedNetEventsPerPlayer[playerId];
                 _fullTickPacket.TalentCardHitNetEvents = _matchNetEventsDataService.TalentCardHitNetEventsPerPlayer[playerId];
+                _fullTickPacket.PowerUpSpawnedNetEvents = _matchNetEventsDataService.PowerUpSpawnedNetEventsPerPlayer[playerId];
+                _fullTickPacket.PowerUpObtainedNetEvents = _matchNetEventsDataService.PowerUpObtainedNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.FullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

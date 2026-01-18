@@ -67,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 HandlePlayerWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
             }
 
             _physicsSimulator.ClearCachedCollisions();
@@ -262,6 +263,65 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             }
             
             throw new System.Exception("No collision!");
+        }
+
+        private void HandlePlayerBulletPowerUpCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBulletToPowerUp = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.PowerUp;
+            var isPowerUpToBullet = objectA.PhysicsBodyType == PhysicsBodyType.PowerUp && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+            var isCollision = isBulletToPowerUp || isPowerUpToBullet;
+
+            if (!isCollision) return;
+
+            ushort bulletId;
+            ushort powerUpId;
+            Body bulletBody;
+            Body powerUpBody;
+
+            if (isBulletToPowerUp)
+            {
+                bulletId = objectA.Id;
+                powerUpId = objectB.Id;
+                bulletBody = contact.FixtureA.Body;
+                powerUpBody = contact.FixtureB.Body;
+            }
+            else
+            {
+                bulletId = objectB.Id;
+                powerUpId = objectA.Id;
+                bulletBody = contact.FixtureB.Body;
+                powerUpBody = contact.FixtureA.Body;
+            }
+
+            if (_matchDataService.SimulationState.TryGetBulletById(bulletId, out var bullet))
+            {
+                // Destroy Bullet
+                DestroyBullet(bullet, bulletBody);
+
+                // Destroy PowerUp and Send Event
+                // Find powerup index
+                int powerUpIndex = -1;
+                for (int i = 0; i < _matchDataService.SimulationState.PowerUps.Count; i++)
+                {
+                    if (_matchDataService.SimulationState.PowerUps[i].Id == powerUpId)
+                    {
+                        powerUpIndex = i;
+                        break;
+                    }
+                }
+
+                if (powerUpIndex != -1)
+                {
+                    _matchDataService.SimulationState.PowerUps.RemoveAt(powerUpIndex);
+                    _physicsSimulator.RemoveBody(powerUpBody);
+
+                    _matchNetEventsDataService.AddEvent(new Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents.PowerUpObtainedNetEventS2C
+                    {
+                        PowerUpId = powerUpId,
+                        PlayerId = bullet.BelongToPlayerId
+                    });
+                }
+            }
         }
     }
 }

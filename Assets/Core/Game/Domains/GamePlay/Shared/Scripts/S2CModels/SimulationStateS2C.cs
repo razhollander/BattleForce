@@ -9,13 +9,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedClassUnorderedList<PlayerStateS2C> Players;
         public FixedUnorderedList<PlayerBulletS2C> Bullets;
         public FixedUnorderedList<TalentCardS2C> TalentCards;
+        public FixedUnorderedList<PowerUpS2C> PowerUps;
         public int EnvironmentLayoutIndex;
 
-        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards)
+        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUps)
         {
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer));
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
             TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
+            PowerUps = new FixedUnorderedList<PowerUpS2C>(maxPowerUps);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -39,6 +41,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var talentCard in TalentCards.AsSpan())
             {
                 talentCard.Serialize(writer);
+            }
+
+            var powerUpsCount = PowerUps.Count;
+            writer.Put((byte)powerUpsCount);
+            foreach (var powerUp in PowerUps.AsSpan())
+            {
+                powerUp.Serialize(writer);
             }
 
             writer.Put((byte)EnvironmentLayoutIndex);
@@ -68,6 +77,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var talentCard = ref TalentCards.AddAndGet();
                 talentCard.Deserialize(reader);
+            }
+
+            var powerUpsCount = reader.GetByte();
+            PowerUps.Clear();
+            for (var i = 0; i < powerUpsCount; i++)
+            {
+                ref var powerUp = ref PowerUps.AddAndGet();
+                powerUp.Deserialize(reader);
             }
 
             EnvironmentLayoutIndex = reader.GetByte();
@@ -225,6 +242,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 bullet.SerializeTransforms(writer);
             }
+
+            var powerUpsCount = PowerUps.Count;
+            writer.Put((byte) powerUpsCount);
+            foreach (var powerUp in PowerUps.AsSpan())
+            {
+                powerUp.SerializeTransforms(writer);
+            }
         }
 
         public void DeserializeTransforms(NetDataReader reader)
@@ -243,6 +267,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var bullet = ref Bullets.AddAndGet();
                 bullet.DeserializeTransforms(reader);
+            }
+
+            var powerUpsCount = reader.GetByte();
+            PowerUps.Clear();
+            for (int i = 0; i < powerUpsCount; i++)
+            {
+                ref var powerUp = ref PowerUps.AddAndGet();
+                powerUp.DeserializeTransforms(reader);
             }
         }
     }

@@ -168,5 +168,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
                 _matchDataService.GetTalentCard(talentCardHitNetEvent.TalentCardId).Health = talentCardHitNetEvent.TalentCardHealth;
             }
         }
+
+        public event Action<PowerUpSpawnedNetEventsS2C> PowerUpSpawned;
+        public event Action<PowerUpObtainedNetEventS2C> PowerUpObtained;
+
+        public void ProcessPowerUpSpawnedEvents(CapacityList<PowerUpSpawnedNetEventsS2C> powerUpSpawnedEvents)
+        {
+            if (powerUpSpawnedEvents.IsNullOrEmpty()) return;
+
+            foreach (var evt in powerUpSpawnedEvents)
+            {
+                PowerUpSpawned?.Invoke(evt);
+            }
+        }
+
+        public void ProcessPowerUpObtainedEvents(CapacityList<PowerUpObtainedNetEventS2C> powerUpObtainedEvents)
+        {
+            if (powerUpObtainedEvents.IsNullOrEmpty()) return;
+
+            foreach (var evt in powerUpObtainedEvents)
+            {
+                PowerUpObtained?.Invoke(evt);
+            }
+        }
     }
 }

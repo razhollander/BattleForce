@@ -42,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             CopyPlayersStates(simulationState);
             CopyBulletsStates(simulationState);
+            CopyPowerUpsStates(simulationState);
         }
 
         public Body GetPlayer(ushort playerId)
@@ -82,6 +83,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     }
 
                     currentBody = currentBody.GetNext();
+                }
+            }
+        }
+
+        private void CopyPowerUpsStates(SimulationStateS2C simulationState)
+        {
+            foreach (var powerUp in simulationState.PowerUps.AsSpan())
+            {
+                var powerUpBody = _world.GetBodyList();
+
+                while (powerUpBody != null)
+                {
+                    var bodyData = (PhysicsBodyData) powerUpBody.UserData;
+
+                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUp && bodyData.Id == powerUp.Id)
+                    {
+                        powerUpBody.SetTransform(powerUp.Position, 0); // PowerUps might not rotate or handle it differently
+                        break;
+                    }
+
+                    powerUpBody = powerUpBody.GetNext();
                 }
             }
         }
@@ -305,6 +327,37 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.CreateFixture(fixtureDef);
         }
 
+        public void AddPowerUp(ushort id, Vector2 position, float radius)
+        {
+            BodyDef bodyDef = new BodyDef
+            {
+                type = BodyType.Dynamic,
+                position = position,
+                userData = new PhysicsBodyData(id, PhysicsBodyType.PowerUp),
+                fixedRotation = true
+            };
+
+            Body body = _world.CreateBody(bodyDef);
+
+            CircleShape circleShape = new CircleShape();
+            circleShape.Radius = radius;
+
+            FixtureDef fixtureDef = new FixtureDef
+            {
+                shape = circleShape,
+                density = 1f,
+                friction = 0,
+                restitution = 1f, // Bounciness
+                filter = new Filter
+                {
+                    categoryBits = PhysicsBodyType.PowerUp.GetCollisionsCategory(),
+                    maskBits     = PhysicsBodyType.PowerUp.GetCollisionMask(),
+                }
+            };
+
+            body.CreateFixture(fixtureDef);
+        }
+
         public Body GetBullet(ushort bulletId)
         {
             var currentBody = _world.GetBodyList();
@@ -325,9 +378,52 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return default;
         }
 
+        public Body GetPowerUp(ushort powerUpId)
+        {
+            var currentBody = _world.GetBodyList();
+
+            while (currentBody != null)
+            {
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUp && bodyData.Id == powerUpId)
+                {
+                    return currentBody;
+                }
+
+                currentBody = currentBody.GetNext();
+            }
+
+            LogService.LogError($"Couldn't find powerUp {powerUpId}");
+            return default;
+        }
+
         public void RemoveBody(Body body)
         {
             _world.DestroyBody(body);
+        }
+
+        public bool IsPositionFree(Vector2 position, float radius)
+        {
+            bool hasCollision = false;
+            var aabb = new Box2D.NetStandard.Collision.AABB();
+            aabb.lowerBound = position - new Vector2(radius, radius);
+            aabb.upperBound = position + new Vector2(radius, radius);
+
+            _world.QueryAABB((fixture) =>
+            {
+                var bodyData = (PhysicsBodyData)fixture.Body.UserData;
+                // Check if it hits a Wall (Static). Lava is fine.
+                // Prompt: "The powerup cant be spawned on top of a wall, though on top of a lava wall is fine."
+                if (bodyData.PhysicsBodyType == PhysicsBodyType.Wall)
+                {
+                    hasCollision = true;
+                    return false; // Stop query
+                }
+                return true; // Continue query
+            }, aabb);
+
+            return !hasCollision;
         }
 
         public void ManagedOnGUI()

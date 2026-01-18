@@ -21,7 +21,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         Body GetPlayer(ushort playerId);
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
         void AddTalentCard(ushort id, Vector2 position, float length, float height);
+        void AddPowerUp(ushort id, Vector2 position, float radius);
         Body GetBullet(ushort bulletId);
+        Body GetPowerUp(ushort powerUpId);
         void RemoveBody(Body body);
+        bool IsPositionFree(Vector2 position, float radius);
     }
 }
