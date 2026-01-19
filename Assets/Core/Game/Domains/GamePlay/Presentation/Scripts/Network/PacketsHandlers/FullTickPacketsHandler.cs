@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
@@ -30,6 +31,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         private readonly CapacityList<PlayersSwapNetEventS2C> _cachedUnprocessedPlayerSwapEvents;
         private readonly CapacityList<TalentCardObtainedNetEventS2C> _cachedUnprocessedTalentCardObtainedEvents;
         private readonly CapacityList<TalentCardHitNetEventS2C> _cachedUnprocessedTalentCardHitEvents;
+        private readonly CapacityList<PowerUpBallSpawnedNetEventS2C> _cachedUnprocessedPowerUpBallSpawnedEvents;
+        private readonly CapacityList<PowerUpBallObtainedNetEventS2C> _cachedUnprocessedPowerUpBallObtainedEvents;
         private readonly ConcurrentPool<FullTickPacket> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.FullTick;
         public int LastProcessedTickFromServer { get; private set; }
@@ -50,6 +53,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _cachedUnprocessedPlayerSwapEvents = new CapacityList<PlayersSwapNetEventS2C>(networkConfig.MaxCap.PlayerSwapNetEvents);
             _cachedUnprocessedTalentCardObtainedEvents = new CapacityList<TalentCardObtainedNetEventS2C>(networkConfig.MaxCap.TalentCardObtainedNetEvent);
             _cachedUnprocessedTalentCardHitEvents = new CapacityList<TalentCardHitNetEventS2C>(networkConfig.MaxCap.TalentCardHitNetEvents);
+            _cachedUnprocessedPowerUpBallSpawnedEvents = new CapacityList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents);
+            _cachedUnprocessedPowerUpBallObtainedEvents = new CapacityList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<FullTickPacket>(() => new FullTickPacket(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -83,9 +88,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             ProcessPlayerSwapEvents(latestFullTickPacket.PlayerSwapNetEvents);
             ProcessTalentCardHitEvents(latestFullTickPacket.TalentCardHitNetEvents);
             ProcessTalentCardObtainedEvents(latestFullTickPacket.TalentCardObtainedNetEvents);
+            ProcessPowerUpBallSpawnedEvents(latestFullTickPacket.PowerUpSpawnedNetEvents);
+            ProcessPowerUpBallObtainedEvents(latestFullTickPacket.PowerUpObtainedNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
+            UpdatePowerUpBallsTransform(simulationState);
 
             LastProcessedTickFromServer = latestTickReceivedFromServer;
 
@@ -97,6 +105,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _fullTickPackets.Clear();
 
             return clientTick;
+        }
+
+        private void UpdatePowerUpBallsTransform(SimulationStateS2C simulationState)
+        {
+            foreach (var powerUpBallModel in _matchDataService.PowerUpBalls)
+            {
+                var powerUpBallById = simulationState.GetPowerUpBallById(powerUpBallModel.Id);
+                powerUpBallModel.Position = powerUpBallById.Position.ToUnityVector2();
+            }
         }
 
         private void ProcessTalentCardHitEvents(FixedUnorderedList<TalentCardHitNetEventS2C> talentCardHitNetEvents)
@@ -224,6 +241,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             if (!_cachedUnprocessedBulletSpawnedEvents.IsNullOrEmpty())
             {
                 _simulationNetEventsHandler.ProcessBulletSpawnEvents(_cachedUnprocessedBulletSpawnedEvents);
+            }
+        }
+        
+        private void ProcessPowerUpBallSpawnedEvents(FixedUnorderedList<PowerUpBallSpawnedNetEventS2C> powerUpBallSpawnNetEvents)
+        {
+            _cachedUnprocessedPowerUpBallSpawnedEvents.Clear();
+
+            foreach (var netEvent in powerUpBallSpawnNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPowerUpBallSpawnedEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPowerUpBallSpawnedEvents.IsNullOrEmpty())
+            {
+                _simulationNetEventsHandler.ProcessPowerUpSpawnedEvents(_cachedUnprocessedPowerUpBallSpawnedEvents);
+            }
+        }
+        
+        private void ProcessPowerUpBallObtainedEvents(FixedUnorderedList<PowerUpBallObtainedNetEventS2C> powerUpBallObtainedNetEvents)
+        {
+            _cachedUnprocessedPowerUpBallObtainedEvents.Clear();
+
+            foreach (var netEvent in powerUpBallObtainedNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPowerUpBallObtainedEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPowerUpBallObtainedEvents.IsNullOrEmpty())
+            {
+                _simulationNetEventsHandler.ProcessPowerUpObtainedEvents(_cachedUnprocessedPowerUpBallObtainedEvents);
             }
         }
 

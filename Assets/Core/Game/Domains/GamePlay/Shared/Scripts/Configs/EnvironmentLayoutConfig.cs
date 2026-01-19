@@ -1,15 +1,27 @@
+using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Extensions;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {
     [System.Serializable]
     public class EnvironmentLayoutConfig
     {
-        [SerializeField] private string _wallsJson;
-        [SerializeField] private string _lavaWallsJson;
-        [SerializeField] private string _talentCardsJson;
+        [UnityEngine.SerializeField] private string _environmentHalfSizeJson;
+        [UnityEngine.SerializeField] private string _wallsJson;
+        [UnityEngine.SerializeField] private string _lavaWallsJson;
+        [UnityEngine.SerializeField] private string _talentCardsJson;
+
+        public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
+        {
+            _wallsJson = wallsJson;
+            _talentCardsJson = talentCardsJson;
+        }
+
+        public Vector2 GetEnvironmentHalfSize()
+        {
+            return _environmentHalfSizeJson.FromJson<Vector2>();
+        }
 
         public WallConfig[] GetWalls()
         {
@@ -34,12 +46,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public TalentCardS2C[] GetTalentCards()
         {
             return _talentCardsJson.FromJson<TalentCardS2C[]>();
-        }
-
-        public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
-        {
-            _wallsJson = wallsJson;
-            _talentCardsJson = talentCardsJson;
         }
     }
 }

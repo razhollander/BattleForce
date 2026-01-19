@@ -165,57 +165,51 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             DestroyBullet(bulletModel, bulletBody);
             ref var talentCard = ref _matchDataService.SimulationState.TalentCards.GetByIndex(talentCardIndex);
             talentCard.Health -= _gamePlayConfig.PlayerBullet.HitDamage;
-            if (talentCard.Health > 0)
+            var isTalentCardAlive = talentCard.Health > 0;
+
+            if (isTalentCardAlive)
             {
-                LogService.LogError("Add talent card hit event!");
                 _matchNetEventsDataService.AddTalentCardHitNetEvent(_processedTick, talentCard.Id, talentCard.Health);
-                return;
             }
-            
-            LogService.LogError("Add talent card obtained event!");
-            _matchNetEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, bulletModel.BelongToPlayerId);
-            DestroyTalentCard(talentCard, cardBody);
+            else
+            {
+                _matchNetEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, bulletModel.BelongToPlayerId);
+                DestroyTalentCard(talentCard, cardBody);
+            }
         }
 
         private bool TryGetTalentCardToBulletCollisionData(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact, bool isBulletToCardCollision, out PlayerBulletS2C bulletModel,
             out int talentCardIndex , out Body bulletBody, out Body cardBody)
         {
             ushort cardId;
+            ushort bulletId; // dont delete used in logs
             talentCardIndex = default;
             cardBody = default;
             bulletBody = default;
+
             if (isBulletToCardCollision)
             {
-                if(_matchDataService.SimulationState.TryGetBulletById(objectA.Id, out bulletModel))
-                {
-                    bulletBody = contact.FixtureA.Body;
-                    cardId = objectB.Id;
-                    cardBody = contact.FixtureB.Body;
-                }
-                else
-                {
-                    LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
-                    return false;
-                }
+                bulletId = objectA.Id;
+                bulletBody = contact.FixtureA.Body;
+                cardId = objectB.Id;
+                cardBody = contact.FixtureB.Body;
             }
             else
             {
-                if(_matchDataService.SimulationState.TryGetBulletById(objectB.Id, out bulletModel))
-                {
-                    bulletBody = contact.FixtureB.Body;
-                    cardId = objectA.Id;
-                    cardBody = contact.FixtureA.Body;
-                }
-                else
-                {
-                    LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
-                    return false;
-                }
+                bulletId = objectB.Id;
+                bulletBody = contact.FixtureB.Body;
+                cardId = objectA.Id;
+                cardBody = contact.FixtureA.Body;
             }
 
-            if (_matchDataService.SimulationState.TryGetTalentCardIndexById(cardId, out int index))
+            if(!_matchDataService.SimulationState.TryGetBulletById(objectA.Id, out bulletModel))
             {
-                talentCardIndex = index;
+                LogService.LogTopic($"Bullet {bulletId} was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return false;
+            }
+
+            if (_matchDataService.SimulationState.TryGetTalentCardIndexById(cardId, out talentCardIndex))
+            {
                 return true;
             }
 
@@ -271,58 +265,65 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             var isPowerUpToBullet = objectA.PhysicsBodyType == PhysicsBodyType.PowerUp && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
             var isCollision = isBulletToPowerUp || isPowerUpToBullet;
 
-            if (!isCollision) return;
+            if (!isCollision)
+            {
+                return;
+            }
+            
+            if (!TryGetPowerUpBallToBulletCollisionData(objectA, objectB, contact, isBulletToPowerUp, out var bulletModel, out int powerUpBallIndex, out var bulletBody, out var powerUpBody))
+            {
+                return;
+            }
 
+            ref var powerUpBall = ref _matchDataService.SimulationState.PowerUpBalls.GetByIndex(powerUpBallIndex);
+            var powerUpBallId = powerUpBall.Id;
+            DestroyBullet(bulletModel, bulletBody);
+            DestroyPowerUpBall(powerUpBallId, powerUpBody);
+            _matchNetEventsDataService.AddPowerUpObtainedNetEvent(_processedTick, powerUpBallId, bulletModel.BelongToPlayerId);
+        }
+
+        private void DestroyPowerUpBall(ushort powerUpBallId, Body powerUpBallBody)
+        {
+            _matchDataService.SimulationState.RemovePowerUpBallById(powerUpBallId);
+            _physicsSimulator.RemoveBody(powerUpBallBody);
+        }
+
+        private bool TryGetPowerUpBallToBulletCollisionData(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact, bool isBulletToPowerUpCollision, out PlayerBulletS2C bulletModel, out int powerUpBallIndex, out Body bulletBody, out Body powerUpBallBody)
+        {
             ushort bulletId;
-            ushort powerUpId;
-            Body bulletBody;
-            Body powerUpBody;
-
-            if (isBulletToPowerUp)
+            ushort powerUpBallId;
+            powerUpBallIndex = default;
+            powerUpBallBody = default;
+            bulletModel = default;
+            
+            if (isBulletToPowerUpCollision)
             {
                 bulletId = objectA.Id;
-                powerUpId = objectB.Id;
+                powerUpBallId = objectB.Id;
                 bulletBody = contact.FixtureA.Body;
-                powerUpBody = contact.FixtureB.Body;
+                powerUpBallBody = contact.FixtureB.Body;
             }
             else
             {
                 bulletId = objectB.Id;
-                powerUpId = objectA.Id;
+                powerUpBallId = objectA.Id;
                 bulletBody = contact.FixtureB.Body;
-                powerUpBody = contact.FixtureA.Body;
+                powerUpBallBody = contact.FixtureA.Body;
             }
 
-            if (_matchDataService.SimulationState.TryGetBulletById(bulletId, out var bullet))
+            if (!_matchDataService.SimulationState.TryGetBulletById(bulletId, out bulletModel))
             {
-                // Destroy Bullet
-                DestroyBullet(bullet, bulletBody);
-
-                // Destroy PowerUp and Send Event
-                // Find powerup index
-                int powerUpIndex = -1;
-                for (int i = 0; i < _matchDataService.SimulationState.PowerUps.Count; i++)
-                {
-                    if (_matchDataService.SimulationState.PowerUps[i].Id == powerUpId)
-                    {
-                        powerUpIndex = i;
-                        break;
-                    }
-                }
-
-                if (powerUpIndex != -1)
-                {
-                    _matchDataService.SimulationState.PowerUps.RemoveAt(powerUpIndex);
-                    _physicsSimulator.RemoveBody(powerUpBody);
-
-                    _matchNetEventsDataService.AddEvent(new Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents.PowerUpObtainedNetEventS2C
-                    {
-                        OccuredOnTick = _processedTick,
-                        PowerUpId = powerUpId,
-                        PlayerId = bullet.BelongToPlayerId
-                    });
-                }
+                LogService.LogTopic($"Bullet {bulletId} was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return false;
             }
+            
+            if (_matchDataService.SimulationState.TryGetPowerUpBallIndexById(powerUpBallId, out powerUpBallIndex))
+            {
+                return true;
+            }
+            
+            LogService.LogTopic($"PowerUpBall {powerUpBallId} was already destroyed in this frame!", LogTopicType.ServerPhysics);
+            return true;
         }
     }
 }

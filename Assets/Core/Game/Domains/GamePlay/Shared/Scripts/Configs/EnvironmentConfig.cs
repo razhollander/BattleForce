@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {
-    [CreateAssetMenu(fileName = "EnvironmentConfig", menuName = "BF/Network/Environment Config")]
+    [CreateAssetMenu(fileName = "EnvironmentConfig", menuName = "BF/Shared/Environment Config")]
     public class EnvironmentConfig : ScriptableObject
     {
         [SerializeField]

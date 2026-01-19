@@ -1,12 +1,8 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
-using Core.Scripts.Extensions.Linq;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.Logger.Base;
 using Sirenix.Utilities;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands
 {
@@ -33,17 +29,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
                 return;
             }
             
-            //var areAnyBulletsDestroyed = !_matchNetEventsDataService.BulletDestroyedNetEvents.IsNullOrEmpty();
             foreach (var bulletsSpawnEvent in bulletsSpawnEvents)
             {
                 var bulletId = bulletsSpawnEvent.BulletId;
-                //var isBulletDestroyed = areAnyBulletsDestroyed && _matchNetEventsDataService.BulletDestroyedNetEvents.Any(x => x.BulletId == bulletId);
-                //if (!isBulletDestroyed)
-                //{
                 var bulletColor = _matchDataService.GetPlayer(bulletsSpawnEvent.BelongToPlayerId).Spaceship.Color;
-                _bulletControllers.CreateBullet(bulletId, bulletsSpawnEvent.BelongToPlayerId, bulletsSpawnEvent.BulletRadius, bulletsSpawnEvent.Position, bulletColor);
-                //}
-                
+                _bulletControllers.CreateBullet(bulletId, bulletsSpawnEvent.BulletRadius, bulletsSpawnEvent.Position, bulletColor);
                 _playerControllers.ShootBulletEffectForPlayer(bulletsSpawnEvent.BelongToPlayerId);
             }
             

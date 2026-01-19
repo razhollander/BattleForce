@@ -2,6 +2,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
     public enum PowerUpType
     {
-        Turn = 0
+        None = 0,
+        Turn = 1
     }
 }

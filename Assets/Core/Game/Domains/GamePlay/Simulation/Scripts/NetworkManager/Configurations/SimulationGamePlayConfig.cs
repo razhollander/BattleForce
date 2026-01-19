@@ -10,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configura
         [EditableRef] public PlayerBulletConfig PlayerBullet;
         [EditableRef] public TalentsConfig Talents;
         [EditableRef] public LavaConfig Lava;
+        [EditableRef] public PowerUpsConfig PowerUps;
         public int ChosenEnvironmentIndex = 0;
     }
 }

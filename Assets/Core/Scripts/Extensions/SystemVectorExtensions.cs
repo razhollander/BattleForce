@@ -10,6 +10,14 @@ namespace Core.Scripts.Extensions
             return Mathf.Atan2(direction.Y, direction.X);
         }
         
+        public static Vector2 FromAngleRadians(this float angle)
+        {
+            return new Vector2(
+                Mathf.Cos(angle),
+                Mathf.Sin(angle)
+            );
+        }
+        
         public static Vector2 ReflectFromWall(this Vector2 direction, Vector2 wallNormal)
         {
             return direction - 2 * Vector2.Dot(direction, wallNormal) * wallNormal;

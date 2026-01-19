@@ -173,6 +173,8 @@ MonoBehaviour:
   _sharedGamePlayConfig: {fileID: 11400000, guid: de964e16c50a04c0a970e0eca290cdfa, type: 2}
   _gamePlayConfig: {fileID: 11400000, guid: f1b92700db4714c2ca39f33201118b36, type: 2}
   _talentCardObtainedEffectView: {fileID: 4070831197063270025, guid: d83c71c50f5ad45899f349e5076e74ed, type: 3}
+  _powerUpBallViewPrefab: {fileID: 3758963260886631903, guid: cbe864724915a462ba3eb0a43e617955, type: 3}
+  _powerUpBallObtainedEffectViewPrefab: {fileID: 2195679162854211240, guid: 48dea62b24cce48919e876128ae02ba4, type: 3}
 --- !u!1 &831192774
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
@@ -169,26 +170,32 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             }
         }
 
-        public event Action<PowerUpSpawnedNetEventsS2C> PowerUpSpawned;
-        public event Action<PowerUpObtainedNetEventS2C> PowerUpObtained;
-
-        public void ProcessPowerUpSpawnedEvents(CapacityList<PowerUpSpawnedNetEventsS2C> powerUpSpawnedEvents)
+        public void ProcessPowerUpSpawnedEvents(CapacityList<PowerUpBallSpawnedNetEventS2C> powerUpBallSpawnedNetEvents)
         {
-            if (powerUpSpawnedEvents.IsNullOrEmpty()) return;
-
-            foreach (var evt in powerUpSpawnedEvents)
+            if (powerUpBallSpawnedNetEvents.IsNullOrEmpty())
             {
-                PowerUpSpawned?.Invoke(evt);
+                return;
+            }
+
+            foreach (var powerUpBallSpawnedNetEvent in powerUpBallSpawnedNetEvents)
+            {
+                _matchDataService.AddPowerUpBall(powerUpBallSpawnedNetEvent.PowerUpBallId, powerUpBallSpawnedNetEvent.Position.ToUnityVector2());
+                _cachedPresentationEventsService.PowerUpBallSpawnedNetEvents.Add(powerUpBallSpawnedNetEvent);
             }
         }
 
-        public void ProcessPowerUpObtainedEvents(CapacityList<PowerUpObtainedNetEventS2C> powerUpObtainedEvents)
+        public void ProcessPowerUpObtainedEvents(CapacityList<PowerUpBallObtainedNetEventS2C> powerUpBallObtainedEvents)
         {
-            if (powerUpObtainedEvents.IsNullOrEmpty()) return;
-
-            foreach (var evt in powerUpObtainedEvents)
+            if (powerUpBallObtainedEvents.IsNullOrEmpty())
             {
-                PowerUpObtained?.Invoke(evt);
+                return;
+            }
+
+            foreach (var powerUpBallObtainedNetEvent in powerUpBallObtainedEvents)
+            {
+                var powerUpBallId = powerUpBallObtainedNetEvent.Id;
+                _matchDataService.RemovePowerUpBall(powerUpBallId);
+                _cachedPresentationEventsService.PowerUpBallObtainedNetEvents.Add(powerUpBallObtainedNetEvent);
             }
         }
     }

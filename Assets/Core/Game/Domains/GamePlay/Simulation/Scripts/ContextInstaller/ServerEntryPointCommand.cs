@@ -1,3 +1,4 @@
+using System;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
@@ -19,7 +20,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private IPhysicsSimulator _physicsSimulator;
         private SimulationGamePlayConfig _simulationGamePlayConfig;
         private IMatchDataService _matchDataService;
-        private SharedGamePlayConfig _sharedGamePlayConfig;
 
         public override void ResolveDependencies()
         {
@@ -29,12 +29,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
-            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
         }
 
         public void Execute()
         {
+            InitRNG();
+            _matchDataService.InitEntryPoint();
             _serverNetworkManager.InitEntryPoint();
             _playerInputsPacketsHandler.InitEntryPoint();
             _playerJoinPacketsHandler.InitEntryPoint();
@@ -46,22 +47,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             CreateTalentCards();
         }
 
+        private static void InitRNG()
+        {
+            var rnd = new Random();
+            RNG.Init(rnd.Next());
+        }
+
         private void CreateWalls()
         {
-            var wallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_matchDataService.SimulationState.EnvironmentLayoutIndex).GetWalls();
+            var wallConfigs = _matchDataService.Environment.WallConfigs;
 
             foreach (var wallConfig in wallConfigs)
             {
                 var wallId = wallConfig.Id;
                 var wallPoints = wallConfig.Points;
-                _matchDataService.AddWall(wallId, wallPoints);
                 _physicsSimulator.AddWall(wallId, wallPoints);
             }
         }
 
         private void CreateLavaWalls()
         {
-            var lavaWallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_matchDataService.SimulationState.EnvironmentLayoutIndex).GetLavaWalls();
+            var lavaWallConfigs = _matchDataService.Environment.LavaWallConfigs;
             if (lavaWallConfigs.IsNullOrEmpty())
             {
                 return;
@@ -71,13 +77,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             {
                 var lavaWallId = lavaWallConfig.Id;
                 var lavaWallPoints = lavaWallConfig.Points;
-                _physicsSimulator.AddLava(lavaWallId, lavaWallPoints);
+                _physicsSimulator.AddLavaWall(lavaWallId, lavaWallPoints);
             }
         }
 
         private void CreateTalentCards()
         {
-            var talentCards = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_matchDataService.SimulationState.EnvironmentLayoutIndex).GetTalentCards();
+            var talentCards = _matchDataService.Environment.TalentCards;
             if (talentCards.IsNullOrEmpty())
             {
                 return;

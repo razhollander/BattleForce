@@ -2,6 +2,8 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
@@ -20,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
         private ITalentCardControllers _talentCardControllers;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
+        private IPowerUpBallControllers _powerUpBallControllers;
 
         public SyncSimulationStateCommand SetSimulationState(SimulationStateS2C simulationState)
         {
@@ -35,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             _environmentWallsControllers = _diContainer.Resolve<IEnvironmentWallsControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
+            _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
@@ -45,8 +49,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             CreateWalls();
             CreateLavaWalls();
             CreateTalentCards();
+            CreatePowerUpBalls();
         }
 
+        private void CreatePowerUpBalls()
+        {
+            foreach (var powerUpBall in _simulationState.PowerUpBalls.AsSpan())
+            {
+                var position = powerUpBall.Position.ToUnityVector2();
+                _matchDataService.AddPowerUpBall(powerUpBall.Id, position);
+                _powerUpBallControllers.CreatePowerUpBall(powerUpBall.Id, position);
+            }
+        }
+        
         private void CreateTalentCards()
         {
             foreach (var talentCard in _simulationState.TalentCards.AsSpan())
@@ -71,7 +86,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             {
                 _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Position, bulletState.Radius);
                 var bulletColor = _matchDataService.GetPlayer(bulletState.BelongToPlayerId).Spaceship.Color;
-                _bulletControllers.CreateBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Radius, bulletState.Position, bulletColor);
+                _bulletControllers.CreateBullet(bulletState.Id, bulletState.Radius, bulletState.Position, bulletColor);
             }
         }
 

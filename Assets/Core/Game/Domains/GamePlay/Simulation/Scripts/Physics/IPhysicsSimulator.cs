@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void Step(float deltaTime, int velocityIterations, int positionIterations);
         void SetPlayerVelocity(ushort playerId, Vector2 velocity);
         void AddWall(ushort id, Vector2[] points);
-        void AddLava(ushort id, Vector2[] points);
+        void AddLavaWall(ushort id, Vector2[] points);
         void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius);
         public FixedUnorderedList<PhysicsCollisionEvent> GetCachedCollisions();
         public void ClearCachedCollisions();
@@ -21,10 +21,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         Body GetPlayer(ushort playerId);
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
         void AddTalentCard(ushort id, Vector2 position, float length, float height);
-        void AddPowerUp(ushort id, Vector2 position, float radius);
+        void AddPowerUpBall(ushort id, Vector2 position, Vector2 velocity, float radius);
         Body GetBullet(ushort bulletId);
-        Body GetPowerUp(ushort powerUpId);
+        Body GetPowerUpBall(ushort powerUpBallId);
         void RemoveBody(Body body);
-        bool IsPositionFree(Vector2 position, float radius);
+        bool IsSquareHitAnyBodyTypes(Vector2 squarePosition, float squareHalfWidth, params PhysicsBodyType[] bodyTypes);
     }
 }

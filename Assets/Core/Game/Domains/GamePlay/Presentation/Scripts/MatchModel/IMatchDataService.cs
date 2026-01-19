@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared;
@@ -12,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
     {
         List<MatchPlayerModel> Players { get; }
         List<MatchPlayerBulletModel> Bullets { get; }
+        List<MatchPowerUpBallModel> PowerUpBalls { get; }
         MatchPlayerModel GetPlayer(ushort playerId);
         MatchPlayerModel LocalPlayer { get; }
         bool IsPlayerJoined { get; }
@@ -26,6 +28,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         MatchTalentCardModel GetTalentCard(ushort cardId);
         MatchTalentCardModel AddTalentCard(ushort talentCardId, UnityEngine.Vector2 talentCardPosition, TalentType talentCardTalentType, ushort talentCardHealth);
         void RemoveTalentCard(ushort cardId);
+        MatchPowerUpBallModel GetPowerUpBall(ushort powerUpBallId);
+        MatchPowerUpBallModel AddPowerUpBall(ushort powerUpBallId, UnityEngine.Vector2 position);
+        void RemovePowerUpBall(ushort powerUpBallId);
         MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort lavaWallId);
     }
 }

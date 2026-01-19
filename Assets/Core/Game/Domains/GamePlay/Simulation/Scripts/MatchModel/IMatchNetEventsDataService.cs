@@ -1,8 +1,8 @@
-using System.Collections.Generic;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
@@ -16,6 +16,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>> PlayerSwapNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<TalentCardObtainedNetEventS2C>> TalentCardObtainedNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<TalentCardHitNetEventS2C>> TalentCardHitNetEventsPerPlayer { get; }
+        CapacityDict<ushort, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> PowerUpBallSpawnedNetEventsPerPlayer { get; }
+        CapacityDict<ushort, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> PowerUpBallObtainedNetEventsPerPlayer { get; }
         void StartSavingPlayerEvents(ushort playerId);
         void StopSavingPlayerEvents(ushort playerId);
         void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius);
@@ -26,5 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         void AddTalentCardObtainedNetEvent(int onTick, ushort cardId, ushort obtainedByPlayerId);
         void RemoveAllEventsOlderThanTick(ushort playerId, int tick);
         void AddTalentCardHitNetEvent(int processedTick, ushort talentCardId, ushort cardHealth);
+        void AddPowerUpSpawnedNetEvent(int onTick, ushort powerUpBallId, Vector2 position);
+        void AddPowerUpObtainedNetEvent(int onTick, ushort powerUpBallId, ushort byPlayerId);
     }
 }

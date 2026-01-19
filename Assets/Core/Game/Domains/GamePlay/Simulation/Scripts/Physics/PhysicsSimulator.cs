@@ -89,7 +89,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         private void CopyPowerUpsStates(SimulationStateS2C simulationState)
         {
-            foreach (var powerUp in simulationState.PowerUps.AsSpan())
+            foreach (var powerUp in simulationState.PowerUpBalls.AsSpan())
             {
                 var powerUpBody = _world.GetBodyList();
 
@@ -99,7 +99,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
                     if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUp && bodyData.Id == powerUp.Id)
                     {
-                        powerUpBody.SetTransform(powerUp.Position, 0); // PowerUps might not rotate or handle it differently
+                        powerUpBody.SetTransform(powerUp.Position, 0);
+                        powerUpBody.SetLinearVelocity(powerUp.Velocity);
                         break;
                     }
 
@@ -203,7 +204,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.CreateFixture(fixtureDef);
         }
 
-        public void AddLava(ushort id, Vector2[] points)
+        public void AddLavaWall(ushort id, Vector2[] points)
         {
             BodyDef bodyDef = new BodyDef
             {
@@ -327,12 +328,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.CreateFixture(fixtureDef);
         }
 
-        public void AddPowerUp(ushort id, Vector2 position, float radius)
+        public void AddPowerUpBall(ushort id, Vector2 position, Vector2 velocity, float radius)
         {
             BodyDef bodyDef = new BodyDef
             {
                 type = BodyType.Dynamic,
                 position = position,
+                linearVelocity = velocity,
                 userData = new PhysicsBodyData(id, PhysicsBodyType.PowerUp),
                 fixedRotation = true
             };
@@ -378,7 +380,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return default;
         }
 
-        public Body GetPowerUp(ushort powerUpId)
+        public Body GetPowerUpBall(ushort powerUpBallId)
         {
             var currentBody = _world.GetBodyList();
 
@@ -386,7 +388,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             {
                 var bodyData = (PhysicsBodyData) currentBody.UserData;
 
-                if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUp && bodyData.Id == powerUpId)
+                if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUp && bodyData.Id == powerUpBallId)
                 {
                     return currentBody;
                 }
@@ -394,7 +396,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 currentBody = currentBody.GetNext();
             }
 
-            LogService.LogError($"Couldn't find powerUp {powerUpId}");
+            LogService.LogError($"Couldn't find powerUp {powerUpBallId}");
             return default;
         }
 
@@ -403,27 +405,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _world.DestroyBody(body);
         }
 
-        public bool IsPositionFree(Vector2 position, float radius)
+        public bool IsSquareHitAnyBodyTypes(Vector2 squarePosition, float squareHalfWidth, params PhysicsBodyType[] bodyTypes)
         {
-            bool hasCollision = false;
-            var aabb = new Box2D.NetStandard.Collision.AABB();
-            aabb.lowerBound = position - new Vector2(radius, radius);
-            aabb.upperBound = position + new Vector2(radius, radius);
+            var hasCollisionWithAnyBodyType = false;
+            var lowerBound = squarePosition - new Vector2(squareHalfWidth, squareHalfWidth);
+            var upperBound = squarePosition + new Vector2(squareHalfWidth, squareHalfWidth);
+            var aabb = new Box2D.NetStandard.Collision.AABB(lowerBound, upperBound);
 
-            _world.QueryAABB((fixture) =>
+            _world.QueryAABB(ShouldProceedCheckHit, aabb);
+
+            bool ShouldProceedCheckHit(Fixture fixture)
             {
                 var bodyData = (PhysicsBodyData)fixture.Body.UserData;
-                // Check if it hits a Wall (Static). Lava is fine.
-                // Prompt: "The powerup cant be spawned on top of a wall, though on top of a lava wall is fine."
-                if (bodyData.PhysicsBodyType == PhysicsBodyType.Wall)
-                {
-                    hasCollision = true;
-                    return false; // Stop query
-                }
-                return true; // Continue query
-            }, aabb);
 
-            return !hasCollision;
+                for (int i = 0; i < bodyTypes.Length; i++)
+                {
+                    hasCollisionWithAnyBodyType = bodyData.PhysicsBodyType == bodyTypes[i];
+                    if (hasCollisionWithAnyBodyType)
+                    {
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+            
+            return hasCollisionWithAnyBodyType;
         }
 
         public void ManagedOnGUI()
