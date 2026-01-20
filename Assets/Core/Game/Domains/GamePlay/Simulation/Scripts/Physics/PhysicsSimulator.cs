@@ -3,6 +3,9 @@ using Box2D.NetStandard.Collision.Shapes;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Fixtures;
 using Box2D.NetStandard.Dynamics.World;
+#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
+using Box2D.NetStandard.Dynamics.World.Callbacks;
+#endif
 using Box2D.WorldTests;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;

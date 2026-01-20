@@ -4,7 +4,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Obta
 {
     public interface IPowerUpBallObtainedEffectController
     {
-        Awaitable PlayEffect(Vector2 from, Vector2 to);
+        void PlayEffect(Vector2 from, Vector2 to);
         void InitEntryPoint();
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
 using Zenject;
@@ -22,10 +24,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Obta
             _effectsPool.InitPool();
         }
 
-        public async Awaitable PlayEffect(Vector2 from, Vector2 to)
+        public void PlayEffect(Vector2 from, Vector2 to)
+        {
+            _ = PlayEffectAsync(from, to);
+        }
+
+        private async Awaitable PlayEffectAsync(Vector2 from, Vector2 to)
         {
             var view = _effectsPool.Spawn();
-            await view.PlayAndDespawn(from, to, EFFECT_DURATION, _stateMachineService.CurrentState().CancellationTokenSource);
+
+            try
+            {
+                await view.PlayAndDespawn(from, to, EFFECT_DURATION, _stateMachineService.CurrentState().CancellationTokenSource);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                LogService.LogError(ex.Message);
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ namespace CoreDomain.Scripts.Helpers.Pools
         private readonly DiContainer _diContainer;
         private readonly TPoolable _prefab;
         private Transform _parentTransform;
-
+        
         public PrefabsPool(PoolData poolData, DiContainer diContainer, TPoolable prefab) : base(poolData)
         {
             _diContainer = diContainer;

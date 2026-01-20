@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace CoreDomain.Scripts.Helpers.Pools
 {
@@ -7,6 +8,7 @@ namespace CoreDomain.Scripts.Helpers.Pools
         private readonly int _increaseStepAmount;
         private Queue<TPoolable> _pool;
         private readonly int _initialAmount;
+        private bool _initialized;
 
         public BasePool(PoolData poolData)
         {
@@ -16,6 +18,7 @@ namespace CoreDomain.Scripts.Helpers.Pools
 
         public virtual void InitPool()
         {
+            _initialized = true;
             _pool = new(_initialAmount);
             AddInstancesToQueue(_initialAmount);
         }
@@ -30,6 +33,12 @@ namespace CoreDomain.Scripts.Helpers.Pools
         
         public TPoolable Spawn()
         {
+            if (!_initialized)
+            {
+                LogService.LogError("Pool is not initialized!");
+                return default;
+            }
+            
             TPoolable obj;
 
             if (_pool.Count <= 0)

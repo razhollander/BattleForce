@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
@@ -33,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
+        private IPowerUpBallObtainedEffectController _powerUpBallObtainedEffectController;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -56,6 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardObtainedEffectController = _diContainer.Resolve<ITalentCardObtainedEffectController>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
+            _powerUpBallObtainedEffectController = _diContainer.Resolve<IPowerUpBallObtainedEffectController>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -70,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _environmentLavaWallsControllers.InitEntryPoint();
             _talentCardObtainedEffectController.InitEntryPoint();
             _powerUpBallControllers.InitEntryPoint();
+            _powerUpBallObtainedEffectController.InitEntryPoint();
         }
     }
 }
