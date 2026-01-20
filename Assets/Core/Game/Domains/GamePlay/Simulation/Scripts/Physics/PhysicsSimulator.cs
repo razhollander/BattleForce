@@ -100,7 +100,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 {
                     var bodyData = (PhysicsBodyData) powerUpBody.UserData;
 
-                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUp && bodyData.Id == powerUp.Id)
+                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUp.Id)
                     {
                         powerUpBody.SetTransform(powerUp.Position, 0);
                         powerUpBody.SetLinearVelocity(powerUp.Velocity);
@@ -338,7 +338,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 type = BodyType.Dynamic,
                 position = position,
                 linearVelocity = velocity,
-                userData = new PhysicsBodyData(id, PhysicsBodyType.PowerUp),
+                userData = new PhysicsBodyData(id, PhysicsBodyType.PowerUpBall),
                 fixedRotation = true
             };
 
@@ -355,8 +355,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 restitution = 1f, // Bounciness
                 filter = new Filter
                 {
-                    categoryBits = PhysicsBodyType.PowerUp.GetCollisionsCategory(),
-                    maskBits     = PhysicsBodyType.PowerUp.GetCollisionMask(),
+                    categoryBits = PhysicsBodyType.PowerUpBall.GetCollisionsCategory(),
+                    maskBits     = PhysicsBodyType.PowerUpBall.GetCollisionMask(),
                 }
             };
 
@@ -391,7 +391,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             {
                 var bodyData = (PhysicsBodyData) currentBody.UserData;
 
-                if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUp && bodyData.Id == powerUpBallId)
+                if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUpBallId)
                 {
                     return currentBody;
                 }

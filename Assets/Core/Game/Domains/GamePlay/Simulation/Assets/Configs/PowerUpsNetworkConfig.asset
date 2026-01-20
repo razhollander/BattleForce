@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpawnInterval: 5
   MaxConcurrentPowerUpBalls: 5
-  MoveSpeed: 5
-  Radius: 0.5
+  MoveSpeed: 30
+  Radius: 1.269

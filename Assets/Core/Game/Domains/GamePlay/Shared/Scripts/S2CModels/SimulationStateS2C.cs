@@ -277,19 +277,18 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 powerUp.DeserializeTransforms(reader);
             }
         }
-
-        public PowerUpBallS2C GetPowerUpBallById(ushort powerUpBallId)
+        
+        public ref PowerUpBallS2C GetPowerUpBallById(ushort powerUpBallId)
         {
             for (int i = 0; i < PowerUpBalls.Count; i++)
             {
-                var powerUp = PowerUpBalls[i]; 
-                if (powerUp.Id == powerUpBallId)
+                if (PowerUpBalls[i].Id == powerUpBallId)
                 {
-                    return powerUp;
+                    return ref PowerUpBalls.GetByIndex(i);
                 }
             }
 
-            throw new System.Exception($"No power up ball for id {powerUpBallId}!");
+            throw new System.Exception($"No talent card for id {powerUpBallId}!");
         }
         
         public bool TryGetPowerUpBallIndexById(ushort powerUpBallId, out int powerUpBallIndex)

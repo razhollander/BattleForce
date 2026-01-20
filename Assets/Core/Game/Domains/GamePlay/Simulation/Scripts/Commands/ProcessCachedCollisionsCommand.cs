@@ -65,12 +65,49 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 }
 
                 HandlePlayerWallCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePowerUpBallWallCollision(objectA, objectB, collisionEvent.Contact);
+                HandleBulletWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandleBulletWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBulletToWallCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
+            var isWallToBulletCollision = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+            var isCollision = isWallToBulletCollision || isBulletToWallCollision;
+            if (!isCollision)
+            {
+                return;
+            }
+            
+            Body bulletBody;
+            PlayerBulletS2C bulletModel;
+            if (isWallToBulletCollision)
+            {
+                if (!_matchDataService.SimulationState.TryGetBulletById(objectB.Id, out bulletModel))
+                {
+                    LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                    return;
+                }
+                bulletBody = contact.FixtureB.Body;
+            }
+            else
+            {
+                if (!_matchDataService.SimulationState.TryGetBulletById(objectA.Id, out bulletModel))
+                {
+                    LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                    return;
+                }
+                
+                bulletBody = contact.FixtureA.Body;
+            }
+
+            DestroyBullet(bulletModel, bulletBody);
         }
 
         private void HandlePlayerLavaCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, PhysicsEventEventType eventType)
@@ -223,6 +260,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             _physicsSimulator.RemoveBody(cardBody);
         }
 
+        private void HandlePowerUpBallWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            bool isPowerUpBallToWallCollision = objectA.PhysicsBodyType == PhysicsBodyType.PowerUpBall && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
+            bool isWallToPowerUpBallCollision = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.PowerUpBall;
+            var isCollision = isPowerUpBallToWallCollision || isWallToPowerUpBallCollision;
+            if (!isCollision)
+            {
+                return;
+            }
+            
+            ref var powerUpBallModel = ref _matchDataService.SimulationState.GetPowerUpBallById(isPowerUpBallToWallCollision ? objectA.Id : objectB.Id);
+            var relativeVelocity = powerUpBallModel.Velocity;
+            contact.GetWorldManifold(out var worldManifold);
+            var collisionNormal = worldManifold.normal;
+            var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
+            powerUpBallModel.Velocity = reflectedVelocity;
+        }
+        
         private void HandlePlayerWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
         {
             bool isPlayerToWallCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
@@ -261,8 +316,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 
         private void HandlePlayerBulletPowerUpCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
         {
-            var isBulletToPowerUp = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.PowerUp;
-            var isPowerUpToBullet = objectA.PhysicsBodyType == PhysicsBodyType.PowerUp && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+            var isBulletToPowerUp = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.PowerUpBall;
+            var isPowerUpToBullet = objectA.PhysicsBodyType == PhysicsBodyType.PowerUpBall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
             var isCollision = isBulletToPowerUp || isPowerUpToBullet;
 
             if (!isCollision)

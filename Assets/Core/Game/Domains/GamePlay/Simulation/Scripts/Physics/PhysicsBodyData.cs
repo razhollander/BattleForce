@@ -20,6 +20,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         PlayerBullet = 2,
         TalentCard = 3,
         Lava = 4,
-        PowerUp = 5
+        PowerUpBall = 5
     }
 }
