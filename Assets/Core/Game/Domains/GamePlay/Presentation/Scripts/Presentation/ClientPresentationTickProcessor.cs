@@ -2,17 +2,19 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands;
+using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.UpdateService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
 {
-    public class ClientPresentationTickProcessor : IUpdatable, IClientPresentationTickProcessor
+    public class ClientPresentationTickProcessor : IUpdatable, ILateUpdatable, IClientPresentationTickProcessor
     {
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly IPlayerControllers _playerControllers;
         private readonly IBulletControllers _bulletControllers;
         private readonly IPowerUpBallControllers _powerUpBallControllers;
+        private readonly IWorldCameraController _worldCameraController;
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
         private readonly HandleBulletDestroyedNetEventsCommand _handleBulletDestroyedNetEventsCommand;
@@ -23,12 +25,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
         private readonly HandlePowerUpBallObtainedNetEventsCommand _handlePowerUpBallObtainedNetEventsCommand;
 
         public ClientPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers)
+            IBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IWorldCameraController worldCameraController)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
             _bulletControllers = bulletControllers;
             _powerUpBallControllers = powerUpBallControllers;
+            _worldCameraController = worldCameraController;
             _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
             _handlePlayerTakeDamangeNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
             _handleBulletDestroyedNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>();
@@ -42,11 +45,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
         public void StartTick()
         {
             _updateSubscriptionService.RegisterUpdatable(this);
+            _updateSubscriptionService.RegisterLateUpdatable(this);
         }
         
         public void StopTick()
         {
             _updateSubscriptionService.UnregisterUpdatable(this);
+            _updateSubscriptionService.UnregisterLateUpdatable(this);
         }
 
         public void ManagedUpdate()
@@ -65,6 +70,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
             
             _handleTalentCardObtainedNetEventsCommand.Execute();
+        }
+
+        public void ManagedLateUpdate()
+        {
+            _worldCameraController.UpdateCamera();
         }
     }
 }

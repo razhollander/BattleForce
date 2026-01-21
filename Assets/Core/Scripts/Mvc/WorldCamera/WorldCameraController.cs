@@ -1,59 +1,36 @@
-using System.Threading;
+using System.Collections.Generic;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
 
 namespace CoreDomain.Scripts.Mvc.WorldCamera
 {
-    public class WorldCameraController : IWorldCameraController//, IUpdatable
+    public class WorldCameraController : IWorldCameraController
     {
         private readonly WorldCameraView _worldCameraView;
-        private readonly IUpdateSubscriptionService _updateSubscriptionService;
-        private Transform _followTarget;
 
-        public WorldCameraController(WorldCameraView worldCameraView, IUpdateSubscriptionService updateSubscriptionService)
+        public WorldCameraController(WorldCameraView worldCameraView)
         {
             _worldCameraView = worldCameraView;
-            _updateSubscriptionService = updateSubscriptionService;
         }
-        
-        // public void StartFollowTarget(Transform targetTransform)
-        // {
-        //     LogService.LogTopic($"Start follow target {targetTransform.gameObject.name}", LogTopicType.Camera );
-        //     _followTarget = targetTransform;
-        //     SetCameraRelativeToTarget(_followTarget);
-        //     _updateSubscriptionService.RegisterUpdatable(this);
-        // }
-        //
-        // public async Awaitable DoLockOnTargetAnimation(Transform targetTransform, CancellationTokenSource cancellationTokenSource)
-        // {
-        //     LogService.LogTopic($"Do lock on target animation {targetTransform.gameObject.name}", LogTopicType.Camera );
-        //     SetCameraRelativeToTarget(targetTransform);
-        //     await _worldCameraView.DoLockOnTargetAnimation(_worldCameraView.transform.position, _worldCameraView.transform.rotation.eulerAngles, cancellationTokenSource);
-        // }
 
-        // public void StopFollowTarget()
-        // {
-        //     LogService.LogTopic("Stop follow target", LogTopicType.Camera );
-        //     _updateSubscriptionService.UnregisterUpdatable(this);
-        //     _followTarget = null;
-        // }
+        public void AddTarget(Transform target)
+        {
+            if (target == null) return;
+            LogService.LogTopic($"Add camera target {target.gameObject.name}", LogTopicType.Camera);
+            _worldCameraView.AddTarget(target, 1f, 1f);
+        }
 
-        // public void ManagedUpdate()
-        // { 
-        //     LerpCameraRelativeToTarget();
-        // }
+        public void RemoveTarget(Transform target)
+        {
+             if (target == null) return;
+            LogService.LogTopic($"Remove camera target {target.gameObject.name}", LogTopicType.Camera);
+            _worldCameraView.RemoveTarget(target);
+        }
 
-        // private void LerpCameraRelativeToTarget()
-        // {
-        //     _worldCameraView.LerpPositionRelativeToTarget(_followTarget);
-        //     _worldCameraView.LookAtTarget(_followTarget);
-        // }
-        //
-        // private void SetCameraRelativeToTarget(Transform target)
-        // {
-        //     _worldCameraView.SetPositionRelativeToTarget(target);
-        //     _worldCameraView.LookAtTarget(target);
-        // }
+        public void UpdateCamera()
+        {
+            _worldCameraView.ManualUpdate();
+        }
     }
 }
