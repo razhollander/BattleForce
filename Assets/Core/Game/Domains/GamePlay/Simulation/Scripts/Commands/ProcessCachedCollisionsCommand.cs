@@ -239,19 +239,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 cardBody = contact.FixtureA.Body;
             }
 
-            if(!_matchDataService.SimulationState.TryGetBulletById(objectA.Id, out bulletModel))
+            if(!_matchDataService.SimulationState.TryGetBulletById(bulletId, out bulletModel))
             {
                 LogService.LogTopic($"Bullet {bulletId} was already destroyed in this frame!", LogTopicType.ServerPhysics);
                 return false;
             }
 
-            if (_matchDataService.SimulationState.TryGetTalentCardIndexById(cardId, out talentCardIndex))
+            if (!_matchDataService.SimulationState.TryGetTalentCardIndexById(cardId, out talentCardIndex))
             {
-                return true;
+                LogService.LogTopic("Card was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return false;
             }
-
-            LogService.LogTopic("Card was already destroyed in this frame!", LogTopicType.ServerPhysics);
-            return false;
+            
+            return true;
         }
 
         private void DestroyTalentCard(TalentCardS2C card, Body cardBody)
@@ -372,12 +372,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 return false;
             }
             
-            if (_matchDataService.SimulationState.TryGetPowerUpBallIndexById(powerUpBallId, out powerUpBallIndex))
+            if (!_matchDataService.SimulationState.TryGetPowerUpBallIndexById(powerUpBallId, out powerUpBallIndex))
             {
-                return true;
+                LogService.LogTopic($"PowerUpBall {powerUpBallId} was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return false;
             }
             
-            LogService.LogTopic($"PowerUpBall {powerUpBallId} was already destroyed in this frame!", LogTopicType.ServerPhysics);
             return true;
         }
     }
