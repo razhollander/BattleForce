@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
-using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts

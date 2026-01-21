@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxConcurrentTalentsForPlayer: 3
   Environment: {fileID: 11400000, guid: c491afc827cee4afbac25f4ed3b7c5b8, type: 2}
+  PowerUps: {fileID: 11400000, guid: 0121acb33a8104de2926cc3c0bb6c95a, type: 2}

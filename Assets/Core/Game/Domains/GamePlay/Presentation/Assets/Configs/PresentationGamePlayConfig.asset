@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InterpolationFactor: 0.9
   TalentCards: {fileID: 11400000, guid: bc656062d5cec4fdfa7c7c7784cfd7df, type: 2}
+  PowerUps: {fileID: 11400000, guid: 0bf6f91347e23451b8e8625c8c7e6a42, type: 2}

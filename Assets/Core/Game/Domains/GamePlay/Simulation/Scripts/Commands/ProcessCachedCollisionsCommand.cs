@@ -65,11 +65,49 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 }
 
                 HandlePlayerWallCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePowerUpBallWallCollision(objectA, objectB, collisionEvent.Contact);
+                HandleBulletWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandleBulletWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBulletToWallCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
+            var isWallToBulletCollision = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+            var isCollision = isWallToBulletCollision || isBulletToWallCollision;
+            if (!isCollision)
+            {
+                return;
+            }
+            
+            Body bulletBody;
+            PlayerBulletS2C bulletModel;
+            if (isWallToBulletCollision)
+            {
+                if (!_matchDataService.SimulationState.TryGetBulletById(objectB.Id, out bulletModel))
+                {
+                    LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                    return;
+                }
+                bulletBody = contact.FixtureB.Body;
+            }
+            else
+            {
+                if (!_matchDataService.SimulationState.TryGetBulletById(objectA.Id, out bulletModel))
+                {
+                    LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                    return;
+                }
+                
+                bulletBody = contact.FixtureA.Body;
+            }
+
+            DestroyBullet(bulletModel, bulletBody);
         }
 
         private void HandlePlayerLavaCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, PhysicsEventEventType eventType)
@@ -164,57 +202,51 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             DestroyBullet(bulletModel, bulletBody);
             ref var talentCard = ref _matchDataService.SimulationState.TalentCards.GetByIndex(talentCardIndex);
             talentCard.Health -= _gamePlayConfig.PlayerBullet.HitDamage;
-            if (talentCard.Health > 0)
+            var isTalentCardAlive = talentCard.Health > 0;
+
+            if (isTalentCardAlive)
             {
-                LogService.LogError("Add talent card hit event!");
                 _matchNetEventsDataService.AddTalentCardHitNetEvent(_processedTick, talentCard.Id, talentCard.Health);
-                return;
             }
-            
-            LogService.LogError("Add talent card obtained event!");
-            _matchNetEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, bulletModel.BelongToPlayerId);
-            DestroyTalentCard(talentCard, cardBody);
+            else
+            {
+                _matchNetEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, bulletModel.BelongToPlayerId);
+                DestroyTalentCard(talentCard, cardBody);
+            }
         }
 
         private bool TryGetTalentCardToBulletCollisionData(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact, bool isBulletToCardCollision, out PlayerBulletS2C bulletModel,
             out int talentCardIndex , out Body bulletBody, out Body cardBody)
         {
             ushort cardId;
+            ushort bulletId; // dont delete used in logs
             talentCardIndex = default;
             cardBody = default;
             bulletBody = default;
+
             if (isBulletToCardCollision)
             {
-                if(_matchDataService.SimulationState.TryGetBulletById(objectA.Id, out bulletModel))
-                {
-                    bulletBody = contact.FixtureA.Body;
-                    cardId = objectB.Id;
-                    cardBody = contact.FixtureB.Body;
-                }
-                else
-                {
-                    LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
-                    return false;
-                }
+                bulletId = objectA.Id;
+                bulletBody = contact.FixtureA.Body;
+                cardId = objectB.Id;
+                cardBody = contact.FixtureB.Body;
             }
             else
             {
-                if(_matchDataService.SimulationState.TryGetBulletById(objectB.Id, out bulletModel))
-                {
-                    bulletBody = contact.FixtureB.Body;
-                    cardId = objectA.Id;
-                    cardBody = contact.FixtureA.Body;
-                }
-                else
-                {
-                    LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
-                    return false;
-                }
+                bulletId = objectB.Id;
+                bulletBody = contact.FixtureB.Body;
+                cardId = objectA.Id;
+                cardBody = contact.FixtureA.Body;
             }
 
-            if (_matchDataService.SimulationState.TryGetTalentCardIndexById(cardId, out int index))
+            if(!_matchDataService.SimulationState.TryGetBulletById(objectA.Id, out bulletModel))
             {
-                talentCardIndex = index;
+                LogService.LogTopic($"Bullet {bulletId} was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return false;
+            }
+
+            if (_matchDataService.SimulationState.TryGetTalentCardIndexById(cardId, out talentCardIndex))
+            {
                 return true;
             }
 
@@ -228,6 +260,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             _physicsSimulator.RemoveBody(cardBody);
         }
 
+        private void HandlePowerUpBallWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            bool isPowerUpBallToWallCollision = objectA.PhysicsBodyType == PhysicsBodyType.PowerUpBall && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
+            bool isWallToPowerUpBallCollision = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.PowerUpBall;
+            var isCollision = isPowerUpBallToWallCollision || isWallToPowerUpBallCollision;
+            if (!isCollision)
+            {
+                return;
+            }
+            
+            ref var powerUpBallModel = ref _matchDataService.SimulationState.GetPowerUpBallById(isPowerUpBallToWallCollision ? objectA.Id : objectB.Id);
+            var relativeVelocity = powerUpBallModel.Velocity;
+            contact.GetWorldManifold(out var worldManifold);
+            var collisionNormal = worldManifold.normal;
+            var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
+            powerUpBallModel.Velocity = reflectedVelocity;
+        }
+        
         private void HandlePlayerWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
         {
             bool isPlayerToWallCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
@@ -262,6 +312,73 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             }
             
             throw new System.Exception("No collision!");
+        }
+
+        private void HandlePlayerBulletPowerUpCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBulletToPowerUp = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.PowerUpBall;
+            var isPowerUpToBullet = objectA.PhysicsBodyType == PhysicsBodyType.PowerUpBall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+            var isCollision = isBulletToPowerUp || isPowerUpToBullet;
+
+            if (!isCollision)
+            {
+                return;
+            }
+            
+            if (!TryGetPowerUpBallToBulletCollisionData(objectA, objectB, contact, isBulletToPowerUp, out var bulletModel, out int powerUpBallIndex, out var bulletBody, out var powerUpBody))
+            {
+                return;
+            }
+
+            ref var powerUpBall = ref _matchDataService.SimulationState.PowerUpBalls.GetByIndex(powerUpBallIndex);
+            var powerUpBallId = powerUpBall.Id;
+            DestroyBullet(bulletModel, bulletBody);
+            DestroyPowerUpBall(powerUpBallId, powerUpBody);
+            _matchNetEventsDataService.AddPowerUpObtainedNetEvent(_processedTick, powerUpBallId, bulletModel.BelongToPlayerId);
+        }
+
+        private void DestroyPowerUpBall(ushort powerUpBallId, Body powerUpBallBody)
+        {
+            _matchDataService.SimulationState.RemovePowerUpBallById(powerUpBallId);
+            _physicsSimulator.RemoveBody(powerUpBallBody);
+        }
+
+        private bool TryGetPowerUpBallToBulletCollisionData(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact, bool isBulletToPowerUpCollision, out PlayerBulletS2C bulletModel, out int powerUpBallIndex, out Body bulletBody, out Body powerUpBallBody)
+        {
+            ushort bulletId;
+            ushort powerUpBallId;
+            powerUpBallIndex = default;
+            powerUpBallBody = default;
+            bulletModel = default;
+            
+            if (isBulletToPowerUpCollision)
+            {
+                bulletId = objectA.Id;
+                powerUpBallId = objectB.Id;
+                bulletBody = contact.FixtureA.Body;
+                powerUpBallBody = contact.FixtureB.Body;
+            }
+            else
+            {
+                bulletId = objectB.Id;
+                powerUpBallId = objectA.Id;
+                bulletBody = contact.FixtureB.Body;
+                powerUpBallBody = contact.FixtureA.Body;
+            }
+
+            if (!_matchDataService.SimulationState.TryGetBulletById(bulletId, out bulletModel))
+            {
+                LogService.LogTopic($"Bullet {bulletId} was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return false;
+            }
+            
+            if (_matchDataService.SimulationState.TryGetPowerUpBallIndexById(powerUpBallId, out powerUpBallIndex))
+            {
+                return true;
+            }
+            
+            LogService.LogTopic($"PowerUpBall {powerUpBallId} was already destroyed in this frame!", LogTopicType.ServerPhysics);
+            return true;
         }
     }
 }

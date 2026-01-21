@@ -49,5 +49,8 @@ namespace Core.Scripts.Network
         public int TalentCardObtainedNetEvent = 64;
         public int MaxCollisionsPerFrame = 256;
         public int TalentCardHitNetEvents = 128;
+        public int ConcurrentPowerUpBalls = 32;
+        public int PowerUpSpawnedNetEvents = 64;
+        public int PowerUpObtainedNetEvents = 64;
     }
 }

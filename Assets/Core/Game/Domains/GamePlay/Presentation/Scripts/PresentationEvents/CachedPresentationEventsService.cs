@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
 {
@@ -11,5 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         public List<PlayersSwapNetEventS2C> PlayerSwapNetEvents { get; set; } = new();
         public List<TalentCardObtainedNetEventS2C> TalentCardObtainedNetEvents { get; set; } = new();
         public List<TalentCardHitNetEventS2C> TalentCardHitNetEvents { get; set; } = new();
+        public List<PowerUpBallSpawnedNetEventS2C> PowerUpBallSpawnedNetEvents { get; set; } = new();
+        public List<PowerUpBallObtainedNetEventS2C> PowerUpBallObtainedNetEvents { get; set; } = new();
     }
 }

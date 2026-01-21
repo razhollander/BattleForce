@@ -6,4 +6,5 @@ public class SharedGamePlayConfig : ScriptableObject
 {
     public int MaxConcurrentTalentsForPlayer = 3;
     public EnvironmentConfig Environment;
+    public PowerUpsSharedConfig PowerUps;
 }

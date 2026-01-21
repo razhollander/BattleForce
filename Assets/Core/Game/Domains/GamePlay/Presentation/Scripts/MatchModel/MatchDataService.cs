@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
         public List<MatchEnvironmentWallModel> EnvironmentWalls { get; private set; }
         public List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
+        public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
 
         public MatchPlayerModel LocalPlayer { get; private set; }
         public bool IsPlayerJoined => LocalPlayer != null;
@@ -31,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             EnvironmentWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
             EnvironmentLavaWalls = new List<MatchEnvironmentLavaWallModel>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
+            PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -73,6 +75,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             return newTalentCard;
         }
 
+        public MatchPowerUpBallModel GetPowerUpBall(ushort powerUpBallId)
+        {
+            return PowerUpBalls.Find(x => x.Id == powerUpBallId);
+        }
+
+        public MatchPowerUpBallModel AddPowerUpBall(ushort powerUpBallId, UnityEngine.Vector2 position)
+        {
+            var newPowerUpBall = new MatchPowerUpBallModel(powerUpBallId, position);
+            PowerUpBalls.Add(newPowerUpBall);
+            return newPowerUpBall;
+        }
+
         public void RemoveTalentCard(ushort cardId)
         {
             var talentCardModel = TalentCards.Find(x => x.Id == cardId);
@@ -84,6 +98,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
             }
             
             TalentCards.Remove(talentCardModel);
+        }
+        
+        public void RemovePowerUpBall(ushort powerUpBallId)
+        {
+            var powerUpBallModel = PowerUpBalls.Find(x => x.Id == powerUpBallId);
+
+            if (powerUpBallModel == null)
+            {
+                LogService.LogError($"No power up ball to remove with id {powerUpBallId}!");
+                return;
+            }
+            
+            PowerUpBalls.Remove(powerUpBallModel);
         }
 
         public MatchPlayerModel GetPlayer(ushort playerId)

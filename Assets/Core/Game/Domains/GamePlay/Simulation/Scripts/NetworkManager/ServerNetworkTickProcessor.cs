@@ -43,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private TimerFixedThreaded2 _fixedTimer;
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
+        private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
         private FullTickPacket _fullTickPacket;
         private TimerFixedThreaded2 _pollEventsFixedTimer;
         private Stopwatch _sw;
@@ -69,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             _fullTickPacket = new FullTickPacket();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
+            _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
         }
 
         private void StartTick()
@@ -83,12 +85,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         private void PollEvents()
         {
-            _sw = Stopwatch.StartNew();
-            _last = _sw.ElapsedMilliseconds;
-
-                long now = _sw.ElapsedMilliseconds;
-                long dt = now - _last;
-                _last = now;
+            // _sw = Stopwatch.StartNew();
+            // _last = _sw.ElapsedMilliseconds;
+            //
+            //     long now = _sw.ElapsedMilliseconds;
+            //     long dt = now - _last;
+            //     _last = now;
 
                 //if (dt > 20)
               //      Debug.LogError($"PollEvents stall: {dt}ms");
@@ -113,18 +115,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 CurrentTick++;
                 var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
                 var processPlayersInputsResult = ProcessPackets(processedTick);
+                _trySpawnPowerUpBallsCommand.SetProcessedTick(processedTick).Execute();
+                
                 ApplyMatchModelToPhysicsSimulation();
                 _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
+                ApplyPhysicsSimulationToMatchModel();
+                
                 _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(processedTick).Execute();
-                ApplyPhysicsSimulationToMatchModel();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(processedTick);
             }
             catch (Exception e)
             {
                 LogService.LogError("Got error! " + e);
-
                 throw;
             }
         }
@@ -141,6 +145,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             {
                 ref var bulletState = ref _matchDataService.SimulationState.Bullets.GetByIndex(i);
                 bulletState.Position = _physicsSimulator.GetBullet(bulletState.Id).Position;
+            }
+
+            for (int i = 0; i < _matchDataService.SimulationState.PowerUpBalls.Count; i++)
+            {
+                ref var powerUpBallState = ref _matchDataService.SimulationState.PowerUpBalls.GetByIndex(i);
+                powerUpBallState.Position = _physicsSimulator.GetPowerUpBall(powerUpBallState.Id).Position;
             }
         }
 
@@ -189,6 +199,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 _fullTickPacket.PlayerSwapNetEvents = _matchNetEventsDataService.PlayerSwapNetEventsPerPlayer[playerId];
                 _fullTickPacket.TalentCardObtainedNetEvents = _matchNetEventsDataService.TalentCardObtainedNetEventsPerPlayer[playerId];
                 _fullTickPacket.TalentCardHitNetEvents = _matchNetEventsDataService.TalentCardHitNetEventsPerPlayer[playerId];
+                _fullTickPacket.PowerUpSpawnedNetEvents = _matchNetEventsDataService.PowerUpBallSpawnedNetEventsPerPlayer[playerId];
+                _fullTickPacket.PowerUpObtainedNetEvents = _matchNetEventsDataService.PowerUpBallObtainedNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.FullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

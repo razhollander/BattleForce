@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using LiteNetLib.Utils;
@@ -16,8 +17,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<PlayerTakeDamageNetEventS2C> PlayerTakeDamageNetEvents;
         public FixedUnorderedList<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents;
         public FixedUnorderedList<PlayersSwapNetEventS2C> PlayerSwapNetEvents;
-        public FixedUnorderedList<TalentCardObtainedNetEventS2C> TalentCardObtainedNetEvents;
+        public FixedUnorderedList<TalentCardObtainedNetEventS2C> TalentCardObtainedNetEvents; // todo: remove events related to card when bullet id destroyed
         public FixedUnorderedList<TalentCardHitNetEventS2C> TalentCardHitNetEvents;
+        public FixedUnorderedList<PowerUpBallSpawnedNetEventS2C> PowerUpSpawnedNetEvents; // todo: remove events related to power up when bullet id destroyed
+        public FixedUnorderedList<PowerUpBallObtainedNetEventS2C> PowerUpObtainedNetEvents;
 
         public FullTickPacket()
         {
@@ -25,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         
         public FullTickPacket(MaxCap maxCap, SharedGamePlayConfig sharedGamePlayConfig)
         {
-            CurrentSimulationState = new SimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, maxCap.ConcurrentTalentCards);
+            CurrentSimulationState = new SimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls);
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
             PlayerJoinAcceptNetEvents = new FixedClassUnorderedList<PlayerJoinAcceptPacketS2C>(maxCap.PlayerJoinAcceptNetEvents, () => new PlayerJoinAcceptPacketS2C(maxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer));
             PlayerTakeDamageNetEvents = new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(maxCap.PlayerTakeDamageNetEvents);
@@ -33,6 +36,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             PlayerSwapNetEvents = new FixedUnorderedList<PlayersSwapNetEventS2C>(maxCap.PlayerSwapNetEvents);
             TalentCardObtainedNetEvents = new FixedUnorderedList<TalentCardObtainedNetEventS2C>(maxCap.TalentCardObtainedNetEvent);
             TalentCardHitNetEvents = new FixedUnorderedList<TalentCardHitNetEventS2C>(maxCap.TalentCardHitNetEvents);
+            PowerUpSpawnedNetEvents = new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(maxCap.PowerUpSpawnedNetEvents);
+            PowerUpObtainedNetEvents = new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(maxCap.PowerUpObtainedNetEvents);
         }
 
 
@@ -61,6 +66,26 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             SerializedPlayerSwapEvents(writer);
             SerializedTalentCardObtainedEvents(writer);
             SerializedTalentCardHitEvents(writer);
+            SerializedPowerUpSpawnedEvents(writer);
+            SerializedPowerUpObtainedEvents(writer);
+        }
+
+        private void SerializedPowerUpObtainedEvents(NetDataWriter writer)
+        {
+            writer.Put((byte) PowerUpObtainedNetEvents.Count);
+            foreach (var evt in PowerUpObtainedNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void SerializedPowerUpSpawnedEvents(NetDataWriter writer)
+        {
+            writer.Put((byte) PowerUpSpawnedNetEvents.Count);
+            foreach (var evt in PowerUpSpawnedNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
         }
 
         private void SerializedTalentCardHitEvents(NetDataWriter writer)
@@ -101,6 +126,30 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             DeserializedPlayerSwapEvents(reader);
             DeserializedTalentCardObtainedEvents(reader);
             DeserializedTalentCardHitEvents(reader);
+            DeserializedPowerUpSpawnedEvents(reader);
+            DeserializedPowerUpObtainedEvents(reader);
+        }
+
+        private void DeserializedPowerUpObtainedEvents(NetDataReader reader)
+        {
+            PowerUpObtainedNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref PowerUpObtainedNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedPowerUpSpawnedEvents(NetDataReader reader)
+        {
+            PowerUpSpawnedNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref PowerUpSpawnedNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
         }
 
         private void DeserializedTalentCardHitEvents(NetDataReader reader)

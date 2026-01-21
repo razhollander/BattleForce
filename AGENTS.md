@@ -26,6 +26,7 @@ For Update on the server side use the ServerNetworkTickProcessor.OnTick()
 - Always wrap condition in {} brackets
 - Awlays prefer Commands over Events, CommandsFactory folder for reference: BattleForce/Assets/Core/Scripts/Services/CommandFactory
 - Composition over Inheritance
+- User RNG class instead of Random
 
 ## Principles
 

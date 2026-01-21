@@ -9,13 +9,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedClassUnorderedList<PlayerStateS2C> Players;
         public FixedUnorderedList<PlayerBulletS2C> Bullets;
         public FixedUnorderedList<TalentCardS2C> TalentCards;
+        public FixedUnorderedList<PowerUpBallS2C> PowerUpBalls;
         public int EnvironmentLayoutIndex;
 
-        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards)
+        public SimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls)
         {
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer));
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
             TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
+            PowerUpBalls = new FixedUnorderedList<PowerUpBallS2C>(maxPowerUpBalls);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -39,6 +41,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var talentCard in TalentCards.AsSpan())
             {
                 talentCard.Serialize(writer);
+            }
+
+            var powerUpsCount = PowerUpBalls.Count;
+            writer.Put((byte)powerUpsCount);
+            foreach (var powerUp in PowerUpBalls.AsSpan())
+            {
+                powerUp.Serialize(writer);
             }
 
             writer.Put((byte)EnvironmentLayoutIndex);
@@ -68,6 +77,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var talentCard = ref TalentCards.AddAndGet();
                 talentCard.Deserialize(reader);
+            }
+
+            var powerUpsCount = reader.GetByte();
+            PowerUpBalls.Clear();
+            for (var i = 0; i < powerUpsCount; i++)
+            {
+                ref var powerUp = ref PowerUpBalls.AddAndGet();
+                powerUp.Deserialize(reader);
             }
 
             EnvironmentLayoutIndex = reader.GetByte();
@@ -166,7 +183,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No talent card for id {cardId}!");
         }
-
+        
         public ref TalentCardS2C GetTalentCardById(ushort cardId)
         {
             for (int i = 0; i < TalentCards.Count; i++)
@@ -225,6 +242,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 bullet.SerializeTransforms(writer);
             }
+
+            var powerUpsCount = PowerUpBalls.Count;
+            writer.Put((byte) powerUpsCount);
+            foreach (var powerUp in PowerUpBalls.AsSpan())
+            {
+                powerUp.SerializeTransforms(writer);
+            }
         }
 
         public void DeserializeTransforms(NetDataReader reader)
@@ -244,6 +268,56 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 ref var bullet = ref Bullets.AddAndGet();
                 bullet.DeserializeTransforms(reader);
             }
+
+            var powerUpsCount = reader.GetByte();
+            PowerUpBalls.Clear();
+            for (int i = 0; i < powerUpsCount; i++)
+            {
+                ref var powerUp = ref PowerUpBalls.AddAndGet();
+                powerUp.DeserializeTransforms(reader);
+            }
+        }
+        
+        public ref PowerUpBallS2C GetPowerUpBallById(ushort powerUpBallId)
+        {
+            for (int i = 0; i < PowerUpBalls.Count; i++)
+            {
+                if (PowerUpBalls[i].Id == powerUpBallId)
+                {
+                    return ref PowerUpBalls.GetByIndex(i);
+                }
+            }
+
+            throw new System.Exception($"No talent card for id {powerUpBallId}!");
+        }
+        
+        public bool TryGetPowerUpBallIndexById(ushort powerUpBallId, out int powerUpBallIndex)
+        {
+            powerUpBallIndex = default;
+            for (int i = 0; i < PowerUpBalls.Count; i++)
+            {
+                if (PowerUpBalls[i].Id == powerUpBallId)
+                {
+                    powerUpBallIndex = i;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void RemovePowerUpBallById(ushort powerUpBallId)
+        {
+            for (int i = 0; i < PowerUpBalls.Count; i++)
+            {
+                if (PowerUpBalls[i].Id == powerUpBallId)
+                {
+                    PowerUpBalls.RemoveAt(i);
+                    return;
+                }
+            }
+
+            throw new System.Exception($"No power up for id {powerUpBallId}!");
         }
     }
 }

@@ -1,7 +1,7 @@
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers
-{
-    public interface IPlayersTransformHandler
-    {
-        void UpdatePlayerTransform();
-    }
-}
+// namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers
+// {
+//     public interface IPlayersTransformHandler
+//     {
+//         void UpdatePlayerTransform();
+//     }
+// }

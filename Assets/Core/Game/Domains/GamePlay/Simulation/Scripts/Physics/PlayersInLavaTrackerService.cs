@@ -7,13 +7,6 @@ using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 {
-    public interface IPlayersInLavaTrackerService
-    {
-        void OnPlayerEnterLava(ushort playerId);
-        void OnPlayerExitLava(ushort playerId);
-        List<ushort> StepAndGetPlayerIdsToDamage(float deltaTime);
-    }
-
     public class PlayersInLavaTrackerService : IPlayersInLavaTrackerService
     {
         private readonly SimulationGamePlayConfig _gamePlayerConfig;
@@ -36,8 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 var playerInLavaData = _playerInLavaDataPool.Get();
                 _playersInLava.Add(playerId, playerInLavaData);
             }
-
-            LogService.LogError("Enter lava!");
+            
             _playersInLava[playerId].LavaAmountPlayerIsIn++;
         }
 
@@ -55,9 +47,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             {
                 LogService.LogError($"Player {playerId} exit lava but does not exist in lava");
             }
-            
-            LogService.LogError("Exit lava!");
-
         }
         
         public List<ushort> StepAndGetPlayerIdsToDamage(float deltaTime)

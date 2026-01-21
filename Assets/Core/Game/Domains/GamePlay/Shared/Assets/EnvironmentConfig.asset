@@ -15,7 +15,8 @@ MonoBehaviour:
   _environmentLayoutConfigs:
     m_keys: 00000000
     m_values:
-    - _wallsJson: '[   {     "Id": 1,     "Points": [       { "X": -6.16, "Y": 2.64
+    - _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
+      _wallsJson: '[   {     "Id": 1,     "Points": [       { "X": -6.16, "Y": 2.64
         },       { "X": -2.64, "Y": 5.28 },       { "X": 1.76, "Y": 4.4 },      
         { "X": 4.4, "Y": 0.88 },       { "X": 0.88, "Y": -3.52 },       { "X": -4.4,
         "Y": -2.64 }     ]   },   {     "Id": 2,     "Points": [       { "X": -22.88,
@@ -42,6 +43,7 @@ MonoBehaviour:
         9,     "Points": [       { "X": -47.324464, "Y": -28.16 },       { "X": 47.324464,
         "Y": -28.16 },       { "X": 47.324464, "Y": -24.64 },       { "X": -47.324464,
         "Y": -24.64 }     ]   } ] '
+      _lavaWallsJson: 
       _talentCardsJson: '[   { "Id": 1, "Position": { "X": -35.0, "Y": 10.0 }, "TalentType":
         "Swap" },   { "Id": 2, "Position": { "X": 35.0, "Y": -10.0 }, "TalentType":
         "Hammer" },   { "Id": 3, "Position": { "X": 0.0, "Y": 22.0 }, "TalentType":

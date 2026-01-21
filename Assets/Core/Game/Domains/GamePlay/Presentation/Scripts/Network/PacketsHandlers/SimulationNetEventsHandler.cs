@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
@@ -166,6 +167,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             {
                 _cachedPresentationEventsService.TalentCardHitNetEvents.Add(talentCardHitNetEvent);
                 _matchDataService.GetTalentCard(talentCardHitNetEvent.TalentCardId).Health = talentCardHitNetEvent.TalentCardHealth;
+            }
+        }
+
+        public void ProcessPowerUpSpawnedEvents(CapacityList<PowerUpBallSpawnedNetEventS2C> powerUpBallSpawnedNetEvents)
+        {
+            if (powerUpBallSpawnedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var powerUpBallSpawnedNetEvent in powerUpBallSpawnedNetEvents)
+            {
+                _matchDataService.AddPowerUpBall(powerUpBallSpawnedNetEvent.PowerUpBallId, powerUpBallSpawnedNetEvent.Position.ToUnityVector2());
+                _cachedPresentationEventsService.PowerUpBallSpawnedNetEvents.Add(powerUpBallSpawnedNetEvent);
+            }
+        }
+
+        public void ProcessPowerUpObtainedEvents(CapacityList<PowerUpBallObtainedNetEventS2C> powerUpBallObtainedEvents)
+        {
+            if (powerUpBallObtainedEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var powerUpBallObtainedNetEvent in powerUpBallObtainedEvents)
+            {
+                var powerUpBallId = powerUpBallObtainedNetEvent.Id;
+                _matchDataService.RemovePowerUpBall(powerUpBallId);
+                _cachedPresentationEventsService.PowerUpBallObtainedNetEvents.Add(powerUpBallObtainedNetEvent);
             }
         }
     }

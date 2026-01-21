@@ -3,6 +3,9 @@ using Box2D.NetStandard.Collision.Shapes;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Fixtures;
 using Box2D.NetStandard.Dynamics.World;
+#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
+using Box2D.NetStandard.Dynamics.World.Callbacks;
+#endif
 using Box2D.WorldTests;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
@@ -42,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             CopyPlayersStates(simulationState);
             CopyBulletsStates(simulationState);
+            CopyPowerUpsStates(simulationState);
         }
 
         public Body GetPlayer(ushort playerId)
@@ -82,6 +86,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     }
 
                     currentBody = currentBody.GetNext();
+                }
+            }
+        }
+
+        private void CopyPowerUpsStates(SimulationStateS2C simulationState)
+        {
+            foreach (var powerUp in simulationState.PowerUpBalls.AsSpan())
+            {
+                var powerUpBody = _world.GetBodyList();
+
+                while (powerUpBody != null)
+                {
+                    var bodyData = (PhysicsBodyData) powerUpBody.UserData;
+
+                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUp.Id)
+                    {
+                        powerUpBody.SetTransform(powerUp.Position, 0);
+                        powerUpBody.SetLinearVelocity(powerUp.Velocity);
+                        break;
+                    }
+
+                    powerUpBody = powerUpBody.GetNext();
                 }
             }
         }
@@ -181,7 +207,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.CreateFixture(fixtureDef);
         }
 
-        public void AddLava(ushort id, Vector2[] points)
+        public void AddLavaWall(ushort id, Vector2[] points)
         {
             BodyDef bodyDef = new BodyDef
             {
@@ -305,6 +331,38 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.CreateFixture(fixtureDef);
         }
 
+        public void AddPowerUpBall(ushort id, Vector2 position, Vector2 velocity, float radius)
+        {
+            BodyDef bodyDef = new BodyDef
+            {
+                type = BodyType.Dynamic,
+                position = position,
+                linearVelocity = velocity,
+                userData = new PhysicsBodyData(id, PhysicsBodyType.PowerUpBall),
+                fixedRotation = true
+            };
+
+            Body body = _world.CreateBody(bodyDef);
+
+            CircleShape circleShape = new CircleShape();
+            circleShape.Radius = radius;
+
+            FixtureDef fixtureDef = new FixtureDef
+            {
+                shape = circleShape,
+                density = 1f,
+                friction = 0,
+                restitution = 1f, // Bounciness
+                filter = new Filter
+                {
+                    categoryBits = PhysicsBodyType.PowerUpBall.GetCollisionsCategory(),
+                    maskBits     = PhysicsBodyType.PowerUpBall.GetCollisionMask(),
+                }
+            };
+
+            body.CreateFixture(fixtureDef);
+        }
+
         public Body GetBullet(ushort bulletId)
         {
             var currentBody = _world.GetBodyList();
@@ -325,9 +383,57 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return default;
         }
 
+        public Body GetPowerUpBall(ushort powerUpBallId)
+        {
+            var currentBody = _world.GetBodyList();
+
+            while (currentBody != null)
+            {
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUpBallId)
+                {
+                    return currentBody;
+                }
+
+                currentBody = currentBody.GetNext();
+            }
+
+            LogService.LogError($"Couldn't find powerUp {powerUpBallId}");
+            return default;
+        }
+
         public void RemoveBody(Body body)
         {
             _world.DestroyBody(body);
+        }
+
+        public bool IsSquareHitAnyBodyTypes(Vector2 squarePosition, float squareHalfWidth, params PhysicsBodyType[] bodyTypes)
+        {
+            var hasCollisionWithAnyBodyType = false;
+            var lowerBound = squarePosition - new Vector2(squareHalfWidth, squareHalfWidth);
+            var upperBound = squarePosition + new Vector2(squareHalfWidth, squareHalfWidth);
+            var aabb = new Box2D.NetStandard.Collision.AABB(lowerBound, upperBound);
+
+            _world.QueryAABB(ShouldProceedCheckHit, aabb);
+
+            bool ShouldProceedCheckHit(Fixture fixture)
+            {
+                var bodyData = (PhysicsBodyData)fixture.Body.UserData;
+
+                for (int i = 0; i < bodyTypes.Length; i++)
+                {
+                    hasCollisionWithAnyBodyType = bodyData.PhysicsBodyType == bodyTypes[i];
+                    if (hasCollisionWithAnyBodyType)
+                    {
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+            
+            return hasCollisionWithAnyBodyType;
         }
 
         public void ManagedOnGUI()
