@@ -86,7 +86,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             return _cachedProcessPlayersInputsResult;
         }
 
-        private CapacityDict<ushort, PlayerInputPacketC2S> ProcessEarliestInputPerPlayers(int processedTick) // todo: move out the unrelated step functions of here
+        private CapacityDict<ushort, PlayerInputPacketC2S> ProcessEarliestInputPerPlayers(int processedTick)
         {
             var earliestInputPerPlayers = PopEarliestInputsOfEachPlayer();
 
