@@ -441,15 +441,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         private FixtureDef GetFixtureDef()
         {
-            var def = _fixtureDefPool.Get();
-            def.Reset();
-            def.filter = new Filter();
+            var def = new FixtureDef();//_fixtureDefPool.Get();
+            // def.Reset();
+            // def.filter = new Filter();
             return def;
         }
 
         private PolygonShape GetPolygonShape()
         {
-            return _polygonShapePool.Get();
+            var polygonShape = _polygonShapePool.Get();
+            polygonShape.Reset();
+            return polygonShape;
         }
 
         private CircleShape GetCircleShape()
