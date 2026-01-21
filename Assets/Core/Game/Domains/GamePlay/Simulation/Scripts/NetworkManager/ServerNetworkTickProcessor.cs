@@ -14,8 +14,10 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
+using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -39,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private readonly IStateMachineService _stateMachineService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
+        private readonly PlaybackService _playbackService;
 
         private TimerFixedThreaded2 _fixedTimer;
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
@@ -53,7 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         public ServerNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IPlayerJoinPacketsHandler playerJoinPacketsHandler, IMatchNetEventsDataService matchNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory)
+            ICommandFactory commandFactory, PlaybackService playbackService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -63,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             _matchNetEventsDataService = matchNetEventsDataService;
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
+            _playbackService = playbackService;
         }
 
         public void InitEntryPoint()
@@ -97,6 +101,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 //if (dt > 20)
               //      Debug.LogError($"PollEvents stall: {dt}ms");
 
+            // In playback, we DO poll events, but the NetworkManager handles fetching from PlaybackService
             _networkManager.PollEvents();
         }
 
@@ -114,6 +119,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         {
             try
             {
+                _networkManager.SetServerTick(CurrentTick); // Update tick for playback recording/reading
                 var stepDeltaTime = _networkConfig.DeltaTime;
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 CurrentTick++;

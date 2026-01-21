@@ -37,6 +37,15 @@ namespace Core.Scripts.Editor.EditorConfig
             _areErrorLogsEnabled = EditorGUILayout.Toggle("Are Error Logs Enabled", _areErrorLogsEnabled);
             _arePhysicsDebugDrawEnabled = EditorGUILayout.Toggle("Are Physics Debug Draw Enabled", _arePhysicsDebugDrawEnabled);
 
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Runtime Settings", EditorStyles.boldLabel);
+            bool isPlayback = Core.Scripts.Utils.PlaybackSettings.IsPlaybackEnabled;
+            bool newIsPlayback = EditorGUILayout.Toggle("Play last recorded match", isPlayback);
+            if (newIsPlayback != isPlayback)
+            {
+                Core.Scripts.Utils.PlaybackSettings.IsPlaybackEnabled = newIsPlayback;
+            }
+
             if (EditorGUILayout.LinkButton("Refresh"))
             {
                 TryRefreshDefineSymbols();

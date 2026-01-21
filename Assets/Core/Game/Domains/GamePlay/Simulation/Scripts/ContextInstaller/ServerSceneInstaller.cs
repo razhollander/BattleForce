@@ -10,6 +10,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Talent;
 using UnityEngine;
 using Zenject;
@@ -41,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<IPlayersTalentsManager>().To<PlayersTalentsManager>().AsSingle().NonLazy();
             Container.Bind<IPlayersInLavaTrackerService>().To<PlayersInLavaTrackerService>().AsSingle().NonLazy();
             Container.BindInterfacesTo<PowerUpsSpawnTimerService>().AsSingle().NonLazy();
+            Container.Bind<PlaybackService>().AsSingle().NonLazy();
         }
     }
 }
