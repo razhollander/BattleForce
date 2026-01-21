@@ -322,20 +322,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         public void AddPowerUpBall(ushort id, Vector2 position, Vector2 velocity, float radius)
         {
-            BodyDef bodyDef = GetBodyDef();
+            var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Dynamic;
             bodyDef.position = position;
             bodyDef.linearVelocity = velocity;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PowerUpBall);
             bodyDef.fixedRotation = true;
 
-            Body body = _world.CreateBody(bodyDef);
+            var body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
 
-            CircleShape circleShape = GetCircleShape();
+            var circleShape = GetCircleShape();
             circleShape.Radius = radius;
 
-            FixtureDef fixtureDef = GetFixtureDef();
+            var fixtureDef = GetFixtureDef();
             fixtureDef.shape = circleShape;
             fixtureDef.density = 1f;
             fixtureDef.friction = 0;
