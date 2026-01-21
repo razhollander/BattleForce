@@ -10,6 +10,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             Id = id;
             PhysicsBodyType = physicsBodyType;
         }
+
+        public void Reset(ushort id, PhysicsBodyType physicsBodyType)
+        {
+            Id = id;
+            PhysicsBodyType = physicsBodyType;
+        }
     }
 
     [System.Flags]

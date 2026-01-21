@@ -28,7 +28,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private readonly ConcurrentPool<FixtureDef> _fixtureDefPool;
         private readonly ConcurrentPool<PolygonShape> _polygonShapePool;
         private readonly ConcurrentPool<CircleShape> _circleShapePool;
-        private readonly ConcurrentPool<PhysicsBodyDataWrapper> _bodyDataWrapperPool;
 
         public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig)
         {
@@ -43,7 +42,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _fixtureDefPool = new ConcurrentPool<FixtureDef>(() => new FixtureDef(), bodyCount);
             _polygonShapePool = new ConcurrentPool<PolygonShape>(() => new PolygonShape(), bodyCount);
             _circleShapePool = new ConcurrentPool<CircleShape>(() => new CircleShape(), bodyCount);
-            _bodyDataWrapperPool = new ConcurrentPool<PhysicsBodyDataWrapper>(() => new PhysicsBodyDataWrapper(), bodyCount);
         }
 
         public void InitEntryPoint()
@@ -70,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             while (currentBody != null)
             {
-                var bodyData = ((PhysicsBodyDataWrapper)currentBody.UserData).Data;
+                var bodyData = (PhysicsBodyData)currentBody.UserData;
 
                 if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerId)
                 {
@@ -92,7 +90,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
                 while (currentBody != null)
                 {
-                    var bodyData = ((PhysicsBodyDataWrapper) currentBody.UserData).Data;
+                    var bodyData = (PhysicsBodyData) currentBody.UserData;
 
                     if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerState.Id)
                     {
@@ -114,7 +112,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
                 while (powerUpBody != null)
                 {
-                    var bodyData = ((PhysicsBodyDataWrapper) powerUpBody.UserData).Data;
+                    var bodyData = (PhysicsBodyData) powerUpBody.UserData;
 
                     if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUp.Id)
                     {
@@ -136,7 +134,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
                 while (bulletBody != null)
                 {
-                    var bodyData = ((PhysicsBodyDataWrapper) bulletBody.UserData).Data;
+                    var bodyData = (PhysicsBodyData) bulletBody.UserData;
 
                     if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerBullet && bodyData.Id == bullet.Id)
                     {
@@ -199,7 +197,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             BodyDef bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
             bodyDef.position = Vector2.Zero; // Assume walls are absolute-world positioned
-            bodyDef.userData = GetBodyDataWrapper(id, PhysicsBodyType.Wall);
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.Wall);
 
             Body body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
@@ -224,7 +222,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             BodyDef bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
             bodyDef.position = Vector2.Zero;
-            bodyDef.userData = GetBodyDataWrapper(id, PhysicsBodyType.Lava);
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.Lava);
 
             Body body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
@@ -251,7 +249,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.position = position;
             bodyDef.linearVelocity = velocity;
             bodyDef.type = BodyType.Dynamic;
-            bodyDef.userData = GetBodyDataWrapper(id, PhysicsBodyType.PlayerSpaceship);
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PlayerSpaceship);
 
             Body body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
@@ -279,7 +277,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.linearVelocity = bulletVelocity;
             bodyDef.type = BodyType.Dynamic;
             bodyDef.bullet = true;
-            bodyDef.userData = GetBodyDataWrapper(bulletId, PhysicsBodyType.PlayerBullet);
+            bodyDef.userData = new PhysicsBodyData(bulletId, PhysicsBodyType.PlayerBullet);
             
             Body bulletBody = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
@@ -305,7 +303,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             BodyDef bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
             bodyDef.position = position;
-            bodyDef.userData = GetBodyDataWrapper(id, PhysicsBodyType.TalentCard);
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.TalentCard);
 
             Body body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
@@ -331,7 +329,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.type = BodyType.Dynamic;
             bodyDef.position = position;
             bodyDef.linearVelocity = velocity;
-            bodyDef.userData = GetBodyDataWrapper(id, PhysicsBodyType.PowerUpBall);
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PowerUpBall);
             bodyDef.fixedRotation = true;
 
             Body body = _world.CreateBody(bodyDef);
@@ -359,7 +357,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             while (currentBody != null)
             {
-                var bodyData = ((PhysicsBodyDataWrapper) currentBody.UserData).Data;
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
 
                 if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerBullet && bodyData.Id == bulletId)
                 {
@@ -379,7 +377,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             while (currentBody != null)
             {
-                var bodyData = ((PhysicsBodyDataWrapper) currentBody.UserData).Data;
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
 
                 if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUpBallId)
                 {
@@ -395,11 +393,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         public void RemoveBody(Body body)
         {
-            if (body.UserData is PhysicsBodyDataWrapper wrapper)
-            {
-                _bodyDataWrapperPool.Return(wrapper);
-                body.UserData = null;
-            }
+            body.UserData = null;
             _world.DestroyBody(body);
         }
 
@@ -414,7 +408,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             bool ShouldProceedCheckHit(Fixture fixture)
             {
-                var bodyData = ((PhysicsBodyDataWrapper)fixture.Body.UserData).Data;
+                var bodyData = (PhysicsBodyData)fixture.Body.UserData;
 
                 for (int i = 0; i < bodyTypes.Length; i++)
                 {
@@ -504,13 +498,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             shape.Radius = 0;
             shape.Center = Vector2.Zero;
             return shape;
-        }
-
-        private PhysicsBodyDataWrapper GetBodyDataWrapper(ushort id, PhysicsBodyType type)
-        {
-            var wrapper = _bodyDataWrapperPool.Get();
-            wrapper.Reset(id, type);
-            return wrapper;
         }
     }
 }

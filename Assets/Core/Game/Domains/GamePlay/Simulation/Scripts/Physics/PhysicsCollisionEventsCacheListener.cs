@@ -57,8 +57,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var fixtureA = contact.GetFixtureA();
             var fixtureB = contact.GetFixtureB();
             
-            var bodyDataA = ((PhysicsBodyDataWrapper)fixtureA.Body.UserData).Data;
-            var bodyDataB = ((PhysicsBodyDataWrapper)fixtureB.Body.UserData).Data;
+            var bodyDataA = (PhysicsBodyData)fixtureA.Body.UserData;
+            var bodyDataB = (PhysicsBodyData)fixtureB.Body.UserData;
             var idA = bodyDataA.Id;
             var idB = bodyDataB.Id;
 
