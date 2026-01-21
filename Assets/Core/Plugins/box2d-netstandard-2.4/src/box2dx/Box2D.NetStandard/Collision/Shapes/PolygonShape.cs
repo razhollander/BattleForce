@@ -52,6 +52,20 @@ namespace Box2D.NetStandard.Collision.Shapes
             m_centroid = Vector2.Zero;
         }
 
+        public void Reset()
+        {
+            m_radius = Settings.PolygonRadius;
+            m_count = 0;
+
+            for (int i = 0; i < m_normals.Length; i++)
+            {
+                m_normals[i] = Vector2.Zero;
+                m_vertices[i] = Vector2.Zero;
+            }
+            
+            m_centroid = Vector2.Zero;
+        }
+
         public PolygonShape(params Vector2[] vectors) : this()
         {
             Set(vectors);
@@ -66,6 +80,14 @@ namespace Box2D.NetStandard.Collision.Shapes
 
         public override Shape Clone() => (Shape)MemberwiseClone();
 
+        // public override Shape Clone() // Deep Copy
+        // {
+        //     var clone = (PolygonShape)MemberwiseClone();
+        //     clone.m_vertices = (Vector2[])m_vertices.Clone();
+        //     clone.m_normals = (Vector2[])m_normals.Clone();
+        //     return clone;
+        // }
+        
         public void SetAsBox(float hx, float hy)
         {
             m_count = 4;
