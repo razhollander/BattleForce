@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
+using Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
@@ -35,6 +36,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
         [SerializeField] private TalentCardObtainedEffectView _talentCardObtainedEffectView;
         [SerializeField] private PowerUpBallView _powerUpBallViewPrefab;
         [SerializeField] private PowerUpBallObtainedEffectView _powerUpBallObtainedEffectViewPrefab;
+        [SerializeField] private MatchUIView _matchUIView;
+        [SerializeField] private MatchPlayersUIView _matchPlayersUIViewPrefab;
 
         public override void InstallBindings()
         {
@@ -73,6 +76,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
             Container.BindInterfacesTo<TalentCardObtainedEffectController>().AsSingle().WithArguments(_talentCardObtainedEffectView).NonLazy();
             Container.BindInterfacesTo<PowerUpBallControllers>().AsSingle().WithArguments(_powerUpBallViewPrefab).NonLazy();
             Container.BindInterfacesTo<PowerUpBallObtainedEffectController>().AsSingle().WithArguments(_powerUpBallObtainedEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<MatchUIController>().AsSingle().WithArguments(_matchUIView).NonLazy();
+            Container.Bind<MatchPlayersUIController>().AsSingle().WithArguments(_matchPlayersUIViewPrefab).NonLazy();
             //Container.BindInterfacesTo<NetworkManager>().AsSingle().WithArguments(_networkConfig).NonLazy();
             // Container.BindInterfacesTo<BFNetworkClient>().AsSingle().NonLazy();
             // Container.BindInterfacesTo<BFNetworkServer>().AsSingle().NonLazy();

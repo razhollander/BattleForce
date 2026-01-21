@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.UpdateService;
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
         private readonly IPlayerControllers _playerControllers;
         private readonly IBulletControllers _bulletControllers;
         private readonly IPowerUpBallControllers _powerUpBallControllers;
+        private readonly IMatchUIController _matchUIController;
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
         private readonly HandleBulletDestroyedNetEventsCommand _handleBulletDestroyedNetEventsCommand;
@@ -23,12 +25,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
         private readonly HandlePowerUpBallObtainedNetEventsCommand _handlePowerUpBallObtainedNetEventsCommand;
 
         public ClientPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers)
+            IBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchUIController matchUIController)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
             _bulletControllers = bulletControllers;
             _powerUpBallControllers = powerUpBallControllers;
+            _matchUIController = matchUIController;
             _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
             _handlePlayerTakeDamangeNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
             _handleBulletDestroyedNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>();
@@ -63,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
+            _matchUIController.UpdateUI();
             
             _handleTalentCardObtainedNetEventsCommand.Execute();
         }
