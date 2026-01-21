@@ -10,6 +10,7 @@ using Box2D.WorldTests;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
+using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
@@ -23,11 +24,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private World _world;
         private readonly CollisionEventCacheListener _collisionEventCacheListener;
 
+        private readonly ConcurrentPool<BodyDef> _bodyDefPool;
+        private readonly ConcurrentPool<FixtureDef> _fixtureDefPool;
+        private readonly ConcurrentPool<PolygonShape> _polygonShapePool;
+        private readonly ConcurrentPool<CircleShape> _circleShapePool;
+        private readonly ConcurrentPool<PhysicsBodyDataWrapper> _bodyDataWrapperPool;
+
         public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _networkConfig = networkConfig;
             _collisionEventCacheListener = new CollisionEventCacheListener(_networkConfig);
+
+            int bodyCount = _networkConfig.MaxCap.ConcurrentBodyCount;
+            // Fixtures and shapes usually match body count or slightly more (walls have multiple segments? no, separate bodies).
+            // Using bodyCount as a safe initial estimate.
+            _bodyDefPool = new ConcurrentPool<BodyDef>(() => new BodyDef(), bodyCount);
+            _fixtureDefPool = new ConcurrentPool<FixtureDef>(() => new FixtureDef(), bodyCount);
+            _polygonShapePool = new ConcurrentPool<PolygonShape>(() => new PolygonShape(), bodyCount);
+            _circleShapePool = new ConcurrentPool<CircleShape>(() => new CircleShape(), bodyCount);
+            _bodyDataWrapperPool = new ConcurrentPool<PhysicsBodyDataWrapper>(() => new PhysicsBodyDataWrapper(), bodyCount);
         }
 
         public void InitEntryPoint()
@@ -54,7 +70,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             while (currentBody != null)
             {
-                var bodyData = (PhysicsBodyData)currentBody.UserData;
+                var bodyData = ((PhysicsBodyDataWrapper)currentBody.UserData).Data;
 
                 if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerId)
                 {
@@ -76,7 +92,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
                 while (currentBody != null)
                 {
-                    var bodyData = (PhysicsBodyData) currentBody.UserData;
+                    var bodyData = ((PhysicsBodyDataWrapper) currentBody.UserData).Data;
 
                     if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerState.Id)
                     {
@@ -98,7 +114,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
                 while (powerUpBody != null)
                 {
-                    var bodyData = (PhysicsBodyData) powerUpBody.UserData;
+                    var bodyData = ((PhysicsBodyDataWrapper) powerUpBody.UserData).Data;
 
                     if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUp.Id)
                     {
@@ -120,7 +136,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
                 while (bulletBody != null)
                 {
-                    var bodyData = (PhysicsBodyData) bulletBody.UserData;
+                    var bodyData = ((PhysicsBodyDataWrapper) bulletBody.UserData).Data;
 
                     if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerBullet && bodyData.Id == bullet.Id)
                     {
@@ -180,187 +196,161 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         public void AddWall(ushort id, Vector2[] points)
         {
-            BodyDef bodyDef = new BodyDef 
-            {
-                type = BodyType.Static,
-                position = Vector2.Zero, // Assume walls are absolute-world positioned
-                userData = new PhysicsBodyData(id, PhysicsBodyType.Wall)
-            };
+            BodyDef bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = Vector2.Zero; // Assume walls are absolute-world positioned
+            bodyDef.userData = GetBodyDataWrapper(id, PhysicsBodyType.Wall);
 
             Body body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
 
-            PolygonShape wallShape = new PolygonShape();
+            PolygonShape wallShape = GetPolygonShape();
             wallShape.Set(points);
 
-            FixtureDef fixtureDef = new FixtureDef
-            {
-                shape = wallShape,
-                density = 0,       // Static objects don't need density
-                friction = 0,
-                filter = new Filter
-                {
-                    categoryBits = PhysicsBodyType.Wall.GetCollisionsCategory(),
-                    maskBits     = PhysicsBodyType.Wall.GetCollisionMask(),
-                }
-            };
+            FixtureDef fixtureDef = GetFixtureDef();
+            fixtureDef.shape = wallShape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.Wall.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.Wall.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(wallShape);
         }
 
         public void AddLavaWall(ushort id, Vector2[] points)
         {
-            BodyDef bodyDef = new BodyDef
-            {
-                type = BodyType.Static,
-                position = Vector2.Zero,
-                userData = new PhysicsBodyData(id, PhysicsBodyType.Lava)
-            };
+            BodyDef bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = Vector2.Zero;
+            bodyDef.userData = GetBodyDataWrapper(id, PhysicsBodyType.Lava);
 
             Body body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
 
-            PolygonShape lavaShape = new PolygonShape();
+            PolygonShape lavaShape = GetPolygonShape();
             lavaShape.Set(points);
 
-            FixtureDef fixtureDef = new FixtureDef
-            {
-                shape = lavaShape,
-                density = 0,
-                friction = 0,
-                isSensor = true,
-                filter = new Filter
-                {
-                    categoryBits = PhysicsBodyType.Lava.GetCollisionsCategory(),
-                    maskBits     = PhysicsBodyType.Lava.GetCollisionMask(),
-                }
-            };
+            FixtureDef fixtureDef = GetFixtureDef();
+            fixtureDef.shape = lavaShape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.Lava.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.Lava.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(lavaShape);
         }
 
         public void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius)
         {
-            BodyDef bodyDef = new BodyDef
-            {
-                position = position,
-                linearVelocity = velocity,
-                type = BodyType.Dynamic,
-                userData = new PhysicsBodyData(id, PhysicsBodyType.PlayerSpaceship)
-            };
+            BodyDef bodyDef = GetBodyDef();
+            bodyDef.position = position;
+            bodyDef.linearVelocity = velocity;
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.userData = GetBodyDataWrapper(id, PhysicsBodyType.PlayerSpaceship);
 
             Body body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
 
-            CircleShape circleShape = new CircleShape();
+            CircleShape circleShape = GetCircleShape();
             circleShape.Radius = radius;
 
-            FixtureDef fixtureDef = new FixtureDef
-            {
-                shape = circleShape,
-                density = 1.0f,
-                friction = 0,
-                filter = new Filter
-                {
-                    categoryBits = PhysicsBodyType.PlayerSpaceship.GetCollisionsCategory(),
-                    maskBits     = PhysicsBodyType.PlayerSpaceship.GetCollisionMask(),
-                    groupIndex = (short)-teamId,
-                }
-            };
+            FixtureDef fixtureDef = GetFixtureDef();
+            fixtureDef.shape = circleShape;
+            fixtureDef.density = 1.0f;
+            fixtureDef.friction = 0;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.PlayerSpaceship.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.PlayerSpaceship.GetCollisionMask();
+            fixtureDef.filter.groupIndex = (short)-teamId;
 
             body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(circleShape);
         }
 
         public void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius)
         {
-            BodyDef bodyDef = new BodyDef
-            {
-                position = bulletPosition,
-                linearVelocity = bulletVelocity,
-                type = BodyType.Dynamic,
-                bullet = true,
-                userData = new PhysicsBodyData(bulletId, PhysicsBodyType.PlayerBullet)
-            };
+            BodyDef bodyDef = GetBodyDef();
+            bodyDef.position = bulletPosition;
+            bodyDef.linearVelocity = bulletVelocity;
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.bullet = true;
+            bodyDef.userData = GetBodyDataWrapper(bulletId, PhysicsBodyType.PlayerBullet);
             
             Body bulletBody = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
             
-            CircleShape circleShape = new CircleShape
-            {
-                Radius = bulletRadius
-            };
+            CircleShape circleShape = GetCircleShape();
+            circleShape.Radius = bulletRadius;
             
-            FixtureDef fixtureDef = new FixtureDef
-            {
-                shape = circleShape,
-                density = 0.3f,
-                friction = 0.0f,
-                filter = new Filter
-                {
-                    categoryBits = PhysicsBodyType.PlayerBullet.GetCollisionsCategory(),
-                    maskBits = PhysicsBodyType.PlayerBullet.GetCollisionMask(),
-                    groupIndex = (short)-teamId,
-                },
-            };
+            FixtureDef fixtureDef = GetFixtureDef();
+            fixtureDef.shape = circleShape;
+            fixtureDef.density = 0.3f;
+            fixtureDef.friction = 0.0f;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.PlayerBullet.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.PlayerBullet.GetCollisionMask();
+            fixtureDef.filter.groupIndex = (short)-teamId;
             
             bulletBody.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(circleShape);
         }
 
         public void AddTalentCard(ushort id, Vector2 position, float length, float height)
         {
-            BodyDef bodyDef = new BodyDef
-            {
-                type = BodyType.Static,
-                position = position,
-                userData = new PhysicsBodyData(id, PhysicsBodyType.TalentCard)
-            };
+            BodyDef bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = position;
+            bodyDef.userData = GetBodyDataWrapper(id, PhysicsBodyType.TalentCard);
 
             Body body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
 
-            PolygonShape boxShape = new PolygonShape();
+            PolygonShape boxShape = GetPolygonShape();
             boxShape.SetAsBox(length * 0.5f, height * 0.5f);
 
-            FixtureDef fixtureDef = new FixtureDef
-            {
-                shape = boxShape,
-                density = 0,
-                friction = 0,
-                filter = new Filter
-                {
-                    categoryBits = PhysicsBodyType.TalentCard.GetCollisionsCategory(),
-                    maskBits     = PhysicsBodyType.TalentCard.GetCollisionMask(),
-                }
-            };
+            FixtureDef fixtureDef = GetFixtureDef();
+            fixtureDef.shape = boxShape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.TalentCard.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.TalentCard.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(boxShape);
         }
 
         public void AddPowerUpBall(ushort id, Vector2 position, Vector2 velocity, float radius)
         {
-            BodyDef bodyDef = new BodyDef
-            {
-                type = BodyType.Dynamic,
-                position = position,
-                linearVelocity = velocity,
-                userData = new PhysicsBodyData(id, PhysicsBodyType.PowerUpBall),
-                fixedRotation = true
-            };
+            BodyDef bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.linearVelocity = velocity;
+            bodyDef.userData = GetBodyDataWrapper(id, PhysicsBodyType.PowerUpBall);
+            bodyDef.fixedRotation = true;
 
             Body body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
 
-            CircleShape circleShape = new CircleShape();
+            CircleShape circleShape = GetCircleShape();
             circleShape.Radius = radius;
 
-            FixtureDef fixtureDef = new FixtureDef
-            {
-                shape = circleShape,
-                density = 1f,
-                friction = 0,
-                restitution = 1f, // Bounciness
-                filter = new Filter
-                {
-                    categoryBits = PhysicsBodyType.PowerUpBall.GetCollisionsCategory(),
-                    maskBits     = PhysicsBodyType.PowerUpBall.GetCollisionMask(),
-                }
-            };
+            FixtureDef fixtureDef = GetFixtureDef();
+            fixtureDef.shape = circleShape;
+            fixtureDef.density = 1f;
+            fixtureDef.friction = 0;
+            fixtureDef.restitution = 1f; // Bounciness
+            fixtureDef.filter.categoryBits = PhysicsBodyType.PowerUpBall.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.PowerUpBall.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(circleShape);
         }
 
         public Body GetBullet(ushort bulletId)
@@ -369,7 +359,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             while (currentBody != null)
             {
-                var bodyData = (PhysicsBodyData) currentBody.UserData;
+                var bodyData = ((PhysicsBodyDataWrapper) currentBody.UserData).Data;
 
                 if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerBullet && bodyData.Id == bulletId)
                 {
@@ -389,7 +379,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             while (currentBody != null)
             {
-                var bodyData = (PhysicsBodyData) currentBody.UserData;
+                var bodyData = ((PhysicsBodyDataWrapper) currentBody.UserData).Data;
 
                 if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUpBallId)
                 {
@@ -405,6 +395,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         public void RemoveBody(Body body)
         {
+            if (body.UserData is PhysicsBodyDataWrapper wrapper)
+            {
+                _bodyDataWrapperPool.Return(wrapper);
+                body.UserData = null;
+            }
             _world.DestroyBody(body);
         }
 
@@ -419,7 +414,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             bool ShouldProceedCheckHit(Fixture fixture)
             {
-                var bodyData = (PhysicsBodyData)fixture.Body.UserData;
+                var bodyData = ((PhysicsBodyDataWrapper)fixture.Body.UserData).Data;
 
                 for (int i = 0; i < bodyTypes.Length; i++)
                 {
@@ -444,6 +439,78 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public void ManagedOnDrawGizmos()
         {
             _world?.DrawDebugData();
+        }
+
+        private BodyDef GetBodyDef()
+        {
+            var def = _bodyDefPool.Get();
+            // Reset to defaults as per BodyDef constructor
+            def.userData = null;
+            def.position = Vector2.Zero;
+            def.angle = 0.0f;
+            def.linearVelocity = Vector2.Zero;
+            def.angularVelocity = 0.0f;
+            def.linearDamping = 0.0f;
+            def.angularDamping = 0.0f;
+            def.allowSleep = true;
+            def.awake = true;
+            def.fixedRotation = false;
+            def.bullet = false;
+            def.type = BodyType.Static;
+            def.enabled = true;
+            def.gravityScale = 1.0f;
+            return def;
+        }
+
+        private FixtureDef GetFixtureDef()
+        {
+            var def = _fixtureDefPool.Get();
+            // Reset to defaults
+            def.density = 0f;
+            def.friction = 0.2f;
+            def.isSensor = false;
+            def.restitution = 0f;
+            def.shape = null;
+            def.userData = null;
+            // Reset filter
+            if (def.filter != null)
+            {
+                def.filter.categoryBits = 0x0001;
+                def.filter.maskBits = 0xFFFF;
+                def.filter.groupIndex = 0;
+            }
+            else
+            {
+                // Should not happen if pool generator uses new FixtureDef() which initializes filter
+                def.filter = new Filter();
+            }
+            return def;
+        }
+
+        private PolygonShape GetPolygonShape()
+        {
+            var shape = _polygonShapePool.Get();
+            // PolygonShape doesn't have a clear reset method but Set() methods will overwrite data.
+            // m_count = 0 in Set methods or constructor.
+            // Vertices are overwritten.
+            // We should ensure it's clean enough.
+            // Using SetAsBox(0,0) might be a way to reset, but not strictly necessary if we always call Set/SetAsBox immediately.
+            return shape;
+        }
+
+        private CircleShape GetCircleShape()
+        {
+            var shape = _circleShapePool.Get();
+            shape.Radius = 0;
+            shape.Center = Vector2.Zero;
+            return shape;
+        }
+
+        private PhysicsBodyDataWrapper GetBodyDataWrapper(ushort id, PhysicsBodyType type)
+        {
+            var wrapper = _bodyDataWrapperPool.Get();
+            wrapper.Reset(id, type);
+            return wrapper;
         }
     }
 }
