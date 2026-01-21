@@ -15,7 +15,9 @@ MonoBehaviour:
   MaxCap:
     ConcurrentPlayers: 8
     ConcurrentBullets: 256
+    ConcurrentTalentCards: 128
     ConcurrentEvironmentWalls: 64
+    ConcurrentEvironmentLavaWalls: 16
     PointsInEvironmentWall: 8
     PacketTypes: 256
     ConcurrentTimeOfImpactContacts: 32
@@ -31,7 +33,12 @@ MonoBehaviour:
     BulletSpawnNetEvents: 512
     BulletDestroyedNetEvents: 512
     PlayerSwapNetEvents: 64
+    TalentCardObtainedNetEvent: 64
     MaxCollisionsPerFrame: 256
+    TalentCardHitNetEvents: 128
+    ConcurrentPowerUpBalls: 32
+    PowerUpSpawnedNetEvents: 64
+    PowerUpObtainedNetEvents: 64
   TicksPerSeconds: 60
   DeltaTime: 0.016666668
   PhysicsVelocityIterations: 8

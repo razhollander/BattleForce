@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _playersParent = new GameObject("PlayersParent");
         }
 
-        public void CreatePlayer(ushort playerId)
+        public void AddPlayer(ushort playerId)
         {
             var playerController = new PlayerController(playerId, _matchDataService, _gamePlayConfig);
             playerController.CreatePlayerView(_playerViewPrefab, _playersParent.transform);
