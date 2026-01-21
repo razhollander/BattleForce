@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
 
         public void InitExitPoint()
         {
-            //throw new NotImplementedException();
+            
         }
 
         private TimerFixedThreaded2 _fixedTimer;

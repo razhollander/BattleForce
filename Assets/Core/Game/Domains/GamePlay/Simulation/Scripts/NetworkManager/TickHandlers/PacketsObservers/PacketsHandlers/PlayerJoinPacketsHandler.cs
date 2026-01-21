@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         public void ProcessPlayersJoined(int processedTick)
         {
-            var startingDirection = new Vector2(0, 1);
+            var startingDirection = RNG.NextFloat(0, 360).AngleToVector();
             var velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
             var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
             var health = _gamePlayConfig.PlayerSpaceship.StartHealth;

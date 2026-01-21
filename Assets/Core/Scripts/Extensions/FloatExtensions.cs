@@ -9,7 +9,7 @@ namespace Core.Scripts.Extensions
             return Quaternion.Euler(0f, 0f, angle);    
         }
         
-        public static System.Numerics.Vector2 AngleToRadians(this float angleRadians)
+        public static System.Numerics.Vector2 AngleToVector(this float angleRadians)
         {
             return new System.Numerics.Vector2(Mathf.Cos(angleRadians), Mathf.Sin(angleRadians));    
         }
