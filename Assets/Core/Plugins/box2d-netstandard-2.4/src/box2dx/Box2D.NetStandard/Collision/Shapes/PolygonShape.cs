@@ -1,4 +1,4 @@
-﻿/*
+/*
   Box2D.NetStandard Copyright © 2020 Ben Ukhanov & Hugh Phoenix-Hulme https://github.com/benzuk/box2d-netstandard
   Box2DX Copyright (c) 2009 Ihar Kalasouski http://code.google.com/p/box2dx
   
@@ -64,7 +64,13 @@ namespace Box2D.NetStandard.Collision.Shapes
 
         internal override byte ContactMatch => contactMatch;
 
-        public override Shape Clone() => (Shape)MemberwiseClone();
+        public override Shape Clone()
+        {
+            var clone = (PolygonShape)MemberwiseClone();
+            clone.m_vertices = (Vector2[])m_vertices.Clone();
+            clone.m_normals = (Vector2[])m_normals.Clone();
+            return clone;
+        }
 
         public void SetAsBox(float hx, float hy)
         {
