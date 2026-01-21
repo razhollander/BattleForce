@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1511189518034459242}
   - component: {fileID: 2300055036656639014}
+  - component: {fileID: 5276802609108538664}
   m_Layer: 5
   m_Name: PlayersPanel
   m_TagString: Untagged
@@ -45,6 +46,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 808355115015036682}
   m_CullTransparentMesh: 1
+--- !u!114 &5276802609108538664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 808355115015036682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b31081690a24e89bdda46cedb3aaf3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <PlayersContainer>k__BackingField: {fileID: 4975040550044611822}
+  <PlayerUIView>k__BackingField: {fileID: 6246738873035419814, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
 --- !u!1 &5618261632046853999
 GameObject:
   m_ObjectHideFlags: 0
@@ -128,7 +143,6 @@ GameObject:
   - component: {fileID: 6855815179307085571}
   - component: {fileID: 1486710573959485107}
   - component: {fileID: 2778380866625836296}
-  - component: {fileID: 7429007643554654409}
   m_Layer: 5
   m_Name: MatchCanvas
   m_TagString: Untagged
@@ -219,16 +233,3 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 55
---- !u!114 &7429007643554654409
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7249973912953480431}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c430d616f43547a784be259a2bebe2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _playersContainer: {fileID: 4975040550044611822}

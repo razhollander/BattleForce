@@ -14,6 +14,7 @@ namespace Core.Scripts.Network
         public int ServerTicksBuffer = 2;
         public int HostPort = 49153;
         public string IpAddress = "109.67.156.134";
+        public bool OnlyLocal = false;
         public string ConntectionKey = "BattleForceGame";
     }
 

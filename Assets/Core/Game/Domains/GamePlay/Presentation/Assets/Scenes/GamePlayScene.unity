@@ -175,8 +175,7 @@ MonoBehaviour:
   _talentCardObtainedEffectView: {fileID: 4070831197063270025, guid: d83c71c50f5ad45899f349e5076e74ed, type: 3}
   _powerUpBallViewPrefab: {fileID: 3758963260886631903, guid: cbe864724915a462ba3eb0a43e617955, type: 3}
   _powerUpBallObtainedEffectViewPrefab: {fileID: 2195679162854211240, guid: 48dea62b24cce48919e876128ae02ba4, type: 3}
-  _matchUIView: {fileID: 4646151668600958595}
-  _matchPlayersUIViewPrefab: {fileID: 6246738873035419814, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
+  _matchPlayerUIControllersView: {fileID: 4646151668600958595}
 --- !u!1 &726356830
 GameObject:
   m_ObjectHideFlags: 0
@@ -1148,13 +1147,13 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &4646151668600958595 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7429007643554654409, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
+  m_CorrespondingSourceObject: {fileID: 5276802609108538664, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
   m_PrefabInstance: {fileID: 4646151668600958593}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c430d616f43547a784be259a2bebe2b, type: 3}
+  m_Script: {fileID: 11500000, guid: 3b31081690a24e89bdda46cedb3aaf3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807

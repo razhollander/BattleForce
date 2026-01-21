@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts
 {
-    public class MatchPlayersUIView : MonoBehaviour
+    public class MatchPlayerUIView : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI _nameText;
         [SerializeField] private Image _spaceshipImage;
@@ -17,9 +17,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts
         [Header("Talents")]
         [SerializeField] private Transform _talentsContainer;
         [SerializeField] private MatchPlayerTalentUIView _talentViewPrefab;
-        // Optional: Map TalentType to Sprites via Inspector or ScriptableObject
-        // For simplicity, I'll assume we can pass sprites or just use placeholders if no config is available yet.
-        // But user didn't mention sprites source. I will just rely on prefab for now or setup generic ones.
 
         private readonly List<MatchPlayerTalentUIView> _talentViews = new List<MatchPlayerTalentUIView>();
 
@@ -35,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts
             _moneyText.text = money+"$";
         }
 
-        public void UpdateHealth(int health, int maxHealth)
+        public void SetHealth(int health, int maxHealth)
         {
             _healthBar.UpdateBar(health, maxHealth);
         }
