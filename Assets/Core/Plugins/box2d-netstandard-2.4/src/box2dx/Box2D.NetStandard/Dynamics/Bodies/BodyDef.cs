@@ -103,6 +103,11 @@ namespace Box2D.NetStandard.Dynamics.Bodies
         /// </summary>
         public BodyDef()
         {
+            Reset();
+        }
+
+        public void Reset()
+        {
             userData = null;
             position = Vector2.Zero;
             angle = 0.0f;
