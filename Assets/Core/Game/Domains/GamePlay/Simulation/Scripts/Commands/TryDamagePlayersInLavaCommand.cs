@@ -13,7 +13,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
-        private NetworkConfig _networkConfig;
 
         public TryDamagePlayersInLavaCommand SetProcessedTick(int processedTick)
         {
@@ -26,16 +25,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
-            _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
         }
 
         public void Execute()
         {
-            var playerIds = _playersInLavaTrackerService.StepAndGetPlayerIdsToDamage(_networkConfig.DeltaTime);
+            var playerIdsToDamage = _playersInLavaTrackerService.GetPlayerIdsToDamage();
 
-            foreach (var playerId in playerIds)
+            foreach (var playerId in playerIdsToDamage)
             {
+                _playersInLavaTrackerService.ResetPlayerTimePassedSinceLastDamageTaken(playerId);
                 _playerHitCommand
                     .SetPlayerId(playerId)
                     .SetProcessedTick(_processedTick)

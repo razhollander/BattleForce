@@ -12,27 +12,31 @@ using Random = UnityEngine.Random;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
-    public class PowerUpsSpawnerController : IPowerUpsSpawnerController
+    public class PowerUpsSpawnTimerService : IPowerUpsSpawnerService
     {
         private readonly SimulationGamePlayConfig _gamePlayConfig;
-        private float _timeSinceLastSpawn;
+        private float _secondsLeftUntilSpawn = 1;
 
-        public PowerUpsSpawnerController(
+        public PowerUpsSpawnTimerService(
             SimulationGamePlayConfig gamePlayConfig)
         {
             _gamePlayConfig = gamePlayConfig;
         }
 
-        public bool StepAndGetIsSpawnTimerEnded(float deltaTime)
+        public void StepTimer(float deltaTime)
         {
-            _timeSinceLastSpawn += deltaTime;
-            if (_timeSinceLastSpawn >= _gamePlayConfig.PowerUps.SpawnInterval)
-            {
-                _timeSinceLastSpawn = 0;
-                return true;
-            }
+            _secondsLeftUntilSpawn -= deltaTime;
+        }
 
-            return false;
+        public bool IsSpawnTimerEnded()
+        {
+            return _secondsLeftUntilSpawn <= 0;
+        }
+
+        public void RestartSpawnTimer()
+        {
+            var randomSeconds = RNG.NextFloat(_gamePlayConfig.PowerUps.SpawnMinSecondsInterval, _gamePlayConfig.PowerUps.SpawnMaxSecondsInterval);
+            _secondsLeftUntilSpawn = randomSeconds;
         }
     }
 }

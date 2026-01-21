@@ -12,13 +12,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private readonly SimulationGamePlayConfig _gamePlayerConfig;
         private readonly CapacityDict<ushort, PlayerInLavaData> _playersInLava;
         private readonly ConcurrentPool<PlayerInLavaData> _playerInLavaDataPool;
-        private readonly List<ushort> _playersToDamage;
+        private readonly List<ushort> _cachedPlayersToDamage;
 
         public PlayersInLavaTrackerService(SimulationGamePlayConfig gamePlayerConfig, NetworkConfig networkConfig)
         {
             _gamePlayerConfig = gamePlayerConfig;
             _playersInLava = new CapacityDict<ushort, PlayerInLavaData>(networkConfig.MaxCap.ConcurrentPlayers);
-            _playersToDamage = new List<ushort>(networkConfig.MaxCap.ConcurrentPlayers);
+            _cachedPlayersToDamage = new List<ushort>(networkConfig.MaxCap.ConcurrentPlayers);
             _playerInLavaDataPool = new ConcurrentPool<PlayerInLavaData>(() => new PlayerInLavaData(), networkConfig.MaxCap.ConcurrentPlayers);
         }
 
@@ -48,24 +48,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 LogService.LogError($"Player {playerId} exit lava but does not exist in lava");
             }
         }
-        
-        public List<ushort> StepAndGetPlayerIdsToDamage(float deltaTime)
-        {
-            _playersToDamage.Clear();
-            if (_playersInLava.Count == 0) return _playersToDamage;
 
+        public void StepTimePassedSinceLastDamageTaken(float deltaTime)
+        {
             foreach (var playerId in _playersInLava.Keys)
             {
                 _playersInLava[playerId].TimePassSinceLastDamageTaken += deltaTime;
+            }
+        }
+
+        public List<ushort> GetPlayerIdsToDamage()
+        {
+            _cachedPlayersToDamage.Clear();
+            if (_playersInLava.Count == 0) return _cachedPlayersToDamage;
+
+            foreach (var playerId in _playersInLava.Keys)
+            {
                 var didPassDamageInterval = _playersInLava[playerId].TimePassSinceLastDamageTaken >= _gamePlayerConfig.Lava.DamageIntervalInSeconds;
                 if (didPassDamageInterval)
                 {
-                    _playersToDamage.Add(playerId);
-                    _playersInLava[playerId].TimePassSinceLastDamageTaken = 0;
+                    _cachedPlayersToDamage.Add(playerId);
                 }
             }
 
-            return _playersToDamage;
+            return _cachedPlayersToDamage;
+        }
+
+        public void ResetPlayerTimePassedSinceLastDamageTaken(ushort playerId)
+        {
+            _playersInLava[playerId].TimePassSinceLastDamageTaken = 0;
         }
         
         private class PlayerInLavaData

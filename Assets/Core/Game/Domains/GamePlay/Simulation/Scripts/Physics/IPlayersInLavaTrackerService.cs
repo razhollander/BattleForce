@@ -6,6 +6,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
     {
         void OnPlayerEnterLava(ushort playerId);
         void OnPlayerExitLava(ushort playerId);
-        List<ushort> StepAndGetPlayerIdsToDamage(float deltaTime);
+        void StepTimePassedSinceLastDamageTaken(float deltaTime);
+        List<ushort> GetPlayerIdsToDamage();
+        void ResetPlayerTimePassedSinceLastDamageTaken(ushort playerId);
     }
 }

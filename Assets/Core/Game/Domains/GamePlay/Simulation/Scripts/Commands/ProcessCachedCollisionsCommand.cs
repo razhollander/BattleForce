@@ -5,7 +5,6 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Talent;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;

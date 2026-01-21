@@ -123,28 +123,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         private void UpdatePlayerTalent(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState)
         {
-            UpdatePlayerTalentsCooldowns(playerState);
             UpdatePlayerTalents(processedTick, isTalentInputPressed, playerState);
-        }
-
-        private void UpdatePlayerTalentsCooldowns(PlayerStateS2C playerState)
-        {
-            for (int i = 0; i < playerState.Spaceship.Talents.Talents.Count; i++)
-            {
-                var playerTalent = playerState.Spaceship.Talents.Talents[i];
-                var isCurrentlyOnCooldown = playerTalent.CooldownSecondsLeft < playerTalent.MaxCooldown;
-                if (isCurrentlyOnCooldown)
-                {
-                    playerTalent.CooldownSecondsLeft -= _networkConfig.DeltaTime;
-                }
-
-                if (playerTalent.CooldownSecondsLeft < 0)
-                {
-                    playerTalent.CooldownSecondsLeft = playerTalent.MaxCooldown;
-                }
-                
-                playerState.Spaceship.Talents.Talents[i] = playerTalent;
-            }
         }
 
         private void UpdatePlayerTalents(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState)
@@ -264,25 +243,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, PlayerStateS2C playerModel)
         {
             var shootState = playerModel.Spaceship.Shoot;
-            var isCurrentlyOnCooldown = shootState.CooldownSecondsLeft < shootState.MaxCooldown;
-            if (isCurrentlyOnCooldown)
-            {
-                shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
-            }
-
-            if (shootState.CooldownSecondsLeft < 0)
-            {
-                shootState.CooldownSecondsLeft = shootState.MaxCooldown;
-            }
-
             var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
             if (shouldShoot)
             {
                 shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
+                playerModel.Spaceship.Shoot = shootState;
                 CreateBulletForPlayer(processedTick, playerModel);
             }
-
-            playerModel.Spaceship.Shoot = shootState;
         }
 
         private void CreateBulletForPlayer(int processedTick, PlayerStateS2C playerModel)

@@ -50,8 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 _net.PollEvents();
                 _nat.PollEvents();
-                await Awaitable.WaitForSecondsAsync(_networkConfig.DeltaTime);
-                //System.Threading.Thread.Sleep(15);
+                //await Awaitable.WaitForSecondsAsync(_networkConfig.DeltaTime);
             }
         }
 

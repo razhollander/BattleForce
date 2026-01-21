@@ -16,10 +16,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         private const int MAX_ATTEMPTS_TO_FIND_FREE_SPAWN_POSITION = 1000;
 
         private SimulationGamePlayConfig _gamePlayConfig;
-        private IPowerUpsSpawnerController _powerUpsSpawnerService;
+        private IPowerUpsSpawnerService _iPowerUpsSpawnerService;
 
         private int _processedTick;
-        private NetworkConfig _networkConfig;
         private IPhysicsSimulator _physicsSimulator;
         private IMatchDataService _matchDataService;
         private IMatchNetEventsDataService _matchNetEventsDataService;
@@ -33,8 +32,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         public override void ResolveDependencies()
         {
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
-            _networkConfig = _diContainer.Resolve<NetworkConfig>();
-            _powerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerController>();
+            _iPowerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerService>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
@@ -42,7 +40,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 
         public void Execute()
         {
-            var isSpawnTimerEnded = _powerUpsSpawnerService.StepAndGetIsSpawnTimerEnded(_networkConfig.DeltaTime);
+            var isSpawnTimerEnded = _iPowerUpsSpawnerService.IsSpawnTimerEnded();
+            if (isSpawnTimerEnded)
+            {
+                _iPowerUpsSpawnerService.RestartSpawnTimer();
+            }
+            
             var areCurrentlyMaxPowerUpBalls = _matchDataService.SimulationState.PowerUpBalls.Count >= _gamePlayConfig.PowerUps.MaxConcurrentPowerUpBalls;
             var shouldSpawnPowerUpBall = isSpawnTimerEnded && !areCurrentlyMaxPowerUpBalls;
 

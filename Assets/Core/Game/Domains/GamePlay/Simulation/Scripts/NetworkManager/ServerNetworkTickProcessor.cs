@@ -44,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
+        private StepTimersCommand _stepTimersCommand;
         private FullTickPacket _fullTickPacket;
         private TimerFixedThreaded2 _pollEventsFixedTimer;
         private Stopwatch _sw;
@@ -71,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
+            _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
         }
 
         private void StartTick()
@@ -107,18 +109,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         {
             _fixedTimer.Stop();
         }
-
+      
         private void OnTick()
         {
             try
             {
+                var stepDeltaTime = _networkConfig.DeltaTime;
+                _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 CurrentTick++;
                 var processedTick = CurrentTick - _networkConfig.ServerTicksBuffer;
                 var processPlayersInputsResult = ProcessPackets(processedTick);
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(processedTick).Execute();
                 
                 ApplyMatchModelToPhysicsSimulation();
-                _physicsSimulator.Step(_networkConfig.DeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
+                _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
                 ApplyPhysicsSimulationToMatchModel();
                 
                 _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();

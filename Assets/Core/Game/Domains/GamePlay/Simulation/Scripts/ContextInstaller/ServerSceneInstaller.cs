@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<IPhysicsSimulator>().To<PhysicsSimulator>().AsSingle().NonLazy();
             Container.Bind<IPlayersTalentsManager>().To<PlayersTalentsManager>().AsSingle().NonLazy();
             Container.Bind<IPlayersInLavaTrackerService>().To<PlayersInLavaTrackerService>().AsSingle().NonLazy();
-            Container.BindInterfacesTo<PowerUpsSpawnerController>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<PowerUpsSpawnTimerService>().AsSingle().NonLazy();
         }
     }
 }
