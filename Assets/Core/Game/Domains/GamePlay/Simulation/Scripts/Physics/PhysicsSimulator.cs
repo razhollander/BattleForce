@@ -28,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private readonly ConcurrentPool<FixtureDef> _fixtureDefPool;
         private readonly ConcurrentPool<PolygonShape> _polygonShapePool;
         private readonly ConcurrentPool<CircleShape> _circleShapePool;
+        private readonly ConcurrentPool<Filter> _filterPool;
 
         public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig)
         {
@@ -441,17 +442,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         private FixtureDef GetFixtureDef()
         {
-            var def = new FixtureDef();//_fixtureDefPool.Get();
-            // def.Reset();
-            // def.filter = new Filter();
-            return def;
+             var def = _fixtureDefPool.Get();
+             def.Reset();
+             return def;
         }
 
         private PolygonShape GetPolygonShape()
         {
-            var polygonShape = _polygonShapePool.Get();
-            polygonShape.Reset();
-            return polygonShape;
+            // var polygonShape = _polygonShapePool.Get();
+            // polygonShape.Reset();
+            // return polygonShape;
+            
+            //todo:
+            //1. Pool any Body we create (it is created at World.CreateBody())
+            //2. Return the Body to the pool when it is destroyed
+            //3. Once the Body is destroyed, also return the Poylgon shape attached to it to its pool
+            //Why? Polygon shape has 2 arrays (m_normals, m_vertices) which are being used by the physics engine. Therefore, we need to return the Polygon to the pool only when the Body holding it is destroyed.
+            return new PolygonShape();
         }
 
         private CircleShape GetCircleShape()
@@ -459,6 +466,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var shape = _circleShapePool.Get();
             shape.Reset();
             return shape;
+             // return new CircleShape();
         }
     }
 }

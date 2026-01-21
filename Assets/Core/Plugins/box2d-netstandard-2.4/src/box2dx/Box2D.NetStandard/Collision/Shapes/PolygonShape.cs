@@ -80,6 +80,14 @@ namespace Box2D.NetStandard.Collision.Shapes
 
         public override Shape Clone() => (Shape)MemberwiseClone();
 
+        // public override Shape Clone() // Deep Copy
+        // {
+        //     var clone = (PolygonShape)MemberwiseClone();
+        //     clone.m_vertices = (Vector2[])m_vertices.Clone();
+        //     clone.m_normals = (Vector2[])m_normals.Clone();
+        //     return clone;
+        // }
+        
         public void SetAsBox(float hx, float hy)
         {
             m_count = 4;

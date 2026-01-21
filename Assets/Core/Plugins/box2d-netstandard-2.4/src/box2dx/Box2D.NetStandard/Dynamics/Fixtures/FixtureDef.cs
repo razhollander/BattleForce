@@ -75,7 +75,7 @@ namespace Box2D.NetStandard.Dynamics.Fixtures
             restitution = 0f;
             shape = null;
             userData = null;
-            filter.Reset();
+            filter = new Filter();
         }
     }
 }
