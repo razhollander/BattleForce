@@ -66,5 +66,16 @@ namespace Box2D.NetStandard.Dynamics.Fixtures
         ///  Use this to store application specific fixture data.
         /// </summary>
         public object userData;
+
+        public void Reset()
+        {
+            density = 0f;
+            friction = 0.2f;
+            isSensor = false;
+            restitution = 0f;
+            shape = null;
+            userData = null;
+            filter = new Filter();
+        }
     }
 }

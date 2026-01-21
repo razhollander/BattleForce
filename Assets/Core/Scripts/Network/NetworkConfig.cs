@@ -32,6 +32,9 @@ namespace Core.Scripts.Network
         public int ConcurrentTimeOfImpactContacts = 32;
         public int ConcurrentBodyCount = 512;
         public int ConcurrentContactCount = 256;
+        public int ConcurrentFixuresCount = 512;
+        public int ConcurrentPolygonCount = 256;
+        public int ConcurrentCircleCount = 256;
         public int ConcurrentJointCount = 0;
         
         // packets receiived *all players combined*
