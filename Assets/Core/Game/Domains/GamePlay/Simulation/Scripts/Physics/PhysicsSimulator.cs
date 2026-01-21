@@ -270,10 +270,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius)
         {
             var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
             bodyDef.position = bulletPosition;
             bodyDef.linearVelocity = bulletVelocity;
-            bodyDef.type = BodyType.Dynamic;
             bodyDef.bullet = true;
+            bodyDef.fixedRotation = true;
             bodyDef.userData = new PhysicsBodyData(bulletId, PhysicsBodyType.PlayerBullet);
             
             var bulletBody = _world.CreateBody(bodyDef);
@@ -326,8 +327,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.type = BodyType.Dynamic;
             bodyDef.position = position;
             bodyDef.linearVelocity = velocity;
-            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PowerUpBall);
             bodyDef.fixedRotation = true;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PowerUpBall);
 
             var body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
@@ -442,6 +443,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var def = _fixtureDefPool.Get();
             def.Reset();
+            def.filter = new Filter();
             return def;
         }
 

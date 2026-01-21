@@ -29,8 +29,20 @@ namespace Box2D.NetStandard.Dynamics.Fixtures
 {
     public class Filter
     {
-        public ushort categoryBits = 0x0001;
-        public short groupIndex = 0;
-        public ushort maskBits = 0xFFFF;
+        public ushort categoryBits;
+        public short groupIndex;
+        public ushort maskBits;
+
+        public Filter()
+        {
+            Reset();
+        }
+
+        public void Reset()
+        {
+            categoryBits = 0x0001;
+            groupIndex = 0;
+            maskBits = 0xFFFF;
+        }
     }
 }
