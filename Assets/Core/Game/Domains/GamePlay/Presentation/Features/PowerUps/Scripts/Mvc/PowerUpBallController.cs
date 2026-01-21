@@ -15,15 +15,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc
             _matchDataService = matchDataService;
         }
 
-        public void CreateView(PowerUpBallView powerUpBallViewPrefab, Transform parent, Vector2 position)
+        public void CreateView(PowerUpBallPool pool, Transform parent, Vector2 position)
         {
-            _powerUpBallView = Object.Instantiate(powerUpBallViewPrefab, parent);
+            _powerUpBallView = pool.Spawn(parent);
             _powerUpBallView.SetPosition(position);
         }
 
-        public void DestroyView()
+        public void DestroyView(PowerUpBallPool pool)
         {
-            Object.Destroy(_powerUpBallView.gameObject);
+            pool.Despawn(_powerUpBallView);
         }
 
         public Vector2 GetPosition()

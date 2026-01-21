@@ -65,13 +65,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
         {
             Container.BindInterfacesTo<GameInputActionsController>().AsSingle().NonLazy();
             Container.BindInterfacesTo<ChooseNetworkRoleUIController>().AsSingle().WithArguments(_chooseNetworkRoleUIView).NonLazy();
-            Container.BindInterfacesTo<PlayerControllers>().AsSingle().WithArguments(_playerViewPrefab).NonLazy();
-            Container.BindInterfacesTo<BulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
+
+            Container.Bind<PlayerPool>().AsSingle().WithArguments(_playerViewPrefab).NonLazy();
+            Container.BindInterfacesTo<PlayerControllers>().AsSingle().NonLazy();
+
+            Container.Bind<BulletPool>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
+            Container.BindInterfacesTo<BulletControllers>().AsSingle().NonLazy();
+
             Container.BindInterfacesTo<EnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentLavaWallsControllers>().AsSingle().WithArguments(_environmentLavaWallViewPrefab).NonLazy();
-            Container.BindInterfacesTo<TalentCardControllers>().AsSingle().WithArguments(_talentCardViewPrefab).NonLazy();
+
+            Container.Bind<TalentCardPool>().AsSingle().WithArguments(_talentCardViewPrefab).NonLazy();
+            Container.BindInterfacesTo<TalentCardControllers>().AsSingle().NonLazy();
             Container.BindInterfacesTo<TalentCardObtainedEffectController>().AsSingle().WithArguments(_talentCardObtainedEffectView).NonLazy();
-            Container.BindInterfacesTo<PowerUpBallControllers>().AsSingle().WithArguments(_powerUpBallViewPrefab).NonLazy();
+
+            Container.Bind<PowerUpBallPool>().AsSingle().WithArguments(_powerUpBallViewPrefab).NonLazy();
+            Container.BindInterfacesTo<PowerUpBallControllers>().AsSingle().NonLazy();
             Container.BindInterfacesTo<PowerUpBallObtainedEffectController>().AsSingle().WithArguments(_powerUpBallObtainedEffectViewPrefab).NonLazy();
             //Container.BindInterfacesTo<NetworkManager>().AsSingle().WithArguments(_networkConfig).NonLazy();
             // Container.BindInterfacesTo<BFNetworkClient>().AsSingle().NonLazy();

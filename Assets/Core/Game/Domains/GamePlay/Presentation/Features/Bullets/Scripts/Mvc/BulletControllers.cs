@@ -9,15 +9,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
     public class BulletControllers : IBulletControllers
     {
         private readonly IMatchDataService _matchDataService;
-        private readonly BulletView _bulletViewPrefab;
+        private readonly BulletPool _bulletPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly List<BulletController> _bulletControllers = new ();
         private GameObject _bulletsParent;
         
-        public BulletControllers(IMatchDataService matchDataService, BulletView bulletViewPrefab, PresentationGamePlayConfig gamePlayConfig)
+        public BulletControllers(IMatchDataService matchDataService, BulletPool bulletPool, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
-            _bulletViewPrefab = bulletViewPrefab;
+            _bulletPool = bulletPool;
             _gamePlayConfig = gamePlayConfig;
         }
 
@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
         public void CreateBullet(ushort bulletId, float bulletRadius, Vector2 position, Color color)
         {
             var bulletController = new BulletController(bulletId, _matchDataService, _gamePlayConfig);
-            bulletController.CreateBulletView(_bulletViewPrefab, position, bulletRadius, _bulletsParent.transform, color);
+            bulletController.CreateBulletView(_bulletPool, position, bulletRadius, _bulletsParent.transform, color);
             _bulletControllers.Add(bulletController);
         }
 
@@ -49,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
         public void DestroyBullet(ushort bulletId)
         {
             var bulletController= GetBullet(bulletId);
-            bulletController.Destroy();
+            bulletController.Destroy(_bulletPool);
             _bulletControllers.Remove(bulletController);
         }
     }

@@ -7,15 +7,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc
 {
     public class PowerUpBallControllers : IPowerUpBallControllers
     {
-        private readonly PowerUpBallView _powerUpBallViewPrefab;
+        private readonly PowerUpBallPool _pool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly IMatchDataService _matchDataService;
         private readonly List<PowerUpBallController> _controllers = new List<PowerUpBallController>();
         private GameObject _parent;
 
-        public PowerUpBallControllers(PowerUpBallView powerUpBallViewPrefab, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
+        public PowerUpBallControllers(PowerUpBallPool pool, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
         {
-            _powerUpBallViewPrefab = powerUpBallViewPrefab;
+            _pool = pool;
             _gamePlayConfig = gamePlayConfig;
             _matchDataService = matchDataService;
         }
@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc
         public void CreatePowerUpBall(ushort powerUpBallId, Vector2 position)
         {
             var controller = new PowerUpBallController(powerUpBallId, _matchDataService);
-            controller.CreateView(_powerUpBallViewPrefab, _parent.transform, position);
+            controller.CreateView(_pool, _parent.transform, position);
             _controllers.Add(controller);
         }
 
@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc
         public void DestroyPowerUpBall(ushort cardId)
         {
             var cardController = GetController(cardId);
-            cardController.DestroyView();
+            cardController.DestroyView(_pool);
             _controllers.Remove(cardController);
         }
 

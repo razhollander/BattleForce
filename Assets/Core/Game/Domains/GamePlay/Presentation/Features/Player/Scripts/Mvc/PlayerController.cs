@@ -23,10 +23,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             PlayerId = playerId;
         }
 
-        public void CreatePlayerView(PlayerView playerViewPrefab, Transform parent)
+        public void CreatePlayerView(PlayerPool playerPool, Transform parent)
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
-            _playerView = Object.Instantiate(playerViewPrefab, parent);
+            _playerView = playerPool.Spawn(parent);
             _playerView.name = "Player_" + PlayerId;
             var playerTransform = playerModel.Spaceship.Transform;
             _playerView.SetColor(playerModel.Spaceship.Color);

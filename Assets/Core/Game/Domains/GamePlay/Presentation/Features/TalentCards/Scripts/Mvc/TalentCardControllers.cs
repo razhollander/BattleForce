@@ -7,15 +7,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
 {
     public class TalentCardControllers : ITalentCardControllers
     {
-        private readonly TalentCardView _talentCardViewPrefab;
+        private readonly TalentCardPool _talentCardPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly IMatchDataService _matchDataService;
         private readonly List<TalentCardController> _controllers = new List<TalentCardController>();
         private readonly GameObject _parent;
 
-        public TalentCardControllers(TalentCardView talentCardViewPrefab, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
+        public TalentCardControllers(TalentCardPool talentCardPool, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
         {
-            _talentCardViewPrefab = talentCardViewPrefab;
+            _talentCardPool = talentCardPool;
             _gamePlayConfig = gamePlayConfig;
             _matchDataService = matchDataService;
             _parent = new GameObject("TalentCardsParent");
@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
         public void CreateTalentCard(ushort cardId)
         {
             var controller = new TalentCardController(cardId, _matchDataService, _gamePlayConfig.TalentCards);
-            controller.CreateView(_talentCardViewPrefab, _parent.transform);
+            controller.CreateView(_talentCardPool, _parent.transform);
             _controllers.Add(controller);
         }
 
@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
         public void DestroyTalentCard(ushort cardId)
         {
             var cardController = GetController(cardId);
-            cardController.DestroyView();
+            cardController.DestroyView(_talentCardPool);
             _controllers.Remove(cardController);
         }
 

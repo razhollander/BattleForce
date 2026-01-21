@@ -9,15 +9,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
     public class PlayerControllers : IPlayerControllers
     {
         private readonly IMatchDataService _matchDataService;
-        private readonly PlayerView _playerViewPrefab;
+        private readonly PlayerPool _playerPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly List<PlayerController> _playerControllers = new ();
         private GameObject _playersParent;
 
-        public PlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, PresentationGamePlayConfig gamePlayConfig)
+        public PlayerControllers(IMatchDataService matchDataService, PlayerPool playerPool, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
-            _playerViewPrefab = playerViewPrefab;
+            _playerPool = playerPool;
             _gamePlayConfig = gamePlayConfig;
         }
 
@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void CreatePlayer(ushort playerId)
         {
             var playerController = new PlayerController(playerId, _matchDataService, _gamePlayConfig);
-            playerController.CreatePlayerView(_playerViewPrefab, _playersParent.transform);
+            playerController.CreatePlayerView(_playerPool, _playersParent.transform);
             _playerControllers.Add(playerController);
         }
 

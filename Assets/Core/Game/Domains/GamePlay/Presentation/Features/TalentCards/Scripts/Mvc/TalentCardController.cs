@@ -23,9 +23,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
             TalentCardId = talentCardId;
         }
 
-        public void CreateView(TalentCardView talentCardViewPrefab, Transform parent)
+        public void CreateView(TalentCardPool talentCardPool, Transform parent)
         {
-            _talentCardView = Object.Instantiate(talentCardViewPrefab, parent);
+            _talentCardView = talentCardPool.Spawn(parent);
             var talentCardModel = _matchDataService.GetTalentCard(TalentCardId);
             _talentCardView.transform.position = talentCardModel.Position;
 
@@ -37,9 +37,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
             _talentCardView.SwapToFullHealthSprite();
         }
 
-        public void DestroyView()
+        public void DestroyView(TalentCardPool talentCardPool)
         {
-            Object.Destroy(_talentCardView.gameObject);
+            talentCardPool.Despawn(_talentCardView);
         }
 
         public void SetDamaged()
