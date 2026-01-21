@@ -9,10 +9,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts
     public class MatchPlayersUIView : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI _nameText;
-        [SerializeField] private Image _colorImage;
+        [SerializeField] private Image _spaceshipImage;
+        [SerializeField] private Image _equipmentImage;
         [SerializeField] private TextMeshProUGUI _moneyText;
-        [SerializeField] private Slider _healthSlider;
-        [SerializeField] private TextMeshProUGUI _healthText;
+        [SerializeField] private SimpleHealthBar _healthBar;
 
         [Header("Talents")]
         [SerializeField] private Transform _talentsContainer;
@@ -25,27 +25,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts
 
         public void Setup(string playerName, Color color)
         {
-            if (_nameText != null) _nameText.text = playerName;
-            if (_colorImage != null) _colorImage.color = color;
+            _nameText.text = playerName;
+            _spaceshipImage.color = color;
             UpdateMoney(0);
         }
 
         public void UpdateMoney(int money)
         {
-            if (_moneyText != null) _moneyText.text = money.ToString();
+            _moneyText.text = money+"$";
         }
 
-        public void UpdateHealth(int current, int max)
+        public void UpdateHealth(int health, int maxHealth)
         {
-            if (_healthSlider != null)
-            {
-                _healthSlider.maxValue = max;
-                _healthSlider.value = current;
-            }
-            if (_healthText != null)
-            {
-                _healthText.text = $"{current}/{max}";
-            }
+            _healthBar.UpdateBar(health, maxHealth);
         }
 
         public void UpdateTalents(PlayerTalentsStateS2C talentsState)
