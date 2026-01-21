@@ -1,7 +1,6 @@
 using System;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
@@ -25,12 +24,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         private readonly NetworkConfig _networkConfig;
         private readonly IClientPresentationTickProcessor _clientPresentationTickProcessor;
         private readonly ICommandFactory _commandFactory;
-        private readonly IMatchPlayerUIControllers _playerUIControllers;
 
         public SimulationNetEventsHandler(IMatchDataService matchDataService,
             ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager,
             IPlayerControllers playerControllers, NetworkConfig networkConfig,
-            IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, IMatchPlayerUIControllers playerUIControllers)
+            IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory)
         {
             _matchDataService = matchDataService;
             _cachedPresentationEventsService = iCachedPresentationEventsService;
@@ -39,7 +37,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _networkConfig = networkConfig;
             _clientPresentationTickProcessor = clientPresentationTickProcessor;
             _commandFactory = commandFactory;
-            _playerUIControllers = playerUIControllers;
         }
 
         public void ProcessPlayerJoinedEvents(CapacityList<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
@@ -62,8 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
                 else
                 {
                     var playerModel = _matchDataService.AddPlayer(playerJoinAcceptNetEvent.PlayerState);
-                    _playerControllers.AddPlayer(playerModel.PlayerId);
-                    _playerUIControllers.AddPlayer(playerModel.PlayerId);
+                    _playerControllers.CreatePlayer(playerModel.PlayerId);
                 }
             }
         }

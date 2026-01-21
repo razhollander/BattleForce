@@ -14,10 +14,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
         private readonly List<BulletController> _bulletControllers = new ();
         private GameObject _bulletsParent;
         
-        public BulletControllers(IMatchDataService matchDataService, BulletPool bulletPool, PresentationGamePlayConfig gamePlayConfig)
+        public BulletControllers(IMatchDataService matchDataService, BulletView bulletViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
-            _bulletPool = bulletPool;
+            _bulletPool = new BulletPool(bulletViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
         }
 

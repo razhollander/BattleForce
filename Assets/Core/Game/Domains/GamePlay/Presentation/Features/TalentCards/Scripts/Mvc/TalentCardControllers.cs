@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
+using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
 {
@@ -13,9 +14,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
         private readonly List<TalentCardController> _controllers = new List<TalentCardController>();
         private readonly GameObject _parent;
 
-        public TalentCardControllers(TalentCardPool talentCardPool, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
+        public TalentCardControllers(TalentCardView talentCardViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
         {
-            _talentCardPool = talentCardPool;
+            _talentCardPool = new TalentCardPool(talentCardViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _matchDataService = matchDataService;
             _parent = new GameObject("TalentCardsParent");

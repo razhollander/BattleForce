@@ -6,7 +6,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
     public interface IPlayerControllers
     {
         void InitEntryPoint();
-        void AddPlayer(ushort playerId);
+        void CreatePlayer(ushort playerId);
         void UpdatePlayersTransform();
         void UpdatePlayersBulletCooldowns();
         void ShootBulletEffectForPlayer(ushort playerId);

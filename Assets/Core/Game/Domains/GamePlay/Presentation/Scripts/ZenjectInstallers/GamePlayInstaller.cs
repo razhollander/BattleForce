@@ -5,12 +5,12 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
-using Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
@@ -35,7 +35,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
         [SerializeField] private TalentCardObtainedEffectView _talentCardObtainedEffectView;
         [SerializeField] private PowerUpBallView _powerUpBallViewPrefab;
         [SerializeField] private PowerUpBallObtainedEffectView _powerUpBallObtainedEffectViewPrefab;
-        [SerializeField] private MatchPlayerUIControllersView _matchPlayerUIControllersView;
 
         public override void InstallBindings()
         {
@@ -67,23 +66,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
             Container.BindInterfacesTo<GameInputActionsController>().AsSingle().NonLazy();
             Container.BindInterfacesTo<ChooseNetworkRoleUIController>().AsSingle().WithArguments(_chooseNetworkRoleUIView).NonLazy();
 
-            Container.Bind<PlayerPool>().AsSingle().WithArguments(_playerViewPrefab).NonLazy();
-            Container.BindInterfacesTo<PlayerControllers>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<PlayerControllers>().AsSingle().WithArguments(_playerViewPrefab).NonLazy();
 
-            Container.Bind<BulletPool>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
-            Container.BindInterfacesTo<BulletControllers>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<BulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
 
             Container.BindInterfacesTo<EnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentLavaWallsControllers>().AsSingle().WithArguments(_environmentLavaWallViewPrefab).NonLazy();
 
-            Container.Bind<TalentCardPool>().AsSingle().WithArguments(_talentCardViewPrefab).NonLazy();
-            Container.BindInterfacesTo<TalentCardControllers>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<TalentCardControllers>().AsSingle().WithArguments(_talentCardViewPrefab).NonLazy();
             Container.BindInterfacesTo<TalentCardObtainedEffectController>().AsSingle().WithArguments(_talentCardObtainedEffectView).NonLazy();
 
-            Container.Bind<PowerUpBallPool>().AsSingle().WithArguments(_powerUpBallViewPrefab).NonLazy();
-            Container.BindInterfacesTo<PowerUpBallControllers>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<PowerUpBallControllers>().AsSingle().WithArguments(_powerUpBallViewPrefab).NonLazy();
             Container.BindInterfacesTo<PowerUpBallObtainedEffectController>().AsSingle().WithArguments(_powerUpBallObtainedEffectViewPrefab).NonLazy();
-            Container.BindInterfacesTo<MatchPlayerUIControllers>().AsSingle().WithArguments(_matchPlayerUIControllersView).NonLazy();
             //Container.BindInterfacesTo<NetworkManager>().AsSingle().WithArguments(_networkConfig).NonLazy();
             // Container.BindInterfacesTo<BFNetworkClient>().AsSingle().NonLazy();
             // Container.BindInterfacesTo<BFNetworkServer>().AsSingle().NonLazy();

@@ -1,7 +1,6 @@
 using System.Linq;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
@@ -40,12 +39,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
 
         public FullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
             IMatchDataService matchDataService, ICachedPresentationEventsService iCachedPresentationEventsService,
-            IPlayerControllers playerControllers, IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, IMatchPlayerUIControllers _playerUIControllers)
+            IPlayerControllers playerControllers, IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
 
-            _simulationNetEventsHandler = new SimulationNetEventsHandler(matchDataService, iCachedPresentationEventsService, networkManager, playerControllers, networkConfig, clientPresentationTickProcessor, commandFactory, _playerUIControllers);
+            _simulationNetEventsHandler = new SimulationNetEventsHandler(matchDataService, iCachedPresentationEventsService, networkManager, playerControllers, networkConfig, clientPresentationTickProcessor, commandFactory);
             _fullTickPackets = new CapacityDict<int, FullTickPacket>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerJoinedEvents = new CapacityList<PlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);

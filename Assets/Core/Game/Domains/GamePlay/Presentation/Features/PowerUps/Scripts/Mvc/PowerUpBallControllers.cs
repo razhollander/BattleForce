@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
+using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc
 {
@@ -13,9 +14,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc
         private readonly List<PowerUpBallController> _controllers = new List<PowerUpBallController>();
         private GameObject _parent;
 
-        public PowerUpBallControllers(PowerUpBallPool pool, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
+        public PowerUpBallControllers(PowerUpBallView powerUpBallViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
         {
-            _pool = pool;
+            _pool = new PowerUpBallPool(powerUpBallViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _matchDataService = matchDataService;
         }

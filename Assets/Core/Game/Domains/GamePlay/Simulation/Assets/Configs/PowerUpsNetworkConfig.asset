@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9c8321651e8a410d94a57145da60e0b, type: 3}
   m_Name: PowerUpsNetworkConfig
   m_EditorClassIdentifier: 
-  SpawnMinSecondsInterval: 5
-  SpawnMaxSecondsInterval: 10
+  SpawnInterval: 5
   MaxConcurrentPowerUpBalls: 5
-  MoveSpeed: 15
+  MoveSpeed: 30
   Radius: 1.269

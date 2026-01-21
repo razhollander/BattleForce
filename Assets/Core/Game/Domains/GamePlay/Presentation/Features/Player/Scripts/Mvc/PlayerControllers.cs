@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
+using Zenject;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
@@ -14,10 +15,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         private readonly List<PlayerController> _playerControllers = new ();
         private GameObject _playersParent;
 
-        public PlayerControllers(IMatchDataService matchDataService, PlayerPool playerPool, PresentationGamePlayConfig gamePlayConfig)
+        public PlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
-            _playerPool = playerPool;
+            _playerPool = new PlayerPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
         }
 
@@ -26,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _playersParent = new GameObject("PlayersParent");
         }
 
-        public void AddPlayer(ushort playerId)
+        public void CreatePlayer(ushort playerId)
         {
             var playerController = new PlayerController(playerId, _matchDataService, _gamePlayConfig);
             playerController.CreatePlayerView(_playerPool, _playersParent.transform);
