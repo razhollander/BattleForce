@@ -1,10 +1,12 @@
+using System;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing;
 using Core.Scripts.Extensions;
+using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
 {
-    public class PlayerView : MonoBehaviour
+    public class PlayerView : MonoBehaviour, IPoolable
     {
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private SpriteRenderer _availableBulletSpriteRenderer;
@@ -49,6 +51,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         public Vector2 GetPosition()
         {
             return _spaceShipTransform.position;
+        }
+
+        public void OnCreated()
+        {
+        }
+
+        public Action Despawn { get; set; }
+
+        public void OnSpawned()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void OnDespawned()
+        {
+            gameObject.SetActive(false);
         }
     }
 }

@@ -42,11 +42,6 @@ namespace Box2D.NetStandard.Collision.Shapes
 
         public CircleShape()
         {
-            Reset();
-        }
-
-        public void Reset()
-        {
             m_radius = 0;
             m_p = Vector2.Zero;
         }
