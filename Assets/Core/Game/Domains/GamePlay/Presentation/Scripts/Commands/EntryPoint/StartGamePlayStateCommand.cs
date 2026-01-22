@@ -35,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
         private IPowerUpBallObtainedEffectController _powerUpBallObtainedEffectController;
+        private ITalentCardControllers _talentCardControllers;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -58,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _talentCardObtainedEffectController = _diContainer.Resolve<ITalentCardObtainedEffectController>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
             _powerUpBallObtainedEffectController = _diContainer.Resolve<IPowerUpBallObtainedEffectController>();
+            _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -68,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _tickProcessor.InitEntryPoint();
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
+            _talentCardControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
             _environmentLavaWallsControllers.InitEntryPoint();
             _talentCardObtainedEffectController.InitEntryPoint();

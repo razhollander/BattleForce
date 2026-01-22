@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
+using Zenject;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
@@ -9,27 +10,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
     public class BulletControllers : IBulletControllers
     {
         private readonly IMatchDataService _matchDataService;
-        private readonly BulletView _bulletViewPrefab;
+        private readonly BulletPool _bulletPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly List<BulletController> _bulletControllers = new ();
-        private GameObject _bulletsParent;
+        private Transform _bulletsParent;
         
-        public BulletControllers(IMatchDataService matchDataService, BulletView bulletViewPrefab, PresentationGamePlayConfig gamePlayConfig)
+        public BulletControllers(IMatchDataService matchDataService, BulletView bulletViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
-            _bulletViewPrefab = bulletViewPrefab;
+            _bulletPool = new BulletPool(bulletViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
         }
 
         public void InitEntryPoint()
         {
-            _bulletsParent = new GameObject("BulletsParent");
+            _bulletsParent = (new GameObject("BulletsParent")).transform;
+            _bulletPool.InitPool();
         }
 
         public void CreateBullet(ushort bulletId, float bulletRadius, Vector2 position, Color color)
         {
-            var bulletController = new BulletController(bulletId, _matchDataService, _gamePlayConfig);
-            bulletController.CreateBulletView(_bulletViewPrefab, position, bulletRadius, _bulletsParent.transform, color);
+            var bulletController = new BulletController(bulletId, _matchDataService, _bulletPool, _bulletsParent);
+            bulletController.CreateBulletView(position, bulletRadius, color);
             _bulletControllers.Add(bulletController);
         }
 

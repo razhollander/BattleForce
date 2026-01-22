@@ -11,21 +11,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
 
         private readonly IMatchDataService _matchDataService;
 
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly BulletPool _bulletPool;
 
         public readonly ushort BulletId;
+        private readonly Transform _bulletsParent;
 
-         public BulletController(ushort bulletId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig)
+        public BulletController(ushort bulletId, IMatchDataService matchDataService, BulletPool bulletPool, Transform bulletsParent)
          {
+             _bulletPool = bulletPool;
              _matchDataService = matchDataService;
-             _gamePlayConfig = gamePlayConfig;
              BulletId = bulletId;
+             _bulletsParent = bulletsParent;
          }
 
-         public void CreateBulletView(BulletView bulletViewPrefab, System.Numerics.Vector2 position, float radius, Transform parent, Color color)
+         public void CreateBulletView(System.Numerics.Vector2 position, float radius, Color color)
         {
-            _bulletView = Object.Instantiate(bulletViewPrefab, parent);
+            _bulletView = _bulletPool.Spawn();
             _bulletView.name = "Bullet_" + BulletId;
+            _bulletView.transform.SetParent(_bulletsParent);
             _bulletView.SetPosition(position.ToUnity());
             _bulletView.SetRadius(radius);
             _bulletView.SetColor(color);
@@ -40,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
 
         public void Destroy()
         {
-            Object.Destroy(_bulletView.gameObject);
+            _bulletView.Despawn();
         }
     }
 }

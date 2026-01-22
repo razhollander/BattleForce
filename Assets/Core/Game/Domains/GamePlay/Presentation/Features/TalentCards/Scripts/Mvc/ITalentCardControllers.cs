@@ -8,5 +8,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
         void DisplayTalentCardTakeDamaged(ushort cardId);
         Vector2 GetTalentCardPosition(ushort cardId);
         void DestroyTalentCard(ushort cardId);
+        void InitEntryPoint();
     }
 }

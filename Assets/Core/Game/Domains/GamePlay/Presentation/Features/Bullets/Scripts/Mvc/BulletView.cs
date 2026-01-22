@@ -1,8 +1,10 @@
+using System;
+using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
 {
-    public class BulletView : MonoBehaviour
+    public class BulletView : MonoBehaviour, IPoolable
     {
         [SerializeField] private SpriteRenderer _spriteRenderer;
 
@@ -26,6 +28,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc
         {
             var diameter = radius * 2;
             transform.localScale = new Vector3(diameter, diameter, 1);
+        }
+
+        public void OnCreated()
+        {
+        }
+
+        public Action Despawn { get; set; }
+
+        public void OnSpawned()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void OnDespawned()
+        {
+            gameObject.SetActive(false);
         }
     }
 }

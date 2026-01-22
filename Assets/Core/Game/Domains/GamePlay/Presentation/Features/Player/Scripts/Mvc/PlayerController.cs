@@ -1,9 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
-using Core.Game.Domains.GamePlay.Shared;
 using Core.Scripts.Extensions;
-using Core.Scripts.Network;
-using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
@@ -13,20 +10,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
     {
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly Transform _parent;
         public readonly ushort PlayerId;
         private PlayerView _playerView;
-        
-        public PlayerController(ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig)
+        private readonly PlayerPool _playerPool;
+
+        public PlayerController(PlayerPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, Transform parent)
         {
+            _playerPool = playerPool;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
+            _parent = parent;
             PlayerId = playerId;
         }
 
-        public void CreatePlayerView(PlayerView playerViewPrefab, Transform parent)
+        public void CreatePlayerView()
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
-            _playerView = Object.Instantiate(playerViewPrefab, parent);
+            _playerView = _playerPool.Spawn();
+            _playerView.transform.SetParent(_parent);
             _playerView.name = "Player_" + PlayerId;
             var playerTransform = playerModel.Spaceship.Transform;
             _playerView.SetColor(playerModel.Spaceship.Color);
@@ -52,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
             var cooldownSecondsLeft = playerShootState.CooldownSecondsLeft;
             var interpolationFactor = _gamePlayConfig.InterpolationFactor;
             _playerView.InterpolateBulletLoading(cooldownSecondsLeft, maxShootCooldown, interpolationFactor);
-            if (cooldownSecondsLeft == maxShootCooldown)
+            if (Mathf.Approximately(cooldownSecondsLeft, maxShootCooldown))
             {
                 RestoreBulletEffect();
             }
