@@ -25,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)Id);
-            writer.Put(Position);
+            writer.PutVector2Quantized(Position);
             writer.Put((byte)TalentType);
             writer.Put(Health);
         }
@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public void Deserialize(NetDataReader reader)
         {
             Id = reader.GetByte();
-            Position = reader.GetVector2();
+            Position = reader.GetVector2Quantized();
             TalentType = (TalentType)reader.GetByte();
             Health = reader.GetUShort();
         }

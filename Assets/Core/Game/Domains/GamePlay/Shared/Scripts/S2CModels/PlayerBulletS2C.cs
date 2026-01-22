@@ -17,28 +17,28 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             writer.Put((byte)Id);
             writer.Put((byte)BelongToPlayerId);
-            writer.Put(Position);
-            writer.Put(Radius);
+            writer.PutVector2Quantized(Position);
+            writer.PutFloat16(Radius);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             Id = reader.GetByte();
             BelongToPlayerId = reader.GetByte();
-            Position = reader.GetVector2();
-            Radius = reader.GetFloat();
+            Position = reader.GetVector2Quantized();
+            Radius = reader.GetFloat16();
         }
 
         public void SerializeTransforms(NetDataWriter writer)
         {
             writer.Put((byte)Id);
-            writer.Put(Position);
+            writer.PutVector2Quantized(Position);
         }
 
         public void DeserializeTransforms(NetDataReader reader)
         {
             Id = reader.GetByte();
-            Position = reader.GetVector2();
+            Position = reader.GetVector2Quantized();
         }
     }
 }

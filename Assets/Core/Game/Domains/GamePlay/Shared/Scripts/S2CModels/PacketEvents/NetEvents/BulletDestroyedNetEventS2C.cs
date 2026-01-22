@@ -21,14 +21,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         {
             writer.Put(OccuredOnTick);
             writer.Put(BulletId);
-            writer.Put(Position);
+            writer.PutVector2Quantized(Position);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
             BulletId = reader.GetUShort();
-            Position = reader.GetVector2();
+            Position = reader.GetVector2Quantized();
         } 
     }
 }

@@ -17,14 +17,14 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             writer.Put(OccuredOnTick);
             writer.Put(PowerUpBallId);
-            writer.Put(Position);
+            writer.PutVector2Quantized(Position);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
             PowerUpBallId = reader.GetUShort();
-            Position = reader.GetVector2();
+            Position = reader.GetVector2Quantized();
         }
 
         public int CompareTo(PowerUpBallSpawnedNetEventS2C other)
