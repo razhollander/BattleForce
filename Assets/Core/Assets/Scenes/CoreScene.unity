@@ -867,7 +867,7 @@ PrefabInstance:
       objectReference: {fileID: 691717231}
     - target: {fileID: 5516514484391682885, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
       propertyPath: near clip plane
-      value: 0.01
+      value: -10
       objectReference: {fileID: 0}
     - target: {fileID: 6329727978539686723, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
       propertyPath: 'm_Cameras.Array.data[0]'

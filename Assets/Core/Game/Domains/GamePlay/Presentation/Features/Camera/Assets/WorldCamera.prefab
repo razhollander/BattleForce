@@ -70,7 +70,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.01
+  near clip plane: -10
   far clip plane: 50
   field of view: 40
   orthographic: 1
@@ -148,7 +148,7 @@ MonoBehaviour:
   FramingMode: 2
   FramingSize: 0.5
   CenterOffset: {x: 0, y: 0}
-  Damping: 5
+  Damping: 8
   SizeAdjustment: 2
   LateralAdjustment: 0
   FovRange: {x: 1, y: 100}
