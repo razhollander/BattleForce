@@ -6,10 +6,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Extensions
 {
     public static class NetworkExtension
     {
+        private static readonly float DOUBLE_PI = Mathf.PI * 2;
         public static void Put(this NetDataWriter writer, Vector2 vector)
         {
-            writer.Put(vector.X);
-            writer.Put(vector.Y);
+            writer.PutFloat16(vector.X);
+            writer.PutFloat16(vector.Y);
         }
         
         public static void Put(this NetDataWriter writer, Color color)
@@ -27,14 +28,14 @@ namespace Core.Game.Domains.GamePlay.Shared.Extensions
         public static Vector2 GetVector2(this NetDataReader reader)
         {
             Vector2 v;
-            v.X = reader.GetFloat();
-            v.Y = reader.GetFloat();
+            v.X = reader.GetFloat16();
+            v.Y = reader.GetFloat16();
             return v;
         }
 
         public static void PutFloat16(this NetDataWriter writer, float value)
         {
-            writer.Put((ushort)Mathf.FloatToHalf(value));
+            writer.Put(Mathf.FloatToHalf(value));
         }
 
         public static float GetFloat16(this NetDataReader reader)
@@ -50,25 +51,25 @@ namespace Core.Game.Domains.GamePlay.Shared.Extensions
 
         public static Vector2 GetVector2Quantized(this NetDataReader reader)
         {
-            float x = reader.GetFloat16();
-            float y = reader.GetFloat16();
+            var x = reader.GetFloat16();
+            var y = reader.GetFloat16();
             return new Vector2(x, y);
         }
 
         public static void PutVector2AsAngle16(this NetDataWriter writer, Vector2 vector)
         {
-             float angle = (float)System.Math.Atan2(vector.Y, vector.X);
-             float normalized = (angle + Mathf.PI) / (Mathf.PI * 2);
+             var angle = (float)System.Math.Atan2(vector.Y, vector.X);
+             var normalized = (angle + Mathf.PI) / (DOUBLE_PI);
              normalized = Mathf.Clamp01(normalized);
-             ushort compressed = (ushort)(normalized * 65535);
+             var compressed = (ushort)(normalized * 65535);
              writer.Put(compressed);
         }
 
         public static Vector2 GetVector2FromAngle16(this NetDataReader reader)
         {
-            ushort compressed = reader.GetUShort();
-            float normalized = compressed / 65535f;
-            float angle = normalized * Mathf.PI * 2 - Mathf.PI;
+            var compressed = reader.GetUShort();
+            var normalized = compressed / 65535f;
+            var angle = normalized * DOUBLE_PI - Mathf.PI;
             return new Vector2((float)System.Math.Cos(angle), (float)System.Math.Sin(angle));
         }
     }
