@@ -25,10 +25,5 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             LogService.LogTopic($"Remove camera target {target.gameObject.name}", LogTopicType.Camera);
             _worldCameraView.RemoveTarget(target);
         }
-
-        public void UpdateCamera()
-        {
-            _worldCameraView.ManualUpdate();
-        }
     }
 }

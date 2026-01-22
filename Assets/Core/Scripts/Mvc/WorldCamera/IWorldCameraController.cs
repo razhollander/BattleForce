@@ -7,7 +7,6 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
     {
         void AddTarget(Transform target);
         void RemoveTarget(Transform target);
-        void UpdateCamera();
         // void StopFollowTarget();
         // void StartFollowTarget(Transform targetTransform);
         // Awaitable DoLockOnTargetAnimation(Transform targetTransform, CancellationTokenSource cancellationTokenSource);

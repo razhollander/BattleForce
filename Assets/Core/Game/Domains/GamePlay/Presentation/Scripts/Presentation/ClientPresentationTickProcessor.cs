@@ -8,7 +8,7 @@ using CoreDomain.Scripts.Services.UpdateService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
 {
-    public class ClientPresentationTickProcessor : IUpdatable, ILateUpdatable, IClientPresentationTickProcessor
+    public class ClientPresentationTickProcessor : IUpdatable, IClientPresentationTickProcessor
     {
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly IPlayerControllers _playerControllers;
@@ -25,13 +25,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
         private readonly HandlePowerUpBallObtainedNetEventsCommand _handlePowerUpBallObtainedNetEventsCommand;
 
         public ClientPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IWorldCameraController worldCameraController)
+            IBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
             _bulletControllers = bulletControllers;
             _powerUpBallControllers = powerUpBallControllers;
-            _worldCameraController = worldCameraController;
             _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
             _handlePlayerTakeDamangeNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
             _handleBulletDestroyedNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>();
@@ -45,13 +44,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
         public void StartTick()
         {
             _updateSubscriptionService.RegisterUpdatable(this);
-            _updateSubscriptionService.RegisterLateUpdatable(this);
         }
         
         public void StopTick()
         {
             _updateSubscriptionService.UnregisterUpdatable(this);
-            _updateSubscriptionService.UnregisterLateUpdatable(this);
         }
 
         public void ManagedUpdate()
@@ -70,11 +67,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
             
             _handleTalentCardObtainedNetEventsCommand.Execute();
-        }
-
-        public void ManagedLateUpdate()
-        {
-            _worldCameraController.UpdateCamera();
         }
     }
 }
