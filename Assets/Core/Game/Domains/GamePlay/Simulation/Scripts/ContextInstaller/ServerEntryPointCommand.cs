@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private IPhysicsSimulator _physicsSimulator;
         private SimulationGamePlayConfig _simulationGamePlayConfig;
         private IMatchDataService _matchDataService;
-        private PlaybackService _playbackService;
+        private IPlaybackRecorderService _playbackRecorderService;
 
         public override void ResolveDependencies()
         {
@@ -33,12 +33,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
-            _playbackService = _diContainer.Resolve<PlaybackService>();
+            _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
         }
 
         public void Execute()
         {
-            InitRNG();
+            InitPlaybackAndRNG();
             _matchDataService.InitEntryPoint();
             _serverNetworkManager.InitEntryPoint();
             _playerInputsPacketsHandler.InitEntryPoint();
@@ -51,19 +51,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             CreateTalentCards();
         }
 
-        private void InitRNG()
+        private void InitPlaybackAndRNG()
         {
-            if (PlaybackSettings.IsPlaybackEnabled)
+            _playbackRecorderService.InitEntryPoint();
+            
+            if (_playbackRecorderService.IsPlaybackEnabled)
             {
-                _playbackService.LoadRecording();
-                RNG.Init(_playbackService.Seed);
+                _playbackRecorderService.LoadRecording();
+                RNG.Init(_playbackRecorderService.Seed);
             }
             else
             {
                 var rnd = new Random();
                 var seed = rnd.Next();
                 RNG.Init(seed);
-                _playbackService.StartRecording(seed);
+                _playbackRecorderService.StartRecording(seed);
             }
         }
 

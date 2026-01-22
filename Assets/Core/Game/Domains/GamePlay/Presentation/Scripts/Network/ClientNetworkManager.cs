@@ -51,21 +51,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 LogService.LogError("Client already running!");
                 return;
             }
-
-            if (PlaybackSettings.IsPlaybackEnabled)
-            {
-                // In Playback, we simulate connection for the logic to proceed (UI hiding etc),
-                // but we don't start LiteNetLib.
-                _updateSubscriptionService.RegisterGuiUpdatable(this);
-                // Fake successful connection
-                _commandFactory.CreateCommandVoid<HandleClientConnectedToPeerCommand>().Execute();
-                IsPeerConnected = true;
-                LogService.LogTopic("Client started in Playback Mode (Network Disabled)", LogTopicType.ClientNetwork);
-                return;
-            }
-            
-            _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _updateSubscriptionService.RegisterGuiUpdatable(this);
+            _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Start();
             //_packetsListener.RegisterListeners();
             var peerToServer = _netManager.Connect(isHost ?"localhost" :_networkConfig.IpAddress, _networkConfig.HostPort, _networkConfig.ConntectionKey);
@@ -119,54 +106,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         
         public void SendPacketSerialized<T>(PacketTypeC2S type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
         {
-            if (PlaybackSettings.IsPlaybackEnabled) return;
             _packetsSender.SendPacketSerialized(type, packet, deliveryMethod);
         }
 
         public void PollEvents()
         {
-            if (PlaybackSettings.IsPlaybackEnabled)
-            {
-                // Fetch packets from Local Bridge
-                while (LocalPacketBridge.TryGetNextPacket(out var packet))
-                {
-                    // Create Reader for FullTickPacket
-                    // Need to serialize it to bytes first to simulate receipt?
-                    // Or modify OnPacketReceived to take object?
-                    // LiteNetLib Reader wraps bytes.
-
-                    // We need to trigger `_packetsListener.OnNetworkReceive`.
-                    // But that expects `NetPacketReader`.
-                    // So we must serialize `packet` to a buffer.
-
-                    // FullTickPacket implements INetSerializable.
-                    NetDataWriter writer = new NetDataWriter();
-                    // First byte is PacketType (from S2C perspective)
-                    // Wait, NetworkS2CPacketsListener expects PacketTypeS2C.
-                    // PacketTypeS2C.FullTick
-                    writer.Put((byte)Core.Game.Domains.GamePlay.Shared.C2SModels.PacketTypeS2C.FullTick);
-                    packet.Serialize(writer);
-
-                    NetPacketReader reader = new NetPacketReader(writer.Data);
-                    // Fake Peer?
-                    // NetworkS2CPacketsListener doesn't really use the peer for much except maybe logging or state.
-                    // Pass null or dummy?
-                    // OnNetworkReceive uses peer?
-                    // NetworkS2CPacketsListener.OnNetworkReceive:
-                    // var packetType = (PacketTypeS2C)reader.GetByte();
-                    // _packetsObservers[packetType].OnPacketReceived(reader, peer);
-
-                    // So we can pass null if observers handle it.
-                    // FullTickPacketsHandler:
-                    // OnPacketReceived(NetPacketReader reader, NetPeer peer)
-                    // -> _fullTickPacket.Deserialize(reader);
-                    // -> ProcessStateLatestTick...
-                    // It doesn't use peer.
-
-                    _packetsListener.OnNetworkReceive(null, reader, 0, DeliveryMethod.ReliableOrdered);
-                }
-                return;
-            }
             _netManager.PollEvents();
         }
 

@@ -27,10 +27,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
 
         public void Execute()
         {
-            if (PlaybackSettings.IsPlaybackEnabled)
-            {
-                return;
-            }
+            // if (PlaybackSettings.IsPlaybackEnabled)
+            // {
+            //     return;
+            // }
 
             var isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
             var isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();

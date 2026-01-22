@@ -16,7 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ITickProcessor _tickProcessor;
         private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private IPhysicsSimulator _physicsSimulator;
-        private PlaybackService _playbackService;
+        private IPlaybackRecorderService _playbackRecorderService;
 
         public override void ResolveDependencies()
         {
@@ -25,14 +25,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
-            _playbackService = _diContainer.Resolve<PlaybackService>();
+            _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
         }
 
         public void Execute()
         {
-            if (!PlaybackSettings.IsPlaybackEnabled)
+            if (!_playbackRecorderService.IsPlaybackEnabled)
             {
-                _playbackService.SaveRecording();
+                _playbackRecorderService.SaveRecording();
             }
 
             _serverNetworkManager.InitExitPoint();

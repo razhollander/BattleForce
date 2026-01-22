@@ -17,6 +17,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib;
+using LiteNetLib.Utils;
 using ModestTree;
 using UnityEngine;
 
@@ -391,7 +392,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             return _lastProcessedInputPerPlayer.TryGetValue(playerId, out playerInputPacket);
         }
         
-        public void OnPacketReceived(NetPacketReader reader, NetPeer peer)
+        public void OnPacketReceived(NetDataReader reader, NetPeer peer)
         {
             var newPacket = _playerInputPacketsPool.Get();
             newPacket.Deserialize(reader);

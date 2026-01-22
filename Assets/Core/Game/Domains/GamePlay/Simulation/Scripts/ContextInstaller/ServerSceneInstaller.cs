@@ -3,12 +3,9 @@ using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Talent;
@@ -26,9 +23,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         public override void InstallBindings()
         {
             Container.BindInstance(_sharedGamePlayConfig).AsSingle().NonLazy();
+            Container.Bind<ITickCounterService>().To<TickCounterService>().AsSingle().NonLazy();
             Container.Bind<IServerInitiator>().To<ServerInitiator>().AsSingle().NonLazy();
             Container.BindInstance(_gamePlayConfig).AsSingle().NonLazy();
             Container.BindInstance(_powerUpsConfig).AsSingle().NonLazy();
+            Container.Bind<IPlaybackRecorderService>().To<PlaybackRecorderService>().AsSingle().NonLazy();
             Container.Bind<IServerNetworkManager>().To<ServerNetworkManager>().AsSingle().NonLazy();
             Container.Bind<IPlayerJoinPacketsHandler>().To<PlayerJoinPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IPlayerInputsPacketsHandler>().To<PlayerInputsPacketsHandler>().AsSingle().NonLazy();
@@ -41,8 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<IPhysicsSimulator>().To<PhysicsSimulator>().AsSingle().NonLazy();
             Container.Bind<IPlayersTalentsManager>().To<PlayersTalentsManager>().AsSingle().NonLazy();
             Container.Bind<IPlayersInLavaTrackerService>().To<PlayersInLavaTrackerService>().AsSingle().NonLazy();
-            Container.BindInterfacesTo<PowerUpsSpawnTimerService>().AsSingle().NonLazy();
-            Container.Bind<PlaybackService>().AsSingle().NonLazy();
+            Container.Bind<IPowerUpsSpawnerService>().To<PowerUpsSpawnTimerService>().AsSingle().NonLazy();
         }
     }
 }

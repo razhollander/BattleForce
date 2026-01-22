@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
+using Core.Game.Domains.GamePlay.Shared.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
@@ -10,66 +12,29 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 {
-    // Internal generic structure for memory
-    public class PlaybackTickData
+    public class PlaybackRecorderService : IPlaybackRecorderService
     {
-        public int Tick;
-        public List<RecordedPacket> Packets = new List<RecordedPacket>();
-    }
-
-    public class RecordedPacket
-    {
-        public ushort PlayerId;
-        public byte[] Data;
-    }
-
-    [Serializable]
-    public class PlaybackFile
-    {
-        public int Seed;
-        public Dictionary<int, PlaybackTickData> Ticks;
-    }
-
-    // Structure for Human Readable JSON
-    [Serializable]
-    public class PlaybackDebugData
-    {
-        public int Seed;
-        public List<DebugTickData> Ticks = new List<DebugTickData>();
-    }
-
-    [Serializable]
-    public class DebugTickData
-    {
-        public int Tick;
-        public List<DebugRecordedPacket> Packets = new List<DebugRecordedPacket>();
-    }
-
-    [Serializable]
-    public class DebugRecordedPacket
-    {
-        public ushort PlayerId;
-        // Depending on packet type, we might want to deserialize differently.
-        // Assuming mostly PlayerInputPacketC2S for now as that's the main input.
-        public PlayerInputPacketC2S? InputPacket;
-        // public string RawDataHex; // Optional: verify raw data
-    }
-
-    public class PlaybackService : IDisposable
-    {
+        private readonly ITickCounterService _tickCounterService;
         private Dictionary<int, PlaybackTickData> _ticks = new Dictionary<int, PlaybackTickData>();
         private int _seed;
         private readonly string _jsonFilePath;
         private readonly string _debugFilePath;
 
         public int Seed => _seed;
+        public bool IsPlaybackEnabled { get; private set; }
 
-        public PlaybackService()
+        public PlaybackRecorderService(ITickCounterService tickCounterService)
         {
+            _tickCounterService = tickCounterService;
             _jsonFilePath = Path.Combine(Application.persistentDataPath, "playback.json");
             _debugFilePath = Path.Combine(Application.persistentDataPath, "playback_debug.json");
         }
 
+        public void InitEntryPoint()
+        {
+            IsPlaybackEnabled = PlaybackSettings.IsPlaybackEnabled;
+        }
+        
         public void StartRecording(int seed)
         {
             _seed = seed;
@@ -77,9 +42,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
             LocalPacketBridge.Clear();
             LogService.LogTopic($"Started Recording Playback. Seed: {seed}", LogTopicType.ServerNetwork);
         }
-
-        public void RecordPacket(int serverTick, ushort playerId, byte[] data)
+        
+        public void RecordPacket(ushort playerId, byte[] data)
         {
+            var serverTick = _tickCounterService.CurrentTick;
             if (!_ticks.TryGetValue(serverTick, out var tickData))
             {
                 tickData = new PlaybackTickData { Tick = serverTick };
@@ -209,11 +175,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
                 return data.Packets;
             }
             return null;
-        }
-
-        public void Dispose()
-        {
-            // No resources to dispose really
         }
     }
 }

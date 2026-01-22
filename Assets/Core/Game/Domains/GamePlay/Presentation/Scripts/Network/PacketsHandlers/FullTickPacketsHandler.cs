@@ -15,6 +15,7 @@ using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
+using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers
 {
@@ -300,7 +301,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             }
         }
         
-        public void OnPacketReceived(NetPacketReader reader)
+        public void OnPacketReceived(NetDataReader reader)
         {
             var newPacket = _fullTickPacketsPool.Get();
             newPacket.Deserialize(reader);
