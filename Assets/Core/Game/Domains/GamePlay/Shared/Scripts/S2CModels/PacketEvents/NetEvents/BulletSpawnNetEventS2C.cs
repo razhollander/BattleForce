@@ -26,8 +26,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             writer.Put(OccuredOnTick);
             writer.Put(BulletId);
             writer.Put((byte)BelongToPlayerId);
-            writer.Put(Position);
-            writer.Put(BulletRadius);
+            writer.PutVector2Quantized(Position);
+            writer.PutFloat16(BulletRadius);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -35,8 +35,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             OccuredOnTick = reader.GetInt();
             BulletId = reader.GetUShort();
             BelongToPlayerId = reader.GetByte();
-            Position = reader.GetVector2();
-            BulletRadius = reader.GetFloat();
+            Position = reader.GetVector2Quantized();
+            BulletRadius = reader.GetFloat16();
         }
     }
 }

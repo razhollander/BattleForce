@@ -1,4 +1,5 @@
 using Core.Scripts.Utils.CustomCollections;
+using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
@@ -89,25 +90,25 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)TalentType);
-            writer.Put(CooldownSecondsLeft);
-            writer.Put(MaxCooldown);
+            writer.PutFloat16(CooldownSecondsLeft);
+            writer.PutFloat16(MaxCooldown);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             TalentType = (TalentType)reader.GetByte();
-            CooldownSecondsLeft = reader.GetFloat();
-            MaxCooldown = reader.GetFloat();
+            CooldownSecondsLeft = reader.GetFloat16();
+            MaxCooldown = reader.GetFloat16();
         }
 
         public void SerializeDeltas(NetDataWriter writer)
         {
-            writer.Put(CooldownSecondsLeft);
+            writer.PutFloat16(CooldownSecondsLeft);
         }
 
         public void DeserializeDeltas(NetDataReader reader)
         {
-            CooldownSecondsLeft = reader.GetFloat();
+            CooldownSecondsLeft = reader.GetFloat16();
         }
     }
 }
