@@ -11,8 +11,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
     {
         private IAudioService _audioService;
         private ICommandFactory _commandFactory;
-        private IWorldCameraController _worldCameraController;
-
         private GamePlayInitiatorEnterData _enterData;
 
         public LoadGamePlayStateCommand SetEnterData(GamePlayInitiatorEnterData enterData)

@@ -16,7 +16,7 @@ using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers
 {
-    public class SimulationNetEventsHandler
+    public class PresentationNetEventsHandler
     {
         private readonly IMatchDataService _matchDataService;
         private readonly ICachedPresentationEventsService _cachedPresentationEventsService;
@@ -26,8 +26,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         private readonly IClientPresentationTickProcessor _clientPresentationTickProcessor;
         private readonly ICommandFactory _commandFactory;
         private readonly IMatchPlayerUIControllers _playerUIControllers;
-
-        public SimulationNetEventsHandler(IMatchDataService matchDataService,
+        private readonly AddMatchPlayerCommand _addMatchPlayerCommand;
+        
+        public PresentationNetEventsHandler(IMatchDataService matchDataService,
             ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager,
             IPlayerControllers playerControllers, NetworkConfig networkConfig,
             IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, IMatchPlayerUIControllers playerUIControllers)
@@ -40,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _clientPresentationTickProcessor = clientPresentationTickProcessor;
             _commandFactory = commandFactory;
             _playerUIControllers = playerUIControllers;
+            _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
         }
 
         public void ProcessPlayerJoinedEvents(CapacityList<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
@@ -61,9 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
                 }
                 else
                 {
-                    var playerModel = _matchDataService.AddPlayer(playerJoinAcceptNetEvent.PlayerState);
-                    _playerControllers.AddPlayer(playerModel.PlayerId);
-                    _playerUIControllers.AddPlayer(playerModel.PlayerId);
+                    _addMatchPlayerCommand.SetPlayerState(playerJoinAcceptNetEvent.PlayerState).Execute();
                 }
             }
         }
@@ -106,6 +106,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             foreach (var playerTakeDamageEvent in playerTakeDamageEvents)
             {
                 var playerModel = _matchDataService.GetPlayer(playerTakeDamageEvent.PlayerId);
+
+                if (playerModel == null)
+                {
+                    LogService.LogError($"Null for id {playerTakeDamageEvent.PlayerId}!");
+                }
                 playerModel.Spaceship.Health.CurrentHealth = Math.Min(playerModel.Spaceship.Health.CurrentHealth, playerTakeDamageEvent.PlayerHealth);// we do Min because the player may get hit multiple times the same frame
                 LogService.LogTopic($"Player lose {playerTakeDamageEvent.HitDamage} health, and now has {playerModel.Spaceship.Health.CurrentHealth}");
                 _cachedPresentationEventsService.PlayerTakeDamageNetEvents.Add(playerTakeDamageEvent);

@@ -82,5 +82,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         {
             return _playerView.GetPosition();
         }
+
+        public Transform GetTransform()
+        {
+            return _playerView.GetTransform();
+        }
     }
 }

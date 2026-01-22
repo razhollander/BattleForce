@@ -15,5 +15,5 @@ MonoBehaviour:
   SpawnMinSecondsInterval: 5
   SpawnMaxSecondsInterval: 10
   MaxConcurrentPowerUpBalls: 5
-  MoveSpeed: 15
+  MoveSpeed: 5
   Radius: 1.269

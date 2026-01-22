@@ -50,5 +50,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
         {
             return _spaceShipTransform.position;
         }
+
+        public Transform GetTransform()
+        {
+            return _spaceShipTransform;
+        }
     }
 }

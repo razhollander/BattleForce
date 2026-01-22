@@ -25,6 +25,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
         private IMatchPlayerUIControllers _playerUIControllers;
+        private AddMatchPlayerCommand _addMatchPlayerCommand;
+        private ICommandFactory _commandFactory;
 
         public SyncSimulationStateCommand SetSimulationState(SimulationStateS2C simulationState)
         {
@@ -43,6 +45,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
         }
 
         public void Execute()
@@ -78,9 +82,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
         {
             foreach (var playerState in _simulationState.Players.AsSpan())
             {
-                var playerModel = _matchDataService.AddPlayer(playerState);
-                _playerControllers.AddPlayer(playerModel.PlayerId);
-                _playerUIControllers.AddPlayer(playerModel.PlayerId);
+                _addMatchPlayerCommand.SetPlayerState(playerState).Execute();
             }
         }
 

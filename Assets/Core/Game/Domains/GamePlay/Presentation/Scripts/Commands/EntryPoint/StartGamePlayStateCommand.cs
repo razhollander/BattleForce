@@ -24,7 +24,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
     public class StartGamePlayStateCommand : BaseCommand, ICommandAsync
     {
         private ICommandFactory _commandFactory;
-        private IWorldCameraController _worldCameraController;
         private IAudioService _audioService;
         private IGameInputActionsController _gameInputActionsController;
         private IChooseNetworkRoleUIController _chooseNetworkRoleUIController;
@@ -48,7 +47,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         public override void ResolveDependencies()
         {
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
-            _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
             _audioService = _diContainer.Resolve<IAudioService>();
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
             _chooseNetworkRoleUIController = _diContainer.Resolve<IChooseNetworkRoleUIController>();

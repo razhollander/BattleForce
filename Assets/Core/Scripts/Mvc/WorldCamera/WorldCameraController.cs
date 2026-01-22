@@ -16,14 +16,12 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
 
         public void AddTarget(Transform target)
         {
-            if (target == null) return;
             LogService.LogTopic($"Add camera target {target.gameObject.name}", LogTopicType.Camera);
-            _worldCameraView.AddTarget(target, 1f, 1f);
+            _worldCameraView.AddTarget(target, 1f, 5f);
         }
 
         public void RemoveTarget(Transform target)
         {
-             if (target == null) return;
             LogService.LogTopic($"Remove camera target {target.gameObject.name}", LogTopicType.Camera);
             _worldCameraView.RemoveTarget(target);
         }
