@@ -23,6 +23,9 @@ MonoBehaviour:
     ConcurrentTimeOfImpactContacts: 32
     ConcurrentBodyCount: 512
     ConcurrentContactCount: 256
+    ConcurrentFixuresCount: 512
+    ConcurrentPolygonCount: 256
+    ConcurrentCircleCount: 256
     ConcurrentJointCount: 0
     PlayersInputsPackets: 12000
     JoinRequestPackets: 30
@@ -46,4 +49,5 @@ MonoBehaviour:
   ServerTicksBuffer: 2
   HostPort: 49153
   IpAddress: 109.67.156.134
+  OnlyLocal: 1
   ConntectionKey: BattleForceGame

@@ -22,7 +22,7 @@ MonoBehaviour:
   - {r: 0, g: 0.83137256, b: 0.600374, a: 1}
   - {r: 0.83137256, g: 0, b: 0.781321, a: 1}
   StartHealth: 5
-  MovementSpeed: 15
+  MovementSpeed: 5
   RotationSpeed: 150
   ShootCooldown: 0.7
   DefaultPlayerRadius: 0.65

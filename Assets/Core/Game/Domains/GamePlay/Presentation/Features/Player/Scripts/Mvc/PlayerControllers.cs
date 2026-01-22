@@ -73,5 +73,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             return GetPlayer(playerId).GetPosition();
         }
+
+        public Transform GetPlayerTranform(ushort playerId)
+        {
+            return GetPlayer(playerId).GetTransform();
+        }
     }
 }
