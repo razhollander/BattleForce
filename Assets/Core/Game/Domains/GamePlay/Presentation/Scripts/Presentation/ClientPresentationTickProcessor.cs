@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands;
+using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.UpdateService;
 
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
         private readonly IPlayerControllers _playerControllers;
         private readonly IBulletControllers _bulletControllers;
         private readonly IPowerUpBallControllers _powerUpBallControllers;
+        private readonly IWorldCameraController _worldCameraController;
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
         private readonly HandleBulletDestroyedNetEventsCommand _handleBulletDestroyedNetEventsCommand;

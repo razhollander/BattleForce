@@ -11,21 +11,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
     {
         private TalentCardView _talentCardView;
         private readonly TalentCardsConfig _talentCardsConfig;
+        private readonly TalentCardPool _talentCardPool;
+        private readonly Transform _parent;
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
 
         public ushort TalentCardId { get; set; }
 
-        public TalentCardController(ushort talentCardId, IMatchDataService matchDataService, TalentCardsConfig talentCardsConfig)
+        public TalentCardController(ushort talentCardId, IMatchDataService matchDataService, TalentCardsConfig talentCardsConfig, TalentCardPool talentCardPool, Transform parent)
         {
             _matchDataService = matchDataService;
             _talentCardsConfig = talentCardsConfig;
+            _talentCardPool = talentCardPool;
+            _parent = parent;
             TalentCardId = talentCardId;
         }
 
-        public void CreateView(TalentCardView talentCardViewPrefab, Transform parent)
+        public void CreateView()
         {
-            _talentCardView = Object.Instantiate(talentCardViewPrefab, parent);
+            _talentCardView = _talentCardPool.Spawn();
+            _talentCardView.transform.SetParent(_parent);
             var talentCardModel = _matchDataService.GetTalentCard(TalentCardId);
             _talentCardView.transform.position = talentCardModel.Position;
 
@@ -39,7 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
 
         public void DestroyView()
         {
-            Object.Destroy(_talentCardView.gameObject);
+            _talentCardView.Despawn();
         }
 
         public void SetDamaged()

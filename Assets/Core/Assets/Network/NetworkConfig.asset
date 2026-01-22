@@ -15,12 +15,17 @@ MonoBehaviour:
   MaxCap:
     ConcurrentPlayers: 8
     ConcurrentBullets: 256
+    ConcurrentTalentCards: 128
     ConcurrentEvironmentWalls: 64
+    ConcurrentEvironmentLavaWalls: 16
     PointsInEvironmentWall: 8
     PacketTypes: 256
     ConcurrentTimeOfImpactContacts: 32
     ConcurrentBodyCount: 512
     ConcurrentContactCount: 256
+    ConcurrentFixuresCount: 512
+    ConcurrentPolygonCount: 256
+    ConcurrentCircleCount: 256
     ConcurrentJointCount: 0
     PlayersInputsPackets: 12000
     JoinRequestPackets: 30
@@ -31,7 +36,12 @@ MonoBehaviour:
     BulletSpawnNetEvents: 512
     BulletDestroyedNetEvents: 512
     PlayerSwapNetEvents: 64
+    TalentCardObtainedNetEvent: 64
     MaxCollisionsPerFrame: 256
+    TalentCardHitNetEvents: 128
+    ConcurrentPowerUpBalls: 32
+    PowerUpSpawnedNetEvents: 64
+    PowerUpObtainedNetEvents: 64
   TicksPerSeconds: 60
   DeltaTime: 0.016666668
   PhysicsVelocityIterations: 8
@@ -39,4 +49,5 @@ MonoBehaviour:
   ServerTicksBuffer: 2
   HostPort: 49153
   IpAddress: 109.67.156.134
+  OnlyLocal: 1
   ConntectionKey: BattleForceGame

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
+using Zenject;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
@@ -9,27 +10,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
     public class PlayerControllers : IPlayerControllers
     {
         private readonly IMatchDataService _matchDataService;
-        private readonly PlayerView _playerViewPrefab;
+        private readonly PlayerPool _playerPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly List<PlayerController> _playerControllers = new ();
-        private GameObject _playersParent;
+        private Transform _playersParent;
 
-        public PlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, PresentationGamePlayConfig gamePlayConfig)
+        public PlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
-            _playerViewPrefab = playerViewPrefab;
+            _playerPool = new PlayerPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
         }
 
         public void InitEntryPoint()
         {
-            _playersParent = new GameObject("PlayersParent");
+            _playersParent = (new GameObject("PlayersParent")).transform;
+            _playerPool.InitPool();
         }
 
-        public void CreatePlayer(ushort playerId)
+        public void AddPlayer(ushort playerId)
         {
-            var playerController = new PlayerController(playerId, _matchDataService, _gamePlayConfig);
-            playerController.CreatePlayerView(_playerViewPrefab, _playersParent.transform);
+            var playerController = new PlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _playersParent.transform);
+            playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
         }
 
@@ -72,6 +74,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public UnityEngine.Vector2 GetPlayerPosition(ushort playerId)
         {
             return GetPlayer(playerId).GetPosition();
+        }
+
+        public Transform GetPlayerTranform(ushort playerId)
+        {
+            return GetPlayer(playerId).GetTransform();
         }
     }
 }

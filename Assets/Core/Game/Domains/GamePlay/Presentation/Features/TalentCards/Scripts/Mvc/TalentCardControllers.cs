@@ -2,29 +2,35 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
+using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
 {
     public class TalentCardControllers : ITalentCardControllers
     {
-        private readonly TalentCardView _talentCardViewPrefab;
+        private readonly TalentCardPool _talentCardPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly IMatchDataService _matchDataService;
         private readonly List<TalentCardController> _controllers = new List<TalentCardController>();
-        private readonly GameObject _parent;
+        private Transform _parent;
 
-        public TalentCardControllers(TalentCardView talentCardViewPrefab, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
+        public TalentCardControllers(TalentCardView talentCardViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
         {
-            _talentCardViewPrefab = talentCardViewPrefab;
+            _talentCardPool = new TalentCardPool(talentCardViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _matchDataService = matchDataService;
-            _parent = new GameObject("TalentCardsParent");
         }
 
+        public void InitEntryPoint()
+        {
+            _parent = (new GameObject("TalentCardsParent")).transform;
+            _talentCardPool.InitPool();
+        }
+        
         public void CreateTalentCard(ushort cardId)
         {
-            var controller = new TalentCardController(cardId, _matchDataService, _gamePlayConfig.TalentCards);
-            controller.CreateView(_talentCardViewPrefab, _parent.transform);
+            var controller = new TalentCardController(cardId, _matchDataService, _gamePlayConfig.TalentCards, _talentCardPool, _parent);
+            controller.CreateView();
             _controllers.Add(controller);
         }
 

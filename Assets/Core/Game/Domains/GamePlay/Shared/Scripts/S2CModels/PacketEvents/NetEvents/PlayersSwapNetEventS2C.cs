@@ -1,5 +1,3 @@
-
-
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
@@ -32,10 +30,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             writer.Put(OccuredOnTick);
             writer.Put((byte)CasterPlayerId);
             writer.Put((byte)OtherPlayerId);
-            writer.Put(CasterPosition);
-            writer.Put(OtherPosition);
-            writer.Put(CasterDirection);
-            writer.Put(OtherDirection);
+            writer.PutVector2Quantized(CasterPosition);
+            writer.PutVector2Quantized(OtherPosition);
+            writer.PutVector2AsAngle16(CasterDirection);
+            writer.PutVector2AsAngle16(OtherDirection);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -43,10 +41,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             OccuredOnTick = reader.GetInt();
             CasterPlayerId = reader.GetByte();
             OtherPlayerId = reader.GetByte();
-            CasterPosition = reader.GetVector2();
-            OtherPosition = reader.GetVector2();
-            CasterDirection = reader.GetVector2();
-            OtherDirection = reader.GetVector2();
+            CasterPosition = reader.GetVector2Quantized();
+            OtherPosition = reader.GetVector2Quantized();
+            CasterDirection = reader.GetVector2FromAngle16();
+            OtherDirection = reader.GetVector2FromAngle16();
         }
     }
 }

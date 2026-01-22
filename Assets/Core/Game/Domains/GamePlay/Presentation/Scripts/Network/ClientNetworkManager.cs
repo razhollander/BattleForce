@@ -55,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Start();
             //_packetsListener.RegisterListeners();
-            var peerToServer = _netManager.Connect(isHost ?"localhost" :_networkConfig.IpAddress, _networkConfig.HostPort, _networkConfig.ConntectionKey);
+            var peerToServer = _netManager.Connect(isHost || _networkConfig.OnlyLocal ?"localhost" :_networkConfig.IpAddress, _networkConfig.HostPort, _networkConfig.ConntectionKey);
             _packetsSender.SetPeer(peerToServer);
            // bool canReachServer = CanPing(_networkConfig.IpAddress);
             //Console.WriteLine("Can reach server: " + canReachServer);

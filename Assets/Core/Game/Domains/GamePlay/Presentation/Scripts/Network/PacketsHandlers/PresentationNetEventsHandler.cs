@@ -1,6 +1,7 @@
 using System;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
@@ -15,7 +16,7 @@ using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers
 {
-    public class SimulationNetEventsHandler
+    public class PresentationNetEventsHandler
     {
         private readonly IMatchDataService _matchDataService;
         private readonly ICachedPresentationEventsService _cachedPresentationEventsService;
@@ -24,11 +25,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         private readonly NetworkConfig _networkConfig;
         private readonly IClientPresentationTickProcessor _clientPresentationTickProcessor;
         private readonly ICommandFactory _commandFactory;
-
-        public SimulationNetEventsHandler(IMatchDataService matchDataService,
+        private readonly IMatchPlayerUIControllers _playerUIControllers;
+        private readonly AddMatchPlayerCommand _addMatchPlayerCommand;
+        
+        public PresentationNetEventsHandler(IMatchDataService matchDataService,
             ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager,
             IPlayerControllers playerControllers, NetworkConfig networkConfig,
-            IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory)
+            IClientPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, IMatchPlayerUIControllers playerUIControllers)
         {
             _matchDataService = matchDataService;
             _cachedPresentationEventsService = iCachedPresentationEventsService;
@@ -37,6 +40,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             _networkConfig = networkConfig;
             _clientPresentationTickProcessor = clientPresentationTickProcessor;
             _commandFactory = commandFactory;
+            _playerUIControllers = playerUIControllers;
+            _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
         }
 
         public void ProcessPlayerJoinedEvents(CapacityList<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
@@ -58,8 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
                 }
                 else
                 {
-                    var playerModel = _matchDataService.AddPlayer(playerJoinAcceptNetEvent.PlayerState);
-                    _playerControllers.CreatePlayer(playerModel.PlayerId);
+                    _addMatchPlayerCommand.SetPlayerState(playerJoinAcceptNetEvent.PlayerState).Execute();
                 }
             }
         }
@@ -102,6 +106,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
             foreach (var playerTakeDamageEvent in playerTakeDamageEvents)
             {
                 var playerModel = _matchDataService.GetPlayer(playerTakeDamageEvent.PlayerId);
+
+                if (playerModel == null)
+                {
+                    LogService.LogError($"Null for id {playerTakeDamageEvent.PlayerId}!");
+                }
                 playerModel.Spaceship.Health.CurrentHealth = Math.Min(playerModel.Spaceship.Health.CurrentHealth, playerTakeDamageEvent.PlayerHealth);// we do Min because the player may get hit multiple times the same frame
                 LogService.LogTopic($"Player lose {playerTakeDamageEvent.HitDamage} health, and now has {playerModel.Spaceship.Health.CurrentHealth}");
                 _cachedPresentationEventsService.PlayerTakeDamageNetEvents.Add(playerTakeDamageEvent);

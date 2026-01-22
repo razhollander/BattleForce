@@ -2,33 +2,35 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
+using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc
 {
     public class PowerUpBallControllers : IPowerUpBallControllers
     {
-        private readonly PowerUpBallView _powerUpBallViewPrefab;
+        private readonly PowerUpBallPool _pool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly IMatchDataService _matchDataService;
         private readonly List<PowerUpBallController> _controllers = new List<PowerUpBallController>();
-        private GameObject _parent;
+        private Transform _parent;
 
-        public PowerUpBallControllers(PowerUpBallView powerUpBallViewPrefab, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
+        public PowerUpBallControllers(PowerUpBallView powerUpBallViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
         {
-            _powerUpBallViewPrefab = powerUpBallViewPrefab;
+            _pool = new PowerUpBallPool(powerUpBallViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _matchDataService = matchDataService;
         }
         
         public void InitEntryPoint()
         {
-            _parent = new GameObject("PowerUpBallParent");
+            _parent = (new GameObject("PowerUpBallParent")).transform;
+            _pool.InitPool();
         }
         
         public void CreatePowerUpBall(ushort powerUpBallId, Vector2 position)
         {
-            var controller = new PowerUpBallController(powerUpBallId, _matchDataService);
-            controller.CreateView(_powerUpBallViewPrefab, _parent.transform, position);
+            var controller = new PowerUpBallController(powerUpBallId, _matchDataService, _pool, _parent);
+            controller.CreateView(position);
             _controllers.Add(controller);
         }
 

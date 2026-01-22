@@ -47,10 +47,14 @@ namespace CoreDomain.Scripts.Helpers.Pools
             }
             
             obj = _pool.Dequeue();
-            obj.Despawn = () => Despawn(obj);
+            obj.Despawn = InternalDespawn;
             obj.OnSpawned();
-
             return obj;
+
+            void InternalDespawn()
+            {
+                Despawn(obj);
+            }
         }
 
         protected virtual void Despawn(TPoolable obj)

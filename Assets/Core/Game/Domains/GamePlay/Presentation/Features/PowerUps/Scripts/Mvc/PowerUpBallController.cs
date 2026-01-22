@@ -6,24 +6,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc
     public class PowerUpBallController
     {
         private readonly IMatchDataService _matchDataService;
+        private readonly PowerUpBallPool _powerUpBallPool;
+        private readonly Transform _parent;
         private PowerUpBallView _powerUpBallView;
         public ushort PowerUpBallId { get; private set; }
 
-        public PowerUpBallController(ushort powerUpBallId, IMatchDataService matchDataService)
+        public PowerUpBallController(ushort powerUpBallId, IMatchDataService matchDataService, PowerUpBallPool powerUpBallPool, Transform parent)
         {
             PowerUpBallId = powerUpBallId;
             _matchDataService = matchDataService;
+            _powerUpBallPool = powerUpBallPool;
+            _parent = parent;
         }
 
-        public void CreateView(PowerUpBallView powerUpBallViewPrefab, Transform parent, Vector2 position)
+        public void CreateView(Vector2 position)
         {
-            _powerUpBallView = Object.Instantiate(powerUpBallViewPrefab, parent);
+            _powerUpBallView = _powerUpBallPool.Spawn();
+            _powerUpBallView.transform.SetParent(_parent);
             _powerUpBallView.SetPosition(position);
         }
 
         public void DestroyView()
         {
-            Object.Destroy(_powerUpBallView.gameObject);
+            _powerUpBallView.Despawn();
         }
 
         public Vector2 GetPosition()

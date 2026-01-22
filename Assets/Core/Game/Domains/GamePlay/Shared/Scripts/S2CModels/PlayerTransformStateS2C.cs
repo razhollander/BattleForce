@@ -21,36 +21,36 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(Position);
+            writer.PutVector2Quantized(Position);
             // writer.Put(Velocity);
             // writer.Put(Acceleration);
-            writer.Put(Direction);
-            writer.Put(Radius);
+            writer.PutVector2AsAngle16(Direction);
+            writer.PutFloat16(Radius);
             // writer.Put(AngularVelocity);
             // writer.Put(AimVector);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            Position = reader.GetVector2();
+            Position = reader.GetVector2Quantized();
             // Velocity = reader.GetVector2();
             // Acceleration = reader.GetVector2();
-            Direction = reader.GetVector2();
-            Radius = reader.GetFloat();
+            Direction = reader.GetVector2FromAngle16();
+            Radius = reader.GetFloat16();
             // AngularVelocity = reader.GetFloat();
             // AimVector = reader.GetVector2();
         }
 
         public void SerializeDeltas(NetDataWriter writer)
         {
-            writer.Put(Position);
-            writer.Put(Direction);
+            writer.PutVector2Quantized(Position);
+            writer.PutVector2AsAngle16(Direction);
         }
 
         public void DeserializeDeltas(NetDataReader reader)
         {
-            Position = reader.GetVector2();
-            Direction = reader.GetVector2();
+            Position = reader.GetVector2Quantized();
+            Direction = reader.GetVector2FromAngle16();
         }
     }
 }
