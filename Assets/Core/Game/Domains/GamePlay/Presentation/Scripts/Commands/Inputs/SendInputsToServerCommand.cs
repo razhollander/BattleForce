@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
@@ -26,6 +27,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
 
         public void Execute()
         {
+            // if (PlaybackSettings.IsPlaybackEnabled)
+            // {
+            //     return;
+            // }
+
             var isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
             var isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
             var isShootInputPressed = _gameInputActionsController.IsShootInputPressed();

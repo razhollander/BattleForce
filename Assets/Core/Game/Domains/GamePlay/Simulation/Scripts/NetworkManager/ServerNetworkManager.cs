@@ -1,9 +1,12 @@
 using System;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Scripts.Network;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -14,17 +17,20 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
     public class ServerNetworkManager : IServerNetworkManager
     {
         private readonly NetworkC2SPacketsListener _packetsListener;
-        private readonly NetManager _netManager;
+        private INetManagerWrapper _netManager;
         private readonly NetPacketProcessor _packetProcessor;
         private readonly NetworkConfig _networkConfig;
+        private readonly IPlaybackRecorderService _playbackRecorderService;
         private readonly NetworkS2CPacketsSender _packetsSender;
+        private bool _didSwitchToPlayback;
 
-        public ServerNetworkManager(NetworkConfig networkConfig)
+        public ServerNetworkManager(NetworkConfig networkConfig, IPlaybackRecorderService playbackRecorderService)
         {
             _networkConfig = networkConfig;
+            _playbackRecorderService = playbackRecorderService;
             _packetProcessor = new NetPacketProcessor();
-            _packetsListener = new NetworkC2SPacketsListener(_networkConfig);
-            _netManager = new NetManager(_packetsListener) { AutoRecycle = true, BroadcastReceiveEnabled = true, IPv6Enabled = false};
+            _packetsListener = new NetworkC2SPacketsListener(_networkConfig, _playbackRecorderService);
+            _netManager = new NetManagerWrapper(_packetsListener);
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
 
@@ -89,6 +95,15 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         public void UnregisterPacketsObserver(IPacketsObserver packetsObserver)
         {
             _packetsListener.UnregisterObserver(packetsObserver);
+        }
+
+        public void SwitchToPlayback()
+        {
+            if (!_didSwitchToPlayback)
+            {
+                _netManager = new NetManagerPlayback(_packetsListener, _playbackRecorderService);
+            }
+            _didSwitchToPlayback = true;
         }
     }
 }

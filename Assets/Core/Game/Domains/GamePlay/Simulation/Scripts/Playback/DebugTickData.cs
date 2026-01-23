@@ -1,0 +1,12 @@
+using System;
+using System.Collections.Generic;
+
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
+{
+    [Serializable]
+    public class DebugTickData
+    {
+        public int Tick;
+        public List<DebugRecordedPacket> Packets = new List<DebugRecordedPacket>();
+    }
+}

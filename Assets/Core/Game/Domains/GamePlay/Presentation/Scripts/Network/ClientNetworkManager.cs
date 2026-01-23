@@ -1,7 +1,9 @@
 using System;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
+using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Scripts.Network;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
@@ -49,9 +51,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 LogService.LogError("Client already running!");
                 return;
             }
-            
-            _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _updateSubscriptionService.RegisterGuiUpdatable(this);
+            _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Start();
             //_packetsListener.RegisterListeners();
             var peerToServer = _netManager.Connect(isHost || _networkConfig.OnlyLocal ?"localhost" :_networkConfig.IpAddress, _networkConfig.HostPort, _networkConfig.ConntectionKey);

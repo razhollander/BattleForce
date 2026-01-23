@@ -16,5 +16,6 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         int GetPlayerPeerId(ushort playerId);
         void RegisterPacketsObserver(IPacketsObserver packetsObserver);
         void UnregisterPacketsObserver(IPacketsObserver packetsObserver);
+        void SwitchToPlayback();
     }
 }

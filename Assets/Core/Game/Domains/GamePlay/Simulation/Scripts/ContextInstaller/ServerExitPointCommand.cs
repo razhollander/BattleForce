@@ -3,6 +3,8 @@ using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
@@ -14,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ITickProcessor _tickProcessor;
         private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private IPhysicsSimulator _physicsSimulator;
+        private IPlaybackRecorderService _playbackRecorderService;
 
         public override void ResolveDependencies()
         {
@@ -22,10 +25,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
+            _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
         }
 
         public void Execute()
         {
+            if (!_playbackRecorderService.IsPlaybackEnabled)
+            {
+                _playbackRecorderService.SaveRecording();
+            }
+
             _serverNetworkManager.InitExitPoint();
             _playerJoinPacketsHandler.InitExitPoint();
             _tickProcessor.InitExitPoint();

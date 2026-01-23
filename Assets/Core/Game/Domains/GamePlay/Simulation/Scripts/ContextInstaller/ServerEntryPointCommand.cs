@@ -6,7 +6,9 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Scripts.Extensions;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
@@ -20,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private IPhysicsSimulator _physicsSimulator;
         private SimulationGamePlayConfig _simulationGamePlayConfig;
         private IMatchDataService _matchDataService;
+        private IPlaybackRecorderService _playbackRecorderService;
 
         public override void ResolveDependencies()
         {
@@ -30,11 +33,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
         }
 
         public void Execute()
         {
-            InitRNG();
+            InitPlaybackAndRNG();
             _matchDataService.InitEntryPoint();
             _serverNetworkManager.InitEntryPoint();
             _playerInputsPacketsHandler.InitEntryPoint();
@@ -47,10 +51,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             CreateTalentCards();
         }
 
-        private static void InitRNG()
+        private void InitPlaybackAndRNG()
         {
-            var rnd = new Random();
-            RNG.Init(rnd.Next());
+            _playbackRecorderService.InitEntryPoint();
+            
+            if (_playbackRecorderService.IsPlaybackEnabled)
+            {
+                _playbackRecorderService.LoadRecording();
+                RNG.Init(_playbackRecorderService.Seed);
+            }
+            else
+            {
+                var rnd = new Random();
+                var seed = rnd.Next();
+                RNG.Init(seed);
+                _playbackRecorderService.StartRecording(seed);
+            }
         }
 
         private void CreateWalls()

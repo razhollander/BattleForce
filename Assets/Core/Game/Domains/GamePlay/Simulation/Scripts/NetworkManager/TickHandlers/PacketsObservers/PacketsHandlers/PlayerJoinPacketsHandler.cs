@@ -14,6 +14,7 @@ using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
+using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsHandlers
 {
@@ -78,9 +79,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
                 _joinedRequestPacketsPool.Return(kvp.Value);
             }
             _playerJoinedPacketsPerPeer.Clear();
+            
+            
         }
         
-        public void OnPacketReceived(NetPacketReader reader, NetPeer peer)
+        public void OnPacketReceived(NetDataReader reader, NetPeer peer)
         {
             var newPacket = _joinedRequestPacketsPool.Get();
             newPacket.Deserialize(reader);
