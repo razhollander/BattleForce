@@ -227,6 +227,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   networkConfig: {fileID: 11400000, guid: b7e0e344763e24e639529857dcf51380, type: 2}
   isOn: 0
+  _didClientConnectToServer: 0
+  _tick: 0
 --- !u!114 &1192382043
 MonoBehaviour:
   m_ObjectHideFlags: 0
