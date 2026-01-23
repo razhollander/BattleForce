@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public void OnNetworkReceive(NetPeer peer, NetDataReader reader)
         {
-            if (_playbackRecorderService.IsPlaybackEnabled)
+            if (!_playbackRecorderService.IsPlaybackEnabled && peer.Tag!=null) // todo make this pretty
             {
                 var playerId = (ushort)peer.Tag;
                 _playbackRecorderService.RecordPacket(playerId, reader.RawData);

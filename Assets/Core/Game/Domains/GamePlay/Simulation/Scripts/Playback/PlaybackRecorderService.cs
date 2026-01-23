@@ -22,12 +22,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 
         public int Seed => _seed;
         public bool IsPlaybackEnabled { get; private set; }
+        public bool IsRecordingEnabled { get; set; }
 
         public PlaybackRecorderService(ITickCounterService tickCounterService)
         {
             _tickCounterService = tickCounterService;
-            _jsonFilePath = Path.Combine(Application.persistentDataPath, "playback.json");
-            _debugFilePath = Path.Combine(Application.persistentDataPath, "playback_debug.json");
+            var directory = Application.dataPath + "/Records";
+            _jsonFilePath = Path.Combine(directory, "playback.json");
+            _debugFilePath = Path.Combine(directory, "playback_debug.json");
+            Directory.CreateDirectory(directory);
         }
 
         public void InitEntryPoint()
@@ -63,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
         {
             SaveJson();
             SaveDebugJson();
+            LogService.LogError("Saved Records!");
         }
 
         private void SaveJson()

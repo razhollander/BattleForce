@@ -17,19 +17,20 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
     public class ServerNetworkManager : IServerNetworkManager
     {
         private readonly NetworkC2SPacketsListener _packetsListener;
-        private INetManagerWrapper _netManagerWrapper;
+        private INetManagerWrapper _netManager;
         private readonly NetPacketProcessor _packetProcessor;
         private readonly NetworkConfig _networkConfig;
         private readonly IPlaybackRecorderService _playbackRecorderService;
         private readonly NetworkS2CPacketsSender _packetsSender;
-        
+        private bool _didSwitchToPlayback;
+
         public ServerNetworkManager(NetworkConfig networkConfig, IPlaybackRecorderService playbackRecorderService)
         {
             _networkConfig = networkConfig;
             _playbackRecorderService = playbackRecorderService;
             _packetProcessor = new NetPacketProcessor();
             _packetsListener = new NetworkC2SPacketsListener(_networkConfig, _playbackRecorderService);
-            _netManagerWrapper = new NetManagerWrapper(_packetsListener);
+            _netManager = new NetManagerWrapper(_packetsListener);
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
 
@@ -46,18 +47,18 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
         
         private void StartServer()
         {
-            if (_netManagerWrapper.IsRunning)
+            if (_netManager.IsRunning)
             {
                 LogService.LogError("Server already running!");
                 return;
             }
             
-            _netManagerWrapper.Start(_networkConfig.HostPort);
+            _netManager.Start(_networkConfig.HostPort);
         }
 
         public void InitExitPoint()
         {
-            _netManagerWrapper.Stop();
+            _netManager.Stop();
         }
         
         // public void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
@@ -78,7 +79,7 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
 
         public void PollEvents()
         {
-            _netManagerWrapper.PollEvents();
+            _netManager.PollEvents();
         }
 
         public int GetPlayerPeerId(ushort playerId)
@@ -98,7 +99,11 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
 
         public void SwitchToPlayback()
         {
-            _netManagerWrapper = new NetManagerPlayback(_packetsListener, _playbackRecorderService);
+            if (!_didSwitchToPlayback)
+            {
+                _netManager = new NetManagerPlayback(_packetsListener, _playbackRecorderService);
+            }
+            _didSwitchToPlayback = true;
         }
     }
 }

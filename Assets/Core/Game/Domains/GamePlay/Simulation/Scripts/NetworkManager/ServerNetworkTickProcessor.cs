@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
         private StepTimersCommand _stepTimersCommand;
         private FullTickPacket _fullTickPacket;
-        private TimerFixedThreaded2 _pollEventsFixedTimer;
+        //private TimerFixedThreaded2 _pollEventsFixedTimer;
         private Stopwatch _sw;
         private long _last;
 
@@ -76,8 +76,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         {
             var cancellationTokenSource = new CancellationTokenSource();
             _fixedTimer = new TimerFixedThreaded2("BattleFroce Thread", _networkConfig.TicksPerSeconds, OnTick);
-            _pollEventsFixedTimer = new TimerFixedThreaded2("Poll Events Thread", -1, PollEvents);
-            _pollEventsFixedTimer.Start(cancellationTokenSource);
+            // _pollEventsFixedTimer = new TimerFixedThreaded2("Poll Events Thread", -1, PollEvents);
+            // _pollEventsFixedTimer.Start(cancellationTokenSource);
             _fixedTimer.Start(cancellationTokenSource);
         }
 
