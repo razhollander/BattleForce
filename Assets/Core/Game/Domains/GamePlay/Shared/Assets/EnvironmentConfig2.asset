@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnvironmentConfig2
   m_EditorClassIdentifier: 
   _environmentLayoutConfigs:
-    m_keys: 00000000
+    m_keys: 0000000063000000
     m_values:
     - _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
@@ -45,3 +45,21 @@ MonoBehaviour:
         "Bomb" },   { "Id": 4, "Position": { "X": -35.0, "Y": -15.0 }, "TalentType":
         "SentryGun" },   { "Id": 5, "Position": { "X": 20.0, "Y": 0.0 }, "TalentType":
         "DashPulse" } ] '
+    - _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
+      _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
+        "Y": -28.16       },       {         "X": -43.804464,         "Y": -28.16      
+        },       {         "X": -43.804464,         "Y": 28.16       },       {        
+        "X": -47.324464,         "Y": 28.16       }     ]   },   {     "Id": 7,    
+        "Points": [       {         "X": 43.804464,         "Y": -28.16       },      
+        {         "X": 47.324464,         "Y": -28.16       },       {         "X":
+        47.324464,         "Y": 28.16       },       {         "X": 43.804464,        
+        "Y": 28.16       }     ]   },   {     "Id": 8,     "Points": [       {        
+        "X": -47.324464,         "Y": 24.64       },       {         "X": 47.324464,        
+        "Y": 24.64       },       {         "X": 47.324464,         "Y": 28.16      
+        },       {         "X": -47.324464,         "Y": 28.16       }     ]   },  
+        {     "Id": 9,     "Points": [       {         "X": -47.324464,         "Y":
+        -28.16       },       {         "X": 47.324464,         "Y": -28.16      
+        },       {         "X": 47.324464,         "Y": -24.64       },       {        
+        "X": -47.324464,         "Y": -24.64       }     ]   }]'
+      _lavaWallsJson: 
+      _talentCardsJson: 
