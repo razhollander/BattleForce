@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             {
                 var playerName = kvp.Value.UserName;
                 var playersAmount = _matchDataService.SimulationState.Players.Count;
-                var playerColor = _gamePlayConfig.PlayerSpaceship.PlayerColors[playersAmount % _gamePlayConfig.PlayerSpaceship.PlayerColors.Length];
+                var playerColor = _gamePlayConfig.PlayerSpaceship.ColorPerTeamId[playersAmount % _gamePlayConfig.PlayerSpaceship.ColorPerTeamId.Count];
                 var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerColor);
                 var playerId = playerState.Id;
                 var peer = kvp.Key;

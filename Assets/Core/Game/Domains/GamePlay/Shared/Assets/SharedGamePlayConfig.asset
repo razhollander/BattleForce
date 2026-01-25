@@ -17,6 +17,6 @@ MonoBehaviour:
   MatchMakingEnvironment:
     _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
     TeamFloorsRadius: 10
-    TeamFloorsPrecision: 10
+    TeamFloorsPrecision: 50
     WallsWidth: 2
   PowerUps: {fileID: 11400000, guid: 0121acb33a8104de2926cc3c0bb6c95a, type: 2}

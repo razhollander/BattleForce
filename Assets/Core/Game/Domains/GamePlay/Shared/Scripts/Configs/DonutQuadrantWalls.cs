@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using Core.Scripts.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {
@@ -19,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         /// - Inner radius is outerRadius * 0.5f.
         /// - Each wall uses 4 points (convex quad), so no concave polygons and under max 8 points.
         /// </summary>
-        public static Dictionary<string, string> Generate4QuadrantWallJsons(float outerRadius, int precision)
+        public static Dictionary<int, WallConfig[]> GenerateQuadrantWallPerTeam(float outerRadius, int precision)
         {
             if (outerRadius <= 0) throw new ArgumentOutOfRangeException(nameof(outerRadius));
             if (precision < 1) precision = 1;
@@ -27,16 +25,16 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             float innerRadius = outerRadius * 0.5f;
 
             // Quadrants (degrees)
-            var quadrants = new (string Name, float StartDeg, float EndDeg)[]
+            var quadrants = new (int TeamId, float StartDeg, float EndDeg)[]
             {
-                ("Red",    90f,   0f),
-                ("Green",   0f, -90f),
-                ("Yellow", -90f,-180f),
-                ("Blue",  180f,  90f),
+                (1,    90f,   0f),
+                (2,   0f, -90f),
+                (3, -90f,-180f),
+                (4,  180f,  90f),
             };
 
             ushort nextId = 1;
-            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var result = new Dictionary<int, WallConfig[]>();
 
             foreach (var q in quadrants)
             {
@@ -49,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                     segments: precision,
                     ref nextId);
 
-                result[q.Name] = walls.ToJson();
+                result[q.TeamId] = walls.ToArray();
             }
 
             return result;

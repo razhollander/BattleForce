@@ -109,8 +109,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
                 var position = Vector2.One;
                 var playersAmount = _matchDataService.SimulationState.Players.Count;
-                var playerColor = _gamePlayConfig.PlayerSpaceship.PlayerColors[playersAmount % _gamePlayConfig.PlayerSpaceship.PlayerColors.Length];
-                
+                var playerColor = _gamePlayConfig.PlayerSpaceship.ColorPerTeamId[playersAmount % _gamePlayConfig.PlayerSpaceship.ColorPerTeamId.Count];
                 _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown, playerColor);
                 _physicsSimulator.AddPlayer(playerId, playerTeamId, position, startingDirection, radius);
                 _playersTalentsManager.AddPlayer(playerId);
