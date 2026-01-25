@@ -15,7 +15,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void PollEvents();
         int GetPlayerPeerId(ushort playerId);
         void RegisterPacketsObserver(IPacketsObserver packetsObserver);
+        void RegisterPacketsObserver(IRawPacketsObserver packetsObserver);
         void UnregisterPacketsObserver(IPacketsObserver packetsObserver);
-        void SwitchToPlayback();
+        void UnregisterPacketsObserver(IRawPacketsObserver packetsObserver);
+        void SwitchToNetManager(INetManagerWrapper netManagerWrapper);
     }
 }

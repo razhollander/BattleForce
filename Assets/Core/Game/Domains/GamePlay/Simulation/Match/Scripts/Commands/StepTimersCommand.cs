@@ -1,9 +1,9 @@
-using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using CoreDomain.Scripts.Services.CommandFactory;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
     public class StepTimersCommand : BaseCommand, ICommandVoid
     {

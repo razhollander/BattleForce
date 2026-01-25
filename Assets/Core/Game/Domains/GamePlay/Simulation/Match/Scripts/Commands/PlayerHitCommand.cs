@@ -1,9 +1,10 @@
 using System;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
     public class PlayerHitCommand : BaseCommand, ICommandVoid
     {
@@ -12,7 +13,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         private ushort _hitDamage;
         private ushort _playerId;
         private IMatchDataService _matchDataService;
-        private IMatchNetEventsDataService _matchNetEventsDataService;
+        private INetEventsDataService _netEventsDataService;
         private int _processedTick;
 
         public PlayerHitCommand SetHitDamage(ushort hitDamage)
@@ -36,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         public override void ResolveDependencies()
         {
             _matchDataService =_diContainer.Resolve<IMatchDataService>();
-            _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
+            _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
         }
 
         public void Execute()
@@ -52,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             }
 
             LogService.LogTopic($"Player Hit! Id {_playerId} hit with damage {_hitDamage}, new health: {newHealth}, is alive: {isPlayerAlive}", LogTopicType.ServerNetwork);
-            _matchNetEventsDataService.AddPlayerTakeDamageNetEvent(_processedTick, _playerId, newHealth, _hitDamage, isPlayerAlive);
+            _netEventsDataService.AddPlayerTakeDamageNetEvent(_processedTick, _playerId, newHealth, _hitDamage, isPlayerAlive);
         }
     }
 }

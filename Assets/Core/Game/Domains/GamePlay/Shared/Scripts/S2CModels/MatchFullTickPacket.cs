@@ -13,7 +13,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         //public SimulationStateS2C PreviousSimulationState; // not sure if gonna need this
         public MatchSimulationStateS2C CurrentSimulationState;
         public FixedUnorderedList<BulletSpawnNetEventS2C> BulletSpawnNetEvents; // todo: remove events related to bullet when bullet id destroyed
-        public FixedClassUnorderedList<PlayerJoinAcceptPacketS2C> PlayerJoinAcceptNetEvents;
+        public FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C> PlayerJoinAcceptNetEvents;
         public FixedUnorderedList<PlayerTakeDamageNetEventS2C> PlayerTakeDamageNetEvents;
         public FixedUnorderedList<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents;
         public FixedUnorderedList<PlayersSwapNetEventS2C> PlayerSwapNetEvents;
@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             CurrentSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls);
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
-            PlayerJoinAcceptNetEvents = new FixedClassUnorderedList<PlayerJoinAcceptPacketS2C>(maxCap.PlayerJoinAcceptNetEvents, () => new PlayerJoinAcceptPacketS2C(maxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer));
+            PlayerJoinAcceptNetEvents = new FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>(maxCap.PlayerJoinAcceptNetEvents, () => new PlayerRejoinAcceptPacketS2C(maxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer));
             PlayerTakeDamageNetEvents = new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(maxCap.PlayerTakeDamageNetEvents);
             BulletDestroyedNetEvents = new FixedUnorderedList<BulletDestroyedNetEventS2C>(maxCap.BulletDestroyedNetEvents);
             PlayerSwapNetEvents = new FixedUnorderedList<PlayersSwapNetEventS2C>(maxCap.PlayerSwapNetEvents);

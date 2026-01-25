@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
@@ -18,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public void ClearCachedCollisions();
         void InitExitPoint();
         void CopyDataToSimulation(MatchSimulationStateS2C simulationState);
+        void CopyDataToSimulation(MatchMakingSimulationStateS2C simulationState);
         Body GetPlayer(ushort playerId);
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
         void AddTalentCard(ushort id, Vector2 position, float length, float height);

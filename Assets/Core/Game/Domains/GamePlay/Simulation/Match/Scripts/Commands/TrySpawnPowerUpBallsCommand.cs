@@ -1,14 +1,15 @@
 using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
     public class TrySpawnPowerUpBallsCommand : BaseCommand, ICommandVoid
     {
@@ -20,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         private int _processedTick;
         private IPhysicsSimulator _physicsSimulator;
         private IMatchDataService _matchDataService;
-        private IMatchNetEventsDataService _matchNetEventsDataService;
+        private INetEventsDataService _netEventsDataService;
 
         public TrySpawnPowerUpBallsCommand SetProcessedTick(int processedTick)
         {
@@ -34,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             _iPowerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerService>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
-            _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
+            _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
         }
 
         public void Execute()
@@ -63,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 
             var powerUpBall = _matchDataService.AddPowerUpBall(position, velocity, powerUpType);
             _physicsSimulator.AddPowerUpBall(powerUpBall.Id, position, velocity, _gamePlayConfig.PowerUps.Radius);
-            _matchNetEventsDataService.AddPowerUpSpawnedNetEvent(_processedTick, powerUpBall.Id, position);
+            _netEventsDataService.AddPowerUpSpawnedNetEvent(_processedTick, powerUpBall.Id, position);
         }
 
         private bool TryGenerateRandomPowerUpBall(out Vector2 position, out Vector2 velocity, out PowerUpType powerUpType)
@@ -77,11 +78,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
                 return false;
             }
 
-            var directionAngle = RNG.RNG.NextFloat(0f, 360f);
+            var directionAngle = Simulation.Scripts.RNG.RNG.NextFloat(0f, 360f);
             var direction = directionAngle.FromAngleRadians();
             velocity = direction * _gamePlayConfig.PowerUps.MoveSpeed;
             var values = (PowerUpType[]) Enum.GetValues(typeof(PowerUpType));
-            powerUpType = values[RNG.RNG.NextInt(values.Length)];
+            powerUpType = values[Simulation.Scripts.RNG.RNG.NextInt(values.Length)];
 
             return true;
         }
@@ -95,8 +96,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 
             for (var i = 0; i < maxAttempts; i++)
             {
-                var randomCandidatePosition = new Vector2(RNG.RNG.NextFloat(-environmentHalfSize.X, environmentHalfSize.X),
-                    RNG.RNG.NextFloat(-environmentHalfSize.Y, environmentHalfSize.Y));
+                var randomCandidatePosition = new Vector2(Simulation.Scripts.RNG.RNG.NextFloat(-environmentHalfSize.X, environmentHalfSize.X),
+                    Simulation.Scripts.RNG.RNG.NextFloat(-environmentHalfSize.Y, environmentHalfSize.Y));
 
                 if (!_physicsSimulator.IsSquareHitAnyBodyTypes(randomCandidatePosition, powerUpsRadius, PhysicsBodyType.Wall, PhysicsBodyType.PlayerBullet))
                 {

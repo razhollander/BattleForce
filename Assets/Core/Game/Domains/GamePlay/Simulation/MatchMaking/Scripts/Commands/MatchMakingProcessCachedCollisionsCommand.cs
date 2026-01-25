@@ -3,7 +3,7 @@ using Box2D.NetStandard.Dynamics.Contacts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
     {
         private IPhysicsSimulator _physicsSimulator;
         private IMatchMakingDataService _matchMakingDataService;
-        private IMatchNetEventsDataService _matchNetEventsDataService;
+        private INetEventsDataService _netEventsDataService;
 
         private int _processedTick;
 
@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
         {
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
-            _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
+            _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
         }
 
         public void Execute()
@@ -105,7 +105,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             _matchMakingDataService.SimulationState.RemoveBulletById(bulletModel.Id);
             _physicsSimulator.RemoveBody(bulletBody);
             LogService.LogError($"Bullet destroyed! {bulletModel.Id}");
-            _matchNetEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
+            _netEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
         }
 
         private void HandlePlayerWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

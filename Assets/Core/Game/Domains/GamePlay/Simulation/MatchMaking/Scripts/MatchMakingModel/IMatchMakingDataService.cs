@@ -7,6 +7,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMa
 {
     public interface IMatchMakingDataService
     {
+        void InitEntryPoint();
         MatchMakingSimulationStateS2C SimulationState { get; }
         MatchMakingEnvironmentDataService Environment { get; }
         MatchMakingPlayerStateS2C AddPlayer(string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius,

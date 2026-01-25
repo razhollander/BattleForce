@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         public void Execute()
         {
             _cachedJoinRequest.UserName = "RazPlayer";
-            _networkManager.SendPacketSerialized(PacketTypeC2S.JoinRequest, _cachedJoinRequest, DeliveryMethod.ReliableOrdered);
+            _networkManager.SendPacketSerialized(PacketTypeC2S.MatchRejoinRequest, _cachedJoinRequest, DeliveryMethod.ReliableOrdered);
         }
     }
 }

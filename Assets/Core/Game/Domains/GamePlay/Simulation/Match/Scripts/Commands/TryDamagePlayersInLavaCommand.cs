@@ -1,9 +1,8 @@
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
-using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
     public class TryDamagePlayersInLavaCommand: BaseCommand, ICommandVoid
     {

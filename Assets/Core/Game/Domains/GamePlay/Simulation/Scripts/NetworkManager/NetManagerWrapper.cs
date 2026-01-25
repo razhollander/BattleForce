@@ -7,11 +7,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
     public class NetManagerWrapper : INetManagerWrapper, IDisposable
     {
-        private readonly NetManager _netManager;
+        private NetManager _netManager;
 
-        public bool IsRunning => _netManager.IsRunning;
+        //public bool IsRunning => _netManager.IsRunning;
 
-        public NetManagerWrapper(NetworkC2SPacketsListener packetsListener)
+        public NetManagerWrapper()
+        {
+        }
+
+        public void SetPacketsListener(NetworkC2SPacketsListener packetsListener)
         {
             _netManager = new NetManager(packetsListener) { AutoRecycle = true, BroadcastReceiveEnabled = true, IPv6Enabled = false};
         }

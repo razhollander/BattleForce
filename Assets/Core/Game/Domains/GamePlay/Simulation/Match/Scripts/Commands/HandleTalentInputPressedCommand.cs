@@ -1,7 +1,7 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using CoreDomain.Scripts.Services.CommandFactory;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
     public class HandleTalentInputPressedCommand : BaseCommand, ICommandVoid
     {

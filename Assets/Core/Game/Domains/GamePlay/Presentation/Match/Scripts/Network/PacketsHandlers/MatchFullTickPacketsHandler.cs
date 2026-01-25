@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationMatchNetEventsHandler _presentationNetEventsHandler;
         private readonly CapacityDict<int, MatchFullTickPacket> _fullTickPackets;
-        private readonly CapacityList<PlayerJoinAcceptPacketS2C> _cachedUnprocessedPlayerJoinedEvents;
+        private readonly CapacityList<PlayerRejoinAcceptPacketS2C> _cachedUnprocessedPlayerJoinedEvents;
         private readonly CapacityList<BulletSpawnNetEventS2C> _cachedUnprocessedBulletSpawnedEvents;
         private readonly CapacityList<PlayerTakeDamageNetEventS2C> _cachedUnprocessedPlayerTakeDamageEvents;
         private readonly CapacityList<BulletDestroyedNetEventS2C> _cachedUnprocessedBulletDestroyedEvents;
@@ -49,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, iCachedPresentationEventsService, networkManager, playerControllers, networkConfig, clientPresentationTickProcessor, commandFactory, _playerUIControllers);
             _fullTickPackets = new CapacityDict<int, MatchFullTickPacket>(networkConfig.MaxCap.FullTickPacketsNetEvents);
-            _cachedUnprocessedPlayerJoinedEvents = new CapacityList<PlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
+            _cachedUnprocessedPlayerJoinedEvents = new CapacityList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
             _cachedUnprocessedPlayerTakeDamageEvents = new CapacityList<PlayerTakeDamageNetEventS2C>(networkConfig.MaxCap.PlayerTakeDamageNetEvents);
             _cachedUnprocessedBulletDestroyedEvents = new CapacityList<BulletDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents);
@@ -211,7 +211,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         }
 
 
-        private void ProcessPlayerJoinedEvents(FixedClassUnorderedList<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
+        private void ProcessPlayerJoinedEvents(FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
         {
             _cachedUnprocessedPlayerJoinedEvents.Clear();
 

@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
         }
 
-        public void ProcessPlayerJoinedEvents(CapacityList<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
+        public void ProcessPlayerJoinedEvents(CapacityList<PlayerRejoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
         {
             foreach (var playerJoinAcceptNetEvent in playerJoinAcceptNetEvents)
             {
@@ -66,10 +66,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void SyncTickToServer(out int clientTick, PlayerJoinAcceptPacketS2C playerJoinAcceptNetEvent)
+        private void SyncTickToServer(out int clientTick, PlayerRejoinAcceptPacketS2C playerRejoinAcceptNetEvent)
         {
             var ticksPassedSinceServerSendPacket = (_networkManager.Ping / 1000f) / _networkConfig.DeltaTime;
-            var tickWouldBeOnServerWhenReceiveMyPackets = (int)(ticksPassedSinceServerSendPacket * 2) + playerJoinAcceptNetEvent.OccuredOnTick;
+            var tickWouldBeOnServerWhenReceiveMyPackets = (int)(ticksPassedSinceServerSendPacket * 2) + playerRejoinAcceptNetEvent.OccuredOnTick;
             clientTick = tickWouldBeOnServerWhenReceiveMyPackets;
         }
 

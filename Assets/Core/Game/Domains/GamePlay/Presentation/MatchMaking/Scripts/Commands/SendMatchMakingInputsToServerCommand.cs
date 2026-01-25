@@ -49,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
                 IsMoveForwardInputPressed = isMoveForwardInputPressed,
             };
             
-            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.PlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
+            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchPlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
         }
     }
 }

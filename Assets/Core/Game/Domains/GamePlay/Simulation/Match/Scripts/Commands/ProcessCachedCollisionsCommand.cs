@@ -2,14 +2,16 @@ using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Contacts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
     public class ProcessCachedCollisionsCommand : BaseCommand, ICommandVoid
     {
@@ -17,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
         private IMatchDataService _matchDataService;
         private ICommandFactory _commandFactory;
         private SimulationGamePlayConfig _gamePlayConfig;
-        private IMatchNetEventsDataService _matchNetEventsDataService;
+        private INetEventsDataService _netEventsDataService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         
         private int _processedTick;
@@ -36,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
-            _matchNetEventsDataService = _diContainer.Resolve<IMatchNetEventsDataService>();
+            _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
         }
 
@@ -179,7 +181,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             _matchDataService.SimulationState.RemoveBulletById(bulletModel.Id);
             _physicsSimulator.RemoveBody(bulletBody);
             LogService.LogError($"Bullet destroyed! {bulletModel.Id}");
-            _matchNetEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
+            _netEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
         }
         
         private void HandlePlayerBulletTalentCardCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
@@ -205,11 +207,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
 
             if (isTalentCardAlive)
             {
-                _matchNetEventsDataService.AddTalentCardHitNetEvent(_processedTick, talentCard.Id, talentCard.Health);
+                _netEventsDataService.AddTalentCardHitNetEvent(_processedTick, talentCard.Id, talentCard.Health);
             }
             else
             {
-                _matchNetEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, bulletModel.BelongToPlayerId);
+                _netEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, bulletModel.BelongToPlayerId);
                 DestroyTalentCard(talentCard, cardBody);
             }
         }
@@ -333,7 +335,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Commands
             var powerUpBallId = powerUpBall.Id;
             DestroyBullet(bulletModel, bulletBody);
             DestroyPowerUpBall(powerUpBallId, powerUpBody);
-            _matchNetEventsDataService.AddPowerUpObtainedNetEvent(_processedTick, powerUpBallId, bulletModel.BelongToPlayerId);
+            _netEventsDataService.AddPowerUpObtainedNetEvent(_processedTick, powerUpBallId, bulletModel.BelongToPlayerId);
         }
 
         private void DestroyPowerUpBall(ushort powerUpBallId, Body powerUpBallBody)

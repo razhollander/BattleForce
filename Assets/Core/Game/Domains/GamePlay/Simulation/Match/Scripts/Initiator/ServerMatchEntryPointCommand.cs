@@ -1,56 +1,78 @@
 using System;
-using Core.Game.Domains.GamePlay.Shared.NetworkManager;
+using System.Numerics;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
-using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
-using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
 {
-    public class ServerMatchEntryPointCommand
+    public class ServerMatchEntryPointCommand : BaseCommand,ICommandVoid
     {
-        private IServerNetworkManager _serverNetworkManager;
-        private IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
+        private IPlayeRejoinPacketsHandler _playeRejoinPacketsHandler;
         private ITickProcessor _tickProcessor;
         private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private IPhysicsSimulator _physicsSimulator;
         private SimulationGamePlayConfig _simulationGamePlayConfig;
         private IMatchDataService _matchDataService;
         private IPlaybackRecorderService _playbackRecorderService;
+        private IPlayersTalentsManager _playersTalentsManager;
+        private IServerNetworkManager _networkManager;
+        private ICommandFactory _commandFactory;
+        private SimulationGamePlayConfig _gamePlayConfig;
+        
+        private SimulationMatchEnterData _simulationMatchEnterData;
 
-        public void Execute(DiContainer diContainer)
+        public ServerMatchEntryPointCommand SetMatchEnterData(SimulationMatchEnterData simulationMatchEnterData)
         {
-            ResolveDependencies(diContainer);
+            _simulationMatchEnterData = simulationMatchEnterData;
+            return this;
+        }
+
+        public override void ResolveDependencies()
+        {
+            _playeRejoinPacketsHandler = _diContainer.Resolve<IPlayeRejoinPacketsHandler>();
+            _tickProcessor = _diContainer.Resolve<ITickProcessor>();
+            _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
+            _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
+            _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
+            _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
+            _networkManager = _diContainer.Resolve<IServerNetworkManager>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+        }
+
+        public void Execute()
+        {
             InitPlaybackAndRNG();
             _matchDataService.InitEntryPoint();
-            _serverNetworkManager.InitEntryPoint();
             _playerInputsPacketsHandler.InitEntryPoint();
-            _playerJoinPacketsHandler.InitEntryPoint();
+            _playeRejoinPacketsHandler.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _physicsSimulator.InitEntryPoint();
-            
+
+            InitPlayers(_simulationMatchEnterData);
             CreateWalls();
             CreateLavaWalls();
             CreateTalentCards();
+            TrySwitchToPlayback();
         }
 
-        public void ResolveDependencies(DiContainer diContainer)
+        private void TrySwitchToPlayback()
         {
-            _serverNetworkManager = diContainer.Resolve<IServerNetworkManager>();
-            _playerJoinPacketsHandler = diContainer.Resolve<IPlayerJoinPacketsHandler>();
-            _tickProcessor = diContainer.Resolve<ITickProcessor>();
-            _playerInputsPacketsHandler = diContainer.Resolve<IPlayerInputsPacketsHandler>();
-            _physicsSimulator = diContainer.Resolve<IPhysicsSimulator>();
-            _simulationGamePlayConfig = diContainer.Resolve<SimulationGamePlayConfig>();
-            _matchDataService = diContainer.Resolve<IMatchDataService>();
-            _playbackRecorderService = diContainer.Resolve<IPlaybackRecorderService>();
+            if (_playbackRecorderService.IsPlaybackEnabled)
+            {
+                _networkManager.SwitchToNetManager(new NetManagerPlayback(_playbackRecorderService));
+            }
         }
 
         private void InitPlaybackAndRNG()
@@ -68,6 +90,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 var seed = rnd.Next();
                 RNG.Init(seed);
                 _playbackRecorderService.StartRecording(seed);
+            }
+        }
+
+        private void InitPlayers(SimulationMatchEnterData simulationMatchEnterData)
+        {
+            for (var i = 0; i < simulationMatchEnterData.Players.Length; i++)
+            {
+                var player = simulationMatchEnterData.Players[i];
+                var playerId = player.Id;
+                var playerName = player.Name;
+                var playerTeamId = player.TeamId;
+                
+                var startingDirection = RNG.NextFloat(0, 360).AngleToVector();
+                var velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
+                var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
+                var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
+                var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
+                var position = Vector2.One;
+                var playersAmount = _matchDataService.SimulationState.Players.Count;
+                var playerColor = _gamePlayConfig.PlayerSpaceship.PlayerColors[playersAmount % _gamePlayConfig.PlayerSpaceship.PlayerColors.Length];
+                
+                _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown, playerColor);
+                _physicsSimulator.AddPlayer(playerId, playerTeamId, position, startingDirection, radius);
+                _playersTalentsManager.AddPlayer(playerId);
             }
         }
 

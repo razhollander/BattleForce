@@ -102,6 +102,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No player for id {playerId}!");
         }
+        
+        public PlayerStateS2C GetPlayerByName(string playerName) // one day this will be replaced with device Unique Id. Until then- players must have different names
+        {
+            for (int i = 0; i < Players.Count; i++)
+            {
+                if (Players[i].Name == playerName)
+                {
+                    return Players.GetByIndex(i);
+                } 
+            }
+
+            throw new System.Exception($"No player for name {playerName}!");
+        }
 
         public PlayerStateS2C GetPlayerByIndex(int index)
         {

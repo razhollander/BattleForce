@@ -2,12 +2,10 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Talent;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
@@ -21,25 +19,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
     public class MatchMakingPlayerJoinPacketsHandler : IPlayerJoinPacketsHandler
     {
         private readonly IServerNetworkManager _networkManager;
-        private readonly IMatchDataService _matchDataService;
+        private readonly IMatchMakingDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
-        private readonly IMatchNetEventsDataService _matchNetEventsDataService;
-        private readonly IPlayersTalentsManager _playersTalentsManager;
+        private readonly INetEventsDataService _netEventsDataService;
         private readonly CapacityDict<NetPeer, JoinRequestPacketC2S> _playerJoinedPacketsPerPeer;
         private readonly ConcurrentPool<JoinRequestPacketC2S> _joinedRequestPacketsPool;
-        public PacketTypeC2S PacketType => PacketTypeC2S.JoinRequest;
+        public PacketTypeC2S PacketType => PacketTypeC2S.MatchMakingJoinRequest;
 
-        public MatchMakingPlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
+        public MatchMakingPlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
-            IMatchNetEventsDataService matchNetEventsDataService, NetworkConfig networkConfig, IPlayersTalentsManager playersTalentsManager)
+            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _physicsSimulator = physicsSimulator;
-            _matchNetEventsDataService = matchNetEventsDataService;
-            _playersTalentsManager = playersTalentsManager;
+            _netEventsDataService = iNetEventsDataService;
             _playerJoinedPacketsPerPeer = new CapacityDict<NetPeer, JoinRequestPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _joinedRequestPacketsPool = new ConcurrentPool<JoinRequestPacketC2S>(() => new JoinRequestPacketC2S(), networkConfig.MaxCap.JoinRequestPackets);
         }
@@ -54,7 +50,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             var startingDirection = RNG.NextFloat(0, 360).AngleToVector();
             var velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
             var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
-            var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
             var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
             var position = Vector2.One;
 
@@ -63,15 +58,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                 var playerName = kvp.Value.UserName;
                 var playersAmount = _matchDataService.SimulationState.Players.Count;
                 var playerColor = _gamePlayConfig.PlayerSpaceship.PlayerColors[playersAmount % _gamePlayConfig.PlayerSpaceship.PlayerColors.Length];
-                var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, health, shootCooldown, playerColor);
+                var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerColor);
                 var playerId = playerState.Id;
                 var peer = kvp.Key;
                 peer.Tag = playerId;
                 _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius);
-                _playersTalentsManager.AddPlayer(playerId);
                 _networkManager.AddPlayerPeer(playerId, peer);
-                _matchNetEventsDataService.StartSavingPlayerEvents(playerId);
-                _matchNetEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);
+                _netEventsDataService.StartSavingPlayerEvents(playerId);
+                _netEventsDataService.AddMatchMakingPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);
                 LogService.LogTopic("Processed player joined: " + playerState.ToJson(), LogTopicType.ServerNetwork);
             }
 

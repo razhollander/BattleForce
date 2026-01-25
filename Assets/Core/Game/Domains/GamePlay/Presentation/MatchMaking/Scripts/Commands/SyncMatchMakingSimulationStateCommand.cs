@@ -1,4 +1,3 @@
-using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
@@ -60,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
 
         private void CreateWalls()
         {
-            var walls = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(MATCH_MAKING_ENVIRONMENT_INDEX).GetWalls();
+            var walls = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_sharedGamePlayConfig.MatchMakingEnvironmentIndex).GetWalls();
             foreach (var wall in walls)
             {
                 var wallModel = _matchDataService.AddWall(wall);

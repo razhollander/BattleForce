@@ -51,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 IsSwitchTalentInputPressed = isSwitchTalentInputPressed
             };
             
-            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.PlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
+            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchPlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
         }
     }
 }

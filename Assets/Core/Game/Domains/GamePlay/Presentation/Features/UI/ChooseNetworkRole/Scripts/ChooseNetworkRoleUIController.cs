@@ -69,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             try
             {
                 await StartServer(enterData, cancellationTokenSource);
-                StartClient(true);
+                await StartClient(true, cancellationTokenSource);
                 _uiView.Hide();
             }
             catch (OperationCanceledException)

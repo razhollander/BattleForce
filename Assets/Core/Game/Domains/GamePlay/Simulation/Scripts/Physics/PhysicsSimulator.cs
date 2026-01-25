@@ -8,6 +8,7 @@ using Box2D.NetStandard.Dynamics.World.Callbacks;
 #endif
 using Box2D.WorldTests;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
@@ -56,8 +57,36 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public void CopyDataToSimulation(MatchSimulationStateS2C simulationState)
         {
             CopyPlayersStates(simulationState);
-            CopyBulletsStates(simulationState);
+            CopyBulletsStates(simulationState.Bullets);
             CopyPowerUpsStates(simulationState);
+        }
+
+        public void CopyDataToSimulation(MatchMakingSimulationStateS2C simulationState)
+        {
+            CopyPlayersStates(simulationState.Players);
+            CopyBulletsStates(simulationState.Bullets);
+        }
+        
+        private void CopyPlayersStates(FixedClassUnorderedList<MatchMakingPlayerStateS2C> players)
+        {
+            foreach (var playerState in players.AsSpan())
+            {
+                var currentBody = _world.GetBodyList();
+
+                while (currentBody != null)
+                {
+                    var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerState.Id)
+                    {
+                        currentBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
+                        currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
+                        break;
+                    }
+
+                    currentBody = currentBody.GetNext();
+                }
+            }
         }
 
         public Body GetPlayer(ushort playerId)
@@ -124,9 +153,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             }
         }
 
-        private void CopyBulletsStates(MatchSimulationStateS2C simulationState)
+        private void CopyBulletsStates(FixedUnorderedList<PlayerBulletS2C> bullets)
         {
-            foreach (var bullet in simulationState.Bullets.AsSpan())
+            foreach (var bullet in bullets.AsSpan())
             {
                 var bulletBody = _world.GetBodyList();
 

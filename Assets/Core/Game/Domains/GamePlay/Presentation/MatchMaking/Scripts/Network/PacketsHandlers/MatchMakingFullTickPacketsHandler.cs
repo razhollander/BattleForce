@@ -32,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchMakingFullTick;
         public int LastProcessedTickFromServer { get; private set; }
 
-        public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
+        public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
             IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory)
         {
             _networkManager = networkManager;
@@ -46,8 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
             _cachedUnprocessedBulletDestroyedEvents = new CapacityList<BulletDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents);
 
-            _fullTickPacketsPool =
-                new ConcurrentPool<MatchMakingFullTickPacket>(() => new MatchMakingFullTickPacket(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
+            _fullTickPacketsPool = new ConcurrentPool<MatchMakingFullTickPacket>(() => new MatchMakingFullTickPacket(networkConfig.MaxCap), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
         public void InitEntryPoint()
@@ -148,7 +147,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             }
         }
 
-        private void UpdatePlayersDeltas(MatchSimulationStateS2C simulationState)
+        private void UpdatePlayersDeltas(MatchMakingSimulationStateS2C simulationState)
         {
             foreach (var player in _matchDataService.Players)
             {
@@ -159,7 +158,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             }
         }
 
-        private void UpdateBulletsTransform(MatchSimulationStateS2C simulationState)
+        private void UpdateBulletsTransform(MatchMakingSimulationStateS2C simulationState)
         {
             foreach (var bullet in _matchDataService.Bullets)
             {

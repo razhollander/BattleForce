@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -13,16 +12,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
     public class NetworkC2SPacketsListener : INetEventListener
     {
         private readonly NetworkConfig _networkConfig;
-        private readonly IPlaybackRecorderService _playbackRecorderService;
         private readonly IServerNetworkManager _serverNetworkManager;
         private NetManager _netManager;
 
         private readonly CapacityDict<PacketTypeC2S, IPacketsObserver> _packetsObservers;
+        private readonly CapacityList<IRawPacketsObserver> _rawPacketsObservers;
 
-        public NetworkC2SPacketsListener(NetworkConfig networkConfig, IPlaybackRecorderService playbackRecorderService)
+        public NetworkC2SPacketsListener(NetworkConfig networkConfig)
         {
             _networkConfig = networkConfig;
-            _playbackRecorderService = playbackRecorderService;
             _packetsObservers = new CapacityDict<PacketTypeC2S, IPacketsObserver>(networkConfig.MaxCap.PacketTypes);
         }
 
@@ -35,14 +33,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         {
             _packetsObservers.Remove(PacketsObserver.PacketType);
         }
+        
+        public void RegisterObserver(IRawPacketsObserver PacketsObserver)
+        {
+            _rawPacketsObservers.Add(PacketsObserver);
+        }
+        
+        public void UnregisterObserver(IRawPacketsObserver PacketsObserver)
+        {
+            _rawPacketsObservers.Remove(PacketsObserver);
+        }
 
         public void OnNetworkReceive(NetPeer peer, NetDataReader reader)
         {
-            if (!_playbackRecorderService.IsPlaybackEnabled && peer.Tag!=null) // todo make this pretty
+            for (int i = _rawPacketsObservers.Count - 1; i >= 0; i--)
             {
-                var playerId = (ushort)peer.Tag;
-                _playbackRecorderService.RecordPacket(playerId, reader.RawData);
+                _rawPacketsObservers[i].OnPacketReceived(reader.RawData, peer);
             }
+        
             var packetType = (PacketTypeC2S) reader.GetByte();
             _packetsObservers[packetType].OnPacketReceived(reader, peer);
             LogService.LogTopic($"OnNetworkReceive!", LogTopicType.ServerNetwork);

@@ -1,9 +1,7 @@
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Scripts.Network;
-using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
@@ -15,17 +13,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private INetManagerWrapper _netManager;
         private readonly NetPacketProcessor _packetProcessor;
         private readonly NetworkConfig _networkConfig;
-        private readonly IPlaybackRecorderService _playbackRecorderService;
         private readonly NetworkS2CPacketsSender _packetsSender;
-        private bool _didSwitchToPlayback;
 
-        public ServerNetworkManager(NetworkConfig networkConfig, IPlaybackRecorderService playbackRecorderService)
+        public ServerNetworkManager(NetworkConfig networkConfig)
         {
             _networkConfig = networkConfig;
-            _playbackRecorderService = playbackRecorderService;
             _packetProcessor = new NetPacketProcessor();
-            _packetsListener = new NetworkC2SPacketsListener(_networkConfig, _playbackRecorderService);
-            _netManager = new NetManagerWrapper(_packetsListener);
+            _packetsListener = new NetworkC2SPacketsListener(_networkConfig);
+            _netManager = new NetManagerWrapper();
+            _netManager.SetPacketsListener(_packetsListener);
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
 
@@ -42,11 +38,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         
         private void StartServer()
         {
-            if (_netManager.IsRunning)
-            {
-                LogService.LogError("Server already running!");
-                return;
-            }
+            // if (_netManager.IsRunning)
+            // {
+            //     LogService.LogError("Server already running!");
+            //     return;
+            // }
             
             _netManager.Start(_networkConfig.HostPort);
         }
@@ -91,14 +87,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         {
             _packetsListener.UnregisterObserver(packetsObserver);
         }
-
-        public void SwitchToPlayback()
+        
+        public void RegisterPacketsObserver(IRawPacketsObserver packetsObserver)
         {
-            if (!_didSwitchToPlayback)
-            {
-                _netManager = new NetManagerPlayback(_packetsListener, _playbackRecorderService);
-            }
-            _didSwitchToPlayback = true;
+            _packetsListener.RegisterObserver(packetsObserver);
+        }
+        
+        public void UnregisterPacketsObserver(IRawPacketsObserver packetsObserver)
+        {
+            _packetsListener.UnregisterObserver(packetsObserver);
+        }
+
+        public void SwitchToNetManager(INetManagerWrapper netManagerWrapper)
+        {
+            netManagerWrapper.SetPacketsListener(_packetsListener);
+            _netManager = netManagerWrapper;
         }
     }
 }

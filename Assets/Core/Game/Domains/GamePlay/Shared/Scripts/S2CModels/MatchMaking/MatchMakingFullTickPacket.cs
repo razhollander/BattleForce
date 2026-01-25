@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
     {
         public int Tick;
         //public SimulationStateS2C PreviousSimulationState; // not sure if gonna need this
-        public MatchSimulationStateS2C CurrentSimulationState;
+        public MatchMakingSimulationStateS2C CurrentSimulationState;
         public FixedUnorderedList<BulletSpawnNetEventS2C> BulletSpawnNetEvents; // todo: remove events related to bullet when bullet id destroyed
         public FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C> PlayerJoinAcceptNetEvents;
         public FixedUnorderedList<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents;
@@ -20,9 +20,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
         {
         }
         
-        public MatchMakingFullTickPacket(MaxCap maxCap, SharedGamePlayConfig sharedGamePlayConfig)
+        public MatchMakingFullTickPacket(MaxCap maxCap)
         {
-            CurrentSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls);
+            CurrentSimulationState = new MatchMakingSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets);
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
             PlayerJoinAcceptNetEvents = new FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>(maxCap.PlayerJoinAcceptNetEvents, () => new MatchMakingPlayerJoinAcceptPacketS2C(maxCap));
             BulletDestroyedNetEvents = new FixedUnorderedList<BulletDestroyedNetEventS2C>(maxCap.BulletDestroyedNetEvents);
