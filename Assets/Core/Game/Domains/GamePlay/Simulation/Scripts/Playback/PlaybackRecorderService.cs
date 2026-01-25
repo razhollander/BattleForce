@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 
         public void InitEntryPoint()
         {
-            IsPlaybackEnabled = PlaybackSettings.IsPlaybackEnabled;
+            IsPlaybackEnabled = PlayerPrefsSettings.IsPlaybackEnabled;
         }
         
         public void StartRecording(int seed)

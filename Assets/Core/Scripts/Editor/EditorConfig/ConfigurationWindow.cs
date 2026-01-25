@@ -36,19 +36,25 @@ namespace Core.Scripts.Editor.EditorConfig
             _areInfoLogsEnabled = EditorGUILayout.Toggle("Are Info Logs Enabled", _areInfoLogsEnabled);
             _areErrorLogsEnabled = EditorGUILayout.Toggle("Are Error Logs Enabled", _areErrorLogsEnabled);
             _arePhysicsDebugDrawEnabled = EditorGUILayout.Toggle("Are Physics Debug Draw Enabled", _arePhysicsDebugDrawEnabled);
-
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Runtime Settings", EditorStyles.boldLabel);
-            bool isPlayback = Core.Scripts.Utils.PlaybackSettings.IsPlaybackEnabled;
-            bool newIsPlayback = EditorGUILayout.Toggle("Play last recorded match", isPlayback);
-            if (newIsPlayback != isPlayback)
-            {
-                Core.Scripts.Utils.PlaybackSettings.IsPlaybackEnabled = newIsPlayback;
-            }
-
             if (EditorGUILayout.LinkButton("Refresh"))
             {
                 TryRefreshDefineSymbols();
+            }
+            
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Runtime Settings", EditorStyles.boldLabel);
+            var isPlayback = Core.Scripts.Utils.PlayerPrefsSettings.IsPlaybackEnabled;
+            var newIsPlayback = EditorGUILayout.Toggle("Play last recorded match", isPlayback);
+            if (newIsPlayback != isPlayback)
+            {
+                Core.Scripts.Utils.PlayerPrefsSettings.IsPlaybackEnabled = newIsPlayback;
+            }
+            
+            var shouldSkipMatchMaking = Core.Scripts.Utils.PlayerPrefsSettings.ShouldSkipMatchMaking;
+            var newShouldSkipMatchMaking = EditorGUILayout.Toggle("Should skip match making", isPlayback);
+            if (shouldSkipMatchMaking != newShouldSkipMatchMaking)
+            {
+                Core.Scripts.Utils.PlayerPrefsSettings.ShouldSkipMatchMaking = newShouldSkipMatchMaking;
             }
         }
 
