@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
 
         private void CreateWalls()
         {
-            var walls = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_sharedGamePlayConfig.MatchMakingEnvironmentIndex).GetWalls();
+            var walls = _sharedGamePlayConfig.MatchMakingEnvironment.GetWalls();
             foreach (var wall in walls)
             {
                 var wallModel = _matchDataService.AddWall(wall);

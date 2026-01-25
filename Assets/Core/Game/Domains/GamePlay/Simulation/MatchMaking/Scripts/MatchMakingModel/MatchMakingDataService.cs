@@ -25,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMa
 
         public void InitEntryPoint()
         {
-            _environmentDataService.InitEntryPoint(_sharedGamePlayConfig.MatchMakingEnvironmentIndex);
+            _environmentDataService.InitEntryPoint();
         }
 
         public MatchMakingPlayerStateS2C AddPlayer(string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius,

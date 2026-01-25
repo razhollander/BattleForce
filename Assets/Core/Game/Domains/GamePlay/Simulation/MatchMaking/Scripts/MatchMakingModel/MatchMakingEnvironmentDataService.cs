@@ -15,10 +15,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMa
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
-        public void InitEntryPoint(int environmentIndex)
+        public void InitEntryPoint()
         {
-            WallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentIndex).GetWalls();
-            EnvironmentHalfSize = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentIndex).GetEnvironmentHalfSize();
+            WallConfigs = _sharedGamePlayConfig.MatchMakingEnvironment.GetWalls();
+            EnvironmentHalfSize = _sharedGamePlayConfig.MatchMakingEnvironment.GetEnvironmentHalfSize();
         }
     }
 }
