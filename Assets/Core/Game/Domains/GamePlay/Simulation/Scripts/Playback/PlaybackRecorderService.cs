@@ -122,7 +122,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
                              // Let's try to deserialize Input
                              try
                              {
-                                 var inputPacket = new PlayerInputPacketC2S();
+                                 var inputPacket = new MatchPlayerInputPacketC2S();
                                  inputPacket.Deserialize(reader);
                                  debugPacket.InputPacket = inputPacket;
                              }

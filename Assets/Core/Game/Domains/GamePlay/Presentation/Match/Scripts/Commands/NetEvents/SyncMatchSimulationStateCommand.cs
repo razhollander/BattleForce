@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls;
 using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
@@ -11,10 +12,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
 {
     public class SyncMatchSimulationStateCommand : BaseCommand, ICommandVoid
     {
-        private SimulationStateS2C _simulationState;
+        private MatchSimulationStateS2C _simulationState;
         private IMatchDataService _matchDataService;
-        private IBulletControllers _bulletControllers;
-        private IEnvironmentWallsControllers _environmentWallsControllers;
+        private IMatchBulletControllers _bulletControllers;
+        private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private ITalentCardControllers _talentCardControllers;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
@@ -22,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
         private AddMatchPlayerCommand _addMatchPlayerCommand;
         private ICommandFactory _commandFactory;
 
-        public SyncMatchSimulationStateCommand SetSimulationState(SimulationStateS2C simulationState)
+        public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
             _simulationState = simulationState;
             return this;
@@ -31,8 +32,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
-            _bulletControllers = _diContainer.Resolve<IBulletControllers>();
-            _environmentWallsControllers = _diContainer.Resolve<IEnvironmentWallsControllers>();
+            _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
+            _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();

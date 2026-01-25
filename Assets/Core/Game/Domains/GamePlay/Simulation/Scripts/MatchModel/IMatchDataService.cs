@@ -7,7 +7,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 {
     public interface IMatchDataService 
     {
-        SimulationStateS2C SimulationState { get; }
+        MatchSimulationStateS2C SimulationState { get; }
         MatchEnvironmentDataService Environment { get; }
         //SimulationStateS2C PreviousSimulationState { get; }
         PlayerStateS2C AddPlayer(string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,

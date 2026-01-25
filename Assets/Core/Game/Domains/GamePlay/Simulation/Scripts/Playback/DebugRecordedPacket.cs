@@ -9,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
         public ushort PlayerId;
         // Depending on packet type, we might want to deserialize differently.
         // Assuming mostly PlayerInputPacketC2S for now as that's the main input.
-        public PlayerInputPacketC2S? InputPacket;
+        public MatchPlayerInputPacketC2S? InputPacket;
         // public string RawDataHex; // Optional: verify raw data
     }
 }

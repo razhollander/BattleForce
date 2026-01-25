@@ -8,14 +8,14 @@ namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
     public static class LocalPacketBridge
     {
         // Queue for Server -> Client packets
-        private static ConcurrentQueue<FullTickPacket> _serverToClientPackets = new ConcurrentQueue<FullTickPacket>();
+        private static ConcurrentQueue<MatchFullTickPacket> _serverToClientPackets = new ConcurrentQueue<MatchFullTickPacket>();
 
-        public static void SendToClient(FullTickPacket packet)
+        public static void SendToClient(MatchFullTickPacket packet)
         {
             _serverToClientPackets.Enqueue(packet);
         }
 
-        public static bool TryGetNextPacket(out FullTickPacket packet)
+        public static bool TryGetNextPacket(out MatchFullTickPacket packet)
         {
             return _serverToClientPackets.TryDequeue(out packet);
         }

@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         bool IsMoveLeftInputPressed();
         bool IsMoveRightInputPressed();
         bool IsShootInputPressed();
+        bool IsMoveForwardInputPressed();
         Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui);
         bool IsTalentInputPressed();
         bool IsSwitchTalentInputPressed();

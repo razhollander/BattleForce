@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
         private StepTimersCommand _stepTimersCommand;
-        private FullTickPacket _fullTickPacket;
+        private MatchFullTickPacket _fullTickPacket;
         //private TimerFixedThreaded2 _pollEventsFixedTimer;
         private Stopwatch _sw;
         private long _last;
@@ -65,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
         public void InitEntryPoint()
         {
             StartTick();
-            _fullTickPacket = new FullTickPacket();
+            _fullTickPacket = new MatchFullTickPacket();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
@@ -214,7 +214,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
                 _fullTickPacket.TalentCardHitNetEvents = _matchNetEventsDataService.TalentCardHitNetEventsPerPlayer[playerId];
                 _fullTickPacket.PowerUpSpawnedNetEvents = _matchNetEventsDataService.PowerUpBallSpawnedNetEventsPerPlayer[playerId];
                 _fullTickPacket.PowerUpObtainedNetEvents = _matchNetEventsDataService.PowerUpBallObtainedNetEventsPerPlayer[playerId];
-                _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.FullTick, _fullTickPacket,
+                _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }
         }

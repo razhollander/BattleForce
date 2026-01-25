@@ -1,6 +1,6 @@
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.ObtainedEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -11,13 +11,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IPowerUpBallObtainedEffectController _powerUpBallObtainedEffectController;
-        private IPlayerControllers _playerControllers;
+        private IMatchPlayerControllers _playerControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
 
         public override void ResolveDependencies()
         {
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
-            _playerControllers = _diContainer.Resolve<IPlayerControllers>();
+            _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _powerUpBallObtainedEffectController = _diContainer.Resolve<IPowerUpBallObtainedEffectController>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
         }

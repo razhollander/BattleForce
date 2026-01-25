@@ -1,4 +1,3 @@
-using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
 using UnityEngine;

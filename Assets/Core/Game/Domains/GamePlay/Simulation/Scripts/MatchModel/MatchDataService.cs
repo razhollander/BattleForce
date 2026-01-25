@@ -9,8 +9,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
 {
     public class MatchDataService : IMatchDataService
     {
-        private readonly SimulationStateS2C _simulationState;
-        public SimulationStateS2C SimulationState => _simulationState;
+        private readonly MatchSimulationStateS2C _simulationState;
+        public MatchSimulationStateS2C SimulationState => _simulationState;
         private ushort _lastBulletCreatedId = 0;
         private ushort _lastPowerUpBallCreatedId = 0;
         private readonly MatchEnvironmentDataService _environmentDataService;
@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         {
             var chosenEnvironmentIndex = gamePlayConfig.ChosenEnvironmentIndex;
             _environmentDataService = new MatchEnvironmentDataService(sharedGamePlayConfig);
-            _simulationState = new SimulationStateS2C(
+            _simulationState = new MatchSimulationStateS2C(
                 networkConfig.MaxCap.ConcurrentPlayers,
                 networkConfig.MaxCap.ConcurrentBullets,
                 sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,

@@ -8,12 +8,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
         public int OccuredOnTick;
         public bool IsLocal;
         public PlayerStateS2C PlayerState;
-        public SimulationStateS2C SimulationState;
+        public MatchSimulationStateS2C SimulationState;
 
         public PlayerJoinAcceptPacketS2C(MaxCap maxCap, int maxTalentsPerPlayer)
         {
             PlayerState = new PlayerStateS2C(maxTalentsPerPlayer);
-            SimulationState = new SimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls);
+            SimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls);
         }
 
         public void Serialize(NetDataWriter writer)

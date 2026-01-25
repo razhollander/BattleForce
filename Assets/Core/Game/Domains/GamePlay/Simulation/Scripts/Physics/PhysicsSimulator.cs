@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
 
-        public void CopyDataToSimulation(SimulationStateS2C simulationState)
+        public void CopyDataToSimulation(MatchSimulationStateS2C simulationState)
         {
             CopyPlayersStates(simulationState);
             CopyBulletsStates(simulationState);
@@ -80,7 +80,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return null;
         }
 
-        private void CopyPlayersStates(SimulationStateS2C simulationState)
+        private void CopyPlayersStates(MatchSimulationStateS2C simulationState)
         {
             foreach (var playerState in simulationState.Players.AsSpan())
             {
@@ -102,7 +102,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             }
         }
 
-        private void CopyPowerUpsStates(SimulationStateS2C simulationState)
+        private void CopyPowerUpsStates(MatchSimulationStateS2C simulationState)
         {
             foreach (var powerUp in simulationState.PowerUpBalls.AsSpan())
             {
@@ -124,7 +124,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             }
         }
 
-        private void CopyBulletsStates(SimulationStateS2C simulationState)
+        private void CopyBulletsStates(MatchSimulationStateS2C simulationState)
         {
             foreach (var bullet in simulationState.Bullets.AsSpan())
             {

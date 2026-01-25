@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentHandler
             (casterPlayerState.Spaceship.Transform.Direction, closetPlayerToCaster.Spaceship.Transform.Direction) = (closetPlayerToCaster.Spaceship.Transform.Direction, casterPlayerState.Spaceship.Transform.Direction);
         }
 
-        private PlayerStateS2C FindClosestPlayerToCaster(PlayerStateS2C casterPlayerState, SimulationStateS2C simulationStateS2C)
+        private PlayerStateS2C FindClosestPlayerToCaster(PlayerStateS2C casterPlayerState, MatchSimulationStateS2C simulationStateS2C)
         {
             var players = simulationStateS2C.Players;
             var span = players.AsSpan();

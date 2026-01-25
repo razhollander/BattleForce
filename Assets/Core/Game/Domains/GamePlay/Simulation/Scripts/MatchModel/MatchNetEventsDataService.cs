@@ -225,7 +225,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
             }
         }
 
-        public void AddPlayerJoinAcceptedEvent(int onTick, PlayerStateS2C playerState, SimulationStateS2C simulationState)
+        public void AddPlayerJoinAcceptedEvent(int onTick, PlayerStateS2C playerState, MatchSimulationStateS2C simulationState)
         {
             foreach (var kvp in JoinAcceptNetEventsPerPlayer)
             {

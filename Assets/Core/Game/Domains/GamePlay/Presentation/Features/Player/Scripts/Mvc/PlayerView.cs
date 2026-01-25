@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
     {
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private SpriteRenderer _availableBulletSpriteRenderer;
-        [SerializeField] private SimpleHealthBar _healthBar;
+        [SerializeField] private SimpleHealthBar _healthBar; // todo move to the match domain
         [SerializeField] private PlayerLoadingRing _playerLoadingRing;
         [SerializeField] private Transform _spaceShipTransform;
 

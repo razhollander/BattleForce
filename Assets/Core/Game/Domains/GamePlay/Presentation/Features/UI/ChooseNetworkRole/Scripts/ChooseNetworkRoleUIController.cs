@@ -1,10 +1,7 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
-using Core.Game.Domains.GamePlay.Simulation.NetworkManager.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.SceneService;
@@ -20,17 +17,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
         private readonly IStateMachineService _stateMachineService;
         private readonly IClientNetworkManager _clientNetworkManager;
         private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
-        private readonly IClientPresentationTickProcessor _clientPresentationTickProcessor;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, IFullTickPacketsHandler fullTickPacketsHandler, IClientPresentationTickProcessor clientPresentationTickProcessor)
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, IFullTickPacketsHandler fullTickPacketsHandler)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
             _stateMachineService = stateMachineService;
             _clientNetworkManager = clientNetworkManager;
             _fullTickPacketsHandler = fullTickPacketsHandler;
-            _clientPresentationTickProcessor = clientPresentationTickProcessor;
         }
 
         public void InitEntryPoint()

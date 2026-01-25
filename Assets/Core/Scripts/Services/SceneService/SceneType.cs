@@ -6,6 +6,8 @@
         GamePlayScene,
         GameScene,
         LobbyScene,
-        ServerScene
+        ServerScene,
+        GamePlayMatchScene,
+        GamePlayMatchMakingScene,
     }
 }

@@ -1,4 +1,4 @@
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -7,12 +7,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsComm
 {
     public class HandlePlayerSwapNetEventsCommand: BaseCommand, ICommandVoid
     {
-        private IPlayerControllers _playerControllers;
+        private IMatchPlayerControllers _playerControllers;
         private ICachedPresentationEventsService _cachedPresentationEventsService;
 
         public override void ResolveDependencies()
         {
-            _playerControllers = _diContainer.Resolve<IPlayerControllers>();
+            _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
         }
 

@@ -1,5 +1,4 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Scripts.Extensions;

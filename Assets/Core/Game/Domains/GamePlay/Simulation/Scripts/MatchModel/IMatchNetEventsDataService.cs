@@ -23,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel
         void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius);
         void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive);
         void AddBulletDestroyedNetEvent(int onTick, ushort bulletId, Vector2 position);
-        void AddPlayerJoinAcceptedEvent(int onTick, PlayerStateS2C playerState, SimulationStateS2C simulationState);
+        void AddPlayerJoinAcceptedEvent(int onTick, PlayerStateS2C playerState, MatchSimulationStateS2C simulationState);
         void AddPlayersSwapEvent(int onTick, ushort casterPlayerId, ushort otherPlayerId, Vector2 casterPlayerPosition, Vector2 otherPlayerPosition, Vector2 casterPlayerDirection, Vector2 otherPlayerDirection);
         void AddTalentCardObtainedNetEvent(int onTick, ushort cardId, ushort obtainedByPlayerId);
         void RemoveAllEventsOlderThanTick(ushort playerId, int tick);

@@ -64,6 +64,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         public bool IsMoveRightInputPressed()
         {
             return _gameInputActions.GamePlay.MoveRight.IsPressed();
+        } 
+        
+        public bool IsMoveForwardInputPressed()
+        {
+            return _gameInputActions.GamePlay.MoveForward.IsPressed();
         }
         
         public bool IsShootInputPressed()
