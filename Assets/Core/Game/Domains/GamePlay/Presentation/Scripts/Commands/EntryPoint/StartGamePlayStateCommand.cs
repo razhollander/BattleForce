@@ -32,7 +32,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         {
             _gameInputActionsController.EnableInputs();
             _chooseNetworkRoleUIController.InitEntryPoint();
-
         }
     }
 }
