@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
@@ -26,12 +27,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly NetworkConfig _networkConfig;
         private readonly IClientMatchPresentationTickProcessor _clientPresentationTickProcessor;
         private readonly ICommandFactory _commandFactory;
+        private readonly ITickCounterService _tickCounterService;
         private readonly AddMatchPlayerCommand _addMatchPlayerCommand;
         
         public PresentationMatchNetEventsHandler(IMatchDataService matchDataService,
-            ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager,
-            IMatchPlayerControllers playerControllers, NetworkConfig networkConfig,
-            IClientMatchPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, IMatchPlayerUIControllers playerUIControllers)
+            ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager, NetworkConfig networkConfig,
+            IClientMatchPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService)
         {
             _matchDataService = matchDataService;
             _cachedPresentationEventsService = iCachedPresentationEventsService;
@@ -39,15 +40,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _networkConfig = networkConfig;
             _clientPresentationTickProcessor = clientPresentationTickProcessor;
             _commandFactory = commandFactory;
+            _tickCounterService = tickCounterService;
             _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
         }
 
-        public void ProcessPlayerJoinedEvents(CapacityList<PlayerRejoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
+        public void ProcessPlayerRejoinedEvents(CapacityList<PlayerRejoinAcceptPacketS2C> playerRejoinAcceptNetEvents)
         {
-            foreach (var playerJoinAcceptNetEvent in playerJoinAcceptNetEvents)
+            foreach (var playerRejoinAcceptNetEvent in playerRejoinAcceptNetEvents)
             {
-                var playerId = playerJoinAcceptNetEvent.PlayerState.Id;
-                var isLocalPlayer = playerJoinAcceptNetEvent.IsLocal;
+                var playerId = playerRejoinAcceptNetEvent.PlayerState.Id;
+                var isLocalPlayer = playerRejoinAcceptNetEvent.IsLocal;
                 LogService.LogTopic(
                     $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerId,
                     LogTopicType.ClientNetwork);
@@ -55,22 +57,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 if (isLocalPlayer)
                 {
                     _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
-                        .SetSimulationState(playerJoinAcceptNetEvent.SimulationState).Execute();
-                    SyncTickToServer(out clientTick, playerJoinAcceptNetEvent);
+                        .SetSimulationState(playerRejoinAcceptNetEvent.SimulationState).Execute();
+                    SyncTickToServer(playerRejoinAcceptNetEvent);
                     SetupLocalPlayer(playerId);
                 }
                 else
                 {
-                    _addMatchPlayerCommand.SetPlayerState(playerJoinAcceptNetEvent.PlayerState).Execute();
+                    _addMatchPlayerCommand.SetPlayerState(playerRejoinAcceptNetEvent.PlayerState).Execute();
                 }
             }
         }
 
-        private void SyncTickToServer(out int clientTick, PlayerRejoinAcceptPacketS2C playerRejoinAcceptNetEvent)
+        private void SyncTickToServer(PlayerRejoinAcceptPacketS2C playerRejoinAcceptNetEvent)
         {
             var ticksPassedSinceServerSendPacket = (_networkManager.Ping / 1000f) / _networkConfig.DeltaTime;
             var tickWouldBeOnServerWhenReceiveMyPackets = (int)(ticksPassedSinceServerSendPacket * 2) + playerRejoinAcceptNetEvent.OccuredOnTick;
-            clientTick = tickWouldBeOnServerWhenReceiveMyPackets;
+            _tickCounterService.SetTick(tickWouldBeOnServerWhenReceiveMyPackets);
         }
 
         private void SetupLocalPlayer(int playerId)

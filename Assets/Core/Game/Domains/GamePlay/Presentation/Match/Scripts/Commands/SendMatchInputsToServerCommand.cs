@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         private IGameInputActionsController _gameInputActionsController;
         private ITickProcessor _tickProcessor;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
+        private ITickCounterService _tickCounterService;
 
         public override void ResolveDependencies()
         {
@@ -23,15 +24,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
              _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
              _tickProcessor = _diContainer.Resolve<ITickProcessor>();
              _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
+             _tickCounterService = _diContainer.Resolve<ITickCounterService>();
         }
 
         public void Execute()
         {
-            // if (PlaybackSettings.IsPlaybackEnabled)
-            // {
-            //     return;
-            // }
-
             var isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
             var isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
             var isShootInputPressed = _gameInputActionsController.IsShootInputPressed();
@@ -42,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 LogTopicType.ClientNetwork);
             var playerInputPacket = new MatchPlayerInputPacketC2S
             {
-                Tick = _tickProcessor.CurrentTick,
+                Tick = _tickCounterService.CurrentClientTick,
                 HeighestProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer,
                 IsMoveLeftInputPressed = isMoveLeftInputPressed,
                 IsMoveRightInputPressed = isMoveRightInputPressed,

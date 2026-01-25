@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using UnityEngine;
 using Zenject;
 
@@ -35,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
             Container.Bind<IGamePlayInitiator>().To<GamePlayInitiator>().AsSingle().NonLazy();
             Container.Bind<IClientNetworkManager>().To<ClientNetworkManager>().AsSingle().NonLazy();
             Container.Bind<ICachedPresentationEventsService>().To<CachedPresentationEventsService>().AsSingle().NonLazy();
+            Container.Bind<ITickCounterService>().To<TickCounterService>().AsSingle().NonLazy();
         }
 
         private void BindControllers()

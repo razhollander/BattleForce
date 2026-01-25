@@ -14,21 +14,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
 {
     public class ClientMatchMakingNetworkTickProcessor : ITickProcessor, IFixedUpdatable, IGUIUpdatable
     {
-        public void SetTick(int tickOnServer)
-        {
-            CurrentTick = tickOnServer;
-        }
-
-        public int CurrentTick { get; private set; }
-
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ICommandFactory _commandFactory;
         private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
-        private readonly IMatchMakingDataService _matchDataService;
+        private readonly IMatchMakingDataService _matchMakingDataService;
+        private readonly ITickCounterService _tickCounterService;
         private readonly IStateMachineService _stateMachineService;
-        private SendMatchMakingInputsToServerCommand _sendInputsToServerCommand;
         private readonly IClientNetworkManager _networkManager;
 
+        private SendMatchMakingInputsToServerCommand _sendInputsToServerCommand;
         private TimerFixedThreaded2 _fixedTimer;
         private DateTime _lastSendTime;
         private int _deltaMS;
@@ -36,13 +30,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
 
         public ClientMatchMakingNetworkTickProcessor(IClientNetworkManager networkManager,
             IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IFullTickPacketsHandler fullTickPacketsHandler, IMatchMakingDataService matchDataService)
+            IFullTickPacketsHandler fullTickPacketsHandler, IMatchMakingDataService matchMakingDataService, ITickCounterService tickCounterService)
         {
             _networkManager = networkManager;
             _updateSubscriptionService = updateSubscriptionService;
             _commandFactory = commandFactory;
             _fullTickPacketsHandler = fullTickPacketsHandler;
-            _matchDataService = matchDataService;
+            _matchMakingDataService = matchMakingDataService;
+            _tickCounterService = tickCounterService;
         }
 
         public void InitEntryPoint()
@@ -67,9 +62,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         public void ManagedFixedUpdate()
         {
             _networkManager.PollEvents();
-            CurrentTick = _fullTickPacketsHandler.ProcessStateLatestTick(CurrentTick);
+            _tickCounterService.IncrementTick();
+            _fullTickPacketsHandler.ProcessStateLatestTick();
             
-            if (_matchDataService.IsPlayerJoined)
+            if (_matchMakingDataService.IsPlayerJoined)
             {
                 SendCurrentTickInputsToServer();
                 _deltaMS = DateTime.Now.Millisecond - _lastSendTime.Millisecond;

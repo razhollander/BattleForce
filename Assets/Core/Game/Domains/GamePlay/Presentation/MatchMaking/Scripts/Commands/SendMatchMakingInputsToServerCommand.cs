@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         private IGameInputActionsController _gameInputActionsController;
         private ITickProcessor _tickProcessor;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
+        private ITickCounterService _tickCounterService;
 
         public override void ResolveDependencies()
         {
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
              _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
              _tickProcessor = _diContainer.Resolve<ITickProcessor>();
              _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
+             _tickCounterService = _diContainer.Resolve<ITickCounterService>();
         }
 
         public void Execute()
@@ -41,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
                 LogTopicType.ClientNetwork);
             var playerInputPacket = new MatchMakingPlayerInputPacketC2S
             {
-                Tick = _tickProcessor.CurrentTick,
+                Tick = _tickCounterService.CurrentClientTick,
                 HeighestProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer,
                 IsMoveLeftInputPressed = isMoveLeftInputPressed,
                 IsMoveRightInputPressed = isMoveRightInputPressed,
@@ -49,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
                 IsMoveForwardInputPressed = isMoveForwardInputPressed,
             };
             
-            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchPlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
+            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchMakingPlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
         }
     }
 }

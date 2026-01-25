@@ -14,18 +14,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
 {
     public class ClientMatchNetworkTickProcessor : ITickProcessor, IFixedUpdatable, IGUIUpdatable
     {
-        public void SetTick(int tickOnServer)
-        {
-            CurrentTick = tickOnServer;
-        }
-
-        public int CurrentTick { get; private set; }
-
         //private readonly ClientSimulationStateHandler _clientSimulationStateHandler;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ICommandFactory _commandFactory;
         private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
         private readonly IMatchDataService _matchDataService;
+        private readonly ITickCounterService _tickCounterService;
         private readonly IStateMachineService _stateMachineService;
         private SendMatchInputsToServerCommand _sendMatchInputsToServerCommand;
         private readonly IClientNetworkManager _networkManager;
@@ -38,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         public ClientMatchNetworkTickProcessor(IClientNetworkManager networkManager,
             //ClientSimulationStateHandler clientSimulationStateHandler,
             IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IFullTickPacketsHandler fullTickPacketsHandler, IMatchDataService matchDataService)
+            IFullTickPacketsHandler fullTickPacketsHandler, IMatchDataService matchDataService, ITickCounterService tickCounterService)
         {
             _networkManager = networkManager;
             //_clientSimulationStateHandler = clientSimulationStateHandler;
@@ -46,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _commandFactory = commandFactory;
             _fullTickPacketsHandler = fullTickPacketsHandler;
             _matchDataService = matchDataService;
+            _tickCounterService = tickCounterService;
         }
 
         public void InitEntryPoint()
@@ -70,7 +65,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         public void ManagedFixedUpdate()
         {
             _networkManager.PollEvents();
-            CurrentTick = _fullTickPacketsHandler.ProcessStateLatestTick(CurrentTick);
+            _tickCounterService.IncrementTick();
+            _fullTickPacketsHandler.ProcessStateLatestTick();
             
             if (_matchDataService.IsPlayerJoined)
             {

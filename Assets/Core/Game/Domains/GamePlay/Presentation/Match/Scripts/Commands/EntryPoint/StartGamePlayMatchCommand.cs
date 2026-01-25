@@ -63,7 +63,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _tickProcessor.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
-            
         }
     }
 }

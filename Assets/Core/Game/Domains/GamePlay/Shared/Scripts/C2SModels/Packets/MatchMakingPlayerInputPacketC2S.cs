@@ -18,7 +18,6 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
             writer.Put(Tick);
             writer.Put(HeighestProcessedTickFromServer);
             writer.Put(ConvertInputsToByte(IsMoveRightInputPressed, IsMoveLeftInputPressed, IsShootInputPressed, IsMoveForwardInputPressed));
-            writer.Put(Tick);
         }
         
         public void Deserialize(NetDataReader reader)
@@ -30,7 +29,6 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
             IsMoveLeftInputPressed = isMoveLeftInputPressed;
             IsShootInputPressed = isShootInputPressed;
             IsMoveForwardInputPressed = isMoveForwardInputPressed;
-            Tick = reader.GetInt();
         }
         
         private byte ConvertInputsToByte(bool isMoveRightInputPressed, bool isMoveLeftInputPressed, bool isShootInputPressed, bool isMoveForwardInputPressed)

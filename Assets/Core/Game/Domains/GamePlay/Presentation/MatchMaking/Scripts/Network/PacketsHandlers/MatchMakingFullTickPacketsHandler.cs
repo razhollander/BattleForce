@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
@@ -33,13 +34,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         public int LastProcessedTickFromServer { get; private set; }
 
         public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
-            IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory)
+            IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService,
+            IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
 
             _presentationNetEventsHandler = new PresentationMatchMakingNetEventsHandler(matchDataService, cachedPresentationEventsService, networkManager, networkConfig,
-                clientPresentationTickProcessor, commandFactory);
+                clientPresentationTickProcessor, commandFactory, tickCounterService);
 
             _fullTickPackets = new CapacityDict<int, MatchMakingFullTickPacket>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerJoinedEvents = new CapacityList<MatchMakingPlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
@@ -54,13 +56,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             _networkManager.RegisterPacketsObserver(this);
         }
 
-        public int ProcessStateLatestTick(int clientTick)
+        public void ProcessStateLatestTick()
         {
-            clientTick++;
-
             if (_fullTickPackets.IsNullOrEmpty())
             {
-                return clientTick;
+                return;
             }
 
             var latestTickReceivedFromServer = _fullTickPackets.Keys.Max();
@@ -70,10 +70,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             {
                 LogService.LogTopic("Didn't receive any state since last tick", LogTopicType.ClientNetwork);
 
-                return clientTick;
+                return;
             }
 
-            ProcessPlayerJoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents, ref clientTick);
+            ProcessPlayerJoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
@@ -88,8 +88,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             }
 
             _fullTickPackets.Clear();
-
-            return clientTick;
         }
         
         private void ProcessBulletDestroyedEvents(FixedUnorderedList<BulletDestroyedNetEventS2C> bulletDestroyedNetEvents)
@@ -111,7 +109,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         }
 
 
-        private void ProcessPlayerJoinedEvents(FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, ref int clientTick)
+        private void ProcessPlayerJoinedEvents(FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents)
         {
             _cachedUnprocessedPlayerJoinedEvents.Clear();
 
@@ -125,7 +123,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
             if (!_cachedUnprocessedPlayerJoinedEvents.IsNullOrEmpty())
             {
-                _presentationNetEventsHandler.ProcessPlayerJoinedEvents(_cachedUnprocessedPlayerJoinedEvents, ref clientTick);
+                _presentationNetEventsHandler.ProcessPlayerJoinedEvents(_cachedUnprocessedPlayerJoinedEvents);
             }
         }
 

@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         {
             _networkConfig = networkConfig;
             _packetsObservers = new CapacityDict<PacketTypeC2S, IPacketsObserver>(networkConfig.MaxCap.PacketTypes);
+            _rawPacketsObservers = new CapacityList<IRawPacketsObserver>(1);
         }
 
         public void RegisterObserver(IPacketsObserver PacketsObserver)
