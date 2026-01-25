@@ -1,5 +1,5 @@
 {
-    "name": "SimulationAssembly",
+    "name": "SimulationMatchAssembly",
     "rootNamespace": "",
     "references": [
         "GUID:f2b6c7fcef93c469e982a640a50f422d",
@@ -8,7 +8,9 @@
         "GUID:ec34a38cd6987469fb186013c4d9da54",
         "GUID:3a466247b15dd4fb789cdb7e3ca3fa20",
         "GUID:12f9c4bef76914797b9108362f9227a1",
-        "GUID:76a4d0b04d75c462ea1572072c04d836"
+        "GUID:76a4d0b04d75c462ea1572072c04d836",
+        "GUID:72159b6d19a7c4a3ab457b6d2cd727e1",
+        "GUID:72159b6d19a7c4a3ab457b6d2cd727e1"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

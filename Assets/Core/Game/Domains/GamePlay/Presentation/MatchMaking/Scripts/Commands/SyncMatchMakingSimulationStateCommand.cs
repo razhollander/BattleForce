@@ -9,8 +9,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
 {
     public class SyncMatchMakingSimulationStateCommand : BaseCommand, ICommandVoid
     {
-        private const int MATCH_MAKING_ENVIRONMENT_INDEX = 99;
-        
         private MatchMakingSimulationStateS2C _simulationState;
         private IMatchMakingDataService _matchDataService;
         private IMatchMakingBulletControllers _bulletControllers;

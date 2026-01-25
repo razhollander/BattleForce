@@ -3,7 +3,10 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Talent;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
@@ -13,9 +16,9 @@ using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers.PacketsHandlers
+namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers
 {
-    public class PlayerJoinPacketsHandler : IPlayerJoinPacketsHandler
+    public class MatchMakingPlayerJoinPacketsHandler : IPlayerJoinPacketsHandler
     {
         private readonly IServerNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
@@ -27,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly ConcurrentPool<JoinRequestPacketC2S> _joinedRequestPacketsPool;
         public PacketTypeC2S PacketType => PacketTypeC2S.JoinRequest;
 
-        public PlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
+        public MatchMakingPlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
             IMatchNetEventsDataService matchNetEventsDataService, NetworkConfig networkConfig, IPlayersTalentsManager playersTalentsManager)
         {
@@ -48,16 +51,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         public void ProcessPlayersJoined(int processedTick)
         {
-            var startingDirection = RNG.RNG.NextFloat(0, 360).AngleToVector();
+            var startingDirection = RNG.NextFloat(0, 360).AngleToVector();
             var velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
             var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
             var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
             var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
             var position = Vector2.One;
+
             foreach (var kvp in _playerJoinedPacketsPerPeer)
-            { 
+            {
                 var playerName = kvp.Value.UserName;
-                var playersAmount =_matchDataService.SimulationState.Players.Count;
+                var playersAmount = _matchDataService.SimulationState.Players.Count;
                 var playerColor = _gamePlayConfig.PlayerSpaceship.PlayerColors[playersAmount % _gamePlayConfig.PlayerSpaceship.PlayerColors.Length];
                 var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, health, shootCooldown, playerColor);
                 var playerId = playerState.Id;
@@ -75,16 +79,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             {
                 _joinedRequestPacketsPool.Return(kvp.Value);
             }
+
             _playerJoinedPacketsPerPeer.Clear();
         }
-        
+
         public void OnPacketReceived(NetDataReader reader, NetPeer peer)
         {
             var newPacket = _joinedRequestPacketsPool.Get();
             newPacket.Deserialize(reader);
             OnJoinReceived(newPacket, peer);
         }
-        
+
         private void OnJoinReceived(JoinRequestPacketC2S joinRequestPacket, NetPeer peer)
         {
             LogService.LogTopic("Join packet received: " + joinRequestPacket.UserName, LogTopicType.ServerNetwork);
