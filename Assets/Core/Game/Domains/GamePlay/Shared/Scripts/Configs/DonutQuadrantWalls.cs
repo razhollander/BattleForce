@@ -9,13 +9,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
     public static class DonutQuadrantWalls
     {
         /// <summary>
-        /// Generates 4 JSON strings (Red, Green, Yellow, Blue) representing donut-quadrant walls.
+        /// Generates 4 JSON strings (Red, Green, Yellow, Blue) representing convex walls for each quadrant.
+        /// Convex-only approach:
+        /// - Builds the quadrant ring sector out of CONVEX QUADS (or triangles if innerRadius == 0).
+        ///
         /// - outerRadius: outer ring radius
-        /// - precision: how many segments per 90° quadrant (points = precision+1 along each arc)
+        /// - precision: number of segments per 90° quadrant (higher = smoother)
         /// Notes:
-        /// - Inner radius is outerRadius * 0.5f (matches the image's "hole" vibe). Change if needed.
-        /// - Max points per wall is 8. If needed, each quadrant is split into sub-walls.
-        /// - Returned dictionary keys: "Red", "Green", "Yellow", "Blue"
+        /// - Inner radius is outerRadius * 0.5f.
+        /// - Each wall uses 4 points (convex quad), so no concave polygons and under max 8 points.
         /// </summary>
         public static Dictionary<string, string> Generate4QuadrantWallJsons(float outerRadius, int precision)
         {
@@ -24,17 +26,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 
             float innerRadius = outerRadius * 0.5f;
 
-            // Quadrants (degrees), clockwise-ish to match common 2D shapes:
-            // Red:   90 -> 0
-            // Green: 0  -> -90
-            // Yellow:-90-> -180
-            // Blue:  180-> 90
+            // Quadrants (degrees)
             var quadrants = new (string Name, float StartDeg, float EndDeg)[]
             {
-                ("Red", 90f, 0f),
-                ("Green", 0f, -90f),
-                ("Yellow", -90f, -180f),
-                ("Blue", 180f, 90f),
+                ("Red",    90f,   0f),
+                ("Green",   0f, -90f),
+                ("Yellow", -90f,-180f),
+                ("Blue",  180f,  90f),
             };
 
             ushort nextId = 1;
@@ -42,157 +40,35 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 
             foreach (var q in quadrants)
             {
-                var walls = BuildQuadrantWalls(
+                // Convex quads per segment
+                var walls = BuildConvexRingSectorQuads(
                     startDeg: q.StartDeg,
                     endDeg: q.EndDeg,
                     outerRadius: outerRadius,
                     innerRadius: innerRadius,
-                    precision: precision,
+                    segments: precision,
                     ref nextId);
 
-                // Serialize each color's walls as its own JSON (array of walls)
                 result[q.Name] = walls.ToJson();
             }
 
             return result;
         }
 
-        // ---- Implementation details ----
-
-        private static List<WallConfig> BuildQuadrantWalls(
-            float startDeg,
-            float endDeg,
-            float outerRadius,
-            float innerRadius,
-            int precision,
-            ref ushort nextId)
-        {
-            // Outer arc points (including endpoints)
-            var outerArc = SampleArcPoints(outerRadius, startDeg, endDeg, precision);
-
-            // We must cap polygon points to 8.
-            // A ring-sector polygon = outerChunkCount + innerChunkCount (same count reversed) => 2*outerChunkCount points.
-            // So outerChunkCount must be <= 4.
-            const int maxPointsPerWall = 8;
-            int maxOuterPtsPerWall = maxPointsPerWall / 2; // 4
-
-            // Split into chunks, overlapping by 1 point so there are no gaps between sub-walls.
-            // Each chunk uses outer points [i..j] inclusive.
-            var walls = new List<WallConfig>();
-            int i = 0;
-
-            while (i < outerArc.Count - 1) // need at least 2 outer points per wall
-            {
-                int remaining = outerArc.Count - i;
-                int take = Math.Min(maxOuterPtsPerWall, remaining);
-                if (take < 2) take = 2;
-
-                int j = i + take - 1;
-                if (j >= outerArc.Count) j = outerArc.Count - 1;
-
-                var outerChunk = outerArc.GetRange(i, j - i + 1);
-
-                // Inner arc chunk uses same angles but at inner radius.
-                // Build corresponding inner chunk by sampling the exact same degrees used by outerChunk.
-                var degreesForChunk = outerChunk.Select(p => MathF.Atan2(p.Y, p.X) * (180f / MathF.PI)).ToList();
-                var innerChunk = degreesForChunk.Select(d => PointOnCircle(innerRadius, d)).ToList();
-
-                // Polygon points: outer chunk in order + inner chunk in reverse order
-                var poly = new List<Vector2>(outerChunk.Count + innerChunk.Count);
-                poly.AddRange(outerChunk);
-                innerChunk.Reverse();
-                poly.AddRange(innerChunk);
-
-                // Remove any adjacent duplicates (can happen at boundaries)
-                poly = RemoveAdjacentDuplicates(poly);
-
-                // If we somehow still exceed, shrink (shouldn't happen with chunking)
-                if (poly.Count > maxPointsPerWall)
-                    poly = poly.Take(maxPointsPerWall).ToList();
-
-                walls.Add(new WallConfig(nextId++, poly.ToArray()));
-
-                // Move to next chunk with 1-point overlap
-                i = j;
-            }
-
-            return walls;
-        }
-
-        private static List<Vector2> SampleArcPoints(float radius, float startDeg, float endDeg, int precision)
-        {
-            // precision = segments per quadrant arc. Points = precision+1.
-            int points = precision + 1;
-
-            var list = new List<Vector2>(points);
-
-            for (int k = 0; k < points; k++)
-            {
-                float t = (points == 1) ? 0f : (k / (float) (points - 1));
-                float deg = Lerp(startDeg, endDeg, t);
-                list.Add(PointOnCircle(radius, deg));
-            }
-
-            return list;
-        }
-
-        private static Vector2 PointOnCircle(float r, float deg)
-        {
-            float rad = deg * (MathF.PI / 180f);
-
-            return new Vector2
-            {
-                X = r * MathF.Cos(rad),
-                Y = r * MathF.Sin(rad)
-            };
-        }
-
-        private static float Lerp(float a, float b, float t) => a + (b - a) * t;
-
-        private static List<Vector2> RemoveAdjacentDuplicates(List<Vector2> pts, float eps = 1e-5f)
-        {
-            if (pts.Count <= 1) return pts;
-
-            var cleaned = new List<Vector2>(pts.Count) {pts[0]};
-
-            for (int i = 1; i < pts.Count; i++)
-            {
-                var prev = cleaned[cleaned.Count - 1];
-                var cur = pts[i];
-
-                if (MathF.Abs(prev.X - cur.X) > eps || MathF.Abs(prev.Y - cur.Y) > eps)
-                    cleaned.Add(cur);
-            }
-
-            return cleaned;
-        }
-
-        //
-        // private static readonly JsonSerializerOptions JsonOptions = new()
-        // {
-        //     WriteIndented = true,
-        //     DefaultIgnoreCondition = JsonIgnoreCondition.Never
-        // };
-
         /// <summary>
-        /// Generates a "wrap-around" circular wall (an annulus ring) centered at (0,0).
-        /// The wall has radial thickness = width.
+        /// Generates convex wrap-around circular wall (annulus ring) with radial thickness = width.
+        /// Convex-only approach:
+        /// - Builds the ring out of CONVEX QUADS per segment.
         ///
-        /// - centerRadius: radius at the middle of the wall (think: track centerline)
+        /// - centerRadius: radius at the middle of the wall
         /// - width: radial thickness (outer = centerRadius + width/2, inner = centerRadius - width/2)
-        /// - precision: number of segments around 360° (points per arc = precision+1; higher = smoother)
-        ///
-        /// Output:
-        /// - JSON array of walls (sub-walls) because each wall is capped to 8 points.
-        ///
-        /// Note:
-        /// - This builds polygons for full ring by splitting into chunks so (outerPts + innerPts) <= 8.
+        /// - precision: number of segments around full 360°
         /// </summary>
         public static WallConfig[] GenerateWrapAroundWallJson(float centerRadius, float width, int precision, ushort startId = 1000)
         {
             if (centerRadius <= 0) throw new ArgumentOutOfRangeException(nameof(centerRadius));
             if (width <= 0) throw new ArgumentOutOfRangeException(nameof(width));
-            if (precision < 4) precision = 4; // reasonable minimum for a circle
+            if (precision < 4) precision = 4;
 
             float half = width * 0.5f;
             float innerRadius = centerRadius - half;
@@ -203,126 +79,169 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 
             ushort nextId = startId;
 
-            // We build the full circle from 0 -> 360 (inclusive endpoint duplicates 0°).
-            // We'll treat it as a closed loop but avoid duplicate last point in chunking.
-            var outerArc = SampleArcPoints(outerRadius, startDeg: 0f, endDeg: 360f, precision);
-
-            // Remove the final point at 360° (duplicate of 0°) to avoid zero-length edges.
-            if (outerArc.Count > 1)
-                outerArc.RemoveAt(outerArc.Count - 1);
-
-            // Each ring polygon chunk: outerChunkCount + innerChunkCount, where innerChunkCount matches outerChunkCount.
-            // With max 8 points total => outerChunkCount <= 4.
-            const int maxPointsPerWall = 8;
-            int maxOuterPtsPerWall = maxPointsPerWall / 2; // 4
-
-            var walls = new List<WallConfig>();
-
-            // Chunk with overlap to keep continuity.
-            int i = 0;
-
-            while (i < outerArc.Count)
-            {
-                int remaining = outerArc.Count - i;
-
-                // Need at least 2 points for a polygon strip.
-                int take = Math.Min(maxOuterPtsPerWall, remaining);
-
-                if (take < 2)
-                {
-                    // Wrap remainder by taking from start to make at least 2 points
-                    // (only happens when remaining == 1)
-                    take = 2;
-                }
-
-                // Collect indices (wrapping around)
-                var outerChunk = new List<Vector2>(take);
-
-                for (int k = 0; k < take; k++)
-                    outerChunk.Add(outerArc[(i + k) % outerArc.Count]);
-
-                // Inner chunk uses same angles as outer points
-                var degreesForChunk = outerChunk
-                    .Select(p => MathF.Atan2(p.Y, p.X) * (180f / MathF.PI))
-                    .ToList();
-
-                var innerChunk = degreesForChunk.Select(d => PointOnCircle(innerRadius, d)).ToList();
-
-                // Polygon: outer forward + inner reverse
-                var poly = new List<Vector2>(outerChunk.Count + innerChunk.Count);
-                poly.AddRange(outerChunk);
-                innerChunk.Reverse();
-                poly.AddRange(innerChunk);
-
-                poly = RemoveAdjacentDuplicates(poly);
-
-                // Ensure <= 8 (should be by construction)
-                if (poly.Count > maxPointsPerWall)
-                    poly = poly.Take(maxPointsPerWall).ToList();
-
-                walls.Add(new WallConfig(nextId++, poly.ToArray()));
-
-                // Advance with 1-point overlap (wrap safe)
-                i += (take - 1);
-
-                // Stop condition: if we’ve looped enough to cover full circle.
-                // Since we’re incrementing with overlap, end when i >= outerArc.Count.
-                if (i >= outerArc.Count)
-                    break;
-            }
+            // Build quads around full circle. Use 0..360 split into 'precision' segments.
+            var walls = BuildConvexRingSectorQuads(
+                startDeg: 0f,
+                endDeg: 360f,
+                outerRadius: outerRadius,
+                innerRadius: innerRadius,
+                segments: precision,
+                ref nextId,
+                wrapFullCircle: true);
 
             return walls.ToArray();
         }
 
-        // ---- Shared helpers ----
+        // --------------------------------------------------------------------
+        // Convex builders
+        // --------------------------------------------------------------------
 
-        private static List<WallConfig> BuildRingSectorWalls(
+        /// <summary>
+        /// Builds a ring sector using convex quads, one per angular segment:
+        /// Quad = [outer(a0), outer(a1), inner(a1), inner(a0)] (ordered consistently).
+        ///
+        /// Always convex when innerRadius > 0 and segment angle < 180° (true here).
+        /// </summary>
+        private static List<WallConfig> BuildConvexRingSectorQuads(
             float startDeg,
             float endDeg,
             float outerRadius,
             float innerRadius,
-            int precision,
-            ref ushort nextId)
+            int segments,
+            ref ushort nextId,
+            bool wrapFullCircle = false)
         {
-            var outerArc = SampleArcPoints(outerRadius, startDeg, endDeg, precision);
+            if (segments < 1) segments = 1;
+            if (outerRadius <= 0) throw new ArgumentOutOfRangeException(nameof(outerRadius));
+            if (innerRadius < 0) throw new ArgumentOutOfRangeException(nameof(innerRadius));
+            if (innerRadius >= outerRadius) throw new ArgumentException("innerRadius must be < outerRadius");
 
-            const int maxPointsPerWall = 8;
-            int maxOuterPtsPerWall = maxPointsPerWall / 2; // 4
+            // For full circle, we do not include the duplicate endpoint.
+            // We generate angles for each segment boundary.
+            var angles = new List<float>(segments + 1);
+
+            for (int i = 0; i <= segments; i++)
+            {
+                float t = i / (float)segments;
+                angles.Add(Lerp(startDeg, endDeg, t));
+            }
+
+            if (wrapFullCircle)
+            {
+                // Remove the final angle (360) to avoid duplicating the 0 seam.
+                // We'll connect last segment to the first by wrapping indices.
+                angles.RemoveAt(angles.Count - 1);
+            }
 
             var walls = new List<WallConfig>();
-            int i = 0;
 
-            while (i < outerArc.Count - 1) // need at least 2 outer points per wall
+            int segCount = wrapFullCircle ? angles.Count : (angles.Count - 1);
+
+            for (int i = 0; i < segCount; i++)
             {
-                int remaining = outerArc.Count - i;
-                int take = Math.Min(maxOuterPtsPerWall, remaining);
-                if (take < 2) take = 2;
+                float a0 = angles[i];
+                float a1 = wrapFullCircle ? angles[(i + 1) % angles.Count] : angles[i + 1];
 
-                int j = i + take - 1;
-                if (j >= outerArc.Count) j = outerArc.Count - 1;
+                // Points on arcs
+                var o0 = PointOnCircle(outerRadius, a0);
+                var o1 = PointOnCircle(outerRadius, a1);
 
-                var outerChunk = outerArc.GetRange(i, j - i + 1);
+                if (innerRadius <= 0.0001f)
+                {
+                    // Degenerates into a triangle fan to center (still convex)
+                    var tri = EnsureWindingCCW(new List<Vector2>
+                    {
+                        o0,
+                        o1,
+                        Vector2.Zero
+                    });
 
-                var degreesForChunk = outerChunk.Select(p => MathF.Atan2(p.Y, p.X) * (180f / MathF.PI)).ToList();
-                var innerChunk = degreesForChunk.Select(d => PointOnCircle(innerRadius, d)).ToList();
+                    walls.Add(new WallConfig(nextId++, tri.ToArray()));
+                    continue;
+                }
 
-                var poly = new List<Vector2>(outerChunk.Count + innerChunk.Count);
-                poly.AddRange(outerChunk);
-                innerChunk.Reverse();
-                poly.AddRange(innerChunk);
+                var i1p = PointOnCircle(innerRadius, a1);
+                var i0p = PointOnCircle(innerRadius, a0);
 
-                poly = RemoveAdjacentDuplicates(poly);
+                // Convex quad: outer(a0) -> outer(a1) -> inner(a1) -> inner(a0)
+                var quad = EnsureWindingCCW(new List<Vector2>
+                {
+                    o0, o1, i1p, i0p
+                });
 
-                if (poly.Count > maxPointsPerWall)
-                    poly = poly.Take(maxPointsPerWall).ToList();
+                // (Optional) Remove accidental duplicates at seam due to float noise
+                quad = RemoveAdjacentDuplicates(quad);
 
-                walls.Add(new WallConfig(nextId++, poly.ToArray()));
-
-                // overlap by one point
-                i = j;
+                walls.Add(new WallConfig(nextId++, quad.ToArray()));
             }
 
             return walls;
+        }
+
+        // --------------------------------------------------------------------
+        // Math helpers
+        // --------------------------------------------------------------------
+
+        private static Vector2 PointOnCircle(float r, float deg)
+        {
+            float rad = deg * (MathF.PI / 180f);
+            return new Vector2
+            {
+                X = r * MathF.Cos(rad),
+                Y = r * MathF.Sin(rad)
+            };
+        }
+
+        private static float Lerp(float a, float b, float t) => a + (b - a) * t;
+
+        /// <summary>
+        /// Ensures polygon winding is CCW (helps some physics engines and keeps normals consistent).
+        /// Works for triangles/quads here.
+        /// </summary>
+        private static List<Vector2> EnsureWindingCCW(List<Vector2> pts)
+        {
+            if (pts.Count < 3) return pts;
+
+            // Signed area > 0 => CCW
+            float area2 = 0f;
+            for (int i = 0; i < pts.Count; i++)
+            {
+                var a = pts[i];
+                var b = pts[(i + 1) % pts.Count];
+                area2 += (a.X * b.Y - b.X * a.Y);
+            }
+
+            if (area2 < 0f)
+                pts.Reverse();
+
+            return pts;
+        }
+
+        private static List<Vector2> RemoveAdjacentDuplicates(List<Vector2> pts, float eps = 1e-5f)
+        {
+            if (pts.Count <= 1) return pts;
+
+            var cleaned = new List<Vector2>(pts.Count) { pts[0] };
+
+            for (int i = 1; i < pts.Count; i++)
+            {
+                var prev = cleaned[cleaned.Count - 1];
+                var cur = pts[i];
+
+                if (MathF.Abs(prev.X - cur.X) > eps || MathF.Abs(prev.Y - cur.Y) > eps)
+                    cleaned.Add(cur);
+            }
+
+            // Also check last vs first (for closed polygon duplicates)
+            if (cleaned.Count > 2)
+            {
+                var first = cleaned[0];
+                var last = cleaned[cleaned.Count - 1];
+                if (MathF.Abs(first.X - last.X) <= eps && MathF.Abs(first.Y - last.Y) <= eps)
+                    cleaned.RemoveAt(cleaned.Count - 1);
+            }
+
+            return cleaned;
         }
     }
 }
