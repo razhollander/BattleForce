@@ -1,7 +1,7 @@
 using CoreDomain.Scripts.Helpers.Pools;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc
 {
     public class TalentCardPool : PrefabsPool<TalentCardView>
     {

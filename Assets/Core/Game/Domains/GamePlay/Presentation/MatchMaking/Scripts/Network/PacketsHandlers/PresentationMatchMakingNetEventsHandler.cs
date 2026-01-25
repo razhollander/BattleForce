@@ -1,8 +1,8 @@
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;

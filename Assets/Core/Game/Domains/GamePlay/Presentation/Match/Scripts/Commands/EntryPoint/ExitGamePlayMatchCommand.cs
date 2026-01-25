@@ -1,6 +1,7 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPoint

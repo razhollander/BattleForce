@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc
 {
     public class PowerUpBallControllers : IPowerUpBallControllers
     {

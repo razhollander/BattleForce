@@ -1,12 +1,15 @@
 using UnityEngine;
 
-public class EnvironmentLavaWallView : MonoBehaviour
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts
 {
-    [SerializeField] private MeshFilter _meshFilter;
-    [SerializeField] private MeshRenderer _meshRenderer;
-
-    public void SetMesh(Mesh mesh)
+    public class EnvironmentLavaWallView : MonoBehaviour
     {
-        _meshFilter.sharedMesh = mesh;
+        [SerializeField] private MeshFilter _meshFilter;
+        [SerializeField] private MeshRenderer _meshRenderer;
+
+        public void SetMesh(Mesh mesh)
+        {
+            _meshFilter.sharedMesh = mesh;
+        }
     }
 }

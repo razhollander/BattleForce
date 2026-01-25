@@ -1,5 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 

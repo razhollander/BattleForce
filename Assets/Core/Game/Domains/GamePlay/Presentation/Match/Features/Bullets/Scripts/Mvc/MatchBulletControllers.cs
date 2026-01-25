@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
 using Zenject;

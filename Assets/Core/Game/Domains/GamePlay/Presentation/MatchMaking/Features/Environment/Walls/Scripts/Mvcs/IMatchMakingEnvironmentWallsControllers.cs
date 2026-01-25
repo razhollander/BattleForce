@@ -1,4 +1,4 @@
-namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls
+namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs
 {
     public interface IMatchMakingEnvironmentWallsControllers
     {

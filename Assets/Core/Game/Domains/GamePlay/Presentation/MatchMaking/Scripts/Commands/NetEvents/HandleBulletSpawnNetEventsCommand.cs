@@ -1,7 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Sirenix.Utilities;
 

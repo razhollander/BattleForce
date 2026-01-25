@@ -3,7 +3,7 @@ using System.Threading;
 using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.ObtainedEffect
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect
 {
     public class PowerUpBallObtainedEffectView : MonoBehaviour, IPoolable
     {

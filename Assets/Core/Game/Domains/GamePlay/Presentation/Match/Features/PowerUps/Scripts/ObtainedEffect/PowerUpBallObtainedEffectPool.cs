@@ -1,7 +1,7 @@
 using CoreDomain.Scripts.Helpers.Pools;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.ObtainedEffect
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect
 {
     public class PowerUpBallObtainedEffectPool : PrefabsPool<PowerUpBallObtainedEffectView>
     {

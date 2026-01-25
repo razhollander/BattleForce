@@ -1,4 +1,4 @@
-namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts
 {
     public interface IEnvironmentLavaWallsControllers
     {

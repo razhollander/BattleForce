@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
 {
     public interface ICachedPresentationEventsService
     {

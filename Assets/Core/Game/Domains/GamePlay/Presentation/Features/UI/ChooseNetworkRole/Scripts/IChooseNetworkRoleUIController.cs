@@ -1,4 +1,4 @@
-namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
+namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.Scripts
 {
     public interface IChooseNetworkRoleUIController
     {

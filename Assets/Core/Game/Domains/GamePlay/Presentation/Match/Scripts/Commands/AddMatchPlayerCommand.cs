@@ -1,10 +1,10 @@
-using Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 {
     public class AddMatchPlayerCommand :BaseCommand, ICommandVoid
     {

@@ -1,13 +1,10 @@
 using System;
-using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
-using CoreDomain.Scripts.Helpers.Pools;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect
 {
     public class TalentCardObtainedEffectController : ITalentCardObtainedEffectController
     {

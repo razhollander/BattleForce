@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
     public class MatchPlayerUIControllers : IMatchPlayerUIControllers
     {

@@ -1,7 +1,7 @@
 using CoreDomain.Scripts.Helpers.Pools;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 {
     public class PlayerViewPool : PrefabsPool<PlayerView>
     {

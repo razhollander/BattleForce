@@ -1,7 +1,7 @@
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 {
     public class MoveInputInvokedCommand : BaseCommand, ICommandVoid
     {

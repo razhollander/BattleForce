@@ -1,12 +1,11 @@
-using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
     public class HandlePlayerTakeDamangeNetEventsCommand: BaseCommand, ICommandVoid
     {

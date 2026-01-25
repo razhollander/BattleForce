@@ -1,9 +1,9 @@
 using System.Linq;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Scripts.Extensions;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.LavaWalls.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts
 {
     public class EnvironmentLavaWallController
     {

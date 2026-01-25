@@ -1,13 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
-using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
-using Core.Game.Domains.GamePlay.Shared.Scripts.MatchData.Models;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 {
     public interface IMatchDataService 
     {

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
-using Core.Game.Domains.GamePlay.Shared.Scripts.MatchMakingData;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;

@@ -1,6 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 
-namespace Core.Game.Domains.GamePlay.Shared.Scripts.MatchMakingData
+namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService
 {
     public class MatchMakingPlayerModel
     {

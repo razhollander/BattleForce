@@ -1,7 +1,6 @@
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Shared.Scripts.MatchData.Models
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
 {
     public class MatchPowerUpBallModel
     {

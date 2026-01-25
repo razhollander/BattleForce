@@ -1,4 +1,4 @@
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors
 {
     public interface ITickProcessor
     {

@@ -1,15 +1,13 @@
-using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.UpdateService;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
 {
     public class ClientMatchPresentationTickProcessor : IUpdatable, IClientMatchPresentationTickProcessor
     {

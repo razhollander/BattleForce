@@ -1,7 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 
-namespace Core.Game.Domains.GamePlay.Shared
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
 {
     public class MatchPlayerModel
     {

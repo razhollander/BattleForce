@@ -14,6 +14,8 @@ namespace CoreDomain.Scripts.Editor.DefaultSceneSelector
         private const string CORE_SCENE_FILE = "Assets/Core/Assets/Scenes/CoreScene.unity";
         private const string GAME_SCENE_FILE = "Assets/Core/Game/Assets/Scenes/GameScene.unity";
         private const string GAMEPLAY_SCENE_FILE = "Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Scenes/GamePlayScene.unity";
+        private const string GAMEPLAY_MATCH_SCENE_FILE = "Assets/Core/Game/Domains/GamePlay/Presentation/Match/Assets/Scenes/GamePlayMatchScene.unity";
+        private const string GAMEPLAY_MATCH_MAKING_SCENE_FILE = "Assets/Core/Game/Domains/GamePlay/Presentation/MatchMaking/Assets/Scenes/GamePlayMatchMakingScene.unity";
         //private const string LOBBY_SCENE_FILE = "Assets/Core/Game/GameState/Lobby/Assets/Scenes/LobbyScene.unity";
         private const string SERVER_SCENE_FILE = "Assets/Core/Game/Domains/GamePlay/Simulation/Scene/ServerScene.unity";
         static DefaultSceneSelector()
@@ -99,11 +101,25 @@ namespace CoreDomain.Scripts.Editor.DefaultSceneSelector
             EditorSceneManager.OpenScene(GAMEPLAY_SCENE_FILE);
         }
         
-        [MenuItem("PracticAPI/Scene/Open/Server &5", false, 5)]
-        private static void OpenLobbyScene()
+        [MenuItem("PracticAPI/Scene/Open/Server &5", false, 6)]
+        private static void OpenServerScene()
         {
             EditorApplication.ExitPlaymode();
             EditorSceneManager.OpenScene(SERVER_SCENE_FILE);
+        }
+        
+        [MenuItem("PracticAPI/Scene/Open/GamePlay Match &6", false, 7)]
+        private static void OpenGamePlayMatchScene()
+        {
+            EditorApplication.ExitPlaymode();
+            EditorSceneManager.OpenScene(GAMEPLAY_MATCH_SCENE_FILE);
+        }
+        
+        [MenuItem("PracticAPI/Scene/Open/GamePlay Match Making &7", false, 8)]
+        private static void OpenGamePlayMatchMakingScene()
+        {
+            EditorApplication.ExitPlaymode();
+            EditorSceneManager.OpenScene(GAMEPLAY_MATCH_MAKING_SCENE_FILE);
         }
 
         private static string GetProjectRelativePath(string absolutePath)

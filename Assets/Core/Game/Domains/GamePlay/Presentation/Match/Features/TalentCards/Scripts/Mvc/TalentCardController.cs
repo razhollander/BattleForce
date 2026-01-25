@@ -1,11 +1,8 @@
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
-using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
-using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
-using Core.Scripts.Extensions;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc
 {
     public class TalentCardController
     {

@@ -1,10 +1,10 @@
 using System.Linq;
+using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Scripts.Extensions;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls
+namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs
 {
     public class MatchMakingEnvironmentWallController
     {

@@ -8,7 +8,7 @@ using CoreDomain.Scripts.Services.SceneService;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.UI
+namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.Scripts
 {
     public class ChooseNetworkRoleUIController : IChooseNetworkRoleUIController
     {

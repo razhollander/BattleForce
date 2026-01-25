@@ -1,14 +1,16 @@
 using System;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.StateMachineService;
 using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
 {
     public class ClientMatchNetworkTickProcessor : ITickProcessor, IFixedUpdatable, IGUIUpdatable
     {

@@ -1,4 +1,4 @@
-namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
     public interface IMatchUIController
     {

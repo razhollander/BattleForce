@@ -2,7 +2,7 @@ using System;
 using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc
 {
     public class TalentCardView : MonoBehaviour, IPoolable
     {

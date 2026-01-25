@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using CoreDomain.Scripts.Services.CommandFactory;

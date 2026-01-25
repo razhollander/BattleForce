@@ -1,10 +1,9 @@
-using System.Collections;
-using CoreDomain.Scripts.Helpers.Pools;
-using UnityEngine;
 using System;
 using System.Threading;
+using CoreDomain.Scripts.Helpers.Pools;
+using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect
 {
     public class TalentCardObtainedEffectView : MonoBehaviour, IPoolable
     {

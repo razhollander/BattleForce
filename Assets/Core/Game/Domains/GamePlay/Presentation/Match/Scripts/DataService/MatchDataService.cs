@@ -1,17 +1,13 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
-using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
-using Core.Game.Domains.GamePlay.Shared.Scripts.MatchData.Models;
-using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
-using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 {
     public class MatchDataService : IMatchDataService
     {

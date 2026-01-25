@@ -1,8 +1,8 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Initiator;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -12,9 +12,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
 {
     public class GamePlayInstaller : MonoInstaller
     {
-        [SerializeField] private Volume _postProcessVolume;
-        [SerializeField] private ChooseNetworkRoleUIView _chooseNetworkRoleUIView;
-        
+        // [SerializeField] private Volume _postProcessVolume;
+        // [SerializeField] private ChooseNetworkRoleUIView _chooseNetworkRoleUIView;
+        //
        
         [SerializeField] private SharedGamePlayConfig _sharedGamePlayConfig;
         [SerializeField] private PresentationGamePlayConfig _gamePlayConfig;
@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
         private void BindControllers()
         {
             Container.BindInterfacesTo<GameInputActionsController>().AsSingle().NonLazy();
-            Container.BindInterfacesTo<ChooseNetworkRoleUIController>().AsSingle().WithArguments(_chooseNetworkRoleUIView).NonLazy();
+            //Container.BindInterfacesTo<ChooseNetworkRoleUIController>().AsSingle().WithArguments(_chooseNetworkRoleUIView).NonLazy();
         }
     }
 }

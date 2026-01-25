@@ -1,9 +1,10 @@
 using System.Threading;
-using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
 

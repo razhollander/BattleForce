@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.StateMachineService;

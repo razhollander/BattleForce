@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.LavaWalls.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts
 {
     public class EnvironmentLavaWallsControllers : IEnvironmentLavaWallsControllers
     {

@@ -1,11 +1,11 @@
 using System;
-using System;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing;
+using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 {
     public class PlayerView : MonoBehaviour, IPoolable
     {

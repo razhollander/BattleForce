@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.Match.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
     public class MatchPlayerUIView : MonoBehaviour
     {

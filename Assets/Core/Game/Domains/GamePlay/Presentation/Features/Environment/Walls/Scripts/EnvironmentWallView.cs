@@ -1,12 +1,15 @@
 using UnityEngine;
 
-public class EnvironmentWallView : MonoBehaviour
+namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts
 {
-    [SerializeField] private MeshFilter _meshFilter;
-    [SerializeField] private MeshRenderer _meshRenderer;
-
-    public void SetMesh(Mesh mesh)
+    public class EnvironmentWallView : MonoBehaviour
     {
-        _meshFilter.sharedMesh = mesh;
+        [SerializeField] private MeshFilter _meshFilter;
+        [SerializeField] private MeshRenderer _meshRenderer;
+
+        public void SetMesh(Mesh mesh)
+        {
+            _meshFilter.sharedMesh = mesh;
+        }
     }
 }

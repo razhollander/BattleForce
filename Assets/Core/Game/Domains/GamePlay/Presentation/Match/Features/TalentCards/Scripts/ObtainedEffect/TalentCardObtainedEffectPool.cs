@@ -1,9 +1,7 @@
 using CoreDomain.Scripts.Helpers.Pools;
-using CoreDomain.Scripts.Services.StateMachineService;
-using UnityEngine;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect
 {
     public class TalentCardObtainedEffectPool : PrefabsPool<TalentCardObtainedEffectView>
     {

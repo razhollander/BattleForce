@@ -1,6 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using CoreDomain.Scripts.Services.CommandFactory;

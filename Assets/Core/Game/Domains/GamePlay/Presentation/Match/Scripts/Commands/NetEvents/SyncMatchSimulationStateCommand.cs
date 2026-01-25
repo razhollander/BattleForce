@@ -1,14 +1,14 @@
-using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls;
-using Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.NetEventsCommands
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
     public class SyncMatchSimulationStateCommand : BaseCommand, ICommandVoid
     {

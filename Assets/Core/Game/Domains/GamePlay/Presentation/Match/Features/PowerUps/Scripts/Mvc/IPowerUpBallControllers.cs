@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.PowerUps.Scripts.Mvc
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc
 {
     public interface IPowerUpBallControllers
     {

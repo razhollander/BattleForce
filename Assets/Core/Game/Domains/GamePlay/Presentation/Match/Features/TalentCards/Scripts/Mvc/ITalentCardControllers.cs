@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.TalentCards.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc
 {
     public interface ITalentCardControllers
     {

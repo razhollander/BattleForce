@@ -1,4 +1,4 @@
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Presentation
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
 {
     public interface IClientMatchPresentationTickProcessor
     {
