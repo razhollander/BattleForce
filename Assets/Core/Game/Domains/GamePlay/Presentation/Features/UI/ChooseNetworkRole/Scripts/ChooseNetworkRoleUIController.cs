@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.SceneService;
@@ -16,16 +16,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly ISceneLoaderService _sceneLoaderService;
         private readonly IStateMachineService _stateMachineService;
         private readonly IClientNetworkManager _clientNetworkManager;
-        private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, IFullTickPacketsHandler fullTickPacketsHandler)
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
             _stateMachineService = stateMachineService;
             _clientNetworkManager = clientNetworkManager;
-            _fullTickPacketsHandler = fullTickPacketsHandler;
         }
 
         public void InitEntryPoint()
@@ -91,19 +89,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             await _sceneLoaderService.StartScene(SceneType.ServerScene, enterData, cancellationTokenSource);
             LogService.LogTopic("Finished starting Server", LogTopicType.ClientNetwork);
         }
-
-        private void StartClient(bool isHost)
+        
+        private async Awaitable StartClient(bool isHost, CancellationTokenSource cancellationTokenSource)
         {
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
+            await LoadMatchMakingScene(cancellationTokenSource);
             _clientNetworkManager.StartClient(isHost);
-            _fullTickPacketsHandler.RegisterListeners();
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
+        }
+
+        private async Awaitable LoadMatchMakingScene(CancellationTokenSource cancellationTokenSource)
+        {
+            var enterData = new GamePlayMatchMakingInitiatorEnterData();
+            await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
+            await _sceneLoaderService.StartScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
         }
 
         private void OnClientClicked()
         {
-            StartClient(false);
-            _uiView.Hide();
+            _ = OnClientClickedAsync();
+        }
+        
+        private async Awaitable OnClientClickedAsync()
+        {
+            var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
+
+            try
+            {
+                await StartClient(false, cancellationTokenSource);
+                _uiView.Hide();
+            }
+            catch (OperationCanceledException)
+            {
+                LogService.LogTopic("OperationCanceledException", LogTopicType.ClientNetwork);
+            }
+            catch (Exception e)
+            {
+                LogService.LogException(e);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;

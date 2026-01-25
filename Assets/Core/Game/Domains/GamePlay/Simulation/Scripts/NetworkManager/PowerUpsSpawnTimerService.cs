@@ -2,9 +2,8 @@ using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
-using Core.Game.Domains.GamePlay.Simulation.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using CoreDomain.Scripts.Services.UpdateService;
 using Zenject;
@@ -35,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public void RestartSpawnTimer()
         {
-            var randomSeconds = RNG.NextFloat(_gamePlayConfig.PowerUps.SpawnMinSecondsInterval, _gamePlayConfig.PowerUps.SpawnMaxSecondsInterval);
+            var randomSeconds = RNG.RNG.NextFloat(_gamePlayConfig.PowerUps.SpawnMinSecondsInterval, _gamePlayConfig.PowerUps.SpawnMaxSecondsInterval);
             _secondsLeftUntilSpawn = randomSeconds;
         }
     }

@@ -1,4 +1,4 @@
-namespace Core.Game.Domains.GamePlay.Simulation.NetworkManager
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
     public interface ITickProcessor
     {

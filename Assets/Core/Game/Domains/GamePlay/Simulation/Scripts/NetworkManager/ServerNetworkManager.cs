@@ -1,18 +1,13 @@
-using System;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
-using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Scripts.Network;
-using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Shared.NetworkManager
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
     public class ServerNetworkManager : IServerNetworkManager
     {

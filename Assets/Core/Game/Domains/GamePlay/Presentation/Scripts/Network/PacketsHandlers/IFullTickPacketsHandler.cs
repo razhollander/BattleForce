@@ -3,7 +3,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
     public interface IFullTickPacketsHandler : IPacketsObserver
     {
         int LastProcessedTickFromServer { get; }
-        void RegisterListeners();
+        void InitEntryPoint();
         int ProcessStateLatestTick(int clientTick);
         void InitExitPoint();
     }

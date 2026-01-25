@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 new ConcurrentPool<MatchMakingFullTickPacket>(() => new MatchMakingFullTickPacket(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
-        public void RegisterListeners()
+        public void InitEntryPoint()
         {
             _networkManager.RegisterPacketsObserver(this);
         }

@@ -9,6 +9,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using CoreDomain.GameDomain.Scripts.States.GamePlayState;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -28,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IMatchBulletControllers _bulletControllers;
         private ITickProcessor _tickProcessor;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
+        private IFullTickPacketsHandler _fullTickPacketsHandler;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -46,10 +48,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
+            _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
+            _fullTickPacketsHandler.InitEntryPoint();
             _talentCardControllers.InitEntryPoint();
             _environmentLavaWallsControllers.InitEntryPoint();
             _talentCardObtainedEffectController.InitEntryPoint();

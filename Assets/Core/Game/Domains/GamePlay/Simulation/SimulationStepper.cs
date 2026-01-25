@@ -1,6 +1,7 @@
-using UnityEngine;
-
-public class SimulationStepper
+namespace Core.Game.Domains.GamePlay.Simulation
 {
+    public class SimulationStepper
+    {
     
+    }
 }

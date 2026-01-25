@@ -1,7 +1,7 @@
 using ASoliman.Utils.EditableRefs;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
     [CreateAssetMenu(fileName = "SimulationGamePlayConfig", menuName = "BF/Network/GamePlay Config")]
     public class SimulationGamePlayConfig : ScriptableObject

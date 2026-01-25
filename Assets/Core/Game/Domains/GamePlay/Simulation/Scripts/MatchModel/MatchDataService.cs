@@ -1,6 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Network;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;

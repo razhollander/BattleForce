@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
     [CreateAssetMenu(fileName = "PlayerBulletConfig", menuName = "BF/Network/Player Bullet Config")]
     public class PlayerBulletConfig : ScriptableObject

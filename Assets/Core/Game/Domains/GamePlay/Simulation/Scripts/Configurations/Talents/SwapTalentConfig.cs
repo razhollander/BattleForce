@@ -1,4 +1,4 @@
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations.Talents
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
 {
     [System.Serializable]
     public class SwapTalentConfig

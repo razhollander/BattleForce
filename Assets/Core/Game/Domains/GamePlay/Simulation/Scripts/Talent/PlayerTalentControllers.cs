@@ -1,7 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentController;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Talent.TalentHandler;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Talent
 {

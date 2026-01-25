@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
-using Core.Game.Domains.GamePlay.Shared.ServerToClientModels;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
     public class NetworkS2CPacketsSender
     {

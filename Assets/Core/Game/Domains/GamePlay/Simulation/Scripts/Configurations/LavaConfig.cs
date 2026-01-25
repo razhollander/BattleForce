@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
     [CreateAssetMenu(fileName = "LavaConfig", menuName = "BF/Network/Lava Config")]
     public class LavaConfig : ScriptableObject

@@ -61,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacket>(() => new MatchFullTickPacket(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
-        public void RegisterListeners()
+        public void InitEntryPoint()
         {
             _networkManager.RegisterPacketsObserver(this);
         }

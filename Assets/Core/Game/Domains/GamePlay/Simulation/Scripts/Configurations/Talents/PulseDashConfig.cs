@@ -1,7 +1,7 @@
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.Configurations.Talents
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
 {
     [System.Serializable]
     public class PulseDashConfig
