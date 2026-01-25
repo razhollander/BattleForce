@@ -51,7 +51,7 @@ namespace Core.Scripts.Editor.EditorConfig
             }
             
             var shouldSkipMatchMaking = Core.Scripts.Utils.PlayerPrefsSettings.ShouldSkipMatchMaking;
-            var newShouldSkipMatchMaking = EditorGUILayout.Toggle("Should skip match making", isPlayback);
+            var newShouldSkipMatchMaking = EditorGUILayout.Toggle("Should skip match making", shouldSkipMatchMaking);
             if (shouldSkipMatchMaking != newShouldSkipMatchMaking)
             {
                 Core.Scripts.Utils.PlayerPrefsSettings.ShouldSkipMatchMaking = newShouldSkipMatchMaking;
