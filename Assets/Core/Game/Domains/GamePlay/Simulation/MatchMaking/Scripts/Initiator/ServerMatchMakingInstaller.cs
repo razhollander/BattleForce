@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTracker;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -27,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _diContainer.Bind<ITickProcessor>().To<ServerMatchMakingNetworkTickProcessor>().AsSingle();
             _diContainer.Bind<IPlayerJoinPacketsHandler>().To<MatchMakingPlayerJoinPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayerInputsPacketsHandler>().To<MatchMakingPlayerInputsPacketsHandler>().AsSingle().NonLazy();
+            _diContainer.Bind<IPlayersOnTeamFloorTrackerService>().To<PlayersOnTeamFloorTrackerService>().AsSingle();
         }
 
         private void StartMatchMaking()

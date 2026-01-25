@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -32,6 +33,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _tickProcessor.InitEntryPoint();
             
             CreateWalls();
+            CreateTeamFloors();
+        }
+
+        private void CreateTeamFloors()
+        {
+            var walls = DonutQuadrantWalls.GenerateQuadrantWallPerTeam(30f, 10);
+            foreach (var keyValuePair in walls)
+            {
+                var teamId = keyValuePair.Key;
+                var wallConfigs = keyValuePair.Value;
+                foreach (var wallConfig in wallConfigs)
+                {
+                    _physicsSimulator.AddTeamFloor((ushort)teamId, wallConfig.Points);
+                }
+            }
         }
 
         private void CreateWalls()

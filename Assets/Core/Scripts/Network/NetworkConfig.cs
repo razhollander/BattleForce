@@ -56,5 +56,6 @@ namespace Core.Scripts.Network
         public int ConcurrentPowerUpBalls = 32;
         public int PowerUpSpawnedNetEvents = 64;
         public int PowerUpObtainedNetEvents = 64;
+        public int PlayerSwitchTeamNetEvents = 64;
     }
 }
