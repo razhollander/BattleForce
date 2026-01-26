@@ -3,13 +3,6 @@ using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTracker
 {
-    public interface IPlayersOnTeamFloorTrackerService
-    {
-        void SetPlayerTeam(ushort playerId, ushort teamId);
-        ushort GetPlayerTeam(ushort playerId);
-        void RemovePlayer(ushort playerId);
-    }
-
     public class PlayersOnTeamFloorTrackerService : IPlayersOnTeamFloorTrackerService
     {
         private readonly CapacityDict<ushort, ushort> _playerTeamMap;
@@ -21,14 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
 
         public void SetPlayerTeam(ushort playerId, ushort teamId)
         {
-            if (_playerTeamMap.ContainsKey(playerId))
-            {
-                _playerTeamMap[playerId] = teamId;
-            }
-            else
-            {
-                _playerTeamMap.Add(playerId, teamId);
-            }
+            _playerTeamMap[playerId] = teamId;
         }
 
         public ushort GetPlayerTeam(ushort playerId)

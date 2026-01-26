@@ -69,15 +69,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             var isPlayerToFloor = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.TeamFloor;
             var isFloorToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.TeamFloor && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
 
-            if (!isPlayerToFloor && !isFloorToPlayer) return;
+            if (!isPlayerToFloor && !isFloorToPlayer)
+            {
+                return;
+            }
 
-            ushort playerId = isPlayerToFloor ? objectA.Id : objectB.Id;
-            ushort teamId = isPlayerToFloor ? objectB.Id : objectA.Id;
+            var playerId = isPlayerToFloor ? objectA.Id : objectB.Id;
+            var teamId = isPlayerToFloor ? objectB.Id : objectA.Id;
 
             var playerState = _matchMakingDataService.SimulationState.GetPlayerById(playerId);
-            if (playerState == null) return;
 
-            if (playerState.TeamId != teamId)
+            var didPlayerSwitchTeams = playerState.TeamId != teamId;
+            if (didPlayerSwitchTeams)
             {
                 playerState.TeamId = teamId;
                 _playersOnTeamFloorTrackerService.SetPlayerTeam(playerId, teamId);

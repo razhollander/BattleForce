@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
         private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private IPhysicsSimulator _physicsSimulator;
         private IMatchMakingDataService _matchMakingDataService;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
 
         public override void ResolveDependencies()
         {
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public void Execute()
@@ -38,14 +40,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
 
         private void CreateTeamFloors()
         {
-            var walls = DonutQuadrantWalls.GenerateQuadrantWallPerTeam(30f, 10);
-            foreach (var keyValuePair in walls)
+            var walls = DonutQuadrantWalls.GenerateQuadrantWallPerTeam(_sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius, _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsPrecision);
+            foreach (var kvp in walls)
             {
-                var teamId = keyValuePair.Key;
-                var wallConfigs = keyValuePair.Value;
+                var teamId = kvp.Key;
+                var wallConfigs = kvp.Value;
                 foreach (var wallConfig in wallConfigs)
                 {
-                    _physicsSimulator.AddTeamFloor((ushort)teamId, wallConfig.Points);
+                    _physicsSimulator.AddTeamFloor(teamId, wallConfig.Points);
                 }
             }
         }
