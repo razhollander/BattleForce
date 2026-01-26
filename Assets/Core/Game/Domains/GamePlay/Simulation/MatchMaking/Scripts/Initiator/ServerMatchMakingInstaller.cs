@@ -24,11 +24,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
         
         private void InstallBindings()
         {
-            _diContainer.Bind<IMatchMakingDataService>().To<MatchMakingDataService>().AsSingle();
-            _diContainer.Bind<ITickProcessor>().To<ServerMatchMakingNetworkTickProcessor>().AsSingle();
+            _diContainer.Bind<IMatchMakingDataService>().To<MatchMakingDataService>().AsSingle().NonLazy();
+            _diContainer.Bind<ITickProcessor>().To<ServerMatchMakingNetworkTickProcessor>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayerJoinPacketsHandler>().To<MatchMakingPlayerJoinPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayerInputsPacketsHandler>().To<MatchMakingPlayerInputsPacketsHandler>().AsSingle().NonLazy();
-            _diContainer.Bind<IPlayersOnTeamFloorTrackerService>().To<PlayersOnTeamFloorTrackerService>().AsSingle();
+            _diContainer.Bind<IPlayersOnTeamFloorTrackerService>().To<PlayersOnTeamFloorTrackerService>().AsSingle().NonLazy();
         }
 
         private void StartMatchMaking()

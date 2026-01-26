@@ -71,6 +71,14 @@ namespace CoreDomain.Scripts.Utils
 
             return awaitable.Awaitable;
         }
+        
+        public static async Awaitable WithCancellation(this AwaitableCompletionSource source, CancellationToken token)
+        {
+            using (token.Register(() => source.TrySetCanceled()))
+            {
+                await source.Awaitable;
+            }
+        }
 
         public static async Awaitable<UnityEngine.Object> WithCancellation(this ResourceRequest request, CancellationToken token)
         {
