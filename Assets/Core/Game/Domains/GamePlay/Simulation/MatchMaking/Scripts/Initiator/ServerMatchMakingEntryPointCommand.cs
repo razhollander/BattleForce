@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
@@ -16,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
         private IPhysicsSimulator _physicsSimulator;
         private IMatchMakingDataService _matchMakingDataService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
+        private StartMatchWallController _startMatchWallController;
 
         public override void ResolveDependencies()
         {
@@ -25,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
+            _startMatchWallController = _diContainer.Resolve<StartMatchWallController>();
         }
 
         public void Execute()
@@ -36,6 +39,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             
             CreateWalls();
             CreateTeamFloors();
+            CreateStartMatchWall();
+        }
+
+        private void CreateStartMatchWall()
+        {
+            _startMatchWallController.Initialize(_sharedGamePlayConfig.MatchMakingEnvironment.StartMatchWallRadius);
         }
 
         private void CreateTeamFloors()

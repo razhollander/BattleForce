@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
@@ -32,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
         private readonly ITickCounterService _tickCounterService;
+        private readonly StartMatchWallController _startMatchWallController;
 
         private TimerFixedThreaded2 _fixedTimer;
         private MatchMakingProcessCachedCollisionsCommand _processCachedCollisionsCommand;
@@ -44,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         public ServerMatchMakingNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchMakingDataService matchDataService,
             IPlayerJoinPacketsHandler playerJoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory, ITickCounterService tickCounterService)
+            ICommandFactory commandFactory, ITickCounterService tickCounterService, StartMatchWallController startMatchWallController)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -55,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
             _tickCounterService = tickCounterService;
+            _startMatchWallController = startMatchWallController;
         }
 
         public void InitEntryPoint()
@@ -113,6 +116,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
                 ApplyPhysicsSimulationToMatchModel();
                 
+                _startMatchWallController.Tick(stepDeltaTime);
                 _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(processedTick);
@@ -181,6 +185,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _fullTickPacket.PlayerJoinAcceptNetEvents = _netEventsDataService.MatchMakingPlayerJoinAcceptNetEventsPerPlayer[playerId];
                 _fullTickPacket.BulletDestroyedNetEvents = _netEventsDataService.BulletDestroyedNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerSwitchTeamNetEvents = _netEventsDataService.PlayerSwitchTeamNetEventsPerPlayer[playerId];
+                _fullTickPacket.StartMatchCountdownNetEvents = _netEventsDataService.StartMatchCountdownNetEventsPerPlayer[playerId];
+                _fullTickPacket.StopMatchCountdownNetEvents = _netEventsDataService.StopMatchCountdownNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchMakingFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }
