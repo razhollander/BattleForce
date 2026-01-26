@@ -116,7 +116,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 
         public MatchPlayerModel AddPlayer(PlayerStateS2C playerState)
         {
-            var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerState.Spaceship);
+            var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerState.TeamId, playerState.Spaceship);
             Players.Add(newPlayer);
             return newPlayer;
         }

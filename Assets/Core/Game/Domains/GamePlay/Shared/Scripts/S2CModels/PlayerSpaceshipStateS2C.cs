@@ -6,7 +6,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
     public class PlayerSpaceshipStateS2C : INetSerializable
     {
-        public Color Color;
         public PlayerTransformStateS2C Transform;
         public PlayerShootStateS2C Shoot;
         public PlayerHealthS2C Health;
@@ -28,7 +27,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Transform.Serialize(writer);
             Shoot.Serialize(writer);
             Health.Serialize(writer);
-            writer.Put(Color);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -36,7 +34,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Transform.Deserialize(reader);
             Shoot.Deserialize(reader);
             Health.Deserialize(reader);
-            Color = reader.GetColor();
         }
 
         public void SerializeDeltas(NetDataWriter writer)
