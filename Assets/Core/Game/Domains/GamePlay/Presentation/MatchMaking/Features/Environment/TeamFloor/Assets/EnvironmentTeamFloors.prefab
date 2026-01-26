@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fae61ac30bb4f03be91641789cd4198, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bounceaAnimationScale: 1.2
+  _bounceaAnimationScale: 0.9
   _bounceaAnimationDuration: 0.15
   _bounceaAnimationLoops: 2
   _environmentTeamFloorViewPrefab: {fileID: 6229960262738751626, guid: ad12937bcbc794fcd9307344878afc98, type: 3}
