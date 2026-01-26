@@ -6,9 +6,11 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Views;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using UnityEngine;
@@ -21,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.ZenjectIns
         [SerializeField] private PlayerView _playerViewPrefab;
         [SerializeField] private BulletView _bulletViewPrefab;
         [SerializeField] private EnvironmentWallView _environmentWallViewPrefab;
+        [SerializeField] private StartMatchButtonView _startMatchButtonViewPrefab;
         
         public override void InstallBindings()
         {
@@ -33,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.ZenjectIns
             Container.Bind<IGamePlayMatchMakingInitiator>().To<GamePlayMatchMakingInitiator>().AsSingle().NonLazy();
             Container.Bind<IMatchMakingDataService>().To<MatchMakingDataService>().AsSingle().NonLazy();
             Container.Bind<ITickProcessor>().To<ClientMatchMakingNetworkTickProcessor>().AsSingle().NonLazy();
+            Container.Bind<PresentationMatchMakingNetEventsHandler>().AsSingle().NonLazy();
             Container.Bind<IFullTickPacketsHandler>().To<MatchMakingFullTickPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IClientMatchMakingPresentationTickProcessor>().To<ClientMatchMakingPresentationTickProcessor>().AsSingle().NonLazy();
             
@@ -43,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.ZenjectIns
             Container.BindInterfacesTo<MatchMakingPlayerControllers>().AsSingle().WithArguments(_playerViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchMakingBulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchMakingEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
+            Container.BindInterfacesAndSelfTo<StartMatchButtonController>().AsSingle().WithArguments(_startMatchButtonViewPrefab).NonLazy();
         }
     }
 }

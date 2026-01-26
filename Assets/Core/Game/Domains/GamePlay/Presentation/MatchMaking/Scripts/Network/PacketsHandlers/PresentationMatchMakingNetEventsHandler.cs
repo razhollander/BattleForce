@@ -1,11 +1,13 @@
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
@@ -23,12 +25,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly IClientMatchMakingPresentationTickProcessor _clientPresentationTickProcessor;
         private readonly ICommandFactory _commandFactory;
         private readonly ITickCounterService _tickCounterService;
+        private readonly StartMatchButtonController _startMatchButtonController;
         private readonly AddMatchMakingPlayerCommand _addMatchMakingPlayerCommand;
         
         public PresentationMatchMakingNetEventsHandler(IMatchMakingDataService matchDataService,
             ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager,
             NetworkConfig networkConfig,
-            IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService)
+            IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService, StartMatchButtonController startMatchButtonController)
         {
             _matchDataService = matchDataService;
             _cachedPresentationEventsService = iCachedPresentationEventsService;
@@ -37,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             _clientPresentationTickProcessor = clientPresentationTickProcessor;
             _commandFactory = commandFactory;
             _tickCounterService = tickCounterService;
+            _startMatchButtonController = startMatchButtonController;
             _addMatchMakingPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchMakingPlayerCommand>();
         }
 
@@ -103,6 +107,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             {
                 _matchDataService.RemoveBullet(bulletDestroyedEvent.BulletId);
                 _cachedPresentationEventsService.BulletDestroyedNetEvents.Add(bulletDestroyedEvent);
+            }
+        }
+
+        public void ProcessStartMatchCountdownEvents(CapacityList<StartMatchCountdownNetEventS2C> startMatchCountdownNetEvents)
+        {
+            foreach (var startMatchCountdownNetEvent in startMatchCountdownNetEvents)
+            {
+                _startMatchButtonController.OnStartMatchCountdown(startMatchCountdownNetEvent.Duration);
+            }
+        }
+
+        public void ProcessStopMatchCountdownEvents(CapacityList<StopMatchCountdownNetEventS2C> stopMatchCountdownNetEvents)
+        {
+            if (!stopMatchCountdownNetEvents.IsNullOrEmpty())
+            {
+                _startMatchButtonController.OnStopMatchCountdown();
             }
         }
     }
