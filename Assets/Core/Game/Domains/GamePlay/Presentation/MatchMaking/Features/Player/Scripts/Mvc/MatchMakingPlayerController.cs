@@ -86,5 +86,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
         {
             return _playerView.GetTransform();
         }
+
+        public void SetColor(Color color)
+        {
+            _playerView.SetColor(color);
+        }
     }
 }

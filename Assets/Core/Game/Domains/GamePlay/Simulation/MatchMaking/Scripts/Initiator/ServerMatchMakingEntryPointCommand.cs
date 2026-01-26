@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -14,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
         private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private IPhysicsSimulator _physicsSimulator;
         private IMatchMakingDataService _matchMakingDataService;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
 
         public override void ResolveDependencies()
         {
@@ -22,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public void Execute()
@@ -32,6 +35,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _tickProcessor.InitEntryPoint();
             
             CreateWalls();
+            CreateTeamFloors();
+        }
+
+        private void CreateTeamFloors()
+        {
+            var walls = DonutQuadrantWalls.GenerateQuadrantWallPerTeam(_sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius, _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsPrecision);
+            foreach (var kvp in walls)
+            {
+                var teamId = kvp.Key;
+                var wallConfigs = kvp.Value;
+                foreach (var wallConfig in wallConfigs)
+                {
+                    _physicsSimulator.AddTeamFloor(teamId, wallConfig.Points);
+                }
+            }
         }
 
         private void CreateWalls()

@@ -27,5 +27,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
             var mesh = MeshUtils.BuildMesh(pointsUnityVector2, 0);
             _wallView.SetMesh(mesh);
         }
+
+        public void SetColor(Color color)
+        {
+            if (_wallView != null)
+            {
+                _wallView.SetColor(color);
+            }
+        }
+
+        public void AnimateBounce()
+        {
+            if (_wallView != null)
+            {
+                _wallView.AnimateBounce();
+            }
+        }
     }
 }
