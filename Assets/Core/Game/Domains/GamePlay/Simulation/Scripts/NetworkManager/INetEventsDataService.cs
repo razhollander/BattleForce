@@ -20,6 +20,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<ushort, FixedUnorderedList<TalentCardHitNetEventS2C>> TalentCardHitNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> PowerUpBallSpawnedNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> PowerUpBallObtainedNetEventsPerPlayer { get; }
+        CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> PlayerSwitchTeamNetEventsPerPlayer { get; }
+        
         void StartSavingPlayerEvents(ushort playerId);
         void StopSavingPlayerEvents(ushort playerId);
         void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius);
@@ -33,5 +35,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddTalentCardHitNetEvent(int processedTick, ushort talentCardId, ushort cardHealth);
         void AddPowerUpSpawnedNetEvent(int onTick, ushort powerUpBallId, Vector2 position);
         void AddPowerUpObtainedNetEvent(int onTick, ushort powerUpBallId, ushort byPlayerId);
+        void AddPlayerSwitchTeamNetEvent(int onTick, ushort playerId, ushort teamId);
     }
 }

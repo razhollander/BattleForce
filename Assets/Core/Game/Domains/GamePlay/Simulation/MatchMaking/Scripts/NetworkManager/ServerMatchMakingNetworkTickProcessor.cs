@@ -180,6 +180,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _fullTickPacket.BulletSpawnNetEvents = _netEventsDataService.BulletSpawnNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerJoinAcceptNetEvents = _netEventsDataService.MatchMakingPlayerJoinAcceptNetEventsPerPlayer[playerId];
                 _fullTickPacket.BulletDestroyedNetEvents = _netEventsDataService.BulletDestroyedNetEventsPerPlayer[playerId];
+                _fullTickPacket.PlayerSwitchTeamNetEvents = _netEventsDataService.PlayerSwitchTeamNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchMakingFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }
