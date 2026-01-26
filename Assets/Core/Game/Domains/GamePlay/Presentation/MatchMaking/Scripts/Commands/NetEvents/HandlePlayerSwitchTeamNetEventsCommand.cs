@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.TeamFloor.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Sirenix.Utilities;
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
         private IMatchMakingPlayerControllers _playerControllers;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private IMatchMakingEnvironmentTeamFloorControllers _environmentTeamFloorControllers;
+        private IMatchMakingDataService _matchMakingDataService;
 
         public override void ResolveDependencies()
         {
@@ -20,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
             _playerControllers = _diContainer.Resolve<IMatchMakingPlayerControllers>();
             _environmentTeamFloorControllers = _diContainer.Resolve<IMatchMakingEnvironmentTeamFloorControllers>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
+            _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
         }
 
         public void Execute()
@@ -32,9 +35,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
 
             foreach (var netEvent in events)
             {
-                var playerNewColor = _sharedGamePlayConfig.ColorPerTeamId[netEvent.TeamId];
+                var teamId = netEvent.TeamId;
+                var playerNewColor = _sharedGamePlayConfig.ColorPerTeamId[teamId];
                 _playerControllers.UpdatePlayerColor(netEvent.PlayerId, playerNewColor);
-                _environmentTeamFloorControllers.AnimateFloorBounce(netEvent.TeamId);
+                _matchMakingDataService.GetPlayer(netEvent.PlayerId).TeamId = teamId;
+                _environmentTeamFloorControllers.AnimateFloorBounce(teamId);
             }
 
             events.Clear();

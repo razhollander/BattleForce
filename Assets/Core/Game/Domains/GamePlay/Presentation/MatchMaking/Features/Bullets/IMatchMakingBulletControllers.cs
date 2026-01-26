@@ -6,7 +6,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets
     public interface IMatchMakingBulletControllers
     {
         void InitEntryPoint();
-        void CreateBullet(ushort bulletId, float bulletRadius, Vector2 position, Color color);
+        void CreateBullet(ushort bulletId, float bulletRadius, Vector2 position);
         void UpdateBulletsTransform();
         void DestroyBullet(ushort bulletId);
     }

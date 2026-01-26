@@ -19,6 +19,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataServic
         MatchPlayerBulletModel GetBullet(ushort bulletId);
         MatchEnvironmentWallModel GetEnvironmentWall(ushort wallId);
         void RemoveBullet(ushort bulletId);
-        void UpdatePlayerTeam(ushort playerId, int teamId);
+        void UpdatePlayerTeam(ushort playerId, ushort teamId);
     }
 }

@@ -6,14 +6,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataServic
     {
         public ushort PlayerId;
         public string PlayerName;
-        public int TeamId;
+        public ushort TeamId;
         public MatchMakingPlayerSpaceshipStateS2C Spaceship;
 
-        public MatchMakingPlayerModel(ushort playerId, string playerName, MatchMakingPlayerSpaceshipStateS2C spaceship)
+        public MatchMakingPlayerModel(ushort playerId, string playerName, MatchMakingPlayerSpaceshipStateS2C spaceship, ushort teamId)
         {
             PlayerId = playerId;
             PlayerName = playerName;
             Spaceship = spaceship;
+            TeamId = teamId;
         }
     }
 }

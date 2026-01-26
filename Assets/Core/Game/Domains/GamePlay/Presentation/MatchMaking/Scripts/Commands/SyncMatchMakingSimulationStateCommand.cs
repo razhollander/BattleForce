@@ -46,8 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
             foreach (var bulletState in _simulationState.Bullets.AsSpan())
             {
                 _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Position, bulletState.Radius);
-                var bulletColor = _matchDataService.GetPlayer(bulletState.BelongToPlayerId).Spaceship.Color;
-                _bulletControllers.CreateBullet(bulletState.Id, bulletState.Radius, bulletState.Position, bulletColor);
+                _bulletControllers.CreateBullet(bulletState.Id, bulletState.Radius, bulletState.Position);
             }
         }
     }

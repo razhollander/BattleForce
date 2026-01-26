@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataServic
 
         public MatchMakingPlayerModel AddPlayer(MatchMakingPlayerStateS2C playerState)
         {
-            var newPlayer = new MatchMakingPlayerModel(playerState.Id, playerState.Name, playerState.Spaceship);
+            var newPlayer = new MatchMakingPlayerModel(playerState.Id, playerState.Name, playerState.Spaceship, playerState.TeamId);
             Players.Add(newPlayer);
             return newPlayer;
         }
@@ -77,7 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataServic
             LocalPlayer = Players.Find(x => x.PlayerId == playerId);
         }
 
-        public void UpdatePlayerTeam(ushort playerId, int teamId)
+        public void UpdatePlayerTeam(ushort playerId, ushort teamId)
         {
             var player = GetPlayer(playerId);
             if (player != null)
