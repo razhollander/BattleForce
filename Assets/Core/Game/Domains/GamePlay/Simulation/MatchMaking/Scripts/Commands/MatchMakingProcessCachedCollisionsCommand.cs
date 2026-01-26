@@ -154,7 +154,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
 
             if (!relativeVelocity.IsFacingWall(collisionNormal))
             {
-                LogService.LogError("Not facing walls on this frame!");
                 return;
             }
             
