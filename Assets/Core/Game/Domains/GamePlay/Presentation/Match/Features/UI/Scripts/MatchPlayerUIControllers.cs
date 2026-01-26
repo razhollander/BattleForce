@@ -7,17 +7,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
     {
         private readonly MatchPlayerUIControllersView _view;
         private readonly IMatchDataService _matchDataService;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly Dictionary<ushort, MatchPlayerUIController> _playerControllers = new Dictionary<ushort, MatchPlayerUIController>();
 
-        public MatchPlayerUIControllers(MatchPlayerUIControllersView view, IMatchDataService matchDataService)
+        public MatchPlayerUIControllers(MatchPlayerUIControllersView view, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _view = view;
             _matchDataService = matchDataService;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void AddPlayer(ushort playerId)
         {
-            var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId);
+            var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId, _sharedGamePlayConfig);
             newPlayerController.CreateView(_view.PlayerUIView, _view.PlayersContainer);
             _playerControllers.Add(playerId, newPlayerController);
         }

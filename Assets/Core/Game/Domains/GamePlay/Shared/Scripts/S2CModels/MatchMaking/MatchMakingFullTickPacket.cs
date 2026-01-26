@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
         public FixedUnorderedList<BulletSpawnNetEventS2C> BulletSpawnNetEvents; // todo: remove events related to bullet when bullet id destroyed
         public FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C> PlayerJoinAcceptNetEvents;
         public FixedUnorderedList<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents;
+        public FixedUnorderedList<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents;
 
         public MatchMakingFullTickPacket()
         {
@@ -26,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
             PlayerJoinAcceptNetEvents = new FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>(maxCap.PlayerJoinAcceptNetEvents, () => new MatchMakingPlayerJoinAcceptPacketS2C(maxCap));
             BulletDestroyedNetEvents = new FixedUnorderedList<BulletDestroyedNetEventS2C>(maxCap.BulletDestroyedNetEvents);
+            PlayerSwitchTeamNetEvents = new FixedUnorderedList<PlayerSwitchTeamNetEventS2C>(maxCap.PlayerSwitchTeamNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -35,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             SerializedPlayerJoinedEvents(writer);
             SerializedBulletSpawnedEvents(writer);
             SerializedBulletDestroyedEvents(writer);
+            SerializedPlayerSwitchTeamEvents(writer);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -44,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             DeserializedPlayerJoinedEvents(reader);
             DeserializedBulletSpawnedEvents(reader);
             DeserializedBulletDestroyedEvents(reader);
+            DeserializedPlayerSwitchTeamEvents(reader);
         }
 
         private void SerializedBulletDestroyedEvents(NetDataWriter writer)
@@ -104,6 +108,26 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             {
                 ref var bulletSpawnEvent = ref BulletSpawnNetEvents.AddAndGet();
                 bulletSpawnEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerSwitchTeamEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerSwitchTeamNetEvents.Count);
+            foreach (var playerSwitchTeamNetEvent in PlayerSwitchTeamNetEvents.AsSpan())
+            {
+                playerSwitchTeamNetEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedPlayerSwitchTeamEvents(NetDataReader reader)
+        {
+            PlayerSwitchTeamNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var playerSwitchTeamNetEvent = ref PlayerSwitchTeamNetEvents.AddAndGet();
+                playerSwitchTeamNetEvent.Deserialize(reader);
             }
         }
     }

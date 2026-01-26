@@ -27,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private IServerNetworkManager _networkManager;
         private ICommandFactory _commandFactory;
         private SimulationGamePlayConfig _gamePlayConfig;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -49,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _networkManager = _diContainer.Resolve<IServerNetworkManager>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public void Execute()
@@ -108,9 +110,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
                 var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
                 var position = Vector2.One;
-                var playersAmount = _matchDataService.SimulationState.Players.Count;
-                var playerColor = _gamePlayConfig.PlayerSpaceship.ColorPerTeamId[playersAmount % _gamePlayConfig.PlayerSpaceship.ColorPerTeamId.Count];
-                _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown, playerColor);
+                _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown);
                 _physicsSimulator.AddPlayer(playerId, playerTeamId, position, startingDirection, radius);
                 _playersTalentsManager.AddPlayer(playerId);
             }

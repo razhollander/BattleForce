@@ -270,6 +270,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(lavaShape);
         }
 
+        public void AddTeamFloor(ushort teamId, Vector2[] points)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = Vector2.Zero;
+            bodyDef.userData = new PhysicsBodyData(teamId, PhysicsBodyType.TeamFloor);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var shape = GetPolygonShape();
+            shape.Set(points);
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.TeamFloor.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.TeamFloor.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(shape);
+        }
+
         public void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius)
         {
             var bodyDef = GetBodyDef();

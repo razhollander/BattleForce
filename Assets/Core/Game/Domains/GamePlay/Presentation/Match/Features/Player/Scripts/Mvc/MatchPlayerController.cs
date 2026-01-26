@@ -16,14 +16,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public readonly ushort PlayerId;
         private PlayerView _playerView;
         private readonly PlayerViewPool _playerPool;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
 
-        public MatchPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, Transform parent)
+        public MatchPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, Transform parent, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _parent = parent;
             PlayerId = playerId;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void CreatePlayerView()
@@ -33,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.transform.SetParent(_parent);
             _playerView.name = "Player_" + PlayerId;
             var playerTransform = playerModel.Spaceship.Transform;
-            _playerView.SetColor(playerModel.Spaceship.Color);
+            _playerView.SetColor(_sharedGamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
         }

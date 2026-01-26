@@ -17,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         /// - Inner radius is outerRadius * 0.5f.
         /// - Each wall uses 4 points (convex quad), so no concave polygons and under max 8 points.
         /// </summary>
-        public static Dictionary<int, WallConfig[]> GenerateQuadrantWallPerTeam(float outerRadius, int precision)
+        public static Dictionary<ushort, WallConfig[]> GenerateQuadrantWallPerTeam(float outerRadius, int precision)
         {
             if (outerRadius <= 0) throw new ArgumentOutOfRangeException(nameof(outerRadius));
             if (precision < 1) precision = 1;
@@ -25,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             float innerRadius = outerRadius * 0.5f;
 
             // Quadrants (degrees)
-            var quadrants = new (int TeamId, float StartDeg, float EndDeg)[]
+            var quadrants = new (ushort TeamId, float StartDeg, float EndDeg)[]
             {
                 (1,    90f,   0f),
                 (2,   0f, -90f),
@@ -34,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             };
 
             ushort nextId = 1;
-            var result = new Dictionary<int, WallConfig[]>();
+            var result = new Dictionary<ushort, WallConfig[]>();
 
             foreach (var q in quadrants)
             {

@@ -294,6 +294,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             contact.GetWorldManifold(out var worldManifold);
             var collisionNormal = worldManifold.normal;
             var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
+            if (!relativeVelocity.IsFacingWall(collisionNormal))
+            {
+                return;
+            }
+            
             playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
             LogService.LogTopic($"new pos {_physicsSimulator.GetPlayer(playerModel.Id).Position}, prev pos: {playerModel.Spaceship.Transform.Position} ", LogTopicType.ServerNetwork);
             playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0

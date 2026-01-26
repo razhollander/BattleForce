@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         }
 
         public PlayerStateS2C AddPlayer(ushort playerId, ushort teamId, string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,
-            float shootCooldown, Color color)
+            float shootCooldown)
         {
             var newPlayer = _simulationState.Players.AddAndGet();
             newPlayer.Id = playerId;
@@ -49,7 +49,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             newPlayer.Spaceship.Transform.Radius = radius;
             newPlayer.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
             newPlayer.Spaceship.Shoot.MaxCooldown = shootCooldown;
-            newPlayer.Spaceship.Color = color;
             return newPlayer;
         }
 
