@@ -58,8 +58,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             foreach (var kvp in _playerJoinedPacketsPerPeer)
             {
                 var playerName = kvp.Value.UserName;
-                var playersAmount = _matchDataService.SimulationState.Players.Count;
-                var playerColor = _sharedGamePlayConfig.ColorPerTeamId[playersAmount % _sharedGamePlayConfig.ColorPerTeamId.Count];
+                var playerTeam = _matchDataService.SimulationState.Players.Count+1;
+                var playerColor = _sharedGamePlayConfig.ColorPerTeamId[playerTeam % _sharedGamePlayConfig.ColorPerTeamId.Count];
                 var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerColor);
                 var playerId = playerState.Id;
                 var peer = kvp.Key;

@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
             }
         }
 
-        public void CreateWall(ushort wallId)
+        private void CreateWall(ushort wallId)
         {
             var wallController = new MatchMakingEnvironmentWallController(wallId, _matchDataService);
             wallController.CreateWallView(_wallViewPrefab, _wallsParent.transform);

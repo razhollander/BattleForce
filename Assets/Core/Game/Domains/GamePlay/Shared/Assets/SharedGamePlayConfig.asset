@@ -20,3 +20,10 @@ MonoBehaviour:
     TeamFloorsPrecision: 50
     WallsWidth: 2
   PowerUps: {fileID: 11400000, guid: 0121acb33a8104de2926cc3c0bb6c95a, type: 2}
+  ColorPerTeamId:
+    m_keys: 01000000020000000300000004000000
+    m_values:
+    - {r: 0.7924528, g: 0, b: 0, a: 1}
+    - {r: 0.07658162, g: 0.8490566, b: 0, a: 1}
+    - {r: 0, g: 0.59331334, b: 0.9622642, a: 1}
+    - {r: 1, g: 0.80729437, b: 0, a: 1}

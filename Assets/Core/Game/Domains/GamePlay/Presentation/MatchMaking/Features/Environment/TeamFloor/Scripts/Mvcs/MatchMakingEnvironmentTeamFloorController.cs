@@ -7,11 +7,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
 {
     public class MatchMakingEnvironmentTeamFloorController
     {
-        private EnvironmentTeamFloorView _teamFloorView;
+        private EnvironmentTeamFloorsView _teamFloorsView;
         private readonly ushort _teamId;
         private readonly WallConfig[] _walls;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private Transform _teamFloorsParent;
         
         public MatchMakingEnvironmentTeamFloorController(ushort teamId, WallConfig[] walls, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -20,24 +19,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
         
-        public void CreateTeamFloors(EnvironmentTeamFloorView teamFloorView, Transform parent)
+        public void CreateTeamFloors(EnvironmentTeamFloorsView teamFloorView, Transform parent)
         {
-            _teamFloorsParent = new GameObject("TeamFloors_" + _teamId).transform;
-            _teamFloorsParent.SetParent(parent);
+            _teamFloorsView = Object.Instantiate(teamFloorView, parent);
+            _teamFloorsView.name = "TeamFloors_" + _teamId;
             
             foreach (var wall in _walls)
             {
-                _teamFloorView = Object.Instantiate(teamFloorView, _teamFloorsParent);
-                _teamFloorView.name = "EnvironmentTeamFloor_" + wall.Id;
                 var pointsUnityVector2 = wall.Points.Select(x => x.ToUnityVector2()).ToArray();
-                var mesh = MeshUtils.BuildMesh(pointsUnityVector2);
-                _teamFloorView.Setup(mesh, _sharedGamePlayConfig.ColorPerTeamId[_teamId]);
+                var mesh = MeshUtils.BuildMesh(pointsUnityVector2, 2);
+                _teamFloorsView.CreateFloor(mesh, wall.Id, _sharedGamePlayConfig.ColorPerTeamId[_teamId]);
             }
         }
-
+        
         public void AnimateBounce()
         {
-            _teamFloorView.AnimateBounce();
+            _teamFloorsView.AnimateBounce();
+
         }
     }
 }

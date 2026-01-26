@@ -7,15 +7,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
 {
     public class MatchMakingEnvironmentTeamFloorControllers : IMatchMakingEnvironmentTeamFloorControllers
     {
-        private readonly EnvironmentTeamFloorView _teamFloorViewPrefab;
+        private readonly EnvironmentTeamFloorsView _teamFloorsViewPrefab;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly Dictionary<ushort, MatchMakingEnvironmentTeamFloorController> _controllerByTeamId = new();
         private GameObject _teamFloorsParent;
 
-        public MatchMakingEnvironmentTeamFloorControllers(EnvironmentTeamFloorView teamFloorViewPrefab, SharedGamePlayConfig sharedGamePlayConfig)
+        public MatchMakingEnvironmentTeamFloorControllers(EnvironmentTeamFloorsView teamFloorsViewPrefab, SharedGamePlayConfig sharedGamePlayConfig)
         {
-            _teamFloorViewPrefab = teamFloorViewPrefab;
+            _teamFloorsViewPrefab = teamFloorsViewPrefab;
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
                 var teamId = kvp.Key;
                 var walls = kvp.Value;
                 var teamFloorController = new MatchMakingEnvironmentTeamFloorController(teamId, walls, _sharedGamePlayConfig);
-                teamFloorController.CreateTeamFloors(_teamFloorViewPrefab, _teamFloorsParent.transform);
+                teamFloorController.CreateTeamFloors(_teamFloorsViewPrefab, _teamFloorsParent.transform);
                 _controllerByTeamId[teamId] = teamFloorController;
             }
         }
