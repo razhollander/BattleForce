@@ -2,6 +2,7 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
 using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall
@@ -11,17 +12,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationStateMachine _simulationStateMachine;
 
         private bool _isCountingDown;
         private float _countdownTimer;
         private int _lastTickGotHitByBullet = -1;
         private const ushort START_MATCH_WALL_ID = 1;
-        public bool DidFinishCountingDown => _countdownTimer <= 0;
-        public StartMatchWallController(IPhysicsSimulator physicsSimulator, INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig)
+        public bool DidFinishCountingDown => _isCountingDown && _countdownTimer <= 0;
+        public StartMatchWallController(IPhysicsSimulator physicsSimulator, INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig, ISimulationStateMachine simulationStateMachine)
         {
             _physicsSimulator = physicsSimulator;
             _netEventsDataService = netEventsDataService;
             _gamePlayConfig = gamePlayConfig;
+            _simulationStateMachine = simulationStateMachine;
         }
 
         public void Initialize(float radius)

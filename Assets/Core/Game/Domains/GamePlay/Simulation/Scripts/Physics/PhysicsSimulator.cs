@@ -548,5 +548,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _fixtureDefPool.Return(fixtureDef);
             _circleShapePool.Return(circleShape);
         }
+
+        public void ClearAllData()
+        {
+            _world = CreateWorld();
+            ClearCachedCollisions();
+        }
     }
 }

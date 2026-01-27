@@ -10,20 +10,16 @@ using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
 {
-    public class ServerMatchMakingInstaller // called from reflection
+    public class ServerMatchMakingInstaller 
     {
-        private readonly DiContainer _diContainer;
-        private readonly ICommandFactory _commandFactory;
+        private DiContainer _diContainer;
 
         public ServerMatchMakingInstaller(DiContainer diContainer) 
         {
             _diContainer = diContainer;
-            _commandFactory = _diContainer.Resolve<ICommandFactory>();
-            InstallBindings();
-            StartMatchMaking();
         }
         
-        private void InstallBindings()
+        public void InstallBindings()
         {
             _diContainer.Bind<IMatchMakingDataService>().To<MatchMakingDataService>().AsSingle().NonLazy();
             _diContainer.Bind<ITickProcessor>().To<ServerMatchMakingNetworkTickProcessor>().AsSingle().NonLazy();
@@ -33,9 +29,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _diContainer.Bind<IStartMatchWallController>().To<StartMatchWallController>().AsSingle().NonLazy();
         }
 
-        private void StartMatchMaking()
+        public void UninstallBindings()
         {
-            _commandFactory.CreateCommandVoid<ServerMatchMakingEntryPointCommand>().Execute();
+            _diContainer = null;
         }
     }
 }

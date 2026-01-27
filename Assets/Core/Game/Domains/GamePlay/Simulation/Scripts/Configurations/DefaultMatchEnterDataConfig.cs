@@ -15,11 +15,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public PlayerData[] Players;
     
         [Serializable]
-        public class PlayerData
+        public struct PlayerData
         {
             public ushort Id;
             public string Name;
             public ushort TeamId;
+        }
+
+        public SimulationMatchEnterData(PlayerData[] players)
+        {
+            Players = players;
         }
     }
 }

@@ -8,10 +8,12 @@ using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -33,6 +35,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
         private readonly ITickCounterService _tickCounterService;
+        private readonly IStartMatchWallController _startMatchWallController;
+        private readonly ISimulationStateMachine _simulationStateMachine;
 
         private TimerFixedThreaded2 _fixedTimer;
         private MatchMakingProcessCachedCollisionsCommand _processCachedCollisionsCommand;
@@ -45,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         public ServerMatchMakingNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchMakingDataService matchDataService,
             IPlayerJoinPacketsHandler playerJoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory, ITickCounterService tickCounterService)
+            ICommandFactory commandFactory, ITickCounterService tickCounterService, IStartMatchWallController startMatchWallController, ISimulationStateMachine simulationStateMachine)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -56,6 +60,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
             _tickCounterService = tickCounterService;
+            _startMatchWallController = startMatchWallController;
+            _simulationStateMachine = simulationStateMachine;
         }
 
         public void InitEntryPoint()
@@ -110,6 +116,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 var processedTick = _tickCounterService.CurrentTick - _networkConfig.ServerTicksBuffer;
                 var processPlayersInputsResult = ProcessPackets(processedTick);
                 StepPhysics(stepDeltaTime, processedTick);
+                MoveToMatchStateIfCountdownEnded();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(processedTick);
             }
@@ -118,6 +125,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 LogService.LogError("Got error! " + e);
                 throw;
             }
+        }
+
+        private void MoveToMatchStateIfCountdownEnded()
+        {
+            if (!_startMatchWallController.DidFinishCountingDown)
+            {
+                return;
+            }
+
+            var playersData = new SimulationMatchEnterData.PlayerData[_matchDataService.SimulationState.Players.Count];
+
+            for (int i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
+            {
+                var playerState = _matchDataService.SimulationState.Players.GetByIndex(i);
+                playersData[i].Id = playerState.Id;
+                playersData[i].TeamId = playerState.TeamId;
+                playersData[i].Name = playerState.Name;
+            }
+
+            var matchEnterData = new SimulationMatchEnterData(playersData);
+            _simulationStateMachine.ChangeToMatch(matchEnterData);
         }
 
         private void StepPhysics(float stepDeltaTime, int processedTick)
