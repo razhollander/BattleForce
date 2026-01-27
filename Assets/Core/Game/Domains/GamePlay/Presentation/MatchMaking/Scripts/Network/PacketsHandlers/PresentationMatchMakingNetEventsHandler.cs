@@ -27,11 +27,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly ITickCounterService _tickCounterService;
         private readonly StartMatchButtonController _startMatchButtonController;
         private readonly AddMatchMakingPlayerCommand _addMatchMakingPlayerCommand;
-        
+
         public PresentationMatchMakingNetEventsHandler(IMatchMakingDataService matchDataService,
             ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager,
-            NetworkConfig networkConfig,
-            IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService, StartMatchButtonController startMatchButtonController)
+            NetworkConfig networkConfig, IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory,
+            ITickCounterService tickCounterService, StartMatchButtonController startMatchButtonController)
         {
             _matchDataService = matchDataService;
             _cachedPresentationEventsService = iCachedPresentationEventsService;
@@ -126,6 +126,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
         public void ProcessStartMatchCountdownEvents(CapacityList<StartMatchCountdownNetEventS2C> startMatchCountdownNetEvents)
         {
+            if (startMatchCountdownNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+            
             foreach (var startMatchCountdownNetEvent in startMatchCountdownNetEvents)
             {
                 _startMatchButtonController.OnStartMatchCountdown(startMatchCountdownNetEvent.Duration);
@@ -134,7 +139,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
         public void ProcessStopMatchCountdownEvents(CapacityList<StopMatchCountdownNetEventS2C> stopMatchCountdownNetEvents)
         {
-            if (!stopMatchCountdownNetEvents.IsNullOrEmpty())
+            if (stopMatchCountdownNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+            
+            foreach (var startMatchCountdownNetEvent in stopMatchCountdownNetEvents)
             {
                 _startMatchButtonController.OnStopMatchCountdown();
             }

@@ -7,26 +7,36 @@ using Object = UnityEngine.Object;
 
 namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Controllers
 {
-    public class StartMatchButtonController : IInitializable, IDisposable
+    public interface IStartMatchButtonController
     {
+        void Initialize();
+        void Dispose();
+        void OnStartMatchCountdown(float duration);
+        void OnStopMatchCountdown();
+    }
+
+    public class StartMatchButtonController : IStartMatchButtonController
+    {
+        private const string TimerLabel = "StartMatchCountdown";
+        
         private readonly StartMatchButtonView _viewPrefab;
         private readonly ITimerService _timerService;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private StartMatchButtonView _viewInstance;
 
-        private const string TimerLabel = "StartMatchCountdown";
-        private const float Radius = 3f;
 
-        public StartMatchButtonController(StartMatchButtonView viewPrefab, ITimerService timerService)
+        public StartMatchButtonController(StartMatchButtonView viewPrefab, ITimerService timerService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _viewPrefab = viewPrefab;
             _timerService = timerService;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void Initialize()
         {
             _viewInstance = Object.Instantiate(_viewPrefab);
             _viewInstance.SetPosition(Vector2.zero);
-            _viewInstance.SetRadius(Radius);
+            _viewInstance.SetRadius(_sharedGamePlayConfig.MatchMakingEnvironment.);
             _viewInstance.SetText("Start");
         }
 
