@@ -37,16 +37,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchMakingFullTick;
         public int LastProcessedTickFromServer { get; private set; }
 
-        //public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
-            //IMatchMakingDataService matchDataService, PresentationMatchMakingNetEventsHandler presentationNetEventsHandler)
-            public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
-                IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService,
-                IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService,
-                IStartMatchButtonController startMatchButtonController)
+        public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
+            IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService,
+            IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService,
+            IStartMatchButtonController startMatchButtonController)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
-//            _presentationNetEventsHandler = presentationNetEventsHandler;
 
             _presentationNetEventsHandler = new PresentationMatchMakingNetEventsHandler(matchDataService, cachedPresentationEventsService, networkManager, networkConfig,
                 clientPresentationTickProcessor, commandFactory, tickCounterService, startMatchButtonController);
@@ -59,7 +56,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             _cachedUnprocessedStopMatchCountdownEvents = new CapacityList<StopMatchCountdownNetEventS2C>(networkConfig.MaxCap.StopMatchCountdownNetEvents);
             _cachedUnprocessedPlayerSwitchTeamEvents = new CapacityList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents);
 
-            _fullTickPacketsPool = new ConcurrentPool<MatchMakingFullTickPacket>(() => new MatchMakingFullTickPacket(networkConfig.MaxCap), networkConfig.MaxCap.FullTickPacketsNetEvents);
+            _fullTickPacketsPool =
+                new ConcurrentPool<MatchMakingFullTickPacket>(() => new MatchMakingFullTickPacket(networkConfig.MaxCap), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
         public void InitEntryPoint()

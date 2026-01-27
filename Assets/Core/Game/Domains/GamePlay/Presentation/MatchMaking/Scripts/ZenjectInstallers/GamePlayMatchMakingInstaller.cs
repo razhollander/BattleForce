@@ -36,7 +36,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.ZenjectIns
             Container.Bind<IGamePlayMatchMakingInitiator>().To<GamePlayMatchMakingInitiator>().AsSingle().NonLazy();
             Container.Bind<IMatchMakingDataService>().To<MatchMakingDataService>().AsSingle().NonLazy();
             Container.Bind<ITickProcessor>().To<ClientMatchMakingNetworkTickProcessor>().AsSingle().NonLazy();
-            Container.Bind<PresentationMatchMakingNetEventsHandler>().AsSingle().NonLazy();
             Container.Bind<IFullTickPacketsHandler>().To<MatchMakingFullTickPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IClientMatchMakingPresentationTickProcessor>().To<ClientMatchMakingPresentationTickProcessor>().AsSingle().NonLazy();
         }
@@ -47,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.ZenjectIns
             Container.BindInterfacesTo<MatchMakingBulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchMakingEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchMakingEnvironmentTeamFloorControllers>().AsSingle().WithArguments(_environmentTeamFloorsViewPrefab).NonLazy();
-            Container.BindInterfacesAndSelfTo<StartMatchButtonController>().AsSingle().WithArguments(_startMatchButtonViewPrefab).NonLazy();
+            Container.BindInterfacesTo<StartMatchButtonController>().AsSingle().WithArguments(_startMatchButtonViewPrefab).NonLazy();
         }
     }
 }
