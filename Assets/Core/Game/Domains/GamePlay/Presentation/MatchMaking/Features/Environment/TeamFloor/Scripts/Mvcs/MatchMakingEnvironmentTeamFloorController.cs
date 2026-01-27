@@ -1,4 +1,5 @@
 using System.Linq;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Scripts.Extensions;
 using UnityEngine;
@@ -10,13 +11,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
         private EnvironmentTeamFloorsView _teamFloorsView;
         private readonly ushort _teamId;
         private readonly WallConfig[] _walls;
-        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        
-        public MatchMakingEnvironmentTeamFloorController(ushort teamId, WallConfig[] walls, SharedGamePlayConfig sharedGamePlayConfig)
+        private readonly PresentationGamePlayConfig _gamePlayConfig;
+
+        public MatchMakingEnvironmentTeamFloorController(ushort teamId, WallConfig[] walls, PresentationGamePlayConfig gamePlayConfig)
         {
             _teamId = teamId;
             _walls = walls;
-            _sharedGamePlayConfig = sharedGamePlayConfig;
+            _gamePlayConfig = gamePlayConfig;
         }
         
         public void CreateTeamFloors(EnvironmentTeamFloorsView teamFloorView, Transform parent)
@@ -28,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
             {
                 var pointsUnityVector2 = wall.Points.Select(x => x.ToUnityVector2()).ToArray();
                 var mesh = MeshUtils.BuildMesh(pointsUnityVector2, 2);
-                _teamFloorsView.CreateFloor(mesh, wall.Id, _sharedGamePlayConfig.ColorPerTeamId[_teamId]);
+                _teamFloorsView.CreateFloor(mesh, wall.Id, _gamePlayConfig.TeamFloor.TeamFloorMaterialPerTeamId[_teamId]);
             }
         }
         

@@ -13,10 +13,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
         private readonly Dictionary<ushort, MatchMakingEnvironmentTeamFloorController> _controllerByTeamId = new();
         private GameObject _teamFloorsParent;
 
-        public MatchMakingEnvironmentTeamFloorControllers(EnvironmentTeamFloorsView teamFloorsViewPrefab, SharedGamePlayConfig sharedGamePlayConfig)
+        public MatchMakingEnvironmentTeamFloorControllers(EnvironmentTeamFloorsView teamFloorsViewPrefab, SharedGamePlayConfig sharedGamePlayConfig, PresentationGamePlayConfig gamePlayConfig)
         {
             _teamFloorsViewPrefab = teamFloorsViewPrefab;
             _sharedGamePlayConfig = sharedGamePlayConfig;
+            _gamePlayConfig = gamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -30,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
             {
                 var teamId = kvp.Key;
                 var walls = kvp.Value;
-                var teamFloorController = new MatchMakingEnvironmentTeamFloorController(teamId, walls, _sharedGamePlayConfig);
+                var teamFloorController = new MatchMakingEnvironmentTeamFloorController(teamId, walls, _gamePlayConfig);
                 teamFloorController.CreateTeamFloors(_teamFloorsViewPrefab, _teamFloorsParent.transform);
                 _controllerByTeamId[teamId] = teamFloorController;
             }

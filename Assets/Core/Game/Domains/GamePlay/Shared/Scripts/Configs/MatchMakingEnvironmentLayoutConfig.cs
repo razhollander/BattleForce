@@ -1,6 +1,7 @@
 using System.Collections.Generic;
-using System.Numerics;
 using Core.Scripts.Extensions;
+using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {

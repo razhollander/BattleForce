@@ -7,10 +7,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
         [SerializeField] private MeshFilter _meshFilter;
         [SerializeField] private MeshRenderer _meshRenderer;
         
-        public void Setup(Mesh mesh, Color color)
+        public void Setup(Mesh mesh, Material material)
         {
             _meshFilter.sharedMesh = mesh;
-            _meshRenderer.material.color = color;
+            _meshRenderer.sharedMaterial = material;
         }
     }
 }

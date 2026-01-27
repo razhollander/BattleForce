@@ -13,16 +13,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets
         private readonly IMatchMakingDataService _matchDataService;
         private readonly BulletPool _bulletPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
-        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly List<MatchMakingBulletController> _bulletControllers = new ();
         private Transform _bulletsParent;
         
-        public MatchMakingBulletControllers(IMatchMakingDataService matchDataService, BulletView bulletViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public MatchMakingBulletControllers(IMatchMakingDataService matchDataService, BulletView bulletViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
             _bulletPool = new BulletPool(bulletViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
-            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -34,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets
         public void CreateBullet(ushort bulletId, float bulletRadius, Vector2 position)
         {
             var bulletState = _matchDataService.GetBullet(bulletId);
-            var bulletColor = _sharedGamePlayConfig.ColorPerTeamId[_matchDataService.GetPlayer(bulletState.BelongToPlayerId).TeamId];
+            var bulletColor = _gamePlayConfig.ColorPerTeamId[_matchDataService.GetPlayer(bulletState.BelongToPlayerId).TeamId];
             var bulletController = new MatchMakingBulletController(bulletId, _matchDataService, _bulletPool, _bulletsParent);
             bulletController.CreateBulletView(position, bulletRadius, bulletColor);
             _bulletControllers.Add(bulletController);

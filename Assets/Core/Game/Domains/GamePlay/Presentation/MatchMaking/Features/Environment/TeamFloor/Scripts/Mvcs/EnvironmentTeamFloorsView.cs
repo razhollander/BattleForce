@@ -16,11 +16,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
         
         private CancellationTokenSource _bounceAnimationCancellationTokenSource;
 
-        public void CreateFloor(Mesh mesh, ushort wallId, Color color)
+        public void CreateFloor(Mesh mesh, ushort wallId, Material material)
         {
             var teamFloorView = UnityEngine.Object.Instantiate(_environmentTeamFloorViewPrefab, transform);
             teamFloorView.name = "EnvironmentTeamFloor_" + wallId;
-            teamFloorView.Setup(mesh, color);
+            teamFloorView.Setup(mesh, material);
         }
 
         public void AnimateBounce()

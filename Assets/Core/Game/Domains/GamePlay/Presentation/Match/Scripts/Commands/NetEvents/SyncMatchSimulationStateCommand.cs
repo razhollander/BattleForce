@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.S
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -22,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IPowerUpBallControllers _powerUpBallControllers;
         private AddMatchPlayerCommand _addMatchPlayerCommand;
         private ICommandFactory _commandFactory;
+        private PresentationGamePlayConfig _gameplayConfig;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -40,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
+            _gameplayConfig =_diContainer.Resolve<PresentationGamePlayConfig>();
         }
 
         public void Execute()
@@ -84,7 +87,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var bulletState in _simulationState.Bullets.AsSpan())
             {
                 _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Position, bulletState.Radius);
-                var bulletColor = _sharedGamePlayConfig.ColorPerTeamId[_matchDataService.GetPlayer(bulletState.BelongToPlayerId).TeamId];
+                var bulletColor = _gameplayConfig.ColorPerTeamId[_matchDataService.GetPlayer(bulletState.BelongToPlayerId).TeamId];
                 _bulletControllers.CreateBullet(bulletState.Id, bulletState.Radius, bulletState.Position, bulletColor);
             }
         }
