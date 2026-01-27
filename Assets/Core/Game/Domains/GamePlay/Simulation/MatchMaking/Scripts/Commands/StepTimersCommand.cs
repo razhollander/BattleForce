@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -7,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands
     {
         private IMatchMakingDataService _matchMakingDataService;
         private float _deltaTime;
+        private IStartMatchWallController _startMatchWallController;
 
         public StepTimersCommand SetStepDeltaTime(float deltaTime)
         {
@@ -17,11 +19,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands
         public override void ResolveDependencies()
         {
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
+            _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
         }
 
         public void Execute()
         {
             StepPlayersShootCooldown(_deltaTime);
+            _startMatchWallController.StepTimer(_deltaTime);
         }
 
         private void StepPlayersShootCooldown(float deltaTime)

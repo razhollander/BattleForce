@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
         private IMatchMakingDataService _matchMakingDataService;
         private INetEventsDataService _netEventsDataService;
         private IPlayersOnTeamFloorTrackerService _playersOnTeamFloorTrackerService;
-        private StartMatchWallController _startMatchWallController;
+        private IStartMatchWallController _startMatchWallController;
 
         private int _processedTick;
 
@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersOnTeamFloorTrackerService = _diContainer.Resolve<IPlayersOnTeamFloorTrackerService>();
-            _startMatchWallController = _diContainer.Resolve<StartMatchWallController>();
+            _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
         }
 
         public void Execute()
@@ -84,6 +84,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             var relativeVelocity = playerModel.Spaceship.Transform.Velocity;
             contact.GetWorldManifold(out var worldManifold);
             var collisionNormal = worldManifold.normal;
+            if (!relativeVelocity.IsFacingWall(collisionNormal))
+            {
+                return;
+            }
+
             var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
             playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
 

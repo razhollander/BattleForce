@@ -17,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
         private IPhysicsSimulator _physicsSimulator;
         private IMatchMakingDataService _matchMakingDataService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
-        private StartMatchWallController _startMatchWallController;
+        private IStartMatchWallController _startMatchWallController;
 
         public override void ResolveDependencies()
         {
@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
-            _startMatchWallController = _diContainer.Resolve<StartMatchWallController>();
+            _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
         }
 
         public void Execute()

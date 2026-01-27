@@ -6,7 +6,7 @@ using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall
 {
-    public class StartMatchWallController
+    public class StartMatchWallController : IStartMatchWallController
     {
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly INetEventsDataService _netEventsDataService;
@@ -14,9 +14,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
 
         private bool _isCountingDown;
         private float _countdownTimer;
-        private int _lastProcessedTick = -1;
-        private const ushort START_MATCH_WALL_ID = 9999;
-
+        private int _lastTickGotHitByBullet = -1;
+        private const ushort START_MATCH_WALL_ID = 1;
+        public bool DidFinishCountingDown => _countdownTimer <= 0;
         public StartMatchWallController(IPhysicsSimulator physicsSimulator, INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig)
         {
             _physicsSimulator = physicsSimulator;
@@ -31,11 +31,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
 
         public void OnHitByBullet(int tick)
         {
-            if (_lastProcessedTick == tick)
+            var wasAlreadyHitByBulletThisTick = _lastTickGotHitByBullet == tick;
+            if (wasAlreadyHitByBulletThisTick)
             {
                 return;
             }
-            _lastProcessedTick = tick;
+            
+            _lastTickGotHitByBullet = tick;
 
             if (_isCountingDown)
             {
@@ -63,18 +65,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
              LogService.LogTopic("Start Match Countdown stopped", LogTopicType.ServerNetwork);
         }
 
-        public void Tick(float deltaTime)
+        public void StepTimer(float deltaTime)
         {
-            if (_isCountingDown)
+            if (!_isCountingDown)
             {
-                _countdownTimer -= deltaTime;
-                if (_countdownTimer <= 0)
-                {
-                    _isCountingDown = false;
-                    _countdownTimer = 0;
-                    // Do nothing when countdown finishes as per instructions.
-                }
+                return;
             }
+
+            _countdownTimer -= deltaTime;
         }
     }
 }

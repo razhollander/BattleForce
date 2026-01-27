@@ -33,7 +33,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
         private readonly ITickCounterService _tickCounterService;
-        private readonly StartMatchWallController _startMatchWallController;
 
         private TimerFixedThreaded2 _fixedTimer;
         private MatchMakingProcessCachedCollisionsCommand _processCachedCollisionsCommand;
@@ -46,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         public ServerMatchMakingNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchMakingDataService matchDataService,
             IPlayerJoinPacketsHandler playerJoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory, ITickCounterService tickCounterService, StartMatchWallController startMatchWallController)
+            ICommandFactory commandFactory, ITickCounterService tickCounterService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -57,7 +56,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
             _tickCounterService = tickCounterService;
-            _startMatchWallController = startMatchWallController;
         }
 
         public void InitEntryPoint()
@@ -111,13 +109,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _tickCounterService.IncrementTick();;
                 var processedTick = _tickCounterService.CurrentTick - _networkConfig.ServerTicksBuffer;
                 var processPlayersInputsResult = ProcessPackets(processedTick);
-                
-                ApplyMatchModelToPhysicsSimulation();
-                _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
-                ApplyPhysicsSimulationToMatchModel();
-                
-                _startMatchWallController.Tick(stepDeltaTime);
-                _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
+                StepPhysics(stepDeltaTime, processedTick);
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(processedTick);
             }
@@ -126,6 +118,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 LogService.LogError("Got error! " + e);
                 throw;
             }
+        }
+
+        private void StepPhysics(float stepDeltaTime, int processedTick)
+        {
+            ApplyMatchModelToPhysicsSimulation();
+            _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
+            ApplyPhysicsSimulationToMatchModel();
+            _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
         }
 
         private void ApplyPhysicsSimulationToMatchModel()

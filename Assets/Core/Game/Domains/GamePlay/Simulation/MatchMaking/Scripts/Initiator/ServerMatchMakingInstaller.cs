@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _diContainer.Bind<IPlayerJoinPacketsHandler>().To<MatchMakingPlayerJoinPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayerInputsPacketsHandler>().To<MatchMakingPlayerInputsPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersOnTeamFloorTrackerService>().To<PlayersOnTeamFloorTrackerService>().AsSingle().NonLazy();
-            _diContainer.Bind<StartMatchWallController>().AsSingle().NonLazy();
+            _diContainer.Bind<IStartMatchWallController>().To<StartMatchWallController>().AsSingle().NonLazy();
         }
 
         private void StartMatchMaking()

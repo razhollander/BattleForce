@@ -546,7 +546,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
-                packet.Seconds = seconds;
+                packet.CountdownSeconds = seconds;
             }
         }
 
