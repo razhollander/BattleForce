@@ -3,6 +3,5 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
     public interface IMatchMakingEnvironmentWallsControllers
     {
         void InitEntryPoint();
-        void CreateWall(ushort wallId);
     }
 }

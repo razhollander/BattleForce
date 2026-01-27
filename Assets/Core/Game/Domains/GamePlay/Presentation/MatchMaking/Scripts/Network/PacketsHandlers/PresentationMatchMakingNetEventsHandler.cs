@@ -105,5 +105,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 _cachedPresentationEventsService.BulletDestroyedNetEvents.Add(bulletDestroyedEvent);
             }
         }
+
+        public void ProcessPlayerSwitchTeamEvents(CapacityList<PlayerSwitchTeamNetEventS2C> playerSwitchTeamNetEvents)
+        {
+            if (playerSwitchTeamNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in playerSwitchTeamNetEvents)
+            {
+                _matchDataService.UpdatePlayerTeam(netEvent.PlayerId, netEvent.TeamId);
+                _cachedPresentationEventsService.PlayerSwitchTeamNetEvents.Add(netEvent);
+            }
+        }
     }
 }

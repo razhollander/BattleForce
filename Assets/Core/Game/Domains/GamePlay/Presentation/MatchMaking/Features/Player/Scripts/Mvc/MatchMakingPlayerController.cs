@@ -13,16 +13,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
         private readonly IMatchMakingDataService _matchDataService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly Transform _parent;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         public readonly ushort PlayerId;
         private PlayerView _playerView;
         private readonly PlayerViewPool _playerPool;
 
-        public MatchMakingPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchMakingDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, Transform parent)
+        public MatchMakingPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchMakingDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, Transform parent, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _parent = parent;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             PlayerId = playerId;
         }
 
@@ -33,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             _playerView.transform.SetParent(_parent);
             _playerView.name = "Player_" + PlayerId;
             var playerTransform = playerModel.Spaceship.Transform;
-            _playerView.SetColor(playerModel.Spaceship.Color);
+            _playerView.SetColor(_sharedGamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
         }
@@ -85,6 +87,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
         public Transform GetTransform()
         {
             return _playerView.GetTransform();
+        }
+
+        public void SetColor(Color color)
+        {
+            _playerView.SetColor(color);
         }
     }
 }

@@ -29,20 +29,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMa
         }
 
         public MatchMakingPlayerStateS2C AddPlayer(string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius,
-            float shootCooldown, Color color)
+            float shootCooldown, ushort teamId)
         {
             var newPlayer = _simulationState.Players.AddAndGet();
             var playerId = (ushort)(_simulationState.Players.Count);
             newPlayer.Id = playerId;
             newPlayer.Name = playerName;
-            newPlayer.TeamId = playerId;
+            newPlayer.TeamId = teamId;
             newPlayer.Spaceship.Transform.Position = position;
             newPlayer.Spaceship.Transform.Direction = direction;
             newPlayer.Spaceship.Transform.Velocity = velocity;
             newPlayer.Spaceship.Transform.Radius = radius;
             newPlayer.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
             newPlayer.Spaceship.Shoot.MaxCooldown = shootCooldown;
-            newPlayer.Spaceship.Color = color;
             return newPlayer;
         }
 

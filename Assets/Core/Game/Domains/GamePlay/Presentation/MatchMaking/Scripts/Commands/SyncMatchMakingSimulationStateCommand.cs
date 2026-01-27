@@ -1,5 +1,4 @@
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
-using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -11,8 +10,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         private MatchMakingSimulationStateS2C _simulationState;
         private IMatchMakingDataService _matchDataService;
         private IMatchMakingBulletControllers _bulletControllers;
-        private IMatchMakingEnvironmentWallsControllers _environmentWallsControllers;
-        private SharedGamePlayConfig _sharedGamePlayConfig;
         private AddMatchMakingPlayerCommand _addMatchMakingPlayerCommand;
         private ICommandFactory _commandFactory;
 
@@ -26,8 +23,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         {
             _matchDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _bulletControllers = _diContainer.Resolve<IMatchMakingBulletControllers>();
-            _environmentWallsControllers = _diContainer.Resolve<IMatchMakingEnvironmentWallsControllers>();
-            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _addMatchMakingPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchMakingPlayerCommand>();
         }
@@ -36,7 +31,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         {
             CreatePlayers();
             CreateBullets();
-            CreateWalls();
         }
 
         private void CreatePlayers()
@@ -52,18 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
             foreach (var bulletState in _simulationState.Bullets.AsSpan())
             {
                 _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Position, bulletState.Radius);
-                var bulletColor = _matchDataService.GetPlayer(bulletState.BelongToPlayerId).Spaceship.Color;
-                _bulletControllers.CreateBullet(bulletState.Id, bulletState.Radius, bulletState.Position, bulletColor);
-            }
-        }
-
-        private void CreateWalls()
-        {
-            var walls = _sharedGamePlayConfig.MatchMakingEnvironment.GetWalls();
-            foreach (var wall in walls)
-            {
-                var wallModel = _matchDataService.AddWall(wall);
-                _environmentWallsControllers.CreateWall(wallModel.Id);
+                _bulletControllers.CreateBullet(bulletState.Id, bulletState.Radius, bulletState.Position);
             }
         }
     }

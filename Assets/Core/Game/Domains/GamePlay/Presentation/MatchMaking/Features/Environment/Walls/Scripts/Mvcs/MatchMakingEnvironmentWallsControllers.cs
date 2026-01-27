@@ -11,21 +11,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
         private readonly IMatchMakingDataService _matchDataService;
         private readonly EnvironmentWallView _wallViewPrefab;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly List<MatchMakingEnvironmentWallController> _wallControllers = new ();
         private GameObject _wallsParent;
-        
-        public MatchMakingEnvironmentWallsControllers(IMatchMakingDataService matchDataService, EnvironmentWallView wallViewPrefab)
+
+        public MatchMakingEnvironmentWallsControllers(IMatchMakingDataService matchDataService, EnvironmentWallView wallViewPrefab, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _matchDataService = matchDataService;
             _wallViewPrefab = wallViewPrefab;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void InitEntryPoint()
         {
             _wallsParent = new GameObject("EnvironmentWallsParent");
+            var boundaryWalls = _sharedGamePlayConfig.MatchMakingEnvironment.GetWalls();
+            foreach (var wall in boundaryWalls)
+            {
+                _matchDataService.AddWall(wall);
+                CreateWall(wall.Id);
+            }
         }
 
-        public void CreateWall(ushort wallId)
+        private void CreateWall(ushort wallId)
         {
             var wallController = new MatchMakingEnvironmentWallController(wallId, _matchDataService);
             wallController.CreateWallView(_wallViewPrefab, _wallsParent.transform);
