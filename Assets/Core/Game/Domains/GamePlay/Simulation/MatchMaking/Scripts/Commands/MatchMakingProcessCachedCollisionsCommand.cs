@@ -134,7 +134,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             }
 
             DestroyBullet(bulletModel, bulletBody);
-            _startMatchWallController.OnHitByBullet(_processedTick);
+            _startMatchWallController.TryToggleState(_processedTick);
         }
 
         private void HandlePlayerTeamFloorCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
@@ -157,6 +157,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             {
                 playerState.TeamId = teamId;
                 _playersOnTeamFloorTrackerService.SetPlayerTeam(playerId, teamId);
+                _startMatchWallController.TryStopCountdown(_processedTick);
                 _netEventsDataService.AddPlayerSwitchTeamNetEvent(_processedTick, playerId, teamId);
             }
         }

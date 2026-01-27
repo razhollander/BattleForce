@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
             _physicsSimulator.AddStartMatchWall(START_MATCH_WALL_ID, Vector2.Zero, radius);
         }
 
-        public void OnHitByBullet(int tick)
+        public void TryToggleState(int tick)
         {
             var wasAlreadyHitByBulletThisTick = _lastTickGotHitByBullet == tick;
             if (wasAlreadyHitByBulletThisTick)
@@ -57,6 +57,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
             LogService.LogTopic($"Start Match Countdown started: {_countdownTimer}s", LogTopicType.ServerNetwork);
         }
 
+        public void TryStopCountdown(int tick)
+        {
+            var wasAlreadyHitByBulletThisTick = _lastTickGotHitByBullet == tick;
+            if (!_isCountingDown || wasAlreadyHitByBulletThisTick)
+            {
+                return;
+            }
+            
+            StopCountdown(tick);
+        }
+        
         private void StopCountdown(int tick)
         {
             _isCountingDown = false;
