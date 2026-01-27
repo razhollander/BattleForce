@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.TeamFloor.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatchButton.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
@@ -21,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
         private IMatchMakingEnvironmentWallsControllers _environmentWallsControllers;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private IMatchMakingEnvironmentTeamFloorControllers _environmentTeamFloorControllers;
+        private IStartMatchButtonController _startMatchButtonController;
 
         public StartGamePlayMatchMakingCommand SetEnterData(GamePlayMatchMakingInitiatorEnterData enterData)
         {
@@ -36,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _environmentWallsControllers = _diContainer.Resolve<IMatchMakingEnvironmentWallsControllers>();
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
             _environmentTeamFloorControllers = _diContainer.Resolve<IMatchMakingEnvironmentTeamFloorControllers>();
+            _startMatchButtonController = _diContainer.Resolve<IStartMatchButtonController>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -46,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _tickProcessor.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
             _environmentTeamFloorControllers.InitEntryPoint();
+            _startMatchButtonController.InitEntryPoint();
         }
     }
 }

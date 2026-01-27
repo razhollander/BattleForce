@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddPowerUpSpawnedNetEvent(int onTick, ushort powerUpBallId, Vector2 position);
         void AddPowerUpObtainedNetEvent(int onTick, ushort powerUpBallId, ushort byPlayerId);
         void AddPlayerSwitchTeamNetEvent(int onTick, ushort playerId, ushort teamId);
-        void AddStartMatchCountdownNetEvent(int onTick, float seconds);
+        void AddStartMatchCountdownNetEvent(int onTick, ushort seconds);
         void AddStopMatchCountdownNetEvent(int onTick);
     }
 }

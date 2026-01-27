@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
         {
             _isCountingDown = true;
             _countdownTimer = _gamePlayConfig.StartMatchCountdownDuration;
-            _netEventsDataService.AddStartMatchCountdownNetEvent(tick, _countdownTimer);
+            _netEventsDataService.AddStartMatchCountdownNetEvent(tick, _gamePlayConfig.StartMatchCountdownDuration);
             LogService.LogTopic($"Start Match Countdown started: {_countdownTimer}s", LogTopicType.ServerNetwork);
         }
 

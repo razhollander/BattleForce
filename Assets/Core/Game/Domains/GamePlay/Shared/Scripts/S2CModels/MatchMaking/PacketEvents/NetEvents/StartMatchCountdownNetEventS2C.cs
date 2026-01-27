@@ -7,12 +7,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.N
         public int OccuredOnTick;
         public ushort CountdownSeconds;
 
-        public StartMatchCountdownNetEventS2C(int occuredOnTick, ushort countdownSeconds)
-        {
-            OccuredOnTick = occuredOnTick;
-            CountdownSeconds = countdownSeconds;
-        }
-
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);

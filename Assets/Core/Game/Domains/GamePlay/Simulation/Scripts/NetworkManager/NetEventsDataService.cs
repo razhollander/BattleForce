@@ -540,7 +540,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddStartMatchCountdownNetEvent(int onTick, float seconds)
+        public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
         {
             foreach (var kvp in StartMatchCountdownNetEventsPerPlayer)
             {
