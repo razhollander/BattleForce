@@ -14,16 +14,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly IMatchDataService _matchDataService;
         private readonly PlayerViewPool _playerPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
-        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly List<MatchPlayerController> _playerControllers = new ();
         private Transform _playersParent;
 
-        public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
             _playerPool = new PlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
-            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -34,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void AddPlayer(ushort playerId)
         {
-            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _playersParent.transform, _sharedGamePlayConfig);
+            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _playersParent.transform);
             playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
         }

@@ -30,19 +30,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly CapacityList<MatchMakingPlayerJoinAcceptPacketS2C> _cachedUnprocessedPlayerJoinedEvents;
         private readonly CapacityList<BulletSpawnNetEventS2C> _cachedUnprocessedBulletSpawnedEvents;
         private readonly CapacityList<BulletDestroyedNetEventS2C> _cachedUnprocessedBulletDestroyedEvents;
+        private readonly CapacityList<PlayerSwitchTeamNetEventS2C> _cachedUnprocessedPlayerSwitchTeamEvents;
         private readonly CapacityList<StartMatchCountdownNetEventS2C> _cachedUnprocessedStartMatchCountdownEvents;
         private readonly CapacityList<StopMatchCountdownNetEventS2C> _cachedUnprocessedStopMatchCountdownEvents;
         private readonly ConcurrentPool<MatchMakingFullTickPacket> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchMakingFullTick;
         public int LastProcessedTickFromServer { get; private set; }
 
+        //public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
+            //IMatchMakingDataService matchDataService, PresentationMatchMakingNetEventsHandler presentationNetEventsHandler)
         public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
-            IMatchMakingDataService matchDataService, PresentationMatchMakingNetEventsHandler presentationNetEventsHandler)
+            IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService,
+            IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
+//            _presentationNetEventsHandler = presentationNetEventsHandler;
 
-            _presentationNetEventsHandler = presentationNetEventsHandler;
+            _presentationNetEventsHandler = new PresentationMatchMakingNetEventsHandler(matchDataService, cachedPresentationEventsService, networkManager, networkConfig,
+                clientPresentationTickProcessor, commandFactory, tickCounterService);
 
             _fullTickPackets = new CapacityDict<int, MatchMakingFullTickPacket>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerJoinedEvents = new CapacityList<MatchMakingPlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
@@ -50,6 +56,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             _cachedUnprocessedBulletDestroyedEvents = new CapacityList<BulletDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents);
             _cachedUnprocessedStartMatchCountdownEvents = new CapacityList<StartMatchCountdownNetEventS2C>(networkConfig.MaxCap.StartMatchCountdownNetEvents);
             _cachedUnprocessedStopMatchCountdownEvents = new CapacityList<StopMatchCountdownNetEventS2C>(networkConfig.MaxCap.StopMatchCountdownNetEvents);
+            _cachedUnprocessedPlayerSwitchTeamEvents = new CapacityList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents);
 
             _fullTickPacketsPool = new ConcurrentPool<MatchMakingFullTickPacket>(() => new MatchMakingFullTickPacket(networkConfig.MaxCap), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
@@ -79,6 +86,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             ProcessPlayerJoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
+            ProcessPlayerSwitchTeamEvents(latestFullTickPacket.PlayerSwitchTeamNetEvents);
             ProcessStartMatchCountdownEvents(latestFullTickPacket.StartMatchCountdownNetEvents);
             ProcessStopMatchCountdownEvents(latestFullTickPacket.StopMatchCountdownNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
@@ -147,6 +155,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             if (!_cachedUnprocessedBulletSpawnedEvents.IsNullOrEmpty())
             {
                 _presentationNetEventsHandler.ProcessBulletSpawnEvents(_cachedUnprocessedBulletSpawnedEvents);
+            }
+        }
+
+        private void ProcessPlayerSwitchTeamEvents(FixedUnorderedList<PlayerSwitchTeamNetEventS2C> playerSwitchTeamNetEvents)
+        {
+            _cachedUnprocessedPlayerSwitchTeamEvents.Clear();
+
+            foreach (var netEvent in playerSwitchTeamNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPlayerSwitchTeamEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPlayerSwitchTeamEvents.IsNullOrEmpty())
+            {
+                _presentationNetEventsHandler.ProcessPlayerSwitchTeamEvents(_cachedUnprocessedPlayerSwitchTeamEvents);
             }
         }
 

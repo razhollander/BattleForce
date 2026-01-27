@@ -110,6 +110,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             }
         }
 
+        public void ProcessPlayerSwitchTeamEvents(CapacityList<PlayerSwitchTeamNetEventS2C> playerSwitchTeamNetEvents)
+        {
+            if (playerSwitchTeamNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in playerSwitchTeamNetEvents)
+            {
+                _matchDataService.UpdatePlayerTeam(netEvent.PlayerId, netEvent.TeamId);
+                _cachedPresentationEventsService.PlayerSwitchTeamNetEvents.Add(netEvent);
+            }
+        }
+
         public void ProcessStartMatchCountdownEvents(CapacityList<StartMatchCountdownNetEventS2C> startMatchCountdownNetEvents)
         {
             foreach (var startMatchCountdownNetEvent in startMatchCountdownNetEvents)

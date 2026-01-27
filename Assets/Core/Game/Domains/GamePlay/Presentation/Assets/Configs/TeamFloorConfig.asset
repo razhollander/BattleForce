@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a88daca2b0444c03a97691b285214e7c, type: 3}
+  m_Name: TeamFloorConfig
+  m_EditorClassIdentifier: 
+  TeamFloorMaterialPerTeamId:
+    m_keys: 0100030002000400
+    m_values:
+    - {fileID: 2100000, guid: 9ab5c611ded8f4b3ea3b9b26279a28a9, type: 2}
+    - {fileID: 2100000, guid: f85c0822a5d8445779adcac9e7a9643d, type: 2}
+    - {fileID: 2100000, guid: 1b03ca853cca544e191b86f7995cf2cc, type: 2}
+    - {fileID: 2100000, guid: 6968437bcb0e94d79b03fb23d5414c1e, type: 2}

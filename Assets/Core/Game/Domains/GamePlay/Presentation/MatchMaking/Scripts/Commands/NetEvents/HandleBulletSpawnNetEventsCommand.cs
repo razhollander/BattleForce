@@ -10,7 +10,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
     public class HandleBulletSpawnNetEventsCommand : BaseCommand, ICommandVoid
     {
         private IMatchMakingPlayerControllers _playerControllers;
-        private IMatchMakingDataService _matchDataService;
         private IMatchMakingBulletControllers _bulletControllers;
         private ICachedPresentationEventsService _cachedPresentationEventsService;
 
@@ -18,7 +17,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
         {
             _playerControllers = _diContainer.Resolve<IMatchMakingPlayerControllers>();
             _bulletControllers = _diContainer.Resolve<IMatchMakingBulletControllers>();
-            _matchDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
         }
 
@@ -33,8 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
             foreach (var bulletsSpawnEvent in bulletsSpawnEvents)
             {
                 var bulletId = bulletsSpawnEvent.BulletId;
-                var bulletColor = _matchDataService.GetPlayer(bulletsSpawnEvent.BelongToPlayerId).Spaceship.Color;
-                _bulletControllers.CreateBullet(bulletId, bulletsSpawnEvent.BulletRadius, bulletsSpawnEvent.Position, bulletColor);
+                _bulletControllers.CreateBullet(bulletId, bulletsSpawnEvent.BulletRadius, bulletsSpawnEvent.Position);
                 _playerControllers.ShootBulletEffectForPlayer(bulletsSpawnEvent.BelongToPlayerId);
             }
             

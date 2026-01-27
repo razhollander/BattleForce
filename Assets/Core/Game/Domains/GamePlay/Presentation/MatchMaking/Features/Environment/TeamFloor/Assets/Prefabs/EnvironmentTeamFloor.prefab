@@ -9,11 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6116396164820640898}
-  - component: {fileID: 1848450532861189530}
+  - component: {fileID: 6229960262738751626}
   - component: {fileID: 1064797891662729060}
   - component: {fileID: 6574485162619562972}
   m_Layer: 0
-  m_Name: EnvironmentWall
+  m_Name: EnvironmentTeamFloor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34,7 +34,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1848450532861189530
+--- !u!114 &6229960262738751626
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,7 +43,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1350475781227517356}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fad8a3615a104195b312ccbfe0d6d11, type: 3}
+  m_Script: {fileID: 11500000, guid: 3bf65101337a4764b3e0b0c910cdc55c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _meshFilter: {fileID: 1064797891662729060}
@@ -55,7 +55,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1350475781227517356}
-  m_Mesh: {fileID: 0}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &6574485162619562972
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -79,7 +79,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b44e1abdac7350f43a89b8ddf892e60c, type: 2}
+  - {fileID: 2100000, guid: 9ab5c611ded8f4b3ea3b9b26279a28a9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

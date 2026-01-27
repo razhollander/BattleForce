@@ -22,5 +22,10 @@ namespace Core.Scripts.Extensions
         {
             return direction - 2 * Vector2.Dot(direction, wallNormal) * wallNormal;
         }
+        
+        public static bool IsFacingWall(this Vector2 direction, Vector2 wallNormal)
+        {
+            return Vector2.Dot(direction, wallNormal) < 0;
+        }
     }
 }
