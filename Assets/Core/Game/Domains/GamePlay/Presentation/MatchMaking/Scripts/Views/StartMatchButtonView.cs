@@ -6,27 +6,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Views
     public class StartMatchButtonView : MonoBehaviour
     {
         [SerializeField] private TMP_Text _text;
-        [SerializeField] private Transform _visualRoot;
+
+        public void Setup(Vector2 position, float radius)
+        {
+            transform.position = position;
+            SetRadius(radius);
+        }
 
         public void SetText(string text)
         {
-            if (_text != null)
-            {
-                _text.text = text;
-            }
+            _text.text = text;
         }
-
-        public void SetPosition(Vector2 position)
+        
+        private void SetRadius(float radius)
         {
-            transform.position = position;
-        }
-
-        public void SetRadius(float radius)
-        {
-            if (_visualRoot != null)
-            {
-                _visualRoot.localScale = new Vector3(radius * 2, radius * 2, 1);
-            }
+            transform.localScale = new Vector3(radius * 2, radius * 2, 1);
         }
     }
 }

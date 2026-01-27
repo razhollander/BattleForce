@@ -1,89 +1,60 @@
 using System;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Views;
 using Core.Scripts.Services.Timer.Scripts;
+using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
 using Zenject;
 using Object = UnityEngine.Object;
 
 namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Controllers
 {
-    public interface IStartMatchButtonController
-    {
-        void Initialize();
-        void Dispose();
-        void OnStartMatchCountdown(float duration);
-        void OnStopMatchCountdown();
-    }
-
     public class StartMatchButtonController : IStartMatchButtonController
     {
-        private const string TimerLabel = "StartMatchCountdown";
+        private const string TIMER_LABEL = "StartMatchCountdown";
+        private const string START_TEXT = "Start";
         
         private readonly StartMatchButtonView _viewPrefab;
         private readonly ITimerService _timerService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private StartMatchButtonView _viewInstance;
+        private readonly IStateMachineService _stateMachineService;
 
-
-        public StartMatchButtonController(StartMatchButtonView viewPrefab, ITimerService timerService, SharedGamePlayConfig sharedGamePlayConfig)
+        private StartMatchButtonView _view;
+        
+        public StartMatchButtonController(StartMatchButtonView viewPrefab, ITimerService timerService, SharedGamePlayConfig sharedGamePlayConfig, IStateMachineService stateMachineService)
         {
             _viewPrefab = viewPrefab;
             _timerService = timerService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
+            _stateMachineService = stateMachineService;
         }
 
-        public void Initialize()
+        public void InitEntryPoint()
         {
-            _viewInstance = Object.Instantiate(_viewPrefab);
-            _viewInstance.SetPosition(Vector2.zero);
-            _viewInstance.SetRadius(_sharedGamePlayConfig.MatchMakingEnvironment.);
-            _viewInstance.SetText("Start");
+            _view = Object.Instantiate(_viewPrefab);
+            _view.Setup(Vector2.zero, _sharedGamePlayConfig.MatchMakingEnvironment.StartMatchWallRadius);
+            SetButtonStartState();
         }
 
-        public void Dispose()
+        public void StartMatchCountdown(float duration)
         {
-            if (_viewInstance != null)
-            {
-                Object.Destroy(_viewInstance.gameObject);
-            }
+            var settings = new TimerSettings(TIMER_LABEL, duration, OnTimerTick);
+            _timerService.StartTimer(settings, _stateMachineService.CurrentState().CancellationTokenSource.Token);
         }
 
-        public void OnStartMatchCountdown(float duration)
+        public void StopMatchCountdown()
         {
-            var settings = new TimerSettings(TimerLabel, duration, OnTimerTick, OnTimerCompleted, OnTimerCanceled);
-            _timerService.StartTimer(settings, default);
-        }
-
-        public void OnStopMatchCountdown()
-        {
-            _timerService.CancelTimer(TimerLabel);
-            ResetText();
+            _timerService.CancelTimer(TIMER_LABEL);
+            SetButtonStartState();
         }
 
         private void OnTimerTick(double percent, TimeSpan timeLeft)
         {
-            if (_viewInstance != null)
-            {
-                _viewInstance.SetText(Mathf.CeilToInt((float)timeLeft.TotalSeconds).ToString());
-            }
+            _view.SetText(Mathf.CeilToInt((float) timeLeft.TotalSeconds).ToString());
         }
 
-        private void OnTimerCompleted()
+        private void SetButtonStartState()
         {
-            // Optional: Handle completion if needed
-        }
-
-        private void OnTimerCanceled()
-        {
-            ResetText();
-        }
-
-        private void ResetText()
-        {
-             if (_viewInstance != null)
-            {
-                _viewInstance.SetText("Start");
-            }
+            _view.SetText(START_TEXT);
         }
     }
 }

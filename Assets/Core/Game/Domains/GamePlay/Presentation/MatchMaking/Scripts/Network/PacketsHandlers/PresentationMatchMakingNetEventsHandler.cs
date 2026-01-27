@@ -25,13 +25,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly IClientMatchMakingPresentationTickProcessor _clientPresentationTickProcessor;
         private readonly ICommandFactory _commandFactory;
         private readonly ITickCounterService _tickCounterService;
-        private readonly StartMatchButtonController _startMatchButtonController;
+        private readonly IStartMatchButtonController _startMatchButtonController;
         private readonly AddMatchMakingPlayerCommand _addMatchMakingPlayerCommand;
 
         public PresentationMatchMakingNetEventsHandler(IMatchMakingDataService matchDataService,
             ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager,
             NetworkConfig networkConfig, IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory,
-            ITickCounterService tickCounterService, StartMatchButtonController startMatchButtonController)
+            ITickCounterService tickCounterService, IStartMatchButtonController startMatchButtonController)
         {
             _matchDataService = matchDataService;
             _cachedPresentationEventsService = iCachedPresentationEventsService;
@@ -133,7 +133,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             
             foreach (var startMatchCountdownNetEvent in startMatchCountdownNetEvents)
             {
-                _startMatchButtonController.OnStartMatchCountdown(startMatchCountdownNetEvent.Duration);
+                _startMatchButtonController.StartMatchCountdown(startMatchCountdownNetEvent.CountdownSeconds);
             }
         }
 
@@ -146,7 +146,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             
             foreach (var startMatchCountdownNetEvent in stopMatchCountdownNetEvents)
             {
-                _startMatchButtonController.OnStopMatchCountdown();
+                _startMatchButtonController.StopMatchCountdown();
             }
         }
     }

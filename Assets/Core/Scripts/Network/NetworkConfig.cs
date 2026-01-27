@@ -57,7 +57,7 @@ namespace Core.Scripts.Network
         public int PowerUpSpawnedNetEvents = 64;
         public int PowerUpObtainedNetEvents = 64;
         public int PlayerSwitchTeamNetEvents = 64;
-        public int StartMatchCountdownNetEvents = 8;
-        public int StopMatchCountdownNetEvents = 8;
+        public int StartMatchCountdownNetEvents = 32;
+        public int StopMatchCountdownNetEvents = 32;
     }
 }

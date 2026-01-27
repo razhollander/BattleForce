@@ -5,24 +5,18 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.N
     public struct StartMatchCountdownNetEventS2C : INetSerializable
     {
         public int OccuredOnTick;
-        public float Duration;
-
-        public StartMatchCountdownNetEventS2C(int occuredOnTick, float duration)
-        {
-            OccuredOnTick = occuredOnTick;
-            Duration = duration;
-        }
+        public ushort CountdownSeconds;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put(Duration);
+            writer.Put((byte)CountdownSeconds);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            Duration = reader.GetFloat();
+            CountdownSeconds = reader.GetByte();
         }
     }
 }
