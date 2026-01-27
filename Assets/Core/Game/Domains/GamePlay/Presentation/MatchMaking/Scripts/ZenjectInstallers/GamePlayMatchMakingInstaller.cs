@@ -38,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.ZenjectIns
             Container.Bind<ITickProcessor>().To<ClientMatchMakingNetworkTickProcessor>().AsSingle().NonLazy();
             Container.Bind<IFullTickPacketsHandler>().To<MatchMakingFullTickPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IClientMatchMakingPresentationTickProcessor>().To<ClientMatchMakingPresentationTickProcessor>().AsSingle().NonLazy();
+            Container.Bind<IStartMatchPacketsHandler>().To<StartMatchPacketsHandler>().AsSingle().NonLazy();
         }
         
         private void BindControllers()

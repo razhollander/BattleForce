@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private IMatchMakingEnvironmentTeamFloorControllers _environmentTeamFloorControllers;
         private IStartMatchButtonController _startMatchButtonController;
+        private IStartMatchPacketsHandler _startMatchPacketsHandler;
 
         public StartGamePlayMatchMakingCommand SetEnterData(GamePlayMatchMakingInitiatorEnterData enterData)
         {
@@ -39,10 +40,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
             _environmentTeamFloorControllers = _diContainer.Resolve<IMatchMakingEnvironmentTeamFloorControllers>();
             _startMatchButtonController = _diContainer.Resolve<IStartMatchButtonController>();
+            _startMatchPacketsHandler = _diContainer.Resolve<IStartMatchPacketsHandler>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
+            _startMatchPacketsHandler.InitEntryPoint();
             _fullTickPacketsHandler.InitEntryPoint();
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();

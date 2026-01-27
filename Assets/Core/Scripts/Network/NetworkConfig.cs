@@ -59,5 +59,6 @@ namespace Core.Scripts.Network
         public int PlayerSwitchTeamNetEvents = 64;
         public int StartMatchCountdownNetEvents = 32;
         public int StopMatchCountdownNetEvents = 32;
+        public int StartMatchNetEvents = 8;
     }
 }

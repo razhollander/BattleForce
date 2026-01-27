@@ -28,6 +28,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private ICommandFactory _commandFactory;
         private SimulationGamePlayConfig _gamePlayConfig;
         private SharedGamePlayConfig _sharedGamePlayConfig;
+        private INetEventsDataService _netEventsDataService;
+        private ITickCounterService _tickCounterService;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -51,6 +53,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
+            _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
+            _tickCounterService = _diContainer.Resolve<ITickCounterService>();
         }
 
         public void Execute()
@@ -66,6 +70,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             CreateWalls();
             CreateLavaWalls();
             CreateTalentCards();
+
+            _netEventsDataService.AddStartMatchNetEvent(_tickCounterService.CurrentTick, _matchDataService.SimulationState);
+
             TrySwitchToPlayback();
         }
 
@@ -113,6 +120,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown);
                 _physicsSimulator.AddPlayer(playerId, playerTeamId, position, startingDirection, radius);
                 _playersTalentsManager.AddPlayer(playerId);
+                _netEventsDataService.StartSavingPlayerEvents(playerId);
             }
         }
 

@@ -21,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentCardHitNetEventS2C> TalentCardHitNetEvents;
         public FixedUnorderedList<PowerUpBallSpawnedNetEventS2C> PowerUpSpawnedNetEvents; // todo: remove events related to power up when bullet id destroyed
         public FixedUnorderedList<PowerUpBallObtainedNetEventS2C> PowerUpObtainedNetEvents;
+        public FixedClassUnorderedList<StartMatchNetEventS2C> StartMatchNetEvents;
 
         public MatchFullTickPacket()
         {
@@ -38,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentCardHitNetEvents = new FixedUnorderedList<TalentCardHitNetEventS2C>(maxCap.TalentCardHitNetEvents);
             PowerUpSpawnedNetEvents = new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(maxCap.PowerUpSpawnedNetEvents);
             PowerUpObtainedNetEvents = new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(maxCap.PowerUpObtainedNetEvents);
+            StartMatchNetEvents = new FixedClassUnorderedList<StartMatchNetEventS2C>(maxCap.StartMatchNetEvents, () => new StartMatchNetEventS2C(maxCap, sharedGamePlayConfig));
         }
 
 
@@ -68,6 +70,16 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             SerializedTalentCardHitEvents(writer);
             SerializedPowerUpSpawnedEvents(writer);
             SerializedPowerUpObtainedEvents(writer);
+            SerializedStartMatchNetEvents(writer);
+        }
+
+        private void SerializedStartMatchNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)StartMatchNetEvents.Count);
+            foreach (var evt in StartMatchNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
         }
 
         private void SerializedPowerUpObtainedEvents(NetDataWriter writer)
@@ -128,6 +140,18 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             DeserializedTalentCardHitEvents(reader);
             DeserializedPowerUpSpawnedEvents(reader);
             DeserializedPowerUpObtainedEvents(reader);
+            DeserializedStartMatchNetEvents(reader);
+        }
+
+        private void DeserializedStartMatchNetEvents(NetDataReader reader)
+        {
+            StartMatchNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                var evt = StartMatchNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
         }
 
         private void DeserializedPowerUpObtainedEvents(NetDataReader reader)
