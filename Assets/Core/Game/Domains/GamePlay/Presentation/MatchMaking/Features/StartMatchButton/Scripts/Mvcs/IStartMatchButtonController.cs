@@ -1,4 +1,4 @@
-namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Controllers
+namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatchButton.Scripts.Mvcs
 {
     public interface IStartMatchButtonController
     {

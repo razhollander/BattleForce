@@ -1,17 +1,14 @@
 using System;
-using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Views;
 using Core.Scripts.Services.Timer.Scripts;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
-using Zenject;
 using Object = UnityEngine.Object;
 
-namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Controllers
+namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatchButton.Scripts.Mvcs
 {
     public class StartMatchButtonController : IStartMatchButtonController
     {
         private const string TIMER_LABEL = "StartMatchCountdown";
-        private const string START_TEXT = "Start";
         
         private readonly StartMatchButtonView _viewPrefab;
         private readonly ITimerService _timerService;
@@ -38,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Controller
         public void StartMatchCountdown(float duration)
         {
             var settings = new TimerSettings(TIMER_LABEL, duration, OnTimerTick);
+            _view.SetCountdownState();
             _timerService.StartTimer(settings, _stateMachineService.CurrentState().CancellationTokenSource.Token);
         }
 
@@ -49,12 +47,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Controller
 
         private void OnTimerTick(double percent, TimeSpan timeLeft)
         {
-            _view.SetText(Mathf.CeilToInt((float) timeLeft.TotalSeconds).ToString());
+            _view.SetCountdownText(Mathf.CeilToInt((float) timeLeft.TotalSeconds).ToString());
         }
 
         private void SetButtonStartState()
         {
-            _view.SetText(START_TEXT);
+            _view.SetStartState();
         }
     }
 }
