@@ -61,7 +61,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var bodyDataB = (PhysicsBodyData)fixtureB.Body.UserData;
             var idA = bodyDataA.Id;
             var idB = bodyDataB.Id;
-
+            var velocityA = fixtureA.GetBody().GetLinearVelocity();
+            var velocityB = fixtureB.GetBody().GetLinearVelocity();
+            
             var key = new EventKey(idA, idB, type);
             if (_noneEqualEvents.Add(key))
             {
@@ -72,6 +74,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 physicsCollisionEvent.BodyDataB = bodyDataB;
                 physicsCollisionEvent.FixtureA = fixtureA;
                 physicsCollisionEvent.FixtureB = fixtureB; 
+                physicsCollisionEvent.VelocityA = velocityA; 
+                physicsCollisionEvent.VelocityB = velocityB; 
             }
         }
         

@@ -1,5 +1,6 @@
 using Core.Scripts.Network;
 using Core.Scripts.Services.ApplicationSubscriptionService;
+using Core.Scripts.Services.Timer.Scripts;
 using CoreDomain.Scripts.Audio;
 using CoreDomain.Scripts.Mvc.LoadingScreen;
 using CoreDomain.Scripts.Mvc.UICamera;
@@ -49,6 +50,7 @@ namespace CoreDomain.Scripts.ZenjectInstallers
             Container.BindInterfacesTo<LoadingScreenController>().AsSingle().WithArguments(_loadingScreenView).NonLazy();
             Container.BindInterfacesTo<UICameraController>().AsSingle().WithArguments(_uiCameraView).NonLazy();
             Container.BindInterfacesTo<WorldCameraController>().AsSingle().WithArguments(_worldCameraView).NonLazy();
+            Container.BindInterfacesTo<TimerService>().AsSingle().NonLazy();
             Container.Bind<CoreAudioClipsScriptableObject>().FromScriptableObject(_coreAudioClipsScriptableObject).AsSingle().NonLazy();
             Container.Bind<GameInputActions>().AsSingle().NonLazy();
         }

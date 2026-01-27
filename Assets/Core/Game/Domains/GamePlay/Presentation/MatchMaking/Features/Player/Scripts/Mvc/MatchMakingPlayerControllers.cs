@@ -77,5 +77,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
         {
             return GetPlayer(playerId).GetTransform();
         }
+
+        public void UpdatePlayerColor(ushort playerId, Color color)
+        {
+            var player = GetPlayer(playerId);
+            if (player != null)
+            {
+                player.SetColor(color);
+            }
+        }
     }
 }

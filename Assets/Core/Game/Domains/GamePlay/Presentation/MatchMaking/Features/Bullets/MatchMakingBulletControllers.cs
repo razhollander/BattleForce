@@ -29,10 +29,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets
             _bulletPool.InitPool();
         }
 
-        public void CreateBullet(ushort bulletId, float bulletRadius, Vector2 position, Color color)
+        public void CreateBullet(ushort bulletId, float bulletRadius, Vector2 position)
         {
+            var bulletState = _matchDataService.GetBullet(bulletId);
+            var bulletColor = _gamePlayConfig.ColorPerTeamId[_matchDataService.GetPlayer(bulletState.BelongToPlayerId).TeamId];
             var bulletController = new MatchMakingBulletController(bulletId, _matchDataService, _bulletPool, _bulletsParent);
-            bulletController.CreateBulletView(position, bulletRadius, color);
+            bulletController.CreateBulletView(position, bulletRadius, bulletColor);
             _bulletControllers.Add(bulletController);
         }
 

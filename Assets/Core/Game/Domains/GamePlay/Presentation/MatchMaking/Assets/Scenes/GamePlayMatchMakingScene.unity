@@ -454,6 +454,7 @@ MonoBehaviour:
   _playerViewPrefab: {fileID: 3197719174041810226, guid: 62780855e77504170a719c539f4d7be9, type: 3}
   _bulletViewPrefab: {fileID: 5098656257286592944, guid: 6d7e26fd88ce749758e4f78e408ac5ee, type: 3}
   _environmentWallViewPrefab: {fileID: 1848450532861189530, guid: 1636cc9bec8694334b3401f1fbe5547b, type: 3}
+  _environmentTeamFloorsViewPrefab: {fileID: 1815429953726330736, guid: 447cad66d3cee4b979e9fe455cfe69ae, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

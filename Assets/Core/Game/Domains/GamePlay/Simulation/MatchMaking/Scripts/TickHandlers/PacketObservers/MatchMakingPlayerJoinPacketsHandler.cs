@@ -23,19 +23,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly INetEventsDataService _netEventsDataService;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly CapacityDict<NetPeer, JoinRequestPacketC2S> _playerJoinedPacketsPerPeer;
         private readonly ConcurrentPool<JoinRequestPacketC2S> _joinedRequestPacketsPool;
         public PacketTypeC2S PacketType => PacketTypeC2S.MatchMakingJoinRequest;
 
         public MatchMakingPlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
-            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig)
+            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _physicsSimulator = physicsSimulator;
             _netEventsDataService = iNetEventsDataService;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _playerJoinedPacketsPerPeer = new CapacityDict<NetPeer, JoinRequestPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _joinedRequestPacketsPool = new ConcurrentPool<JoinRequestPacketC2S>(() => new JoinRequestPacketC2S(), networkConfig.MaxCap.JoinRequestPackets);
         }
@@ -56,9 +58,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             foreach (var kvp in _playerJoinedPacketsPerPeer)
             {
                 var playerName = kvp.Value.UserName;
-                var playersAmount = _matchDataService.SimulationState.Players.Count;
-                var playerColor = _gamePlayConfig.PlayerSpaceship.ColorPerTeamId[playersAmount % _gamePlayConfig.PlayerSpaceship.ColorPerTeamId.Count];
-                var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerColor);
+                var playerTeamId = (ushort)(_matchDataService.SimulationState.Players.Count+1);
+                var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerTeamId);
                 var playerId = playerState.Id;
                 var peer = kvp.Key;
                 peer.Tag = playerId;

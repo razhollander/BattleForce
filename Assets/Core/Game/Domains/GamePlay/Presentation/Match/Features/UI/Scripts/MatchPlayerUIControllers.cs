@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
@@ -7,17 +8,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
     {
         private readonly MatchPlayerUIControllersView _view;
         private readonly IMatchDataService _matchDataService;
+        private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly Dictionary<ushort, MatchPlayerUIController> _playerControllers = new Dictionary<ushort, MatchPlayerUIController>();
 
-        public MatchPlayerUIControllers(MatchPlayerUIControllersView view, IMatchDataService matchDataService)
+        public MatchPlayerUIControllers(MatchPlayerUIControllersView view, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig)
         {
             _view = view;
             _matchDataService = matchDataService;
+            _gamePlayConfig = gamePlayConfig;
         }
 
         public void AddPlayer(ushort playerId)
         {
-            var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId);
+            var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId, _gamePlayConfig);
             newPlayerController.CreateView(_view.PlayerUIView, _view.PlayersContainer);
             _playerControllers.Add(playerId, newPlayerController);
         }

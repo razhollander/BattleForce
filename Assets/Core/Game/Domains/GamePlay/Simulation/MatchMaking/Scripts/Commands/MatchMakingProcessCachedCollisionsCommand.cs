@@ -219,6 +219,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             var relativeVelocity = playerModel.Spaceship.Transform.Velocity;
             contact.GetWorldManifold(out var worldManifold);
             var collisionNormal = worldManifold.normal;
+
+            if (!relativeVelocity.IsFacingWall(collisionNormal))
+            {
+                return;
+            }
+            
             var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
             playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
 

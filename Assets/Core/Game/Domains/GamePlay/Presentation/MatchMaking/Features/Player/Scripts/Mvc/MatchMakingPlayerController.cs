@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             _playerView.transform.SetParent(_parent);
             _playerView.name = "Player_" + PlayerId;
             var playerTransform = playerModel.Spaceship.Transform;
-            _playerView.SetColor(playerModel.Spaceship.Color);
+            _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
         }
@@ -85,6 +85,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
         public Transform GetTransform()
         {
             return _playerView.GetTransform();
+        }
+
+        public void SetColor(Color color)
+        {
+            _playerView.SetColor(color);
         }
     }
 }

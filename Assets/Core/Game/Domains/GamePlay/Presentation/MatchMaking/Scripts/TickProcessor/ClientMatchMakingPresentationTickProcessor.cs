@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         private readonly IWorldCameraController _worldCameraController;
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandleBulletDestroyedNetEventsCommand _handleBulletDestroyedNetEventsCommand;
+        private readonly HandlePlayerSwitchTeamNetEventsCommand _handlePlayerSwitchTeamNetEventsCommand;
 
         public ClientMatchMakingPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchMakingPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchMakingBulletControllers bulletControllers)
@@ -25,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
             _bulletControllers = bulletControllers;
             _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
             _handleBulletDestroyedNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>();
+            _handlePlayerSwitchTeamNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerSwitchTeamNetEventsCommand>();
         }
         
         public void StartTick()
@@ -41,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         {
             _handleBulletSpawnNetEventsCommand.Execute();
             _handleBulletDestroyedNetEventsCommand.Execute();
+            _handlePlayerSwitchTeamNetEventsCommand.Execute();
 
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();
