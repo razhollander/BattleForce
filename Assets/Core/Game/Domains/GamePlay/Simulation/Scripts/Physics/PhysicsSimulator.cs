@@ -523,5 +523,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return shape;
              // return new CircleShape();
         }
+
+        public void AddStartMatchWall(ushort id, Vector2 position, float radius)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.StartMatchWall);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var circleShape = GetCircleShape();
+            circleShape.Radius = radius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = circleShape;
+            fixtureDef.density = 0f;
+            fixtureDef.friction = 0;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.StartMatchWall.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.StartMatchWall.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(circleShape);
+        }
     }
 }

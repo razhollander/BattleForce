@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public float TeamFloorsRadius=10;
         public int TeamFloorsPrecision=10;
         public float WallsWidth=2;
+        public float StartMatchWallRadius = 5f;
         
         public Vector2 GetEnvironmentHalfSize()
         {

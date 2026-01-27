@@ -12,5 +12,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         [EditableRef] public LavaConfig Lava;
         [EditableRef] public PowerUpsConfig PowerUps;
         public int ChosenEnvironmentIndex = 0;
+        public float StartMatchCountdownDuration = 3f;
     }
 }

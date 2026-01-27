@@ -10,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         TalentCard = 4,
         Lava = 5,
         PowerUpBall = 6,
-        TeamFloor = 7
+        TeamFloor = 7,
+        StartMatchWall = 8
     }
 }

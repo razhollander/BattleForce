@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
@@ -108,12 +109,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _tickCounterService.IncrementTick();;
                 var processedTick = _tickCounterService.CurrentTick - _networkConfig.ServerTicksBuffer;
                 var processPlayersInputsResult = ProcessPackets(processedTick);
-                
-                ApplyMatchModelToPhysicsSimulation();
-                _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
-                ApplyPhysicsSimulationToMatchModel();
-                
-                _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
+                StepPhysics(stepDeltaTime, processedTick);
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(processedTick);
             }
@@ -122,6 +118,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 LogService.LogError("Got error! " + e);
                 throw;
             }
+        }
+
+        private void StepPhysics(float stepDeltaTime, int processedTick)
+        {
+            ApplyMatchModelToPhysicsSimulation();
+            _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
+            ApplyPhysicsSimulationToMatchModel();
+            _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
         }
 
         private void ApplyPhysicsSimulationToMatchModel()
@@ -181,6 +185,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _fullTickPacket.PlayerJoinAcceptNetEvents = _netEventsDataService.MatchMakingPlayerJoinAcceptNetEventsPerPlayer[playerId];
                 _fullTickPacket.BulletDestroyedNetEvents = _netEventsDataService.BulletDestroyedNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerSwitchTeamNetEvents = _netEventsDataService.PlayerSwitchTeamNetEventsPerPlayer[playerId];
+                _fullTickPacket.StartMatchCountdownNetEvents = _netEventsDataService.StartMatchCountdownNetEventsPerPlayer[playerId];
+                _fullTickPacket.StopMatchCountdownNetEvents = _netEventsDataService.StopMatchCountdownNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchMakingFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Network;
@@ -16,6 +17,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
         public FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C> PlayerJoinAcceptNetEvents;
         public FixedUnorderedList<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents;
         public FixedUnorderedList<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents;
+        public FixedUnorderedList<StartMatchCountdownNetEventS2C> StartMatchCountdownNetEvents;
+        public FixedUnorderedList<StopMatchCountdownNetEventS2C> StopMatchCountdownNetEvents;
 
         public MatchMakingFullTickPacket()
         {
@@ -28,6 +31,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             PlayerJoinAcceptNetEvents = new FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>(maxCap.PlayerJoinAcceptNetEvents, () => new MatchMakingPlayerJoinAcceptPacketS2C(maxCap));
             BulletDestroyedNetEvents = new FixedUnorderedList<BulletDestroyedNetEventS2C>(maxCap.BulletDestroyedNetEvents);
             PlayerSwitchTeamNetEvents = new FixedUnorderedList<PlayerSwitchTeamNetEventS2C>(maxCap.PlayerSwitchTeamNetEvents);
+            StartMatchCountdownNetEvents = new FixedUnorderedList<StartMatchCountdownNetEventS2C>(maxCap.StartMatchCountdownNetEvents);
+            StopMatchCountdownNetEvents = new FixedUnorderedList<StopMatchCountdownNetEventS2C>(maxCap.StopMatchCountdownNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -38,6 +43,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             SerializedBulletSpawnedEvents(writer);
             SerializedBulletDestroyedEvents(writer);
             SerializedPlayerSwitchTeamEvents(writer);
+            SerializedStartMatchCountdownEvents(writer);
+            SerializedStopMatchCountdownEvents(writer);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -48,6 +55,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             DeserializedBulletSpawnedEvents(reader);
             DeserializedBulletDestroyedEvents(reader);
             DeserializedPlayerSwitchTeamEvents(reader);
+            DeserializedStartMatchCountdownEvents(reader);
+            DeserializedStopMatchCountdownEvents(reader);
         }
 
         private void SerializedBulletDestroyedEvents(NetDataWriter writer)
@@ -128,6 +137,46 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             {
                 ref var playerSwitchTeamNetEvent = ref PlayerSwitchTeamNetEvents.AddAndGet();
                 playerSwitchTeamNetEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedStartMatchCountdownEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)StartMatchCountdownNetEvents.Count);
+            foreach (var evt in StartMatchCountdownNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void SerializedStopMatchCountdownEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)StopMatchCountdownNetEvents.Count);
+            foreach (var evt in StopMatchCountdownNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void DeserializedStartMatchCountdownEvents(NetDataReader reader)
+        {
+            StartMatchCountdownNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref StartMatchCountdownNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedStopMatchCountdownEvents(NetDataReader reader)
+        {
+            StopMatchCountdownNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref StopMatchCountdownNetEvents.AddAndGet();
+                evt.Deserialize(reader);
             }
         }
     }

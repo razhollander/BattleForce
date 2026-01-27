@@ -12,13 +12,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
                                     | GetCollisionMask(PhysicsBodyType.PlayerBullet)
                                     | GetCollisionMask(PhysicsBodyType.Lava)
-                                    | GetCollisionMask(PhysicsBodyType.TeamFloor);
+                                    | GetCollisionMask(PhysicsBodyType.TeamFloor)
+                                    | GetCollisionMask(PhysicsBodyType.StartMatchWall);
                     break;
                 case PhysicsBodyType.PlayerBullet:
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
                                     | GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsBodyType.TalentCard)
-                                    | GetCollisionMask(PhysicsBodyType.PowerUpBall);
+                                    | GetCollisionMask(PhysicsBodyType.PowerUpBall)
+                                    | GetCollisionMask(PhysicsBodyType.StartMatchWall);
                     break;
                 case PhysicsBodyType.Wall:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
@@ -37,6 +39,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     break;
                 case PhysicsBodyType.TeamFloor:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    break;
+                case PhysicsBodyType.StartMatchWall:
+                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsBodyType.PlayerBullet);
                     break;
                 default:
                     collisionMask = 0xFFFF;

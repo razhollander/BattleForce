@@ -2,6 +2,7 @@ using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Contacts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTracker;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -18,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
         private IMatchMakingDataService _matchMakingDataService;
         private INetEventsDataService _netEventsDataService;
         private IPlayersOnTeamFloorTrackerService _playersOnTeamFloorTrackerService;
+        private IStartMatchWallController _startMatchWallController;
 
         private int _processedTick;
 
@@ -33,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersOnTeamFloorTrackerService = _diContainer.Resolve<IPlayersOnTeamFloorTrackerService>();
+            _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
         }
 
         public void Execute()
@@ -59,9 +62,79 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
                 HandlePlayerWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandleBulletWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerTeamFloorCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerStartMatchWallCollision(objectA, objectB, collisionEvent.Contact);
+                HandleBulletStartMatchWallCollision(objectA, objectB, collisionEvent.Contact);
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandlePlayerStartMatchWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            bool isPlayerToWallCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.StartMatchWall;
+            bool isWallToPlayerCollision = objectA.PhysicsBodyType == PhysicsBodyType.StartMatchWall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            var isCollision = isPlayerToWallCollision || isWallToPlayerCollision;
+
+            if (!isCollision)
+            {
+                return;
+            }
+
+            var playerModel = GetPlayerFromCollision(objectA, objectB, isPlayerToWallCollision, isWallToPlayerCollision);
+            var relativeVelocity = playerModel.Spaceship.Transform.Velocity;
+            contact.GetWorldManifold(out var worldManifold);
+            var collisionNormal = worldManifold.normal;
+            if (!relativeVelocity.IsFacingWall(collisionNormal))
+            {
+                return;
+            }
+
+            var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
+            playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
+
+            LogService.LogTopic($"new pos {_physicsSimulator.GetPlayer(playerModel.Id).Position}, prev pos: {playerModel.Spaceship.Transform.Position} ",
+                LogTopicType.ServerNetwork);
+
+            playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0
+                ? System.Numerics.Vector2.Normalize(reflectedVelocity)
+                : System.Numerics.Vector2.Zero;
+        }
+
+        private void HandleBulletStartMatchWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBulletToWallCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.StartMatchWall;
+            var isWallToBulletCollision = objectA.PhysicsBodyType == PhysicsBodyType.StartMatchWall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+            var isCollision = isWallToBulletCollision || isBulletToWallCollision;
+
+            if (!isCollision)
+            {
+                return;
+            }
+
+            Body bulletBody;
+            PlayerBulletS2C bulletModel;
+
+            if (isWallToBulletCollision)
+            {
+                if (!_matchMakingDataService.SimulationState.TryGetBulletById(objectB.Id, out bulletModel))
+                {
+                    return;
+                }
+
+                bulletBody = contact.FixtureB.Body;
+            }
+            else
+            {
+                if (!_matchMakingDataService.SimulationState.TryGetBulletById(objectA.Id, out bulletModel))
+                {
+                    return;
+                }
+
+                bulletBody = contact.FixtureA.Body;
+            }
+
+            DestroyBullet(bulletModel, bulletBody);
+            _startMatchWallController.OnHitByBullet(_processedTick);
         }
 
         private void HandlePlayerTeamFloorCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
