@@ -100,10 +100,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             try
             {
                 _networkManager.PollEvents();
-                //_networkManager.SetServerTick(CurrentTick); // Update tick for playback recording/reading
                 var stepDeltaTime = _networkConfig.DeltaTime;
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
-                var processedTick = currentTick - _networkConfig.ServerTicksBuffer; // todo change this to be only in the process packets
+                var processedTick = currentTick;//
                 var processPlayersInputsResult = ProcessPackets(processedTick);
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(processedTick).Execute();
                 
