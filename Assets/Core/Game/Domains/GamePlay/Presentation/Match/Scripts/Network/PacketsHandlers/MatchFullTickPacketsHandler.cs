@@ -1,6 +1,4 @@
 using System.Linq;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
@@ -27,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationMatchNetEventsHandler _presentationNetEventsHandler;
-        private readonly CapacityDict<int, MatchFullTickPacket> _fullTickPackets;
+        private readonly CapacityDict<int, MatchFullTickPacketS2C> _fullTickPackets;
         private readonly CapacityList<PlayerRejoinAcceptPacketS2C> _cachedUnprocessedPlayerRejoinedEvents;
         private readonly CapacityList<BulletSpawnNetEventS2C> _cachedUnprocessedBulletSpawnedEvents;
         private readonly CapacityList<PlayerTakeDamageNetEventS2C> _cachedUnprocessedPlayerTakeDamageEvents;
@@ -37,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<TalentCardHitNetEventS2C> _cachedUnprocessedTalentCardHitEvents;
         private readonly CapacityList<PowerUpBallSpawnedNetEventS2C> _cachedUnprocessedPowerUpBallSpawnedEvents;
         private readonly CapacityList<PowerUpBallObtainedNetEventS2C> _cachedUnprocessedPowerUpBallObtainedEvents;
-        private readonly ConcurrentPool<MatchFullTickPacket> _fullTickPacketsPool;
+        private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
 
@@ -49,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _matchDataService = matchDataService;
 
             _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, iCachedPresentationEventsService, networkManager, networkConfig, clientPresentationTickProcessor, commandFactory, tickCounterService);
-            _fullTickPackets = new CapacityDict<int, MatchFullTickPacket>(networkConfig.MaxCap.FullTickPacketsNetEvents);
+            _fullTickPackets = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerRejoinedEvents = new CapacityList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
             _cachedUnprocessedPlayerTakeDamageEvents = new CapacityList<PlayerTakeDamageNetEventS2C>(networkConfig.MaxCap.PlayerTakeDamageNetEvents);
@@ -59,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedTalentCardHitEvents = new CapacityList<TalentCardHitNetEventS2C>(networkConfig.MaxCap.TalentCardHitNetEvents);
             _cachedUnprocessedPowerUpBallSpawnedEvents = new CapacityList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents);
             _cachedUnprocessedPowerUpBallObtainedEvents = new CapacityList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents);
-            _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacket>(() => new MatchFullTickPacket(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
+            _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
         public void InitEntryPoint()
@@ -82,7 +80,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 LogService.LogTopic("Didn't receive any state since last tick", LogTopicType.ClientNetwork);
                 return;
             }
-
+            
             ProcessPlayerRejoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
             ProcessPlayerTakeDamageEvents(latestFullTickPacket.PlayerTakeDamageNetEvents);
@@ -307,7 +305,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             OnFullTickReceived(newPacket);
         }
         
-        private void OnFullTickReceived(MatchFullTickPacket fullTickPacket)
+        private void OnFullTickReceived(MatchFullTickPacketS2C fullTickPacket)
         {
             LogService.LogTopic("FullTickPacket accepted received", LogTopicType.ClientNetwork);
             var tick = fullTickPacket.Tick;

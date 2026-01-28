@@ -4,12 +4,14 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -30,15 +32,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IStateMachineService _stateMachineService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
-        private readonly ITickCounterService _tickCounterService;
+        private readonly ITickService _tickService;
         private readonly IPlaybackRecorderService _playbackRecorderService;
 
-        private TimerFixedThreaded2 _fixedTimer;
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
         private StepTimersCommand _stepTimersCommand;
-        private MatchFullTickPacket _fullTickPacket;
+        private readonly MatchFullTickPacketS2C _fullTickPacket;
+        private StartMatchPacketS2C _startMatchPacket;
         //private TimerFixedThreaded2 _pollEventsFixedTimer;
         private Stopwatch _sw;
         private long _last;
@@ -46,7 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IPlayeRejoinPacketsHandler iPlayeRejoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory, ITickCounterService tickCounterService, IPlaybackRecorderService playbackRecorderService)
+            ICommandFactory commandFactory, ITickService tickService, IPlaybackRecorderService playbackRecorderService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -56,27 +58,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _netEventsDataService = iNetEventsDataService;
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
-            _tickCounterService = tickCounterService;
+            _tickService = tickService;
             _playbackRecorderService = playbackRecorderService;
+            _fullTickPacket = new MatchFullTickPacketS2C();
+            _startMatchPacket = new StartMatchPacketS2C();
         }
 
         public void InitEntryPoint()
         {
-            StartTick();
-            _fullTickPacket = new MatchFullTickPacket();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
-        }
-
-        private void StartTick()
-        {
-            var cancellationTokenSource = new CancellationTokenSource();
-            _fixedTimer = new TimerFixedThreaded2("BattleFroce Thread", _networkConfig.TicksPerSeconds, OnTick);
-            // _pollEventsFixedTimer = new TimerFixedThreaded2("Poll Events Thread", -1, PollEvents);
-            // _pollEventsFixedTimer.Start(cancellationTokenSource);
-            _fixedTimer.Start(cancellationTokenSource);
+            _tickService.RegisterObserver(this);
         }
 
         private void PollEvents()
@@ -97,15 +91,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         public void InitExitPoint()
         {
-            StopTick();
+            _tickService.UnregisterObserver(this);
         }
-
-        private void StopTick()
-        {
-            _fixedTimer.Stop();
-        }
+        
       
-        private void OnTick()
+        public void OnTick(int currentTick)
         {
             try
             {
@@ -113,8 +103,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 //_networkManager.SetServerTick(CurrentTick); // Update tick for playback recording/reading
                 var stepDeltaTime = _networkConfig.DeltaTime;
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
-                _tickCounterService.IncrementTick();;
-                var processedTick = _tickCounterService.CurrentTick - _networkConfig.ServerTicksBuffer;
+                var processedTick = currentTick - _networkConfig.ServerTicksBuffer; // todo change this to be only in the process packets
                 var processPlayersInputsResult = ProcessPackets(processedTick);
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(processedTick).Execute();
                 
@@ -126,12 +115,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(processedTick).Execute();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(processedTick);
+
+                SendStartMatchToNotAcknowledgedPlayers(processedTick);
             }
             catch (Exception e)
             {
                 LogService.LogError("Got error! " + e);
                 throw;
             }
+        }
+
+        private void SendStartMatchToNotAcknowledgedPlayers(int processedTick)
+        {
+            foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                var didPlayerAcknowledgeMatch = _playerInputsPacketsHandler.DidReceiveAnyInputFromPlayer(playerState.Id);
+                if (!didPlayerAcknowledgeMatch)
+                {
+                    SendStartMatchPacketToClient(playerState.Id, processedTick);
+                }
+            }
+        }
+
+        private void SendStartMatchPacketToClient(ushort playerId, int processedTick)
+        {
+            _startMatchPacket.InitialState = _matchDataService.SimulationState;
+            _startMatchPacket.OccuredOnTick = processedTick;
+            _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.StartMatch, _startMatchPacket, DeliveryMethod.Unreliable);
         }
 
         private void ApplyPhysicsSimulationToMatchModel()

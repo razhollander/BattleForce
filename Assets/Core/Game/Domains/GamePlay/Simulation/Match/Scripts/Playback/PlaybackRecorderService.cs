@@ -5,7 +5,10 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Utils;
+using CoreDomain.Scripts.Services.DataPersistence;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -16,8 +19,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
 {
     public class PlaybackRecorderService : IPlaybackRecorderService, IRawPacketsObserver
     {
-        private readonly ITickCounterService _tickCounterService;
+        private readonly ITickService _tickService;
         private readonly IServerNetworkManager _networkManager;
+        private readonly ISimulationPersistentData _simulationPersistentData;
         private Dictionary<int, PlaybackTickData> _ticks = new Dictionary<int, PlaybackTickData>();
         private int _seed;
         private readonly string _jsonFilePath;
@@ -27,10 +31,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
         public bool IsPlaybackEnabled { get; private set; }
         public bool IsRecordingEnabled { get; set; }
 
-        public PlaybackRecorderService(ITickCounterService tickCounterService, IServerNetworkManager networkManager)
+        public PlaybackRecorderService(ITickService tickService, IServerNetworkManager networkManager, ISimulationPersistentData simulationPersistentData)
         {
-            _tickCounterService = tickCounterService;
+            _tickService = tickService;
             _networkManager = networkManager;
+            _simulationPersistentData = simulationPersistentData;
             var directory = Application.dataPath + "/Records";
             _jsonFilePath = Path.Combine(directory, "playback.json");
             _debugFilePath = Path.Combine(directory, "playback_debug.json");
@@ -39,7 +44,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
 
         public void InitEntryPoint()
         {
-            IsPlaybackEnabled = PlayerPrefsSettings.IsPlaybackEnabled;
+            IsPlaybackEnabled = _simulationPersistentData.IsPlaybackEnabled;
 
             if (!IsPlaybackEnabled)
             {
@@ -196,7 +201,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
         
         public void RecordPacket(ushort playerId, byte[] data)
         {
-            var serverTick = _tickCounterService.CurrentTick;
+            var serverTick = _tickService.CurrentTick;
             if (!_ticks.TryGetValue(serverTick, out var tickData))
             {
                 tickData = new PlaybackTickData { Tick = serverTick };

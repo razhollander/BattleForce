@@ -57,7 +57,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 if (isLocalPlayer)
                 {
                     _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
-                        .SetSimulationState(playerRejoinAcceptNetEvent.SimulationState).Execute();
+                        .SetSimulationState(playerRejoinAcceptNetEvent.SimulationState)
+                        .Execute();
                     SyncTickToServer(playerRejoinAcceptNetEvent);
                     SetupLocalPlayer(playerId);
                 }
@@ -78,7 +79,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private void SetupLocalPlayer(int playerId)
         {
             _matchDataService.SetLocalPlayer(playerId);
-            _clientPresentationTickProcessor.StartTick();
+            _clientPresentationTickProcessor.InitEntryPoint();
         }
         
         public void ProcessBulletSpawnEvents(CapacityList<BulletSpawnNetEventS2C> bulletSpawnNetEvents)

@@ -1,5 +1,7 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
@@ -8,17 +10,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
     {
         private IServerNetworkManager _serverNetworkManager;
         private IPhysicsSimulator _physicsSimulator;
+        private ISimulationStateMachine _simulationStateMachine;
+        private ITickService _tickService;
 
         public override void ResolveDependencies()
         {
             _serverNetworkManager = _diContainer.Resolve<IServerNetworkManager>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
+            _simulationStateMachine = _diContainer.Resolve<ISimulationStateMachine>();
+            _tickService = _diContainer.Resolve<ITickService>();
         }
 
         public void Execute()
         {
             _serverNetworkManager.InitExitPoint();
             _physicsSimulator.InitExitPoint();
+            _simulationStateMachine.InitExitPoint();
+            _tickService.InitExitPoint(); // must be last this stops the thread
         }
     }
 }

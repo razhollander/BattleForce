@@ -5,6 +5,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
     public interface IPlayerInputsPacketsHandler : IPacketsObserver
     {
         void InitEntryPoint();
+        bool DidReceiveAnyInputFromPlayer(ushort playerId);
         ProcessPlayersInputsResult ProcessInputs(int processedTick);
         void InitExitPoint();
     }

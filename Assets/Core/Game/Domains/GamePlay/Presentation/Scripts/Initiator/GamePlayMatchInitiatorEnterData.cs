@@ -1,11 +1,17 @@
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using CoreDomain.Scripts.CoreInitiator.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator
 {
     public class GamePlayMatchInitiatorEnterData : IInitiatorEnterData
     {
-    public GamePlayMatchInitiatorEnterData()
-    {
-    }
+        public readonly MatchSimulationStateS2C InitialState;
+        public readonly ushort LocalPlayerId;
+
+        public GamePlayMatchInitiatorEnterData(MatchSimulationStateS2C initialState, ushort localPlayerId)
+        {
+            InitialState = initialState;
+            LocalPlayerId = localPlayerId;
+        }
     }
 }

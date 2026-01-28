@@ -1,5 +1,5 @@
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.States;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Zenject;
 
@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.State
             _commandFactory = newDiContainer.Resolve<ICommandFactory>();
         }
 
-        public void Enter(object enterData)
+        public void Enter()
         {
             _installer.InstallBindings();
             _commandFactory.CreateCommandVoid<ServerMatchMakingEntryPointCommand>().Execute();

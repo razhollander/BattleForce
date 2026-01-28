@@ -1,14 +1,15 @@
 using System;
 using System.Threading;
 using Core.Scripts.Extensions;
+using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace CoreDomain.Scripts.Utils
+namespace Core.Scripts.Utils
 {
     public static class AwaitableUtils
     {
-        static readonly AwaitableCompletionSource completionSource = new();
+        private static readonly AwaitableCompletionSource completionSource = new();
 	
         public static Awaitable CompletedTask
         {
@@ -21,6 +22,27 @@ namespace CoreDomain.Scripts.Utils
             }
         }
         
+        public static void Forget(this Awaitable awaitable)
+        {
+            _ = ForgetAsync(awaitable);
+        }
+
+        private static async Awaitable ForgetAsync(this Awaitable awaitable)
+        {
+            try
+            {
+                await awaitable;
+            }
+            catch (OperationCanceledException)
+            {
+                // ignored
+            }
+            catch (Exception e)
+            {
+                LogService.LogException(e);
+            }
+        }
+
         public static async Awaitable WaitUntil(Func<bool> condition, CancellationToken cancellationToken)
         {
             while (!condition())

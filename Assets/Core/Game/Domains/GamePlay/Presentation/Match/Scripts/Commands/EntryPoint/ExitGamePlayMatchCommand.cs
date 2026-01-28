@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
 
         public void Execute()
         {
-            _clientPresentationTickProcessor.StopTick();
+            _clientPresentationTickProcessor.InitExitPoint();
             _tickProcessor.StopTick();
             _fullTickPacketsHandler.InitExitPoint();
         }

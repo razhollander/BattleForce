@@ -18,3 +18,4 @@ MonoBehaviour:
   Lava: {fileID: 11400000, guid: 7c1289f5735214c4b89bd8c0ea511f75, type: 2}
   PowerUps: {fileID: 11400000, guid: f3f1e9d59a8914447bcbb1a5299d3b37, type: 2}
   ChosenEnvironmentIndex: 0
+  StartMatchCountdownDuration: 3

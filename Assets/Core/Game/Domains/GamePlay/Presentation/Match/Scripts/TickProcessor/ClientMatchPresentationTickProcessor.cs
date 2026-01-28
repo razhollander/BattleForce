@@ -44,12 +44,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePowerUpBallObtainedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePowerUpBallObtainedNetEventsCommand>();
         }
         
-        public void StartTick()
+        public void InitEntryPoint()
         {
             _updateSubscriptionService.RegisterUpdatable(this);
         }
         
-        public void StopTick()
+        public void InitExitPoint()
         {
             _updateSubscriptionService.UnregisterUpdatable(this);
         }

@@ -4,9 +4,9 @@ namespace Core.Scripts.Utils
 {
     public static class PlayerPrefsSettings
     {
-        private const string PlaybackEnabledKey = "PlaybackEnabled";
-        private const string SkipMatchMakingKey = "SkipMatchMaking";
-
+        public const string PlaybackEnabledKey = "PlaybackEnabled";
+        public const string SkipMatchMakingKey = "SkipMatchMaking";
+        
         public static bool IsPlaybackEnabled
         {
             get => PlayerPrefs.GetInt(PlaybackEnabledKey, 0) == 1;

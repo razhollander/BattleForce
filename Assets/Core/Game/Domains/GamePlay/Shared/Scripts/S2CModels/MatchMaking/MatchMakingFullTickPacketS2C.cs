@@ -8,7 +8,7 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
 {
-    public class MatchMakingFullTickPacket : INetSerializable
+    public class MatchMakingFullTickPacketS2C : INetSerializable
     {
         public int Tick;
         //public SimulationStateS2C PreviousSimulationState; // not sure if gonna need this
@@ -20,11 +20,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
         public FixedUnorderedList<StartMatchCountdownNetEventS2C> StartMatchCountdownNetEvents;
         public FixedUnorderedList<StopMatchCountdownNetEventS2C> StopMatchCountdownNetEvents;
 
-        public MatchMakingFullTickPacket()
+        public MatchMakingFullTickPacketS2C()
         {
         }
-        
-        public MatchMakingFullTickPacket(MaxCap maxCap)
+
+        public MatchMakingFullTickPacketS2C(MaxCap maxCap)
         {
             CurrentSimulationState = new MatchMakingSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets);
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
@@ -58,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             DeserializedStartMatchCountdownEvents(reader);
             DeserializedStopMatchCountdownEvents(reader);
         }
-
+        
         private void SerializedBulletDestroyedEvents(NetDataWriter writer)
         {
             writer.Put((byte) BulletDestroyedNetEvents.Count);

@@ -2,8 +2,10 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
+using Core.Scripts.Utils;
 using CoreDomain.GameDomain.Scripts.States.GamePlayState;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.DataPersistence;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
@@ -12,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
     {
         private IGameInputActionsController _gameInputActionsController;
         private IChooseNetworkRoleUIController _chooseNetworkRoleUIController;
+        private IDataPersistence _dataPersistence;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -25,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         {
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
             _chooseNetworkRoleUIController = _diContainer.Resolve<IChooseNetworkRoleUIController>();
-        
+            _dataPersistence = _diContainer.Resolve<IDataPersistence>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)

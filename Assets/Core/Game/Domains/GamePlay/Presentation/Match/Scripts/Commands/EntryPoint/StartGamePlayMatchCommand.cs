@@ -7,7 +7,10 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mv
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
@@ -19,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
 {
     public class StartGamePlayMatchCommand: BaseCommand, ICommandAsync
     {
-        private GamePlayMatchInitiatorEnterData _enterEnterData;
+        private GamePlayMatchInitiatorEnterData _enterData;
         private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
@@ -30,10 +33,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ITickProcessor _tickProcessor;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
+        private IMatchDataService _matchDataService;
+        private ICommandFactory _commandFactory;
+        private IClientMatchPresentationTickProcessor _clientMatchPresentationTickProcessor;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
-            _enterEnterData = enterEnterData;
+            _enterData = enterEnterData;
             return this;
         }
 
@@ -49,6 +55,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
+            _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _clientMatchPresentationTickProcessor = _diContainer.Resolve<IClientMatchPresentationTickProcessor>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -60,9 +69,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _powerUpBallControllers.InitEntryPoint();
             _powerUpBallObtainedEffectController.InitEntryPoint();
             _playerControllers.InitEntryPoint();
-            _tickProcessor.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
+            _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
+                .SetSimulationState(_enterData.InitialState)
+                .Execute();
+            _matchDataService.SetLocalPlayer(_enterData.LocalPlayerId);
+            _tickProcessor.InitEntryPoint();
+            _clientMatchPresentationTickProcessor.InitEntryPoint();
         }
     }
 }

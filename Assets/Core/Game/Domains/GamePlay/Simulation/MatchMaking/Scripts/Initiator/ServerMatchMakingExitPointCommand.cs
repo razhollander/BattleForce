@@ -24,9 +24,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
         public void Execute()
         {
             _playerJoinPacketsHandler.InitExitPoint();
-            _tickProcessor.InitExitPoint();
             _playerInputsPacketsHandler.InitExitPoint();
             _physicsSimulator.ClearAllData();
+            _tickProcessor.InitExitPoint();
         }
     }
 }
