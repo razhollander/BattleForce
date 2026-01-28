@@ -56,7 +56,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
         {
             var packetType = (PacketTypeS2C)reader.GetByte();
-            _packetsObservers[packetType].OnPacketReceived(reader);
+
+            if (_packetsObservers.TryGetValue(packetType, out IPacketsObserver packetObserver))
+            {
+                packetObserver.OnPacketReceived(reader);
+            }
             LogService.LogTopic($"OnNetworkReceive {packetType}", LogTopicType.ClientNetwork);
             //_packetProcessor.ReadAllPackets(reader);
         }

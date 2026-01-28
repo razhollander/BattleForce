@@ -42,6 +42,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly HandleTalentInputPressedCommand _handleTalentInputPressedCommand;
         private readonly IPlayersTalentsManager _playersTalentsManager;
 
+        public bool DidReceiveAnyInputFromPlayer(ushort playerId)
+        {
+            return _inputsPerPlayer.ContainsKey(playerId);
+        }
+        
         public PlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
             IPlayersTalentsManager playersTalentsManager)

@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
 using UnityEngine;
 using Zenject;
@@ -16,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         public override void InstallBindings()
         {
             Container.BindInstance(_sharedGamePlayConfig).AsSingle().NonLazy();
-            Container.Bind<ITickCounterService>().To<TickCounterService>().AsSingle().NonLazy();
+            Container.Bind<ITickService>().To<TickService>().AsSingle().NonLazy();
             Container.Bind<IServerInitiator>().To<ServerInitiator>().AsSingle().NonLazy();
             Container.BindInstance(_gamePlayConfig).AsSingle().NonLazy();
             Container.BindInstance(_powerUpsConfig).AsSingle().NonLazy();

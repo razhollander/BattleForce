@@ -149,12 +149,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 
         public void Init(MatchSimulationStateS2C initialState)
         {
-            Players.Clear();
-            Bullets.Clear();
-            TalentCards.Clear();
-            PowerUpBalls.Clear();
-            LocalPlayer = null;
-
             foreach (var player in initialState.Players.AsSpan())
             {
                 AddPlayer(player);

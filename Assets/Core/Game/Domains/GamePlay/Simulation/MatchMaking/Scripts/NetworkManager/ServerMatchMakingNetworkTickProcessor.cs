@@ -13,6 +13,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
@@ -34,22 +35,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly IStateMachineService _stateMachineService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
-        private readonly ITickCounterService _tickCounterService;
+        private readonly ITickService _tickService;
         private readonly IStartMatchWallController _startMatchWallController;
         private readonly ISimulationStateMachine _simulationStateMachine;
 
-        private TimerFixedThreaded2 _fixedTimer;
         private MatchMakingProcessCachedCollisionsCommand _processCachedCollisionsCommand;
         private StepTimersCommand _stepTimersCommand;
-        private MatchMakingFullTickPacket _fullTickPacket;
-        //private TimerFixedThreaded2 _pollEventsFixedTimer;
+        private MatchMakingFullTickPacketS2C _fullTickPacket;
         private Stopwatch _sw;
         private long _last;
 
         public ServerMatchMakingNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchMakingDataService matchDataService,
             IPlayerJoinPacketsHandler playerJoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory, ITickCounterService tickCounterService, IStartMatchWallController startMatchWallController, ISimulationStateMachine simulationStateMachine)
+            ICommandFactory commandFactory, ITickService tickService, IStartMatchWallController startMatchWallController, ISimulationStateMachine simulationStateMachine)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -59,24 +58,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _netEventsDataService = iNetEventsDataService;
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
-            _tickCounterService = tickCounterService;
+            _tickService = tickService;
             _startMatchWallController = startMatchWallController;
             _simulationStateMachine = simulationStateMachine;
         }
 
         public void InitEntryPoint()
         {
-            StartTick();
-            _fullTickPacket = new MatchMakingFullTickPacket();
+            _fullTickPacket = new MatchMakingFullTickPacketS2C();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<MatchMakingProcessCachedCollisionsCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
-        }
-
-        private void StartTick()
-        {
-            var cancellationTokenSource = new CancellationTokenSource();
-            _fixedTimer = new TimerFixedThreaded2("BattleFroce MatchMaking Thread", _networkConfig.TicksPerSeconds, OnTick);
-            _fixedTimer.Start(cancellationTokenSource);
+            _tickService.RegisterObserver(this);
         }
 
         private void PollEvents()
@@ -97,23 +89,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
 
         public void InitExitPoint()
         {
-            StopTick();
-        }
+            _tickService.UnregisterObserver(this);
 
-        private void StopTick()
-        {
-            _fixedTimer.Stop();
         }
       
-        private void OnTick()
+        public void OnTick(int currentTick)
         {
             try
             {
                 _networkManager.PollEvents();
                 var stepDeltaTime = _networkConfig.DeltaTime;
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
-                _tickCounterService.IncrementTick();;
-                var processedTick = _tickCounterService.CurrentTick - _networkConfig.ServerTicksBuffer;
+                var processedTick = currentTick - _networkConfig.ServerTicksBuffer;
                 var processPlayersInputsResult = ProcessPackets(processedTick);
                 StepPhysics(stepDeltaTime, processedTick);
                 MoveToMatchStateIfCountdownEnded();
@@ -188,9 +175,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             {
                 var playerId = playerState.Id;
 
-                if (heighestProcessedTickPerPlayer.TryGetValue(playerId, out int tickOfPlayer))
+                if (heighestProcessedTickPerPlayer.TryGetValue(playerId, out int heighestProcessedTick))
                 {
-                    _netEventsDataService.RemoveAllEventsOlderThanTick(playerId, tickOfPlayer);
+                    _netEventsDataService.RemoveAllEventsOlderThanTick(playerId, heighestProcessedTick);
                 }
             }
         }

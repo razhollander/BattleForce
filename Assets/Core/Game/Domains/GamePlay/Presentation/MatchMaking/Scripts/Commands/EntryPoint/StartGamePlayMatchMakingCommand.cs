@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.W
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatchButton.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
@@ -23,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private IMatchMakingEnvironmentTeamFloorControllers _environmentTeamFloorControllers;
         private IStartMatchButtonController _startMatchButtonController;
-        private IStartMatchPacketsHandler _startMatchPacketsHandler;
+        private IStartMatchPacketHandler _startMatchPacketHandler;
 
         public StartGamePlayMatchMakingCommand SetEnterData(GamePlayMatchMakingInitiatorEnterData enterData)
         {
@@ -40,13 +41,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
             _environmentTeamFloorControllers = _diContainer.Resolve<IMatchMakingEnvironmentTeamFloorControllers>();
             _startMatchButtonController = _diContainer.Resolve<IStartMatchButtonController>();
-            _startMatchPacketsHandler = _diContainer.Resolve<IStartMatchPacketsHandler>();
+            _startMatchPacketHandler = _diContainer.Resolve<IStartMatchPacketHandler>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
-            _startMatchPacketsHandler.InitEntryPoint();
             _fullTickPacketsHandler.InitEntryPoint();
+            _startMatchPacketHandler.InitEntryPoint();
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
             _tickProcessor.InitEntryPoint();

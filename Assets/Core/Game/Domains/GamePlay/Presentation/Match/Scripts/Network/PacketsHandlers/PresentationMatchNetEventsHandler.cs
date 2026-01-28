@@ -57,7 +57,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 if (isLocalPlayer)
                 {
                     _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
-                        .SetSimulationState(playerRejoinAcceptNetEvent.SimulationState).Execute();
+                        .SetSimulationState(playerRejoinAcceptNetEvent.SimulationState)
+                        .Execute();
                     SyncTickToServer(playerRejoinAcceptNetEvent);
                     SetupLocalPlayer(playerId);
                 }

@@ -26,14 +26,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchMakingDataService _matchDataService;
         private readonly PresentationMatchMakingNetEventsHandler _presentationNetEventsHandler;
-        private readonly CapacityDict<int, MatchMakingFullTickPacket> _fullTickPackets;
+        private readonly CapacityDict<int, MatchMakingFullTickPacketS2C> _fullTickPackets;
         private readonly CapacityList<MatchMakingPlayerJoinAcceptPacketS2C> _cachedUnprocessedPlayerJoinedEvents;
         private readonly CapacityList<BulletSpawnNetEventS2C> _cachedUnprocessedBulletSpawnedEvents;
         private readonly CapacityList<BulletDestroyedNetEventS2C> _cachedUnprocessedBulletDestroyedEvents;
         private readonly CapacityList<PlayerSwitchTeamNetEventS2C> _cachedUnprocessedPlayerSwitchTeamEvents;
         private readonly CapacityList<StartMatchCountdownNetEventS2C> _cachedUnprocessedStartMatchCountdownEvents;
         private readonly CapacityList<StopMatchCountdownNetEventS2C> _cachedUnprocessedStopMatchCountdownEvents;
-        private readonly ConcurrentPool<MatchMakingFullTickPacket> _fullTickPacketsPool;
+        private readonly ConcurrentPool<MatchMakingFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchMakingFullTick;
         public int LastProcessedTickFromServer { get; private set; }
 
@@ -48,7 +48,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             _presentationNetEventsHandler = new PresentationMatchMakingNetEventsHandler(matchDataService, cachedPresentationEventsService, networkManager, networkConfig,
                 clientPresentationTickProcessor, commandFactory, tickCounterService, startMatchButtonController);
 
-            _fullTickPackets = new CapacityDict<int, MatchMakingFullTickPacket>(networkConfig.MaxCap.FullTickPacketsNetEvents);
+            _fullTickPackets = new CapacityDict<int, MatchMakingFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerJoinedEvents = new CapacityList<MatchMakingPlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
             _cachedUnprocessedBulletDestroyedEvents = new CapacityList<BulletDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents);
@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             _cachedUnprocessedPlayerSwitchTeamEvents = new CapacityList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents);
 
             _fullTickPacketsPool =
-                new ConcurrentPool<MatchMakingFullTickPacket>(() => new MatchMakingFullTickPacket(networkConfig.MaxCap), networkConfig.MaxCap.FullTickPacketsNetEvents);
+                new ConcurrentPool<MatchMakingFullTickPacketS2C>(() => new MatchMakingFullTickPacketS2C(networkConfig.MaxCap), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
         public void InitEntryPoint()
@@ -238,7 +238,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             OnFullTickReceived(newPacket);
         }
 
-        private void OnFullTickReceived(MatchMakingFullTickPacket fullTickPacket)
+        private void OnFullTickReceived(MatchMakingFullTickPacketS2C fullTickPacket)
         {
             LogService.LogTopic("FullTickPacket accepted received", LogTopicType.ClientNetwork);
             var tick = fullTickPacket.Tick;

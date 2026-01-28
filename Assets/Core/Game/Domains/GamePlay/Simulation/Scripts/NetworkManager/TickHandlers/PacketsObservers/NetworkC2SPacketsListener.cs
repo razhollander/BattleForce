@@ -53,7 +53,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             }
         
             var packetType = (PacketTypeC2S) reader.GetByte();
-            _packetsObservers[packetType].OnPacketReceived(reader, peer);
+
+            if (_packetsObservers.TryGetValue(packetType, out var observer))
+            {
+                observer.OnPacketReceived(reader, peer);
+            }
             LogService.LogTopic($"OnNetworkReceive!", LogTopicType.ServerNetwork);
         }
 

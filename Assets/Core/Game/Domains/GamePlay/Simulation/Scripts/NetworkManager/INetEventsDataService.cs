@@ -24,7 +24,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> PlayerSwitchTeamNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<StartMatchCountdownNetEventS2C>> StartMatchCountdownNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<StopMatchCountdownNetEventS2C>> StopMatchCountdownNetEventsPerPlayer { get; }
-        CapacityDict<ushort, FixedClassUnorderedList<StartMatchNetEventS2C>> StartMatchNetEventsPerPlayer { get; }
 
         void StartSavingPlayerEvents(ushort playerId);
         void StopSavingPlayerEvents(ushort playerId);
@@ -42,6 +41,5 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddPlayerSwitchTeamNetEvent(int onTick, ushort playerId, ushort teamId);
         void AddStartMatchCountdownNetEvent(int onTick, ushort seconds);
         void AddStopMatchCountdownNetEvent(int onTick);
-        void AddStartMatchNetEvent(int onTick, MatchSimulationStateS2C simulationState);
     }
 }

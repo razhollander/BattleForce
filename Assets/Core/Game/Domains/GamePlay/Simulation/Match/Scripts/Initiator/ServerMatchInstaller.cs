@@ -5,29 +5,21 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
-using CoreDomain.Scripts.Services.CommandFactory;
 using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
 {
-    public class ServerMatchInstaller // called from reflection
+    public class ServerMatchInstaller
     {
-        private readonly DiContainer _diContainer;
-        private readonly SimulationMatchEnterData _simulationMatchEnterData;
-        private readonly ICommandFactory _commandFactory;
+        private  DiContainer _diContainer;
 
-        public ServerMatchInstaller(DiContainer diContainer, SimulationMatchEnterData simulationMatchEnterData) 
+        public ServerMatchInstaller(DiContainer diContainer) 
         {
             _diContainer = diContainer;
-            _simulationMatchEnterData = simulationMatchEnterData;
-            _commandFactory = _diContainer.Resolve<ICommandFactory>();
-            InstallBindings();
-            StartMatch();
         }
         
-        private void InstallBindings()
+        public void InstallBindings()
         {
             _diContainer.Bind<IMatchDataService>().To<MatchDataService>().AsSingle();
             _diContainer.Bind<ITickProcessor>().To<ServerMatchNetworkTickProcessor>().AsSingle().NonLazy();
@@ -39,11 +31,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<IPlaybackRecorderService>().To<PlaybackRecorderService>().AsSingle().NonLazy();
         }
 
-        private void StartMatch()
+        public void UninstallBindings()
         {
-            _commandFactory.CreateCommandVoid<ServerMatchEntryPointCommand>()
-                .SetMatchEnterData(_simulationMatchEnterData)
-                .Execute();
+            _diContainer = null;
         }
     }
 }

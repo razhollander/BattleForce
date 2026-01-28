@@ -25,11 +25,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private IPlaybackRecorderService _playbackRecorderService;
         private IPlayersTalentsManager _playersTalentsManager;
         private IServerNetworkManager _networkManager;
-        private ICommandFactory _commandFactory;
         private SimulationGamePlayConfig _gamePlayConfig;
-        private SharedGamePlayConfig _sharedGamePlayConfig;
         private INetEventsDataService _netEventsDataService;
-        private ITickCounterService _tickCounterService;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -50,11 +47,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _networkManager = _diContainer.Resolve<IServerNetworkManager>();
-            _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
-            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
-            _tickCounterService = _diContainer.Resolve<ITickCounterService>();
         }
 
         public void Execute()
@@ -63,17 +57,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _matchDataService.InitEntryPoint();
             _playerInputsPacketsHandler.InitEntryPoint();
             _playeRejoinPacketsHandler.InitEntryPoint();
-            _tickProcessor.InitEntryPoint();
-            _physicsSimulator.InitEntryPoint();
+            _physicsSimulator.ClearAllData(); // needed if come from match making
 
             InitPlayers(_simulationMatchEnterData);
             CreateWalls();
             CreateLavaWalls();
             CreateTalentCards();
-
-            _netEventsDataService.AddStartMatchNetEvent(_tickCounterService.CurrentTick, _matchDataService.SimulationState);
-
             TrySwitchToPlayback();
+            
+            _tickProcessor.InitEntryPoint();
         }
 
         private void TrySwitchToPlayback()
@@ -120,7 +112,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown);
                 _physicsSimulator.AddPlayer(playerId, playerTeamId, position, startingDirection, radius);
                 _playersTalentsManager.AddPlayer(playerId);
-                _netEventsDataService.StartSavingPlayerEvents(playerId);
             }
         }
 

@@ -1,8 +1,8 @@
-namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.States
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.States
 {
     public interface IState
     {
-        void Enter(object enterData);
+        void Enter();
         void Exit();
     }
 }

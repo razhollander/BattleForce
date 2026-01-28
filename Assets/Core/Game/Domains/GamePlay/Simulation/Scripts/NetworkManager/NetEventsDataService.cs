@@ -27,7 +27,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> PlayerSwitchTeamNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<StartMatchCountdownNetEventS2C>> StartMatchCountdownNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<StopMatchCountdownNetEventS2C>> StopMatchCountdownNetEventsPerPlayer { get; }
-        public CapacityDict<ushort, FixedClassUnorderedList<StartMatchNetEventS2C>> StartMatchNetEventsPerPlayer { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -42,7 +41,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> _playerSwitchTeamListPool;
         private readonly ConcurrentPool<FixedUnorderedList<StartMatchCountdownNetEventS2C>> _startMatchCountdownListPool;
         private readonly ConcurrentPool<FixedUnorderedList<StopMatchCountdownNetEventS2C>> _stopMatchCountdownListPool;
-        private readonly ConcurrentPool<FixedClassUnorderedList<StartMatchNetEventS2C>> _startMatchNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -60,7 +58,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerSwitchTeamNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(maxConcurrentPlayers);
             StartMatchCountdownNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<StartMatchCountdownNetEventS2C>>(maxConcurrentPlayers);
             StopMatchCountdownNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<StopMatchCountdownNetEventS2C>>(maxConcurrentPlayers);
-            StartMatchNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<StartMatchNetEventS2C>>(maxConcurrentPlayers);
 
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
@@ -87,14 +84,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _playerSwitchTeamListPool = new ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(() => new FixedUnorderedList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents), maxConcurrentPlayers);
             _startMatchCountdownListPool = new ConcurrentPool<FixedUnorderedList<StartMatchCountdownNetEventS2C>>(() => new FixedUnorderedList<StartMatchCountdownNetEventS2C>(networkConfig.MaxCap.StartMatchCountdownNetEvents), maxConcurrentPlayers);
             _stopMatchCountdownListPool = new ConcurrentPool<FixedUnorderedList<StopMatchCountdownNetEventS2C>>(() => new FixedUnorderedList<StopMatchCountdownNetEventS2C>(networkConfig.MaxCap.StopMatchCountdownNetEvents), maxConcurrentPlayers);
-            _startMatchNetEventsListPool = new ConcurrentPool<FixedClassUnorderedList<StartMatchNetEventS2C>>(() =>
-            {
-                var list = new FixedClassUnorderedList<StartMatchNetEventS2C>(networkConfig.MaxCap.StartMatchNetEvents, () => new StartMatchNetEventS2C(networkConfig.MaxCap, sharedGamePlayConfig));
-                list.Clear();
-                return list;
-            }, maxConcurrentPlayers);
         }
-        
+
+
         public void StartSavingPlayerEvents(ushort playerId)
         {
             if (!BulletSpawnNetEventsPerPlayer.ContainsKey(playerId)) // don't use TryAdd since it will _bulletSpawnListPool.Get() an object from the pool! 
@@ -213,15 +205,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
-
-            if (!StartMatchNetEventsPerPlayer.ContainsKey(playerId))
-            {
-                StartMatchNetEventsPerPlayer.Add(playerId, _startMatchNetEventsListPool.Get());
-            }
-            else
-            {
-                LogService.LogError($"Player already exists! {playerId}");
-            }
         }
         
         public void StopSavingPlayerEvents(ushort playerId)
@@ -265,10 +248,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var stopMatchCountdownList = StopMatchCountdownNetEventsPerPlayer[playerId];
             stopMatchCountdownList.Clear();
             _stopMatchCountdownListPool.Return(stopMatchCountdownList);
-            var startMatchList = StartMatchNetEventsPerPlayer[playerId];
-            startMatchList.Clear();
-            _startMatchNetEventsListPool.Return(startMatchList);
-
+        
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
             MatchMakingPlayerJoinAcceptNetEventsPerPlayer.Remove(playerId);
@@ -282,7 +262,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerSwitchTeamNetEventsPerPlayer.Remove(playerId);
             StartMatchCountdownNetEventsPerPlayer.Remove(playerId);
             StopMatchCountdownNetEventsPerPlayer.Remove(playerId);
-            StartMatchNetEventsPerPlayer.Remove(playerId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -560,17 +539,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
-
-            if (StartMatchNetEventsPerPlayer.TryGetValue(playerId, out var startMatchNetEvents))
-            {
-                for (int i = startMatchNetEvents.Count - 1; i >= 0; i--)
-                {
-                    if (startMatchNetEvents[i].OccuredOnTick < tick)
-                    {
-                        startMatchNetEvents.RemoveAt(i);
-                    }
-                }
-            }
         }
 
         public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
@@ -589,16 +557,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
-            }
-        }
-
-        public void AddStartMatchNetEvent(int onTick, MatchSimulationStateS2C simulationState)
-        {
-            foreach (var kvp in StartMatchNetEventsPerPlayer)
-            {
-                var packet = kvp.Value.AddAndGet();
-                packet.OccuredOnTick = onTick;
-                packet.InitialState = simulationState;
             }
         }
     }

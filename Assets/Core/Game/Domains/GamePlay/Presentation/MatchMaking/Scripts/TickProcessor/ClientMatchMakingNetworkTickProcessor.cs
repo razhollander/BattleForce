@@ -1,6 +1,7 @@
 using System;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
@@ -19,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
         private readonly IMatchMakingDataService _matchMakingDataService;
         private readonly ITickCounterService _tickCounterService;
+        private readonly IStartMatchPacketHandler _startMatchPacketHandler;
         private readonly IStateMachineService _stateMachineService;
         private readonly IClientNetworkManager _networkManager;
 
@@ -30,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
 
         public ClientMatchMakingNetworkTickProcessor(IClientNetworkManager networkManager,
             IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IFullTickPacketsHandler fullTickPacketsHandler, IMatchMakingDataService matchMakingDataService, ITickCounterService tickCounterService)
+            IFullTickPacketsHandler fullTickPacketsHandler, IMatchMakingDataService matchMakingDataService, ITickCounterService tickCounterService, IStartMatchPacketHandler startMatchPacketHandler)
         {
             _networkManager = networkManager;
             _updateSubscriptionService = updateSubscriptionService;
@@ -38,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
             _fullTickPacketsHandler = fullTickPacketsHandler;
             _matchMakingDataService = matchMakingDataService;
             _tickCounterService = tickCounterService;
+            _startMatchPacketHandler = startMatchPacketHandler;
         }
 
         public void InitEntryPoint()
@@ -72,6 +75,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
                 _highestMs = Mathf.Max(_deltaMS, _highestMs);
                 _lastSendTime = DateTime.Now;
             }
+            
+            _startMatchPacketHandler.ProcessStartMatchPacket();
         }
 
         private void SendCurrentTickInputsToServer()
