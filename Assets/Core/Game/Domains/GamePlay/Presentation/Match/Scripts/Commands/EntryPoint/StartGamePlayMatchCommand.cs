@@ -62,8 +62,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
-            //_matchDataService.Init(_enterData.InitialState);
-
             _fullTickPacketsHandler.InitEntryPoint();
             _talentCardControllers.InitEntryPoint();
             _environmentLavaWallsControllers.InitEntryPoint();
@@ -78,7 +76,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
                 .Execute();
             _matchDataService.SetLocalPlayer(_enterData.LocalPlayerId);
             _tickProcessor.InitEntryPoint();
-            _clientMatchPresentationTickProcessor.StartTick();
+            _clientMatchPresentationTickProcessor.InitEntryPoint();
         }
     }
 }

@@ -30,6 +30,5 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchPowerUpBallModel AddPowerUpBall(ushort powerUpBallId, UnityEngine.Vector2 position);
         void RemovePowerUpBall(ushort powerUpBallId);
         MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort lavaWallId);
-        void Init(MatchSimulationStateS2C initialState);
     }
 }

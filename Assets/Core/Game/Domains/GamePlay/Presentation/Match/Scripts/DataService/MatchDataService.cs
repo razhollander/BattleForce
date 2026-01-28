@@ -146,28 +146,5 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         {
             LocalPlayer = Players.Find(x => x.PlayerId == playerId);
         }
-
-        public void Init(MatchSimulationStateS2C initialState)
-        {
-            foreach (var player in initialState.Players.AsSpan())
-            {
-                AddPlayer(player);
-            }
-
-            foreach (var bullet in initialState.Bullets.AsSpan())
-            {
-                AddBullet(bullet.Id, bullet.BelongToPlayerId, bullet.Position, bullet.Radius);
-            }
-
-            foreach (var talentCard in initialState.TalentCards.AsSpan())
-            {
-                AddTalentCard(talentCard.Id, new UnityEngine.Vector2(talentCard.Position.X, talentCard.Position.Y), talentCard.TalentType, talentCard.Health);
-            }
-
-            foreach (var powerUpBall in initialState.PowerUpBalls.AsSpan())
-            {
-                AddPowerUpBall(powerUpBall.Id, new UnityEngine.Vector2(powerUpBall.Position.X, powerUpBall.Position.Y));
-            }
-        }
     }
 }
