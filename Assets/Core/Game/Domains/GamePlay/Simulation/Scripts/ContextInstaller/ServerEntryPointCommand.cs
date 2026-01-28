@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -12,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private IPhysicsSimulator _physicsSimulator;
         private ISimulationStateMachine _simulationStateMachine;
         private ITickService _tickService;
+        private ISimulationPersistentData _simulationPersistentData;
 
         public override void ResolveDependencies()
         {
@@ -19,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _simulationStateMachine = _diContainer.Resolve<ISimulationStateMachine>();
             _tickService = _diContainer.Resolve<ITickService>();
+            _simulationPersistentData = _diContainer.Resolve<ISimulationPersistentData>();
         }
 
         public void Execute()
@@ -28,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _simulationStateMachine.InitEntryPoint();
             _simulationStateMachine.ChangeToMatchMaking();
             _tickService.InitEntryPoint();
+            _simulationPersistentData.InitEntryPoint();
         }
     }
 }

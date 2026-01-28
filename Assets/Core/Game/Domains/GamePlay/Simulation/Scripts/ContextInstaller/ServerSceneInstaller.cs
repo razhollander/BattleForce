@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
 using UnityEngine;
@@ -25,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<INetEventsDataService>().To<NetEventsDataService>().AsSingle().NonLazy();
             Container.Bind<IPhysicsSimulator>().To<PhysicsSimulator>().AsSingle().NonLazy();
             Container.Bind<ISimulationStateMachine>().To<SimulationStateMachine>().AsSingle().NonLazy();
+            Container.Bind<ISimulationPersistentData>().To<SimulationPersistentData>().AsSingle().NonLazy();
         }
     }
 }

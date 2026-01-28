@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<IPlaybackRecorderService>().To<PlaybackRecorderService>().AsSingle().NonLazy();
         }
 
-        public void UninstallBindings()
+        public void UninstallBindings() // not sure this is needed
         {
             _diContainer = null;
         }

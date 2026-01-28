@@ -57,7 +57,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _matchDataService.InitEntryPoint();
             _playerInputsPacketsHandler.InitEntryPoint();
             _playeRejoinPacketsHandler.InitEntryPoint();
-            _physicsSimulator.ClearAllData(); // needed if come from match making
 
             InitPlayers(_simulationMatchEnterData);
             CreateWalls();
