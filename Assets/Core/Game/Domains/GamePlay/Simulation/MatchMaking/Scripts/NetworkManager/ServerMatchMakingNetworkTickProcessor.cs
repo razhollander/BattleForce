@@ -100,12 +100,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _networkManager.PollEvents();
                 var stepDeltaTime = _networkConfig.DeltaTime;
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
-                var processedTick = currentTick - _networkConfig.ServerTicksBuffer;
-                var processPlayersInputsResult = ProcessPackets(processedTick);
-                StepPhysics(stepDeltaTime, processedTick);
+                var processPlayersInputsResult = ProcessPackets(currentTick);
+                StepPhysics(stepDeltaTime, currentTick);
                 MoveToMatchStateIfCountdownEnded();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
-                SendCurrentTickStateToAllClients(processedTick);
+                SendCurrentTickStateToAllClients(currentTick);
             }
             catch (Exception e)
             {

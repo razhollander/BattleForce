@@ -84,7 +84,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public ProcessPlayersInputsResult ProcessInputs(int processedTick)
         {
             _cachedProcessPlayersInputsResult.Clear();
-            LeaveLatestPacketsForBuffer(_networkConfig.ServerTicksBuffer);
+            LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
             _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
             return _cachedProcessPlayersInputsResult;

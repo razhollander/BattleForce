@@ -69,9 +69,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         public ProcessPlayersInputsResult ProcessInputs(int processedTick)
         {
             _cachedProcessPlayersInputsResult.Clear();
+            LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
             _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
             return _cachedProcessPlayersInputsResult;
+        }
+        
+        private void LeaveLatestPacketsForBuffer(int bufferAmount)
+        {
+            foreach (var kvp in _inputsPerPlayer)
+            {
+                var inputsOfPlayer = kvp.Value;
+                var amountOfPacketsToRemove = inputsOfPlayer.Count - bufferAmount;
+                var doesHaveLessPacketsThanBuffer = amountOfPacketsToRemove <= 0;
+                if (doesHaveLessPacketsThanBuffer)
+                {
+                    continue;
+                }
+
+                RemoveAmountOfEarliestInputs(inputsOfPlayer, amountOfPacketsToRemove);
+            }
+        }
+
+        private void RemoveAmountOfEarliestInputs(FixedUnorderedList<MatchMakingPlayerInputPacketC2S> inputsOfPlayer, int amountOfPacketsToRemove)
+        {
+            inputsOfPlayer.Sort();
+            inputsOfPlayer.RemoveRange(0, amountOfPacketsToRemove);
         }
 
         private CapacityDict<ushort, MatchMakingPlayerInputPacketC2S> ProcessEarliestInputPerPlayers(int processedTick)

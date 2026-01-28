@@ -102,20 +102,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _networkManager.PollEvents();
                 var stepDeltaTime = _networkConfig.DeltaTime;
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
-                var processedTick = currentTick;//
-                var processPlayersInputsResult = ProcessPackets(processedTick);
-                _trySpawnPowerUpBallsCommand.SetProcessedTick(processedTick).Execute();
+                var processPlayersInputsResult = ProcessPackets(currentTick);
+                _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
                 
                 ApplyMatchModelToPhysicsSimulation();
                 _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
                 ApplyPhysicsSimulationToMatchModel();
                 
-                _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
-                _tryDamagePlayersInLavaCommand.SetProcessedTick(processedTick).Execute();
+                _processCachedCollisionsCommand.SetProcessedTick(currentTick).Execute();
+                _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
-                SendCurrentTickStateToAllClients(processedTick);
+                SendCurrentTickStateToAllClients(currentTick);
 
-                SendStartMatchToNotAcknowledgedPlayers(processedTick);
+                SendStartMatchToNotAcknowledgedPlayers(currentTick);
             }
             catch (Exception e)
             {
