@@ -90,7 +90,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
                     Ticks = _ticks
                 };
 
-                string json = fileData.ToJson();
+                string json = JsonConvert.SerializeObject(fileData);
                 File.WriteAllText(_jsonFilePath, json);
                 LogService.LogTopic($"Saved Playback to {_jsonFilePath}", LogTopicType.ServerNetwork);
             }
@@ -127,6 +127,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
 
                              NetDataReader reader = new NetDataReader(packet.Data);
                              var b = reader.GetByte();
+                            
                              PacketTypeC2S packetType = (PacketTypeC2S) (int) b;
                             
                              switch (packetType)
@@ -134,12 +135,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
                                  case PacketTypeC2S.MatchPlayerInput: 
                                      var matchInputPacket = new MatchPlayerInputPacketC2S();
                                      matchInputPacket.Deserialize(reader);
-                                     debugPacket.PacketData = matchInputPacket.ToJson();
+                                     debugPacket.PacketData = JsonConvert.SerializeObject(matchInputPacket);
                                      break;
                                  case PacketTypeC2S.MatchMakingPlayerInput: 
                                      var matchMakingInputPacket = new MatchMakingPlayerInputPacketC2S();
                                      matchMakingInputPacket.Deserialize(reader);
-                                     debugPacket.PacketData = matchMakingInputPacket.ToJson();
+                                     debugPacket.PacketData = JsonConvert.SerializeObject(matchMakingInputPacket);
                                      break;
                                  default: LogService.LogError("packet not recorded of type: " + packetType + ""); break;
                              }
