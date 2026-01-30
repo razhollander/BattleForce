@@ -48,7 +48,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         {
             _sendInputsToServerCommand = _commandFactory.CreateCommandVoid<SendMatchMakingInputsToServerCommand>();
             StartTick();
-            LogService.LogError("Razz Init!!!");
         }
 
         private void StartTick()
@@ -62,7 +61,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         {
             _updateSubscriptionService.UnregisterFixedUpdatable(this);
             _updateSubscriptionService.UnregisterGuiUpdatable(this);
-            LogService.LogError("Razz Exit!!!");
         }
 
         public void ManagedFixedUpdate()

@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
                 IsShootInputPressed = isShootInputPressed,
                 IsMoveForwardInputPressed = isMoveForwardInputPressed,
             };
-            LogService.LogError("Send matchmaking input!");
+
             _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchMakingPlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
         }
     }

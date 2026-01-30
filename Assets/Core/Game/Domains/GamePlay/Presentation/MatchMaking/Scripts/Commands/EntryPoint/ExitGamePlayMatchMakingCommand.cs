@@ -25,8 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
         public void Execute()
         {
             _startMatchPacketHandler.InitExitPoint();
-            _fullTickPacketsHandler.InitExitPoint();
-            LogService.LogError("Exit match making!");
+            _fullTickPacketsHandler.InitExitPoint();    
             _tickProcessor.StopTick();
             _clientMatchMakingPresentationTickProcessor.StopTick();
         }
