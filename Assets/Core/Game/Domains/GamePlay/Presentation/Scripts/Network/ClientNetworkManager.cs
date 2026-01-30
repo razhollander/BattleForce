@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _guiStyle.normal.textColor = Color.white;
         }
 
-        public void StartClient(bool isHost)
+        public void StartClient(bool isHost, bool forceRemote = false)
         {
             if (_netManager.IsRunning)
             {
@@ -52,7 +52,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Start();
             //_packetsListener.RegisterListeners();
-            var ipAddress = isHost || _networkConfig.OnlyLocal ? "localhost" : _networkConfig.IpAddress;
+            string ipAddress;
+            if (isHost)
+            {
+                ipAddress = "localhost";
+            }
+            else
+            {
+                ipAddress = forceRemote ? _networkConfig.IpAddress : (_networkConfig.OnlyLocal ? "localhost" : _networkConfig.IpAddress);
+            }
+
             var peerToServer = _netManager.Connect(ipAddress, _networkConfig.HostPort, _networkConfig.ConntectionKey);
             _packetsSender.SetPeer(peerToServer);
            // bool canReachServer = CanPing(_networkConfig.IpAddress);

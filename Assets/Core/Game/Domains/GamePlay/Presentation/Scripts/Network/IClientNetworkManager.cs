@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         bool IsPeerConnected { get; }
         int Ping { get; }
         int LocalPeerId { get; }
-        void StartClient(bool isHost);
+        void StartClient(bool isHost, bool forceRemote = false);
         void InitExitPoint();
         
         //void SubscribeReusable<T>(Action<T> onReceive) where T : class, new();

@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         public void InitEntryPoint()
         {
-            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked);
+            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayFabClicked);
 #if UNITY_SERVER
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             StartServer(cancellationTokenSource).Forget();
@@ -94,11 +94,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             LogService.LogTopic("Finished starting Server", LogTopicType.ClientNetwork);
         }
         
-        private async Awaitable StartClient(bool isHost, CancellationTokenSource cancellationTokenSource)
+        private async Awaitable StartClient(bool isHost, CancellationTokenSource cancellationTokenSource, bool forceRemote = false)
         {
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             await LoadMatchMakingScene(cancellationTokenSource);
-            _clientNetworkManager.StartClient(isHost);
+            _clientNetworkManager.StartClient(isHost, forceRemote);
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
 
@@ -121,6 +121,30 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             try
             {
                 await StartClient(false, cancellationTokenSource);
+                _uiView.Hide();
+            }
+            catch (OperationCanceledException)
+            {
+                LogService.LogTopic("OperationCanceledException", LogTopicType.ClientNetwork);
+            }
+            catch (Exception e)
+            {
+                LogService.LogException(e);
+            }
+        }
+
+        private void OnPlayFabClicked()
+        {
+            _ = OnPlayFabClickedAsync();
+        }
+
+        private async Awaitable OnPlayFabClickedAsync()
+        {
+            var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
+
+            try
+            {
+                await StartClient(false, cancellationTokenSource, true);
                 _uiView.Hide();
             }
             catch (OperationCanceledException)
