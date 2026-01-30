@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Net.Sockets;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
@@ -47,9 +48,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         public void OnNetworkReceive(NetPeer peer, NetDataReader reader)
         {
+            byte[] packetData = new byte[reader.AvailableBytes];
+            Buffer.BlockCopy(reader.RawData, reader.Position, packetData, 0, reader.AvailableBytes);
+
             for (int i = _rawPacketsObservers.Count - 1; i >= 0; i--)
             {
-                _rawPacketsObservers[i].OnPacketReceived(reader.RawData, peer);
+                _rawPacketsObservers[i].OnPacketReceived(packetData, peer);
             }
         
             var packetType = (PacketTypeC2S) reader.GetByte();
