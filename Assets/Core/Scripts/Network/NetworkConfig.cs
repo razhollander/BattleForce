@@ -16,6 +16,7 @@ namespace Core.Scripts.Network
         public string IpAddress = "109.67.156.134";
         public bool OnlyLocal = false;
         public string ConntectionKey = "BattleForceGame";
+        public int HeadlessQuitTimeoutSeconds = 60;
     }
 
     [Serializable]

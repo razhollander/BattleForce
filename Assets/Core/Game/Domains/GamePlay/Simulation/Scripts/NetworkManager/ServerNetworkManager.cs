@@ -15,6 +15,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly NetworkConfig _networkConfig;
         private readonly NetworkS2CPacketsSender _packetsSender;
 
+        public NetworkC2SPacketsListener PacketsListener => _packetsListener;
+
         public ServerNetworkManager(NetworkConfig networkConfig)
         {
             _networkConfig = networkConfig;

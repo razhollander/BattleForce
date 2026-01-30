@@ -7,6 +7,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
     public interface IServerNetworkManager
     {
+        NetworkC2SPacketsListener PacketsListener { get; }
         void InitEntryPoint();
         void InitExitPoint();
         //void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
