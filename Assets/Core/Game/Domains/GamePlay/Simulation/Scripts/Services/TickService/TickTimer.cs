@@ -64,5 +64,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
         {
             _observers.Remove(observer);
         }
+
+        public void SetCurrentTick(int initialTick)
+        {
+            CurrentTick = initialTick;
+        }
     }
 }

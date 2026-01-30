@@ -7,6 +7,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
     public class PlaybackFile
     {
         public int Seed;
+        public int InitialTick;
         public Dictionary<int, PlaybackTickData> Ticks;
     }
 }

@@ -2,7 +2,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers
 {
-    public interface IPlayerInputsPacketsHandler : IPacketsObserver
+    public interface IMatchPlayerInputsPacketsHandler : IPacketsObserver
     {
         void InitEntryPoint();
         bool DidReceiveAnyInputFromPlayer(ushort playerId);

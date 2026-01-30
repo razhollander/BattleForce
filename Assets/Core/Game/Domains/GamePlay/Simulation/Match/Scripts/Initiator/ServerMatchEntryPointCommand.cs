@@ -9,6 +9,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -18,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
     {
         private IPlayeRejoinPacketsHandler _playeRejoinPacketsHandler;
         private ITickProcessor _tickProcessor;
-        private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
+        private IMatchPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private IPhysicsSimulator _physicsSimulator;
         private SimulationGamePlayConfig _simulationGamePlayConfig;
         private IMatchDataService _matchDataService;
@@ -27,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private IServerNetworkManager _networkManager;
         private SimulationGamePlayConfig _gamePlayConfig;
         private INetEventsDataService _netEventsDataService;
+        private ITickService _tickService;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -40,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         {
             _playeRejoinPacketsHandler = _diContainer.Resolve<IPlayeRejoinPacketsHandler>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
-            _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
+            _playerInputsPacketsHandler = _diContainer.Resolve<IMatchPlayerInputsPacketsHandler>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
@@ -49,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _networkManager = _diContainer.Resolve<IServerNetworkManager>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
+            _tickService = _diContainer.Resolve<ITickService>();
         }
 
         public void Execute()
@@ -71,7 +74,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         {
             if (_playbackRecorderService.IsPlaybackEnabled)
             {
-                _networkManager.SwitchToNetManager(new NetManagerPlayback(_playbackRecorderService));
+                _networkManager.SwitchToNetManager(new NetManagerPlayback(_playbackRecorderService, _tickService));
             }
         }
 
@@ -83,6 +86,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             {
                 _playbackRecorderService.LoadRecording();
                 RNG.Init(_playbackRecorderService.Seed);
+                _tickService.SetCurrentTick(_playbackRecorderService.InitialTick);
             }
             else
             {

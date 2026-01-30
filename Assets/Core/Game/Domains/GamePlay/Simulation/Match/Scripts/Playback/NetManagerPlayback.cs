@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -10,11 +11,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
     {
         private NetworkC2SPacketsListener _packetsListener;
         private readonly IPlaybackRecorderService _playbackRecorderService;
-        private int _lastTick = 0;
-        
-        public NetManagerPlayback(IPlaybackRecorderService playbackRecorderService)
+        private readonly ITickService _tickService;
+
+        public NetManagerPlayback(IPlaybackRecorderService playbackRecorderService, ITickService tickService)
         {
             _playbackRecorderService = playbackRecorderService;
+            _tickService = tickService;
         }
 
         public void SetPacketsListener(NetworkC2SPacketsListener packetsListener)
@@ -34,8 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
 
         public void PollEvents()
         {
-            var packets = _playbackRecorderService.GetPacketsForTick(_lastTick);
-            _lastTick++;
+            var packets = _playbackRecorderService.GetPacketsForTick(_tickService.CurrentTick);
 
             if (packets.IsNullOrEmpty())
             {

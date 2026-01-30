@@ -7,6 +7,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
     public class PlaybackDebugData
     {
         public int Seed;
+        public int InitialTick;
         public List<DebugTickData> Ticks = new List<DebugTickData>();
     }
 }

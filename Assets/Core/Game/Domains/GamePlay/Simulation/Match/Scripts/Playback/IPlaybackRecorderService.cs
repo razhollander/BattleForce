@@ -5,6 +5,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
     public interface IPlaybackRecorderService
     {
         int Seed { get; }
+        int InitialTick { get; }
         bool IsPlaybackEnabled { get; }
         void StartRecording(int seed);
         void LoadRecording();

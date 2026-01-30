@@ -25,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
     {
         private readonly NetworkConfig _networkConfig;
         private readonly IServerNetworkManager _networkManager;
-        private readonly IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
+        private readonly IMatchPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private readonly IMatchDataService _matchDataService;
         private readonly IPlayeRejoinPacketsHandler _playeRejoinPacketsHandler;
         private readonly INetEventsDataService _netEventsDataService;
@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private long _last;
 
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
-            IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
+            IMatchPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IPlayeRejoinPacketsHandler iPlayeRejoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
             ICommandFactory commandFactory, ITickService tickService, IPlaybackRecorderService playbackRecorderService)
         {

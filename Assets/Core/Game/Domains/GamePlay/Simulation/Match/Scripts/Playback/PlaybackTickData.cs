@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
 {
+    [System.Serializable]
     public class PlaybackTickData
     {
         public int Tick;

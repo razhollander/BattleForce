@@ -9,14 +9,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
     {
         private IPlayeRejoinPacketsHandler _playeRejoinPacketsHandler;
         private ITickProcessor _tickProcessor;
-        private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
+        private IMatchPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private IPlaybackRecorderService _playbackRecorderService;
 
         public override void ResolveDependencies()
         {
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _playeRejoinPacketsHandler = _diContainer.Resolve<IPlayeRejoinPacketsHandler>();
-            _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
+            _playerInputsPacketsHandler = _diContainer.Resolve<IMatchPlayerInputsPacketsHandler>();
             _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
         }
 

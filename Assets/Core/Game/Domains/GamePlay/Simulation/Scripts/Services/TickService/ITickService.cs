@@ -7,5 +7,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
         void InitExitPoint();
         void RegisterObserver(ITickObserver observer);
         void UnregisterObserver(ITickObserver observer);
+        void SetCurrentTick(int initialTick);
     }
 }
