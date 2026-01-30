@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
             foreach (var bulletState in _simulationState.Bullets.AsSpan())
             {
                 _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Position, bulletState.Radius);
-                _bulletControllers.CreateBullet(bulletState.Id, bulletState.Radius, bulletState.Position);
+                _bulletControllers.CreateBullet(bulletState.Id, bulletState.Radius, bulletState.Position, bulletState.BelongToPlayerId);
             }
         }
     }

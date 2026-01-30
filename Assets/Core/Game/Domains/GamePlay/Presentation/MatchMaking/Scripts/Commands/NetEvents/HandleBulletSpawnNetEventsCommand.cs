@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
             foreach (var bulletsSpawnEvent in bulletsSpawnEvents)
             {
                 var bulletId = bulletsSpawnEvent.BulletId;
-                _bulletControllers.CreateBullet(bulletId, bulletsSpawnEvent.BulletRadius, bulletsSpawnEvent.Position);
+                _bulletControllers.CreateBullet(bulletId, bulletsSpawnEvent.BulletRadius, bulletsSpawnEvent.Position, bulletsSpawnEvent.BelongToPlayerId);
                 _playerControllers.ShootBulletEffectForPlayer(bulletsSpawnEvent.BelongToPlayerId);
             }
             
