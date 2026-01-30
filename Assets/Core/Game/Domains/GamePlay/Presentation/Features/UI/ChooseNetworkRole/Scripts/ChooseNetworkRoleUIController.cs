@@ -3,6 +3,7 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.SceneService;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -29,6 +30,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         public void InitEntryPoint()
         {
             _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked);
+#if UNITY_SERVER
+            var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
+            StartServer(cancellationTokenSource).Forget();
+#endif
         }
 
         private void OnServerClicked()
@@ -38,12 +43,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private async Awaitable OnServerClickedAsync()
         {
-            var enterData = new ServerInitiatorEnterData();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
 
             try
             {
-                await StartServer(enterData, cancellationTokenSource);
+                await StartServer(cancellationTokenSource);
                 _uiView.Hide();
             }
             catch (OperationCanceledException)
@@ -63,12 +67,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private async Awaitable OnHostClickedAsync()
         {
-            var enterData = new ServerInitiatorEnterData();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
 
             try
             {
-                await StartServer(enterData, cancellationTokenSource);
+                await StartServer(cancellationTokenSource);
                 await StartClient(true, cancellationTokenSource);
                 _uiView.Hide();
             }
@@ -82,8 +85,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             }
         }
 
-        private async Awaitable StartServer(ServerInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
+        private async Awaitable StartServer(CancellationTokenSource cancellationTokenSource)
         {
+            var enterData = new ServerInitiatorEnterData();
             LogService.LogTopic("Starting Server", LogTopicType.ClientNetwork);
             await _sceneLoaderService.TryLoadScene(SceneType.ServerScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.ServerScene, enterData, cancellationTokenSource);
