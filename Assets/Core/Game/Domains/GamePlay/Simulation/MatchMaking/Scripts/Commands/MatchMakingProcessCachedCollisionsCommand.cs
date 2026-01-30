@@ -206,7 +206,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
         {
             _matchMakingDataService.SimulationState.RemoveBulletById(bulletModel.Id);
             _physicsSimulator.RemoveBody(bulletBody);
-            LogService.LogError($"Bullet destroyed! {bulletModel.Id}");
             _netEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
         }
 

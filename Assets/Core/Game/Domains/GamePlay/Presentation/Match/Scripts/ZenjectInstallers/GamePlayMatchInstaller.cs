@@ -45,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         {
             Container.Bind<IGamePlayMatchInitiator>().To<GamePlayMatchInitiator>().AsSingle().NonLazy();
             Container.Bind<IMatchDataService>().To<MatchDataService>().AsSingle().NonLazy();
-            Container.Bind<ITickProcessor>().To<ClientMatchNetworkTickProcessor>().AsSingle().NonLazy();
+            Container.Rebind<ITickProcessor>().To<ClientMatchNetworkTickProcessor>().AsSingle().NonLazy();
             Container.Bind<IFullTickPacketsHandler>().To<MatchFullTickPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IClientMatchPresentationTickProcessor>().To<ClientMatchPresentationTickProcessor>().AsSingle().NonLazy();
         }

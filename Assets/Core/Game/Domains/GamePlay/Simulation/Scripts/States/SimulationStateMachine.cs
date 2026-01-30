@@ -39,7 +39,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.States
         
         public void ChangeToMatch(SimulationMatchEnterData enterData)
         {
-            LogService.LogError("ChangeToMatch!");
             ExitCurerntState();
             var matchState = ReflectionUtils.CreateInstace("Core.Game.Domains.GamePlay.Simulation.Match.Scripts.State.SimulationMatchState", "SimulationMatchAssembly", _diContainer, enterData);
             _currentState = (IState) matchState;

@@ -437,7 +437,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
             ref var input = ref _inputsPerPlayer[playerId].AddAndGet();
             input = playerInputPacket;
-            LogService.LogError($"Input packet received from player id {playerId}, input: {playerInputPacket.ToJson()}, inputs per player: {_inputsPerPlayer.ToJson()}");
             if (playerInputPacket.IsShootInputPressed)
             {
                 //string time = DateTime.Now.ToString("HH:mm:ss.fff");

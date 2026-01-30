@@ -110,7 +110,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
                 foreach (var tick in sortedKeys)
                 {
                     var tickData = _ticks[tick];
-                    var debugTick = new DebugTickData { Tick = tick };
+                    var debugTick = new DebugTickData();
                     foreach (var packet in tickData.Packets)
                     {
                         var debugPacket = new DebugRecordedPacket { PlayerId = packet.PlayerId };

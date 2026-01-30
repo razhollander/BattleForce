@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
@@ -47,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         {
             _sendInputsToServerCommand = _commandFactory.CreateCommandVoid<SendMatchMakingInputsToServerCommand>();
             StartTick();
+            LogService.LogError("Razz Init!!!");
         }
 
         private void StartTick()
@@ -60,6 +62,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         {
             _updateSubscriptionService.UnregisterFixedUpdatable(this);
             _updateSubscriptionService.UnregisterGuiUpdatable(this);
+            LogService.LogError("Razz Exit!!!");
         }
 
         public void ManagedFixedUpdate()
