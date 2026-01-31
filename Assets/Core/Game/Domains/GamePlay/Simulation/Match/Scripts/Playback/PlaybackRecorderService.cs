@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
             _tickService = tickService;
             _networkManager = networkManager;
             _simulationPersistentData = simulationPersistentData;
-            var directory = Application.dataPath + "/Records";
+            var directory = Directory.GetCurrentDirectory() + "/Records";
             _jsonFilePath = Path.Combine(directory, "playback.json");
             _debugFilePath = Path.Combine(directory, "playback_debug.json");
             Directory.CreateDirectory(directory);
