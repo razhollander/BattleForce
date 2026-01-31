@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -7,8 +8,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands
     public class StepTimersCommand : BaseCommand, ICommandVoid
     {
         private IMatchMakingDataService _matchMakingDataService;
-        private float _deltaTime;
         private IStartMatchWallController _startMatchWallController;
+        private IHeadLessQuitterController _headLessQuitterController;
+        
+        private float _deltaTime;
 
         public StepTimersCommand SetStepDeltaTime(float deltaTime)
         {
@@ -20,12 +23,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands
         {
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
+            _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
         }
 
         public void Execute()
         {
             StepPlayersShootCooldown(_deltaTime);
             _startMatchWallController.StepTimer(_deltaTime);
+            _headLessQuitterController.StepTimer(_deltaTime);
         }
 
         private void StepPlayersShootCooldown(float deltaTime)

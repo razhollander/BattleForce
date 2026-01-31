@@ -19,6 +19,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly CapacityDict<PacketTypeC2S, IPacketsObserver> _packetsObservers;
         private readonly CapacityList<IRawPacketsObserver> _rawPacketsObservers;
 
+        public event Action OnPacketReceivedEvent;
+        public event Action OnPeerDisconnectedEvent;
+
         public NetworkC2SPacketsListener(NetworkConfig networkConfig)
         {
             _networkConfig = networkConfig;
@@ -48,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         public void OnNetworkReceive(NetPeer peer, NetDataReader reader)
         {
+            OnPacketReceivedEvent?.Invoke();
             for (int i = _rawPacketsObservers.Count - 1; i >= 0; i--)
             {
                 //var slice = reader.RawData.AsSpan(reader.Position, reader.AvailableBytes).ToArray();
@@ -72,6 +76,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         void INetEventListener.OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
         {
+            OnPeerDisconnectedEvent?.Invoke();
             // LogService.Log("[S] Player disconnected: " + disconnectInfo.Reason);
             //
             // if (peer.Tag != null)

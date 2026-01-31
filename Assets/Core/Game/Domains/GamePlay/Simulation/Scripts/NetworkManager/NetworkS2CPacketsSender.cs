@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly NetDataWriter _writer;
         private Dictionary<ushort, NetPeer> _peerPerPlayerId = new();
         private readonly NetPacketProcessor _packetProcessor;
-
+        
         public NetworkS2CPacketsSender(NetPacketProcessor packetProcessor)
         {
             _writer = new NetDataWriter();

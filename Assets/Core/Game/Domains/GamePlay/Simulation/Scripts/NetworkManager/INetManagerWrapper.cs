@@ -9,5 +9,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void Start(int port);
         void Stop();
         void PollEvents();
+        int ConnectedPeersCount { get; }
     }
 }
