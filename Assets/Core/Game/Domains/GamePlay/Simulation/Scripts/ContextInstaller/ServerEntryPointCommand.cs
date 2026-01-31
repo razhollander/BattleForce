@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
@@ -14,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ISimulationStateMachine _simulationStateMachine;
         private ITickService _tickService;
         private ISimulationPersistentData _simulationPersistentData;
+        private IHeadLessQuitterController _headLessQuitterController;
 
         public override void ResolveDependencies()
         {
@@ -22,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _simulationStateMachine = _diContainer.Resolve<ISimulationStateMachine>();
             _tickService = _diContainer.Resolve<ITickService>();
             _simulationPersistentData = _diContainer.Resolve<ISimulationPersistentData>();
+            _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
         }
 
         public void Execute()
@@ -32,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _simulationStateMachine.ChangeToMatchMaking();
             _tickService.InitEntryPoint();
             _simulationPersistentData.InitEntryPoint();
+            _headLessQuitterController.InitEntryPoint();
         }
     }
 }

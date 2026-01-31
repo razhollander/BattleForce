@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Core.Scripts.Network;
+using Core.Scripts.Services.UnityThreadDispatcher;
 using CoreDomain.Scripts.Audio;
 using CoreDomain.Scripts.Mvc.LoadingScreen;
 using CoreDomain.Scripts.Services.AudioService;
@@ -19,10 +20,11 @@ namespace CoreDomain.Scripts.CoreInitiator
         private ILoadingScreenController _loadingScreenController;
         private CoreAudioClipsScriptableObject _coreAudioClipsScriptableObject;
         private NetworkConfig _networkConfig;
+        private IUnityMainThreadDispatcher _unityMainThreadDispatcher;
 
         [Inject]
         private void Setup(GameInputActions gameInputActions, ISceneLoaderService sceneLoaderService, IAudioService audioService, ILoadingScreenController loadingScreenController,
-            CoreAudioClipsScriptableObject coreAudioClipsScriptableObject, NetworkConfig networkConfig)
+            CoreAudioClipsScriptableObject coreAudioClipsScriptableObject, NetworkConfig networkConfig, IUnityMainThreadDispatcher unityMainThreadDispatcher)
         {
             _gameInputActions = gameInputActions;
             _sceneLoaderService = sceneLoaderService;
@@ -30,6 +32,7 @@ namespace CoreDomain.Scripts.CoreInitiator
             _loadingScreenController = loadingScreenController;
             _coreAudioClipsScriptableObject = coreAudioClipsScriptableObject;
             _networkConfig = networkConfig;
+            _unityMainThreadDispatcher = unityMainThreadDispatcher;
         }
 
         private void Start()
@@ -75,6 +78,7 @@ namespace CoreDomain.Scripts.CoreInitiator
             _gameInputActions.Enable();
             _audioService.InitEntryPoint();
             _sceneLoaderService.InitEntryPoint();
+            _unityMainThreadDispatcher.InitEntryPoint();
         }
 
         private async Awaitable LoadGameScene(CancellationTokenSource cancellationTokenSource)

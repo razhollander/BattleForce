@@ -13,6 +13,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
         private readonly IPlaybackRecorderService _playbackRecorderService;
         private readonly ITickService _tickService;
 
+        public int ConnectedPeersCount => 1;
+
         public NetManagerPlayback(IPlaybackRecorderService playbackRecorderService, ITickService tickService)
         {
             _playbackRecorderService = playbackRecorderService;
@@ -23,7 +25,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
         {
             _packetsListener = packetsListener;
         }
+
         //public bool IsRunning { get; private set; }
+
         public void Start(int port)
         {
             //IsRunning = true;

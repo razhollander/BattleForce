@@ -10,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private NetManager _netManager;
 
         //public bool IsRunning => _netManager.IsRunning;
+        public int ConnectedPeersCount => _netManager.ConnectedPeersCount;
 
         public NetManagerWrapper()
         {
@@ -34,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         {
             _netManager.PollEvents();
         }
-
+        
         public void Dispose()
         {
             LogService.LogError("NetManagerWrapper disposed");

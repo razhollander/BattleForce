@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
@@ -10,6 +11,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchDataService _matchDataService;
         private IPowerUpsSpawnerService _powerUpsSpawnerService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
+        private IHeadLessQuitterController _headLessQuitterController;
+        
         private float _deltaTime;
 
         public StepTimersCommand SetStepDeltaTime(float deltaTime)
@@ -23,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _powerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
+            _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
         }
 
         public void Execute()
@@ -31,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             StepPlayersTalentsCooldowns(_deltaTime);
             _powerUpsSpawnerService.StepTimer(_deltaTime);
             _playersInLavaTrackerService.StepTimePassedSinceLastDamageTaken(_deltaTime);
+            _headLessQuitterController.StepTimer(_deltaTime);
         }
 
         private void StepPlayersTalentsCooldowns(float deltaTime)

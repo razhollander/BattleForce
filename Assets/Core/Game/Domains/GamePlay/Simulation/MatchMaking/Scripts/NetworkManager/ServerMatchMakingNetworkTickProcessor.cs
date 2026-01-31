@@ -9,6 +9,7 @@ using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.T
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -38,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly ITickService _tickService;
         private readonly IStartMatchWallController _startMatchWallController;
         private readonly ISimulationStateMachine _simulationStateMachine;
+        private readonly IHeadLessQuitterController _headLessQuitterController;
 
         private MatchMakingProcessCachedCollisionsCommand _processCachedCollisionsCommand;
         private StepTimersCommand _stepTimersCommand;
@@ -48,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         public ServerMatchMakingNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchMakingDataService matchDataService,
             IPlayerJoinPacketsHandler playerJoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory, ITickService tickService, IStartMatchWallController startMatchWallController, ISimulationStateMachine simulationStateMachine)
+            ICommandFactory commandFactory, ITickService tickService, IStartMatchWallController startMatchWallController, ISimulationStateMachine simulationStateMachine, IHeadLessQuitterController headLessQuitterController)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -61,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _tickService = tickService;
             _startMatchWallController = startMatchWallController;
             _simulationStateMachine = simulationStateMachine;
+            _headLessQuitterController = headLessQuitterController;
         }
 
         public void InitEntryPoint()
@@ -105,6 +108,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 MoveToMatchStateIfCountdownEnded();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(currentTick);
+                _headLessQuitterController.QuitIfTimeOut();
             }
             catch (Exception e)
             {

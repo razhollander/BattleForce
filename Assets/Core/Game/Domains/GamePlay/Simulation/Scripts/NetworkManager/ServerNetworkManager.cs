@@ -1,3 +1,4 @@
+using System;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
@@ -15,7 +16,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly NetworkConfig _networkConfig;
         private readonly NetworkS2CPacketsSender _packetsSender;
 
-        public NetworkC2SPacketsListener PacketsListener => _packetsListener;
+        public int ConnectedPeersCount => _netManager.ConnectedPeersCount;
+        public event Action OnPacketReceivedEvent;
+        public event Action OnPeerDisconnectedEvent;
 
         public ServerNetworkManager(NetworkConfig networkConfig)
         {
@@ -26,12 +29,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _netManager.SetPacketsListener(_packetsListener);
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
-
+        
         public void InitEntryPoint()
         {
+            AddListeners();
             RegisterAutoSerializedTypes();
             StartServer();
         }
+
+        private void AddListeners()
+        {
+            _packetsListener.OnPacketReceivedEvent += OnPacketReceived;
+            _packetsListener.OnPeerDisconnectedEvent += OnPeerDisconnected;
+        }
+        
+        private void OnPacketReceived()
+        {
+            OnPacketReceivedEvent?.Invoke();
+        }
+
+        private void OnPeerDisconnected()
+        {
+            OnPeerDisconnectedEvent?.Invoke();
+        }
+
         
         private void RegisterAutoSerializedTypes()
         {
@@ -51,9 +72,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public void InitExitPoint()
         {
+            RemoveListeners();
             _netManager.Stop();
         }
-        
+
+        private void RemoveListeners()
+        {
+            _packetsListener.OnPacketReceivedEvent -= OnPacketReceived;
+            _packetsListener.OnPeerDisconnectedEvent -= OnPeerDisconnected;
+        }
+
         // public void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
         // {
         //     _packetsSender.SendPacketToAllPlayersSerialized(type, packet, deliveryMethod);

@@ -1,3 +1,4 @@
+using System;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using LiteNetLib;
@@ -7,7 +8,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
     public interface IServerNetworkManager
     {
-        NetworkC2SPacketsListener PacketsListener { get; }
+        int ConnectedPeersCount { get; }
+        event Action OnPacketReceivedEvent;
+        event Action OnPeerDisconnectedEvent;
         void InitEntryPoint();
         void InitExitPoint();
         //void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
