@@ -15,6 +15,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastPowerUpBallCreatedId = 0;
         private readonly MatchEnvironmentDataService _environmentDataService;
         public MatchEnvironmentDataService Environment => _environmentDataService;
+        public bool IsMatchEnded { get; set; }
+
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
         {
             var chosenEnvironmentIndex = gamePlayConfig.ChosenEnvironmentIndex;

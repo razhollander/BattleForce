@@ -5,6 +5,7 @@ using UnityEngine;
 public class SharedGamePlayConfig : ScriptableObject
 {
     public int MaxConcurrentTalentsForPlayer = 3;
+    public int WinJemsAmount = 10;
     public EnvironmentConfig Environment;
     public MatchMakingEnvironmentLayoutConfig MatchMakingEnvironment;
     public PowerUpsSharedConfig PowerUps;

@@ -15,5 +15,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<PowerUpBallSpawnedNetEventS2C> PowerUpBallSpawnedNetEvents { get; set; }
         List<PowerUpBallObtainedNetEventS2C> PowerUpBallObtainedNetEvents { get; set; }
         List<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents { get; set; }
+        List<StageEndNetEventS2C> StageEndNetEvents { get; set; }
     }
 }

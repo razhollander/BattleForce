@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -14,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ushort _playerId;
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
+        private ICommandFactory _commandFactory;
         private int _processedTick;
 
         public PlayerHitCommand SetHitDamage(ushort hitDamage)
@@ -38,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService =_diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
         }
 
         public void Execute()
@@ -54,6 +57,54 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             LogService.LogTopic($"Player Hit! Id {_playerId} hit with damage {_hitDamage}, new health: {newHealth}, is alive: {isPlayerAlive}", LogTopicType.ServerNetwork);
             _netEventsDataService.AddPlayerTakeDamageNetEvent(_processedTick, _playerId, newHealth, _hitDamage, isPlayerAlive);
+
+            if (!isPlayerAlive)
+            {
+                CheckMatchEnded();
+            }
+        }
+
+        private void CheckMatchEnded()
+        {
+            if (_matchDataService.IsMatchEnded)
+            {
+                return;
+            }
+
+            var aliveTeams = new HashSet<ushort>();
+            foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                if (player.IsAlive)
+                {
+                    aliveTeams.Add(player.TeamId);
+                }
+            }
+
+            if (aliveTeams.Count <= 1)
+            {
+                ushort winningTeamId = 0;
+                foreach (var teamId in aliveTeams)
+                {
+                    winningTeamId = teamId;
+                    break;
+                }
+
+                if (aliveTeams.Count == 1)
+                {
+                    _commandFactory.CreateCommandVoid<StageEndedCommand>()
+                        .SetWinningTeamId(winningTeamId)
+                        .SetProcessedTick(_processedTick)
+                        .Execute();
+                }
+                else if (aliveTeams.Count == 0)
+                {
+                    LogService.LogWarning("All players died! No winner?");
+                    _commandFactory.CreateCommandVoid<StageEndedCommand>()
+                        .SetWinningTeamId(0)
+                        .SetProcessedTick(_processedTick)
+                        .Execute();
+                }
+            }
         }
     }
 }

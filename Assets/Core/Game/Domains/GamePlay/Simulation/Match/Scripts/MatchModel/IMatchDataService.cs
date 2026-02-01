@@ -17,5 +17,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public TalentCardS2C AddTalentCard(ushort talentCardId, Vector2 position, TalentType talentType, ushort health);
         void InitEntryPoint();
         PowerUpBallS2C AddPowerUpBall(Vector2 position, Vector2 velocity, PowerUpType powerUpType);
+        bool IsMatchEnded { get; set; }
     }
 }
