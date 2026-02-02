@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private INetEventsDataService _netEventsDataService;
         private ICommandFactory _commandFactory;
         private int _processedTick;
+        private HashSet<ushort> _cachedAliveTeams;
 
         public PlayerHitCommand SetHitDamage(ushort hitDamage)
         {
@@ -41,6 +42,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService =_diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            var sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
+            _cachedAliveTeams = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
         }
 
         public void Execute()
@@ -50,16 +53,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             playerState.Spaceship.Health.CurrentHealth = newHealth;
             var isPlayerAlive = newHealth > DEAD_HEALTH_AMOUNT;
 
-            if (!isPlayerAlive)
-            {
-                playerState.IsAlive = false;
-            }
-
+          
             LogService.LogTopic($"Player Hit! Id {_playerId} hit with damage {_hitDamage}, new health: {newHealth}, is alive: {isPlayerAlive}", LogTopicType.ServerNetwork);
             _netEventsDataService.AddPlayerTakeDamageNetEvent(_processedTick, _playerId, newHealth, _hitDamage, isPlayerAlive);
 
             if (!isPlayerAlive)
             {
+                playerState.IsAlive = false;
                 CheckMatchEnded();
             }
         }
@@ -70,40 +70,44 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 return;
             }
-
-            var aliveTeams = new HashSet<ushort>();
+            
+            _cachedAliveTeams.Clear();
+            var didFindAlivePlay
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
                 if (player.IsAlive)
                 {
-                    aliveTeams.Add(player.TeamId);
+                    _cachedAliveTeams.Add(player.TeamId);
                 }
             }
 
-            if (aliveTeams.Count <= 1)
+            var isGameEneded = _cachedAliveTeams.Count <= 1;
+            if (!isGameEneded)
             {
-                ushort winningTeamId = 0;
-                foreach (var teamId in aliveTeams)
-                {
-                    winningTeamId = teamId;
-                    break;
-                }
+                return;
+            }
 
-                if (aliveTeams.Count == 1)
-                {
-                    _commandFactory.CreateCommandVoid<StageEndedCommand>()
-                        .SetWinningTeamId(winningTeamId)
-                        .SetProcessedTick(_processedTick)
-                        .Execute();
-                }
-                else if (aliveTeams.Count == 0)
-                {
-                    LogService.LogWarning("All players died! No winner?");
-                    _commandFactory.CreateCommandVoid<StageEndedCommand>()
-                        .SetWinningTeamId(0)
-                        .SetProcessedTick(_processedTick)
-                        .Execute();
-                }
+            ushort winningTeamId = 0;
+            foreach (var teamId in _cachedAliveTeams)
+            {
+                winningTeamId = teamId;
+                break;
+            }
+
+            if (_cachedAliveTeams.Count == 1)
+            {
+                _commandFactory.CreateCommandVoid<StageEndedCommand>()
+                    .SetWinningTeamId(winningTeamId)
+                    .SetProcessedTick(_processedTick)
+                    .Execute();
+            }
+            else if (_cachedAliveTeams.Count == 0)
+            {
+                LogService.LogWarning("All players died! No winner?");
+                _commandFactory.CreateCommandVoid<StageEndedCommand>()
+                    .SetWinningTeamId(0)
+                    .SetProcessedTick(_processedTick)
+                    .Execute();
             }
         }
     }

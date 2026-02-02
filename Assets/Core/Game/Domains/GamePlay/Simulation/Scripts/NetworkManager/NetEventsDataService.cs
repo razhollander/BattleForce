@@ -90,7 +90,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _stopMatchCountdownListPool = new ConcurrentPool<FixedUnorderedList<StopMatchCountdownNetEventS2C>>(() => new FixedUnorderedList<StopMatchCountdownNetEventS2C>(networkConfig.MaxCap.StopMatchCountdownNetEvents), maxConcurrentPlayers);
             _stageEndNetEventsListPool = new ConcurrentPool<FixedClassUnorderedList<StageEndNetEventS2C>>(() =>
             {
-                var list = new FixedClassUnorderedList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents, () => new StageEndNetEventS2C());
+                var list = new FixedClassUnorderedList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents, () => new StageEndNetEventS2C(sharedGamePlayConfig.MaxTeamsAmount));
                 list.Clear();
                 return list;
             }, maxConcurrentPlayers);
@@ -594,12 +594,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddStageEndNetEvent(int tick, ushort winningTeamId, Dictionary<ushort, int> jemsWon, Dictionary<ushort, int> totalJems)
+        public void AddStageEndNetEvent(int onTick, ushort winningTeamId, Dictionary<ushort, int> jemsWon, Dictionary<ushort, int> totalJems)
         {
             foreach (var kvp in StageEndNetEventsPerPlayer)
             {
                 var packet = kvp.Value.AddAndGet();
-                packet.OccuredOnTick = tick;
+                packet.OccuredOnTick = onTick;
                 packet.WinningTeamId = winningTeamId;
                 packet.JemsWonPerTeam.Clear();
                 foreach (var jems in jemsWon)

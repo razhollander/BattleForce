@@ -8,12 +8,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     public class HandleStageEndNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
-        private StageEndedUiController _stageEndedUiController;
+        private IStageEndedUiController _stageEndedUiController;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
-            _stageEndedUiController = _diContainer.Resolve<StageEndedUiController>();
+            _stageEndedUiController = _diContainer.Resolve<IStageEndedUiController>();
         }
 
         public void Execute()
@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var stageEndEvent in stageEndEvents)
             {
-                _stageEndedUiController.Show(stageEndEvent);
+                _stageEndedUiController.Show(stageEndEvent.WinningTeamId, stageEndEvent.TotalJemsPerTeam);
             }
 
             stageEndEvents.Clear();

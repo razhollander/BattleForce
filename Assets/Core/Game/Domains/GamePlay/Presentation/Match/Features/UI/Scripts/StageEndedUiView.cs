@@ -9,16 +9,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
     {
         [SerializeField] private TextMeshProUGUI _winningTeamText;
         [SerializeField] private TextMeshProUGUI _jemsText;
-        [SerializeField] private Image _winningTeamColorImage;
         [SerializeField] private GameObject _panel;
 
         public void Show(int winningTeamId, Color teamColor, Dictionary<ushort, int> totalJems)
         {
             _panel.SetActive(true);
             _winningTeamText.text = $"Team {winningTeamId} Wins!";
-            _winningTeamColorImage.color = teamColor;
+            _winningTeamText.color = teamColor;
 
-            string jemsInfo = "Jems:\n";
+            var jemsInfo = "Jems:\n";
             foreach(var kvp in totalJems)
             {
                 jemsInfo += $"Team {kvp.Key}: {kvp.Value}\n";

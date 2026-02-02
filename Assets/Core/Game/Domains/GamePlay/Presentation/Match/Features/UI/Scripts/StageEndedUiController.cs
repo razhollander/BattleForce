@@ -1,35 +1,23 @@
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
-using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
-    public class StageEndedUiController
+    public class StageEndedUiController : IStageEndedUiController
     {
-        private readonly StageEndedUiView _viewPrefab;
+        private readonly StageEndedUiView _view;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
-        private StageEndedUiView _view;
 
-        public StageEndedUiController(StageEndedUiView viewPrefab, PresentationGamePlayConfig gamePlayConfig)
+        public StageEndedUiController(StageEndedUiView view, PresentationGamePlayConfig gamePlayConfig)
         {
-            _viewPrefab = viewPrefab;
+            _view = view;
             _gamePlayConfig = gamePlayConfig;
         }
-
-        public void Show(StageEndNetEventS2C evt)
+        
+        public void Show(int winningTeamId, Dictionary<ushort, int> totalJemsPerTeam)
         {
-            if (_view == null)
-            {
-                _view = Object.Instantiate(_viewPrefab);
-            }
-
-            Color teamColor = Color.white;
-            if (_gamePlayConfig.ColorPerTeamId.Count > evt.WinningTeamId)
-            {
-                teamColor = _gamePlayConfig.ColorPerTeamId[evt.WinningTeamId];
-            }
-
-            _view.Show(evt.WinningTeamId, teamColor, evt.TotalJemsPerTeam);
+            var teamColor = _gamePlayConfig.ColorPerTeamId[winningTeamId];
+            _view.Show(winningTeamId, teamColor, totalJemsPerTeam);
         }
     }
 }
