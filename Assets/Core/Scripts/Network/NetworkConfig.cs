@@ -62,5 +62,6 @@ namespace Core.Scripts.Network
         public int StopMatchCountdownNetEvents = 32;
         public int ExitMatchMakingNetEvents = 32;
         public int StartMatchNetEvents = 32;
+        public int StageEndNetEvents = 1;
     }
 }

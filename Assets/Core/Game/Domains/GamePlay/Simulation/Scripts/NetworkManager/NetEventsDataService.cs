@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
@@ -27,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> PlayerSwitchTeamNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<StartMatchCountdownNetEventS2C>> StartMatchCountdownNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<StopMatchCountdownNetEventS2C>> StopMatchCountdownNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedClassUnorderedList<StageEndNetEventS2C>> StageEndNetEventsPerPlayer { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -41,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> _playerSwitchTeamListPool;
         private readonly ConcurrentPool<FixedUnorderedList<StartMatchCountdownNetEventS2C>> _startMatchCountdownListPool;
         private readonly ConcurrentPool<FixedUnorderedList<StopMatchCountdownNetEventS2C>> _stopMatchCountdownListPool;
+        private readonly ConcurrentPool<FixedClassUnorderedList<StageEndNetEventS2C>> _stageEndNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -58,6 +61,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerSwitchTeamNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(maxConcurrentPlayers);
             StartMatchCountdownNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<StartMatchCountdownNetEventS2C>>(maxConcurrentPlayers);
             StopMatchCountdownNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<StopMatchCountdownNetEventS2C>>(maxConcurrentPlayers);
+            StageEndNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<StageEndNetEventS2C>>(maxConcurrentPlayers);
 
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
@@ -84,6 +88,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _playerSwitchTeamListPool = new ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(() => new FixedUnorderedList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents), maxConcurrentPlayers);
             _startMatchCountdownListPool = new ConcurrentPool<FixedUnorderedList<StartMatchCountdownNetEventS2C>>(() => new FixedUnorderedList<StartMatchCountdownNetEventS2C>(networkConfig.MaxCap.StartMatchCountdownNetEvents), maxConcurrentPlayers);
             _stopMatchCountdownListPool = new ConcurrentPool<FixedUnorderedList<StopMatchCountdownNetEventS2C>>(() => new FixedUnorderedList<StopMatchCountdownNetEventS2C>(networkConfig.MaxCap.StopMatchCountdownNetEvents), maxConcurrentPlayers);
+            _stageEndNetEventsListPool = new ConcurrentPool<FixedClassUnorderedList<StageEndNetEventS2C>>(() =>
+            {
+                var list = new FixedClassUnorderedList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents, () => new StageEndNetEventS2C(sharedGamePlayConfig.MaxTeamsAmount));
+                list.Clear();
+                return list;
+            }, maxConcurrentPlayers);
         }
 
 
@@ -205,6 +215,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
+
+            if (!StageEndNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                StageEndNetEventsPerPlayer.Add(playerId, _stageEndNetEventsListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {playerId}");
+            }
         }
         
         public void StopSavingPlayerEvents(ushort playerId)
@@ -248,6 +267,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var stopMatchCountdownList = StopMatchCountdownNetEventsPerPlayer[playerId];
             stopMatchCountdownList.Clear();
             _stopMatchCountdownListPool.Return(stopMatchCountdownList);
+            var stageEndList = StageEndNetEventsPerPlayer[playerId];
+            stageEndList.Clear();
+            _stageEndNetEventsListPool.Return(stageEndList);
         
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
@@ -262,6 +284,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerSwitchTeamNetEventsPerPlayer.Remove(playerId);
             StartMatchCountdownNetEventsPerPlayer.Remove(playerId);
             StopMatchCountdownNetEventsPerPlayer.Remove(playerId);
+            StageEndNetEventsPerPlayer.Remove(playerId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -539,6 +562,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
+
+            if (StageEndNetEventsPerPlayer.TryGetValue(playerId, out var stageEndNetEvents))
+            {
+                for (int i = stageEndNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (stageEndNetEvents[i].OccuredOnTick < tick)
+                    {
+                        stageEndNetEvents.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
@@ -557,6 +591,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
+            }
+        }
+
+        public void AddStageEndNetEvent(int onTick, ushort winningTeamId, Dictionary<ushort, int> jemsWon, Dictionary<ushort, int> totalJems)
+        {
+            foreach (var kvp in StageEndNetEventsPerPlayer)
+            {
+                var packet = kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.WinningTeamId = winningTeamId;
+                packet.JemsWonPerTeam.Clear();
+                foreach (var jems in jemsWon)
+                {
+                    packet.JemsWonPerTeam.Add(jems.Key, jems.Value);
+                }
+                packet.TotalJemsPerTeam.Clear();
+                foreach (var jems in totalJems)
+                {
+                    packet.TotalJemsPerTeam.Add(jems.Key, jems.Value);
+                }
             }
         }
     }

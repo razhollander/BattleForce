@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
-using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
@@ -17,5 +17,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public TalentCardS2C AddTalentCard(ushort talentCardId, Vector2 position, TalentType talentType, ushort health);
         void InitEntryPoint();
         PowerUpBallS2C AddPowerUpBall(Vector2 position, Vector2 velocity, PowerUpType powerUpType);
+        HashSet<ushort> TeamIds { get; }
     }
 }

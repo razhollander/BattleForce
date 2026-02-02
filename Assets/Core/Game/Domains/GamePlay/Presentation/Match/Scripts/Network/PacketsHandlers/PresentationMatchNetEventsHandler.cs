@@ -208,5 +208,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.PowerUpBallObtainedNetEvents.Add(powerUpBallObtainedNetEvent);
             }
         }
+
+        public void ProcessStageEndEvents(CapacityList<StageEndNetEventS2C> stageEndNetEvents)
+        {
+            if (stageEndNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var stageEndNetEvent in stageEndNetEvents)
+            {
+                _cachedPresentationEventsService.StageEndNetEvents.Add(stageEndNetEvent);
+            }
+        }
     }
 }

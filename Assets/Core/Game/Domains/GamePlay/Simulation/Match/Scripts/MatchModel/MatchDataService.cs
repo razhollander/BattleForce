@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -15,6 +16,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastPowerUpBallCreatedId = 0;
         private readonly MatchEnvironmentDataService _environmentDataService;
         public MatchEnvironmentDataService Environment => _environmentDataService;
+        public HashSet<ushort> TeamIds { get; private set; }
+
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
         {
             var chosenEnvironmentIndex = gamePlayConfig.ChosenEnvironmentIndex;
@@ -26,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
                 networkConfig.MaxCap.ConcurrentTalentCards,
                 networkConfig.MaxCap.ConcurrentPowerUpBalls);
 
+            TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.EnvironmentLayoutIndex = chosenEnvironmentIndex;
         }
 
@@ -49,6 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             newPlayer.Spaceship.Transform.Radius = radius;
             newPlayer.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
             newPlayer.Spaceship.Shoot.MaxCooldown = shootCooldown;
+            TeamIds.Add(teamId);
             return newPlayer;
         }
 

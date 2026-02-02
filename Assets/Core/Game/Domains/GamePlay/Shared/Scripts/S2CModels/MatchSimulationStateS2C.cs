@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
 using LiteNetLib.Utils;
@@ -10,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<PlayerBulletS2C> Bullets;
         public FixedUnorderedList<TalentCardS2C> TalentCards;
         public FixedUnorderedList<PowerUpBallS2C> PowerUpBalls;
+        public Dictionary<ushort, int> JemsPerTeamId;
         public int EnvironmentLayoutIndex;
 
         public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls)
@@ -18,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
             TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
             PowerUpBalls = new FixedUnorderedList<PowerUpBallS2C>(maxPowerUpBalls);
+            JemsPerTeamId = new Dictionary<ushort, int>();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -48,6 +51,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var powerUp in PowerUpBalls.AsSpan())
             {
                 powerUp.Serialize(writer);
+            }
+
+            writer.Put((ushort)JemsPerTeamId.Count);
+            foreach (var kvp in JemsPerTeamId)
+            {
+                writer.Put(kvp.Key);
+                writer.Put(kvp.Value);
             }
 
             writer.Put((byte)EnvironmentLayoutIndex);
@@ -85,6 +95,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var powerUp = ref PowerUpBalls.AddAndGet();
                 powerUp.Deserialize(reader);
+            }
+
+            JemsPerTeamId.Clear();
+            var jemsCount = reader.GetUShort();
+            for (int i = 0; i < jemsCount; i++)
+            {
+                var teamId = reader.GetUShort();
+                var jems = reader.GetInt();
+                JemsPerTeamId.Add(teamId, jems);
             }
 
             EnvironmentLayoutIndex = reader.GetByte();

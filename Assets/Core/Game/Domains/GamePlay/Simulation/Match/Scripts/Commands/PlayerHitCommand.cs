@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -14,6 +16,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ushort _playerId;
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
+        private ICommandFactory _commandFactory;
+        private IStageDataService _stageDataService;
         private int _processedTick;
 
         public PlayerHitCommand SetHitDamage(ushort hitDamage)
@@ -38,22 +42,87 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService =_diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _stageDataService = _diContainer.Resolve<IStageDataService>();
+            var sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public void Execute()
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(_playerId);
+
+            if (!playerState.IsAlive)
+            {
+                return;
+            }
+            
             var newHealth = (ushort)Math.Max(DEAD_HEALTH_AMOUNT, playerState.Spaceship.Health.CurrentHealth - _hitDamage);
             playerState.Spaceship.Health.CurrentHealth = newHealth;
             var isPlayerAlive = newHealth > DEAD_HEALTH_AMOUNT;
 
+          
+            LogService.LogTopic($"Player Hit! Id {_playerId} hit with damage {_hitDamage}, new health: {newHealth}, is alive: {isPlayerAlive}", LogTopicType.ServerNetwork);
+            _netEventsDataService.AddPlayerTakeDamageNetEvent(_processedTick, _playerId, newHealth, _hitDamage, isPlayerAlive);
+
             if (!isPlayerAlive)
             {
                 playerState.IsAlive = false;
+                if (!_stageDataService.IsMatchEnded)
+                {
+                    MarkTeamIfLost(playerState.TeamId);
+                    TryInvokeMatchEnded();
+                }
+            }
+        }
+
+        private void MarkTeamIfLost(ushort teamId)
+        {
+            foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                var isPlayerAliveInTeam = player.TeamId == teamId && player.IsAlive;
+                if (isPlayerAliveInTeam)
+                {
+                    return;
+                }
+            }
+            
+            _stageDataService.AddLosingTeam(teamId);
+        }
+        
+        private void TryInvokeMatchEnded()
+        {
+            if (!TryFindWinningTeam(out ushort winningTeamId))
+            {
+                return;
             }
 
-            LogService.LogTopic($"Player Hit! Id {_playerId} hit with damage {_hitDamage}, new health: {newHealth}, is alive: {isPlayerAlive}", LogTopicType.ServerNetwork);
-            _netEventsDataService.AddPlayerTakeDamageNetEvent(_processedTick, _playerId, newHealth, _hitDamage, isPlayerAlive);
+            _commandFactory.CreateCommandVoid<StageEndedCommand>()
+                .SetWinningTeamId(winningTeamId)
+                .SetProcessedTick(_processedTick)
+                .Execute();
+        }
+
+        private bool TryFindWinningTeam(out ushort winningTeamId)
+        {
+            var didFindAliveTeam = false;
+            winningTeamId = 0;
+            foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                if (!player.IsAlive)
+                {
+                    continue;
+                }
+
+                if (didFindAliveTeam && player.TeamId != winningTeamId)
+                {
+                    return false;
+                }
+                    
+                winningTeamId = player.TeamId;
+                didFindAliveTeam = true;
+            }
+
+            return true;
         }
     }
 }

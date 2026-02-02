@@ -34,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private MatchPlayerUIControllersView _matchPlayerUIControllersView;
         [SerializeField] private BulletView _bulletViewPrefab;
         [SerializeField] private EnvironmentWallView _environmentWallViewPrefab;
+        [SerializeField] private StageEndedUiView _stageEndedUiView;
 
         public override void InstallBindings()
         {
@@ -61,6 +62,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<MatchPlayerUIControllers>().AsSingle().WithArguments(_matchPlayerUIControllersView).NonLazy();
             Container.BindInterfacesTo<MatchBulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
+            Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();
         }
     }
 }

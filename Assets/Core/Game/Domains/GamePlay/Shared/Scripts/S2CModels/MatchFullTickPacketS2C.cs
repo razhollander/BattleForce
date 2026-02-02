@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentCardHitNetEventS2C> TalentCardHitNetEvents;
         public FixedUnorderedList<PowerUpBallSpawnedNetEventS2C> PowerUpSpawnedNetEvents; // todo: remove events related to power up when bullet id destroyed
         public FixedUnorderedList<PowerUpBallObtainedNetEventS2C> PowerUpObtainedNetEvents;
+        public FixedClassUnorderedList<StageEndNetEventS2C> StageEndNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -39,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentCardHitNetEvents = new FixedUnorderedList<TalentCardHitNetEventS2C>(maxCap.TalentCardHitNetEvents);
             PowerUpSpawnedNetEvents = new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(maxCap.PowerUpSpawnedNetEvents);
             PowerUpObtainedNetEvents = new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(maxCap.PowerUpObtainedNetEvents);
+            StageEndNetEvents = new FixedClassUnorderedList<StageEndNetEventS2C>(maxCap.StageEndNetEvents, () => new StageEndNetEventS2C(sharedGamePlayConfig.MaxTeamsAmount));
         }
 
 
@@ -69,6 +71,16 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             SerializedTalentCardHitEvents(writer);
             SerializedPowerUpSpawnedEvents(writer);
             SerializedPowerUpObtainedEvents(writer);
+            SerializedStageEndEvents(writer);
+        }
+
+        private void SerializedStageEndEvents(NetDataWriter writer)
+        {
+            writer.Put((byte) StageEndNetEvents.Count);
+            foreach (var evt in StageEndNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
         }
 
         private void SerializedPowerUpObtainedEvents(NetDataWriter writer)
@@ -129,6 +141,18 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             DeserializedTalentCardHitEvents(reader);
             DeserializedPowerUpSpawnedEvents(reader);
             DeserializedPowerUpObtainedEvents(reader);
+            DeserializedStageEndEvents(reader);
+        }
+
+        private void DeserializedStageEndEvents(NetDataReader reader)
+        {
+            StageEndNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                var evt = StageEndNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
         }
 
         private void DeserializedPowerUpObtainedEvents(NetDataReader reader)
