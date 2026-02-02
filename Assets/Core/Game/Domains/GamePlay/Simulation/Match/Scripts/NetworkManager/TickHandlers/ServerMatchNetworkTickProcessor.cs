@@ -104,26 +104,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         {
             try
             {
-                if (_matchDataService.IsMatchEnded)
-                {
-                    return;
-                }
-
                 _networkManager.PollEvents();
                 var stepDeltaTime = _networkConfig.DeltaTime;
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick);
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
                 
-                ApplyMatchModelToPhysicsSimulation();
-                _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
-                ApplyPhysicsSimulationToMatchModel();
-                
+                StepPhysics(stepDeltaTime);
+
                 _processCachedCollisionsCommand.SetProcessedTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
+                
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(currentTick);
-
                 SendStartMatchToNotAcknowledgedPlayers(currentTick);
                 _headLessQuitterController.QuitIfTimeOut();
             }
@@ -132,6 +125,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 LogService.LogError("Got error! " + e);
                 throw;
             }
+        }
+
+        private void StepPhysics(float stepDeltaTime)
+        {
+            ApplyMatchModelToPhysicsSimulation();
+            _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
+            ApplyPhysicsSimulationToMatchModel();
         }
 
         private void SendStartMatchToNotAcknowledgedPlayers(int processedTick)

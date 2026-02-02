@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var stageEndEvent in stageEndEvents)
             {
-                _stageEndedUiController.Show(stageEndEvent.WinningTeamId, stageEndEvent.TotalJemsPerTeam);
+                _stageEndedUiController.Show(stageEndEvent.WinningTeamId, stageEndEvent.JemsWonPerTeam);
             }
 
             stageEndEvents.Clear();

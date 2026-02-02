@@ -232,7 +232,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -244}
   m_SizeDelta: {x: 1356.1724, y: 206.9616}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7539211341235539334
@@ -263,9 +263,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Winner
-
-'
+  m_text: 'Jems:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -602,5 +600,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _winningTeamText: {fileID: 1670375127035662665}
   _jemsText: {fileID: 6601260771289057911}
-  _winningTeamColorImage: {fileID: 6932592520148587023}
   _panel: {fileID: 7787888629021930021}

@@ -14,10 +14,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _gamePlayConfig = gamePlayConfig;
         }
         
-        public void Show(int winningTeamId, Dictionary<ushort, int> totalJemsPerTeam)
+        public void Show(int winningTeamId, Dictionary<ushort, int> JemsWonPerTeam)
         {
             var teamColor = _gamePlayConfig.ColorPerTeamId[winningTeamId];
-            _view.Show(winningTeamId, teamColor, totalJemsPerTeam);
+            _view.Show(winningTeamId, teamColor, JemsWonPerTeam);
         }
     }
 }

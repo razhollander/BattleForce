@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -16,8 +17,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
         private ICommandFactory _commandFactory;
+        private IStageDataService _stageDataService;
         private int _processedTick;
-        private HashSet<ushort> _cachedAliveTeams;
 
         public PlayerHitCommand SetHitDamage(ushort hitDamage)
         {
@@ -42,13 +43,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService =_diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _stageDataService = _diContainer.Resolve<IStageDataService>();
             var sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
-            _cachedAliveTeams = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
         }
 
         public void Execute()
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(_playerId);
+
+            if (!playerState.IsAlive)
+            {
+                return;
+            }
+            
             var newHealth = (ushort)Math.Max(DEAD_HEALTH_AMOUNT, playerState.Spaceship.Health.CurrentHealth - _hitDamage);
             playerState.Spaceship.Health.CurrentHealth = newHealth;
             var isPlayerAlive = newHealth > DEAD_HEALTH_AMOUNT;
@@ -60,55 +67,62 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             if (!isPlayerAlive)
             {
                 playerState.IsAlive = false;
-                CheckMatchEnded();
+                if (!_stageDataService.IsMatchEnded)
+                {
+                    MarkTeamIfLost(playerState.TeamId);
+                    TryInvokeMatchEnded();
+                }
             }
         }
 
-        private void CheckMatchEnded()
+        private void MarkTeamIfLost(ushort teamId)
         {
-            if (_matchDataService.IsMatchEnded)
-            {
-                return;
-            }
-            
-            _cachedAliveTeams.Clear();
-            var didFindAlivePlay
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
-                if (player.IsAlive)
+                var isPlayerAliveInTeam = player.TeamId == teamId && player.IsAlive;
+                if (isPlayerAliveInTeam)
                 {
-                    _cachedAliveTeams.Add(player.TeamId);
+                    return;
                 }
             }
-
-            var isGameEneded = _cachedAliveTeams.Count <= 1;
-            if (!isGameEneded)
+            
+            _stageDataService.AddLosingTeam(teamId);
+        }
+        
+        private void TryInvokeMatchEnded()
+        {
+            if (!TryFindWinningTeam(out ushort winningTeamId))
             {
                 return;
             }
 
-            ushort winningTeamId = 0;
-            foreach (var teamId in _cachedAliveTeams)
+            _commandFactory.CreateCommandVoid<StageEndedCommand>()
+                .SetWinningTeamId(winningTeamId)
+                .SetProcessedTick(_processedTick)
+                .Execute();
+        }
+
+        private bool TryFindWinningTeam(out ushort winningTeamId)
+        {
+            var didFindAliveTeam = false;
+            winningTeamId = 0;
+            foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
-                winningTeamId = teamId;
-                break;
+                if (!player.IsAlive)
+                {
+                    continue;
+                }
+
+                if (didFindAliveTeam && player.TeamId != winningTeamId)
+                {
+                    return false;
+                }
+                    
+                winningTeamId = player.TeamId;
+                didFindAliveTeam = true;
             }
 
-            if (_cachedAliveTeams.Count == 1)
-            {
-                _commandFactory.CreateCommandVoid<StageEndedCommand>()
-                    .SetWinningTeamId(winningTeamId)
-                    .SetProcessedTick(_processedTick)
-                    .Execute();
-            }
-            else if (_cachedAliveTeams.Count == 0)
-            {
-                LogService.LogWarning("All players died! No winner?");
-                _commandFactory.CreateCommandVoid<StageEndedCommand>()
-                    .SetWinningTeamId(0)
-                    .SetProcessedTick(_processedTick)
-                    .Execute();
-            }
+            return true;
         }
     }
 }

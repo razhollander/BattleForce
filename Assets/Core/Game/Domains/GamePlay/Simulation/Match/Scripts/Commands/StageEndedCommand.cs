@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -13,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
-        private SharedGamePlayConfig _sharedGamePlayConfig;
+        private IStageDataService _stageDataService;
 
         public StageEndedCommand SetWinningTeamId(ushort winningTeamId)
         {
@@ -31,39 +32,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
-            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
+            _stageDataService = _diContainer.Resolve<IStageDataService>();
         }
 
         public void Execute()
         {
             LogService.LogTopic($"Match Ended! Winning Team: {_winningTeamId}", LogTopicType.ServerNetwork);
 
-            var players = _matchDataService.SimulationState.Players;
             var jemsPerTeam = _matchDataService.SimulationState.JemsPerTeamId;
-            var jemsWonPerTeam = new Dictionary<ushort, int>();
-
-            // Calculate jems for all teams present in the match
-            // Iterate over players to find all teams
-            var teams = new HashSet<ushort>();
-            foreach(var player in players.AsSpan())
-            {
-                teams.Add(player.TeamId);
-            }
-
-            foreach(var teamId in teams)
-            {
-                int jemsWon = (teamId == _winningTeamId) ? _sharedGamePlayConfig.WinJemsAmount : _sharedGamePlayConfig.WinJemsAmount - 1;
-                jemsWonPerTeam[teamId] = jemsWon;
-
-                if(!jemsPerTeam.ContainsKey(teamId))
-                {
-                    jemsPerTeam[teamId] = 0;
-                }
-                jemsPerTeam[teamId] += jemsWon;
-            }
-
+            _stageDataService.AddWinnerTeam(_winningTeamId);
+            var jemsWonPerTeam = _stageDataService.GetJemsCollectedPerTeam();
             _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, jemsWonPerTeam, jemsPerTeam);
-            _matchDataService.IsMatchEnded = true;
+            _stageDataService.IsMatchEnded = true;
         }
     }
 }
