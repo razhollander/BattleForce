@@ -80,7 +80,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerState.Id)
                     {
                         currentBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
-                        currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
+                        // currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
                         break;
                     }
 
@@ -122,7 +122,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerState.Id)
                     {
                         currentBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
-                        currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
+                        // currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
                         break;
                     }
 

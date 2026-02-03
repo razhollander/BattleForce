@@ -8,6 +8,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
@@ -43,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly HandleTalentInputPressedCommand _handleTalentInputPressedCommand;
         private readonly IPlayersTalentsManager _playersTalentsManager;
         private readonly IPlaybackRecorderService _recorderService;
+        private readonly IPlayersForcesService _playersForcesService;
 
         public bool DidReceiveAnyInputFromPlayer(ushort playerId)
         {
@@ -51,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService recorderService)
+            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService recorderService, IPlayersForcesService playersForcesService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -63,6 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _commandFactory = commandFactory;
             _playersTalentsManager = playersTalentsManager;
             _recorderService = recorderService;
+            _playersForcesService = playersForcesService;
             _handleTalentInputPressedCommand = _commandFactory.CreateCommandVoid<HandleTalentInputPressedCommand>();
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, MatchPlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -293,12 +296,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private void UpdatePlayerDirection(MatchPlayerInputPacketC2S playerInputPacket, PlayerStateS2C playerModel)
         {
             var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
+            var forceSpin = _playersForcesService.CalculatePlayerSpin(playerModel.Id);
             var rotationAngle =
                 (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
                  playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
+
+            rotationAngle += forceSpin * _networkConfig.DeltaTime;
+
             var rotatedVector = playerModel.Spaceship.Transform.Direction.Rotate(rotationAngle);
             playerModel.Spaceship.Transform.Direction = rotatedVector;
-            playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
+
+            var forceVelocity = _playersForcesService.CalculatePlayerVelocity(playerModel.Id);
+            var forceMagnitude = forceVelocity.Length();
+            var dampFactor = 1.0f;
+            if (forceMagnitude > 0)
+            {
+                dampFactor = 1.0f / (1.0f + forceMagnitude * 0.5f);
+            }
+            var inputVelocity = playerModel.Spaceship.Transform.Direction * (_gamePlayConfig.PlayerSpaceship.MovementSpeed * dampFactor);
+            var totalVelocity = inputVelocity + forceVelocity;
+
+            _physicsSimulator.SetPlayerVelocity(playerModel.Id, totalVelocity);
+            // playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
         }
 
         // private Dictionary<ushort, PlayerInputPacketC2S> PopLastInputsOfEachPlayer()
