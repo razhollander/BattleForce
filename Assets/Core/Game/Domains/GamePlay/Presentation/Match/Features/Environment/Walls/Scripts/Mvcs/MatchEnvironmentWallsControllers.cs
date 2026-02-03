@@ -31,5 +31,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
             wallController.CreateWallView(_wallViewPrefab, _wallsParent.transform);
             _wallControllers.Add(wallController);
         }
+
+        public void DestroyAll()
+        {
+            foreach (var wallController in _wallControllers)
+            {
+                wallController.Destroy();
+            }
+            _wallControllers.Clear();
+        }
     }
 }

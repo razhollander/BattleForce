@@ -9,5 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         void AddWinnerTeam(ushort teamId);
         Dictionary<ushort, int> GetJemsCollectedPerTeam();
         bool IsMatchEnded { get; set; }
+        float StageRestartTimer { get; set; }
+        void ClearData();
     }
 }

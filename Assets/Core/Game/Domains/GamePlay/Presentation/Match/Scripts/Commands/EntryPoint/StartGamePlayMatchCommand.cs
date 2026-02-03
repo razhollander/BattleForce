@@ -34,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IMatchDataService _matchDataService;
         private ICommandFactory _commandFactory;
         private IClientMatchPresentationTickProcessor _clientMatchPresentationTickProcessor;
+        private IMatchStartMatchPacketHandler _startMatchPacketHandler;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -56,11 +57,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _clientMatchPresentationTickProcessor = _diContainer.Resolve<IClientMatchPresentationTickProcessor>();
+            _startMatchPacketHandler = _diContainer.Resolve<IMatchStartMatchPacketHandler>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
             _fullTickPacketsHandler.InitEntryPoint();
+            _startMatchPacketHandler.InitEntryPoint();
             _talentCardControllers.InitEntryPoint();
             _environmentLavaWallsControllers.InitEntryPoint();
             _talentCardObtainedEffectController.InitEntryPoint();

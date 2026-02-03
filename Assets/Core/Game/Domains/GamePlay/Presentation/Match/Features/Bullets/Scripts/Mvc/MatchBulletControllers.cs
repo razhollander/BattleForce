@@ -55,5 +55,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts
             bulletController.Destroy();
             _bulletControllers.Remove(bulletController);
         }
+
+        public void DestroyAll()
+        {
+            foreach (var bulletController in _bulletControllers)
+            {
+                bulletController.Destroy();
+            }
+            _bulletControllers.Clear();
+        }
     }
 }

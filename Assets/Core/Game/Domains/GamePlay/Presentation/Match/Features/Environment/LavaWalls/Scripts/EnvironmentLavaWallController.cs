@@ -26,5 +26,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
             var mesh = MeshUtils.BuildMesh(pointsUnityVector2, 2);
             _lavaWallView.SetMesh(mesh);
         }
+
+        public void Destroy()
+        {
+            if (_lavaWallView != null)
+                Object.Destroy(_lavaWallView.gameObject);
+        }
     }
 }

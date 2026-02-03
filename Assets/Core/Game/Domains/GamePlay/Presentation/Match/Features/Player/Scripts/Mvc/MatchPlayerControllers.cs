@@ -82,5 +82,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             return GetPlayer(playerId).GetTransform();
         }
+
+        public void DestroyAll()
+        {
+            foreach (var controller in _playerControllers)
+            {
+                controller.Destroy();
+            }
+            _playerControllers.Clear();
+        }
     }
 }

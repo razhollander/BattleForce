@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -15,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
         private IStageDataService _stageDataService;
+        private SimulationGamePlayConfig _config;
 
         public StageEndedCommand SetWinningTeamId(ushort winningTeamId)
         {
@@ -33,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
+            _config = _diContainer.Resolve<SimulationGamePlayConfig>();
         }
 
         public void Execute()
@@ -42,8 +45,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var jemsPerTeam = _matchDataService.SimulationState.JemsPerTeamId;
             _stageDataService.AddWinnerTeam(_winningTeamId);
             var jemsWonPerTeam = _stageDataService.GetJemsCollectedPerTeam();
+
+            foreach (var kvp in jemsWonPerTeam)
+            {
+                if (jemsPerTeam.ContainsKey(kvp.Key))
+                {
+                    jemsPerTeam[kvp.Key] += kvp.Value;
+                }
+                else
+                {
+                    jemsPerTeam.Add(kvp.Key, kvp.Value);
+                }
+            }
+
             _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, jemsWonPerTeam, jemsPerTeam);
             _stageDataService.IsMatchEnded = true;
+            _stageDataService.StageRestartTimer = _config.StageRestartDelaySeconds;
         }
     }
 }

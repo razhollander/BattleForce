@@ -24,6 +24,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private AddMatchPlayerCommand _addMatchPlayerCommand;
         private ICommandFactory _commandFactory;
         private PresentationGamePlayConfig _gameplayConfig;
+        private IMatchPlayerControllers _playerControllers;
+        private IMatchPlayerUIControllers _playerUIControllers;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -43,10 +45,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
             _gameplayConfig =_diContainer.Resolve<PresentationGamePlayConfig>();
+            _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+            _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
         }
 
         public void Execute()
         {
+            _matchDataService.ClearAll();
+
+            _bulletControllers.DestroyAll();
+            _environmentWallsControllers.DestroyAll();
+            _environmentLavaWallsControllers.DestroyAll();
+            _talentCardControllers.DestroyAll();
+            _powerUpBallControllers.DestroyAll();
+            _playerControllers.DestroyAll();
+            _playerUIControllers.DestroyAll();
+
             CreatePlayers();
             CreateBullets();
             CreateWalls();

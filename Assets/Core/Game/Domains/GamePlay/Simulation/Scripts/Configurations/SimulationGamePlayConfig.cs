@@ -13,5 +13,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         [EditableRef] public PowerUpsConfig PowerUps;
         public int ChosenEnvironmentIndex = 0;
         public ushort StartMatchCountdownDuration = 5;
+        public float StageRestartDelaySeconds = 3f;
     }
 }

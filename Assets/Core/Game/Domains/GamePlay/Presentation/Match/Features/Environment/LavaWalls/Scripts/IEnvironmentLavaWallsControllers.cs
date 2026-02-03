@@ -4,5 +4,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
     {
         void InitEntryPoint();
         void CreateLavaWall(ushort wallId);
+        void DestroyAll();
     }
 }

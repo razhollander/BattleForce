@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private SimulationGamePlayConfig _gamePlayConfig;
         private INetEventsDataService _netEventsDataService;
         private ITickService _tickService;
+        private ICommandFactory _commandFactory;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -52,6 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _tickService = _diContainer.Resolve<ITickService>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
         }
 
         public void Execute()
@@ -62,9 +64,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _playeRejoinPacketsHandler.InitEntryPoint();
 
             InitPlayers(_simulationMatchEnterData);
-            CreateWalls();
-            CreateLavaWalls();
-            CreateTalentCards();
+            _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
+
             TrySwitchToPlayback();
             
             _tickProcessor.InitEntryPoint();
@@ -106,60 +107,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 var playerName = player.Name;
                 var playerTeamId = player.TeamId;
                 
-                var startingDirection = RNG.NextFloat(0, 360).AngleToVector();
-                var velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
+                var startingDirection = Vector2.UnitX;
+                var velocity = Vector2.Zero;
                 var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
                 var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
                 var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
-                var position = Vector2.One;
+                var position = Vector2.Zero;
                 _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown);
-                _physicsSimulator.AddPlayer(playerId, playerTeamId, position, startingDirection, radius);
                 _playersTalentsManager.AddPlayer(playerId);
-            }
-        }
-
-        private void CreateWalls()
-        {
-            var wallConfigs = _matchDataService.Environment.WallConfigs;
-
-            foreach (var wallConfig in wallConfigs)
-            {
-                var wallId = wallConfig.Id;
-                var wallPoints = wallConfig.Points;
-                _physicsSimulator.AddWall(wallId, wallPoints);
-            }
-        }
-
-        private void CreateLavaWalls()
-        {
-            var lavaWallConfigs = _matchDataService.Environment.LavaWallConfigs;
-            if (lavaWallConfigs.IsNullOrEmpty())
-            {
-                return;
-            }
-
-            foreach (var lavaWallConfig in lavaWallConfigs)
-            {
-                var lavaWallId = lavaWallConfig.Id;
-                var lavaWallPoints = lavaWallConfig.Points;
-                _physicsSimulator.AddLavaWall(lavaWallId, lavaWallPoints);
-            }
-        }
-
-        private void CreateTalentCards()
-        {
-            var talentCards = _matchDataService.Environment.TalentCards;
-            if (talentCards.IsNullOrEmpty())
-            {
-                return;
-            }
-            
-            foreach (var talentCard in talentCards)
-            {
-                var talentCardPosition = talentCard.Position;
-                var talentCardId = talentCard.Id;
-                _matchDataService.AddTalentCard(talentCardId, talentCardPosition, talentCard.TalentType, _simulationGamePlayConfig.Talents.TalentCardHealth);
-                _physicsSimulator.AddTalentCard(talentCardId, talentCardPosition, _simulationGamePlayConfig.Talents.TalentCardWidth, _simulationGamePlayConfig.Talents.TalentCardHeight);
             }
         }
     }

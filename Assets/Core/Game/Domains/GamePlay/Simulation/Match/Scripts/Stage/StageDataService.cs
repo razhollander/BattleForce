@@ -9,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         public Queue<ushort> OrderedTeamIdsLost { get; private set; }
         public ushort WinnerTeamId;
         public bool IsMatchEnded { get; set; }
+        public float StageRestartTimer { get; set; }
 
         public void ClearData()
         {

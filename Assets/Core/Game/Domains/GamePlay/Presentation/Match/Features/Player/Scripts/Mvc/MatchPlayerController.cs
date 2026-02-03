@@ -91,5 +91,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             return _playerView.GetTransform();
         }
+
+        public void Destroy()
+        {
+            if (_playerView != null)
+                _playerPool.Despawn(_playerView);
+        }
     }
 }

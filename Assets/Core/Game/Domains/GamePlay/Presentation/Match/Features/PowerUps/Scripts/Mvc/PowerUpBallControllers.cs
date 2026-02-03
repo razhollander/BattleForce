@@ -46,6 +46,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
             _controllers.Remove(cardController);
         }
 
+        public void DestroyAll()
+        {
+            foreach (var controller in _controllers)
+            {
+                controller.DestroyView();
+            }
+            _controllers.Clear();
+        }
+
         public void UpdatePowerUpBallsTransform()
         {
             foreach (var controller in _controllers)
