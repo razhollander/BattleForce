@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -18,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private INetEventsDataService _netEventsDataService;
         private ICommandFactory _commandFactory;
         private IStageDataService _stageDataService;
+        private SimulationGamePlayConfig _gamePlayConfig;
         private int _processedTick;
 
         public PlayerHitCommand SetHitDamage(ushort hitDamage)
@@ -44,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
+            _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             var sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
@@ -67,6 +70,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             if (!isPlayerAlive)
             {
                 playerState.IsAlive = false;
+
+                var shootState = playerState.Spaceship.Shoot;
+                shootState.MaxCooldown *= _gamePlayConfig.ShootCooldownMultiplierWhenDead;
+                playerState.Spaceship.Shoot = shootState;
+
+                _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerId, shootState.MaxCooldown);
+
                 if (!_stageDataService.IsMatchEnded)
                 {
                     MarkTeamIfLost(playerState.TeamId);

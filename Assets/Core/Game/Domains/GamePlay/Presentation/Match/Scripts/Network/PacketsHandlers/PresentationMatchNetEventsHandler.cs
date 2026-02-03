@@ -118,6 +118,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessPlayerDiedEvents(CapacityList<PlayerDiedNetEventS2C> playerDiedEvents)
+        {
+            if (playerDiedEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerDiedEvent in playerDiedEvents)
+            {
+                _cachedPresentationEventsService.PlayerDiedNetEvents.Add(playerDiedEvent);
+            }
+        }
+
         public void ProcessBulletDestroyedEvents(CapacityList<BulletDestroyedNetEventS2C> bulletDestroyedEvents)
         {
             if (bulletDestroyedEvents.IsNullOrEmpty())
