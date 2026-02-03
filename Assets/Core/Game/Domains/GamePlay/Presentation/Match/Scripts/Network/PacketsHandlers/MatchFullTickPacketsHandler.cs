@@ -88,13 +88,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPlayerRejoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
             ProcessPlayerTakeDamageEvents(latestFullTickPacket.PlayerTakeDamageNetEvents);
-            ProcessPlayerDiedEvents(latestFullTickPacket.PlayerDiedNetEvents);
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
             ProcessPlayerSwapEvents(latestFullTickPacket.PlayerSwapNetEvents);
             ProcessTalentCardHitEvents(latestFullTickPacket.TalentCardHitNetEvents);
             ProcessTalentCardObtainedEvents(latestFullTickPacket.TalentCardObtainedNetEvents);
             ProcessPowerUpBallSpawnedEvents(latestFullTickPacket.PowerUpSpawnedNetEvents);
             ProcessPowerUpBallObtainedEvents(latestFullTickPacket.PowerUpObtainedNetEvents);
+            ProcessPlayerDiedEvents(latestFullTickPacket.PlayerDiedNetEvents);
             ProcessStageEndEvents(latestFullTickPacket.StageEndNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);

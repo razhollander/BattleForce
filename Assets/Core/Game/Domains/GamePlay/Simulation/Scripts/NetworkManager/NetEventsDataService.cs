@@ -317,13 +317,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddPlayerDiedNetEvent(int onTick, ushort playerId)
+        public void AddPlayerDiedNetEvent(int onTick, ushort playerId, float maxShootCooldown)
         {
             foreach (var kvp in PlayerDiedNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.PlayerId = playerId;
+                packet.PlayerMaxShootCooldown = maxShootCooldown;
             }
         }
 

@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -9,11 +10,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchPlayerUIControllers _matchPlayerUIControllers;
+        private IMatchDataService _matchDataService;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _matchPlayerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
+            _matchDataService = _diContainer.Resolve<IMatchDataService>();
         }
 
         public void Execute()
@@ -26,7 +29,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var playerDiedEvent in playerDiedEvents)
             {
-                _matchPlayerUIControllers.DisableHealthBar(playerDiedEvent.PlayerId);
+                var playerId = playerDiedEvent.PlayerId;
+                _matchDataService.GetPlayer(playerId).Spaceship.Shoot.MaxCooldown = playerDiedEvent.PlayerMaxShootCooldown; 
+                _matchPlayerUIControllers.HidePlayerHealthBar(playerDiedEvent.PlayerId);
             }
 
             playerDiedEvents.Clear();
