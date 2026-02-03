@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly IWorldCameraController _worldCameraController;
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
+        private readonly HandlePlayerDiedNetEventsCommand _handlePlayerDiedNetEventsCommand;
         private readonly HandleBulletDestroyedNetEventsCommand _handleBulletDestroyedNetEventsCommand;
         private readonly HandlePlayerSwapNetEventsCommand _handlePlayerSwapNetEventsCommand;
         private readonly HandleTalentCardObtainedNetEventsCommand _handleTalentCardObtainedNetEventsCommand;
@@ -37,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _matchDataService = matchDataService;
             _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
             _handlePlayerTakeDamangeNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
+            _handlePlayerDiedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerDiedNetEventsCommand>();
             _handleBulletDestroyedNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>();
             _handlePlayerSwapNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerSwapNetEventsCommand>();
             _handleTalentCardObtainedNetEventsCommand = commandFactory.CreateCommandVoid<HandleTalentCardObtainedNetEventsCommand>();
@@ -61,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleBulletSpawnNetEventsCommand.Execute();
             _handleBulletDestroyedNetEventsCommand.Execute();
             _handlePlayerTakeDamangeNetEventsCommand.Execute();
+            _handlePlayerDiedNetEventsCommand.Execute();
             _handlePlayerSwapNetEventsCommand.Execute();
             _handleTalentCardHitNetEventsCommand.Execute();
             _handlePowerUpBallSpawneddNetEventsCommand.Execute();

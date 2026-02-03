@@ -67,6 +67,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             if (!isPlayerAlive)
             {
                 playerState.IsAlive = false;
+
+                var shootState = playerState.Spaceship.Shoot;
+                shootState.MaxCooldown *= 2;
+                playerState.Spaceship.Shoot = shootState;
+
+                _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerId);
+
                 if (!_stageDataService.IsMatchEnded)
                 {
                     MarkTeamIfLost(playerState.TeamId);

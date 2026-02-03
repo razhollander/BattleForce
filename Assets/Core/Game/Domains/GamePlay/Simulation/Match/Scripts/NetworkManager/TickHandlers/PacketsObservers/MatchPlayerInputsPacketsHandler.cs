@@ -129,7 +129,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     continue;
                 }
 
-                UpdatePlayerDirection(playerInputPacket, playerState);
+                if (!playerState.IsAlive)
+                {
+                    playerState.Spaceship.Transform.Velocity = System.Numerics.Vector2.Zero;
+                }
+                else
+                {
+                    UpdatePlayerDirection(playerInputPacket, playerState);
+                }
+
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
                 UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState);
 
