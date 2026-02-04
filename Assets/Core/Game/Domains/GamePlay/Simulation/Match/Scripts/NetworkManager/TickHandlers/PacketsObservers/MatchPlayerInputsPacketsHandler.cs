@@ -129,7 +129,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     continue;
                 }
 
-              
                 UpdatePlayerDirection(playerInputPacket, playerState);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
                 UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState);
