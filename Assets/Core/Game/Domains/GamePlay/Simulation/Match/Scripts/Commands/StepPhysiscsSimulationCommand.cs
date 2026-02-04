@@ -38,8 +38,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
-                _iPlayersVelocityService.StepPlayerVelocity(playerState.Spaceship, stepDeltaTime);
-                _iPlayersVelocityService.StepPlayerSpin(playerState.Spaceship, stepDeltaTime);
+                _iPlayersVelocityService.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
+                _iPlayersVelocityService.DeceleratePlayerSpin(playerState.Spaceship, stepDeltaTime);
             }
 
             ApplyMatchModelToPhysicsSimulation();
