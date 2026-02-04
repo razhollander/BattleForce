@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchDataService _matchDataService;
         private IPhysicsSimulator _physicsSimulator;
         private NetworkConfig _networkConfig;
-        private IPlayersDecelerationLogic _iPlayersDecelerationLogic;
+        private IPlayersDecelerationLogic _playersDecelerationLogic;
         private IPlayersEngineLogic _playersEngineLogic;
         private ICommandFactory _commandFactory;
         
@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
-            _iPlayersDecelerationLogic = _diContainer.Resolve<IPlayersDecelerationLogic>();
+            _playersDecelerationLogic = _diContainer.Resolve<IPlayersDecelerationLogic>();
             _playersEngineLogic = _diContainer.Resolve<IPlayersEngineLogic>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
@@ -51,8 +51,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
-                _iPlayersDecelerationLogic.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
-                _iPlayersDecelerationLogic.DeceleratePlayerSpin(playerState.Spaceship, stepDeltaTime);
+                _playersDecelerationLogic.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
+                _playersDecelerationLogic.DeceleratePlayerSpin(playerState.Spaceship, stepDeltaTime);
                 _playersEngineLogic.TurnOnEngineIfPlayerIdle(playerState.Spaceship);
                 _playersEngineLogic.TryAddEngineForceToPlayer(playerState.Spaceship, stepDeltaTime);
             }

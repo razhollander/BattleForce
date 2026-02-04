@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -69,23 +71,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             if (!isPlayerAlive)
             {
-                playerState.Spaceship.IsAlive = false;
-
-                var shootState = playerState.Spaceship.Shoot;
-                shootState.MaxCooldown *= _gamePlayConfig.ShootCooldownMultiplierWhenDead;
-                playerState.Spaceship.Shoot = shootState;
-
-                _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerId, shootState.MaxCooldown);
-
-                if (!_stageDataService.IsMatchEnded)
-                {
-                    MarkTeamIfLost(playerState.TeamId);
-                    TryInvokeMatchEnded();
-                }
+                KillPlayer(playerState);
             }
         }
 
-        private void MarkTeamIfLost(ushort teamId)
+        private void KillPlayer(PlayerStateS2C playerState)
+        {
+            playerState.Spaceship.IsAlive = false;
+            var shootState = playerState.Spaceship.Shoot;
+            shootState.MaxCooldown *= _gamePlayConfig.ShootCooldownMultiplierWhenDead;
+            playerState.Spaceship.Shoot = shootState;
+            playerState.Spaceship.IsEngineOn = false;
+            playerState.Spaceship.Transform.Velocity = Vector2.Zero;
+            _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerId, shootState.MaxCooldown);
+
+            if (!_stageDataService.IsMatchEnded)
+            {
+                TryAddLosingTeam(playerState.TeamId);
+                TryInvokeMatchEnded();
+            }
+        }
+
+        private void TryAddLosingTeam(ushort teamId)
         {
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {

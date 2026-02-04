@@ -51,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             var cachedCollisions = _physicsSimulator.GetCachedCollisions();
 
-            for (int i = 0; i < cachedCollisions.Count; i++) // this must stay for and not forearch, since if we destroy and object an event 'ContactEnd' will be added
+            for (int i = 0; i < cachedCollisions.Count; i++) // This must stay for and not forearch! since if we destroy and object an event 'ContactEnd' will be added
             {
                 var collisionEvent = cachedCollisions[i];
 

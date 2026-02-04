@@ -38,11 +38,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _healthBar.UpdateBar(health, maxHealth);
         }
 
-        public void HideHealthBar()
-        {
-            _healthBar.gameObject.SetActive(false);
-        }
-
         public void UpdateTalents(PlayerTalentsStateS2C talentsState)
         {
             // Ensure enough views

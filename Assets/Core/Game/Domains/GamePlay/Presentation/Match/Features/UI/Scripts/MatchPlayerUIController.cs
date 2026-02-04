@@ -29,10 +29,5 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             _view.SetHealth(currentHealth, maxHealth);
         }
-
-        public void HideHealthBar()
-        {
-            _view.HideHealthBar();
-        }
     }
 }
