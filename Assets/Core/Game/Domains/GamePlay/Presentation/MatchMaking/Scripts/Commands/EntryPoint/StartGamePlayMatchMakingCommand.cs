@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.T
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatchButton.Scripts.Mvcs;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.MatchMakingUI.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
@@ -25,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
         private IMatchMakingEnvironmentTeamFloorControllers _environmentTeamFloorControllers;
         private IStartMatchButtonController _startMatchButtonController;
         private IStartMatchPacketHandler _startMatchPacketHandler;
+        private IMatchMakingUiController _matchMakingUiController;
 
         public StartGamePlayMatchMakingCommand SetEnterData(GamePlayMatchMakingInitiatorEnterData enterData)
         {
@@ -42,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _environmentTeamFloorControllers = _diContainer.Resolve<IMatchMakingEnvironmentTeamFloorControllers>();
             _startMatchButtonController = _diContainer.Resolve<IStartMatchButtonController>();
             _startMatchPacketHandler = _diContainer.Resolve<IStartMatchPacketHandler>();
+            _matchMakingUiController = _diContainer.Resolve<IMatchMakingUiController>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -54,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _environmentWallsControllers.InitEntryPoint();
             _environmentTeamFloorControllers.InitEntryPoint();
             _startMatchButtonController.InitEntryPoint();
+            _matchMakingUiController.InitEntryPoint();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
+using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.SceneService;
@@ -17,19 +18,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly ISceneLoaderService _sceneLoaderService;
         private readonly IStateMachineService _stateMachineService;
         private readonly IClientNetworkManager _clientNetworkManager;
+        private readonly NetworkConfig _networkConfig;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager)
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, NetworkConfig networkConfig)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
             _stateMachineService = stateMachineService;
             _clientNetworkManager = clientNetworkManager;
+            _networkConfig = networkConfig;
         }
 
         public void InitEntryPoint()
         {
-            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked);
+            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, _networkConfig.OnlyLocal, _networkConfig.IpAddress, _networkConfig.HostPort);
 #if UNITY_SERVER
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             StartServer(cancellationTokenSource).Forget();
@@ -98,7 +101,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         {
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             await LoadMatchMakingScene(cancellationTokenSource);
-            _clientNetworkManager.StartClient(isHost);
+
+            string ip = _uiView.IsLocalHost ? "localhost" : _uiView.IpAddress;
+            int port = _uiView.Port;
+            if (port == 0) port = _networkConfig.HostPort; // Fallback
+
+            _clientNetworkManager.StartClient(isHost, ip, port);
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
 

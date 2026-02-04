@@ -10,9 +10,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
     public interface IClientNetworkManager
     {
         bool IsPeerConnected { get; }
+        bool IsHost { get; }
         int Ping { get; }
         int LocalPeerId { get; }
-        void StartClient(bool isHost);
+        void StartClient(bool isHost, string ipAddress, int port);
         void InitExitPoint();
         
         //void SubscribeReusable<T>(Action<T> onReceive) where T : class, new();
