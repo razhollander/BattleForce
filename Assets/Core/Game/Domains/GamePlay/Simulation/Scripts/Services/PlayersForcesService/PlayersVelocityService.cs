@@ -42,7 +42,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesSe
         public void DeceleratePlayerVelocity(PlayerSpaceshipStateS2C playerSpaceshipState, float deltaTIme)
         {
             var playerMovementSpeed = playerSpaceshipState.Transform.Velocity.Length();
+            if (playerMovementSpeed <= 0.001f)
+            {
+                playerSpaceshipState.Transform.Velocity = Vector2.Zero;
+                return;
+            }
+
             var newSpeed = playerMovementSpeed - _simulationGamePlayConfig.PlayerSpaceship.VelocityDecelerationPerSecond * deltaTIme;
+            if (newSpeed <= 0)
+            {
+                playerSpaceshipState.Transform.Velocity = Vector2.Zero;
+                return;
+            }
+
             playerSpaceshipState.Transform.Velocity = playerSpaceshipState.Transform.Velocity.Normalize() * newSpeed;
         }
     }
