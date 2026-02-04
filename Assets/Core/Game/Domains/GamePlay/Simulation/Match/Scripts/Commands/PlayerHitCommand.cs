@@ -82,7 +82,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             shootState.MaxCooldown *= _gamePlayConfig.ShootCooldownMultiplierWhenDead;
             playerState.Spaceship.Shoot = shootState;
             playerState.Spaceship.IsEngineOn = false;
-            //playerState.Spaceship.Transform.Velocity = Vector2.Zero;
+            playerState.Spaceship.Transform.Velocity = Vector2.Zero;
             _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerId, shootState.MaxCooldown);
 
             if (!_stageDataService.IsMatchEnded)

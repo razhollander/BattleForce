@@ -30,6 +30,11 @@ namespace Core.Scripts.Extensions
 
         public static Vector2 Normalize(this Vector2 v)
         {
+            if (v == Vector2.Zero)
+            {
+                return Vector2.Zero;
+            }
+            
             return Vector2.Normalize(v);
         }
     }
