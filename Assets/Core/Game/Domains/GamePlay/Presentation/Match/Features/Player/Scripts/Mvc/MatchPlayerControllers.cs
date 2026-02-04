@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
@@ -81,6 +82,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public Transform GetPlayerTranform(ushort playerId)
         {
             return GetPlayer(playerId).GetTransform();
+        }
+
+        public void HidePlayerHealthBar(ushort playerId)
+        {
+            LogService.LogError("Set health bar off!");
+            GetPlayer(playerId).HideHealthBar();
         }
     }
 }

@@ -10,6 +10,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public PlayerShootStateS2C Shoot;
         public PlayerHealthS2C Health;
         public PlayerTalentsStateS2C Talents;
+        public bool IsEngineOn;
+        public bool IsAlive = true;
         // public PlayerSpaceshipStateS2C(PlayerTransformStateS2C transform, float shootCooldown, ushort health)
         // {
         //     Transform = transform;

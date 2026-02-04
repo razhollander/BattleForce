@@ -91,5 +91,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             return _playerView.GetTransform();
         }
+
+        public void HideHealthBar()
+        {
+            _playerView.HidePlayerHealthBar();
+        }
     }
 }

@@ -12,7 +12,6 @@ namespace Core.Scripts.Utils.CustomCollections
         // Avoid log spam: log only once per capacity value
         private int _lastLoggedCapacity = -1;
 
-        public CapacityList() => _list = new List<T>();
         public CapacityList(int capacity) => _list = new List<T>(capacity);
 
         // -------------------- List-like API --------------------

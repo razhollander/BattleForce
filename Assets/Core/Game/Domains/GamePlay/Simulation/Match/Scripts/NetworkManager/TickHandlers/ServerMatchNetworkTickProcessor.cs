@@ -12,6 +12,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
@@ -35,12 +36,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
         private readonly ITickService _tickService;
-        private readonly IPlaybackRecorderService _playbackRecorderService;
         private readonly IHeadLessQuitterController _headLessQuitterController;
 
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
+        private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private StepTimersCommand _stepTimersCommand;
         private readonly MatchFullTickPacketS2C _fullTickPacket;
         private StartMatchPacketS2C _startMatchPacket;
@@ -51,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IServerNetworkManager networkManager,
             IMatchPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IPlayeRejoinPacketsHandler iPlayeRejoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory, ITickService tickService, IPlaybackRecorderService playbackRecorderService, IHeadLessQuitterController headLessQuitterController)
+            ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController)
         {
             _networkConfig = networkConfig;
             _sharedGamePlayConfig = sharedGamePlayConfig;
@@ -63,7 +64,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
             _tickService = tickService;
-            _playbackRecorderService = playbackRecorderService;
             _headLessQuitterController = headLessQuitterController;
             _fullTickPacket = new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig);
             _startMatchPacket = new StartMatchPacketS2C();
@@ -75,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
+            _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
             _tickService.RegisterObserver(this);
         }
 
@@ -109,12 +110,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick);
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
-                
-                StepPhysics(stepDeltaTime);
-
-                _processCachedCollisionsCommand.SetProcessedTick(currentTick).Execute();
+                _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
-                
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(currentTick);
                 SendStartMatchToNotAcknowledgedPlayers(currentTick);
@@ -125,13 +122,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 LogService.LogError("Got error! " + e);
                 throw;
             }
-        }
-
-        private void StepPhysics(float stepDeltaTime)
-        {
-            ApplyMatchModelToPhysicsSimulation();
-            _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
-            ApplyPhysicsSimulationToMatchModel();
         }
 
         private void SendStartMatchToNotAcknowledgedPlayers(int processedTick)
@@ -151,32 +141,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _startMatchPacket.InitialState = _matchDataService.SimulationState;
             _startMatchPacket.OccuredOnTick = processedTick;
             _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.StartMatch, _startMatchPacket, DeliveryMethod.Unreliable);
-        }
-
-        private void ApplyPhysicsSimulationToMatchModel()
-        {
-            for (int i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
-            {
-                var playerState = _matchDataService.SimulationState.Players.GetByIndex(i);
-                playerState.Spaceship.Transform.Position = _physicsSimulator.GetPlayer(playerState.Id).Position;
-            }
-
-            for (int i = 0; i < _matchDataService.SimulationState.Bullets.Count; i++)
-            {
-                ref var bulletState = ref _matchDataService.SimulationState.Bullets.GetByIndex(i);
-                bulletState.Position = _physicsSimulator.GetBullet(bulletState.Id).Position;
-            }
-
-            for (int i = 0; i < _matchDataService.SimulationState.PowerUpBalls.Count; i++)
-            {
-                ref var powerUpBallState = ref _matchDataService.SimulationState.PowerUpBalls.GetByIndex(i);
-                powerUpBallState.Position = _physicsSimulator.GetPowerUpBall(powerUpBallState.Id).Position;
-            }
-        }
-
-        private void ApplyMatchModelToPhysicsSimulation()
-        {
-            _physicsSimulator.CopyDataToSimulation(_matchDataService.SimulationState);
         }
 
         private ProcessPlayersInputsResult ProcessPackets(int processedTick)
