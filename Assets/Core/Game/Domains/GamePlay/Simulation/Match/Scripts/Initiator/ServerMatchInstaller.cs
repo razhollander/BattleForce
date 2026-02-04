@@ -32,7 +32,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<IPlayeRejoinPacketsHandler>().To<PlayeRejoinPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IMatchPlayerInputsPacketsHandler>().To<MatchPlayerInputsPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IPlaybackRecorderService>().To<PlaybackRecorderService>().AsSingle().NonLazy();
-            _diContainer.Bind<IPlayersVelocityService>().To<PlayersEngineService>().AsSingle().NonLazy();
+            _diContainer.Bind<IPlayersDecelerationLogic>().To<PlayersDecelerationLogic>().AsSingle().NonLazy();
+            _diContainer.Bind<IPlayersEngineLogic>().To<PlayersEngineLogic>().AsSingle().NonLazy();
         }
 
         public void UninstallBindings() // not sure this is needed

@@ -30,35 +30,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly NetworkConfig _networkConfig;
         private readonly IServerNetworkManager _networkManager;
         private readonly IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
-        private readonly IMatchMakingDataService _matchDataService;
+        private readonly IMatchMakingDataService _matchMakingDataService;
         private readonly IPlayerJoinPacketsHandler _playerJoinPacketsHandler;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IStateMachineService _stateMachineService;
-        private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
         private readonly ITickService _tickService;
         private readonly IStartMatchWallController _startMatchWallController;
         private readonly ISimulationStateMachine _simulationStateMachine;
         private readonly IHeadLessQuitterController _headLessQuitterController;
 
-        private MatchMakingProcessCachedCollisionsCommand _processCachedCollisionsCommand;
         private StepTimersCommand _stepTimersCommand;
+        private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private MatchMakingFullTickPacketS2C _fullTickPacket;
         private Stopwatch _sw;
         private long _last;
 
         public ServerMatchMakingNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
-            IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchMakingDataService matchDataService,
-            IPlayerJoinPacketsHandler playerJoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory, ITickService tickService, IStartMatchWallController startMatchWallController, ISimulationStateMachine simulationStateMachine, IHeadLessQuitterController headLessQuitterController)
+            IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchMakingDataService matchMakingDataService,
+            IPlayerJoinPacketsHandler playerJoinPacketsHandler, INetEventsDataService iNetEventsDataService,
+            ICommandFactory commandFactory, ITickService tickService, IStartMatchWallController startMatchWallController, ISimulationStateMachine simulationStateMachine,
+            IHeadLessQuitterController headLessQuitterController)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _playerInputsPacketsHandler = playerInputsPacketsHandler;
-            _matchDataService = matchDataService;
+            _matchMakingDataService = matchMakingDataService;
             _playerJoinPacketsHandler = playerJoinPacketsHandler;
             _netEventsDataService = iNetEventsDataService;
-            _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
             _tickService = tickService;
             _startMatchWallController = startMatchWallController;
@@ -69,8 +68,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         public void InitEntryPoint()
         {
             _fullTickPacket = new MatchMakingFullTickPacketS2C();
-            _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<MatchMakingProcessCachedCollisionsCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
+            _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
             _tickService.RegisterObserver(this);
         }
 
@@ -104,7 +103,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 var stepDeltaTime = _networkConfig.DeltaTime;
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick);
-                StepPhysics(stepDeltaTime, currentTick);
+                _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute(); 
                 MoveToMatchStateIfCountdownEnded();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(currentTick);
@@ -124,11 +123,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 return;
             }
 
-            var playersData = new SimulationMatchEnterData.PlayerData[_matchDataService.SimulationState.Players.Count];
+            var playersData = new SimulationMatchEnterData.PlayerData[_matchMakingDataService.SimulationState.Players.Count];
 
-            for (int i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
+            for (int i = 0; i < _matchMakingDataService.SimulationState.Players.Count; i++)
             {
-                var playerState = _matchDataService.SimulationState.Players.GetByIndex(i);
+                var playerState = _matchMakingDataService.SimulationState.Players.GetByIndex(i);
                 playersData[i].Id = playerState.Id;
                 playersData[i].TeamId = playerState.TeamId;
                 playersData[i].Name = playerState.Name;
@@ -136,34 +135,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
 
             var matchEnterData = new SimulationMatchEnterData(playersData);
             _simulationStateMachine.ChangeToMatch(matchEnterData);
-        }
-
-        private void StepPhysics(float stepDeltaTime, int processedTick)
-        {
-            ApplyMatchModelToPhysicsSimulation();
-            _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
-            ApplyPhysicsSimulationToMatchModel();
-            _processCachedCollisionsCommand.SetProcessedTick(processedTick).Execute();
-        }
-
-        private void ApplyPhysicsSimulationToMatchModel()
-        {
-            for (int i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
-            {
-                var playerState = _matchDataService.SimulationState.Players.GetByIndex(i);
-                playerState.Spaceship.Transform.Position = _physicsSimulator.GetPlayer(playerState.Id).Position;
-            }
-
-            for (int i = 0; i < _matchDataService.SimulationState.Bullets.Count; i++)
-            {
-                ref var bulletState = ref _matchDataService.SimulationState.Bullets.GetByIndex(i);
-                bulletState.Position = _physicsSimulator.GetBullet(bulletState.Id).Position;
-            }
-        }
-
-        private void ApplyMatchModelToPhysicsSimulation()
-        {
-            _physicsSimulator.CopyDataToSimulation(_matchDataService.SimulationState);
         }
 
         private ProcessPlayersInputsResult ProcessPackets(int processedTick)
@@ -174,7 +145,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
 
         private void RemoveOlderThanTickEventsPerPlayer(CapacityDict<ushort, int> heighestProcessedTickPerPlayer)
         {
-            foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())        
+            foreach (var playerState in _matchMakingDataService.SimulationState.Players.AsSpan())        
             {
                 var playerId = playerState.Id;
 
@@ -187,12 +158,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
 
         private void SendCurrentTickStateToAllClients(int processedTick)
         {
-            if (_matchDataService.SimulationState.Players.Count == 0)
+            if (_matchMakingDataService.SimulationState.Players.Count == 0)
             {
                 return;
             }
 
-            var currentSimulationState = _matchDataService.SimulationState;
+            var currentSimulationState = _matchMakingDataService.SimulationState;
             _fullTickPacket.Tick = processedTick;
             _fullTickPacket.CurrentSimulationState = currentSimulationState;
             //_fullTickPacket.PreviousSimulationState = _matchDataService.PreviousSimulationState;

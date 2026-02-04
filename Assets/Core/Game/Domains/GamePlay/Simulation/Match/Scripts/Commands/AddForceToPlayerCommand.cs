@@ -10,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     public class AddForceToPlayerCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
-        private IPlayersVelocityService _iPlayersVelocityService;
+        private IPlayersDecelerationLogic _iIIPlayersDecelerationLogic;
         private INetEventsDataService _netEventsDataService;
         
         private Vector2 _force;
@@ -38,18 +38,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
-            _iPlayersVelocityService = _diContainer.Resolve<IPlayersVelocityService>();
+            _iIIPlayersDecelerationLogic = _diContainer.Resolve<IPlayersDecelerationLogic>();
             _netEventsDataService  = _diContainer.Resolve<INetEventsDataService>();
         }
 
         public void Execute()
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(_playerId);
-            _iPlayersVelocityService.AddForceToPlayer(playerState.Spaceship, _force, _shouldTurnOffEngine);
+            playerState.Spaceship.Transform.Velocity += _force;
 
             if (_shouldTurnOffEngine)
             {
-                //_netEventsDataService.AddBulletDestroyedNetEvent();
+                playerState.Spaceship.IsEngineOn = false;
             }
         }
     }

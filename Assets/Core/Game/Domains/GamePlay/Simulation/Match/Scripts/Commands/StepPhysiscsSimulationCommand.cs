@@ -11,13 +11,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchDataService _matchDataService;
         private IPhysicsSimulator _physicsSimulator;
         private NetworkConfig _networkConfig;
-        private IPlayersVelocityService _iPlayersVelocityService;
+        private IPlayersDecelerationLogic _iPlayersDecelerationLogic;
+        private IPlayersEngineLogic _playersEngineLogic;
+        private ICommandFactory _commandFactory;
+        
         private float _deltaTime;
+        private int _tick;
+        private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
 
+        public StepPhysiscsSimulationCommand SetTick(int tick)
+        {
+            _tick = tick;
+            return this;
+        }
+        
         public StepPhysiscsSimulationCommand SetDeltaTime(float deltaTime)
         {
             _deltaTime = deltaTime;
-
             return this;
         }
 
@@ -25,8 +35,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
-            _iPlayersVelocityService = _diContainer.Resolve<IPlayersVelocityService>();
+            _iPlayersDecelerationLogic = _diContainer.Resolve<IPlayersDecelerationLogic>();
+            _playersEngineLogic = _diContainer.Resolve<IPlayersEngineLogic>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
         }
 
         public void Execute()
@@ -38,13 +51,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
-                _iPlayersVelocityService.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
-                _iPlayersVelocityService.DeceleratePlayerSpin(playerState.Spaceship, stepDeltaTime);
+                _iPlayersDecelerationLogic.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
+                _iPlayersDecelerationLogic.DeceleratePlayerSpin(playerState.Spaceship, stepDeltaTime);
+                _playersEngineLogic.TurnOnEngineIfPlayerIdle(playerState.Spaceship);
+                _playersEngineLogic.TryAddEngineForceToPlayer(playerState.Spaceship, stepDeltaTime);
             }
-
+            
             ApplyMatchModelToPhysicsSimulation();
             _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
             ApplyPhysicsSimulationToMatchModel();
+            
+            _processCachedCollisionsCommand.SetProcessedTick(_tick).Execute();
         }
 
         private void ApplyMatchModelToPhysicsSimulation()

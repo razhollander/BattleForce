@@ -299,15 +299,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                  playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
             var rotatedVector = playerState.Spaceship.Transform.Direction.Rotate(rotationAngle);
             playerState.Spaceship.Transform.Direction = rotatedVector;
-
-            if (playerState.IsAlive)
-            {
-                playerState.Spaceship.Transform.Velocity = playerState.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
-            }
-            else
-            {
-                playerState.Spaceship.Transform.Velocity = System.Numerics.Vector2.Zero;
-            }
         }
 
         // private Dictionary<ushort, PlayerInputPacketC2S> PopLastInputsOfEachPlayer()

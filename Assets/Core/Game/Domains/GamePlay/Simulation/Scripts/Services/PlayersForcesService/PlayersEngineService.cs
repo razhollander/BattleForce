@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesSe
 
         public void TurnOnEngineIfPlayerIdle(PlayerSpaceshipStateS2C playerSpaceshipState)
         {
-            if (playerSpaceshipState.IsEngineOn)
+            if (playerSpaceshipState.IsEngineOn || !playerSpaceshipState.IsAlive)
             {
                 return;
             }
@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesSe
 
         public void TryAddEngineForceToPlayer(PlayerSpaceshipStateS2C playerSpaceshipState, float deltaTIme)
         {
-            if (!playerSpaceshipState.IsEngineOn)
+            if (!playerSpaceshipState.IsEngineOn || !playerSpaceshipState.IsAlive)
             {
                 return;
             }

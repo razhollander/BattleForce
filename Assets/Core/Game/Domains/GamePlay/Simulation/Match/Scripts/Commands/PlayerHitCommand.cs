@@ -54,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(_playerId);
 
-            if (!playerState.IsAlive)
+            if (!playerState.Spaceship.IsAlive)
             {
                 return;
             }
@@ -69,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             if (!isPlayerAlive)
             {
-                playerState.IsAlive = false;
+                playerState.Spaceship.IsAlive = false;
 
                 var shootState = playerState.Spaceship.Shoot;
                 shootState.MaxCooldown *= _gamePlayConfig.ShootCooldownMultiplierWhenDead;
@@ -89,7 +89,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
-                var isPlayerAliveInTeam = player.TeamId == teamId && player.IsAlive;
+                var isPlayerAliveInTeam = player.TeamId == teamId && player.Spaceship.IsAlive;
                 if (isPlayerAliveInTeam)
                 {
                     return;
@@ -118,7 +118,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             winningTeamId = 0;
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
-                if (!player.IsAlive)
+                if (!player.Spaceship.IsAlive)
                 {
                     continue;
                 }

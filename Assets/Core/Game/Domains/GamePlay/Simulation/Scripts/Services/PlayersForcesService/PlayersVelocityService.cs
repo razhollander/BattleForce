@@ -7,11 +7,11 @@ using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService
 {
-    public class PlayersVelocityService : IPlayersVelocityService
+    public class PlayersDecelerationLogic : IPlayersDecelerationLogic
     {
         private readonly SimulationGamePlayConfig _simulationGamePlayConfig;
 
-        public PlayersVelocityService(SimulationGamePlayConfig simulationGamePlayConfig)
+        public PlayersDecelerationLogic(SimulationGamePlayConfig simulationGamePlayConfig)
         {
             _simulationGamePlayConfig = simulationGamePlayConfig;
         }
