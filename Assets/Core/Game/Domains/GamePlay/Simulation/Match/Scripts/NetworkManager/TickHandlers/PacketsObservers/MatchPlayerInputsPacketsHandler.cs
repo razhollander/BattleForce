@@ -44,7 +44,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly HandleTalentInputPressedCommand _handleTalentInputPressedCommand;
         private readonly IPlayersTalentsManager _playersTalentsManager;
         private readonly IPlaybackRecorderService _recorderService;
-        private readonly IPlayersForcesService _playersForcesService;
+        private readonly IPlayersVelocityService _iPlayersVelocityService;
 
         public bool DidReceiveAnyInputFromPlayer(ushort playerId)
         {
@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService recorderService, IPlayersForcesService playersForcesService)
+            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService recorderService, IPlayersVelocityService iIPlayersVelocityService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -65,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _commandFactory = commandFactory;
             _playersTalentsManager = playersTalentsManager;
             _recorderService = recorderService;
-            _playersForcesService = playersForcesService;
+            _iPlayersVelocityService = iIPlayersVelocityService;
             _handleTalentInputPressedCommand = _commandFactory.CreateCommandVoid<HandleTalentInputPressedCommand>();
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, MatchPlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -131,7 +131,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     LogService.LogTopic($"Didn't find any last cached inputs for player {playerId}!", LogTopicType.ServerNetwork);
                     continue;
                 }
-
+                
                 UpdatePlayerDirection(playerInputPacket, playerState);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
                 UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState);
@@ -293,30 +293,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);
         }
 
-        private void UpdatePlayerDirection(MatchPlayerInputPacketC2S playerInputPacket, PlayerStateS2C playerModel)
+        private void UpdatePlayerDirection(MatchPlayerInputPacketC2S playerInputPacket, PlayerStateS2C playerState)
         {
             var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
-            var forceSpin = _playersForcesService.CalculatePlayerSpin(playerModel.Id);
+            var forceSpin = _iPlayersVelocityService.CalculatePlayerSpin(playerState.Id);
             var rotationAngle =
                 (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
                  playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
 
             rotationAngle += forceSpin * _networkConfig.DeltaTime;
 
-            var rotatedVector = playerModel.Spaceship.Transform.Direction.Rotate(rotationAngle);
-            playerModel.Spaceship.Transform.Direction = rotatedVector;
+            var rotatedVector = playerState.Spaceship.Transform.Direction.Rotate(rotationAngle);
+            playerState.Spaceship.Transform.Direction = rotatedVector;
 
-            var forceVelocity = _playersForcesService.CalculatePlayerVelocity(playerModel.Id);
+            var forceVelocity = _iPlayersVelocityService.CalculatePlayerVelocity(playerState.Id);
             var forceMagnitude = forceVelocity.Length();
             var dampFactor = 1.0f;
             if (forceMagnitude > 0)
             {
                 dampFactor = 1.0f / (1.0f + forceMagnitude * 0.5f);
             }
-            var inputVelocity = playerModel.Spaceship.Transform.Direction * (_gamePlayConfig.PlayerSpaceship.MovementSpeed * dampFactor);
-            var totalVelocity = inputVelocity + forceVelocity;
+            var inputVelocity = playerState.Spaceship.Transform.Direction * (_gamePlayConfig.PlayerSpaceship.TargetMovementSpeed * dampFactor);
+            var totalVelocity = playerState.IsAlive ? inputVelocity + forceVelocity :  System.Numerics.Vector2.Zero;
 
-            _physicsSimulator.SetPlayerVelocity(playerModel.Id, totalVelocity);
+            _physicsSimulator.SetPlayerVelocity(playerState.Id, totalVelocity);
             // playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
         }
 

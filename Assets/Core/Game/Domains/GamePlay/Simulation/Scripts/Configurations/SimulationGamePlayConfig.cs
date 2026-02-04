@@ -11,7 +11,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         [EditableRef] public TalentsConfig Talents;
         [EditableRef] public LavaConfig Lava;
         [EditableRef] public PowerUpsConfig PowerUps;
+        [EditableRef] public PhysicsConfig Physics;
         public int ChosenEnvironmentIndex = 0;
         public ushort StartMatchCountdownDuration = 5;
+        public float ShootCooldownMultiplierWhenDead = 2;
     }
 }

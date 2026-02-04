@@ -107,7 +107,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 var playerTeamId = player.TeamId;
                 
                 var startingDirection = RNG.NextFloat(0, 360).AngleToVector();
-                var velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
+                var velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
                 var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
                 var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
                 var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;

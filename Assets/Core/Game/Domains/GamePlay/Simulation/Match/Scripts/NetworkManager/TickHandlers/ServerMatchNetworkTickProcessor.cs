@@ -36,9 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
         private readonly ITickService _tickService;
-        private readonly IPlaybackRecorderService _playbackRecorderService;
         private readonly IHeadLessQuitterController _headLessQuitterController;
-        private readonly IPlayersForcesService _playersForcesService;
 
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
@@ -53,8 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IServerNetworkManager networkManager,
             IMatchPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IPlayeRejoinPacketsHandler iPlayeRejoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory, ITickService tickService, IPlaybackRecorderService playbackRecorderService, IHeadLessQuitterController headLessQuitterController,
-            IPlayersForcesService playersForcesService)
+            ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController)
         {
             _networkConfig = networkConfig;
             _sharedGamePlayConfig = sharedGamePlayConfig;
@@ -66,9 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
             _tickService = tickService;
-            _playbackRecorderService = playbackRecorderService;
             _headLessQuitterController = headLessQuitterController;
-            _playersForcesService = playersForcesService;
             _fullTickPacket = new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig);
             _startMatchPacket = new StartMatchPacketS2C();
         }
@@ -111,7 +106,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _networkManager.PollEvents();
                 var stepDeltaTime = _networkConfig.DeltaTime;
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
-                _playersForcesService.Tick(stepDeltaTime);
                 var processPlayersInputsResult = ProcessPackets(currentTick);
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
                 
@@ -220,6 +214,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.BulletSpawnNetEvents = _netEventsDataService.BulletSpawnNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerJoinAcceptNetEvents = _netEventsDataService.PlayerRejoinAcceptNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerTakeDamageNetEvents = _netEventsDataService.PlayerTakeDamageNetEventsPerPlayer[playerId];
+                _fullTickPacket.PlayerDiedNetEvents = _netEventsDataService.PlayerDiedNetEventsPerPlayer[playerId];
                 _fullTickPacket.BulletDestroyedNetEvents = _netEventsDataService.BulletDestroyedNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerSwapNetEvents = _netEventsDataService.PlayerSwapNetEventsPerPlayer[playerId];
                 _fullTickPacket.TalentCardObtainedNetEvents = _netEventsDataService.TalentCardObtainedNetEventsPerPlayer[playerId];

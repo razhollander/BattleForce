@@ -7,7 +7,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     public struct PlayerTransformStateS2C : INetSerializable
     {
         public Vector2 Position;
-        // public Vector2 Velocity;
+        public Vector2 Velocity;
         public Vector2 Acceleration;
         public Vector2 Direction;
         public float Radius;
