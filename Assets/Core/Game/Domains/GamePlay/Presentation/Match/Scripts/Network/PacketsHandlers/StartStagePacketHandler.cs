@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
@@ -13,14 +14,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
     {
         private readonly IClientNetworkManager _networkManager;
         private readonly ICommandFactory _commandFactory;
+        private readonly IStageEndedUiController _stageEndedUiController;
         private readonly StartStagePacketS2C _startStagePacket;
 
         public PacketTypeS2C PacketType => PacketTypeS2C.StartStage;
 
-        public StartStagePacketHandler(IClientNetworkManager networkManager, ICommandFactory commandFactory, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public StartStagePacketHandler(IClientNetworkManager networkManager, ICommandFactory commandFactory, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IStageEndedUiController stageEndedUiController)
         {
             _networkManager = networkManager;
             _commandFactory = commandFactory;
+            _stageEndedUiController = stageEndedUiController;
             _startStagePacket = new StartStagePacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
         }
 
@@ -41,6 +44,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
                 .SetSimulationState(_startStagePacket.InitialState)
                 .Execute();
+
+            _stageEndedUiController.Hide();
             LogService.LogError("Stage start received");
         }
     }

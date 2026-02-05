@@ -72,7 +72,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.Transform.Direction = direction;
                 player.Spaceship.Transform.Velocity = velocity;
                 player.Spaceship.Transform.Radius = radius;
-
+                player.Spaceship.IsEngineOn = true;
+                player.Spaceship.IsAlive = true;
+                
                 _physicsSimulator.AddPlayer(player.Id, player.TeamId, position, velocity, radius);
             }
         }
