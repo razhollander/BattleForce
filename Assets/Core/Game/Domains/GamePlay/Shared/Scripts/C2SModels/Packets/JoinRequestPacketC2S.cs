@@ -4,16 +4,16 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 {
     public class JoinRequestPacketC2S : INetSerializable
     {
-        public string UserName { get; set; }
+        public string PlayerName { get; set; }
         
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(UserName);
+            writer.Put(PlayerName);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            UserName = reader.GetString();
+            PlayerName = reader.GetString();
         }
     }
 }

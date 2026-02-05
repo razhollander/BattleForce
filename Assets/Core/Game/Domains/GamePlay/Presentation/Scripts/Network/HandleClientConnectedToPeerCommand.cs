@@ -10,21 +10,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
     {
         private IClientNetworkManager _networkManager;
         private readonly JoinRequestPacketC2S _cachedJoinRequest = new();
-        private string _userName;
+        private string _playerName;
+
+        public HandleClientConnectedToPeerCommand SetPlayerName(string playerName)
+        {
+            _playerName = playerName;
+            return this;
+        }
 
         public override void ResolveDependencies()
         {
             _networkManager = _diContainer.Resolve<IClientNetworkManager>();
         }
 
-        public void SetUserName(string userName)
-        {
-            _userName = userName;
-        }
-
         public void Execute()
         {
-            _cachedJoinRequest.UserName = _userName;
+            _cachedJoinRequest.PlayerName = _playerName;
             _networkManager.SendPacketSerialized(PacketTypeC2S.MatchMakingJoinRequest, _cachedJoinRequest, DeliveryMethod.ReliableOrdered);
         }
     }

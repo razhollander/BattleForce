@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkC2SPacketsSender _packetsSender;
         private readonly GUIStyle _guiStyle;
-        private string _userName;
+        private string _playerName;
         public bool IsPeerConnected { get; private set; }
         public int Ping => _packetsSender.Peer.Ping;
         public int LocalPeerId => _packetsSender.Peer.Id;
@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _guiStyle.normal.textColor = Color.white;
         }
 
-        public void StartClient(string ipAddress, int port, string userName)
+        public void StartClient(string ipAddress, int port, string playerName)
         {
             if (_netManager.IsRunning)
             {
@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 return;
             }
 
-            _userName = userName;
+            _playerName = playerName;
             _updateSubscriptionService.RegisterGuiUpdatable(this);
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Start();
@@ -78,9 +78,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             LogService.LogTopic("Server peer received!", LogTopicType.ClientNetwork);
             _packetsSender.SetPeer(peerToServer);
-            var command = _commandFactory.CreateCommandVoid<HandleClientConnectedToPeerCommand>();
-            command.SetUserName(_userName);
-            command.Execute();
+            _commandFactory.CreateCommandVoid<HandleClientConnectedToPeerCommand>().SetPlayerName(_playerName).Execute();
             IsPeerConnected = true;
         }
 

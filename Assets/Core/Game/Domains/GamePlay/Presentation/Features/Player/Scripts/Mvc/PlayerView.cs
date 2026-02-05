@@ -16,16 +16,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private GameObject _healthBarGameObject; // todo move to the match domain
         [SerializeField] private PlayerLoadingRing _playerLoadingRing;
         [SerializeField] private Transform _spaceShipTransform;
-        [SerializeField] private TextMeshPro _playerNameText;
+        [SerializeField] private TextMeshProUGUI _playerNameText;
 
         public Action Despawn { get; set; }
 
-        public void SetPlayerName(string name)
+        public void SetPlayerName(string playerName)
         {
-            if (_playerNameText != null)
-            {
-                _playerNameText.text = name;
-            }
+            _playerNameText.text = playerName;
         }
 
         public void SetColor(Color color)

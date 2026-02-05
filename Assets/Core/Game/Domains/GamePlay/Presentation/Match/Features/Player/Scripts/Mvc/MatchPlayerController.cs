@@ -29,14 +29,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void CreatePlayerView()
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
+            var playerName = playerModel.PlayerName;
             _playerView = _playerPool.Spawn();
             _playerView.transform.SetParent(_parent);
-            _playerView.name = "Player_" + PlayerId;
-            _playerView.SetPlayerName(playerModel.PlayerName);
+            _playerView.name = "Player_" + PlayerId + "_" + playerName;
+            _playerView.SetPlayerName(playerName);
             var playerTransform = playerModel.Spaceship.Transform;
             _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
+            SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
         }
 
         public void UpdateTransform()
