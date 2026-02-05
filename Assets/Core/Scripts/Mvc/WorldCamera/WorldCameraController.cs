@@ -25,5 +25,11 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             LogService.LogTopic($"Remove camera target {target.gameObject.name}", LogTopicType.Camera);
             _worldCameraView.RemoveTarget(target);
         }
+
+        public void ClearTargets()
+        {
+            LogService.LogTopic("Clear all camera targets", LogTopicType.Camera);
+            _worldCameraView.ClearTargets();
+        }
     }
 }

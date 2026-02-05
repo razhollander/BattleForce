@@ -9,6 +9,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
+using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -28,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private PresentationGamePlayConfig _gameplayConfig;
         private IMatchPlayerControllers _playerControllers;
         private IMatchPlayerUIControllers _playerUIControllers;
+        private IWorldCameraController _worldCameraController;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -49,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _gameplayConfig =_diContainer.Resolve<PresentationGamePlayConfig>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
+            _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
         }
 
         public void Execute()
@@ -59,6 +62,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         private void DestroyAll()
         {
+            _worldCameraController.ClearTargets();
             _matchDataService.ClearAll();
             _bulletControllers.DestroyAll();
             _environmentWallsControllers.DestroyAll();
