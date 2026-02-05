@@ -41,19 +41,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _guiStyle.normal.textColor = Color.white;
         }
 
-        public void StartClient(bool isHost)
+        public void StartClient(string ipAddress, int port)
         {
             if (_netManager.IsRunning)
             {
                 LogService.LogError("Client already running!");
                 return;
             }
+
             _updateSubscriptionService.RegisterGuiUpdatable(this);
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Start();
-            //_packetsListener.RegisterListeners();
-            var ipAddress = isHost || _networkConfig.OnlyLocal ? "localhost" : _networkConfig.IpAddress;
-            var peerToServer = _netManager.Connect(ipAddress, _networkConfig.HostPort, _networkConfig.ConntectionKey);
+            var peerToServer = _netManager.Connect(ipAddress, port, _networkConfig.ConntectionKey);
             _packetsSender.SetPeer(peerToServer);
            // bool canReachServer = CanPing(_networkConfig.IpAddress);
             //Console.WriteLine("Can reach server: " + canReachServer);

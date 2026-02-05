@@ -24,7 +24,8 @@ namespace LiteNetLib
     public static class NetUtils
     {
         private static readonly NetworkSorter NetworkSorter = new NetworkSorter();
-
+        public const string LOCAL_HOST_IP_ADDRESS = "localhost";
+        
         public static IPEndPoint MakeEndPoint(string hostStr, int port)
         {
             return new IPEndPoint(ResolveAddress(hostStr), port);
@@ -32,7 +33,7 @@ namespace LiteNetLib
 
         public static IPAddress ResolveAddress(string hostStr)
         {
-            if(hostStr == "localhost")
+            if(hostStr == LOCAL_HOST_IP_ADDRESS)
                 return IPAddress.Loopback;
 
             if (!IPAddress.TryParse(hostStr, out var ipAddress))
