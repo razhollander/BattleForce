@@ -32,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             _playerView = _playerPool.Spawn();
             _playerView.transform.SetParent(_parent);
             _playerView.name = "Player_" + PlayerId;
+            _playerView.SetPlayerName(playerModel.PlayerName);
             var playerTransform = playerModel.Spaceship.Transform;
             _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),

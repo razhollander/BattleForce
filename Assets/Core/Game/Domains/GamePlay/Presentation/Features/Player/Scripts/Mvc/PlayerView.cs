@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Scripts.Extensions;
@@ -15,8 +16,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private GameObject _healthBarGameObject; // todo move to the match domain
         [SerializeField] private PlayerLoadingRing _playerLoadingRing;
         [SerializeField] private Transform _spaceShipTransform;
+        [SerializeField] private TextMeshProUGUI _playerNameText;
 
         public Action Despawn { get; set; }
+
+        public void SetPlayerName(string playerName)
+        {
+            _playerNameText.text = playerName;
+        }
 
         public void SetColor(Color color)
         {

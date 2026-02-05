@@ -79,11 +79,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             playerState.Spaceship.IsAlive = false;
             var shootState = playerState.Spaceship.Shoot;
+            var isShootOnCooldown = shootState.MaxCooldown > shootState.CooldownSecondsLeft; 
             shootState.MaxCooldown *= _gamePlayConfig.ShootCooldownMultiplierWhenDead;
+
+            if (!isShootOnCooldown)
+            {
+                shootState.CooldownSecondsLeft = shootState.MaxCooldown;
+            }
+            
             playerState.Spaceship.Shoot = shootState;
             playerState.Spaceship.IsEngineOn = false;
             playerState.Spaceship.Transform.Velocity = Vector2.Zero;
-            _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerId, shootState.MaxCooldown);
+            _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerId, shootState.MaxCooldown, shootState.CooldownSecondsLeft);
 
             if (!_stageDataService.IsStageEnded)
             {

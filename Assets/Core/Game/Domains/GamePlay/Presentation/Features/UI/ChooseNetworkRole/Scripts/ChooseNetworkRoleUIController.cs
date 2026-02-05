@@ -103,11 +103,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;
             var port = _uiView.Port;
+            var playerName = _uiView.PlayerName;
             var enterData = new GamePlayMatchMakingInitiatorEnterData(ip, port, isHost);
             await LoadMatchMakingScene(enterData, cancellationTokenSource);
-
-
-            _clientNetworkManager.StartClient(ip, port);
+            _clientNetworkManager.StartClient(ip, port, playerName);
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
 
