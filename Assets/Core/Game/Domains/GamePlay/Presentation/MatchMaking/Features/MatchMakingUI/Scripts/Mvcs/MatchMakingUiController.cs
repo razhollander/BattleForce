@@ -1,6 +1,4 @@
-using System.Net;
-using System.Net.Sockets;
-using UnityEngine;
+using Core.Scripts.Utils;
 
 namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.MatchMakingUI.Scripts.Mvcs
 {
@@ -12,31 +10,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.MatchMaki
         {
             _view = view;
         }
-        
-        private string GetLocalIPAddress()
-        {
-            try
-            {
-                var host = Dns.GetHostEntry(Dns.GetHostName());
-                foreach (var ip in host.AddressList)
-                {
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        return ip.ToString();
-                    }
-                }
-                return "No IPv4 detected";
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError("Error getting local IP: " + e.Message);
-                return "Error";
-            }
-        }
 
         public void InitEntryPoint(string ipAddress, int port, bool isHost)
         {
-            _view.Setup(isHost ? GetLocalIPAddress() : ipAddress, port.ToString());
+            _view.Setup(isHost ? NetworkUtils.GetLocalIPAddress() : ipAddress, port.ToString());
         }
     }
 }
