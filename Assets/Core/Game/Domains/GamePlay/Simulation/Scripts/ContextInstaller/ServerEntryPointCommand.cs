@@ -1,3 +1,5 @@
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -16,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ITickService _tickService;
         private ISimulationPersistentData _simulationPersistentData;
         private IHeadLessQuitterController _headLessQuitterController;
+        private IPlaybackRecorderService _playbackRecorderService;
 
         public override void ResolveDependencies()
         {
@@ -25,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _tickService = _diContainer.Resolve<ITickService>();
             _simulationPersistentData = _diContainer.Resolve<ISimulationPersistentData>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
+            _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
         }
 
         public void Execute()
@@ -32,10 +36,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _serverNetworkManager.InitEntryPoint();
             _physicsSimulator.InitEntryPoint();
             _simulationStateMachine.InitEntryPoint();
-            _simulationStateMachine.ChangeToMatchMaking();
             _tickService.InitEntryPoint();
             _simulationPersistentData.InitEntryPoint();
             _headLessQuitterController.InitEntryPoint();
+
+            if (_playbackRecorderService.IsPlaybackEnabled)
+            {
+                _playbackRecorderService.LoadRecording();
+                var matchEnterData = new SimulationMatchEnterData(_playbackRecorderService.LoadedPlayers, true, "");
+                _simulationStateMachine.ChangeToMatch(matchEnterData);
+            }
+            else
+            {
+                _simulationStateMachine.ChangeToMatchMaking();
+            }
         }
     }
 }

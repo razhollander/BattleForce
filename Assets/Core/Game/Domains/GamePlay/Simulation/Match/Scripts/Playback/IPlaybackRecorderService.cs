@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
 {
@@ -7,7 +8,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
         int Seed { get; }
         int InitialTick { get; }
         bool IsPlaybackEnabled { get; }
-        void StartRecording(int seed);
+        SimulationMatchEnterData.PlayerData[] LoadedPlayers { get; }
+        void SetPlaybackInfo(bool isEnabled, string playbackFileName);
+        void StartRecording(int seed, SimulationMatchEnterData.PlayerData[] players);
         void LoadRecording();
         void InitEntryPoint();
         void InitExitPoint();

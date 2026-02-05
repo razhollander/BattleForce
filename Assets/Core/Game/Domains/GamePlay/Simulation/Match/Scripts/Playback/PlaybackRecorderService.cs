@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions;
 using Core.Scripts.Utils;
@@ -22,33 +24,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
     {
         private readonly ITickService _tickService;
         private readonly IServerNetworkManager _networkManager;
-        private readonly ISimulationPersistentData _simulationPersistentData;
+        private readonly SimulationGamePlayConfig _gamePlayConfig;
         private Dictionary<int, PlaybackTickData> _ticks = new Dictionary<int, PlaybackTickData>();
         private int _seed;
-        private readonly string _jsonFilePath;
-        private readonly string _debugFilePath;
         private int _initialTick;
+        private SimulationMatchEnterData.PlayerData[] _players;
+        private string _playbackFileName;
 
         public int Seed => _seed;
         public int InitialTick => _initialTick;
         public bool IsPlaybackEnabled { get; private set; }
-        public bool IsRecordingEnabled { get; set; }
+        public SimulationMatchEnterData.PlayerData[] LoadedPlayers => _players;
 
-        public PlaybackRecorderService(ITickService tickService, IServerNetworkManager networkManager, ISimulationPersistentData simulationPersistentData)
+        public PlaybackRecorderService(ITickService tickService, IServerNetworkManager networkManager, SimulationGamePlayConfig gamePlayConfig)
         {
             _tickService = tickService;
             _networkManager = networkManager;
-            _simulationPersistentData = simulationPersistentData;
-            var directory = Directory.GetCurrentDirectory() + "/Records";
-            _jsonFilePath = Path.Combine(directory, "playback.json");
-            _debugFilePath = Path.Combine(directory, "playback_debug.json");
-            Directory.CreateDirectory(directory);
+            _gamePlayConfig = gamePlayConfig;
+        }
+
+        public void SetPlaybackInfo(bool isEnabled, string playbackFileName)
+        {
+            IsPlaybackEnabled = isEnabled;
+            _playbackFileName = playbackFileName;
         }
 
         public void InitEntryPoint()
         {
-            IsPlaybackEnabled = _simulationPersistentData.IsPlaybackEnabled;
-
             if (!IsPlaybackEnabled)
             {
                 _networkManager.RegisterPacketsObserver(this);
@@ -64,9 +66,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
             }
         }
 
-        public void StartRecording(int seed)
+        public void StartRecording(int seed, SimulationMatchEnterData.PlayerData[] players)
         {
             _seed = seed;
+            _players = players;
             _ticks.Clear();
             _initialTick = _tickService.CurrentTick;
             LogService.LogTopic($"Started Recording Playback. Seed: {seed}", LogTopicType.ServerNetwork);
@@ -75,7 +78,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
         public void SaveRecording()
         {
             SaveJson();
-            SaveDebugJson();
             LogService.LogError("Saved Records!");
         }
 
@@ -83,16 +85,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
         {
             try
             {
+                var directory = Path.Combine(Directory.GetCurrentDirectory(), "Records");
+                Directory.CreateDirectory(directory);
+
+                var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+                var fileName = $"playback_{timestamp}.json";
+                var filePath = Path.Combine(directory, fileName);
+
                 var fileData = new PlaybackFile
                 {
                     InitialTick = _initialTick,
                     Seed = _seed,
-                    Ticks = _ticks
+                    Ticks = _ticks,
+                    Players = _players
                 };
 
                 string json = JsonConvert.SerializeObject(fileData);
-                File.WriteAllText(_jsonFilePath, json);
-                LogService.LogTopic($"Saved Playback to {_jsonFilePath}", LogTopicType.ServerNetwork);
+                File.WriteAllText(filePath, json);
+                LogService.LogTopic($"Saved Playback to {filePath}", LogTopicType.ServerNetwork);
+
+                ManageSavedPlaybacks(directory);
             }
             catch (Exception e)
             {
@@ -100,84 +112,47 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
             }
         }
 
-        private void SaveDebugJson()
+        private void ManageSavedPlaybacks(string directory)
         {
             try
             {
-                var debugData = new PlaybackDebugData { Seed = _seed , InitialTick = _initialTick};
-                var sortedKeys = new List<int>(_ticks.Keys);
+                var files = Directory.GetFiles(directory, "playback_*.json")
+                    .OrderBy(f => File.GetCreationTime(f))
+                    .ToList();
 
-                foreach (var tick in sortedKeys)
+                while (files.Count > _gamePlayConfig.MaxSavedPlaybacks)
                 {
-                    var tickData = _ticks[tick];
-                    var debugTick = new DebugTickData();
-                    foreach (var packet in tickData.Packets)
-                    {
-                        var debugPacket = new DebugRecordedPacket { PlayerId = packet.PlayerId };
-
-                        // Attempt to deserialize as PlayerInputPacketC2S
-                        // We need to skip the first byte (PacketType)
-                        if (packet.Data.Length > 1)
-                        {
-                            // 0 = PacketType
-                            // Rest is data
-                            // Assuming PacketTypeC2S.PlayerInput (check byte if needed)
-                             // PacketTypeC2S.PlayerInput is likely not 0, need to check enum.
-                             // But regardless, the requirement is to save human readable JSON.
-
-                             NetDataReader reader = new NetDataReader(packet.Data);
-                             var b = reader.GetByte();
-                            
-                             PacketTypeC2S packetType = (PacketTypeC2S) (int) b;
-                            
-                             switch (packetType)
-                             {
-                                 case PacketTypeC2S.MatchPlayerInput: 
-                                     var matchInputPacket = new MatchPlayerInputPacketC2S();
-                                     matchInputPacket.Deserialize(reader);
-                                     debugPacket.PacketData = JsonConvert.SerializeObject(matchInputPacket);
-                                     break;
-                                 case PacketTypeC2S.MatchMakingPlayerInput: 
-                                     var matchMakingInputPacket = new MatchMakingPlayerInputPacketC2S();
-                                     matchMakingInputPacket.Deserialize(reader);
-                                     debugPacket.PacketData = JsonConvert.SerializeObject(matchMakingInputPacket);
-                                     break;
-                                 default: LogService.LogError("packet not recorded of type: " + packetType + ""); break;
-                             }
-                        }
-
-                        debugTick.Packets.Add(debugPacket);
-                    }
-                    debugData.Ticks.Add(debugTick);
+                    File.Delete(files[0]);
+                    files.RemoveAt(0);
                 }
-
-                string json = JsonConvert.SerializeObject(debugData, Formatting.Indented);
-                File.WriteAllText(_debugFilePath, json);
-                LogService.LogTopic($"Saved Debug Playback to {_debugFilePath}", LogTopicType.ServerNetwork);
             }
             catch (Exception e)
             {
-                LogService.LogError($"Failed to save debug playback: {e}");
+                LogService.LogError($"Failed to manage saved playbacks: {e}");
             }
         }
 
         public void LoadRecording()
         {
-            if (!File.Exists(_jsonFilePath))
+            var directory = Path.Combine(Directory.GetCurrentDirectory(), "Records");
+            var filePath = Path.Combine(directory, _playbackFileName);
+
+            if (!File.Exists(filePath))
             {
-                LogService.LogError($"Playback file not found at {_jsonFilePath}");
+                LogService.LogError($"Playback file not found at {filePath}");
                 return;
             }
 
             try
             {
                 _ticks.Clear();
-                string json = File.ReadAllText(_jsonFilePath);
+                string json = File.ReadAllText(filePath);
                 var fileData = JsonConvert.DeserializeObject<PlaybackFile>(json);
                 _seed = fileData.Seed;
                 _ticks = fileData.Ticks;
                 _initialTick = fileData.InitialTick;
-                LogService.LogTopic($"Loaded Playback. Seed: {_seed}, Ticks: {_ticks.Count}", LogTopicType.ServerNetwork);
+                _players = fileData.Players;
+                LogService.LogTopic($"Loaded Playback. Seed: {_seed}, Ticks: {_ticks.Count}, Players: {_players?.Length}", LogTopicType.ServerNetwork);
             }
             catch (Exception e)
             {

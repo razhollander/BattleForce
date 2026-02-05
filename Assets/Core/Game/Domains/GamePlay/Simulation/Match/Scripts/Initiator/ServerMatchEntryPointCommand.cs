@@ -85,7 +85,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             
             if (_playbackRecorderService.IsPlaybackEnabled)
             {
-                _playbackRecorderService.LoadRecording();
                 RNG.Init(_playbackRecorderService.Seed);
                 _tickService.SetCurrentTick(_playbackRecorderService.InitialTick);
             }
@@ -94,7 +93,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 var rnd = new Random();
                 var seed = rnd.Next();
                 RNG.Init(seed);
-                _playbackRecorderService.StartRecording(seed);
+                _playbackRecorderService.StartRecording(seed, _simulationMatchEnterData.Players);
             }
         }
 

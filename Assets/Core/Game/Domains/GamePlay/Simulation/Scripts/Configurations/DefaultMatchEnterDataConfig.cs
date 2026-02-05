@@ -13,6 +13,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
     public class SimulationMatchEnterData
     {
         public PlayerData[] Players;
+        public bool IsPlaybackEnabled;
+        public string PlaybackFileName;
     
         [Serializable]
         public struct PlayerData
@@ -22,9 +24,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
             public ushort TeamId;
         }
 
-        public SimulationMatchEnterData(PlayerData[] players)
+        public SimulationMatchEnterData(PlayerData[] players, bool isPlaybackEnabled = false, string playbackFileName = "")
         {
             Players = players;
+            IsPlaybackEnabled = isPlaybackEnabled;
+            PlaybackFileName = playbackFileName;
         }
     }
 }

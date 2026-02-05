@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
 {
@@ -9,5 +10,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
         public int Seed;
         public int InitialTick;
         public Dictionary<int, PlaybackTickData> Ticks;
+        public SimulationMatchEnterData.PlayerData[] Players;
     }
 }

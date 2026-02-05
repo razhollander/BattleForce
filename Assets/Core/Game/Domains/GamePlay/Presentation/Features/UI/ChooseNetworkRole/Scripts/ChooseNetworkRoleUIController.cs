@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
@@ -33,11 +34,53 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         public void InitEntryPoint()
         {
-            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, _networkConfig.OnlyLocal, _networkConfig.IpAddress, _networkConfig.HostPort);
+            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, _networkConfig.OnlyLocal, _networkConfig.IpAddress, _networkConfig.HostPort);
+            PopulatePlaybacks();
 #if UNITY_SERVER
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             StartServer(cancellationTokenSource).Forget();
 #endif
+        }
+
+        private void PopulatePlaybacks()
+        {
+            var directory = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Records");
+            if (System.IO.Directory.Exists(directory))
+            {
+                var files = System.IO.Directory.GetFiles(directory, "playback_*.json")
+                    .OrderByDescending(f => System.IO.File.GetCreationTime(f))
+                    .Select(System.IO.Path.GetFileName)
+                    .ToList();
+                _uiView.PlaybacksDropdown.ClearOptions();
+                _uiView.PlaybacksDropdown.AddOptions(files);
+            }
+        }
+
+        private void OnPlayPlaybackClicked()
+        {
+            _ = OnPlayPlaybackClickedAsync();
+        }
+
+        private async Awaitable OnPlayPlaybackClickedAsync()
+        {
+            var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
+            var selectedOptionIndex = _uiView.PlaybacksDropdown.value;
+            if (selectedOptionIndex < 0 || selectedOptionIndex >= _uiView.PlaybacksDropdown.options.Count)
+            {
+                return;
+            }
+            var filename = _uiView.PlaybacksDropdown.options[selectedOptionIndex].text;
+
+            try
+            {
+                await StartServer(cancellationTokenSource, true, filename);
+                await StartClient(false, cancellationTokenSource);
+                _uiView.Hide();
+            }
+            catch (Exception e)
+            {
+                LogService.LogException(e);
+            }
         }
 
         private void OnServerClicked()
@@ -89,9 +132,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             }
         }
 
-        private async Awaitable StartServer(CancellationTokenSource cancellationTokenSource)
+        private async Awaitable StartServer(CancellationTokenSource cancellationTokenSource, bool isPlayback = false, string playbackFile = "")
         {
-            var enterData = new ServerInitiatorEnterData();
+            var enterData = new ServerInitiatorEnterData(isPlayback, playbackFile);
             LogService.LogTopic("Starting Server", LogTopicType.ClientNetwork);
             await _sceneLoaderService.TryLoadScene(SceneType.ServerScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.ServerScene, enterData, cancellationTokenSource);

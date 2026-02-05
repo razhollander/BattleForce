@@ -12,8 +12,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
         private NetworkC2SPacketsListener _packetsListener;
         private readonly IPlaybackRecorderService _playbackRecorderService;
         private readonly ITickService _tickService;
+        private NetManager _netManager;
 
-        public int ConnectedPeersCount => 1;
+        public int ConnectedPeersCount => _netManager != null ? _netManager.ConnectedPeersCount : 0;
 
         public NetManagerPlayback(IPlaybackRecorderService playbackRecorderService, ITickService tickService)
         {
@@ -24,22 +25,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
         public void SetPacketsListener(NetworkC2SPacketsListener packetsListener)
         {
             _packetsListener = packetsListener;
+            _netManager = new NetManager(packetsListener) { AutoRecycle = true, BroadcastReceiveEnabled = true, IPv6Enabled = false };
         }
-
-        //public bool IsRunning { get; private set; }
 
         public void Start(int port)
         {
-            //IsRunning = true;
+            _netManager?.Start(port);
         }
 
         public void Stop()
         {
-            //IsRunning = false;
+            _netManager?.Stop();
         }
 
         public void PollEvents()
         {
+            _netManager?.PollEvents();
+
             var packets = _playbackRecorderService.GetPacketsForTick(_tickService.CurrentTick);
 
             if (packets.IsNullOrEmpty())

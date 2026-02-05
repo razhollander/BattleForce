@@ -1,4 +1,5 @@
 using System.Threading;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback;
 using Core.Scripts.Services.ApplicationSubscriptionService;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.CoreInitiator.Base;
@@ -15,16 +16,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private readonly ICommandFactory _commandFactory;
         private readonly ISceneInitiatorsService _sceneInitiatorsService;
         private readonly IApplicationSubscriptionService _applicationSubscriptionService;
+        private readonly IPlaybackRecorderService _playbackRecorderService;
         private readonly ServerEntryPointCommand _serverEntryPointCommand;
         private readonly ServerExitPointCommand _serverExitPointCommand;
 
         public SceneType SceneType => SceneType.ServerScene;
 
-        public ServerInitiator(ICommandFactory commandFactory, ISceneInitiatorsService sceneInitiatorsService, IApplicationSubscriptionService applicationSubscriptionService)
+        public ServerInitiator(ICommandFactory commandFactory, ISceneInitiatorsService sceneInitiatorsService, IApplicationSubscriptionService applicationSubscriptionService, IPlaybackRecorderService playbackRecorderService)
         {
             _commandFactory = commandFactory;
             _sceneInitiatorsService = sceneInitiatorsService;
             _applicationSubscriptionService = applicationSubscriptionService;
+            _playbackRecorderService = playbackRecorderService;
             _applicationSubscriptionService.RegisterObserver(this);
             _sceneInitiatorsService.RegisterInitiator(this);
             _serverEntryPointCommand = _commandFactory.CreateCommandVoid<ServerEntryPointCommand>();
@@ -38,6 +41,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
 
         public Awaitable StartEntryPoint(IInitiatorEnterData enterDataObject, CancellationTokenSource cancellationTokenSource)
         {
+            var serverInitiatorEnterData = (ServerInitiatorEnterData) enterDataObject;
+            if (serverInitiatorEnterData != null)
+            {
+                _playbackRecorderService.SetPlaybackInfo(serverInitiatorEnterData.IsPlaybackEnabled, serverInitiatorEnterData.PlaybackFileName);
+            }
             _serverEntryPointCommand.Execute();
             return AwaitableUtils.CompletedTask;
         }
