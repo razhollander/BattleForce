@@ -10,15 +10,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
     {
         private IClientNetworkManager _networkManager;
         private readonly JoinRequestPacketC2S _cachedJoinRequest = new();
+        private string _userName;
 
         public override void ResolveDependencies()
         {
             _networkManager = _diContainer.Resolve<IClientNetworkManager>();
         }
 
+        public void SetUserName(string userName)
+        {
+            _userName = userName;
+        }
+
         public void Execute()
         {
-            _cachedJoinRequest.UserName = "RazPlayer";
+            _cachedJoinRequest.UserName = _userName;
             _networkManager.SendPacketSerialized(PacketTypeC2S.MatchMakingJoinRequest, _cachedJoinRequest, DeliveryMethod.ReliableOrdered);
         }
     }

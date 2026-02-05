@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         [SerializeField] private Toggle _localHostToggle;
         [SerializeField] private TMP_InputField _ipInputField;
         [SerializeField] private TMP_InputField _portInputField;
+        [SerializeField] private TMP_InputField _userNameInputField;
 
         private Action _onClientClicked;
         private Action _onHostClicked;
@@ -31,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _localHostToggle.isOn = defaultOnlyLocal;
             _ipInputField.text = defaultIp;
             _portInputField.text = defaultPort.ToString();
+            _userNameInputField.text = "Player_" + UnityEngine.Random.Range(1000, 9999);
 
             _localHostToggle.onValueChanged.AddListener(OnLocalHostToggleChanged);
             OnLocalHostToggleChanged(_localHostToggle.isOn);
@@ -43,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         public bool IsLocalHost => _localHostToggle.isOn;
         public string IpAddress => _ipInputField.text;
+        public string UserName => _userNameInputField.text;
 
         public int Port
         {
