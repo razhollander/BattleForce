@@ -146,5 +146,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         {
             LocalPlayer = Players.Find(x => x.PlayerId == playerId);
         }
+
+        public void ClearAll()
+        {
+            Players.Clear();
+            Bullets.Clear();
+            EnvironmentWalls.Clear();
+            EnvironmentLavaWalls.Clear();
+            TalentCards.Clear();
+            PowerUpBalls.Clear();
+        }
     }
 }

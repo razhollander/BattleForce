@@ -27,5 +27,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
             var mesh = MeshUtils.BuildMesh(pointsUnityVector2, 0);
             _wallView.SetMesh(mesh);
         }
+
+        public void Destroy()
+        {
+            Object.Destroy(_wallView.gameObject);
+        }
     }
 }

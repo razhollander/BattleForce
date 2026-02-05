@@ -19,5 +19,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             var teamColor = _gamePlayConfig.ColorPerTeamId[winningTeamId];
             _view.Show(winningTeamId, teamColor, jemsWonPerTeam);
         }
+        
+        public void Hide()
+        {
+            _view.Hide();
+        }
     }
 }

@@ -74,6 +74,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnSpawned()
         {
             gameObject.SetActive(true);
+            SetIsHealthBarShown(true);
         }
 
         public void OnDespawned()
@@ -86,9 +87,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             return _spaceShipTransform;
         }
 
-        public void HidePlayerHealthBar()
+        public void SetIsHealthBarShown(bool isShown)
         {
-            _healthBarGameObject.SetActive(false);
+            _healthBarGameObject.SetActive(isShown);
         }
     }
 }

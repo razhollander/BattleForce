@@ -15,5 +15,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         UnityEngine.Vector2 GetPlayerPosition(ushort playerId);
         Transform GetPlayerTranform(ushort playerId);
         void HidePlayerHealthBar(ushort playerId);
+        void DestroyAll();
     }
 }

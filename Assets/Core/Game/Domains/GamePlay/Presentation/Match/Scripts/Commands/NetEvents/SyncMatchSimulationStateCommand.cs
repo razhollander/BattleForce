@@ -1,8 +1,10 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
@@ -24,6 +26,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private AddMatchPlayerCommand _addMatchPlayerCommand;
         private ICommandFactory _commandFactory;
         private PresentationGamePlayConfig _gameplayConfig;
+        private IMatchPlayerControllers _playerControllers;
+        private IMatchPlayerUIControllers _playerUIControllers;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -43,9 +47,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
             _gameplayConfig =_diContainer.Resolve<PresentationGamePlayConfig>();
+            _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+            _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
         }
 
         public void Execute()
+        {
+            DestroyAll();
+            CreateAll();
+        }
+
+        private void DestroyAll()
+        {
+            _matchDataService.ClearAll();
+            _bulletControllers.DestroyAll();
+            _environmentWallsControllers.DestroyAll();
+            _environmentLavaWallsControllers.DestroyAll();
+            _talentCardControllers.DestroyAll();
+            _powerUpBallControllers.DestroyAll();
+            _playerControllers.DestroyAll();
+            _playerUIControllers.DestroyAll();
+        }
+
+        private void CreateAll()
         {
             CreatePlayers();
             CreateBullets();

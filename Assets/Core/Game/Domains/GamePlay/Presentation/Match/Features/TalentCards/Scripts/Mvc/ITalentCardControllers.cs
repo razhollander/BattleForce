@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scr
         void DisplayTalentCardTakeDamaged(ushort cardId);
         Vector2 GetTalentCardPosition(ushort cardId);
         void DestroyTalentCard(ushort cardId);
+        void DestroyAll();
         void InitEntryPoint();
     }
 }

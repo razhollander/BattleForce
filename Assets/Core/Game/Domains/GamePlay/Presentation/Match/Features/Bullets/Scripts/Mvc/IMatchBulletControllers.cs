@@ -9,5 +9,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts
         void CreateBullet(ushort bulletId, float bulletRadius, Vector2 position, Color color);
         void UpdateBulletsTransform();
         void DestroyBullet(ushort bulletId);
+        void DestroyAll();
     }
 }

@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
         void CreatePowerUpBall(ushort powerUpBallId, Vector2 position);
         Vector2 GetPowerUpBallPosition(ushort powerUpBallId);
         void DestroyPowerUpBall(ushort cardId);
+        void DestroyAll();
         void UpdatePowerUpBallsTransform();
     }
 }
