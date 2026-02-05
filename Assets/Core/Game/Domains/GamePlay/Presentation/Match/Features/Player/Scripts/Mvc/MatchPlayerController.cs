@@ -99,8 +99,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void Destroy()
         {
-            if (_playerView != null)
-                _playerView.Despawn();
+            _playerView.Despawn();
         }
     }
 }

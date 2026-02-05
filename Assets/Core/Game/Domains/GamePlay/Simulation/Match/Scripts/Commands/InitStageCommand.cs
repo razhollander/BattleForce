@@ -7,7 +7,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
-using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateTalentCards();
             ResetPlayers();
 
-            _stageDataService.IsMatchEnded = false;
+            _stageDataService.IsStageEnded = false;
             _stageDataService.StageRestartTimer = -1;
             _stageDataService.ClearData();
         }
@@ -77,7 +77,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
         }
 
-        private Vector2 GetRandomFreePosition(float radius, Vector2 halfSize)
+        private Vector2 GetRandomFreePosition(float radius, Vector2 halfSize) // todo: in each environemnt we should have spawn points, and just choose one of them
         {
              for (int i = 0; i < 100; i++)
              {
@@ -90,6 +90,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                      return pos;
                  }
              }
+             LogService.LogError("No free position found!");
              return Vector2.Zero;
         }
 

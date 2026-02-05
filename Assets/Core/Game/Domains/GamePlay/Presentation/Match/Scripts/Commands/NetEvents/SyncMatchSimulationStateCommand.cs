@@ -53,8 +53,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            _matchDataService.ClearAll();
+            DestroyAll();
+            CreateAll();
+        }
 
+        private void DestroyAll()
+        {
+            _matchDataService.ClearAll();
             _bulletControllers.DestroyAll();
             _environmentWallsControllers.DestroyAll();
             _environmentLavaWallsControllers.DestroyAll();
@@ -62,7 +67,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _powerUpBallControllers.DestroyAll();
             _playerControllers.DestroyAll();
             _playerUIControllers.DestroyAll();
+        }
 
+        private void CreateAll()
+        {
             CreatePlayers();
             CreateBullets();
             CreateWalls();

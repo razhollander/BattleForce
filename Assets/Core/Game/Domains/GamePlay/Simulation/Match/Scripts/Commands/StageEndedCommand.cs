@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, jemsWonPerTeam, jemsPerTeam);
-            _stageDataService.IsMatchEnded = true;
+            _stageDataService.IsStageEnded = true;
             _stageDataService.StageRestartTimer = _config.StageRestartDelaySeconds;
         }
     }

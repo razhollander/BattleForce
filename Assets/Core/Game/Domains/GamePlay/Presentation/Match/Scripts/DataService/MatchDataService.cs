@@ -155,7 +155,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentLavaWalls.Clear();
             TalentCards.Clear();
             PowerUpBalls.Clear();
-            LocalPlayer = null;
         }
     }
 }

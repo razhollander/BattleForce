@@ -85,7 +85,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             playerState.Spaceship.Transform.Velocity = Vector2.Zero;
             _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerId, shootState.MaxCooldown);
 
-            if (!_stageDataService.IsMatchEnded)
+            if (!_stageDataService.IsStageEnded)
             {
                 TryAddLosingTeam(playerState.TeamId);
                 TryInvokeMatchEnded();

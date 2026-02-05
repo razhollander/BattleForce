@@ -8,7 +8,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         private readonly IMatchDataService _matchDataService;
         public Queue<ushort> OrderedTeamIdsLost { get; private set; }
         public ushort WinnerTeamId;
-        public bool IsMatchEnded { get; set; }
+        public bool IsStageEnded { get; set; }
         public float StageRestartTimer { get; set; }
 
         public void ClearData()

@@ -30,8 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
 
         public void Destroy()
         {
-            if (_wallView != null)
-                Object.Destroy(_wallView.gameObject);
+            Object.Destroy(_wallView.gameObject);
         }
     }
 }

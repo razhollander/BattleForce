@@ -29,8 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
 
         public void Destroy()
         {
-            if (_lavaWallView != null)
-                Object.Destroy(_lavaWallView.gameObject);
+            Object.Destroy(_lavaWallView.gameObject);
         }
     }
 }

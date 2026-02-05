@@ -49,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.Rebind<ITickProcessor>().To<ClientMatchNetworkTickProcessor>().AsSingle().NonLazy();
             Container.Bind<IFullTickPacketsHandler>().To<MatchFullTickPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IClientMatchPresentationTickProcessor>().To<ClientMatchPresentationTickProcessor>().AsSingle().NonLazy();
-            Container.Bind<IMatchStartMatchPacketHandler>().To<MatchStartMatchPacketHandler>().AsSingle().NonLazy();
+            Container.Bind<IStartStagePacketHandler>().To<StartStagePacketHandler>().AsSingle().NonLazy();
         }
         
         private void BindControllers()

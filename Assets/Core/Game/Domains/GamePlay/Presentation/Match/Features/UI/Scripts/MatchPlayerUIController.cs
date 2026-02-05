@@ -37,8 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 
         public void Destroy()
         {
-            if (_view != null)
-                Object.Destroy(_view.gameObject);
+            Object.Destroy(_view.gameObject);
         }
     }
 }
