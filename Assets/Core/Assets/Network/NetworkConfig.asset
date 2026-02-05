@@ -42,12 +42,20 @@ MonoBehaviour:
     ConcurrentPowerUpBalls: 32
     PowerUpSpawnedNetEvents: 64
     PowerUpObtainedNetEvents: 64
+    PlayerSwitchTeamNetEvents: 64
+    StartMatchCountdownNetEvents: 32
+    StopMatchCountdownNetEvents: 32
+    ExitMatchMakingNetEvents: 32
+    StartMatchNetEvents: 32
+    StageEndNetEvents: 1
+    PlayerDiedNetEvents: 32
   TicksPerSeconds: 60
   DeltaTime: 0.016666668
   PhysicsVelocityIterations: 8
   PositionIterations: 8
-  ServerTicksBuffer: 2
+  ServerPlayerInputPacketsBuffer: 2
   HostPort: 49153
   IpAddress: 109.67.156.134
   OnlyLocal: 1
   ConntectionKey: BattleForceGame
+  HeadlessQuitTimeoutSeconds: 30

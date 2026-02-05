@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
     {
         List<BulletSpawnNetEventS2C> BulletSpawnNetEvents { get; set; }
         List<PlayerTakeDamageNetEventS2C> PlayerTakeDamageNetEvents { get; set; }
+        List<PlayerDiedNetEventS2C> PlayerDiedNetEvents { get; set; }
         List<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents { get; set; }
         List<PlayersSwapNetEventS2C> PlayerSwapNetEvents { get; set; }
         List<TalentCardObtainedNetEventS2C> TalentCardObtainedNetEvents { get; set; }

@@ -241,7 +241,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             playerModel.Spaceship.Transform.Direction = rotatedVector;
             if (playerInputPacket.IsMoveForwardInputPressed)
             {
-                playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
+                playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
             }
             else
             {

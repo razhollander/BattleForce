@@ -27,5 +27,15 @@ namespace Core.Scripts.Extensions
         {
             return Vector2.Dot(direction, wallNormal) < 0;
         }
+
+        public static Vector2 Normalize(this Vector2 v)
+        {
+            if (v == Vector2.Zero)
+            {
+                return Vector2.Zero;
+            }
+            
+            return Vector2.Normalize(v);
+        }
     }
 }

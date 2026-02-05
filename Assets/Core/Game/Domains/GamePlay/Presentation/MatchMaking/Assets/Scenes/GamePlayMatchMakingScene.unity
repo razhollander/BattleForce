@@ -227,6 +227,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7530288827701495871, guid: 34d62f0acde244a308a235b01cb5acd9, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -237,6 +241,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1807788284632709863, guid: 34d62f0acde244a308a235b01cb5acd9, type: 3}
   m_PrefabInstance: {fileID: 35296558}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &35296560 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 385519898863445788, guid: 34d62f0acde244a308a235b01cb5acd9, type: 3}
+  m_PrefabInstance: {fileID: 35296558}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09f8eaafece94a2289c2ec7781a59d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &892709618
 GameObject:
   m_ObjectHideFlags: 0
@@ -456,6 +471,7 @@ MonoBehaviour:
   _environmentWallViewPrefab: {fileID: 1848450532861189530, guid: 1636cc9bec8694334b3401f1fbe5547b, type: 3}
   _environmentTeamFloorsViewPrefab: {fileID: 1815429953726330736, guid: 447cad66d3cee4b979e9fe455cfe69ae, type: 3}
   _startMatchButtonViewPrefab: {fileID: 1429378958978371035, guid: 25939835ccd504a2baf2eb0978071404, type: 3}
+  _matchMakingUiViewPrefab: {fileID: 35296560}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

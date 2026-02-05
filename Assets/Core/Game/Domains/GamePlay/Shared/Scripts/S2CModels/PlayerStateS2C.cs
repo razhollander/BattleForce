@@ -8,7 +8,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public string Name;
         public PlayerSpaceshipStateS2C Spaceship;
         public ushort TeamId;
-        public bool IsAlive = true;
 
         public PlayerStateS2C(int maxTalents)
         {

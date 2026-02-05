@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private SpriteRenderer _availableBulletSpriteRenderer;
         [SerializeField] private SimpleHealthBar _healthBar; // todo move to the match domain
+        [SerializeField] private GameObject _healthBarGameObject; // todo move to the match domain
         [SerializeField] private PlayerLoadingRing _playerLoadingRing;
         [SerializeField] private Transform _spaceShipTransform;
 
@@ -73,6 +74,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public Transform GetTransform()
         {
             return _spaceShipTransform;
+        }
+
+        public void HidePlayerHealthBar()
+        {
+            _healthBarGameObject.SetActive(false);
         }
     }
 }

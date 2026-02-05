@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -18,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private INetEventsDataService _netEventsDataService;
         private ICommandFactory _commandFactory;
         private IStageDataService _stageDataService;
+        private SimulationGamePlayConfig _gamePlayConfig;
         private int _processedTick;
 
         public PlayerHitCommand SetHitDamage(ushort hitDamage)
@@ -44,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
+            _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             var sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
@@ -51,7 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(_playerId);
 
-            if (!playerState.IsAlive)
+            if (!playerState.Spaceship.IsAlive)
             {
                 return;
             }
@@ -66,20 +71,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             if (!isPlayerAlive)
             {
-                playerState.IsAlive = false;
-                if (!_stageDataService.IsMatchEnded)
-                {
-                    MarkTeamIfLost(playerState.TeamId);
-                    TryInvokeMatchEnded();
-                }
+                KillPlayer(playerState);
             }
         }
 
-        private void MarkTeamIfLost(ushort teamId)
+        private void KillPlayer(PlayerStateS2C playerState)
+        {
+            playerState.Spaceship.IsAlive = false;
+            var shootState = playerState.Spaceship.Shoot;
+            shootState.MaxCooldown *= _gamePlayConfig.ShootCooldownMultiplierWhenDead;
+            playerState.Spaceship.Shoot = shootState;
+            playerState.Spaceship.IsEngineOn = false;
+            playerState.Spaceship.Transform.Velocity = Vector2.Zero;
+            _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerId, shootState.MaxCooldown);
+
+            if (!_stageDataService.IsMatchEnded)
+            {
+                TryAddLosingTeam(playerState.TeamId);
+                TryInvokeMatchEnded();
+            }
+        }
+
+        private void TryAddLosingTeam(ushort teamId)
         {
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
-                var isPlayerAliveInTeam = player.TeamId == teamId && player.IsAlive;
+                var isPlayerAliveInTeam = player.TeamId == teamId && player.Spaceship.IsAlive;
                 if (isPlayerAliveInTeam)
                 {
                     return;
@@ -108,7 +125,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             winningTeamId = 0;
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
-                if (!player.IsAlive)
+                if (!player.Spaceship.IsAlive)
                 {
                     continue;
                 }

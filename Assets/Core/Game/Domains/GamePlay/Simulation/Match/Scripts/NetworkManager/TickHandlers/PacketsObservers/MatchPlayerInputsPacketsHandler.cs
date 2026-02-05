@@ -290,15 +290,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);
         }
 
-        private void UpdatePlayerDirection(MatchPlayerInputPacketC2S playerInputPacket, PlayerStateS2C playerModel)
+        private void UpdatePlayerDirection(MatchPlayerInputPacketC2S playerInputPacket, PlayerStateS2C playerState)
         {
             var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
             var rotationAngle =
                 (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
                  playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
-            var rotatedVector = playerModel.Spaceship.Transform.Direction.Rotate(rotationAngle);
-            playerModel.Spaceship.Transform.Direction = rotatedVector;
-            playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
+            var rotatedVector = playerState.Spaceship.Transform.Direction.Rotate(rotationAngle);
+            playerState.Spaceship.Transform.Direction = rotatedVector;
         }
 
         // private Dictionary<ushort, PlayerInputPacketC2S> PopLastInputsOfEachPlayer()

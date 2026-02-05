@@ -66,7 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
                 var position = GetRandomFreePosition(radius, halfSize);
                 var direction = RNG.NextFloat(0, 360).AngleToVector();
-                var velocity = direction * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
+                var velocity = direction * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
 
                 player.Spaceship.Transform.Position = position;
                 player.Spaceship.Transform.Direction = direction;

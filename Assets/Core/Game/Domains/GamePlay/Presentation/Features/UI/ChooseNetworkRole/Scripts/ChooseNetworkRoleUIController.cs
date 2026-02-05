@@ -3,10 +3,12 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
+using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.SceneService;
 using CoreDomain.Scripts.Services.StateMachineService;
+using LiteNetLib;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.Scripts
@@ -17,19 +19,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly ISceneLoaderService _sceneLoaderService;
         private readonly IStateMachineService _stateMachineService;
         private readonly IClientNetworkManager _clientNetworkManager;
+        private readonly NetworkConfig _networkConfig;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager)
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, NetworkConfig networkConfig)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
             _stateMachineService = stateMachineService;
             _clientNetworkManager = clientNetworkManager;
+            _networkConfig = networkConfig;
         }
 
         public void InitEntryPoint()
         {
-            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked);
+            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, _networkConfig.OnlyLocal, _networkConfig.IpAddress, _networkConfig.HostPort);
 #if UNITY_SERVER
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             StartServer(cancellationTokenSource).Forget();
@@ -97,14 +101,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private async Awaitable StartClient(bool isHost, CancellationTokenSource cancellationTokenSource)
         {
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
-            await LoadMatchMakingScene(cancellationTokenSource);
-            _clientNetworkManager.StartClient(isHost);
+            var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;
+            var port = _uiView.Port;
+            var enterData = new GamePlayMatchMakingInitiatorEnterData(ip, port, isHost);
+            await LoadMatchMakingScene(enterData, cancellationTokenSource);
+
+
+            _clientNetworkManager.StartClient(ip, port);
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
 
-        private async Awaitable LoadMatchMakingScene(CancellationTokenSource cancellationTokenSource)
+        private async Awaitable LoadMatchMakingScene(GamePlayMatchMakingInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
         {
-            var enterData = new GamePlayMatchMakingInitiatorEnterData();
             await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
         }
