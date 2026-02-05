@@ -8,6 +8,7 @@ using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.SceneService;
 using CoreDomain.Scripts.Services.StateMachineService;
+using LiteNetLib;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.Scripts
@@ -100,19 +101,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private async Awaitable StartClient(bool isHost, CancellationTokenSource cancellationTokenSource)
         {
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
-            await LoadMatchMakingScene(cancellationTokenSource);
+            var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;
+            var port = _uiView.Port;
+            var enterData = new GamePlayMatchMakingInitiatorEnterData(ip, port, isHost);
+            await LoadMatchMakingScene(enterData, cancellationTokenSource);
 
-            string ip = _uiView.IsLocalHost ? "localhost" : _uiView.IpAddress;
-            int port = _uiView.Port;
-            if (port == 0) port = _networkConfig.HostPort; // Fallback
 
-            _clientNetworkManager.StartClient(isHost, ip, port);
+            _clientNetworkManager.StartClient(ip, port);
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
 
-        private async Awaitable LoadMatchMakingScene(CancellationTokenSource cancellationTokenSource)
+        private async Awaitable LoadMatchMakingScene(GamePlayMatchMakingInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
         {
-            var enterData = new GamePlayMatchMakingInitiatorEnterData();
             await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
         }

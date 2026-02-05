@@ -2,6 +2,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.MatchMaki
 {
     public interface IMatchMakingUiController
     {
-        void InitEntryPoint();
+        void InitEntryPoint(string ipAddress, int port, bool isHost);
     }
 }

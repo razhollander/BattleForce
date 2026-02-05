@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _environmentWallsControllers.InitEntryPoint();
             _environmentTeamFloorControllers.InitEntryPoint();
             _startMatchButtonController.InitEntryPoint();
-            _matchMakingUiController.InitEntryPoint();
+            _matchMakingUiController.InitEntryPoint(_enterData.IPAddress, _enterData.Port, _enterData.IsHost);
         }
     }
 }

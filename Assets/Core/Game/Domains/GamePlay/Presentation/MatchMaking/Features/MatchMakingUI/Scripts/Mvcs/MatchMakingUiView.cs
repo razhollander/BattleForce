@@ -6,13 +6,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.MatchMaki
     public class MatchMakingUiView : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI _ipAddressText;
+        [SerializeField] private TextMeshProUGUI _portText;
 
-        public void SetIpAddress(string ip)
+        public void Setup(string ipAddress, string port)
         {
-            if (_ipAddressText != null)
-            {
-                _ipAddressText.text = ip;
-            }
+            _ipAddressText.text = "IP Address:" + ipAddress;
+            _portText.text = "Port: "+ port;
         }
     }
 }

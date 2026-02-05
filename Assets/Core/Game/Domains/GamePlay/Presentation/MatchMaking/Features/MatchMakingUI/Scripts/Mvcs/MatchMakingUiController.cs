@@ -1,43 +1,18 @@
 using System.Net;
 using System.Net.Sockets;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.MatchMakingUI.Scripts.Mvcs
 {
     public class MatchMakingUiController : IMatchMakingUiController
     {
-        private readonly MatchMakingUiView _viewPrefab;
-        private readonly IClientNetworkManager _clientNetworkManager;
-        private MatchMakingUiView _view;
+        private readonly MatchMakingUiView _view;
 
-        public MatchMakingUiController(MatchMakingUiView viewPrefab, IClientNetworkManager clientNetworkManager)
+        public MatchMakingUiController(MatchMakingUiView view)
         {
-            _viewPrefab = viewPrefab;
-            _clientNetworkManager = clientNetworkManager;
+            _view = view;
         }
-
-        public void InitEntryPoint()
-        {
-            if (_viewPrefab == null)
-            {
-                Debug.LogWarning("MatchMakingUiView prefab is missing!");
-                return;
-            }
-
-            _view = Object.Instantiate(_viewPrefab);
-
-            if (_clientNetworkManager.IsHost)
-            {
-                string localIP = GetLocalIPAddress();
-                _view.SetIpAddress("Host IP: " + localIP);
-            }
-            else
-            {
-                _view.SetIpAddress("");
-            }
-        }
-
+        
         private string GetLocalIPAddress()
         {
             try
@@ -57,6 +32,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.MatchMaki
                 Debug.LogError("Error getting local IP: " + e.Message);
                 return "Error";
             }
+        }
+
+        public void InitEntryPoint(string ipAddress, int port, bool isHost)
+        {
+            _view.Setup(isHost ? GetLocalIPAddress() : ipAddress, port.ToString());
         }
     }
 }

@@ -20,7 +20,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly NetworkC2SPacketsSender _packetsSender;
         private readonly GUIStyle _guiStyle;
         public bool IsPeerConnected { get; private set; }
-        public bool IsHost { get; private set; }
         public int Ping => _packetsSender.Peer.Ping;
         public int LocalPeerId => _packetsSender.Peer.Id;
 
@@ -42,19 +41,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _guiStyle.normal.textColor = Color.white;
         }
 
-        public void StartClient(bool isHost, string ipAddress, int port)
+        public void StartClient(string ipAddress, int port)
         {
             if (_netManager.IsRunning)
             {
                 LogService.LogError("Client already running!");
                 return;
             }
-            IsHost = isHost;
+
             _updateSubscriptionService.RegisterGuiUpdatable(this);
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Start();
-            //_packetsListener.RegisterListeners();
-            // var ipAddress = isHost || _networkConfig.OnlyLocal ? "localhost" : _networkConfig.IpAddress;
             var peerToServer = _netManager.Connect(ipAddress, port, _networkConfig.ConntectionKey);
             _packetsSender.SetPeer(peerToServer);
            // bool canReachServer = CanPing(_networkConfig.IpAddress);
