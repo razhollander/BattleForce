@@ -104,6 +104,39 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
             
             _stageDataService.AddLosingTeam(teamId);
+
+            // Distribute gems to surviving teams
+            var gemsGainedPerTeam = new Dictionary<ushort, int>();
+            var teamsProcessed = new HashSet<ushort>();
+            teamsProcessed.Add(teamId); // Exclude losing team from gaining gems
+
+            foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                if (teamsProcessed.Contains(player.TeamId))
+                {
+                    continue;
+                }
+
+                // Check if this team is alive (has at least one alive player)
+                bool isTeamAlive = false;
+                foreach (var p in _matchDataService.SimulationState.Players.AsSpan())
+                {
+                    if (p.TeamId == player.TeamId && p.Spaceship.IsAlive)
+                    {
+                        isTeamAlive = true;
+                        break;
+                    }
+                }
+
+                if (isTeamAlive)
+                {
+                    _stageDataService.AddGems(player.TeamId, 1);
+                    gemsGainedPerTeam.Add(player.TeamId, 1);
+                    teamsProcessed.Add(player.TeamId);
+                }
+            }
+
+            _netEventsDataService.AddTeamLostNetEvent(_processedTick, teamId, _stageDataService.GemsPerTeam, gemsGainedPerTeam);
         }
         
         private void TryInvokeMatchEnded()

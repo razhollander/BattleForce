@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.Pools;
+using TMPro;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
@@ -15,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private GameObject _healthBarGameObject; // todo move to the match domain
         [SerializeField] private PlayerLoadingRing _playerLoadingRing;
         [SerializeField] private Transform _spaceShipTransform;
+        [SerializeField] private TextMeshPro _gemGainText;
 
         public Action Despawn { get; set; }
 
@@ -80,6 +83,39 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetIsHealthBarShown(bool isShown)
         {
             _healthBarGameObject.SetActive(isShown);
+        }
+
+        public void ShowGemGain(int amount)
+        {
+            if (_gemGainText != null)
+            {
+                _gemGainText.gameObject.SetActive(true);
+                _gemGainText.text = $"+{amount}";
+                StartCoroutine(AnimateGemGain());
+            }
+        }
+
+        private IEnumerator AnimateGemGain()
+        {
+            float duration = 1.5f;
+            float elapsed = 0f;
+            Vector3 originalPos = _gemGainText.transform.localPosition;
+            Vector3 targetPos = originalPos + Vector3.up * 1f;
+            Color originalColor = _gemGainText.color;
+            Color targetColor = new Color(originalColor.r, originalColor.g, originalColor.b, 0f);
+
+            while (elapsed < duration)
+            {
+                float t = elapsed / duration;
+                _gemGainText.transform.localPosition = Vector3.Lerp(originalPos, targetPos, t);
+                _gemGainText.color = Color.Lerp(originalColor, targetColor, t);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            _gemGainText.gameObject.SetActive(false);
+            _gemGainText.transform.localPosition = originalPos;
+            _gemGainText.color = originalColor;
         }
     }
 }

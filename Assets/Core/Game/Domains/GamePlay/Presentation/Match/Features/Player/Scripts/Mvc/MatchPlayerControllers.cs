@@ -90,6 +90,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetIsHealthBarShown(false);
         }
 
+        public void ShowGemGain(ushort playerId, int amount)
+        {
+            GetPlayer(playerId)?.ShowGemGain(amount);
+        }
+
         public void DestroyAll()
         {
             foreach (var controller in _playerControllers)

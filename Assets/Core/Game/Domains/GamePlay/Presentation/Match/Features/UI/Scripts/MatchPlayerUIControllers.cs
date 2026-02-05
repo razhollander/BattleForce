@@ -35,6 +35,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _playerControllers[playerId].HideHealthBar();
         }
 
+        public void SetPlayerOpacity(ushort playerId, float alpha)
+        {
+            if (_playerControllers.TryGetValue(playerId, out var controller))
+            {
+                controller.SetOpacity(alpha);
+            }
+        }
+
         public void DestroyAll()
         {
             foreach (var controller in _playerControllers.Values)

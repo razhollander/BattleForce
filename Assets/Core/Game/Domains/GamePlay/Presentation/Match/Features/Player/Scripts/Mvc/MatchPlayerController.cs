@@ -97,6 +97,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetIsHealthBarShown(isShown);
         }
 
+        public void ShowGemGain(int amount)
+        {
+            _playerView.ShowGemGain(amount);
+        }
+
         public void Destroy()
         {
             _playerView.Despawn();
