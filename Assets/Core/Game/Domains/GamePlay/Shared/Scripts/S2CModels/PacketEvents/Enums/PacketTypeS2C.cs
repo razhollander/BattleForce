@@ -5,6 +5,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels
         None = 0,
         MatchFullTick = 1,
         MatchMakingFullTick = 2,
-        StartMatch = 3
+        StartMatch = 3,
+        StartStage = 4
     }
 }

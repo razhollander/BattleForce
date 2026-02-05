@@ -1,6 +1,6 @@
 namespace Core.Game.Domains.GamePlay.Shared.ServerToClientModels
 {
-    public class PlayerLeavedPacket
+    public class PlayerLeftPacket
     {
         public byte Id { get; set; }
     }

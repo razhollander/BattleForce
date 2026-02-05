@@ -34,5 +34,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             _playerControllers[playerId].HideHealthBar();
         }
+
+        public void DestroyAll()
+        {
+            foreach (var controller in _playerControllers.Values)
+            {
+                controller.Destroy();
+            }
+            _playerControllers.Clear();
+        }
     }
 }

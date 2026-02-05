@@ -51,6 +51,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scr
             _controllers.Remove(cardController);
         }
 
+        public void DestroyAll()
+        {
+            foreach (var controller in _controllers)
+            {
+                controller.DestroyView();
+            }
+            _controllers.Clear();
+        }
+
         private TalentCardController GetController(ushort cardId)
         {
             return _controllers.Find(x => x.TalentCardId == cardId);

@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
@@ -11,12 +12,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IClientMatchPresentationTickProcessor _clientPresentationTickProcessor;
         private ITickProcessor _tickProcessor;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
+        private IStartStagePacketHandler _startStagePacketHandler;
 
         public override void ResolveDependencies()
         {
             _clientPresentationTickProcessor = _diContainer.Resolve<IClientMatchPresentationTickProcessor>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
+            _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
         }
 
         public void Execute()
@@ -24,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _clientPresentationTickProcessor.InitExitPoint();
             _tickProcessor.StopTick();
             _fullTickPacketsHandler.InitExitPoint();
+            _startStagePacketHandler.InitExitPoint();
         }
     }
 }

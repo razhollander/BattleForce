@@ -30,5 +30,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
             lavaWallController.CreateWallView(_lavaWallViewPrefab, _lavaWallsParent.transform);
             _lavaWallControllers.Add(lavaWallController);
         }
+
+        public void DestroyAll()
+        {
+            foreach (var lavaWallController in _lavaWallControllers)
+            {
+                lavaWallController.Destroy();
+            }
+            _lavaWallControllers.Clear();
+        }
     }
 }

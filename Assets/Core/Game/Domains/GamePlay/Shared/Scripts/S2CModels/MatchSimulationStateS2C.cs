@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
 using LiteNetLib.Utils;
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<PowerUpBallS2C> PowerUpBalls;
         public Dictionary<ushort, int> JemsPerTeamId;
         public int EnvironmentLayoutIndex;
+        public StageType StageType;
 
         public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls)
         {
@@ -61,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
 
             writer.Put((byte)EnvironmentLayoutIndex);
+            writer.Put((byte)StageType);
         }
         
         public void Deserialize(NetDataReader reader)
@@ -107,6 +110,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
 
             EnvironmentLayoutIndex = reader.GetByte();
+            StageType = (StageType)reader.GetByte();
         }
 
         public PlayerStateS2C GetPlayerById(ushort playerId)

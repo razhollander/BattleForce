@@ -8,6 +8,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         void AddLosingTeam(ushort teamId);
         void AddWinnerTeam(ushort teamId);
         Dictionary<ushort, int> GetJemsCollectedPerTeam();
-        bool IsMatchEnded { get; set; }
+        bool IsStageEnded { get; set; }
+        float StageRestartTimer { get; set; }
+        void ClearData();
     }
 }
