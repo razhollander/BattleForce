@@ -37,9 +37,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
         {
             if (_playersInLava.ContainsKey(playerId))
             {
-                var lavaAmountPlayerIsIn = --_playersInLava[playerId].LavaAmountPlayerIsIn;
+                var playerInLavaData = _playersInLava[playerId];
+                var lavaAmountPlayerIsIn = --playerInLavaData.LavaAmountPlayerIsIn;
                 if (lavaAmountPlayerIsIn <= 0)
                 {
+                    playerInLavaData.Reset();
+                    _playerInLavaDataPool.Return(playerInLavaData);
                     _playersInLava.Remove(playerId);
                 }
             }
@@ -74,6 +77,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
             return _cachedPlayersToDamage;
         }
 
+        public void ClearAllData()
+        {
+            foreach (var kvp in _playersInLava)
+            {
+                kvp.Value.Reset();
+                _playerInLavaDataPool.Return(kvp.Value);
+            }
+            
+            _playersInLava.Clear();
+        }
+        
         public void ResetPlayerTimePassedSinceLastDamageTaken(ushort playerId)
         {
             _playersInLava[playerId].TimePassSinceLastDamageTaken = 0;
@@ -83,6 +97,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
         {
             public float TimePassSinceLastDamageTaken;
             public int LavaAmountPlayerIsIn;
+
+            public void Reset()
+            {
+                TimePassSinceLastDamageTaken = 0;
+                LavaAmountPlayerIsIn = 0;
+            }
         }
     }
 }
