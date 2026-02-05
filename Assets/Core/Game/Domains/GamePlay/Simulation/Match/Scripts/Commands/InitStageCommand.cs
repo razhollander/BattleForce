@@ -1,5 +1,6 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -17,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPhysicsSimulator _physicsSimulator;
         private SimulationGamePlayConfig _gamePlayConfig;
         private IStageDataService _stageDataService;
-        private INetEventsDataService _netEventsDataService;
+        private IPlayersInLavaTrackerService _playersInLavaTrackerService;
 
         public override void ResolveDependencies()
         {
@@ -25,13 +26,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
-            _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
+            _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
         }
 
         public void Execute()
         {
             _physicsSimulator.ClearAllData();
-
+            _playersInLavaTrackerService.ClearAllData();
+            
             _matchDataService.SimulationState.Bullets.Clear();
             _matchDataService.SimulationState.PowerUpBalls.Clear();
             _matchDataService.SimulationState.TalentCards.Clear();

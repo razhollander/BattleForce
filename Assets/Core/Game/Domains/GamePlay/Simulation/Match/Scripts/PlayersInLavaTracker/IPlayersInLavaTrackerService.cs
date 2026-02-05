@@ -9,5 +9,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
         void StepTimePassedSinceLastDamageTaken(float deltaTime);
         List<ushort> GetPlayerIdsToDamage();
         void ResetPlayerTimePassedSinceLastDamageTaken(ushort playerId);
+        void ClearAllData();
     }
 }
