@@ -31,5 +31,11 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             LogService.LogTopic("Clear all camera targets", LogTopicType.Camera);
             _worldCameraView.ClearTargets();
         }
+
+        public void ShakeCamera(float intensity, float duration)
+        {
+            LogService.LogTopic($"Shake camera with intensity {intensity} for {duration} seconds", LogTopicType.Camera);
+            _worldCameraView.ShakeCamera(intensity, duration);
+        }
     }
 }
