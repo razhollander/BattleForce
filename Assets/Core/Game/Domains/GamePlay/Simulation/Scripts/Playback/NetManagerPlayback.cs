@@ -5,7 +5,7 @@ using Core.Scripts.Extensions;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 {
     public class NetManagerPlayback : INetManagerWrapper
     {

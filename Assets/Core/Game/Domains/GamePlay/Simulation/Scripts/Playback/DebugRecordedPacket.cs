@@ -1,7 +1,6 @@
 using System;
-using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 {
     [Serializable]
     public class DebugRecordedPacket

@@ -1,24 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Core.Game.Domains.GamePlay.Shared.C2SModels;
-using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions;
-using Core.Scripts.Utils;
-using CoreDomain.Scripts.Services.DataPersistence;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
-using LiteNetLib.Utils;
 using Newtonsoft.Json;
-using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 {
     public class PlaybackRecorderService : IPlaybackRecorderService, IRawPacketsObserver
     {
