@@ -22,10 +22,5 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         {
             _targetGroup.Targets.Clear();
         }
-
-        public void ManualUpdate()
-        {
-            // Cinemachine updates automatically, but we can add manual logic here if needed
-        }
     }
 }
