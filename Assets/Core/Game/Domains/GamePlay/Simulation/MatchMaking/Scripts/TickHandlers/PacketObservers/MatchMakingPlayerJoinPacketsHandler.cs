@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
 
             foreach (var kvp in _playerJoinedPacketsPerPeer)
             {
-                var playerName = kvp.Value.UserName;
+                var playerName = kvp.Value.PlayerName;
                 var playerTeamId = (ushort)(_matchDataService.SimulationState.Players.Count+1);
                 var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerTeamId);
                 var playerId = playerState.Id;
@@ -87,7 +87,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
 
         private void OnJoinReceived(JoinRequestPacketC2S joinRequestPacket, NetPeer peer)
         {
-            LogService.LogTopic("Join packet received: " + joinRequestPacket.UserName, LogTopicType.ServerNetwork);
+            LogService.LogTopic("Join packet received: " + joinRequestPacket.PlayerName, LogTopicType.ServerNetwork);
             _playerJoinedPacketsPerPeer.Add(peer, joinRequestPacket);
         }
 

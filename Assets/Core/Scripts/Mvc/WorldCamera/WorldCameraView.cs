@@ -18,9 +18,9 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             _targetGroup.RemoveMember(target);
         }
 
-        public void ManualUpdate()
+        public void ClearTargets()
         {
-            // Cinemachine updates automatically, but we can add manual logic here if needed
+            _targetGroup.Targets.Clear();
         }
     }
 }

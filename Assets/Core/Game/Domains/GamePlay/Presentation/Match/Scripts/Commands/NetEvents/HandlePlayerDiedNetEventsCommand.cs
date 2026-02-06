@@ -32,7 +32,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var playerDiedEvent in playerDiedEvents)
             {
                 var playerId = playerDiedEvent.PlayerId;
-                _matchDataService.GetPlayer(playerId).Spaceship.Shoot.MaxCooldown = playerDiedEvent.PlayerMaxShootCooldown; 
+                var playerSpaceshipState = _matchDataService.GetPlayer(playerId).Spaceship;
+                playerSpaceshipState.Shoot.MaxCooldown = playerDiedEvent.PlayerMaxShootCooldown; 
+                playerSpaceshipState.Shoot.CooldownSecondsLeft = playerDiedEvent.PlayerShootCooldownSecondsLeft; 
                 _matchPlayerControllers.HidePlayerHealthBar(playerDiedEvent.PlayerId);
             }
 
