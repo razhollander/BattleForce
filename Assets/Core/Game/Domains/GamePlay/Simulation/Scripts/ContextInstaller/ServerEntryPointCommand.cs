@@ -19,6 +19,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ISimulationPersistentData _simulationPersistentData;
         private IHeadLessQuitterController _headLessQuitterController;
         private IPlaybackRecorderService _playbackRecorderService;
+        
+        private ServerInitiatorEnterData _serverInitiatorEnterData;
 
         public override void ResolveDependencies()
         {
@@ -33,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
 
         public void Execute()
         {
+            _playbackRecorderService.SetPlaybackInfo(_serverInitiatorEnterData.IsPlaybackEnabled, _serverInitiatorEnterData.PlaybackFileName);
             _serverNetworkManager.InitEntryPoint();
             _physicsSimulator.InitEntryPoint();
             _simulationStateMachine.InitEntryPoint();
@@ -50,6 +53,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             {
                 _simulationStateMachine.ChangeToMatchMaking();
             }
+        }
+
+        public ServerEntryPointCommand SetEnterData(ServerInitiatorEnterData serverInitiatorEnterData)
+        {
+            _serverInitiatorEnterData = serverInitiatorEnterData;
+            return this;
         }
     }
 }

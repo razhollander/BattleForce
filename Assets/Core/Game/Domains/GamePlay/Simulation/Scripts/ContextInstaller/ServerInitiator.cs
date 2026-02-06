@@ -42,11 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         public Awaitable StartEntryPoint(IInitiatorEnterData enterDataObject, CancellationTokenSource cancellationTokenSource)
         {
             var serverInitiatorEnterData = (ServerInitiatorEnterData) enterDataObject;
-            if (serverInitiatorEnterData != null)
-            {
-                _playbackRecorderService.SetPlaybackInfo(serverInitiatorEnterData.IsPlaybackEnabled, serverInitiatorEnterData.PlaybackFileName);
-            }
-            _serverEntryPointCommand.Execute();
+            _serverEntryPointCommand.SetEnterData(serverInitiatorEnterData).Execute();
             return AwaitableUtils.CompletedTask;
         }
 

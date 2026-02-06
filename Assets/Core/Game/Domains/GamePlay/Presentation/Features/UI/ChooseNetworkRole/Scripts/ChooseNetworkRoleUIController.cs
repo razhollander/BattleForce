@@ -5,7 +5,6 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
 using Core.Scripts.Network;
-using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.SceneService;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -132,9 +131,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             }
         }
 
-        private async Awaitable StartServer(CancellationTokenSource cancellationTokenSource, bool isPlayback = false, string playbackFile = "")
+        private async Awaitable StartServer(CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled = false, string playbackFilePath = "")
         {
-            var enterData = new ServerInitiatorEnterData(isPlayback, playbackFile);
+            var enterData = new ServerInitiatorEnterData(isPlaybackEnabled, playbackFilePath);
             LogService.LogTopic("Starting Server", LogTopicType.ClientNetwork);
             await _sceneLoaderService.TryLoadScene(SceneType.ServerScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.ServerScene, enterData, cancellationTokenSource);
