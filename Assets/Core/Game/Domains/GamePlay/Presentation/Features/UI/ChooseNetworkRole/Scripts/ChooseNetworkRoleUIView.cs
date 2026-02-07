@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             return PlaybacksDropdown.options[selectedOptionIndex].text;
         }
         
-        public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked, Action onPlayPlaybackClicked, bool defaultOnlyLocal, string defaultIp, int defaultPort)
+        public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked, Action onPlayPlaybackClicked, bool defaultOnlyLocal, string defaultIp, int defaultPort, string playerName)
         {
             _onClientClicked = onClientClicked;
             _onHostClicked = onHostClicked;
@@ -45,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _localHostToggle.isOn = defaultOnlyLocal;
             _ipInputField.text = defaultIp;
             _portInputField.text = defaultPort.ToString();
-            _playerNameInputField.text = "Player_" + UnityEngine.Random.Range(1000, 9999);
+            _playerNameInputField.text = playerName;
 
             _localHostToggle.onValueChanged.AddListener(OnLocalHostToggleChanged);
             OnLocalHostToggleChanged(_localHostToggle.isOn);

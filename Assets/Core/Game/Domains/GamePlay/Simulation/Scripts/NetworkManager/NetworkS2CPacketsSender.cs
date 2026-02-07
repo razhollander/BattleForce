@@ -119,7 +119,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         //     _peerPerPlayerId.ForEach(x => x.Value.Send(_writer, deliveryMethod));
 
         // }
-
+        public void RemovePlayerPeer(ushort playerId)
+        {
+            _peerPerPlayerId.Remove(playerId);
+        }
+        
+        public bool IsPlayerConnected(ushort playerId)
+        {
+            return _peerPerPlayerId.ContainsKey(playerId);
+        }
+        
         public int GetPlayerPeerId(ushort playerId)
         {
             return _peerPerPlayerId[playerId].Id;

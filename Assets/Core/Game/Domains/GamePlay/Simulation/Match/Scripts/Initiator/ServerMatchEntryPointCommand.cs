@@ -17,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
 {
     public class ServerMatchEntryPointCommand : BaseCommand,ICommandVoid
     {
-        private IPlayeRejoinPacketsHandler _playeRejoinPacketsHandler;
+        private IMatchPlayerJoinPacketsHandler _matchPlayerJoinPacketsHandler;
         private ITickProcessor _tickProcessor;
         private IMatchPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private IPhysicsSimulator _physicsSimulator;
@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
 
         public override void ResolveDependencies()
         {
-            _playeRejoinPacketsHandler = _diContainer.Resolve<IPlayeRejoinPacketsHandler>();
+            _matchPlayerJoinPacketsHandler = _diContainer.Resolve<IMatchPlayerJoinPacketsHandler>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _playerInputsPacketsHandler = _diContainer.Resolve<IMatchPlayerInputsPacketsHandler>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
@@ -62,7 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             InitTickService();
             _matchDataService.InitEntryPoint();
             _playerInputsPacketsHandler.InitEntryPoint();
-            _playeRejoinPacketsHandler.InitEntryPoint();
+            _matchPlayerJoinPacketsHandler.InitEntryPoint();
 
             InitPlayers(_simulationMatchEnterData);
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
@@ -123,7 +123,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
                 var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
                 var position = Vector2.Zero;
-                _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown);
+                var isPlayerConnected = _networkManager.IsPlayerPeerConencted(playerId);
+                _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown, isPlayerConnected);
                 _playersTalentsManager.AddPlayer(playerId);
             }
         }

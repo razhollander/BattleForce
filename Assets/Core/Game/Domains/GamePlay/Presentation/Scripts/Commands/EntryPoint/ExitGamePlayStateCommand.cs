@@ -1,6 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint

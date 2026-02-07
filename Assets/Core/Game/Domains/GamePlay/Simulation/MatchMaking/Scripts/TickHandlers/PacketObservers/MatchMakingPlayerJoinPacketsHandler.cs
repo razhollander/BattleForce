@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
         private readonly ConcurrentPool<JoinRequestPacketC2S> _joinedRequestPacketsPool;
         private readonly ConcurrentPool<JoinResponsePacketS2C> _joinedResponsePacketsPool;
         private readonly NetworkConfig _networkConfig;
-        public PacketTypeC2S PacketType => PacketTypeC2S.MatchMakingJoinRequest;
+        public PacketTypeC2S PacketType => PacketTypeC2S.JoinRequest;
 
         public MatchMakingPlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,

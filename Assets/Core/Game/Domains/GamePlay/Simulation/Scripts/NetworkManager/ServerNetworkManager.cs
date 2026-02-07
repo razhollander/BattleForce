@@ -103,6 +103,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _packetsSender.AddPlayerPeer(playerId, peer);
         }
 
+        public void RemovePlayerPeer(ushort playerId)
+        {
+            _packetsSender.RemovePlayerPeer(playerId);
+        }
+
         public void PollEvents()
         {
             _netManager.PollEvents();
@@ -111,6 +116,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public int GetPlayerPeerId(ushort playerId)
         {
             return _packetsSender.GetPlayerPeerId(playerId);
+        }  
+        
+        public bool IsPlayerPeerConencted(ushort playerId)
+        {
+            return _packetsSender.IsPlayerConnected(playerId);
         }
 
         public void RegisterPacketsObserver(IPacketsObserver packetsObserver)

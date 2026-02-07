@@ -81,7 +81,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             LogService.LogTopic("Server peer received!", LogTopicType.ClientNetwork);
             _packetsSender.SetPeer(peerToServer);
-            _commandFactory.CreateCommandVoid<HandleClientConnectedToPeerCommand>().SetPlayerName(_playerName).Execute();
             IsPeerConnected = true;
         }
 

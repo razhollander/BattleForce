@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IServerNetworkManager _networkManager;
         private readonly IMatchPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private readonly IMatchDataService _matchDataService;
-        private readonly IPlayeRejoinPacketsHandler _playeRejoinPacketsHandler;
+        private readonly IMatchPlayerJoinPacketsHandler _matchPlayerJoinPacketsHandler;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IStateMachineService _stateMachineService;
         private readonly IPhysicsSimulator _physicsSimulator;
@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IServerNetworkManager networkManager,
             IMatchPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
-            IPlayeRejoinPacketsHandler iPlayeRejoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
+            IMatchPlayerJoinPacketsHandler iIMatchPlayerJoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
             ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController, IStageDataService stageDataService)
         {
             _networkConfig = networkConfig;
@@ -61,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _networkManager = networkManager;
             _playerInputsPacketsHandler = playerInputsPacketsHandler;
             _matchDataService = matchDataService;
-            _playeRejoinPacketsHandler = iPlayeRejoinPacketsHandler;
+            _matchPlayerJoinPacketsHandler = iIMatchPlayerJoinPacketsHandler;
             _netEventsDataService = iNetEventsDataService;
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
@@ -160,7 +160,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
                 var didPlayerAcknowledgeMatch = _playerInputsPacketsHandler.DidReceiveAnyInputFromPlayer(playerState.Id);
-                if (!didPlayerAcknowledgeMatch)
+                if (!didPlayerAcknowledgeMatch && playerState.IsConnected)
                 {
                     SendStartMatchPacketToClient(playerState.Id, processedTick, DeliveryMethod.Unreliable);
                 }
@@ -176,7 +176,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         private ProcessPlayersInputsResult ProcessPackets(int processedTick)
         {
-            _playeRejoinPacketsHandler.ProcessPlayersRejoined(processedTick);
+            _matchPlayerJoinPacketsHandler.ProcessPlayersJoined(processedTick);
             return _playerInputsPacketsHandler.ProcessInputs(processedTick);
         }
 
@@ -206,6 +206,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             //_fullTickPacket.PreviousSimulationState = _matchDataService.PreviousSimulationState;
             foreach (var playerState in currentSimulationState.Players.AsSpan())
             {
+                if (!playerState.IsConnected)
+                {
+                    return;
+                }
+                
                 var playerId = playerState.Id;
                 _fullTickPacket.BulletSpawnNetEvents = _netEventsDataService.BulletSpawnNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerJoinAcceptNetEvents = _netEventsDataService.PlayerRejoinAcceptNetEventsPerPlayer[playerId];

@@ -7,7 +7,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
 {
     public class ServerMatchExitPointCommand: BaseCommand, ICommandVoid
     {
-        private IPlayeRejoinPacketsHandler _playeRejoinPacketsHandler;
+        private IMatchPlayerJoinPacketsHandler _matchPlayerJoinPacketsHandler;
         private ITickProcessor _tickProcessor;
         private IMatchPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private IPlaybackRecorderService _playbackRecorderService;
@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         public override void ResolveDependencies()
         {
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
-            _playeRejoinPacketsHandler = _diContainer.Resolve<IPlayeRejoinPacketsHandler>();
+            _matchPlayerJoinPacketsHandler = _diContainer.Resolve<IMatchPlayerJoinPacketsHandler>();
             _playerInputsPacketsHandler = _diContainer.Resolve<IMatchPlayerInputsPacketsHandler>();
             _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
         }
@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             {
                 _playbackRecorderService.StopRecording();
             }
-            _playeRejoinPacketsHandler.InitExitPoint();
+            _matchPlayerJoinPacketsHandler.InitExitPoint();
             _tickProcessor.InitExitPoint();
             _playerInputsPacketsHandler.InitExitPoint();
         }

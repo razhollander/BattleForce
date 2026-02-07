@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
@@ -19,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ISimulationPersistentData _simulationPersistentData;
         private IHeadLessQuitterController _headLessQuitterController;
         private IPlaybackRecorderService _playbackRecorderService;
+        private DefaultMatchEnterDataConfig _defaultMatchEnterDataConfig;
         
         private ServerInitiatorEnterData _serverInitiatorEnterData;
 
@@ -31,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _simulationPersistentData = _diContainer.Resolve<ISimulationPersistentData>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
             _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
+            _defaultMatchEnterDataConfig = _diContainer.Resolve<DefaultMatchEnterDataConfig>();
         }
 
         public void Execute()
@@ -47,6 +50,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             {
                 var matchEnterData = new SimulationMatchEnterData(_playbackRecorderService.Players);
                 _simulationStateMachine.ChangeToMatch(matchEnterData);
+            }
+            else if (PlayerPrefsSettings.ShouldSkipMatchMaking)
+            {
+                _simulationStateMachine.ChangeToMatch(_defaultMatchEnterDataConfig.DefaultSimulationMatchEnterData);
             }
             else
             {
