@@ -1,8 +1,11 @@
 using System;
 using System.Linq;
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -20,15 +23,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly IStateMachineService _stateMachineService;
         private readonly IClientNetworkManager _clientNetworkManager;
         private readonly NetworkConfig _networkConfig;
+        private readonly IPlaybackIOService _playbackIOService;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, NetworkConfig networkConfig)
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, NetworkConfig networkConfig, IPlaybackIOService playbackIOService)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
             _stateMachineService = stateMachineService;
             _clientNetworkManager = clientNetworkManager;
             _networkConfig = networkConfig;
+            _playbackIOService = playbackIOService;
         }
 
         public void InitEntryPoint()
@@ -73,7 +78,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             try
             {
                 await StartServer(cancellationTokenSource, true, filename);
-                await StartClient(false, cancellationTokenSource);
+                await StartClient(true, cancellationTokenSource, true, filename);
                 _uiView.Hide();
             }
             catch (Exception e)
@@ -118,7 +123,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             try
             {
                 await StartServer(cancellationTokenSource);
-                await StartClient(true, cancellationTokenSource);
+                await StartClient(true, cancellationTokenSource, false);
                 _uiView.Hide();
             }
             catch (OperationCanceledException)
@@ -131,7 +136,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             }
         }
 
-        private async Awaitable StartServer(CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled = false, string playbackFilePath = "")
+        private async Awaitable StartServer(CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled, string playbackFilePath = "")
         {
             var enterData = new ServerInitiatorEnterData(isPlaybackEnabled, playbackFilePath);
             LogService.LogTopic("Starting Server", LogTopicType.ClientNetwork);
@@ -140,14 +145,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             LogService.LogTopic("Finished starting Server", LogTopicType.ClientNetwork);
         }
         
-        private async Awaitable StartClient(bool isHost, CancellationTokenSource cancellationTokenSource)
+        private async Awaitable StartClient(bool isHost, CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled, string playbackFilePath = "")
         {
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;
             var port = _uiView.Port;
             var playerName = _uiView.PlayerName;
-            var enterData = new GamePlayMatchMakingInitiatorEnterData(ip, port, isHost);
-            await LoadMatchMakingScene(enterData, cancellationTokenSource);
+
+            if (isPlaybackEnabled && _playbackIOService.TryGetPlayback(playbackFilePath, out var playbackFile))
+            {
+                var InitialState = playbackFile.InitialSimulationState;
+                var enterData = new GamePlayMatchInitiatorEnterData(InitialState, InitialState.Players[0].Id);
+                await LoadMatchScene(enterData, cancellationTokenSource);
+            }
+            else
+            {
+                var enterData = new GamePlayMatchMakingInitiatorEnterData(ip, port, isHost);
+                await LoadMatchMakingScene(enterData, cancellationTokenSource);
+            }
+            
             _clientNetworkManager.StartClient(ip, port, playerName);
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
@@ -156,6 +172,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         {
             await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
+        }  
+        
+        private async Awaitable LoadMatchScene(GamePlayMatchInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
+        {
+            await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchScene, enterData, cancellationTokenSource);
+            await _sceneLoaderService.StartScene(SceneType.GamePlayMatchScene, enterData, cancellationTokenSource);
         }
 
         private void OnClientClicked()

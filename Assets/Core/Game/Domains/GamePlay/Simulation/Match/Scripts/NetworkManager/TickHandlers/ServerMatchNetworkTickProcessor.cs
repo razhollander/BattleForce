@@ -45,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private StepTimersCommand _stepTimersCommand;
         private readonly MatchFullTickPacketS2C _fullTickPacket;
-        private StartMatchPacketS2C _startMatchPacket;
+        private StartMatchPacketS2C _cachedStartMatchPacket;
         private StartStagePacketS2C _startStagePacket;
         //private TimerFixedThreaded2 _pollEventsFixedTimer;
         private Stopwatch _sw;
@@ -69,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _headLessQuitterController = headLessQuitterController;
             _stageDataService = stageDataService;
             _fullTickPacket = new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig);
-            _startMatchPacket = new StartMatchPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
+            _cachedStartMatchPacket = new StartMatchPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
             _startStagePacket = new StartStagePacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
         }
 
@@ -169,9 +169,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         private void SendStartMatchPacketToClient(ushort playerId, int processedTick, DeliveryMethod deliveryMethod)
         {
-            _startMatchPacket.InitialState = _matchDataService.SimulationState;
-            _startMatchPacket.OccuredOnTick = processedTick;
-            _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.StartMatch, _startMatchPacket, deliveryMethod);
+            _cachedStartMatchPacket.InitialState = _matchDataService.SimulationState;
+            _cachedStartMatchPacket.OccuredOnTick = processedTick;
+            _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.StartMatch, _cachedStartMatchPacket, deliveryMethod);
         }
 
         private ProcessPlayersInputsResult ProcessPackets(int processedTick)

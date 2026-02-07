@@ -58,7 +58,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
 
         public void Execute()
         {
-            InitPlaybackAndRNG();
+            InitRNG();
+            InitTickService();
             _matchDataService.InitEntryPoint();
             _playerInputsPacketsHandler.InitEntryPoint();
             _playeRejoinPacketsHandler.InitEntryPoint();
@@ -71,37 +72,48 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _tickProcessor.InitEntryPoint();
         }
 
-        private void TrySwitchToPlayback()
+        private void InitRNG()
         {
-            if (_playbackRecorderService.IsPlaybackEnabled)
-            {
-                _networkManager.SwitchToNetManager(new NetManagerPlayback(_playbackRecorderService, _tickService));
-            }
-        }
-
-        private void InitPlaybackAndRNG()
-        {
-            _playbackRecorderService.InitEntryPoint();
-            
             if (_playbackRecorderService.IsPlaybackEnabled)
             {
                 RNG.Init(_playbackRecorderService.Seed);
-                _tickService.SetCurrentTick(_playbackRecorderService.InitialTick);
             }
             else
             {
                 var rnd = new Random();
                 var seed = rnd.Next();
                 RNG.Init(seed);
-                _playbackRecorderService.StartRecording(seed, _simulationMatchEnterData.Players);
+            }
+        }
+
+        private void InitTickService()
+        {
+            if (_playbackRecorderService.IsPlaybackEnabled)
+            {
+                _tickService.SetCurrentTick(_playbackRecorderService.InitialTick);
+            }
+        }
+
+        private void TrySwitchToPlayback()
+        {
+            if (_playbackRecorderService.IsPlaybackEnabled)
+            {
+                _networkManager.SwitchToNetManager(new NetManagerPlayback(_playbackRecorderService, _tickService));
+            }
+            else
+            {
+                var simulationState = _matchDataService.SimulationState.DeepClone();
+                _playbackRecorderService.StartRecording(RNG.Seed, simulationState);
             }
         }
 
         private void InitPlayers(SimulationMatchEnterData simulationMatchEnterData)
         {
-            for (var i = 0; i < simulationMatchEnterData.Players.Length; i++)
+            var playerDatas = simulationMatchEnterData.Players;
+
+            for (var i = 0; i < playerDatas.Length; i++)
             {
-                var player = simulationMatchEnterData.Players[i];
+                var player = playerDatas[i];
                 var playerId = player.Id;
                 var playerName = player.Name;
                 var playerTeamId = player.TeamId;

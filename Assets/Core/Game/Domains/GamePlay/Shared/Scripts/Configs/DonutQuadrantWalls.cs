@@ -36,18 +36,18 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             ushort nextId = 1;
             var result = new Dictionary<ushort, WallConfig[]>();
 
-            foreach (var q in quadrants)
+            foreach (var quadrant in quadrants)
             {
                 // Convex quads per segment
                 var walls = BuildConvexRingSectorQuads(
-                    startDeg: q.StartDeg,
-                    endDeg: q.EndDeg,
+                    startDeg: quadrant.StartDeg,
+                    endDeg: quadrant.EndDeg,
                     outerRadius: outerRadius,
                     innerRadius: innerRadius,
                     segments: precision,
                     ref nextId);
 
-                result[q.TeamId] = walls.ToArray();
+                result[quadrant.TeamId] = walls.ToArray();
             }
 
             return result;

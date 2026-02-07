@@ -25,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         public void Execute()
         {
+            if()
             _cachedJoinRequest.PlayerName = _playerName;
             _networkManager.SendPacketSerialized(PacketTypeC2S.MatchMakingJoinRequest, _cachedJoinRequest, DeliveryMethod.ReliableOrdered);
         }

@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
 
         public void Execute()
         {
-            _playbackRecorderService.SetPlaybackInfo(_serverInitiatorEnterData.IsPlaybackEnabled, _serverInitiatorEnterData.PlaybackFileName);
+            _playbackRecorderService.InitEntryPoint(_serverInitiatorEnterData.IsPlaybackEnabled, _serverInitiatorEnterData.PlaybackFileName);
             _serverNetworkManager.InitEntryPoint();
             _physicsSimulator.InitEntryPoint();
             _simulationStateMachine.InitEntryPoint();
@@ -45,8 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
 
             if (_playbackRecorderService.IsPlaybackEnabled)
             {
-                _playbackRecorderService.LoadRecording();
-                var matchEnterData = new SimulationMatchEnterData(_playbackRecorderService.LoadedPlayers, true, "");
+                var matchEnterData = new SimulationMatchEnterData(_playbackRecorderService.LoadedPlayers);
                 _simulationStateMachine.ChangeToMatch(matchEnterData);
             }
             else

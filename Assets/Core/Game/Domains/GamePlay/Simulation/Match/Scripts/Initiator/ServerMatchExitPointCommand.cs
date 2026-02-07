@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         {
             if (!_playbackRecorderService.IsPlaybackEnabled)
             {
-                _playbackRecorderService.InitExitPoint();
+                _playbackRecorderService.StopRecording();
             }
             _playeRejoinPacketsHandler.InitExitPoint();
             _tickProcessor.InitExitPoint();

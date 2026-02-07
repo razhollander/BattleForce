@@ -53,11 +53,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _startMatchPacketHandler.InitEntryPoint();
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
-            _tickProcessor.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
             _environmentTeamFloorControllers.InitEntryPoint();
             _startMatchButtonController.InitEntryPoint();
             _matchMakingUiController.InitEntryPoint(_enterData.IPAddress, _enterData.Port, _enterData.IsHost);
+            _tickProcessor.InitEntryPoint();
         }
     }
 }

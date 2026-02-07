@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
@@ -17,139 +19,80 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
         private readonly ITickService _tickService;
         private readonly IServerNetworkManager _networkManager;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly IPlaybackIOService _playbackIOService;
         private Dictionary<int, PlaybackTickData> _ticks = new Dictionary<int, PlaybackTickData>();
         private int _seed;
         private int _initialTick;
-        private SimulationMatchEnterData.PlayerData[] _players;
-        private string _playbackFileName;
+        
+        public MatchSimulationStateS2C InitialSimulationState { get; private set; }
+
+        public SimulationMatchEnterData.PlayerData[] LoadedPlayers
+        {
+            get
+            {
+                var playersData = new SimulationMatchEnterData.PlayerData[InitialSimulationState.Players.Count];
+
+                for (int i = 0; i < InitialSimulationState.Players.Count; i++)
+                {
+                    var playerState = InitialSimulationState.Players.GetByIndex(i);
+                    playersData[i].Id = playerState.Id;
+                    playersData[i].TeamId = playerState.TeamId;
+                    playersData[i].Name = playerState.Name;
+                }
+
+                return playersData;
+            }
+        }
 
         public int Seed => _seed;
         public int InitialTick => _initialTick;
         public bool IsPlaybackEnabled { get; private set; }
-        public SimulationMatchEnterData.PlayerData[] LoadedPlayers => _players;
 
-        public PlaybackRecorderService(ITickService tickService, IServerNetworkManager networkManager, SimulationGamePlayConfig gamePlayConfig)
+        public PlaybackRecorderService(ITickService tickService, IServerNetworkManager networkManager, SimulationGamePlayConfig gamePlayConfig, IPlaybackIOService playbackIOService)
         {
             _tickService = tickService;
             _networkManager = networkManager;
             _gamePlayConfig = gamePlayConfig;
+            _playbackIOService = playbackIOService;
         }
 
-        public void SetPlaybackInfo(bool isEnabled, string playbackFileName)
+        public void InitEntryPoint(bool isEnabled, string playbackFileName)
         {
             IsPlaybackEnabled = isEnabled;
-            _playbackFileName = playbackFileName;
-        }
 
-        public void InitEntryPoint()
-        {
-            if (!IsPlaybackEnabled)
+            if (IsPlaybackEnabled && _playbackIOService.TryGetPlayback(playbackFileName, out var playbackFile))
             {
-                _networkManager.RegisterPacketsObserver(this);
+                LoadPlayback(playbackFile);
             }
         }
 
-        public void InitExitPoint()
+        public void StopRecording()
         {
-            if (!IsPlaybackEnabled)
-            {
-                _networkManager.UnregisterPacketsObserver(this);
-                SaveRecording();
-            }
+            _networkManager.UnregisterPacketsObserver(this);
+            SaveRecording();
         }
 
-        public void StartRecording(int seed, SimulationMatchEnterData.PlayerData[] players)
+        public void StartRecording(int seed, MatchSimulationStateS2C initialSimulationState)
         {
             _seed = seed;
-            _players = players;
+            InitialSimulationState = initialSimulationState;
             _ticks.Clear();
             _initialTick = _tickService.CurrentTick;
+            _networkManager.RegisterPacketsObserver(this);
             LogService.LogTopic($"Started Recording Playback. Seed: {seed}", LogTopicType.ServerNetwork);
         }
 
         public void SaveRecording()
         {
-            SaveJson();
-            LogService.LogError("Saved Records!");
+            _playbackIOService.SavePlayback(_initialTick, _seed, _ticks, InitialSimulationState);
         }
 
-        private void SaveJson()
+        public void LoadPlayback(PlaybackFile playbackFile)
         {
-            try
-            {
-                var directory = Path.Combine(Directory.GetCurrentDirectory(), "Records");
-                Directory.CreateDirectory(directory);
-
-                var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-                var fileName = $"playback_{timestamp}.json";
-                var filePath = Path.Combine(directory, fileName);
-
-                var fileData = new PlaybackFile
-                {
-                    InitialTick = _initialTick,
-                    Seed = _seed,
-                    Ticks = _ticks,
-                    Players = _players
-                };
-
-                string json = JsonConvert.SerializeObject(fileData);
-                File.WriteAllText(filePath, json);
-                LogService.LogTopic($"Saved Playback to {filePath}", LogTopicType.ServerNetwork);
-
-                ManageSavedPlaybacks(directory);
-            }
-            catch (Exception e)
-            {
-                LogService.LogError($"Failed to save playback: {e}");
-            }
-        }
-
-        private void ManageSavedPlaybacks(string directory)
-        {
-            try
-            {
-                var files = Directory.GetFiles(directory, "playback_*.json")
-                    .OrderBy(f => File.GetCreationTime(f))
-                    .ToList();
-
-                while (files.Count > _gamePlayConfig.MaxSavedPlaybacks)
-                {
-                    File.Delete(files[0]);
-                    files.RemoveAt(0);
-                }
-            }
-            catch (Exception e)
-            {
-                LogService.LogError($"Failed to manage saved playbacks: {e}");
-            }
-        }
-
-        public void LoadRecording()
-        {
-            var directory = Path.Combine(Directory.GetCurrentDirectory(), "Records");
-            var filePath = Path.Combine(directory, _playbackFileName);
-
-            if (!File.Exists(filePath))
-            {
-                LogService.LogError($"Playback file not found at {filePath}");
-                return;
-            }
-
-            try
-            {
-                _ticks.Clear();
-                string json = File.ReadAllText(filePath);
-                var fileData = JsonConvert.DeserializeObject<PlaybackFile>(json);
-                _seed = fileData.Seed;
-                _ticks = fileData.Ticks;
-                _initialTick = fileData.InitialTick;
-                _players = fileData.Players;
-                LogService.LogTopic($"Loaded Playback. Seed: {_seed}, Ticks: {_ticks.Count}, Players: {_players?.Length}", LogTopicType.ServerNetwork);
-            }
-            catch (Exception e)
-            {
-                LogService.LogError($"Failed to load playback: {e}");
-            }
+            _seed = playbackFile.Seed;
+            _ticks = playbackFile.Ticks;
+            _initialTick = playbackFile.InitialTick;
+            InitialSimulationState = playbackFile.InitialSimulationState;
         }
 
         public List<RecordedPacket> GetPacketsForTick(int tick)

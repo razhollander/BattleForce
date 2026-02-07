@@ -1,4 +1,4 @@
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
+namespace Core.Game.Domains.GamePlay.Shared.Scripts.Playback
 {
     [System.Serializable]
     public class RecordedPacket
