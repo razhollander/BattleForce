@@ -74,6 +74,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataServic
         public void SetLocalPlayer(int playerId)
         {
             LocalPlayer = Players.Find(x => x.PlayerId == playerId);
+            var id = LocalPlayer.PlayerId;
         }
 
         public void UpdatePlayerTeam(ushort playerId, ushort teamId)

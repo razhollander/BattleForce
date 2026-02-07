@@ -129,9 +129,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             for (int i = 0; i < _matchMakingDataService.SimulationState.Players.Count; i++)
             {
                 var playerState = _matchMakingDataService.SimulationState.Players.GetByIndex(i);
-                playersData[i].Id = playerState.Id;
-                playersData[i].TeamId = playerState.TeamId;
-                playersData[i].Name = playerState.Name;
+                playersData[i] = new EnterMatchPlayerData(playerState.Id, playerState.Name, playerState.TeamId);
             }
 
             var matchEnterData = new SimulationMatchEnterData(playersData);

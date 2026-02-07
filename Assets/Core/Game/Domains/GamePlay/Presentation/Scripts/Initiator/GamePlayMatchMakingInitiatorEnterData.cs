@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator
         public MatchMakingSimulationStateS2C SimulationState;
         public int ServerTick;
         
-        public GamePlayMatchMakingInitiatorEnterData(MatchMakingSimulationStateS2C simulationState,string ipAddress, int port, bool isHost, int playerId, int serverTick)
+        public GamePlayMatchMakingInitiatorEnterData(MatchMakingSimulationStateS2C simulationState,string ipAddress, int port, bool isHost, int serverTick, int playerId)
         {
             SimulationState = simulationState;
             IPAddress = ipAddress;

@@ -8,5 +8,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts
         public ushort Id;
         public string Name;
         public ushort TeamId;
+
+        public EnterMatchPlayerData(ushort id, string name, ushort teamId)
+        {
+            Id = id;
+            Name = name;
+            TeamId = teamId;
+        }
     }
 }
