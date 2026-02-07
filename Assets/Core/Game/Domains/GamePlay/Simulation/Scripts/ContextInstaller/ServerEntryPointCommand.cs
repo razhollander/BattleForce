@@ -39,7 +39,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         public void Execute()
         {
             _playbackRecorderService.InitEntryPoint(_serverInitiatorEnterData.IsPlaybackEnabled, _serverInitiatorEnterData.PlaybackFileName);
-            _serverNetworkManager.InitEntryPoint();
             _physicsSimulator.InitEntryPoint();
             _simulationStateMachine.InitEntryPoint();
             _tickService.InitEntryPoint();
@@ -59,6 +58,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             {
                 _simulationStateMachine.ChangeToMatchMaking();
             }
+            
+            _serverNetworkManager.InitEntryPoint();
         }
 
         public ServerEntryPointCommand SetEnterData(ServerInitiatorEnterData serverInitiatorEnterData)

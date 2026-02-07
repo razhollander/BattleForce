@@ -89,7 +89,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
                 LogService.LogError("Can't join server!");
                 return;
             }
-
+            
             if (joinResponse.IsMatchMaking)
             {
                 var enterData = new GamePlayMatchMakingInitiatorEnterData(joinResponse.MatchMakingSimulationState ,_ipAddress, _port, _isHost, joinResponse.OccuredOnTick, joinResponse.LocalPlayerId);

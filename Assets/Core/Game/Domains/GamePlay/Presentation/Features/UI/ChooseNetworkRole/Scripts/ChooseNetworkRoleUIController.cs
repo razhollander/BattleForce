@@ -71,7 +71,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             try
             {
                 await StartServer(cancellationTokenSource, true, playbackName);
-                await StartClient(true, cancellationTokenSource, true, playbackName);
+                StartClient(true, cancellationTokenSource, true, playbackName);
                 _uiView.Hide();
             }
             catch (Exception e)
@@ -116,7 +116,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             try
             {
                 await StartServer(cancellationTokenSource, false);
-                await StartClient(true, cancellationTokenSource, false);
+                StartClient(true, cancellationTokenSource, false);
                 _uiView.Hide();
             }
             catch (OperationCanceledException)
@@ -138,9 +138,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             LogService.LogTopic("Finished starting Server", LogTopicType.ClientNetwork);
         }
         
-        private async Awaitable StartClient(bool isHost, CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled, string playbackName = "")
+        private void StartClient(bool isHost, CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled, string playbackName = "")
         {
-            
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;
             var port = _uiView.Port;
@@ -165,26 +164,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         
         private void OnClientClicked()
         {
-            _ = OnClientClickedAsync();
-        }
-        
-        private async Awaitable OnClientClickedAsync()
-        {
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
-
-            try
-            {
-                await StartClient(false, cancellationTokenSource, false);
-                _uiView.Hide();
-            }
-            catch (OperationCanceledException)
-            {
-                LogService.LogTopic("OperationCanceledException", LogTopicType.ClientNetwork);
-            }
-            catch (Exception e)
-            {
-                LogService.LogException(e);
-            }
+            StartClient(false, cancellationTokenSource, false);
+            _uiView.Hide();
         }
     }
 }

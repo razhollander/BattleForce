@@ -104,7 +104,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _tickService.UnregisterObserver(this);
         }
         
-      
         public void OnTick(int currentTick)
         {
             try
