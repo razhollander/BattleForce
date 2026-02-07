@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -31,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<ISimulationPersistentData>().To<SimulationPersistentData>().AsSingle().NonLazy();
             Container.Bind<IHeadLessQuitterController>().To<HeadLessQuitterController>().AsSingle().NonLazy();
             Container.Bind<IPlaybackRecorderService>().To<PlaybackRecorderService>().AsSingle().NonLazy();
+            Container.Bind<IPlaybackIOService>().To<PlaybackIOService>().AsSingle().NonLazy();
         }
     }
 }

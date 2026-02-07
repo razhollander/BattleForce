@@ -39,25 +39,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         public void InitEntryPoint()
         {
             _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, _networkConfig.OnlyLocal, _networkConfig.IpAddress, _networkConfig.HostPort);
-            PopulatePlaybacks();
+            PopulatePlaybacksDropdown();
 #if UNITY_SERVER
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
-            StartServer(cancellationTokenSource).Forget();
+            StartServer(cancellationTokenSource, false).Forget();
 #endif
         }
 
-        private void PopulatePlaybacks()
+        private void PopulatePlaybacksDropdown()
         {
-            var directory = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Records");
-            if (System.IO.Directory.Exists(directory))
-            {
-                var files = System.IO.Directory.GetFiles(directory, "playback_*.json")
-                    .OrderByDescending(f => System.IO.File.GetCreationTime(f))
-                    .Select(System.IO.Path.GetFileName)
-                    .ToList();
-                _uiView.PlaybacksDropdown.ClearOptions();
-                _uiView.PlaybacksDropdown.AddOptions(files);
-            }
+            _uiView.PlaybacksDropdown.ClearOptions();
+            _uiView.PlaybacksDropdown.AddOptions(_playbackIOService.GetAllPlaybackNames());
         }
 
         private void OnPlayPlaybackClicked()
@@ -98,7 +90,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
             try
             {
-                await StartServer(cancellationTokenSource);
+                await StartServer(cancellationTokenSource, false);
                 _uiView.Hide();
             }
             catch (OperationCanceledException)
@@ -122,7 +114,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
             try
             {
-                await StartServer(cancellationTokenSource);
+                await StartServer(cancellationTokenSource, false);
                 await StartClient(true, cancellationTokenSource, false);
                 _uiView.Hide();
             }
@@ -191,7 +183,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
             try
             {
-                await StartClient(false, cancellationTokenSource);
+                await StartClient(false, cancellationTokenSource, false);
                 _uiView.Hide();
             }
             catch (OperationCanceledException)
