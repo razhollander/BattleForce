@@ -1,16 +1,11 @@
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatchButton.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
-using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
-using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Extensions;
-using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -21,26 +16,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
     {
         private readonly IMatchMakingDataService _matchDataService;
         private readonly ICachedPresentationEventsService _cachedPresentationEventsService;
-        private readonly IClientNetworkManager _networkManager;
-        private readonly NetworkConfig _networkConfig;
-        private readonly IClientMatchMakingPresentationTickProcessor _clientPresentationTickProcessor;
         private readonly ICommandFactory _commandFactory;
-        private readonly ITickCounterService _tickCounterService;
         private readonly IStartMatchButtonController _startMatchButtonController;
         private readonly AddMatchMakingPlayerCommand _addMatchMakingPlayerCommand;
 
         public PresentationMatchMakingNetEventsHandler(IMatchMakingDataService matchDataService,
-            ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager,
-            NetworkConfig networkConfig, IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory,
-            ITickCounterService tickCounterService, IStartMatchButtonController startMatchButtonController)
+            ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory, IStartMatchButtonController startMatchButtonController)
         {
             _matchDataService = matchDataService;
-            _cachedPresentationEventsService = iCachedPresentationEventsService;
-            _networkManager = networkManager;
-            _networkConfig = networkConfig;
-            _clientPresentationTickProcessor = clientPresentationTickProcessor;
+            _cachedPresentationEventsService = cachedPresentationEventsService;
             _commandFactory = commandFactory;
-            _tickCounterService = tickCounterService;
             _startMatchButtonController = startMatchButtonController;
             _addMatchMakingPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchMakingPlayerCommand>();
         }
@@ -55,31 +40,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                     $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerId,
                     LogTopicType.ClientNetwork);
                 
-                if (isLocalPlayer)
-                {
-                    _commandFactory.CreateCommandVoid<SyncMatchMakingSimulationStateCommand>()
-                        .SetSimulationState(playerJoinAcceptNetEvent.SimulationState).Execute();
-                    SyncTickToServer(playerJoinAcceptNetEvent);
-                    SetupLocalPlayer(playerId);
-                }
-                else
+                if (!isLocalPlayer)
                 {
                     _addMatchMakingPlayerCommand.SetPlayerState(playerJoinAcceptNetEvent.PlayerState).Execute();
                 }
             }
-        }
-
-        private void SyncTickToServer(MatchMakingPlayerJoinAcceptPacketS2C playerJoinAcceptNetEvent)
-        {
-            var ticksPassedSinceServerSendPacket = (_networkManager.Ping / 1000f) / _networkConfig.DeltaTime;
-            var tickWouldBeOnServerWhenReceiveMyPackets = (int)(ticksPassedSinceServerSendPacket * 2) + playerJoinAcceptNetEvent.OccuredOnTick;
-            _tickCounterService.SetTick(tickWouldBeOnServerWhenReceiveMyPackets);
-        }
-
-        private void SetupLocalPlayer(int playerId)
-        {
-            _matchDataService.SetLocalPlayer(playerId);
-            _clientPresentationTickProcessor.StartTick();
         }
         
         public void ProcessBulletSpawnEvents(CapacityList<BulletSpawnNetEventS2C> bulletSpawnNetEvents)
@@ -145,7 +110,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 return;
             }
             
-            foreach (var startMatchCountdownNetEvent in stopMatchCountdownNetEvents)
+            foreach (var _ in stopMatchCountdownNetEvents)
             {
                 _startMatchButtonController.StopMatchCountdown();
             }

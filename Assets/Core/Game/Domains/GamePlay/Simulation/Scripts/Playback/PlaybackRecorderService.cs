@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -23,27 +24,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
         private Dictionary<int, PlaybackTickData> _ticks = new Dictionary<int, PlaybackTickData>();
         private int _seed;
         private int _initialTick;
-        
-        public MatchSimulationStateS2C InitialSimulationState { get; private set; }
+        private EnterMatchPlayerData[] _players;
 
-        public SimulationMatchEnterData.PlayerData[] LoadedPlayers
-        {
-            get
-            {
-                var playersData = new SimulationMatchEnterData.PlayerData[InitialSimulationState.Players.Count];
-
-                for (int i = 0; i < InitialSimulationState.Players.Count; i++)
-                {
-                    var playerState = InitialSimulationState.Players.GetByIndex(i);
-                    playersData[i].Id = playerState.Id;
-                    playersData[i].TeamId = playerState.TeamId;
-                    playersData[i].Name = playerState.Name;
-                }
-
-                return playersData;
-            }
-        }
-
+        public EnterMatchPlayerData[] Players => _players;
         public int Seed => _seed;
         public int InitialTick => _initialTick;
         public bool IsPlaybackEnabled { get; private set; }
@@ -72,10 +55,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
             SaveRecording();
         }
 
-        public void StartRecording(int seed, MatchSimulationStateS2C initialSimulationState)
+        public void StartRecording(int seed, EnterMatchPlayerData[] players)
         {
             _seed = seed;
-            InitialSimulationState = initialSimulationState;
+            _players = players;
             _ticks.Clear();
             _initialTick = _tickService.CurrentTick;
             _networkManager.RegisterPacketsObserver(this);
@@ -84,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 
         public void SaveRecording()
         {
-            _playbackIOService.SavePlayback(_initialTick, _seed, _ticks, InitialSimulationState);
+            _playbackIOService.SavePlayback(_initialTick, _seed, _ticks, _players);
         }
 
         public void LoadPlayback(PlaybackFile playbackFile)
@@ -92,7 +75,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
             _seed = playbackFile.Seed;
             _ticks = playbackFile.Ticks;
             _initialTick = playbackFile.InitialTick;
-            InitialSimulationState = playbackFile.InitialSimulationState;
+            _players = playbackFile.Players;
         }
 
         public List<RecordedPacket> GetPacketsForTick(int tick)

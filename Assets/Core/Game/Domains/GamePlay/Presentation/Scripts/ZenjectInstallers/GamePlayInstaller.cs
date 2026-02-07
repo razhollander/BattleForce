@@ -40,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
             Container.Bind<ICachedPresentationEventsService>().To<CachedPresentationEventsService>().AsSingle().NonLazy();
             Container.Bind<ITickCounterService>().To<TickCounterService>().AsSingle().NonLazy();
             Container.Bind<IPlaybackIOService>().To<PlaybackIOService>().AsSingle().NonLazy();
+            Container.Bind<IJoinResponsePacketHandler>().To<JoinResponsePacketHandler>().AsSingle().NonLazy();
         }
 
         private void BindControllers()

@@ -102,8 +102,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             }
             else
             {
-                var simulationState = _matchDataService.SimulationState.DeepClone();
-                _playbackRecorderService.StartRecording(RNG.Seed, simulationState);
+                _playbackRecorderService.StartRecording(RNG.Seed, _simulationMatchEnterData.Players);
             }
         }
 

@@ -63,6 +63,21 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
 
             throw new System.Exception($"No player for id {playerId}!");
         }
+        
+        public bool TryGetPlayerByName(string playerName, out MatchMakingPlayerStateS2C playerState)
+        {
+            for (int i = 0; i < Players.Count; i++)
+            {
+                if (Players[i].Name == playerName)
+                {
+                    playerState = Players.GetByIndex(i);
+                    return true;
+                } 
+            }
+
+            playerState = default;
+            return false;
+        }
 
         public MatchMakingPlayerStateS2C GetPlayerByIndex(int index)
         {

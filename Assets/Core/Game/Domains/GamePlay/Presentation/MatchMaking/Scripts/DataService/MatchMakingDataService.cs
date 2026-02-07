@@ -14,7 +14,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataServic
         public List<MatchEnvironmentWallModel> EnvironmentWalls { get; private set; }
 
         public MatchMakingPlayerModel LocalPlayer { get; private set; }
-        public bool IsPlayerJoined => LocalPlayer != null;
 
         public MatchMakingDataService(NetworkConfig networkConfig)
         {

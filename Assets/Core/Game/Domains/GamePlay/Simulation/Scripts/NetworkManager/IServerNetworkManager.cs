@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void InitExitPoint();
         //void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
         public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
+        public void SendPacketToPeerSerialized<T>(NetPeer peer, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
         void AddPlayerPeer(ushort playerId, NetPeer peer);
         void PollEvents();
         int GetPlayerPeerId(ushort playerId);

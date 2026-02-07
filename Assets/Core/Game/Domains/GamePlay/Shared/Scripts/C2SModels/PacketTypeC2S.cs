@@ -7,5 +7,6 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels
         MatchRejoinRequest = 2,
         MatchMakingPlayerInput = 3,
         MatchMakingJoinRequest = 4,
+        JoinRequest = 5
     }
 }

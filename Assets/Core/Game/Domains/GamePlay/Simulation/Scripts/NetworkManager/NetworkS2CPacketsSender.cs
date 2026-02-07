@@ -85,20 +85,41 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             peer.Send(_writer, deliveryMethod);
             LogService.LogTopic($"Send packet type {packetType} to player {playerId}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
         }
-        
+
+        public void SendPacketToPeerSerialized<T>(NetPeer peer, PacketTypeS2C packetType, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        {
+            _writer.Reset();
+            _writer.Put((byte)packetType);
+            packet.Serialize(_writer);
+            peer.Send(_writer, deliveryMethod);
+        }
+
         // public void SendPacket<T>(T packet, DeliveryMethod deliveryMethod) where T : class, new()
+
         // {
+
         //     if (_peerPerPlayerId == null)
+
         //     {
+
         //         LogService.LogError("NetPeer is null! Must have a peer to send packets to!");
+
         //         return;
+
         //     }
+
         //     
+
         //     _writer.Reset();
+
         //     _writer.Put((byte) PacketType.Serialized);
+
         //     _packetProcessor.Write(_writer, packet);
+
         //     _peerPerPlayerId.ForEach(x => x.Value.Send(_writer, deliveryMethod));
+
         // }
+
         public int GetPlayerPeerId(ushort playerId)
         {
             return _peerPerPlayerId[playerId].Id;

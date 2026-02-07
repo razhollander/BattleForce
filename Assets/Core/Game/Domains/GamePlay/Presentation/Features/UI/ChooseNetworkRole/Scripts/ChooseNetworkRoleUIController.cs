@@ -3,11 +3,14 @@ using System.Linq;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
 using Core.Scripts.Network;
+using Core.Scripts.Utils;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.SceneService;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -24,9 +27,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly IClientNetworkManager _clientNetworkManager;
         private readonly NetworkConfig _networkConfig;
         private readonly IPlaybackIOService _playbackIOService;
+        private readonly ICommandFactory _commandFactory;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, NetworkConfig networkConfig, IPlaybackIOService playbackIOService)
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, NetworkConfig networkConfig, IPlaybackIOService playbackIOService, ICommandFactory commandFactory)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
@@ -34,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _clientNetworkManager = clientNetworkManager;
             _networkConfig = networkConfig;
             _playbackIOService = playbackIOService;
+            _commandFactory = commandFactory;
         }
 
         public void InitEntryPoint()
@@ -60,17 +65,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private async Awaitable OnPlayPlaybackClickedAsync()
         {
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
-            var selectedOptionIndex = _uiView.PlaybacksDropdown.value;
-            if (selectedOptionIndex < 0 || selectedOptionIndex >= _uiView.PlaybacksDropdown.options.Count)
-            {
-                return;
-            }
-            var filename = _uiView.PlaybacksDropdown.options[selectedOptionIndex].text;
+            var playbackName = _uiView.GetSelectedPlayback();
 
             try
             {
-                await StartServer(cancellationTokenSource, true, filename);
-                await StartClient(true, cancellationTokenSource, true, filename);
+                await StartServer(cancellationTokenSource, true, playbackName);
+                await StartClient(true, cancellationTokenSource, true, playbackName);
                 _uiView.Hide();
             }
             catch (Exception e)
@@ -137,41 +137,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             LogService.LogTopic("Finished starting Server", LogTopicType.ClientNetwork);
         }
         
-        private async Awaitable StartClient(bool isHost, CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled, string playbackFilePath = "")
+        private async Awaitable StartClient(bool isHost, CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled, string playbackName = "")
         {
+            
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;
             var port = _uiView.Port;
             var playerName = _uiView.PlayerName;
-
-            if (isPlaybackEnabled && _playbackIOService.TryGetPlayback(playbackFilePath, out var playbackFile))
+            
+            if (isPlaybackEnabled)
             {
-                var InitialState = playbackFile.InitialSimulationState;
-                var enterData = new GamePlayMatchInitiatorEnterData(InitialState, InitialState.Players[0].Id);
-                await LoadMatchScene(enterData, cancellationTokenSource);
-            }
-            else
-            {
-                var enterData = new GamePlayMatchMakingInitiatorEnterData(ip, port, isHost);
-                await LoadMatchMakingScene(enterData, cancellationTokenSource);
+                _playbackIOService.TryGetPlayback(playbackName, out var playbackFile);
+                playerName = playbackFile.Players[0].Name;
             }
             
-            _clientNetworkManager.StartClient(ip, port, playerName);
+            _commandFactory.CreateCommandAsync<StartClientCommand>()
+                .SetIsHost(isHost)
+                .SetIsPlaybackEnabled(isPlaybackEnabled)
+                .SetPlaybackName(playbackName)
+                .SetServerAddress(ip,port)
+                .SetPlayerName(playerName)
+                .Execute(cancellationTokenSource).Forget();
+            
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
-
-        private async Awaitable LoadMatchMakingScene(GamePlayMatchMakingInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
-        {
-            await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
-            await _sceneLoaderService.StartScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
-        }  
         
-        private async Awaitable LoadMatchScene(GamePlayMatchInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
-        {
-            await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchScene, enterData, cancellationTokenSource);
-            await _sceneLoaderService.StartScene(SceneType.GamePlayMatchScene, enterData, cancellationTokenSource);
-        }
-
         private void OnClientClicked()
         {
             _ = OnClientClickedAsync();

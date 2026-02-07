@@ -45,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
 
             if (_playbackRecorderService.IsPlaybackEnabled)
             {
-                var matchEnterData = new SimulationMatchEnterData(_playbackRecorderService.LoadedPlayers);
+                var matchEnterData = new SimulationMatchEnterData(_playbackRecorderService.Players);
                 _simulationStateMachine.ChangeToMatch(matchEnterData);
             }
             else

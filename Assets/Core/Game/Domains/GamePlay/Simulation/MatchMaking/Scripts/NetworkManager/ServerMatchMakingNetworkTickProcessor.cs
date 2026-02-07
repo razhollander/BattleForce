@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.TickHandlers.PacketsObservers;
@@ -123,7 +124,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 return;
             }
 
-            var playersData = new SimulationMatchEnterData.PlayerData[_matchMakingDataService.SimulationState.Players.Count];
+            var playersData = new EnterMatchPlayerData[_matchMakingDataService.SimulationState.Players.Count];
 
             for (int i = 0; i < _matchMakingDataService.SimulationState.Players.Count; i++)
             {

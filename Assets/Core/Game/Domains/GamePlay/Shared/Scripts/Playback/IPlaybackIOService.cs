@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Playback
 {
@@ -7,6 +6,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Playback
     {
         List<string> GetAllPlaybackNames();
         bool TryGetPlayback(string playbackName, out PlaybackFile playbackFile);
-        void SavePlayback(int _initialTick, int _seed, Dictionary<int, PlaybackTickData> _ticks, MatchSimulationStateS2C InitialSimulationState);
+        void SavePlayback(int initialTick, int seed, Dictionary<int, PlaybackTickData> ticks, EnterMatchPlayerData[] players);
     }
 }

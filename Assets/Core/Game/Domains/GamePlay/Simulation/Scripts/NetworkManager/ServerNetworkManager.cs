@@ -93,6 +93,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _packetsSender.SendPacketToPlayerSerialized(playerId, type, packet, deliveryMethod);
         }
 
+        public void SendPacketToPeerSerialized<T>(NetPeer peer, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        {
+            _packetsSender.SendPacketToPeerSerialized(peer, type, packet, deliveryMethod);
+        }
+
         public void AddPlayerPeer(ushort playerId, NetPeer peer)
         {
             _packetsSender.AddPlayerPeer(playerId, peer);

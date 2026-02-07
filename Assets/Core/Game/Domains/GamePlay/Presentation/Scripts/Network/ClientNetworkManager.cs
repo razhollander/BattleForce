@@ -1,5 +1,7 @@
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
+using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -42,20 +44,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _guiStyle.normal.textColor = Color.white;
         }
 
-        public void StartClient(string ipAddress, int port, string playerName)
+        public void ConenctToServerPeer(string ipAddress, int port, string playerName)
         {
             if (_netManager.IsRunning)
             {
                 LogService.LogError("Client already running!");
                 return;
             }
-
+            
             _playerName = playerName;
             _updateSubscriptionService.RegisterGuiUpdatable(this);
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Start();
             var peerToServer = _netManager.Connect(ipAddress, port, _networkConfig.ConntectionKey);
             _packetsSender.SetPeer(peerToServer);
+
            // bool canReachServer = CanPing(_networkConfig.IpAddress);
             //Console.WriteLine("Can reach server: " + canReachServer);
         }

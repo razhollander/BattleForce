@@ -65,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Playback
             }
         }
 
-        public void SavePlayback(int _initialTick, int _seed, Dictionary<int, PlaybackTickData> _ticks, MatchSimulationStateS2C InitialSimulationState)
+        public void SavePlayback(int _initialTick, int _seed, Dictionary<int, PlaybackTickData> _ticks, EnterMatchPlayerData[] players)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Playback
                     InitialTick = _initialTick,
                     Seed = _seed,
                     Ticks = _ticks,
-                    InitialSimulationState = InitialSimulationState
+                    Players = players
                 };
 
                 string json = JsonConvert.SerializeObject(fileData);

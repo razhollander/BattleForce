@@ -1,4 +1,5 @@
 using System;
+using Core.Game.Domains.GamePlay.Shared.Scripts;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
@@ -12,17 +13,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
     [Serializable]
     public class SimulationMatchEnterData
     {
-        public PlayerData[] Players;
-    
-        [Serializable]
-        public struct PlayerData
-        {
-            public ushort Id;
-            public string Name;
-            public ushort TeamId;
-        }
+        public EnterMatchPlayerData[] Players;
 
-        public SimulationMatchEnterData(PlayerData[] players)
+        public SimulationMatchEnterData(EnterMatchPlayerData[] players)
         {
             Players = players;
         }

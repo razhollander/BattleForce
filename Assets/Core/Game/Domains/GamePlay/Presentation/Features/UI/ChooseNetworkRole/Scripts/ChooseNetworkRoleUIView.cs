@@ -25,6 +25,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         public TMP_Dropdown PlaybacksDropdown => _playbacksDropdown;
 
+        public string GetSelectedPlayback()
+        {
+            var selectedOptionIndex = PlaybacksDropdown.value;
+            return PlaybacksDropdown.options[selectedOptionIndex].text;
+        }
+        
         public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked, Action onPlayPlaybackClicked, bool defaultOnlyLocal, string defaultIp, int defaultPort)
         {
             _onClientClicked = onClientClicked;

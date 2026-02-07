@@ -68,15 +68,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
             _networkManager.PollEvents();
             _tickCounterService.IncrementTick();
             _fullTickPacketsHandler.ProcessStateLatestTick();
-            
-            if (_matchMakingDataService.IsPlayerJoined)
-            {
-                SendCurrentTickInputsToServer();
-                _deltaMS = DateTime.Now.Millisecond - _lastSendTime.Millisecond;
-                _highestMs = Mathf.Max(_deltaMS, _highestMs);
-                _lastSendTime = DateTime.Now;
-            }
-            
+
+            SendCurrentTickInputsToServer();
+            _deltaMS = DateTime.Now.Millisecond - _lastSendTime.Millisecond;
+            _highestMs = Mathf.Max(_deltaMS, _highestMs);
+            _lastSendTime = DateTime.Now;
+
             _startMatchPacketHandler.ProcessStartMatchPacket();
         }
 
