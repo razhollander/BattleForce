@@ -112,6 +112,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private void RemoveAmountOfEarliestInputs(FixedUnorderedList<MatchPlayerInputPacketC2S> inputsOfPlayer, int amountOfPacketsToRemove)
         {
             inputsOfPlayer.Sort();
+            for (int i = 0; i < amountOfPacketsToRemove; i++)
+            {
+                _playerInputPacketsPool.Return(inputsOfPlayer[i]);
+            }
             inputsOfPlayer.RemoveRange(0, amountOfPacketsToRemove);
         }
 
@@ -434,7 +438,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 _inputsPerPlayer.Add(playerId, _inputsListsPool.Get());
             }
-            ref var input = ref _inputsPerPlayer[playerId].AddAndGet();
+
+            var inputsList = _inputsPerPlayer[playerId];
+            if (inputsList.IsFull)
+            {
+                inputsList.Sort();
+                var earliest = inputsList[0];
+                _playerInputPacketsPool.Return(earliest);
+                inputsList.RemoveAt(0);
+            }
+
+            ref var input = ref inputsList.AddAndGet();
             input = playerInputPacket;
             if (playerInputPacket.IsShootInputPressed)
             {
