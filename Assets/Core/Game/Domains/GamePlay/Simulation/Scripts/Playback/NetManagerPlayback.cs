@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
         public void SetPacketsListener(NetworkC2SPacketsListener packetsListener)
         {
             _packetsListener = packetsListener;
-            _netManager = new NetManager(_packetsListener/*new EmptyNetworkC2SPacketsListener(_networkConfig)*/) { AutoRecycle = true, BroadcastReceiveEnabled = true, IPv6Enabled = false };
+            _netManager = new NetManager(_packetsListener) { AutoRecycle = true, BroadcastReceiveEnabled = true, IPv6Enabled = false };
         }
 
         public void Start(int port)
@@ -44,7 +44,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 
         public void PollEvents()
         {
-            LogService.LogError("Poll from playback!");
             _netManager?.PollEvents();
 
             var packets = _playbackRecorderService.GetPacketsForTick(_tickService.CurrentTick);
@@ -64,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
                 }
                     
                 var reader = new NetDataReader(packet.Data);
-                _packetsListener.OnNetworkReceive(dummyPeer, reader);
+                _packetsListener.OnNetworkReceive(dummyPeer, reader, true);
             }
         }
     }

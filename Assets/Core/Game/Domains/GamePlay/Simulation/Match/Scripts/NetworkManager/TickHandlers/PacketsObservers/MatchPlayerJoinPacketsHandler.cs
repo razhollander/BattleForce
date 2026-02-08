@@ -81,7 +81,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _playerRejoinedPacketsPerPeer.Clear();
         }
         
-        public void OnPacketReceived(NetDataReader reader, NetPeer peer)
+        public void OnPacketReceived(NetDataReader reader, NetPeer peer, bool isReceivedFromPlayback)
         {
             var newPacket = _joinedRequestPacketsPool.Get();
             newPacket.Deserialize(reader);

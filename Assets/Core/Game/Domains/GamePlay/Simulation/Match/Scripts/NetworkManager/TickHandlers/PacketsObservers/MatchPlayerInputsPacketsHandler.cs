@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         private readonly HandleTalentInputPressedCommand _handleTalentInputPressedCommand;
         private readonly IPlayersTalentsManager _playersTalentsManager;
-        private readonly IPlaybackRecorderService _recorderService;
+        private readonly IPlaybackRecorderService _playerbackRecorderService;
 
         public bool DidReceiveAnyInputFromPlayer(ushort playerId)
         {
@@ -51,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService recorderService)
+            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -62,7 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _updateSubscriptionService = updateSubscriptionService;
             _commandFactory = commandFactory;
             _playersTalentsManager = playersTalentsManager;
-            _recorderService = recorderService;
+            _playerbackRecorderService = playerbackRecorderService;
             _handleTalentInputPressedCommand = _commandFactory.CreateCommandVoid<HandleTalentInputPressedCommand>();
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, MatchPlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -487,8 +487,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             return _lastProcessedInputPerPlayer.TryGetValue(playerId, out playerInputPacket);
         }
         
-        public void OnPacketReceived(NetDataReader reader, NetPeer peer)
+        public void OnPacketReceived(NetDataReader reader, NetPeer peer, bool isReceivedFromPlayback)
         {
+            var shouldIgnorePacket = !isReceivedFromPlayback && _playerbackRecorderService.IsPlaybackEnabled;
+            if (shouldIgnorePacket)
+            {
+                return;
+            }
+            
             var newPacket = _playerInputPacketsPool.Get();
             newPacket.Deserialize(reader);
             OnPlayerInputReceived(newPacket, peer);

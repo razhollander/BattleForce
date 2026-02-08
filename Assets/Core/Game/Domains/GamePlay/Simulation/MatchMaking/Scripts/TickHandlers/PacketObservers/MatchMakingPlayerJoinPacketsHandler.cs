@@ -104,7 +104,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             _playerJoinedPacketsPerPeer.Clear();
         }
 
-        public void OnPacketReceived(NetDataReader reader, NetPeer peer)
+        public void OnPacketReceived(NetDataReader reader, NetPeer peer, bool isReceivedFromPlayback)
         {
             var newPacket = _joinedRequestPacketsPool.Get();
             newPacket.Deserialize(reader);
