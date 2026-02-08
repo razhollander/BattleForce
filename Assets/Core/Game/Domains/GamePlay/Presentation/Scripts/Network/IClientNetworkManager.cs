@@ -1,3 +1,4 @@
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using LiteNetLib;
@@ -10,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         bool IsPeerConnected { get; }
         int Ping { get; }
         int LocalPeerId { get; }
-        void StartClient(string ipAddress, int port);
+        void ConenctToServerPeer(string ipAddress, int port, string playerName);
         void InitExitPoint();
         
         //void SubscribeReusable<T>(Action<T> onReceive) where T : class, new();

@@ -334,7 +334,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddPlayerDiedNetEvent(int onTick, ushort playerId, float maxShootCooldown)
+        public void AddPlayerDiedNetEvent(int onTick, ushort playerId, float maxShootCooldown, float shootCooldownSecondsLeft)
         {
             foreach (var kvp in PlayerDiedNetEventsPerPlayer)
             {
@@ -342,6 +342,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 packet.OccuredOnTick = onTick;
                 packet.PlayerId = playerId;
                 packet.PlayerMaxShootCooldown = maxShootCooldown;
+                packet.PlayerShootCooldownSecondsLeft = shootCooldownSecondsLeft;
             }
         }
 
@@ -369,7 +370,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddPlayerRejoinAcceptedEvent(int onTick, PlayerStateS2C playerState, MatchSimulationStateS2C simulationState)
+        public void AddPlayerJoinAcceptedEvent(int onTick, PlayerStateS2C playerState, MatchSimulationStateS2C simulationState)
         {
             foreach (var kvp in PlayerRejoinAcceptNetEventsPerPlayer)
             {

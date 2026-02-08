@@ -1,7 +1,9 @@
+using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
@@ -15,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         [SerializeField] private SimulationGamePlayConfig _gamePlayConfig;
         [SerializeField] private SharedGamePlayConfig _sharedGamePlayConfig;
         [SerializeField] private PowerUpsConfig _powerUpsConfig;
+        [SerializeField] private DefaultMatchEnterDataConfig _defaultMatchEnterDataConfig;
 
         public override void InstallBindings()
         {
@@ -23,12 +26,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<IServerInitiator>().To<ServerInitiator>().AsSingle().NonLazy();
             Container.BindInstance(_gamePlayConfig).AsSingle().NonLazy();
             Container.BindInstance(_powerUpsConfig).AsSingle().NonLazy();
+            Container.BindInstance(_defaultMatchEnterDataConfig).AsSingle().NonLazy();
             Container.Bind<IServerNetworkManager>().To<ServerNetworkManager>().AsSingle().NonLazy();
             Container.Bind<INetEventsDataService>().To<NetEventsDataService>().AsSingle().NonLazy();
             Container.Bind<IPhysicsSimulator>().To<PhysicsSimulator>().AsSingle().NonLazy();
             Container.Bind<ISimulationStateMachine>().To<SimulationStateMachine>().AsSingle().NonLazy();
             Container.Bind<ISimulationPersistentData>().To<SimulationPersistentData>().AsSingle().NonLazy();
             Container.Bind<IHeadLessQuitterController>().To<HeadLessQuitterController>().AsSingle().NonLazy();
+            Container.Bind<IPlaybackRecorderService>().To<PlaybackRecorderService>().AsSingle().NonLazy();
+            Container.Bind<IPlaybackIOService>().To<PlaybackIOService>().AsSingle().NonLazy();
         }
     }
 }

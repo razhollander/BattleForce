@@ -2,10 +2,10 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers
 {
-    public interface IPlayeRejoinPacketsHandler : IPacketsObserver
+    public interface IMatchPlayerJoinPacketsHandler : IPacketsObserver
     {
         void InitEntryPoint();
         void InitExitPoint();
-        void ProcessPlayersRejoined(int processedTick);
+        void ProcessPlayersJoined(int processedTick);
     }
 }

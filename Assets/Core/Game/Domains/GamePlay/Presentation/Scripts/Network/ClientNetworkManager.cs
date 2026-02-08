@@ -1,5 +1,7 @@
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
+using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -19,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkC2SPacketsSender _packetsSender;
         private readonly GUIStyle _guiStyle;
+        private string _playerName;
         public bool IsPeerConnected { get; private set; }
         public int Ping => _packetsSender.Peer.Ping;
         public int LocalPeerId => _packetsSender.Peer.Id;
@@ -41,19 +44,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             _guiStyle.normal.textColor = Color.white;
         }
 
-        public void StartClient(string ipAddress, int port)
+        public void ConenctToServerPeer(string ipAddress, int port, string playerName)
         {
             if (_netManager.IsRunning)
             {
                 LogService.LogError("Client already running!");
                 return;
             }
-
+            
+            _playerName = playerName;
             _updateSubscriptionService.RegisterGuiUpdatable(this);
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Start();
             var peerToServer = _netManager.Connect(ipAddress, port, _networkConfig.ConntectionKey);
             _packetsSender.SetPeer(peerToServer);
+
            // bool canReachServer = CanPing(_networkConfig.IpAddress);
             //Console.WriteLine("Can reach server: " + canReachServer);
         }
@@ -76,7 +81,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             LogService.LogTopic("Server peer received!", LogTopicType.ClientNetwork);
             _packetsSender.SetPeer(peerToServer);
-            _commandFactory.CreateCommandVoid<HandleClientConnectedToPeerCommand>().Execute();
             IsPeerConnected = true;
         }
 

@@ -865,6 +865,18 @@ PrefabInstance:
       propertyPath: BoundingShape2D
       value: 
       objectReference: {fileID: 691717231}
+    - target: {fileID: 3247110556816160417, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
+      propertyPath: OversizeWindow.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3247110556816160417, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
+      propertyPath: OversizeWindow.MaxWindowSize
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4126886619047320635, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
+      propertyPath: Lens.NearClipPlane
+      value: -10
+      objectReference: {fileID: 0}
     - target: {fileID: 5516514484391682885, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
       propertyPath: near clip plane
       value: -10

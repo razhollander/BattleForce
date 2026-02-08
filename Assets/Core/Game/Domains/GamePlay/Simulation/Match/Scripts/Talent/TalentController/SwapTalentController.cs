@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
     public void OnTick(bool isTalentInputPressed, int tick)
     {
         var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-        var isSelected = casterPlayerState.Spaceship.Talents.GetCurrentSelectedTalent().TalentType == TalentType;
+        var isSelected = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().TalentType == TalentType;
         var shoudlPerforamSwap = isSelected && isTalentInputPressed;
 
         if (!shoudlPerforamSwap)

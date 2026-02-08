@@ -101,6 +101,11 @@ namespace Core.Scripts.Utils
                 await source.Awaitable;
             }
         }
+        
+        public static void CancelWhenTokenCancelled(this CancellationTokenSource cancellationTokenSource, CancellationToken token)
+        {
+            token.Register(cancellationTokenSource.Cancel);
+        }
 
         public static async Awaitable<UnityEngine.Object> WithCancellation(this ResourceRequest request, CancellationToken token)
         {

@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         public bool TryAddTalentToPlayer(TalentType talentType, ushort playerId)
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var didPlayerReachMaxTalents = playerState.Spaceship.Talents.Talents.Count == _sharedGamePlayConfig.MaxConcurrentTalentsForPlayer;
+            var didPlayerReachMaxTalents = playerState.Spaceship.TalentsState.Talents.Count == _sharedGamePlayConfig.MaxConcurrentTalentsForPlayer;
 
             if (didPlayerReachMaxTalents)
             {
@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         public void SwitchTalent(ushort playerId)
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var talents = playerState.Spaceship.Talents;
+            var talents = playerState.Spaceship.TalentsState;
             if (talents.Talents.Count == 0)
             {
                 return;
@@ -68,14 +68,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 
         private void AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)
         {
-            ref var newTalent = ref playerState.Spaceship.Talents.Talents.AddAndGet();
+            ref var newTalent = ref playerState.Spaceship.TalentsState.Talents.AddAndGet();
             var maxCooldown = _gamePlayConfig.Talents.CooldownPerTalentType[talentType];
             newTalent.Setup(talentType, maxCooldown);
         }
 
         private bool TryReplaceTalentWithCurrentSelectedTalent(TalentType talentType, PlayerStateS2C playerState)
         {
-            ref var currentSelectedTalent = ref playerState.Spaceship.Talents.Talents.Get(playerState.Spaceship.Talents.SelectedTalentIndex);
+            ref var currentSelectedTalent = ref playerState.Spaceship.TalentsState.Talents.Get(playerState.Spaceship.TalentsState.SelectedTalentIndex);
             var talentController = _talentControllersPerPlayer[playerState.Id].GetTalentByType(currentSelectedTalent.TalentType);
 
             if (talentController != null)

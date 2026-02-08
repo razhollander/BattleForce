@@ -7,6 +7,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
     public interface IPacketsObserver
     {
         PacketTypeC2S PacketType { get; }
-        void OnPacketReceived(NetDataReader reader, NetPeer peer);
+        void OnPacketReceived(NetDataReader reader, NetPeer peer, bool isReceivedFromPlayback);
     }
 }

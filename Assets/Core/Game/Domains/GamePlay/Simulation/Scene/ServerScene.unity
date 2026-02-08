@@ -166,6 +166,7 @@ MonoBehaviour:
   _gamePlayConfig: {fileID: 11400000, guid: 322d4f0f32b31486db5e8892412642a8, type: 2}
   _sharedGamePlayConfig: {fileID: 11400000, guid: de964e16c50a04c0a970e0eca290cdfa, type: 2}
   _powerUpsConfig: {fileID: 11400000, guid: f3f1e9d59a8914447bcbb1a5299d3b37, type: 2}
+  _defaultMatchEnterDataConfig: {fileID: 11400000, guid: 1e385c71b341148f1a886bde85eacecd, type: 2}
 --- !u!1 &1631379501
 GameObject:
   m_ObjectHideFlags: 0

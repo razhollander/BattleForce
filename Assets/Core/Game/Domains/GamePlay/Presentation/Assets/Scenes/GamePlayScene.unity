@@ -460,6 +460,38 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5671939103945378371, guid: 878f9e8d7142e4143830202d6b0c5f00, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5671939103945378371, guid: 878f9e8d7142e4143830202d6b0c5f00, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5671939103945378371, guid: 878f9e8d7142e4143830202d6b0c5f00, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5671939103945378371, guid: 878f9e8d7142e4143830202d6b0c5f00, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798645538515658335, guid: 878f9e8d7142e4143830202d6b0c5f00, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798645538515658335, guid: 878f9e8d7142e4143830202d6b0c5f00, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798645538515658335, guid: 878f9e8d7142e4143830202d6b0c5f00, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798645538515658335, guid: 878f9e8d7142e4143830202d6b0c5f00, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6437369323921921650, guid: 878f9e8d7142e4143830202d6b0c5f00, type: 3}
       propertyPath: m_Name
       value: ChooseNetworkRole

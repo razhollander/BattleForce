@@ -43,12 +43,6 @@ namespace Core.Scripts.Editor.EditorConfig
             
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Runtime Settings", EditorStyles.boldLabel);
-            var isPlayback = Core.Scripts.Utils.PlayerPrefsSettings.IsPlaybackEnabled;
-            var newIsPlayback = EditorGUILayout.Toggle("Play last recorded match", isPlayback);
-            if (newIsPlayback != isPlayback)
-            {
-                Core.Scripts.Utils.PlayerPrefsSettings.IsPlaybackEnabled = newIsPlayback;
-            }
             
             var shouldSkipMatchMaking = Core.Scripts.Utils.PlayerPrefsSettings.ShouldSkipMatchMaking;
             var newShouldSkipMatchMaking = EditorGUILayout.Toggle("Should skip match making", shouldSkipMatchMaking);

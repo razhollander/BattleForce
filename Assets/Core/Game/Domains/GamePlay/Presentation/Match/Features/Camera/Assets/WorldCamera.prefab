@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 3247110556816160417}
   - component: {fileID: 2269534722950037217}
   - component: {fileID: 8865977086233092433}
+  - component: {fileID: 3842843542390826818}
   m_Layer: 7
   m_Name: WorldCamera
   m_TagString: MainCamera
@@ -70,7 +71,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: -10
+  near clip plane: 0.01
   far clip plane: 50
   field of view: 40
   orthographic: 1
@@ -116,7 +117,7 @@ MonoBehaviour:
   Lens:
     FieldOfView: 40
     OrthographicSize: 20
-    NearClipPlane: -10
+    NearClipPlane: 0.01
     FarClipPlane: 50
     Dutch: 0
     ModeOverride: 0
@@ -202,8 +203,7 @@ MonoBehaviour:
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
-  m_Cameras:
-  - {fileID: 0}
+  m_Cameras: []
   m_RendererIndex: 0
   m_VolumeLayerMask:
     serializedVersion: 2
@@ -264,6 +264,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetGroup: {fileID: 8865977086233092433}
+  _perlin: {fileID: 3842843542390826818}
 --- !u!114 &8865977086233092433
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -281,3 +282,20 @@ MonoBehaviour:
   UpdateMethod: 2
   Targets: []
   m_LegacyTargets: []
+--- !u!114 &3842843542390826818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2752942936510871120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68bb026fafb42b14791938953eaace77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
+  PivotOffset: {x: 0, y: 0, z: 0}
+  AmplitudeGain: 0
+  FrequencyGain: 1
+  m_NoiseOffsets: {x: 0, y: 0, z: 0}

@@ -86,7 +86,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void HidePlayerHealthBar(ushort playerId)
         {
-            LogService.LogError("Set health bar off!");
             GetPlayer(playerId).SetIsHealthBarShown(false);
         }
 

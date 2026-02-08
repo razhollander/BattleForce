@@ -10,27 +10,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         [SerializeField] private Button _clientButton;
         [SerializeField] private Button _hostButton;
         [SerializeField] private Button _serverButton;
+        [SerializeField] private Button _playPlaybackButton;
         
         [SerializeField] private Toggle _localHostToggle;
         [SerializeField] private TMP_InputField _ipInputField;
         [SerializeField] private TMP_InputField _portInputField;
+        [SerializeField] private TMP_Dropdown _playbacksDropdown;
+        [SerializeField] private TMP_InputField _playerNameInputField;
 
         private Action _onClientClicked;
         private Action _onHostClicked;
         private Action _onServerClicked;
+        private Action _onPlayPlaybackClicked;
 
-        public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked, bool defaultOnlyLocal, string defaultIp, int defaultPort)
+        public TMP_Dropdown PlaybacksDropdown => _playbacksDropdown;
+
+        public string GetSelectedPlayback()
+        {
+            var selectedOptionIndex = PlaybacksDropdown.value;
+            return PlaybacksDropdown.options[selectedOptionIndex].text;
+        }
+        
+        public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked, Action onPlayPlaybackClicked, bool defaultOnlyLocal, string defaultIp, int defaultPort, string playerName)
         {
             _onClientClicked = onClientClicked;
             _onHostClicked = onHostClicked;
             _onServerClicked = onServerClicked;
+            _onPlayPlaybackClicked = onPlayPlaybackClicked;
             _clientButton.onClick.AddListener(OnClientClicked);
             _hostButton.onClick.AddListener(OnHostClicked);
             _serverButton.onClick.AddListener(OnServerClicked);
+            _playPlaybackButton.onClick.AddListener(OnPlayPlaybackClicked);
 
             _localHostToggle.isOn = defaultOnlyLocal;
             _ipInputField.text = defaultIp;
             _portInputField.text = defaultPort.ToString();
+            _playerNameInputField.text = playerName;
 
             _localHostToggle.onValueChanged.AddListener(OnLocalHostToggleChanged);
             OnLocalHostToggleChanged(_localHostToggle.isOn);
@@ -43,6 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         public bool IsLocalHost => _localHostToggle.isOn;
         public string IpAddress => _ipInputField.text;
+        public string PlayerName => _playerNameInputField.text;
 
         public int Port
         {
@@ -59,6 +75,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private void OnServerClicked()
         {
             _onServerClicked?.Invoke();
+        }
+
+        private void OnPlayPlaybackClicked()
+        {
+            _onPlayPlaybackClicked?.Invoke();
         }
 
         private void OnClientClicked()
