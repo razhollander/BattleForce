@@ -1,6 +1,7 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
@@ -58,7 +59,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             var velocity = startingDirection * 0.01f;
             var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
             var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
-            var position = Vector2.One;
 
             foreach (var kvp in _playerJoinedPacketsPerPeer)
             {
@@ -80,6 +80,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                     joinResponse.IsSuccess = true;
                     joinResponse.IsMatchMaking = true;
                     var playerTeamId = (ushort)(_matchDataService.SimulationState.Players.Count+1);
+                    var position = DonutQuadrantWalls.GetTeamFloorCenter(playerTeamId, _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius);
                     var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerTeamId);
                     var playerId = playerState.Id;
                     joinResponse.LocalPlayerId = playerId;

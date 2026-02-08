@@ -65,5 +65,6 @@ namespace Core.Scripts.Network
         public int StartMatchNetEvents = 32;
         public int StageEndNetEvents = 1;
         public int PlayerDiedNetEvents = 32;
+        public int StartMatchEligibleChangedNetEvents = 32;
     }
 }

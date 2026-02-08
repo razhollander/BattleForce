@@ -45,6 +45,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatc
             SetButtonStartState();
         }
 
+        public void SetEligibility(bool isEligible)
+        {
+            _view.SetOpacity(isEligible ? 1f : 0.5f);
+        }
+
         private void OnTimerTick(double percent, TimeSpan timeLeft)
         {
             _view.SetCountdownText(Mathf.CeilToInt((float) timeLeft.TotalSeconds).ToString());

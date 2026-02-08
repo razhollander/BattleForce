@@ -1,5 +1,6 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
@@ -13,18 +14,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
         private readonly INetEventsDataService _netEventsDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly ISimulationStateMachine _simulationStateMachine;
+        private readonly IMatchMakingDataService _matchMakingDataService;
 
         private bool _isCountingDown;
+        private bool _isEligible = true;
         private float _countdownTimer;
         private int _lastTickGotHitByBullet = -1;
         private const ushort START_MATCH_WALL_ID = 1;
         public bool DidFinishCountingDown => _isCountingDown && _countdownTimer <= 0;
-        public StartMatchWallController(IPhysicsSimulator physicsSimulator, INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig, ISimulationStateMachine simulationStateMachine)
+        public StartMatchWallController(IPhysicsSimulator physicsSimulator, INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig, ISimulationStateMachine simulationStateMachine, IMatchMakingDataService matchMakingDataService)
         {
             _physicsSimulator = physicsSimulator;
             _netEventsDataService = netEventsDataService;
             _gamePlayConfig = gamePlayConfig;
             _simulationStateMachine = simulationStateMachine;
+            _matchMakingDataService = matchMakingDataService;
         }
 
         public void Initialize(float radius)
@@ -48,7 +52,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
             }
             else
             {
-                StartCountdown(tick);
+                if (_isEligible)
+                {
+                    StartCountdown(tick);
+                }
             }
         }
 
@@ -87,6 +94,41 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
             }
 
             _countdownTimer -= deltaTime;
+        }
+
+        public void OnPlayerTeamChanged(int tick)
+        {
+            var isEligible = CheckEligibility();
+            if (isEligible != _isEligible)
+            {
+                _isEligible = isEligible;
+                _netEventsDataService.AddStartMatchEligibleChangedNetEvent(tick, _isEligible);
+            }
+
+            if (!_isEligible)
+            {
+                TryStopCountdown(tick);
+            }
+            else
+            {
+                // Previously logic was to stop countdown on any team change.
+                // Assuming we want to maintain that behavior:
+                TryStopCountdown(tick);
+            }
+        }
+
+        private bool CheckEligibility()
+        {
+            var players = _matchMakingDataService.SimulationState.Players;
+            for (int i = 0; i < players.Count; i++)
+            {
+                if (players[i].TeamId == 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

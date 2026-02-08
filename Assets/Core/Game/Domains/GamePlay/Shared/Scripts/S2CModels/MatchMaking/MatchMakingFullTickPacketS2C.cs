@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
         public FixedUnorderedList<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents;
         public FixedUnorderedList<StartMatchCountdownNetEventS2C> StartMatchCountdownNetEvents;
         public FixedUnorderedList<StopMatchCountdownNetEventS2C> StopMatchCountdownNetEvents;
+        public FixedUnorderedList<StartMatchEligibleChangedNetEventS2C> StartMatchEligibleChangedNetEvents;
 
         public MatchMakingFullTickPacketS2C()
         {
@@ -33,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             PlayerSwitchTeamNetEvents = new FixedUnorderedList<PlayerSwitchTeamNetEventS2C>(maxCap.PlayerSwitchTeamNetEvents);
             StartMatchCountdownNetEvents = new FixedUnorderedList<StartMatchCountdownNetEventS2C>(maxCap.StartMatchCountdownNetEvents);
             StopMatchCountdownNetEvents = new FixedUnorderedList<StopMatchCountdownNetEventS2C>(maxCap.StopMatchCountdownNetEvents);
+            StartMatchEligibleChangedNetEvents = new FixedUnorderedList<StartMatchEligibleChangedNetEventS2C>(maxCap.StartMatchEligibleChangedNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -45,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             SerializedPlayerSwitchTeamEvents(writer);
             SerializedStartMatchCountdownEvents(writer);
             SerializedStopMatchCountdownEvents(writer);
+            SerializedStartMatchEligibleChangedEvents(writer);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -57,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             DeserializedPlayerSwitchTeamEvents(reader);
             DeserializedStartMatchCountdownEvents(reader);
             DeserializedStopMatchCountdownEvents(reader);
+            DeserializedStartMatchEligibleChangedEvents(reader);
         }
         
         private void SerializedBulletDestroyedEvents(NetDataWriter writer)
@@ -176,6 +180,26 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             for (var i = 0; i < count; i++)
             {
                 ref var evt = ref StopMatchCountdownNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void SerializedStartMatchEligibleChangedEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)StartMatchEligibleChangedNetEvents.Count);
+            foreach (var evt in StartMatchEligibleChangedNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void DeserializedStartMatchEligibleChangedEvents(NetDataReader reader)
+        {
+            StartMatchEligibleChangedNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref StartMatchEligibleChangedNetEvents.AddAndGet();
                 evt.Deserialize(reader);
             }
         }

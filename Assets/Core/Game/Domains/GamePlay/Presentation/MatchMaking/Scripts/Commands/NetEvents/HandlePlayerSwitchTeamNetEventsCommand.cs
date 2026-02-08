@@ -37,7 +37,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
             foreach (var netEvent in events)
             {
                 var teamId = netEvent.TeamId;
-                var playerNewColor = _gameplayConfig.ColorPerTeamId[teamId];
+                var playerNewColor = teamId == 0
+                    ? _gameplayConfig.NoneTeamColor
+                    : _gameplayConfig.ColorPerTeamId[teamId];
                 _playerControllers.UpdatePlayerColor(netEvent.PlayerId, playerNewColor);
                 _matchMakingDataService.GetPlayer(netEvent.PlayerId).TeamId = teamId;
                 _environmentTeamFloorControllers.AnimateFloorBounce(teamId);

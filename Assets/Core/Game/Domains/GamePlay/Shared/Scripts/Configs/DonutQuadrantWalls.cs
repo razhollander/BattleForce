@@ -62,6 +62,24 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         /// - width: radial thickness (outer = centerRadius + width/2, inner = centerRadius - width/2)
         /// - precision: number of segments around full 360°
         /// </summary>
+        public static Vector2 GetTeamFloorCenter(ushort teamId, float outerRadius)
+        {
+            float innerRadius = outerRadius * 0.5f;
+            float centerRadius = (outerRadius + innerRadius) * 0.5f;
+            float angle = 0;
+
+            switch (teamId)
+            {
+                case 1: angle = 45f; break;
+                case 2: angle = -45f; break;
+                case 3: angle = -135f; break;
+                case 4: angle = 135f; break;
+                default: return Vector2.Zero;
+            }
+
+            return PointOnCircle(centerRadius, angle);
+        }
+
         public static WallConfig[] GenerateWrapAroundWallJson(float centerRadius, float width, int precision, ushort startId = 1000)
         {
             if (centerRadius <= 0) throw new ArgumentOutOfRangeException(nameof(centerRadius));

@@ -35,5 +35,38 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatc
         {
             transform.localScale = new Vector3(radius * 2, radius * 2, 1);
         }
+
+        public void SetOpacity(float alpha)
+        {
+            var spriteRenderer = GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                var color = spriteRenderer.color;
+                color.a = alpha;
+                spriteRenderer.color = color;
+            }
+
+            if (_countdownText != null)
+            {
+                _countdownText.alpha = alpha;
+            }
+
+            if (_startTextTransform != null)
+            {
+                var renderers = _startTextTransform.GetComponentsInChildren<SpriteRenderer>();
+                foreach (var renderer in renderers)
+                {
+                    var color = renderer.color;
+                    color.a = alpha;
+                    renderer.color = color;
+                }
+
+                var texts = _startTextTransform.GetComponentsInChildren<TMP_Text>();
+                foreach (var text in texts)
+                {
+                    text.alpha = alpha;
+                }
+            }
+        }
     }
 }

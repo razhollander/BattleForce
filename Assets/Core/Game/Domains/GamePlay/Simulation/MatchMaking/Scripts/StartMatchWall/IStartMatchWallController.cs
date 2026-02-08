@@ -7,5 +7,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
         void TryStopCountdown(int tick);
         void StepTimer(float deltaTime);
         bool DidFinishCountingDown { get; }
+        void OnPlayerTeamChanged(int tick);
     }
 }
