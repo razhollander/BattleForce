@@ -65,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
             LogService.LogTopic($"Started Recording Playback. Seed: {seed}", LogTopicType.ServerNetwork);
         }
 
-        public void SaveRecording()
+        private void SaveRecording()
         {
             _playbackIOService.SavePlayback(_initialTick, _seed, _ticks, _players);
         }
@@ -98,7 +98,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
             RecordPacket(playerId, packetBytes);
         }
         
-        public void RecordPacket(ushort playerId, byte[] data)
+        private void RecordPacket(ushort playerId, byte[] data)
         {
             var serverTick = _tickService.CurrentTick;
             if (!_ticks.TryGetValue(serverTick, out var tickData))

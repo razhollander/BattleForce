@@ -11,6 +11,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
@@ -30,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private INetEventsDataService _netEventsDataService;
         private ITickService _tickService;
         private ICommandFactory _commandFactory;
+        private NetworkConfig _networkConfig;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -54,6 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _tickService = _diContainer.Resolve<ITickService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _networkConfig = _diContainer.Resolve<NetworkConfig>();
         }
 
         public void Execute()
@@ -98,7 +101,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         {
             if (_playbackRecorderService.IsPlaybackEnabled)
             {
-                _networkManager.SwitchToNetManager(new NetManagerPlayback(_playbackRecorderService, _tickService));
+                _networkManager.SwitchToNetManager(new NetManagerPlayback(_playbackRecorderService, _tickService, _networkConfig));
             }
             else
             {

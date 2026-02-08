@@ -87,19 +87,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public ProcessPlayersInputsResult ProcessInputs(int processedTick)
         {
             _cachedProcessPlayersInputsResult.Clear();
-            if (!_recorderService.IsPlaybackEnabled)
-            {
+            //if (!_recorderService.IsPlaybackEnabled)
+            //{
                 LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
-            }
+            //}
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
-            if (_recorderService.IsPlaybackEnabled)
-            {
-                _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessAllInputsPerPlayers(processedTick);
-            }
-            else
-            {
+            //if (_recorderService.IsPlaybackEnabled)
+           // {
+           //     _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessAllInputsPerPlayers(processedTick);
+           // }
+           // else
+           // {
                 _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
-            }
+           // }
             return _cachedProcessPlayersInputsResult;
         }
 
@@ -176,11 +176,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private void RemoveAmountOfEarliestInputs(FixedUnorderedList<MatchPlayerInputPacketC2S> inputsOfPlayer, int amountOfPacketsToRemove)
         {
             inputsOfPlayer.Sort();
-            for (int i = 0; i < amountOfPacketsToRemove; i++)
+            for (int i = amountOfPacketsToRemove - 1; i >= 0; i--)
             {
                 _playerInputPacketsPool.Return(inputsOfPlayer[i]);
+                inputsOfPlayer.RemoveAt(i);
             }
-            inputsOfPlayer.RemoveRange(0, amountOfPacketsToRemove);
         }
 
         private CapacityDict<ushort, MatchPlayerInputPacketC2S> ProcessEarliestInputPerPlayers(int processedTick)
@@ -502,15 +502,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 _inputsPerPlayer.Add(playerId, _inputsListsPool.Get());
             }
-
+    
             var inputsList = _inputsPerPlayer[playerId];
-            if (inputsList.IsFull)
-            {
-                inputsList.Sort();
-                var earliest = inputsList[0];
-                _playerInputPacketsPool.Return(earliest);
-                inputsList.RemoveAt(0);
-            }
+            // if (inputsList.IsFull)
+            // {
+            //     inputsList.Sort();
+            //     var earliest = inputsList[0];
+            //     _playerInputPacketsPool.Return(earliest);
+            //     inputsList.RemoveAt(0);
+            // }
 
             ref var input = ref inputsList.AddAndGet();
             input = playerInputPacket;

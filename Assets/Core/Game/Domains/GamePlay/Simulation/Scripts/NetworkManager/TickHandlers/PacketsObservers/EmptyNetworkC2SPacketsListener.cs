@@ -10,7 +10,7 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers
 {
-    public class NetworkC2SPacketsListener : INetEventListener
+    public class EmptyNetworkC2SPacketsListener : INetEventListener
     {
         private readonly NetworkConfig _networkConfig;
         private readonly IServerNetworkManager _serverNetworkManager;
@@ -22,32 +22,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         public event Action OnPacketReceivedEvent;
         public event Action OnPeerDisconnectedEvent;
 
-        public NetworkC2SPacketsListener(NetworkConfig networkConfig)
+        public EmptyNetworkC2SPacketsListener(NetworkConfig networkConfig)
         {
             _networkConfig = networkConfig;
             _packetsObservers = new CapacityDict<PacketTypeC2S, IPacketsObserver>(networkConfig.MaxCap.PacketTypes);
             _rawPacketsObservers = new CapacityList<IRawPacketsObserver>(1);
         }
-
-        public void RegisterObserver(IPacketsObserver PacketsObserver)
-        {
-            _packetsObservers.Add(PacketsObserver.PacketType, PacketsObserver);
-        }
         
-        public void UnregisterObserver(IPacketsObserver PacketsObserver)
-        {
-            _packetsObservers.Remove(PacketsObserver.PacketType);
-        }
-        
-        public void RegisterObserver(IRawPacketsObserver PacketsObserver)
-        {
-            _rawPacketsObservers.Add(PacketsObserver);
-        }
-        
-        public void UnregisterObserver(IRawPacketsObserver PacketsObserver)
-        {
-            _rawPacketsObservers.Remove(PacketsObserver);
-        }
 
         public void OnNetworkReceive(NetPeer peer, NetDataReader reader)
         {
@@ -60,8 +41,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             }
         
             var packetType = (PacketTypeC2S) reader.GetByte();
-
-            if (_packetsObservers.TryGetValue(packetType, out var observer))
+            
+            if (packetType != PacketTypeC2S.MatchPlayerInput && _packetsObservers.TryGetValue(packetType, out var observer))
             {
                 observer.OnPacketReceived(reader, peer);
             }
