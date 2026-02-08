@@ -35,11 +35,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _matchMakingDataService.InitEntryPoint();
             _playerInputsPacketsHandler.InitEntryPoint();
             _playerJoinPacketsHandler.InitEntryPoint();
-            _tickProcessor.InitEntryPoint();
             
             CreateWalls();
             CreateTeamFloors();
             CreateStartMatchWall();
+            
+            _tickProcessor.InitEntryPoint();
         }
 
         private void CreateStartMatchWall()

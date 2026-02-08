@@ -38,15 +38,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         public int LastProcessedTickFromServer { get; private set; }
 
         public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
-            IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService,
-            IClientMatchMakingPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService,
+            IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory,
             IStartMatchButtonController startMatchButtonController)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
 
-            _presentationNetEventsHandler = new PresentationMatchMakingNetEventsHandler(matchDataService, cachedPresentationEventsService, networkManager, networkConfig,
-                clientPresentationTickProcessor, commandFactory, tickCounterService, startMatchButtonController);
+            _presentationNetEventsHandler = new PresentationMatchMakingNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory, startMatchButtonController);
 
             _fullTickPackets = new CapacityDict<int, MatchMakingFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerJoinedEvents = new CapacityList<MatchMakingPlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);

@@ -8,7 +8,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersi
     public class SimulationPersistentData : ISimulationPersistentData
     {
         public bool ShouldSkipMatchMaking { get; private set; }
-        public bool IsPlaybackEnabled { get; private set; }
         
 
         public SimulationPersistentData()
@@ -17,7 +16,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersi
 
         public void InitEntryPoint()
         {
-            IsPlaybackEnabled = PlayerPrefsSettings.IsPlaybackEnabled;
             ShouldSkipMatchMaking = PlayerPrefsSettings.ShouldSkipMatchMaking;
         }
     }

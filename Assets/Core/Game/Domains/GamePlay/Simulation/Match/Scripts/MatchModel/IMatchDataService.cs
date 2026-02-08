@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         MatchEnvironmentDataService Environment { get; }
         //SimulationStateS2C PreviousSimulationState { get; }
         PlayerStateS2C AddPlayer(ushort playerId, ushort teamId, string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,
-            float shootCooldown);
+            float shootCooldown, bool isPlayerConnected);
         PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed, float radius);
         //void CopySimulationStateIntoPrevious();
         public TalentCardS2C AddTalentCard(ushort talentCardId, Vector2 position, TalentType talentType, ushort health);

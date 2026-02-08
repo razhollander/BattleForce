@@ -3,11 +3,11 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         private readonly HandleTalentInputPressedCommand _handleTalentInputPressedCommand;
         private readonly IPlayersTalentsManager _playersTalentsManager;
-        private readonly IPlaybackRecorderService _recorderService;
+        private readonly IPlaybackRecorderService _playerbackRecorderService;
 
         public bool DidReceiveAnyInputFromPlayer(ushort playerId)
         {
@@ -51,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService recorderService)
+            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -62,7 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _updateSubscriptionService = updateSubscriptionService;
             _commandFactory = commandFactory;
             _playersTalentsManager = playersTalentsManager;
-            _recorderService = recorderService;
+            _playerbackRecorderService = playerbackRecorderService;
             _handleTalentInputPressedCommand = _commandFactory.CreateCommandVoid<HandleTalentInputPressedCommand>();
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, MatchPlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -83,13 +83,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _networkManager.UnregisterPacketsObserver(this);
             _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
-        
+
         public ProcessPlayersInputsResult ProcessInputs(int processedTick)
         {
             _cachedProcessPlayersInputsResult.Clear();
             LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
             _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
+
             return _cachedProcessPlayersInputsResult;
         }
 
@@ -112,7 +113,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private void RemoveAmountOfEarliestInputs(FixedUnorderedList<MatchPlayerInputPacketC2S> inputsOfPlayer, int amountOfPacketsToRemove)
         {
             inputsOfPlayer.Sort();
-            inputsOfPlayer.RemoveRange(0, amountOfPacketsToRemove);
+            for (int i = amountOfPacketsToRemove - 1; i >= 0; i--)
+            {
+                _playerInputPacketsPool.Return(inputsOfPlayer[i]);
+                inputsOfPlayer.RemoveAt(i);
+            }
         }
 
         private CapacityDict<ushort, MatchPlayerInputPacketC2S> ProcessEarliestInputPerPlayers(int processedTick)
@@ -419,8 +424,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             return _lastProcessedInputPerPlayer.TryGetValue(playerId, out playerInputPacket);
         }
         
-        public void OnPacketReceived(NetDataReader reader, NetPeer peer)
+        public void OnPacketReceived(NetDataReader reader, NetPeer peer, bool isReceivedFromPlayback)
         {
+            var shouldIgnorePacket = !isReceivedFromPlayback && _playerbackRecorderService.IsPlaybackEnabled;
+            if (shouldIgnorePacket)
+            {
+                return;
+            }
+            
             var newPacket = _playerInputPacketsPool.Get();
             newPacket.Deserialize(reader);
             OnPlayerInputReceived(newPacket, peer);
@@ -434,7 +445,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 _inputsPerPlayer.Add(playerId, _inputsListsPool.Get());
             }
-            ref var input = ref _inputsPerPlayer[playerId].AddAndGet();
+    
+            var inputsList = _inputsPerPlayer[playerId];
+            ref var input = ref inputsList.AddAndGet();
             input = playerInputPacket;
             if (playerInputPacket.IsShootInputPressed)
             {

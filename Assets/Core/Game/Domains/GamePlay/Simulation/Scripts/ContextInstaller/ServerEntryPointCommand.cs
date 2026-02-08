@@ -1,9 +1,12 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
@@ -16,6 +19,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ITickService _tickService;
         private ISimulationPersistentData _simulationPersistentData;
         private IHeadLessQuitterController _headLessQuitterController;
+        private IPlaybackRecorderService _playbackRecorderService;
+        private DefaultMatchEnterDataConfig _defaultMatchEnterDataConfig;
+        
+        private ServerInitiatorEnterData _serverInitiatorEnterData;
 
         public override void ResolveDependencies()
         {
@@ -25,17 +32,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _tickService = _diContainer.Resolve<ITickService>();
             _simulationPersistentData = _diContainer.Resolve<ISimulationPersistentData>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
+            _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
+            _defaultMatchEnterDataConfig = _diContainer.Resolve<DefaultMatchEnterDataConfig>();
         }
 
         public void Execute()
         {
-            _serverNetworkManager.InitEntryPoint();
+            _playbackRecorderService.InitEntryPoint(_serverInitiatorEnterData.IsPlaybackEnabled, _serverInitiatorEnterData.PlaybackFileName);
             _physicsSimulator.InitEntryPoint();
             _simulationStateMachine.InitEntryPoint();
-            _simulationStateMachine.ChangeToMatchMaking();
             _tickService.InitEntryPoint();
             _simulationPersistentData.InitEntryPoint();
             _headLessQuitterController.InitEntryPoint();
+
+            if (_playbackRecorderService.IsPlaybackEnabled)
+            {
+                var matchEnterData = new SimulationMatchEnterData(_playbackRecorderService.Players);
+                _simulationStateMachine.ChangeToMatch(matchEnterData);
+            }
+            else if (PlayerPrefsSettings.ShouldSkipMatchMaking)
+            {
+                _simulationStateMachine.ChangeToMatch(_defaultMatchEnterDataConfig.DefaultSimulationMatchEnterData);
+            }
+            else
+            {
+                _simulationStateMachine.ChangeToMatchMaking();
+            }
+            
+            _serverNetworkManager.InitEntryPoint();
+        }
+
+        public ServerEntryPointCommand SetEnterData(ServerInitiatorEnterData serverInitiatorEnterData)
+        {
+            _serverInitiatorEnterData = serverInitiatorEnterData;
+            return this;
         }
     }
 }

@@ -368,7 +368,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             return _lastProcessedInputPerPlayer.TryGetValue(playerId, out playerInputPacket);
         }
         
-        public void OnPacketReceived(NetDataReader reader, NetPeer peer)
+        public void OnPacketReceived(NetDataReader reader, NetPeer peer, bool isReceivedFromPlayback)
         {
             var newPacket = _playerInputPacketsPool.Get();
             newPacket.Deserialize(reader);
