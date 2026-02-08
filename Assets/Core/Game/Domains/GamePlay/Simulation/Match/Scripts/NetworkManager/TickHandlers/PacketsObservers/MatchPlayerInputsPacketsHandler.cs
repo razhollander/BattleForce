@@ -83,78 +83,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _networkManager.UnregisterPacketsObserver(this);
             _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
-        
+
         public ProcessPlayersInputsResult ProcessInputs(int processedTick)
         {
             _cachedProcessPlayersInputsResult.Clear();
-            //if (!_recorderService.IsPlaybackEnabled)
-            //{
-                LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
-            //}
+            LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
-            //if (_recorderService.IsPlaybackEnabled)
-           // {
-           //     _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessAllInputsPerPlayers(processedTick);
-           // }
-           // else
-           // {
-                _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
-           // }
+            _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
+
             return _cachedProcessPlayersInputsResult;
-        }
-
-        private CapacityDict<ushort, MatchPlayerInputPacketC2S> ProcessAllInputsPerPlayers(int processedTick)
-        {
-            for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
-            {
-                var playerState = _matchDataService.SimulationState.GetPlayerByIndex(i);
-                var playerId = playerState.Id;
-
-                if (!_inputsPerPlayer.TryGetValue(playerId, out var playerInputs) || playerInputs.Count == 0)
-                {
-                    if (TryGetCachedInputForPlayer(playerId, out var cachedInput))
-                    {
-                        _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Add(playerId, cachedInput);
-                    }
-                    continue;
-                }
-
-                playerInputs.Sort();
-                MatchPlayerInputPacketC2S lastProcessedPacket = default;
-                bool processedAny = false;
-
-                while (playerInputs.Count > 0)
-                {
-                    var packet = playerInputs[0];
-                    playerInputs.RemoveAt(0);
-
-                    UpdatePlayerDirection(packet, playerState);
-                    UpdatePlayerShoot(processedTick, packet.IsShootInputPressed, playerState);
-                    UpdatePlayerTalent(processedTick, packet.IsTalentInputPressed, playerState);
-
-                    var wasSwitchTalentInputPressed = _lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastInput) && lastInput.IsSwitchTalentInputPressed;
-                    var isSwitchTalentInputPressed = packet.IsSwitchTalentInputPressed;
-                    if (!wasSwitchTalentInputPressed && isSwitchTalentInputPressed)
-                    {
-                        _playersTalentsManager.SwitchTalent(playerId);
-                    }
-
-                    if (_lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastPlayerInput))
-                    {
-                        _playerInputPacketsPool.Return(lastPlayerInput);
-                    }
-                    _lastProcessedInputPerPlayer[playerId] = packet;
-                    lastProcessedPacket = packet;
-                    processedAny = true;
-                }
-
-                if (processedAny)
-                {
-                    _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Add(playerId, lastProcessedPacket);
-                }
-            }
-
-            return _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer;
         }
 
         private void LeaveLatestPacketsForBuffer(int bufferAmount)
@@ -510,14 +447,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
     
             var inputsList = _inputsPerPlayer[playerId];
-            // if (inputsList.IsFull)
-            // {
-            //     inputsList.Sort();
-            //     var earliest = inputsList[0];
-            //     _playerInputPacketsPool.Return(earliest);
-            //     inputsList.RemoveAt(0);
-            // }
-
             ref var input = ref inputsList.AddAndGet();
             input = playerInputPacket;
             if (playerInputPacket.IsShootInputPressed)
