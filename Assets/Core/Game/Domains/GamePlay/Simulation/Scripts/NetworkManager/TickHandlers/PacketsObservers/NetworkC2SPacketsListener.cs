@@ -49,12 +49,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
             _rawPacketsObservers.Remove(PacketsObserver);
         }
 
-        public void OnNetworkReceive(NetPeer peer, NetDataReader reader)
+        public void OnNetworkReceive(NetPeer peer, NetDataReader reader, bool isReceivedFromPlayback)
         {
             OnPacketReceivedEvent?.Invoke();
             for (int i = _rawPacketsObservers.Count - 1; i >= 0; i--)
             {
-                //var slice = reader.RawData.AsSpan(reader.Position, reader.AvailableBytes).ToArray();
                 byte[] slice = new byte[reader.AvailableBytes];
                 Array.Copy(reader.RawData, reader.Position, slice, 0, reader.AvailableBytes);
                 _rawPacketsObservers[i].OnPacketReceived(slice, peer);
@@ -64,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
             if (_packetsObservers.TryGetValue(packetType, out var observer))
             {
-                observer.OnPacketReceived(reader, peer);
+                observer.OnPacketReceived(reader, peer, isReceivedFromPlayback);
             }
             LogService.LogTopic($"OnNetworkReceive!", LogTopicType.ServerNetwork);
         }
@@ -97,7 +96,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
         {
-            OnNetworkReceive(peer, reader);
+            OnNetworkReceive(peer, reader, false);
         }
 
         void INetEventListener.OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader,

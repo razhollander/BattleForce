@@ -8,7 +8,6 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -31,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IServerNetworkManager _networkManager;
         private readonly IMatchPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private readonly IMatchDataService _matchDataService;
-        private readonly IPlayeRejoinPacketsHandler _playeRejoinPacketsHandler;
+        private readonly IMatchPlayerJoinPacketsHandler _matchPlayerJoinPacketsHandler;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IStateMachineService _stateMachineService;
         private readonly IPhysicsSimulator _physicsSimulator;
@@ -46,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private StepTimersCommand _stepTimersCommand;
         private readonly MatchFullTickPacketS2C _fullTickPacket;
-        private StartMatchPacketS2C _startMatchPacket;
+        private StartMatchPacketS2C _cachedStartMatchPacket;
         private StartStagePacketS2C _startStagePacket;
         //private TimerFixedThreaded2 _pollEventsFixedTimer;
         private Stopwatch _sw;
@@ -54,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IServerNetworkManager networkManager,
             IMatchPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
-            IPlayeRejoinPacketsHandler iPlayeRejoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
+            IMatchPlayerJoinPacketsHandler iIMatchPlayerJoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
             ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController, IStageDataService stageDataService)
         {
             _networkConfig = networkConfig;
@@ -62,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _networkManager = networkManager;
             _playerInputsPacketsHandler = playerInputsPacketsHandler;
             _matchDataService = matchDataService;
-            _playeRejoinPacketsHandler = iPlayeRejoinPacketsHandler;
+            _matchPlayerJoinPacketsHandler = iIMatchPlayerJoinPacketsHandler;
             _netEventsDataService = iNetEventsDataService;
             _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
@@ -70,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _headLessQuitterController = headLessQuitterController;
             _stageDataService = stageDataService;
             _fullTickPacket = new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig);
-            _startMatchPacket = new StartMatchPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
+            _cachedStartMatchPacket = new StartMatchPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
             _startStagePacket = new StartStagePacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
         }
 
@@ -105,7 +104,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _tickService.UnregisterObserver(this);
         }
         
-      
         public void OnTick(int currentTick)
         {
             try
@@ -161,7 +159,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
                 var didPlayerAcknowledgeMatch = _playerInputsPacketsHandler.DidReceiveAnyInputFromPlayer(playerState.Id);
-                if (!didPlayerAcknowledgeMatch)
+                if (!didPlayerAcknowledgeMatch && playerState.IsConnected)
                 {
                     SendStartMatchPacketToClient(playerState.Id, processedTick, DeliveryMethod.Unreliable);
                 }
@@ -170,14 +168,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         private void SendStartMatchPacketToClient(ushort playerId, int processedTick, DeliveryMethod deliveryMethod)
         {
-            _startMatchPacket.InitialState = _matchDataService.SimulationState;
-            _startMatchPacket.OccuredOnTick = processedTick;
-            _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.StartMatch, _startMatchPacket, deliveryMethod);
+            _cachedStartMatchPacket.InitialState = _matchDataService.SimulationState;
+            _cachedStartMatchPacket.OccuredOnTick = processedTick;
+            _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.StartMatch, _cachedStartMatchPacket, deliveryMethod);
         }
 
         private ProcessPlayersInputsResult ProcessPackets(int processedTick)
         {
-            _playeRejoinPacketsHandler.ProcessPlayersRejoined(processedTick);
+            _matchPlayerJoinPacketsHandler.ProcessPlayersJoined(processedTick);
             return _playerInputsPacketsHandler.ProcessInputs(processedTick);
         }
 
@@ -207,6 +205,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             //_fullTickPacket.PreviousSimulationState = _matchDataService.PreviousSimulationState;
             foreach (var playerState in currentSimulationState.Players.AsSpan())
             {
+                if (!playerState.IsConnected)
+                {
+                    return;
+                }
+                
                 var playerId = playerState.Id;
                 _fullTickPacket.BulletSpawnNetEvents = _netEventsDataService.BulletSpawnNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerJoinAcceptNetEvents = _netEventsDataService.PlayerRejoinAcceptNetEventsPerPlayer[playerId];

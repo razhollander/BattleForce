@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
+namespace Core.Game.Domains.GamePlay.Shared.Scripts.Playback
 {
     [System.Serializable]
     public class PlaybackTickData

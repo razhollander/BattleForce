@@ -2,6 +2,7 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Scripts.Utils;
 using CoreDomain.GameDomain.Scripts.States.GamePlayState;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -15,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private IGameInputActionsController _gameInputActionsController;
         private IChooseNetworkRoleUIController _chooseNetworkRoleUIController;
         private IDataPersistence _dataPersistence;
+        private IJoinResponsePacketHandler _joinResponsePacketHandler;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -28,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         {
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
             _chooseNetworkRoleUIController = _diContainer.Resolve<IChooseNetworkRoleUIController>();
+            _joinResponsePacketHandler = _diContainer.Resolve<IJoinResponsePacketHandler>();
             _dataPersistence = _diContainer.Resolve<IDataPersistence>();
         }
 
@@ -35,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         {
             _gameInputActionsController.EnableInputs();
             _chooseNetworkRoleUIController.InitEntryPoint();
+            _joinResponsePacketHandler.InitEntryPoint();
         }
     }
 }

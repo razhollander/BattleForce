@@ -11,7 +11,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataServic
         List<MatchPlayerBulletModel> Bullets { get; }
         MatchMakingPlayerModel GetPlayer(ushort playerId);
         MatchMakingPlayerModel LocalPlayer { get; }
-        bool IsPlayerJoined { get; }
         MatchMakingPlayerModel AddPlayer(MatchMakingPlayerStateS2C playerState);
         MatchEnvironmentWallModel AddWall(WallConfig wallConfig);
         void SetLocalPlayer(int playerId);

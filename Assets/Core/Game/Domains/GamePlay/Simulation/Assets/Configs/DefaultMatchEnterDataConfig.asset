@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f9ffde725414051a53e06293db7858, type: 3}
   m_Name: DefaultMatchEnterDataConfig
   m_EditorClassIdentifier: 
-  DefaultMatchEnterData:
+  DefaultSimulationMatchEnterData:
     Players:
     - Id: 1
-      Name: Razon
-      TeamId: 0
+      Name: Raz
+      TeamId: 1

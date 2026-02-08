@@ -93,9 +93,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _packetsSender.SendPacketToPlayerSerialized(playerId, type, packet, deliveryMethod);
         }
 
+        public void SendPacketToPeerSerialized<T>(NetPeer peer, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        {
+            _packetsSender.SendPacketToPeerSerialized(peer, type, packet, deliveryMethod);
+        }
+
         public void AddPlayerPeer(ushort playerId, NetPeer peer)
         {
             _packetsSender.AddPlayerPeer(playerId, peer);
+        }
+
+        public void RemovePlayerPeer(ushort playerId)
+        {
+            _packetsSender.RemovePlayerPeer(playerId);
         }
 
         public void PollEvents()
@@ -106,6 +116,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public int GetPlayerPeerId(ushort playerId)
         {
             return _packetsSender.GetPlayerPeerId(playerId);
+        }  
+        
+        public bool IsPlayerPeerConencted(ushort playerId)
+        {
+            return _packetsSender.IsPlayerConnected(playerId);
         }
 
         public void RegisterPacketsObserver(IPacketsObserver packetsObserver)

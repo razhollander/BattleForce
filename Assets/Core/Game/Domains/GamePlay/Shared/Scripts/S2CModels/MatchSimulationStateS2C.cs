@@ -355,5 +355,20 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No power up for id {powerUpBallId}!");
         }
+
+        public  bool TryGetPlayerByName(string playerName, out PlayerStateS2C playerState)
+        {
+            for (int i = 0; i < Players.Count; i++)
+            {
+                if (Players[i].Name == playerName)
+                {
+                    playerState = Players.GetByIndex(i);
+                    return true;
+                } 
+            }
+
+            playerState = default;
+            return false;
+        }
     }
 }

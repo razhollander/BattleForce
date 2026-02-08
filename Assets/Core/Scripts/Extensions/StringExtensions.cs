@@ -10,12 +10,6 @@ namespace Core.Scripts.Extensions
         {
             return string.IsNullOrEmpty(str);
         }
-
-        public static string ToJson(this object obj)
-        {
-            var bytes = SerializationUtility.SerializeValue(obj, DataFormat.JSON);
-            return Encoding.UTF8.GetString(bytes);
-        }
         
         public static T FromJson<T>(this string json)
         {

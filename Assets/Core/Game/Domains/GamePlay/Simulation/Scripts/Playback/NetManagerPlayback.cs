@@ -2,44 +2,50 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions;
+using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 {
     public class NetManagerPlayback : INetManagerWrapper
     {
         private NetworkC2SPacketsListener _packetsListener;
         private readonly IPlaybackRecorderService _playbackRecorderService;
         private readonly ITickService _tickService;
+        private readonly NetworkConfig _networkConfig;
+        private NetManager _netManager;
 
-        public int ConnectedPeersCount => 1;
+        public int ConnectedPeersCount => _netManager != null ? _netManager.ConnectedPeersCount : 0;
 
-        public NetManagerPlayback(IPlaybackRecorderService playbackRecorderService, ITickService tickService)
+        public NetManagerPlayback(IPlaybackRecorderService playbackRecorderService, ITickService tickService, NetworkConfig networkConfig)
         {
             _playbackRecorderService = playbackRecorderService;
             _tickService = tickService;
+            _networkConfig = networkConfig;
         }
 
         public void SetPacketsListener(NetworkC2SPacketsListener packetsListener)
         {
             _packetsListener = packetsListener;
+            _netManager = new NetManager(_packetsListener) { AutoRecycle = true, BroadcastReceiveEnabled = true, IPv6Enabled = false };
         }
-
-        //public bool IsRunning { get; private set; }
 
         public void Start(int port)
         {
-            //IsRunning = true;
+            _netManager?.Start(port);
         }
 
         public void Stop()
         {
-            //IsRunning = false;
+            _netManager?.Stop();
         }
 
         public void PollEvents()
         {
+            _netManager?.PollEvents();
+
             var packets = _playbackRecorderService.GetPacketsForTick(_tickService.CurrentTick);
 
             if (packets.IsNullOrEmpty())
@@ -47,17 +53,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Playback
                 return;
             }
 
-            foreach (var p in packets)
+            foreach (var packet in packets)
             {
                 var dummyPeer = (NetPeer) System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(NetPeer));
 
-                if (p.PlayerId != ushort.MaxValue) // todo dont send a peer but instead send player id
+                if (packet.PlayerId != ushort.MaxValue) // todo dont send a peer but instead send player id
                 {
-                    dummyPeer.Tag = p.PlayerId;
+                    dummyPeer.Tag = packet.PlayerId;
                 }
                     
-                var reader = new NetDataReader(p.Data);
-                _packetsListener.OnNetworkReceive(dummyPeer, reader);
+                var reader = new NetDataReader(packet.Data);
+                _packetsListener.OnNetworkReceive(dummyPeer, reader, true);
             }
         }
     }
