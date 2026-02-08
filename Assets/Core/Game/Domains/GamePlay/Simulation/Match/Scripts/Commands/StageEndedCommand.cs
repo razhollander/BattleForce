@@ -42,9 +42,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             LogService.LogTopic($"Match Ended! Winning Team: {_winningTeamId}", LogTopicType.ServerNetwork);
 
-            var jemsPerTeam = _matchDataService.SimulationState.JemsPerTeamId;
+            var jemsPerTeam = _matchDataService.SimulationState.GemsPerTeamId;
             _stageDataService.AddWinnerTeam(_winningTeamId);
-            var jemsWonPerTeam = _stageDataService.GetJemsCollectedPerTeam();
+            var jemsWonPerTeam = _stageDataService.GemsCollectedPerTeam;
 
             foreach (var kvp in jemsWonPerTeam)
             {

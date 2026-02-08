@@ -72,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
-                var list =new FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents, ()=>new PlayerRejoinAcceptPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer));
+                var list =new FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents, ()=>new PlayerRejoinAcceptPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount));
                 list.Clear();
                 return list;
             }, maxConcurrentPlayers);
@@ -682,14 +682,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddTeamLostNetEvent(int onTick, ushort losingTeamId, Dictionary<ushort, int> gemsPerTeam, Dictionary<ushort, int> gemsGainedPerTeam)
+        public void AddTeamLostNetEvent(int onTick, ushort losingTeamId, Dictionary<ushort, int> totalGemsPerTeam, Dictionary<ushort, int> gemsGainedPerTeam)
         {
             foreach (var kvp in TeamLostNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.LosingTeamId = losingTeamId;
-                packet.GemsPerTeam = gemsPerTeam;
+                packet.TotalGemsPerTeam = totalGemsPerTeam;
                 packet.GemsGainedPerTeam = gemsGainedPerTeam;
             }
         }

@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchPlayerModel> Players { get; }
         List<MatchPlayerBulletModel> Bullets { get; }
         List<MatchPowerUpBallModel> PowerUpBalls { get; }
+        HashSet<ushort> TeamIds {get; }
         MatchPlayerModel GetPlayer(ushort playerId);
         MatchPlayerModel LocalPlayer { get; }
         bool IsPlayerJoined { get; }

@@ -14,10 +14,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public MatchMakingSimulationStateS2C MatchMakingSimulationState;
         public MatchSimulationStateS2C MatchSimulationState;
 
-        public JoinResponsePacketS2C(MaxCap maxCap, int maxTalentsPerPlayer)
+        public JoinResponsePacketS2C(MaxCap maxCap, int maxTalentsPerPlayer, int maxTeams)
         {
             MatchMakingSimulationState = new MatchMakingSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets);
-            MatchSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls);
+            MatchSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, maxTeams);
         }
         
         public JoinResponsePacketS2C()

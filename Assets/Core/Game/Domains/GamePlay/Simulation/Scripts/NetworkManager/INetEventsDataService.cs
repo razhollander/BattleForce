@@ -47,6 +47,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddStartMatchCountdownNetEvent(int onTick, ushort seconds);
         void AddStopMatchCountdownNetEvent(int onTick);
         void AddStageEndNetEvent(int onTick, ushort winningTeamId, Dictionary<ushort, int> jemsWon, Dictionary<ushort, int> totalJems);
-        void AddTeamLostNetEvent(int onTick, ushort losingTeamId, Dictionary<ushort, int> gemsPerTeam, Dictionary<ushort, int> gemsGainedPerTeam);
+        void AddTeamLostNetEvent(int onTick, ushort losingTeamId, Dictionary<ushort, int> totalGemsPerTeam, Dictionary<ushort, int> gemsGainedPerTeam);
     }
 }

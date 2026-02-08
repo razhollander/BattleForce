@@ -28,7 +28,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
                 networkConfig.MaxCap.ConcurrentBullets,
                 sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
                 networkConfig.MaxCap.ConcurrentTalentCards,
-                networkConfig.MaxCap.ConcurrentPowerUpBalls);
+                networkConfig.MaxCap.ConcurrentPowerUpBalls,
+                sharedGamePlayConfig.MaxTeamsAmount);
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.EnvironmentLayoutIndex = chosenEnvironmentIndex;

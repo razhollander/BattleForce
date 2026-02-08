@@ -8,24 +8,16 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     {
         public int OccuredOnTick;
         public ushort LosingTeamId;
-        public Dictionary<ushort, int> GemsPerTeam;
+        public Dictionary<ushort, int> TotalGemsPerTeam;
         public Dictionary<ushort, int> GemsGainedPerTeam;
-
-        public TeamLostNetEventS2C(int occuredOnTick, ushort losingTeamId, Dictionary<ushort, int> gemsPerTeam, Dictionary<ushort, int> gemsGainedPerTeam)
-        {
-            OccuredOnTick = occuredOnTick;
-            LosingTeamId = losingTeamId;
-            GemsPerTeam = gemsPerTeam;
-            GemsGainedPerTeam = gemsGainedPerTeam;
-        }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
             writer.Put(LosingTeamId);
 
-            writer.Put((byte)GemsPerTeam.Count);
-            foreach (var kvp in GemsPerTeam)
+            writer.Put((byte)TotalGemsPerTeam.Count);
+            foreach (var kvp in TotalGemsPerTeam)
             {
                 writer.Put(kvp.Key);
                 writer.Put(kvp.Value);
@@ -45,12 +37,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             LosingTeamId = reader.GetUShort();
 
             var gemsCount = reader.GetByte();
-            GemsPerTeam = new Dictionary<ushort, int>(gemsCount);
+            TotalGemsPerTeam = new Dictionary<ushort, int>(gemsCount);
             for (int i = 0; i < gemsCount; i++)
             {
                 var teamId = reader.GetUShort();
                 var gems = reader.GetInt();
-                GemsPerTeam.Add(teamId, gems);
+                TotalGemsPerTeam.Add(teamId, gems);
             }
 
             var gainedCount = reader.GetByte();
