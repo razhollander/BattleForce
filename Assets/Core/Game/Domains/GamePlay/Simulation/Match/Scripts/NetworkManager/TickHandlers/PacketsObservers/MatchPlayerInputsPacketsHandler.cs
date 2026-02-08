@@ -1,3 +1,4 @@
+using System;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
@@ -36,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly ICommandFactory _commandFactory;
 
         private readonly CapacityDict<ushort, FixedUnorderedList<MatchPlayerInputPacketC2S>> _inputsPerPlayer;
+        private readonly CapacityDict<ushort, int> _heighestProcessedTickPerPlayer;
         private readonly CapacityDict<ushort, MatchPlayerInputPacketC2S> _lastProcessedInputPerPlayer;
         private readonly ConcurrentPool<MatchPlayerInputPacketC2S> _playerInputPacketsPool;
         private readonly ConcurrentPool<FixedUnorderedList<MatchPlayerInputPacketC2S>> _inputsListsPool;
@@ -70,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var inputPacketsSavedPerPlayer = networkConfig.MaxCap.PlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
             _inputsListsPool = new ConcurrentPool<FixedUnorderedList<MatchPlayerInputPacketC2S>>(() => new FixedUnorderedList<MatchPlayerInputPacketC2S>(inputPacketsSavedPerPlayer), networkConfig.MaxCap.ConcurrentPlayers);
             _playerInputPacketsPool = new ConcurrentPool<MatchPlayerInputPacketC2S>(() => new MatchPlayerInputPacketC2S(), networkConfig.MaxCap.ConcurrentInputsProcessed);
+            _heighestProcessedTickPerPlayer = new CapacityDict<ushort, int>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void InitEntryPoint()
@@ -191,14 +194,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         private CapacityDict<ushort, int> GetHeighestProcessedTickFromServerPerPlayer()
         {
-            foreach (var inputsOfPlayer in _inputsPerPlayer)
+            _cachedProcessPlayersInputsResult.Clear();
+
+            foreach (var kvp in _heighestProcessedTickPerPlayer)
             {
-                var didReceiveAnyInputsFromPlayer = inputsOfPlayer.Value.Count > 0;
-                if (didReceiveAnyInputsFromPlayer)
-                {
-                    var heighetsTick = GetMaxHighestProcessedTickFromServer(inputsOfPlayer.Value);
-                    _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.TryAdd(inputsOfPlayer.Key,heighetsTick);
-                }
+                _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.TryAdd(kvp.Key, kvp.Value);
             }
 
             return _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer;
@@ -222,25 +222,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
             return indexOfMin;
         }
-        
-        private int GetMaxHighestProcessedTickFromServer(FixedUnorderedList<MatchPlayerInputPacketC2S> inputs)
-        {
-            var span = inputs.AsSpan();
-            if (span.Length == 0)
-                return 0;
-
-            int max = span[0].HeighestProcessedTickFromServer;
-            for (int i = 1; i < span.Length; i++)
-            {
-                int v = span[i].HeighestProcessedTickFromServer;
-                if (v > max)
-                    max = v;
-            }
-
-            return max;
-        }
-
-        
 
         //         public Dictionary<ushort, PlayerInputPacketC2S> ProcessInputs(int processedTick)
 //         {
@@ -292,6 +273,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 playerModel.Spaceship.Transform.Direction, _gamePlayConfig.PlayerBullet.MoveSpeed, _gamePlayConfig.PlayerBullet.Radius);
             _netEventsDataService.AddBulletSpawnNetEvent(processedTick, bullet.Id, bullet.BelongToPlayerId, bullet.Position, bullet.Radius);
             _physicsSimulator.AddPlayerBullet(bullet.Id, playerModel.TeamId, bullet.Position, bullet.Velocity, bullet.Radius);
+            LogService.LogError($"Server add bullet {bullet.Id}");
             LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);
         }
 
@@ -426,21 +408,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         
         public void OnPacketReceived(NetDataReader reader, NetPeer peer, bool isReceivedFromPlayback)
         {
+            var newPacket = _playerInputPacketsPool.Get();
+            newPacket.Deserialize(reader);
+            var playerId = (ushort)peer.Tag;
+            var heighestProcessedTickOfPlayer = _heighestProcessedTickPerPlayer.TryGetValue(playerId, out int value) ? value : -1;
+
+            if (newPacket.Tick > heighestProcessedTickOfPlayer)
+            {
+                _heighestProcessedTickPerPlayer[playerId] = newPacket.Tick;
+            }
+            
             var shouldIgnorePacket = !isReceivedFromPlayback && _playerbackRecorderService.IsPlaybackEnabled;
             if (shouldIgnorePacket)
             {
+                _playerInputPacketsPool.Return(newPacket);
                 return;
             }
             
-            var newPacket = _playerInputPacketsPool.Get();
-            newPacket.Deserialize(reader);
-            OnPlayerInputReceived(newPacket, peer);
+            OnPlayerInputReceived(newPacket, playerId);
         }
 
-        private void OnPlayerInputReceived(MatchPlayerInputPacketC2S playerInputPacket, NetPeer peer)
+        private void OnPlayerInputReceived(MatchPlayerInputPacketC2S playerInputPacket, ushort playerId)
         {
-            var playerId = (ushort)peer.Tag;
-
             if (!_inputsPerPlayer.ContainsKey(playerId))
             {
                 _inputsPerPlayer.Add(playerId, _inputsListsPool.Get());

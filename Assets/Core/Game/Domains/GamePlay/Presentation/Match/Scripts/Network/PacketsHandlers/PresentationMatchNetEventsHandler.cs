@@ -140,6 +140,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var bulletDestroyedEvent in bulletDestroyedEvents)
             {
+                LogService.LogError($"Client Remove bullet {bulletDestroyedEvent.BulletId}");
                 _matchDataService.RemoveBullet(bulletDestroyedEvent.BulletId);
                 _cachedPresentationEventsService.BulletDestroyedNetEvents.Add(bulletDestroyedEvent);
             }

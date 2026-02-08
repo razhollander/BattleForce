@@ -181,6 +181,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void DestroyBullet(PlayerBulletS2C bulletModel, Body bulletBody)
         {
+            LogService.LogError($"Server remove bullet {bulletModel.Id}");
             _matchDataService.SimulationState.RemoveBulletById(bulletModel.Id);
             _physicsSimulator.RemoveBody(bulletBody);
             _netEventsDataService.AddBulletDestroyedNetEvent(_processedTick, bulletModel.Id, bulletModel.Position);
@@ -213,7 +214,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
             else
             {
-                _playersTalentsManager.TryAddTalentToPlayer(talentCard.TalentType, bulletModel.BelongToPlayerId);
+                //_playersTalentsManager.TryAddTalentToPlayer(talentCard.TalentType, bulletModel.BelongToPlayerId);
                 _netEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, bulletModel.BelongToPlayerId);
                 DestroyTalentCard(talentCard, cardBody);
             }

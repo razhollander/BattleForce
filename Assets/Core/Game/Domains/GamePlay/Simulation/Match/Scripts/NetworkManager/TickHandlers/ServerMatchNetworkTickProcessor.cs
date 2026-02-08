@@ -140,9 +140,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         private void SendStartStageToAllPlayers(int processedTick)
         {
-            LogService.LogError("SendStartStageToAllPlayers called");
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
+                if (!playerState.IsConnected)
+                {
+                    return;
+                }
+                
                 SendStartStagePacketToClient(playerState.Id, processedTick, DeliveryMethod.Unreliable);
             }
         }
