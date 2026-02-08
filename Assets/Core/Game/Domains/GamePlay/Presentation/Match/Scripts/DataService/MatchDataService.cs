@@ -138,7 +138,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius)
         {
             var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, position, radius);
-            LogService.LogError($"Cleint Add bullet {bulletId}");
             Bullets.Add(newBullet);
             return newBullet;
         }
