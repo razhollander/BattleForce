@@ -264,7 +264,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetGroup: {fileID: 8865977086233092433}
-  _cinemachineCamera: {fileID: 4126886619047320635}
   _perlin: {fileID: 3842843542390826818}
 --- !u!114 &8865977086233092433
 MonoBehaviour:
@@ -297,6 +296,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
   PivotOffset: {x: 0, y: 0, z: 0}
-  AmplitudeGain: 1
+  AmplitudeGain: 0
   FrequencyGain: 1
   m_NoiseOffsets: {x: 0, y: 0, z: 0}

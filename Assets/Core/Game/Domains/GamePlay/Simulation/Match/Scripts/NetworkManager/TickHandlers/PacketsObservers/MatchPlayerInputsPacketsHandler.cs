@@ -162,7 +162,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         private void UpdatePlayerTalents(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState)
         {
-            foreach (var VARIABLE in playerState.Spaceship.Talents.Talents.AsSpan())
+            foreach (var VARIABLE in playerState.Spaceship.TalentsState.Talents.AsSpan())
             {
                 
             }

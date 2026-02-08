@@ -42,9 +42,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
-                for (int i = 0; i < playerState.Spaceship.Talents.Talents.Count; i++)
+                for (int i = 0; i < playerState.Spaceship.TalentsState.Talents.Count; i++)
                 {
-                    var playerTalent = playerState.Spaceship.Talents.Talents[i];
+                    var playerTalent = playerState.Spaceship.TalentsState.Talents[i];
                     var isCurrentlyOnCooldown = playerTalent.CooldownSecondsLeft < playerTalent.MaxCooldown;
 
                     if (isCurrentlyOnCooldown)
@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         playerTalent.CooldownSecondsLeft = playerTalent.MaxCooldown;
                     }
 
-                    playerState.Spaceship.Talents.Talents[i] = playerTalent;
+                    playerState.Spaceship.TalentsState.Talents[i] = playerTalent;
                 }
             }
         }

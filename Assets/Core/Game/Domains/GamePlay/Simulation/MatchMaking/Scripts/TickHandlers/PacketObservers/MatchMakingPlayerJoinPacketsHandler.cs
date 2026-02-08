@@ -55,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
         public void ProcessPlayersJoined(int processedTick)
         {
             var startingDirection = Vector2.One;
-            var velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
+            var velocity = startingDirection * 0.01f;
             var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
             var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
             var position = Vector2.One;

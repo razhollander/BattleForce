@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -21,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private SimulationGamePlayConfig _gamePlayConfig;
         private INetEventsDataService _netEventsDataService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
+        private IPlayersTalentsManager _playersTalentsManager;
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
@@ -40,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
+            _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
         }
 
         public void Execute()
@@ -210,6 +213,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
             else
             {
+                _playersTalentsManager.TryAddTalentToPlayer(talentCard.TalentType, bulletModel.BelongToPlayerId);
                 _netEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, bulletModel.BelongToPlayerId);
                 DestroyTalentCard(talentCard, cardBody);
             }

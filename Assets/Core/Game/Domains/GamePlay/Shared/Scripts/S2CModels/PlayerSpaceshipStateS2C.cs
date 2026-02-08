@@ -9,13 +9,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public PlayerTransformStateS2C Transform;
         public PlayerShootStateS2C Shoot;
         public PlayerHealthS2C Health;
-        public PlayerTalentsStateS2C Talents;
+        public PlayerTalentsStateS2C TalentsState;
         public bool IsEngineOn = true;
         public bool IsAlive = true;
 
         public PlayerSpaceshipStateS2C(int maxTalents)
         {
-            Talents = new PlayerTalentsStateS2C(maxTalents);
+            TalentsState = new PlayerTalentsStateS2C(maxTalents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -23,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Transform.Serialize(writer);
             Shoot.Serialize(writer);
             Health.Serialize(writer);
-            Talents.Serialize(writer);
+            TalentsState.Serialize(writer);
             writer.Put(IsEngineOn);
             writer.Put(IsAlive);
         }
@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Transform.Deserialize(reader);
             Shoot.Deserialize(reader);
             Health.Deserialize(reader);
-            Talents.Deserialize(reader);
+            TalentsState.Deserialize(reader);
             IsEngineOn = reader.GetBool();
             IsAlive = reader.GetBool();
         }
