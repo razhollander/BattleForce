@@ -33,7 +33,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public void PollEvents()
         {
-            LogService.LogError("Poll from wrapper!");
             _netManager.PollEvents();
         }
         
