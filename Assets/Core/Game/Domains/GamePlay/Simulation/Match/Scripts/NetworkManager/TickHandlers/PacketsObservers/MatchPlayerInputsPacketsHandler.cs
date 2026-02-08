@@ -18,6 +18,7 @@ using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using UnityEngine;
+using System;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers
 {
@@ -87,9 +88,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public ProcessPlayersInputsResult ProcessInputs(int processedTick)
         {
             _cachedProcessPlayersInputsResult.Clear();
-            LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
-            _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
-            _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
+
+            if (_playerbackRecorderService.IsPlaybackEnabled)
+            {
+                _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
+                _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessAllInputsPerPlayers(processedTick);
+            }
+            else
+            {
+                LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
+                _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
+                _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
+            }
 
             return _cachedProcessPlayersInputsResult;
         }
@@ -118,6 +128,73 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _playerInputPacketsPool.Return(inputsOfPlayer[i]);
                 inputsOfPlayer.RemoveAt(i);
             }
+        }
+
+        private CapacityDict<ushort, MatchPlayerInputPacketC2S> ProcessAllInputsPerPlayers(int processedTick)
+        {
+            for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
+            {
+                var playerState = _matchDataService.SimulationState.GetPlayerByIndex(i);
+                var playerId = playerState.Id;
+
+                // Handle missing/empty inputs by repeating cached input
+                if (!_inputsPerPlayer.TryGetValue(playerId, out var inputsList) || inputsList.Count == 0)
+                {
+                    if (TryGetCachedInputForPlayer(playerId, out var cachedInput))
+                    {
+                        // Repeat last input logic
+                        UpdatePlayerDirection(cachedInput, playerState);
+                        UpdatePlayerShoot(processedTick, cachedInput.IsShootInputPressed, playerState);
+                        UpdatePlayerTalent(processedTick, cachedInput.IsTalentInputPressed, playerState);
+
+                        _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Add(playerId, cachedInput);
+                    }
+                    continue;
+                }
+
+                // Process all available inputs
+                inputsList.Sort();
+                var span = inputsList.AsSpan();
+
+                for (int j = 0; j < span.Length; j++)
+                {
+                    var playerInputPacket = span[j];
+
+                    UpdatePlayerDirection(playerInputPacket, playerState);
+                    UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
+                    UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState);
+
+                    var wasSwitchTalentInputPressed = _lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastInput) && lastInput.IsSwitchTalentInputPressed;
+                    var isSwitchTalentInputPressed = playerInputPacket.IsSwitchTalentInputPressed;
+                    if (!wasSwitchTalentInputPressed && isSwitchTalentInputPressed)
+                    {
+                        _playersTalentsManager.SwitchTalent(playerId);
+                    }
+
+                    if (_lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastPlayerInput))
+                    {
+                        _playerInputPacketsPool.Return(lastPlayerInput);
+                    }
+                    _lastProcessedInputPerPlayer[playerId] = playerInputPacket;
+                }
+
+                // Return processed inputs to pool (except the one stored in _lastProcessedInputPerPlayer, effectively handled by recycling logic)
+                // Actually, since we processed span[j], and then potentially overwrote _lastProcessedInputPerPlayer,
+                // the previous _lastProcessedInputPerPlayer was returned.
+                // The current _lastProcessedInputPerPlayer is span[Last].
+                // The other inputs span[0]...span[Last-1] were "cycled through" _lastProcessedInputPerPlayer and thus returned.
+                // So all intermediate inputs are returned.
+                // The list `inputsList` still holds references/copies. We just clear it.
+
+                if (_lastProcessedInputPerPlayer.TryGetValue(playerId, out var finalInput))
+                {
+                     _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Add(playerId, finalInput);
+                }
+
+                inputsList.Clear();
+            }
+
+            return _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer;
         }
 
         private CapacityDict<ushort, MatchPlayerInputPacketC2S> ProcessEarliestInputPerPlayers(int processedTick)
