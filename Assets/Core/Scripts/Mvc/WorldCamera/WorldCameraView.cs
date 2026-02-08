@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Threading;
+using Core.Scripts.Utils;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -8,18 +10,9 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
     public class WorldCameraView : MonoBehaviour
     {
         [SerializeField] private CinemachineTargetGroup _targetGroup;
-        [SerializeField] private CinemachineCamera _cinemachineCamera;
+        [SerializeField] private CinemachineBasicMultiChannelPerlin _perlin;
 
-        private CinemachineBasicMultiChannelPerlin _perlin;
-        private Coroutine _shakeCoroutine;
-
-        private void Awake()
-        {
-            if (_cinemachineCamera != null)
-            {
-                _perlin = _cinemachineCamera.GetComponent<CinemachineBasicMultiChannelPerlin>();
-            }
-        }
+        private CancellationTokenSource _shakeCancellationTokenSource;
 
         public void AddTarget(Transform target, float weight, float radius)
         {
@@ -36,28 +29,16 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             _targetGroup.Targets.Clear();
         }
 
-        public void ShakeCamera(float intensity, float duration)
+        public async Awaitable ShakeCamera(float intensity, float durationInSeconds, CancellationTokenSource cancellationTokenSource)
         {
-            if (_perlin == null)
-            {
-                Debug.LogWarning("CinemachineBasicMultiChannelPerlin component not found on CinemachineCamera.");
-                return;
-            }
-
-            if (_shakeCoroutine != null)
-            {
-                StopCoroutine(_shakeCoroutine);
-            }
-
-            _shakeCoroutine = StartCoroutine(ShakeCameraCoroutine(intensity, duration));
-        }
-
-        private IEnumerator ShakeCameraCoroutine(float intensity, float duration)
-        {
+            _shakeCancellationTokenSource?.Cancel();
+            _shakeCancellationTokenSource = new CancellationTokenSource();
+            _shakeCancellationTokenSource.CancelWhenTokenCancelled(cancellationTokenSource.Token);
             _perlin.AmplitudeGain = intensity;
-            yield return new WaitForSeconds(duration);
+            await Awaitable.WaitForSecondsAsync(durationInSeconds);
             _perlin.AmplitudeGain = 0f;
-            _shakeCoroutine = null;
+            transform.rotation = Quaternion.identity;
+            _shakeCancellationTokenSource = null;        
         }
     }
 }
