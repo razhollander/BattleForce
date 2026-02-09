@@ -35,6 +35,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _playerControllers[playerId].HideHealthBar();
         }
 
+        public void SwitchToPlayerDeadState(ushort playerId)
+        {
+            _playerControllers[playerId].SwitchToPlayerDeadState();
+        }
+
         public void DestroyAll()
         {
             foreach (var controller in _playerControllers.Values)

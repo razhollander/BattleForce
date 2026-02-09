@@ -10,10 +10,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
         public PlayerStateS2C PlayerState;
         public MatchSimulationStateS2C SimulationState;
 
-        public PlayerRejoinAcceptPacketS2C(MaxCap maxCap, int maxTalentsPerPlayer)
+        public PlayerRejoinAcceptPacketS2C(MaxCap maxCap, int maxTalentsPerPlayer, int maxTeams)
         {
             PlayerState = new PlayerStateS2C(maxTalentsPerPlayer);
-            SimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls);
+            SimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, maxTeams);
         }
 
         public void Serialize(NetDataWriter writer)

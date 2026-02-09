@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _matchPlayerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
         }
 
         public void Execute()
@@ -36,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 playerSpaceshipState.Shoot.MaxCooldown = playerDiedEvent.PlayerMaxShootCooldown; 
                 playerSpaceshipState.Shoot.CooldownSecondsLeft = playerDiedEvent.PlayerShootCooldownSecondsLeft; 
                 _matchPlayerControllers.HidePlayerHealthBar(playerDiedEvent.PlayerId);
+                _matchPlayerUIControllers.SwitchToPlayerDeadState(playerId);
             }
 
             playerDiedEvents.Clear();

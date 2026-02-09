@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private Image _equipmentImage;
         [SerializeField] private TextMeshProUGUI _moneyText;
         [SerializeField] private SimpleHealthBar _healthBar;
+        [SerializeField]private CanvasGroup _canvasGroup;
 
         [Header("Talents")]
         [SerializeField] private Transform _talentsContainer;
@@ -26,6 +27,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _nameText.text = playerName;
             _spaceshipImage.color = color;
             UpdateMoney(0);
+        }
+
+        public void SetOpacity(float alpha)
+        {
+            _canvasGroup.alpha = alpha;
         }
 
         public void UpdateMoney(int money)

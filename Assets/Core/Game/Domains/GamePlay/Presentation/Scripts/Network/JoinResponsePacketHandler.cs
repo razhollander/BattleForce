@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         
         public void OnPacketReceived(NetDataReader reader)
         {
-            JoinResponse = new JoinResponsePacketS2C(_networkConfig.MaxCap, _sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
+            JoinResponse = new JoinResponsePacketS2C(_networkConfig.MaxCap, _sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, _sharedGamePlayConfig.MaxTeamsAmount);
             JoinResponse.Deserialize(reader);
         }
     }

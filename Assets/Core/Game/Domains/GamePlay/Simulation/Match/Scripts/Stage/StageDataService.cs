@@ -6,45 +6,53 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
     public class StageDataService : IStageDataService
     {
         private readonly IMatchDataService _matchDataService;
-        public Queue<ushort> OrderedTeamIdsLost { get; private set; }
         public ushort WinnerTeamId;
+        public HashSet<ushort> LosingTeamIds { get; private set; }
+        public Dictionary<ushort, int> GemsCollectedPerTeam { get; private set; }
         public bool IsStageEnded { get; set; }
         public float StageRestartTimer { get; set; }
 
-        public void ClearData()
-        {
-            OrderedTeamIdsLost.Clear();
-            WinnerTeamId = 0;
-        }
-        
-        public void AddLosingTeam(ushort teamId)
-        {
-            OrderedTeamIdsLost.Enqueue(teamId);
-        }
-        
-        public void AddWinnerTeam(ushort teamId)
-        {
-            WinnerTeamId = teamId;
-        }
-        
         public StageDataService(IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _matchDataService = matchDataService;
-            OrderedTeamIdsLost = new Queue<ushort>(sharedGamePlayConfig.MaxTeamsAmount-1);
+            LosingTeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
         }
 
-        public Dictionary<ushort, int> GetJemsCollectedPerTeam()
+        public void AddLosingTeam(ushort teamId)
         {
-            var jemsCollectedPerTeam = new Dictionary<ushort, int>();
-            var amountOfJemsForTeam = 1;
+            LosingTeamIds.Add(teamId);
+        }
 
-            while (OrderedTeamIdsLost.TryDequeue(out var teamId))
+        public void InitEntryPoint()
+        {
+            var teamIds = _matchDataService.TeamIds;
+            GemsCollectedPerTeam = new Dictionary<ushort, int>(teamIds.Count);
+
+            foreach (ushort teamId in teamIds)
             {
-                jemsCollectedPerTeam.Add(teamId, amountOfJemsForTeam++);
+                GemsCollectedPerTeam.Add(teamId, 0);
             }
+        }
 
-            jemsCollectedPerTeam.Add(WinnerTeamId, amountOfJemsForTeam);
-            return jemsCollectedPerTeam;
+        public void ClearData()
+        {
+            WinnerTeamId = 0;
+            LosingTeamIds.Clear();
+
+            foreach (var teamId in _matchDataService.TeamIds)
+            {
+                GemsCollectedPerTeam[teamId] = 0;
+            }
+        }
+
+        public void AddGemsForTeam(ushort teamAlive, int gemsDelta)
+        {
+            GemsCollectedPerTeam[teamAlive] += gemsDelta;
+        }
+
+        public void AddWinnerTeam(ushort teamId)
+        {
+            WinnerTeamId = teamId;
         }
     }
 }

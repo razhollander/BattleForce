@@ -3,6 +3,7 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -32,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private ITickService _tickService;
         private ICommandFactory _commandFactory;
         private NetworkConfig _networkConfig;
+        private IStageDataService _stageDataService;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -57,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _tickService = _diContainer.Resolve<ITickService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
+            _stageDataService = _diContainer.Resolve<IStageDataService>();
         }
 
         public void Execute()
@@ -66,8 +69,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _matchDataService.InitEntryPoint();
             _playerInputsPacketsHandler.InitEntryPoint();
             _matchPlayerJoinPacketsHandler.InitEntryPoint();
-
             InitPlayers(_simulationMatchEnterData);
+            _stageDataService.InitEntryPoint();
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
 
             TrySwitchToPlayback();

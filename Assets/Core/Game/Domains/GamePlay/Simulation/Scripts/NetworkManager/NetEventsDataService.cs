@@ -30,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<StartMatchCountdownNetEventS2C>> StartMatchCountdownNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<StopMatchCountdownNetEventS2C>> StopMatchCountdownNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedClassUnorderedList<StageEndNetEventS2C>> StageEndNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<TeamLostNetEventS2C>> TeamLostNetEventsPerPlayer { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -46,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<StartMatchCountdownNetEventS2C>> _startMatchCountdownListPool;
         private readonly ConcurrentPool<FixedUnorderedList<StopMatchCountdownNetEventS2C>> _stopMatchCountdownListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<StageEndNetEventS2C>> _stageEndNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>> _teamLostNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -65,11 +67,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             StartMatchCountdownNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<StartMatchCountdownNetEventS2C>>(maxConcurrentPlayers);
             StopMatchCountdownNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<StopMatchCountdownNetEventS2C>>(maxConcurrentPlayers);
             StageEndNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<StageEndNetEventS2C>>(maxConcurrentPlayers);
+            TeamLostNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<TeamLostNetEventS2C>>(maxConcurrentPlayers);
 
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
-                var list =new FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents, ()=>new PlayerRejoinAcceptPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer));
+                var list =new FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents, ()=>new PlayerRejoinAcceptPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount));
                 list.Clear();
                 return list;
             }, maxConcurrentPlayers);
@@ -98,6 +101,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 list.Clear();
                 return list;
             }, maxConcurrentPlayers);
+            _teamLostNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>>(() => new FixedUnorderedList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount), maxConcurrentPlayers);
         }
 
 
@@ -237,6 +241,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
+
+            if (!TeamLostNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                TeamLostNetEventsPerPlayer.Add(playerId, _teamLostNetEventsListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {playerId}");
+            }
         }
         
         public void StopSavingPlayerEvents(ushort playerId)
@@ -286,6 +299,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var stageEndList = StageEndNetEventsPerPlayer[playerId];
             stageEndList.Clear();
             _stageEndNetEventsListPool.Return(stageEndList);
+            var teamLostList = TeamLostNetEventsPerPlayer[playerId];
+            teamLostList.Clear();
+            _teamLostNetEventsListPool.Return(teamLostList);
         
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
@@ -302,6 +318,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             StartMatchCountdownNetEventsPerPlayer.Remove(playerId);
             StopMatchCountdownNetEventsPerPlayer.Remove(playerId);
             StageEndNetEventsPerPlayer.Remove(playerId);
+            TeamLostNetEventsPerPlayer.Remove(playerId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -613,6 +630,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
+
+            if (TeamLostNetEventsPerPlayer.TryGetValue(playerId, out var teamLostNetEvents))
+            {
+                for (int i = teamLostNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (teamLostNetEvents[i].OccuredOnTick < tick)
+                    {
+                        teamLostNetEvents.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
@@ -651,6 +679,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 {
                     packet.TotalJemsPerTeam.Add(jems.Key, jems.Value);
                 }
+            }
+        }
+
+        public void AddTeamLostNetEvent(int onTick, ushort losingTeamId, Dictionary<ushort, int> totalGemsPerTeam, Dictionary<ushort, int> gemsGainedPerTeam)
+        {
+            foreach (var kvp in TeamLostNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.LosingTeamId = losingTeamId;
+                packet.TotalGemsPerTeam = totalGemsPerTeam;
+                packet.GemsGainedPerTeam = gemsGainedPerTeam;
             }
         }
     }
