@@ -76,11 +76,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
-            _teamsBoardUIController.InitEntryPoint();
             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
                 .SetSimulationState(_enterData.InitialState)
                 .Execute();
             _matchDataService.SetLocalPlayer(_enterData.LocalPlayerId);
+            _teamsBoardUIController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }

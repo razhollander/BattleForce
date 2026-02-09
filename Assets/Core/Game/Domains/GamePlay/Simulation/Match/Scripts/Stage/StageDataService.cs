@@ -13,33 +13,47 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         public bool IsStageEnded { get; set; }
         public float StageRestartTimer { get; set; }
 
+        public StageDataService(IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig)
+        {
+            _matchDataService = matchDataService;
+            LosingTeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
+        }
+
         public void AddLosingTeam(ushort teamId)
         {
             LosingTeamIds.Add(teamId);
+        }
+
+        public void InitEntryPoint()
+        {
+            var teamIds = _matchDataService.TeamIds;
+            GemsCollectedPerTeam = new Dictionary<ushort, int>(teamIds.Count);
+
+            foreach (ushort teamId in teamIds)
+            {
+                GemsCollectedPerTeam.Add(teamId, 0);
+            }
         }
 
         public void ClearData()
         {
             WinnerTeamId = 0;
             LosingTeamIds.Clear();
-            GemsCollectedPerTeam.Clear();
+
+            foreach (var teamId in _matchDataService.TeamIds)
+            {
+                GemsCollectedPerTeam[teamId] = 0;
+            }
         }
 
-        public void AddGemsForTeam(ushort teamAlive, ushort gemsCollectedForTeamAlive)
+        public void AddGemsForTeam(ushort teamAlive, ushort gemsDelta)
         {
-            GemsCollectedPerTeam.Add(teamAlive, gemsCollectedForTeamAlive);
+            GemsCollectedPerTeam[teamAlive] += gemsDelta;
         }
 
         public void AddWinnerTeam(ushort teamId)
         {
             WinnerTeamId = teamId;
-        }
-        
-        public StageDataService(IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig)
-        {
-            _matchDataService = matchDataService;
-            LosingTeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
-            GemsCollectedPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
         }
     }
 }

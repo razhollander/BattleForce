@@ -41,24 +41,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public void Execute()
         {
             LogService.LogTopic($"Match Ended! Winning Team: {_winningTeamId}", LogTopicType.ServerNetwork);
-
-            var jemsPerTeam = _matchDataService.SimulationState.GemsPerTeamId;
             _stageDataService.AddWinnerTeam(_winningTeamId);
-            var jemsWonPerTeam = _stageDataService.GemsCollectedPerTeam;
-
-            foreach (var kvp in jemsWonPerTeam)
-            {
-                if (jemsPerTeam.ContainsKey(kvp.Key))
-                {
-                    jemsPerTeam[kvp.Key] += kvp.Value;
-                }
-                else
-                {
-                    jemsPerTeam.Add(kvp.Key, kvp.Value);
-                }
-            }
-
-            _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, jemsWonPerTeam, jemsPerTeam);
+            _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, _stageDataService.GemsCollectedPerTeam, _matchDataService.SimulationState.GemsPerTeamId);
             _stageDataService.IsStageEnded = true;
             _stageDataService.StageRestartTimer = _config.StageRestartDelaySeconds;
         }

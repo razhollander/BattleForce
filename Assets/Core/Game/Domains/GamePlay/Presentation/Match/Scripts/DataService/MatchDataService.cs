@@ -23,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchPlayerModel LocalPlayer { get; private set; }
         public bool IsPlayerJoined => LocalPlayer != null;
         public HashSet<ushort> TeamIds  {get; private set; }
-        public MatchDataService(NetworkConfig networkConfig)
+        public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             Players = new List<MatchPlayerModel>(networkConfig.MaxCap.ConcurrentPlayers);
             Bullets = new List<MatchPlayerBulletModel>(networkConfig.MaxCap.ConcurrentBullets);
@@ -31,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentLavaWalls = new List<MatchEnvironmentLavaWallModel>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
             PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
+            TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)

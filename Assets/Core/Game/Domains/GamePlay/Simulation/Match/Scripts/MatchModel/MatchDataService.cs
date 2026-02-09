@@ -32,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
                 sharedGamePlayConfig.MaxTeamsAmount);
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
+            _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.EnvironmentLayoutIndex = chosenEnvironmentIndex;
             _simulationState.StageType = StageType.DeathMatch;
         }
@@ -58,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             newPlayer.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
             newPlayer.Spaceship.Shoot.MaxCooldown = shootCooldown;
             TeamIds.Add(teamId);
+            _simulationState.GemsPerTeamId.Add(teamId, 0);
             return newPlayer;
         }
 

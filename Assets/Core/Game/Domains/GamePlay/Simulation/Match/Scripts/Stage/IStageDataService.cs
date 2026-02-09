@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         float StageRestartTimer { get; set; }
         void ClearData();
         Dictionary<ushort, int> GemsCollectedPerTeam { get; }
-        void AddGemsForTeam(ushort teamAlive, ushort gemsCollectedForTeamAlive);
+        void AddGemsForTeam(ushort teamAlive, ushort gemsDelta);
+        void InitEntryPoint();
     }
 }
