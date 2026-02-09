@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private GameObject _healthBarGameObject; // todo move to the match domain
         [SerializeField] private PlayerLoadingRing _playerLoadingRing;
         [SerializeField] private Transform _spaceShipTransform;
+        [SerializeField] private Transform _aimArrowTransform;
         [SerializeField] private TextMeshProUGUI _playerNameText;
 
         public Action Despawn { get; set; }
@@ -87,6 +88,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetIsHealthBarShown(bool isShown)
         {
             _healthBarGameObject.SetActive(isShown);
+        }
+
+        public void SetAimRotation(System.Numerics.Vector2 direction)
+        {
+            if (_aimArrowTransform == null)
+            {
+                return;
+            }
+
+            var unityDirection = new Vector2(direction.X, direction.Y);
+            if (unityDirection == Vector2.zero)
+                return;
+
+            var angle = Mathf.Atan2(unityDirection.y, unityDirection.x) * Mathf.Rad2Deg;
+            _aimArrowTransform.rotation = Quaternion.Euler(0, 0, angle);
         }
     }
 }

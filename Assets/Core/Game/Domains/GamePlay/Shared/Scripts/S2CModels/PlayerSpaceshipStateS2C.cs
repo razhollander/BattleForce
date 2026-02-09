@@ -42,12 +42,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             Transform.SerializeDeltas(writer);
             Shoot.SerializeDeltas(writer);
+            TalentsState.SerializeDeltas(writer);
         }
 
         public void DeserializeDeltas(NetDataReader reader)
         {
             Transform.DeserializeDeltas(reader);
             Shoot.DeserializeDeltas(reader);
+            TalentsState.DeserializeDeltas(reader);
         }
     }
 }

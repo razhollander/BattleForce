@@ -49,6 +49,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerRotation = playerTransformState.Direction.ToUnityVector2().ToQuaternion();
             var interpolationFactor = _gamePlayConfig.InterpolationFactor;
             _playerView.InterpolateTransform(playerPosition, playerRotation, interpolationFactor);
+
+            _playerView.SetAimRotation(playerModel.Spaceship.TalentsState.AimDirection);
         }
 
         public void UpdateBulletCooldown()

@@ -140,6 +140,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 UpdatePlayerDirection(playerInputPacket, playerState);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
                 UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState);
+                playerState.Spaceship.TalentsState.AimDirection = playerInputPacket.AimDirection;
 
                 var wasSwitchTalentInputPressed = _lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastInput) && lastInput.IsSwitchTalentInputPressed;
                 var isSwitchTalentInputPressed = playerInputPacket.IsSwitchTalentInputPressed;

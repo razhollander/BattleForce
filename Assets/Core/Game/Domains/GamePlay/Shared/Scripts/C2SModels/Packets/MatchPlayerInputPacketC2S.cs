@@ -1,4 +1,6 @@
 using System;
+using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
@@ -13,12 +15,14 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
         public bool IsShootInputPressed;
         public bool IsTalentInputPressed;
         public bool IsSwitchTalentInputPressed;
+        public Vector2 AimDirection;
         
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(Tick);
             writer.Put(HeighestProcessedTickFromServer);
             writer.Put(ConvertInputsToByte(IsMoveRightInputPressed, IsMoveLeftInputPressed, IsShootInputPressed, IsTalentInputPressed, IsSwitchTalentInputPressed));
+            writer.PutVector2AsAngle16(AimDirection);
             writer.Put(Tick);
         }
         
@@ -32,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
             IsShootInputPressed = isShootInputPressed;
             IsTalentInputPressed = isTalentInputPressed;
             IsSwitchTalentInputPressed = isSwitchTalentInputPressed;
+            AimDirection = reader.GetVector2FromAngle16();
             Tick = reader.GetInt();
         }
         
