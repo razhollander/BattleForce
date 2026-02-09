@@ -29,6 +29,7 @@ MonoBehaviour:
     ConcurrentJointCount: 0
     PlayersInputsPackets: 12000
     JoinRequestPackets: 30
+    JoinResponsePackets: 10
     ConcurrentInputsProcessed: 100
     FullTickPacketsNetEvents: 1000
     PlayerJoinAcceptNetEvents: 32
@@ -47,14 +48,14 @@ MonoBehaviour:
     StopMatchCountdownNetEvents: 32
     ExitMatchMakingNetEvents: 32
     StartMatchNetEvents: 32
-    StageEndNetEvents: 1
+    StageEndNetEvents: 32
     PlayerDiedNetEvents: 32
   TicksPerSeconds: 60
   DeltaTime: 0.016666668
   PhysicsVelocityIterations: 8
   PositionIterations: 8
   ServerPlayerInputPacketsBuffer: 2
-  HostPort: 49153
+  DefaultHostPort: 49153
   IpAddress: 109.67.156.134
   OnlyLocal: 1
   ConntectionKey: BattleForceGame

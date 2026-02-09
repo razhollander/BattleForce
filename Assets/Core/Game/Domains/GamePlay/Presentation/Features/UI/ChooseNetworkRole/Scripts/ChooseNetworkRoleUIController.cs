@@ -44,7 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         public void InitEntryPoint()
         {
             var playerName = PlayerPrefsSettings.ShouldSkipMatchMaking ? "Raz" : "Player_" + UnityEngine.Random.Range(1000, 9999);
-            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, _networkConfig.OnlyLocal, _networkConfig.IpAddress, _networkConfig.HostPort, playerName);
+            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, _networkConfig.OnlyLocal, _networkConfig.IpAddress, _networkConfig.DefaultHostPort, playerName);
             PopulatePlaybacksDropdown();
 #if UNITY_SERVER
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
@@ -131,7 +131,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private async Awaitable StartServer(CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled, string playbackFilePath = "")
         {
-            var enterData = new ServerInitiatorEnterData(isPlaybackEnabled, playbackFilePath);
+            var port = _uiView.Port;
+            var enterData = new ServerInitiatorEnterData(isPlaybackEnabled, playbackFilePath, port);
             LogService.LogTopic("Starting Server", LogTopicType.ClientNetwork);
             await _sceneLoaderService.TryLoadScene(SceneType.ServerScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.ServerScene, enterData, cancellationTokenSource);

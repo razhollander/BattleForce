@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -20,8 +22,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 
         public MatchPlayerModel LocalPlayer { get; private set; }
         public bool IsPlayerJoined => LocalPlayer != null;
-
-        public MatchDataService(NetworkConfig networkConfig)
+        public HashSet<ushort> TeamIds  {get; private set; }
+        public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             Players = new List<MatchPlayerModel>(networkConfig.MaxCap.ConcurrentPlayers);
             Bullets = new List<MatchPlayerBulletModel>(networkConfig.MaxCap.ConcurrentBullets);
@@ -29,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentLavaWalls = new List<MatchEnvironmentLavaWallModel>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
             PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
+            TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -116,8 +119,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 
         public MatchPlayerModel AddPlayer(PlayerStateS2C playerState)
         {
-            var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerState.TeamId, playerState.Spaceship);
+            var playerTeamId = playerState.TeamId;
+            var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, playerState.Spaceship);
             Players.Add(newPlayer);
+            TeamIds.Add(playerTeamId);
             return newPlayer;
         }
 

@@ -30,11 +30,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
         
-        public void InitEntryPoint()
+        public void InitEntryPoint(int port)
         {
             AddListeners();
             RegisterAutoSerializedTypes();
-            StartServer();
+            StartServer(port);
         }
 
         private void AddListeners()
@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _packetProcessor.RegisterNestedType((w, v) => w.Put(v), r => r.GetVector2());
         }
         
-        private void StartServer()
+        private void StartServer(int port)
         {
             // if (_netManager.IsRunning)
             // {
@@ -67,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             //     return;
             // }
             
-            _netManager.Start(_networkConfig.HostPort);
+            _netManager.Start(port);
         }
 
         public void InitExitPoint()

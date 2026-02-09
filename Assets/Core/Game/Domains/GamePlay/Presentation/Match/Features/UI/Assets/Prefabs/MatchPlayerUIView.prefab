@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4123453233464706171}
   - component: {fileID: 4746107045105540790}
   - component: {fileID: 6246738873035419814}
+  - component: {fileID: 65682781423828582}
   m_Layer: 5
   m_Name: MatchPlayerUIView
   m_TagString: Untagged
@@ -67,8 +68,21 @@ MonoBehaviour:
   _equipmentImage: {fileID: 9171546435055525675}
   _moneyText: {fileID: 5447874160441701297}
   _healthBar: {fileID: 2875161570312970966}
+  _canvasGroup: {fileID: 65682781423828582}
   _talentsContainer: {fileID: 6799655694962967036}
   _talentViewPrefab: {fileID: 8799029873765119190, guid: 8930a71fa3b3c4ab7a0ebe8b09def285, type: 3}
+--- !u!225 &65682781423828582
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 744474588705495657}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2494535651957678439
 GameObject:
   m_ObjectHideFlags: 0

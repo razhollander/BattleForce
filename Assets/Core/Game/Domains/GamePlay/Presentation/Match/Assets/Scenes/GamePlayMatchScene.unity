@@ -816,6 +816,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: MatchCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 7502169906635470799, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7502169906635470799, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7502169906635470799, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7502169906635470799, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7502169906635470799, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7502169906635470799, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7665849020420382199, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -888,6 +912,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce66e3a79ba14767b15cc97803b192c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1138906651 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4848078449285196284, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
+  m_PrefabInstance: {fileID: 1138906647}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3f9d5a752fb4466d9923072cb7b4cd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1520472468
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,6 +977,7 @@ MonoBehaviour:
   _bulletViewPrefab: {fileID: 5098656257286592944, guid: 6d7e26fd88ce749758e4f78e408ac5ee, type: 3}
   _environmentWallViewPrefab: {fileID: 1848450532861189530, guid: 1636cc9bec8694334b3401f1fbe5547b, type: 3}
   _stageEndedUiView: {fileID: 1138906650}
+  _teamsBoardContainerView: {fileID: 1138906651}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
                 _simulationStateMachine.ChangeToMatchMaking();
             }
             
-            _serverNetworkManager.InitEntryPoint();
+            _serverNetworkManager.InitEntryPoint(_serverInitiatorEnterData.Port);
         }
 
         public ServerEntryPointCommand SetEnterData(ServerInitiatorEnterData serverInitiatorEnterData)

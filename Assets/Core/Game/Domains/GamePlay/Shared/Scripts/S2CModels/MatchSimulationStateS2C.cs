@@ -12,17 +12,17 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<PlayerBulletS2C> Bullets;
         public FixedUnorderedList<TalentCardS2C> TalentCards;
         public FixedUnorderedList<PowerUpBallS2C> PowerUpBalls;
-        public Dictionary<ushort, int> JemsPerTeamId;
+        public Dictionary<ushort, int> GemsPerTeamId;
         public int EnvironmentLayoutIndex;
         public StageType StageType;
 
-        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls)
+        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams)
         {
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer));
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
             TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
             PowerUpBalls = new FixedUnorderedList<PowerUpBallS2C>(maxPowerUpBalls);
-            JemsPerTeamId = new Dictionary<ushort, int>();
+            GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -55,8 +55,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 powerUp.Serialize(writer);
             }
 
-            writer.Put((ushort)JemsPerTeamId.Count);
-            foreach (var kvp in JemsPerTeamId)
+            writer.Put((ushort)GemsPerTeamId.Count);
+            foreach (var kvp in GemsPerTeamId)
             {
                 writer.Put(kvp.Key);
                 writer.Put(kvp.Value);
@@ -100,13 +100,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 powerUp.Deserialize(reader);
             }
 
-            JemsPerTeamId.Clear();
+            GemsPerTeamId.Clear();
             var jemsCount = reader.GetUShort();
             for (int i = 0; i < jemsCount; i++)
             {
                 var teamId = reader.GetUShort();
                 var jems = reader.GetInt();
-                JemsPerTeamId.Add(teamId, jems);
+                GemsPerTeamId.Add(teamId, jems);
             }
 
             EnvironmentLayoutIndex = reader.GetByte();

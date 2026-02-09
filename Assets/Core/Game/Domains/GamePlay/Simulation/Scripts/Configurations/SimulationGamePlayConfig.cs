@@ -16,5 +16,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public ushort StartMatchCountdownDuration = 5;
         public float ShootCooldownMultiplierWhenDead = 2;
         public float StageRestartDelaySeconds = 3f;
+        public int GemsCollectedForTeamAlive = 1;
     }
 }

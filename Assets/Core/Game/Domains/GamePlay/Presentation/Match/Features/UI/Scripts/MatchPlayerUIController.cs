@@ -35,6 +35,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _view.HideHealthBar();
         }
 
+        public void SwitchToPlayerDeadState()
+        {
+            _view.SetOpacity(0.5f);
+        }
+
         public void Destroy()
         {
             Object.Destroy(_view.gameObject);
