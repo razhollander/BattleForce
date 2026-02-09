@@ -7,8 +7,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
     {
         [SerializeField] private Transform _container;
         [SerializeField] private TeamBoardUIView _teamBoardUIViewPrefab;
+        
+        private readonly Dictionary<ushort, TeamBoardUIView> _boardViewsPerTeam = new Dictionary<ushort, TeamBoardUIView>();
 
-        public Transform Container => _container;
-        public TeamBoardUIView Prefab => _teamBoardUIViewPrefab;
+        public void CreateTeamBoard(ushort teamId, Color color)
+        {
+            var teamView = Object.Instantiate(_teamBoardUIViewPrefab, _container);
+            teamView.Setup(color);
+            _boardViewsPerTeam.Add(teamId, teamView);
+        }
+
+        public void UpdateTeamGems(ushort teamId, int gems)
+        {
+            _boardViewsPerTeam[teamId].UpdateGems(gems);
+        }
     }
 }

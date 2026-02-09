@@ -18,7 +18,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     public class PlayerHitCommand : BaseCommand, ICommandVoid
     {
         private const ushort DEAD_HEALTH_AMOUNT = 0;
-        private const ushort GEMS_COLLECTED_FOR_TEAM_ALIVE = 1;
         
         private ushort _hitDamage;
         private ushort _playerId;
@@ -140,11 +139,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             totalGemsPerTeam.Clear();
             var teamsCurrentlyAlive = GetTeamsCurrentlyAlive();
             
+            var gemsCollectedForTeamAlive = _gamePlayConfig.GemsCollectedForTeamAlive;
             foreach (ushort teamAlive in teamsCurrentlyAlive)
             {
-                gemsGainedPerTeam.Add(teamAlive, GEMS_COLLECTED_FOR_TEAM_ALIVE);
-                totalGemsPerTeam.Add(teamAlive, ++_matchDataService.SimulationState.GemsPerTeamId[teamAlive]);
-                _stageDataService.AddGemsForTeam(teamAlive, GEMS_COLLECTED_FOR_TEAM_ALIVE);
+                gemsGainedPerTeam.Add(teamAlive, gemsCollectedForTeamAlive);
+                _matchDataService.SimulationState.GemsPerTeamId[teamAlive] += gemsCollectedForTeamAlive;
+                totalGemsPerTeam.Add(teamAlive, _matchDataService.SimulationState.GemsPerTeamId[teamAlive]);
+                _stageDataService.AddGemsForTeam(teamAlive, gemsCollectedForTeamAlive);
             }
             
             _netEventsDataService.AddTeamLostNetEvent(_processedTick, losingTeamId, totalGemsPerTeam, gemsGainedPerTeam);

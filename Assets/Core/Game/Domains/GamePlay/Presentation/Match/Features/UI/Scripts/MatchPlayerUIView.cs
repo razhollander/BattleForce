@@ -14,36 +14,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private Image _equipmentImage;
         [SerializeField] private TextMeshProUGUI _moneyText;
         [SerializeField] private SimpleHealthBar _healthBar;
+        [SerializeField]private CanvasGroup _canvasGroup;
 
         [Header("Talents")]
         [SerializeField] private Transform _talentsContainer;
         [SerializeField] private MatchPlayerTalentUIView _talentViewPrefab;
 
         private readonly List<MatchPlayerTalentUIView> _talentViews = new List<MatchPlayerTalentUIView>();
-        private CanvasGroup _canvasGroup;
-
-        private void Awake()
-        {
-            if (!TryGetComponent<CanvasGroup>(out _canvasGroup))
-            {
-                _canvasGroup = gameObject.AddComponent<CanvasGroup>();
-            }
-        }
 
         public void Setup(string playerName, Color color)
         {
             _nameText.text = playerName;
             _spaceshipImage.color = color;
             UpdateMoney(0);
-            SetOpacity(1f);
         }
 
         public void SetOpacity(float alpha)
         {
-            if (_canvasGroup != null)
-            {
-                _canvasGroup.alpha = alpha;
-            }
+            _canvasGroup.alpha = alpha;
         }
 
         public void UpdateMoney(int money)

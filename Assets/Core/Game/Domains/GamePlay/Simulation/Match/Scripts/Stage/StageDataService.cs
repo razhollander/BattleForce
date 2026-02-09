@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
-using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
 {
@@ -46,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
             }
         }
 
-        public void AddGemsForTeam(ushort teamAlive, ushort gemsDelta)
+        public void AddGemsForTeam(ushort teamAlive, int gemsDelta)
         {
             GemsCollectedPerTeam[teamAlive] += gemsDelta;
         }

@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 playerSpaceshipState.Shoot.MaxCooldown = playerDiedEvent.PlayerMaxShootCooldown; 
                 playerSpaceshipState.Shoot.CooldownSecondsLeft = playerDiedEvent.PlayerShootCooldownSecondsLeft; 
                 _matchPlayerControllers.HidePlayerHealthBar(playerDiedEvent.PlayerId);
-                _matchPlayerUIControllers.SetPlayerOpacity(playerId, 0.5f);
+                _matchPlayerUIControllers.SwitchToPlayerDeadState(playerId);
             }
 
             playerDiedEvents.Clear();

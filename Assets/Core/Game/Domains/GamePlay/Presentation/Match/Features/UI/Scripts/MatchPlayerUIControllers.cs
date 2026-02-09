@@ -35,12 +35,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _playerControllers[playerId].HideHealthBar();
         }
 
-        public void SetPlayerOpacity(ushort playerId, float alpha)
+        public void SwitchToPlayerDeadState(ushort playerId)
         {
-            if (_playerControllers.TryGetValue(playerId, out var controller))
-            {
-                controller.SetOpacity(alpha);
-            }
+            _playerControllers[playerId].SwitchToPlayerDeadState();
         }
 
         public void DestroyAll()

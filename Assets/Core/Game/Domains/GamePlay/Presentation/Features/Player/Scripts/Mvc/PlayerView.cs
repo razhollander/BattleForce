@@ -1,11 +1,9 @@
 using System;
 using TMPro;
-using System.Collections;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.Pools;
-using TMPro;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc

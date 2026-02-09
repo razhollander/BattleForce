@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using CoreDomain.Scripts.Services.Logger.Base;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard
 {
@@ -11,7 +10,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         private readonly TeamsBoardContainerView _view;
         private readonly PresentationGamePlayConfig _presentationGamePlayConfig;
         private readonly IMatchDataService _matchDataService;
-        private readonly Dictionary<ushort, TeamBoardUIView> _boardViewsPerTeam = new Dictionary<ushort, TeamBoardUIView>();
 
         public TeamsBoardUIController(TeamsBoardContainerView view, PresentationGamePlayConfig presentationGamePlayConfig, IMatchDataService matchDataService)
         {
@@ -24,22 +22,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         {
             foreach (ushort teamId in _matchDataService.TeamIds)
             {
-                var teamView = Object.Instantiate(_view.Prefab, _view.Container);
                 if (_presentationGamePlayConfig.ColorPerTeamId.TryGetValue(teamId, out var color))
                 {
-                    teamView.Setup(color);
+                   _view.CreateTeamBoard(teamId, color);
                 }
                 else
                 {
                     LogService.LogError($"No color for team with id {teamId}");
                 }
-                _boardViewsPerTeam.Add(teamId, teamView);
             }
         }
 
         public void UpdateTeamGems(ushort teamId, int gems)
         {
-            _boardViewsPerTeam[teamId].UpdateGems(gems);
+            _view.UpdateTeamGems(teamId, gems);
         }
     }
 }
