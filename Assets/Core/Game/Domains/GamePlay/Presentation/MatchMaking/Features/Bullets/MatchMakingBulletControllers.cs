@@ -37,9 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets
                 return;
             }
 
-            var bulletColor = player.TeamId == 0
-                ? _gamePlayConfig.NoneTeamColor
-                : _gamePlayConfig.ColorPerTeamId[player.TeamId];
+            var bulletColor = _gamePlayConfig.ColorPerTeamId[player.TeamId];
             var bulletController = new MatchMakingBulletController(bulletId, _matchDataService, _bulletPool, _bulletsParent);
             bulletController.CreateBulletView(position, bulletRadius, bulletColor);
             _bulletControllers.Add(bulletController);

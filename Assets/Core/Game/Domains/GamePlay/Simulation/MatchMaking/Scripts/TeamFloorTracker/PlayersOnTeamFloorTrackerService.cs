@@ -8,13 +8,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
     {
         private readonly CapacityDict<ushort, FixedUnorderedList<ushort>> _playerTeamContacts;
         private readonly ConcurrentPool<FixedUnorderedList<ushort>> _contactsPool;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private const int MAX_OVERLAPPING_FLOORS = 8;
 
-        public PlayersOnTeamFloorTrackerService(NetworkConfig networkConfig)
+        public PlayersOnTeamFloorTrackerService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             var maxPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             _playerTeamContacts = new CapacityDict<ushort, FixedUnorderedList<ushort>>(maxPlayers);
             _contactsPool = new ConcurrentPool<FixedUnorderedList<ushort>>(() => new FixedUnorderedList<ushort>(MAX_OVERLAPPING_FLOORS), maxPlayers);
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void AddFloorContact(ushort playerId, ushort teamId)
@@ -70,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
                 }
                 return maxTeam;
             }
-            return 0;
+            return _sharedGamePlayConfig.NoTeamId;
         }
 
         public void RemovePlayer(ushort playerId)

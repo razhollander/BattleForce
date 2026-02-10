@@ -10,4 +10,5 @@ public class SharedGamePlayConfig : ScriptableObject
     public MatchMakingEnvironmentLayoutConfig MatchMakingEnvironment;
     public PowerUpsSharedConfig PowerUps;
     public int MaxSavedPlaybacks = 10;
+    public ushort NoTeamId = 5;
 }
