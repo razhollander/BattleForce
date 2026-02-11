@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 
 namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchEligibilityLogic
@@ -11,24 +12,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchEl
     {
         private readonly IMatchMakingDataService _matchMakingDataService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-
+        private readonly HashSet<ushort> _cachedDifferentTeamIdsAssignedToPlayers;
+        
         public StartMatchEligibilityLogicService(IMatchMakingDataService matchMakingDataService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _matchMakingDataService = matchMakingDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
+            _cachedDifferentTeamIdsAssignedToPlayers = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
         }
 
         public bool IsEligibleToStartMatch()
         {
+            _cachedDifferentTeamIdsAssignedToPlayers.Clear();
             foreach (var playerState in _matchMakingDataService.SimulationState.Players.AsSpan())
             {
                 if (playerState.TeamId == _sharedGamePlayConfig.NoTeamId)
                 {
                     return false;
                 }
+
+                _cachedDifferentTeamIdsAssignedToPlayers.Add(playerState.TeamId);
             }
 
-            return true;
+            return _cachedDifferentTeamIdsAssignedToPlayers.Count > 1;
         }
     }
 }

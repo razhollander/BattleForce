@@ -43,7 +43,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
                 _playerControllers.UpdatePlayerColor(netEvent.PlayerId, playerNewColor);
                 _matchMakingDataService.GetPlayer(netEvent.PlayerId).TeamId = teamId;
 
-                if (teamId != _sharedGamePlayConfig.NoTeamId)
+                var isNoTeamId = teamId != _sharedGamePlayConfig.NoTeamId;
+                if (isNoTeamId)
                 {
                     _environmentTeamFloorControllers.AnimateFloorBounce(teamId);
                 }

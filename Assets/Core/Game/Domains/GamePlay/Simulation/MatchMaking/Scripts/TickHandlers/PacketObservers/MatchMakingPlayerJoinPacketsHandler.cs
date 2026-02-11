@@ -79,7 +79,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                 {
                     joinResponse.IsSuccess = true;
                     joinResponse.IsMatchMaking = true;
-                    var playerTeamId = (ushort)(_matchDataService.SimulationState.Players.Count+1);
+                    var playerTeamId = (ushort) (_matchDataService.SimulationState.Players.Count % _sharedGamePlayConfig.MaxTeamsAmount + 1);
                     var position = DonutQuadrantWalls.GetTeamFloorCenter(playerTeamId, _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius);
                     var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerTeamId);
                     var playerId = playerState.Id;
