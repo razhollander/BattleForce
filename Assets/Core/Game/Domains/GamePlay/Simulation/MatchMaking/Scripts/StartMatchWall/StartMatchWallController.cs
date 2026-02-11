@@ -11,25 +11,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
 
         private bool _isCountingDown;
         private float _countdownTimer;
         private int _lastTickGotHitByBullet = -1;
         
         public bool DidFinishCountingDown => _isCountingDown && _countdownTimer <= 0;
-        public StartMatchWallController(IPhysicsSimulator physicsSimulator, INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig)
+        public StartMatchWallController(IPhysicsSimulator physicsSimulator, INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _physicsSimulator = physicsSimulator;
             _netEventsDataService = netEventsDataService;
             _gamePlayConfig = gamePlayConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void Initialize(float radius)
         {
-            _physicsSimulator.AddStartMatchWall(PhysicsSimulator.MIN_BOX2D_ID, Vector2.Zero, radius);
+            _physicsSimulator.AddStartMatchWall(_sharedGamePlayConfig.MinEntityId, Vector2.Zero, radius);
         }
 
-        public void TryToggleState(int tick)
+        public void TryToggleCountdownState(int tick)
         {
             var wasAlreadyHitByBulletThisTick = _lastTickGotHitByBullet == tick;
             if (wasAlreadyHitByBulletThisTick)

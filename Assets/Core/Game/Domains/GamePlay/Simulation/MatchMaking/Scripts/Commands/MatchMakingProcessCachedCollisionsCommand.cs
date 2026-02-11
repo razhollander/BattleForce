@@ -89,14 +89,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
 
         private void HandlePlayerChangedTeam(MatchMakingPlayerStateS2C playerState, ushort newTeamId)
         {
-            var previousIsEligibleToStartMatch = _startMatchEligibilityLogicService.IsEligibleToStartMatch();
+            var previousIsEligibleToStartMatch = _matchMakingDataService.SimulationState.StartMatchWall.IsEnabled;
             playerState.TeamId = newTeamId;
             var newIsEligibleToStartMatch = _startMatchEligibilityLogicService.IsEligibleToStartMatch();
 
             if (newIsEligibleToStartMatch != previousIsEligibleToStartMatch)
             {
+                _matchMakingDataService.SimulationState.StartMatchWall.IsEnabled = newIsEligibleToStartMatch;
                 _netEventsDataService.AddStartMatchEligibleChangedNetEvent(_processedTick, newIsEligibleToStartMatch);
             }
+            
             _startMatchWallController.TryStopCountdown(_processedTick);
             _netEventsDataService.AddPlayerSwitchTeamNetEvent(_processedTick, playerState.Id, newTeamId);
         }
@@ -169,7 +171,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
 
             if (_startMatchEligibilityLogicService.IsEligibleToStartMatch())
             {
-                _startMatchWallController.TryToggleState(_processedTick);
+                _startMatchWallController.TryToggleCountdownState(_processedTick);
             }
         }
 

@@ -20,8 +20,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 {
     public class PhysicsSimulator : IPhysicsSimulator, IGUIUpdatable
     {
-        public const int MIN_BOX2D_ID = 1;
-
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkConfig _networkConfig;
         private World _world;

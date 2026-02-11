@@ -49,21 +49,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
         private void CreateStartMatchWall()
         {
             _startMatchWallController.Initialize(_sharedGamePlayConfig.MatchMakingEnvironment.StartMatchWallRadius);
+            _matchMakingDataService.SimulationState.StartMatchWall.IsEnabled = true;
         }
 
         private void CreateTeamFloors()
         {
-            var walls = DonutQuadrantWalls.GenerateQuadrantWallPerTeam(_sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius, _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsPrecision);
-            ushort teamFloorId = PhysicsSimulator.MIN_BOX2D_ID;
+            var walls = DonutQuadrantWalls.GenerateQuadrantWallsPerTeam(
+                _sharedGamePlayConfig.TeamIds,
+                _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius,
+                _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsPrecision,
+                _sharedGamePlayConfig.MinEntityId);
+            
             foreach (var kvp in walls)
             {
                 var teamId = kvp.Key;
                 var wallConfigs = kvp.Value;
                 foreach (var wallConfig in wallConfigs)
                 {
-                    _teamFloorDataService.FloorIdToTeamId.Add(teamFloorId, teamId);
-                    _physicsSimulator.AddTeamFloor(teamFloorId, wallConfig.Points);
-                    teamFloorId++;
+                    _teamFloorDataService.FloorIdToTeamId.Add(wallConfig.Id, teamId);
+                    _physicsSimulator.AddTeamFloor(wallConfig.Id, wallConfig.Points);
                 }
             }
         }

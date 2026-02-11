@@ -13,7 +13,8 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
         [SerializeField] private EnvironmentConfig _environmentConfig;
         [SerializeField] private List<PolygonPath2D> _walls;
         [SerializeField] private List<LavaWall> _lavaWalls;
-
+        [SerializeField] private SharedGamePlayConfig _sharedGamePlayConfig;
+        
         [Button]
         public void RefreshConfig(int index)
         {
@@ -23,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
             for (int i = 0; i < _walls.Count; i++)
             {
                 var wallGenerator = _walls[i];
-                var wallConfig = new WallConfig((ushort) (i + PhysicsSimulator.MIN_BOX2D_ID), wallGenerator.GetPointsRelativeToObject().Select(x=>x.ToNumericsVector2()).ToArray());
+                var wallConfig = new WallConfig((ushort) (i + _sharedGamePlayConfig.MinEntityId), wallGenerator.GetPointsRelativeToObject().Select(x=>x.ToNumericsVector2()).ToArray());
                 wallsConfigs[i] = wallConfig;
             }
 
@@ -31,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
 
             _lavaWalls = GetLavaWalls();
             var lavaConfigs = new WallConfig[_lavaWalls.Count];
-            var lavaStartId = PhysicsSimulator.MIN_BOX2D_ID;
+            var lavaStartId = _sharedGamePlayConfig.MinEntityId;
 
             for (int i = 0; i < _lavaWalls.Count; i++)
             {

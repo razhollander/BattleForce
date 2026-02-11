@@ -45,9 +45,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatc
             SetButtonStartState();
         }
 
-        public void SetEligibility(bool isEligible)
+        public void SetIsEnabled(bool isEnabled)
         {
-            _view.SetOpacity(isEligible ? 1f : 0.5f);
+            _view.SetIsDisabledOverlayShown(!isEnabled);
         }
 
         private void OnTimerTick(double percent, TimeSpan timeLeft)

@@ -5,6 +5,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatc
         void InitEntryPoint();
         void StartMatchCountdown(float duration);
         void StopMatchCountdown();
-        void SetEligibility(bool isEligible);
+        void SetIsEnabled(bool isEnabled);
     }
 }

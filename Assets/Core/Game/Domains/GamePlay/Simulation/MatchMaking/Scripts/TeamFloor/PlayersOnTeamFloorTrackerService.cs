@@ -36,7 +36,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
             {
                 ref var item = ref contacts.AddAndGet();
                 item = teamId;
-                LogService.LogError($"Add team {teamId} to player {playerId} contacts {System.Environment.NewLine} {_playerTeamContacts[playerId].ToJson()}");
             }
             else
             {
@@ -53,7 +52,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
                     if (contacts[i] == teamId)
                     {
                         contacts.RemoveAt(i);
-                        LogService.LogError($"Remove team {teamId} to player {playerId} contacts {System.Environment.NewLine} {_playerTeamContacts[playerId].ToJson()}");
                         return;
                     }
                 }

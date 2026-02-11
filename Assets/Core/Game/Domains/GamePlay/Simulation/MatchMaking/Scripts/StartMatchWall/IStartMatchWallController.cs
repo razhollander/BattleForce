@@ -3,7 +3,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
     public interface IStartMatchWallController
     {
         void Initialize(float radius);
-        void TryToggleState(int tick);
+        void TryToggleCountdownState(int tick);
         void TryStopCountdown(int tick);
         void StepTimer(float deltaTime);
         bool DidFinishCountingDown { get; }

@@ -125,7 +125,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
             foreach (var evt in startMatchEligibleChangedEvents)
             {
-                _startMatchButtonController.SetEligibility(evt.IsEligible);
+                _startMatchButtonController.SetIsEnabled(evt.IsEligible);
             }
         }
     }

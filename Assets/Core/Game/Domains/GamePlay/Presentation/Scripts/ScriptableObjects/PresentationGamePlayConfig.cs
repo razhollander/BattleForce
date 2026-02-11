@@ -12,6 +12,5 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
         [EditableRef] public PowerUpsConfig PowerUps;
         [EditableRef] public TeamFloorConfig TeamFloor;
         public SerializableDictionary<int, Color> ColorPerTeamId;
-        public Color NoneTeamColor;
     }
 }

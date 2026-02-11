@@ -34,9 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             _playerView.name = "Player_" + PlayerId;
             _playerView.SetPlayerName(playerModel.PlayerName);
             var playerTransform = playerModel.Spaceship.Transform;
-            _playerView.SetColor(playerModel.TeamId == 0
-                ? _gamePlayConfig.NoneTeamColor
-                : _gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
+            _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
         }

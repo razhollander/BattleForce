@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatchButton.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -12,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         private IMatchMakingBulletControllers _bulletControllers;
         private AddMatchMakingPlayerCommand _addMatchMakingPlayerCommand;
         private ICommandFactory _commandFactory;
+        private IStartMatchButtonController _startMatchButtonController;
 
         public SyncMatchMakingSimulationStateCommand SetSimulationState(MatchMakingSimulationStateS2C simulationState)
         {
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
             _matchDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _bulletControllers = _diContainer.Resolve<IMatchMakingBulletControllers>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _startMatchButtonController = _diContainer.Resolve<IStartMatchButtonController>();
             _addMatchMakingPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchMakingPlayerCommand>();
         }
 
@@ -31,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         {
             CreatePlayers();
             CreateBullets();
+            _startMatchButtonController.SetIsEnabled(_simulationState.StartMatchWall.IsEnabled);
         }
 
         private void CreatePlayers()
