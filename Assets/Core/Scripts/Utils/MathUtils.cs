@@ -32,6 +32,7 @@ namespace CoreDomain.Scripts.Utils
             // Mathf.Exp(-decay * deltaTime) calculates how much of the "residual" 
             // rotation 'a' should remain. 
             // 1 - that value is the interpolation factor (t) for the Slerp.
+            // https://www.youtube.com/watch?v=LSNQuFEDOyQ
             float t = 1f - Mathf.Exp(-decay * deltaTime);
 
             return Quaternion.Slerp(a, b, t);

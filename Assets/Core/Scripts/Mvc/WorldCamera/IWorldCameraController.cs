@@ -12,5 +12,6 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         // void StopFollowTarget();
         // void StartFollowTarget(Transform targetTransform);
         // Awaitable DoLockOnTargetAnimation(Transform targetTransform, CancellationTokenSource cancellationTokenSource);
+        Vector3 ScreenToWorldPoint(Vector3 position);
     }
 }

@@ -11,6 +11,7 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
     {
         [SerializeField] private CinemachineTargetGroup _targetGroup;
         [SerializeField] private CinemachineBasicMultiChannelPerlin _perlin;
+        [SerializeField] private Camera _camera;
 
         private CancellationTokenSource _shakeCancellationTokenSource;
 
@@ -39,6 +40,11 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             _perlin.AmplitudeGain = 0f;
             transform.rotation = Quaternion.identity;
             _shakeCancellationTokenSource = null;        
+        }
+
+        public Vector3 ScreenToWorldPoint(Vector3 position)
+        {
+            return _camera.ScreenToWorldPoint(position);
         }
     }
 }

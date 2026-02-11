@@ -91,12 +91,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             _healthBarGameObject.SetActive(isShown);
         }
-
-        // public void InterpolateAimRotation(System.Numerics.Vector2 direction, float interpolationFactor)
-        // {
-        //     var targetRotation=direction.ToQuaternion();
-        //     _aimArrowTransform.rotation = Quaternion.Slerp(_aimArrowTransform.rotation, targetRotation, interpolationFactor);
-        // }
         
         public void InterpolateAimRotation(System.Numerics.Vector2 direction, float decay)
         {
