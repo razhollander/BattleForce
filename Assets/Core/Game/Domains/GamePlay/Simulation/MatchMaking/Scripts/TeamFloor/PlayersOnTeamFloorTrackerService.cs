@@ -1,15 +1,19 @@
+using Core.Scripts.Extensions;
+using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTracker
 {
     public class PlayersOnTeamFloorTrackerService : IPlayersOnTeamFloorTrackerService
     {
+        private const int MAX_OVERLAPPING_FLOORS = 32;
+        
         private readonly CapacityDict<ushort, FixedUnorderedList<ushort>> _playerTeamContacts;
         private readonly ConcurrentPool<FixedUnorderedList<ushort>> _contactsPool;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private const int MAX_OVERLAPPING_FLOORS = 8;
 
         public PlayersOnTeamFloorTrackerService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -19,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
-        public void AddFloorContact(ushort playerId, ushort teamId)
+        public void AddTeamFloorContact(ushort playerId, ushort teamId)
         {
             if (!_playerTeamContacts.TryGetValue(playerId, out var contacts))
             {
@@ -28,18 +32,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
                 _playerTeamContacts.Add(playerId, contacts);
             }
 
-            for (int i = 0; i < contacts.Count; i++)
-            {
-                if (contacts[i] == teamId)
-                {
-                    return;
-                }
-            }
-
             if (!contacts.IsFull)
             {
                 ref var item = ref contacts.AddAndGet();
                 item = teamId;
+                LogService.LogError($"Add team {teamId} to player {playerId} contacts {System.Environment.NewLine} {_playerTeamContacts[playerId].ToJson()}");
+            }
+            else
+            {
+                LogService.LogError($"Contact is full! Player is touching above: {MAX_OVERLAPPING_FLOORS} floor");
             }
         }
 
@@ -52,25 +53,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
                     if (contacts[i] == teamId)
                     {
                         contacts.RemoveAt(i);
+                        LogService.LogError($"Remove team {teamId} to player {playerId} contacts {System.Environment.NewLine} {_playerTeamContacts[playerId].ToJson()}");
                         return;
                     }
                 }
             }
+            
+            LogService.LogError("Player "+playerId+" tried to remove floor contact for team "+teamId+" but it was not found");
         }
 
         public ushort GetPlayerTeam(ushort playerId)
         {
             if (_playerTeamContacts.TryGetValue(playerId, out var contacts) && contacts.Count > 0)
             {
-                ushort maxTeam = 0;
-                for (int i = 0; i < contacts.Count; i++)
-                {
-                    if (contacts[i] > maxTeam)
-                    {
-                        maxTeam = contacts[i];
-                    }
-                }
-                return maxTeam;
+                return contacts.GetMostFrequent();
             }
             return _sharedGamePlayConfig.NoTeamId;
         }

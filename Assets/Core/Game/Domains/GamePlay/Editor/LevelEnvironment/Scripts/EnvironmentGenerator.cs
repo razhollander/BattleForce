@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -9,7 +10,6 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
 {
     public class EnvironmentGenerator : MonoBehaviour
     {
-        private const int MIN_BOX2D_ID = 1;
         [SerializeField] private EnvironmentConfig _environmentConfig;
         [SerializeField] private List<PolygonPath2D> _walls;
         [SerializeField] private List<LavaWall> _lavaWalls;
@@ -23,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
             for (int i = 0; i < _walls.Count; i++)
             {
                 var wallGenerator = _walls[i];
-                var wallConfig = new WallConfig((ushort) (i + MIN_BOX2D_ID), wallGenerator.GetPointsRelativeToObject().Select(x=>x.ToNumericsVector2()).ToArray());
+                var wallConfig = new WallConfig((ushort) (i + PhysicsSimulator.MIN_BOX2D_ID), wallGenerator.GetPointsRelativeToObject().Select(x=>x.ToNumericsVector2()).ToArray());
                 wallsConfigs[i] = wallConfig;
             }
 
@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
 
             _lavaWalls = GetLavaWalls();
             var lavaConfigs = new WallConfig[_lavaWalls.Count];
-            var lavaStartId = MIN_BOX2D_ID;
+            var lavaStartId = PhysicsSimulator.MIN_BOX2D_ID;
 
             for (int i = 0; i < _lavaWalls.Count; i++)
             {

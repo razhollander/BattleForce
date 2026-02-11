@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.T
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloor;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -18,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
         private IMatchMakingDataService _matchMakingDataService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private IStartMatchWallController _startMatchWallController;
+        private ITeamFloorDataService _teamFloorDataService;
 
         public override void ResolveDependencies()
         {
@@ -28,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
+            _teamFloorDataService = _diContainer.Resolve<ITeamFloorDataService>();
         }
 
         public void Execute()
@@ -51,13 +54,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
         private void CreateTeamFloors()
         {
             var walls = DonutQuadrantWalls.GenerateQuadrantWallPerTeam(_sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius, _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsPrecision);
+            ushort teamFloorId = PhysicsSimulator.MIN_BOX2D_ID;
             foreach (var kvp in walls)
             {
                 var teamId = kvp.Key;
                 var wallConfigs = kvp.Value;
                 foreach (var wallConfig in wallConfigs)
                 {
-                    _physicsSimulator.AddTeamFloor(teamId, wallConfig.Points);
+                    _teamFloorDataService.FloorIdToTeamId.Add(teamFloorId, teamId);
+                    _physicsSimulator.AddTeamFloor(teamFloorId, wallConfig.Points);
+                    teamFloorId++;
                 }
             }
         }

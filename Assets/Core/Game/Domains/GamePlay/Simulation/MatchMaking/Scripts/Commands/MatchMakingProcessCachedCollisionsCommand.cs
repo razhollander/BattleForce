@@ -1,13 +1,16 @@
+using System.Collections.Generic;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Contacts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloor;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTracker;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -20,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
         private INetEventsDataService _netEventsDataService;
         private IPlayersOnTeamFloorTrackerService _playersOnTeamFloorTrackerService;
         private IStartMatchWallController _startMatchWallController;
-
+        private ITeamFloorDataService _teamFloorDataService;
         private int _processedTick;
 
         public MatchMakingProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
@@ -36,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersOnTeamFloorTrackerService = _diContainer.Resolve<IPlayersOnTeamFloorTrackerService>();
             _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
+            _teamFloorDataService = _diContainer.Resolve<ITeamFloorDataService>();
         }
 
         public void Execute()
@@ -53,22 +57,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
 
                 var objectA = collisionEvent.BodyDataA;
                 var objectB = collisionEvent.BodyDataB;
-
-                if (collisionEvent.Type == PhysicsEventEventType.Begin)
-                {
-                    HandlePlayerWallCollision(objectA, objectB, collisionEvent.Contact);
-                    HandleBulletWallCollision(objectA, objectB, collisionEvent.Contact);
-                    HandlePlayerTeamFloorCollision(objectA, objectB, collisionEvent.Contact, PhysicsEventEventType.Begin);
-                    HandlePlayerStartMatchWallCollision(objectA, objectB, collisionEvent.Contact);
-                    HandleBulletStartMatchWallCollision(objectA, objectB, collisionEvent.Contact);
-                }
-                else if (collisionEvent.Type == PhysicsEventEventType.End)
-                {
-                    HandlePlayerTeamFloorCollision(objectA, objectB, collisionEvent.Contact, PhysicsEventEventType.End);
-                }
+                
+                HandlePlayerWallCollision(objectA, objectB, collisionEvent.Contact);
+                HandleBulletWallCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerTeamFloorCollision(objectA, objectB, collisionEvent.Contact, collisionEvent.Type);
+                HandlePlayerStartMatchWallCollision(objectA, objectB, collisionEvent.Contact);
+                HandleBulletStartMatchWallCollision(objectA, objectB, collisionEvent.Contact);
             }
 
+            HandlePlayerChangedTeamFloor();
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandlePlayerChangedTeamFloor()
+        {
+            foreach (var playerState in _matchMakingDataService.SimulationState.Players.AsSpan())
+            {
+                var playerId = playerState.Id;
+                var newTeamId = _playersOnTeamFloorTrackerService.GetPlayerTeam(playerId);
+                var didPlayerSwitchTeams = playerState.TeamId != newTeamId;
+                
+                if (didPlayerSwitchTeams)
+                {
+                    playerState.TeamId = newTeamId;
+                    _startMatchWallController.OnPlayerTeamChanged(_processedTick);
+                    _netEventsDataService.AddPlayerSwitchTeamNetEvent(_processedTick, playerId, newTeamId);
+                }
+            }
         }
 
         private void HandlePlayerStartMatchWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
@@ -150,26 +165,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             }
 
             var playerId = isPlayerToFloor ? objectA.Id : objectB.Id;
-            var teamId = isPlayerToFloor ? objectB.Id : objectA.Id;
-
+            var floorId = isPlayerToFloor ? objectB.Id : objectA.Id;
+            var floorTeamId = _teamFloorDataService.FloorIdToTeamId[floorId];
             if (eventType == PhysicsEventEventType.Begin)
             {
-                _playersOnTeamFloorTrackerService.AddFloorContact(playerId, teamId);
+                _playersOnTeamFloorTrackerService.AddTeamFloorContact(playerId, floorTeamId);
             }
             else
             {
-                _playersOnTeamFloorTrackerService.RemoveFloorContact(playerId, teamId);
-            }
-
-            var newTeamId = _playersOnTeamFloorTrackerService.GetPlayerTeam(playerId);
-            var playerState = _matchMakingDataService.SimulationState.GetPlayerById(playerId);
-
-            var didPlayerSwitchTeams = playerState.TeamId != newTeamId;
-            if (didPlayerSwitchTeams)
-            {
-                playerState.TeamId = newTeamId;
-                _startMatchWallController.OnPlayerTeamChanged(_processedTick);
-                _netEventsDataService.AddPlayerSwitchTeamNetEvent(_processedTick, playerId, newTeamId);
+                _playersOnTeamFloorTrackerService.RemoveFloorContact(playerId, floorTeamId);
             }
         }
 
