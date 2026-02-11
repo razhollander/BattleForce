@@ -3,6 +3,7 @@ using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Contacts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchEligibilityLogic;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloor;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTracker;
@@ -24,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
         private IPlayersOnTeamFloorTrackerService _playersOnTeamFloorTrackerService;
         private IStartMatchWallController _startMatchWallController;
         private ITeamFloorDataService _teamFloorDataService;
+        private IStartMatchEligibilityLogicService _startMatchEligibilityLogicService;
         private int _processedTick;
 
         public MatchMakingProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
@@ -40,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             _playersOnTeamFloorTrackerService = _diContainer.Resolve<IPlayersOnTeamFloorTrackerService>();
             _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
             _teamFloorDataService = _diContainer.Resolve<ITeamFloorDataService>();
+            _startMatchEligibilityLogicService = _diContainer.Resolve<IStartMatchEligibilityLogicService>();
         }
 
         public void Execute()
@@ -65,11 +68,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
                 HandleBulletStartMatchWallCollision(objectA, objectB, collisionEvent.Contact);
             }
 
-            HandlePlayerChangedTeamFloor();
+            HandleIfAnyPlayerChangedTeamFloor();
             _physicsSimulator.ClearCachedCollisions();
         }
 
-        private void HandlePlayerChangedTeamFloor()
+        private void HandleIfAnyPlayerChangedTeamFloor()
         {
             foreach (var playerState in _matchMakingDataService.SimulationState.Players.AsSpan())
             {
@@ -79,11 +82,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
                 
                 if (didPlayerSwitchTeams)
                 {
-                    playerState.TeamId = newTeamId;
-                    _startMatchWallController.OnPlayerTeamChanged(_processedTick);
-                    _netEventsDataService.AddPlayerSwitchTeamNetEvent(_processedTick, playerId, newTeamId);
+                    HandlePlayerChangedTeam(playerState, newTeamId);
                 }
             }
+        }
+
+        private void HandlePlayerChangedTeam(MatchMakingPlayerStateS2C playerState, ushort newTeamId)
+        {
+            var previousIsEligibleToStartMatch = _startMatchEligibilityLogicService.IsEligibleToStartMatch();
+            playerState.TeamId = newTeamId;
+            var newIsEligibleToStartMatch = _startMatchEligibilityLogicService.IsEligibleToStartMatch();
+
+            if (newIsEligibleToStartMatch != previousIsEligibleToStartMatch)
+            {
+                _netEventsDataService.AddStartMatchEligibleChangedNetEvent(_processedTick, newIsEligibleToStartMatch);
+            }
+            _startMatchWallController.TryStopCountdown(_processedTick);
+            _netEventsDataService.AddPlayerSwitchTeamNetEvent(_processedTick, playerState.Id, newTeamId);
         }
 
         private void HandlePlayerStartMatchWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
@@ -151,7 +166,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             }
 
             DestroyBullet(bulletModel, bulletBody);
-            _startMatchWallController.TryToggleState(_processedTick);
+
+            if (_startMatchEligibilityLogicService.IsEligibleToStartMatch())
+            {
+                _startMatchWallController.TryToggleState(_processedTick);
+            }
         }
 
         private void HandlePlayerTeamFloorCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact, PhysicsEventEventType eventType)
