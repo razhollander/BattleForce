@@ -7,6 +7,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatc
     {
         [SerializeField] private GameObject _startTextTransform;
         [SerializeField] private TMP_Text _countdownText;
+        [SerializeField] private GameObject _disabledOverlay;
 
         public void Setup(Vector2 position, float radius)
         {
@@ -34,6 +35,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatc
         private void SetRadius(float radius)
         {
             transform.localScale = new Vector3(radius * 2, radius * 2, 1);
+        }
+
+        public void SetIsDisabledOverlayShown(bool isShown)
+        {
+            _disabledOverlay.SetActive(isShown);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         int ConnectedPeersCount { get; }
         event Action OnPacketReceivedEvent;
         event Action OnPeerDisconnectedEvent;
-        void InitEntryPoint();
+        void InitEntryPoint(int port);
         void InitExitPoint();
         //void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
         public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;

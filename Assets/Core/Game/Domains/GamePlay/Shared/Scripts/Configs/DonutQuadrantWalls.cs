@@ -17,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         /// - Inner radius is outerRadius * 0.5f.
         /// - Each wall uses 4 points (convex quad), so no concave polygons and under max 8 points.
         /// </summary>
-        public static Dictionary<ushort, WallConfig[]> GenerateQuadrantWallPerTeam(float outerRadius, int precision)
+        public static Dictionary<ushort, WallConfig[]> GenerateQuadrantWallsPerTeam(List<ushort> teamIds, float outerRadius, int precision, ushort startEntityId)
         {
             if (outerRadius <= 0) throw new ArgumentOutOfRangeException(nameof(outerRadius));
             if (precision < 1) precision = 1;
@@ -27,13 +27,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             // Quadrants (degrees)
             var quadrants = new (ushort TeamId, float StartDeg, float EndDeg)[]
             {
-                (1,    90f,   0f),
-                (2,   0f, -90f),
-                (3, -90f,-180f),
-                (4,  180f,  90f),
+                (teamIds[0],    90f,   0f),
+                (teamIds[1],   0f, -90f),
+                (teamIds[2], -90f,-180f),
+                (teamIds[3],  180f,  90f),
             };
 
-            ushort nextId = 1;
+            ushort nextId = startEntityId;
             var result = new Dictionary<ushort, WallConfig[]>();
 
             foreach (var quadrant in quadrants)
@@ -62,6 +62,25 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         /// - width: radial thickness (outer = centerRadius + width/2, inner = centerRadius - width/2)
         /// - precision: number of segments around full 360°
         /// </summary>
+        public static Vector2 GetTeamFloorCenter(List<ushort> teamIds, ushort teamId, float outerRadius)
+        {
+            var innerRadius = outerRadius * 0.5f;
+            var centerRadius = (outerRadius + innerRadius) * 0.5f;
+            var angle = 0f;
+            var indexOfTeamId = teamIds.IndexOf(teamId);
+            
+            switch (indexOfTeamId)
+            {
+                case 0: angle = 45f; break;
+                case 1: angle = -45f; break;
+                case 2: angle = -135f; break;
+                case 3: angle = 135f; break;
+                default: return Vector2.Zero;
+            }
+
+            return PointOnCircle(centerRadius, angle);
+        }
+
         public static WallConfig[] GenerateWrapAroundWallJson(float centerRadius, float width, int precision, ushort startId = 1000)
         {
             if (centerRadius <= 0) throw new ArgumentOutOfRangeException(nameof(centerRadius));

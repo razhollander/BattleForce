@@ -270,12 +270,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(lavaShape);
         }
 
-        public void AddTeamFloor(ushort teamId, Vector2[] points)
+        public void AddTeamFloor(ushort id, Vector2[] points)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
             bodyDef.position = Vector2.Zero;
-            bodyDef.userData = new PhysicsBodyData(teamId, PhysicsBodyType.TeamFloor);
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.TeamFloor);
 
             var body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);

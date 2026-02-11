@@ -1,13 +1,17 @@
+using System.Collections.Generic;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Contacts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchEligibilityLogic;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloor;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTracker;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -20,7 +24,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
         private INetEventsDataService _netEventsDataService;
         private IPlayersOnTeamFloorTrackerService _playersOnTeamFloorTrackerService;
         private IStartMatchWallController _startMatchWallController;
-
+        private ITeamFloorDataService _teamFloorDataService;
+        private IStartMatchEligibilityLogicService _startMatchEligibilityLogicService;
         private int _processedTick;
 
         public MatchMakingProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
@@ -36,6 +41,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersOnTeamFloorTrackerService = _diContainer.Resolve<IPlayersOnTeamFloorTrackerService>();
             _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
+            _teamFloorDataService = _diContainer.Resolve<ITeamFloorDataService>();
+            _startMatchEligibilityLogicService = _diContainer.Resolve<IStartMatchEligibilityLogicService>();
         }
 
         public void Execute()
@@ -53,15 +60,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
 
                 var objectA = collisionEvent.BodyDataA;
                 var objectB = collisionEvent.BodyDataB;
-
-                if (collisionEvent.Type != PhysicsEventEventType.Begin)
-                {
-                    continue;
-                }
-
+                
                 HandlePlayerWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandleBulletWallCollision(objectA, objectB, collisionEvent.Contact);
-                HandlePlayerTeamFloorCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerTeamFloorCollision(objectA, objectB, collisionEvent.Contact, collisionEvent.Type);
                 HandlePlayerStartMatchWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandleBulletStartMatchWallCollision(objectA, objectB, collisionEvent.Contact);
             }
@@ -134,10 +136,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             }
 
             DestroyBullet(bulletModel, bulletBody);
-            _startMatchWallController.TryToggleState(_processedTick);
+
+            if (_startMatchEligibilityLogicService.IsEligibleToStartMatch())
+            {
+                _startMatchWallController.TryToggleCountdownState(_processedTick);
+            }
         }
 
-        private void HandlePlayerTeamFloorCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        private void HandlePlayerTeamFloorCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact, PhysicsEventEventType eventType)
         {
             var isPlayerToFloor = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.TeamFloor;
             var isFloorToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.TeamFloor && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
@@ -148,17 +154,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
             }
 
             var playerId = isPlayerToFloor ? objectA.Id : objectB.Id;
-            var teamId = isPlayerToFloor ? objectB.Id : objectA.Id;
-
-            var playerState = _matchMakingDataService.SimulationState.GetPlayerById(playerId);
-
-            var didPlayerSwitchTeams = playerState.TeamId != teamId;
-            if (didPlayerSwitchTeams)
+            var floorId = isPlayerToFloor ? objectB.Id : objectA.Id;
+            var floorTeamId = _teamFloorDataService.FloorIdToTeamId[floorId];
+            if (eventType == PhysicsEventEventType.Begin)
             {
-                playerState.TeamId = teamId;
-                _playersOnTeamFloorTrackerService.SetPlayerTeam(playerId, teamId);
-                _startMatchWallController.TryStopCountdown(_processedTick);
-                _netEventsDataService.AddPlayerSwitchTeamNetEvent(_processedTick, playerId, teamId);
+                _playersOnTeamFloorTrackerService.AddTeamFloorContact(playerId, floorTeamId);
+            }
+            else
+            {
+                _playersOnTeamFloorTrackerService.RemoveFloorContact(playerId, floorTeamId);
             }
         }
 

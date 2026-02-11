@@ -17,9 +17,11 @@ MonoBehaviour:
   PowerUps: {fileID: 11400000, guid: 0bf6f91347e23451b8e8625c8c7e6a42, type: 2}
   TeamFloor: {fileID: 11400000, guid: c4cc2d03286a1424da9b1d4ea5299300, type: 2}
   ColorPerTeamId:
-    m_keys: 01000000020000000300000004000000
+    m_keys: 0100000002000000030000000400000005000000
     m_values:
     - {r: 0.7924528, g: 0, b: 0, a: 1}
     - {r: 0.07658162, g: 0.8490566, b: 0, a: 1}
     - {r: 0, g: 0.59331334, b: 0.9622642, a: 1}
     - {r: 1, g: 0.80729437, b: 0, a: 1}
+    - {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 1}
+  NoneTeamColor: {r: 0, g: 0, b: 0, a: 0}

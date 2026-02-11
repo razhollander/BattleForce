@@ -12,7 +12,7 @@ namespace Core.Scripts.Network
         public int PhysicsVelocityIterations = 8;
         public int PositionIterations = 8;
         public int ServerPlayerInputPacketsBuffer = 2;
-        public int HostPort = 49153;
+        public int DefaultHostPort = 49153;
         public string IpAddress = "109.67.156.134";
         public bool OnlyLocal = false;
         public string ConntectionKey = "BattleForceGame";
@@ -63,7 +63,8 @@ namespace Core.Scripts.Network
         public int StopMatchCountdownNetEvents = 32;
         public int ExitMatchMakingNetEvents = 32;
         public int StartMatchNetEvents = 32;
-        public int StageEndNetEvents = 1;
+        public int StageEndNetEvents = 32;
         public int PlayerDiedNetEvents = 32;
+        public int StartMatchEligibleChangedNetEvents = 32;
     }
 }

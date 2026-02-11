@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
         private IMatchMakingEnvironmentTeamFloorControllers _environmentTeamFloorControllers;
         private IMatchMakingDataService _matchMakingDataService;
         private PresentationGamePlayConfig _gameplayConfig;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
 
         public override void ResolveDependencies()
         {
@@ -24,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
             _environmentTeamFloorControllers = _diContainer.Resolve<IMatchMakingEnvironmentTeamFloorControllers>();
             _gameplayConfig =_diContainer.Resolve<PresentationGamePlayConfig>();
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public void Execute()
@@ -40,7 +42,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
                 var playerNewColor = _gameplayConfig.ColorPerTeamId[teamId];
                 _playerControllers.UpdatePlayerColor(netEvent.PlayerId, playerNewColor);
                 _matchMakingDataService.GetPlayer(netEvent.PlayerId).TeamId = teamId;
-                _environmentTeamFloorControllers.AnimateFloorBounce(teamId);
+
+                var isNoTeamId = teamId != _sharedGamePlayConfig.NoTeamId;
+                if (isNoTeamId)
+                {
+                    _environmentTeamFloorControllers.AnimateFloorBounce(teamId);
+                }
             }
 
             events.Clear();

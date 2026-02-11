@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly CapacityList<PlayerSwitchTeamNetEventS2C> _cachedUnprocessedPlayerSwitchTeamEvents;
         private readonly CapacityList<StartMatchCountdownNetEventS2C> _cachedUnprocessedStartMatchCountdownEvents;
         private readonly CapacityList<StopMatchCountdownNetEventS2C> _cachedUnprocessedStopMatchCountdownEvents;
+        private readonly CapacityList<StartMatchEligibleChangedNetEventS2C> _cachedUnprocessedStartMatchEligibleChangedEvents;
         private readonly ConcurrentPool<MatchMakingFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchMakingFullTick;
         public int LastProcessedTickFromServer { get; private set; }
@@ -53,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             _cachedUnprocessedStartMatchCountdownEvents = new CapacityList<StartMatchCountdownNetEventS2C>(networkConfig.MaxCap.StartMatchCountdownNetEvents);
             _cachedUnprocessedStopMatchCountdownEvents = new CapacityList<StopMatchCountdownNetEventS2C>(networkConfig.MaxCap.StopMatchCountdownNetEvents);
             _cachedUnprocessedPlayerSwitchTeamEvents = new CapacityList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents);
+            _cachedUnprocessedStartMatchEligibleChangedEvents = new CapacityList<StartMatchEligibleChangedNetEventS2C>(networkConfig.MaxCap.StartMatchEligibleChangedNetEvents);
 
             _fullTickPacketsPool =
                 new ConcurrentPool<MatchMakingFullTickPacketS2C>(() => new MatchMakingFullTickPacketS2C(networkConfig.MaxCap), networkConfig.MaxCap.FullTickPacketsNetEvents);
@@ -86,6 +88,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             ProcessPlayerSwitchTeamEvents(latestFullTickPacket.PlayerSwitchTeamNetEvents);
             ProcessStartMatchCountdownEvents(latestFullTickPacket.StartMatchCountdownNetEvents);
             ProcessStopMatchCountdownEvents(latestFullTickPacket.StopMatchCountdownNetEvents);
+            ProcessStartMatchEligibleChangedEvents(latestFullTickPacket.StartMatchEligibleChangedNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
@@ -206,6 +209,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             if (!_cachedUnprocessedStopMatchCountdownEvents.IsNullOrEmpty())
             {
                 _presentationNetEventsHandler.ProcessStopMatchCountdownEvents(_cachedUnprocessedStopMatchCountdownEvents);
+            }
+        }
+
+        private void ProcessStartMatchEligibleChangedEvents(FixedUnorderedList<StartMatchEligibleChangedNetEventS2C> events)
+        {
+            _cachedUnprocessedStartMatchEligibleChangedEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedStartMatchEligibleChangedEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedStartMatchEligibleChangedEvents.IsNullOrEmpty())
+            {
+                _presentationNetEventsHandler.ProcessStartMatchEligibleChangedEvents(_cachedUnprocessedStartMatchEligibleChangedEvents);
             }
         }
 
