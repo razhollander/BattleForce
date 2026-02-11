@@ -8,13 +8,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
     {
         public FixedClassUnorderedList<MatchMakingPlayerStateS2C> Players;
         public FixedUnorderedList<PlayerBulletS2C> Bullets;
+        public MatchMakingStartMatchWallS2C StartMatchWall;
 
         public MatchMakingSimulationStateS2C(int maxPlayers, int maxBullets)
         {
             Players = new FixedClassUnorderedList<MatchMakingPlayerStateS2C>(maxPlayers, ()=>new MatchMakingPlayerStateS2C());
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
+            StartMatchWall = new MatchMakingStartMatchWallS2C();
         }
-
+        
         public void Serialize(NetDataWriter writer)
         {
             var playerCount = Players.Count;
@@ -30,6 +32,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             {
                 bullet.Serialize(writer);
             }
+            
+            StartMatchWall.Serialize(writer);
         }
         
         public void Deserialize(NetDataReader reader)
@@ -49,6 +53,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
                 ref var bullet = ref Bullets.AddAndGet();
                 bullet.Deserialize(reader);
             }
+            
+            StartMatchWall.Deserialize(reader);
         }
 
         public MatchMakingPlayerStateS2C GetPlayerById(ushort playerId)

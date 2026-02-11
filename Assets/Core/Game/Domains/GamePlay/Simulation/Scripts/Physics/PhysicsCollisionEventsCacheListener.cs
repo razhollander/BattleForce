@@ -6,6 +6,7 @@ using Box2D.NetStandard.Dynamics.World;
 using Box2D.NetStandard.Dynamics.World.Callbacks;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 {
@@ -77,6 +78,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 physicsCollisionEvent.VelocityA = velocityA; 
                 physicsCollisionEvent.VelocityB = velocityB; 
             }
+            else
+            {
+                LogService.LogError($"Already have event {key}");
+            }
         }
         
         private readonly struct EventKey : IEquatable<EventKey>
@@ -97,6 +102,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 => _lowId == other._lowId && _highId == other._highId && _type == other._type;
 
             public override bool Equals(object obj) => obj is EventKey other && Equals(other);
+
+            public override string ToString()
+            {
+                return $"_lowId : {_lowId}, _highId : {_highId}, _type : {_type}";
+            }
 
             public override int GetHashCode()
             {

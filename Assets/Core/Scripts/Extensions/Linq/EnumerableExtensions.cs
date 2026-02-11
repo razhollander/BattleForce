@@ -1,19 +1,76 @@
 using System;
 using System.Collections.Generic;
+using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Scripts.Extensions.Linq
 {
     public static class EnumerableExtensions
     {
+        private static Dictionary<ushort, int> _cachedCounts = new Dictionary<ushort, int>();
+
         public static List<T> ToList<T>(this IEnumerable<T> source)
         {
             var list = new List<T>();
+
             foreach (var item in source)
             {
                 list.Add(item);
             }
 
             return list;
+        }
+
+
+        public static ushort GetMostFrequent(this List<ushort> list)
+        {
+            if (list == null || list.Count == 0)
+                throw new ArgumentException("List is empty");
+
+            _cachedCounts.Clear();
+            var winner = list[0];
+            var maxCount = 0;
+
+            foreach (ushort num in list)
+            {
+                if (!_cachedCounts.TryAdd(num, 1))
+                {
+                    _cachedCounts[num]++;
+                }
+
+                if (_cachedCounts[num] > maxCount)
+                {
+                    maxCount = _cachedCounts[num];
+                    winner = num;
+                }
+            }
+
+            return winner;
+        }
+
+        public static ushort GetMostFrequent(this FixedUnorderedList<ushort> list)
+        {
+            if (list == null || list.Count == 0)
+                throw new ArgumentException("List is empty");
+
+            _cachedCounts.Clear();
+            var winner = list[0];
+            var maxCount = 0;
+
+            foreach (ushort num in list.AsSpan())
+            {
+                if (!_cachedCounts.TryAdd(num, 1))
+                {
+                    _cachedCounts[num]++;
+                }
+
+                if (_cachedCounts[num] > maxCount)
+                {
+                    maxCount = _cachedCounts[num];
+                    winner = num;
+                }
+            }
+
+            return winner;
         }
         
         public static T Max<T>(this IEnumerable<T> source) where T : IComparable<T>
@@ -30,7 +87,7 @@ namespace Core.Scripts.Extensions.Linq
 
             return max;
         }
-        
+
         public static IEnumerable<TResult> Select<TSource, TResult>(
             this IEnumerable<TSource> source, Func<TSource, TResult> selector)
         {
@@ -55,7 +112,7 @@ namespace Core.Scripts.Extensions.Linq
                 yield return selector(item);
             }
         }
-        
+
         public static TSource FirstOrDefault<TSource>(
             this IEnumerable<TSource> source)
         {
@@ -71,6 +128,7 @@ namespace Core.Scripts.Extensions.Linq
                     return enumerator.Current;
                 }
             }
+
             return default(TSource);
         }
 
@@ -94,9 +152,10 @@ namespace Core.Scripts.Extensions.Linq
                     return element;
                 }
             }
+
             return default(TSource);
         }
-    
+
         public static bool Contains<T>(this IEnumerable<T> source, T value)
         {
             if (source == null)
@@ -111,9 +170,10 @@ namespace Core.Scripts.Extensions.Linq
                     return true;
                 }
             }
+
             return false;
         }
-        
+
         public static IEnumerable<TResult> SelectMany<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, IEnumerable<TResult>> selector)
         {
             foreach (var item in source)
@@ -124,7 +184,7 @@ namespace Core.Scripts.Extensions.Linq
                 }
             }
         }
-        
+
         public static IEnumerable<T> Where<T>(this IEnumerable<T> source, Func<T, bool> predicate)
         {
             if (source == null || predicate == null)
@@ -140,7 +200,7 @@ namespace Core.Scripts.Extensions.Linq
                 }
             }
         }
-        
+
         public static IEnumerable<T> OrderBy<T, TKey>(this IEnumerable<T> source, Func<T, TKey> keySelector)
             where TKey : IComparable<TKey>
         {
@@ -177,9 +237,8 @@ namespace Core.Scripts.Extensions.Linq
             where TKey : IComparable<TKey>
         {
             var sortedList = new List<T>(source);
-            sortedList.Sort((x, y) => ascending ?
-                keySelector(x).CompareTo(keySelector(y)) :
-                keySelector(y).CompareTo(keySelector(x)));
+            sortedList.Sort((x, y) => ascending ? keySelector(x).CompareTo(keySelector(y)) : keySelector(y).CompareTo(keySelector(x)));
+
             return sortedList;
         }
 
@@ -191,7 +250,7 @@ namespace Core.Scripts.Extensions.Linq
             }
 
             using var enumerator = source.GetEnumerator();
-            
+
             if (!enumerator.MoveNext())
             {
                 throw new InvalidOperationException("Sequence contains no elements");

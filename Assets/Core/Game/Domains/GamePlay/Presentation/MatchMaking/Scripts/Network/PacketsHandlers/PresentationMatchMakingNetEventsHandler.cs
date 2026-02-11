@@ -115,5 +115,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 _startMatchButtonController.StopMatchCountdown();
             }
         }
+
+        public void ProcessStartMatchEligibleChangedEvents(CapacityList<StartMatchEligibleChangedNetEventS2C> startMatchEligibleChangedEvents)
+        {
+            if (startMatchEligibleChangedEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var evt in startMatchEligibleChangedEvents)
+            {
+                _startMatchButtonController.SetIsEnabled(evt.IsEligible);
+            }
+        }
     }
 }

@@ -1,7 +1,9 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -11,6 +13,7 @@ using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -33,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
 
         public MatchMakingPlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
-            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
+            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ICommandFactory commandFactory)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -58,7 +61,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             var velocity = startingDirection * 0.01f;
             var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
             var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
-            var position = Vector2.One;
 
             foreach (var kvp in _playerJoinedPacketsPerPeer)
             {
@@ -79,7 +81,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                 {
                     joinResponse.IsSuccess = true;
                     joinResponse.IsMatchMaking = true;
-                    var playerTeamId = (ushort)(_matchDataService.SimulationState.Players.Count+1);
+                    var playerTeamId = (ushort) (_matchDataService.SimulationState.Players.Count % _sharedGamePlayConfig.MaxTeamsAmount + 1);
+                    var position = DonutQuadrantWalls.GetTeamFloorCenter(_sharedGamePlayConfig.TeamIds, playerTeamId, _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius);
                     var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerTeamId);
                     var playerId = playerState.Id;
                     joinResponse.LocalPlayerId = playerId;

@@ -23,9 +23,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
         public void InitEntryPoint()
         {
             _teamFloorsParent = new GameObject("EnvironmentTeamFloorsParent");
-            var teamFloors = DonutQuadrantWalls.GenerateQuadrantWallPerTeam(
+            var teamFloors = DonutQuadrantWalls.GenerateQuadrantWallsPerTeam(
+                _sharedGamePlayConfig.TeamIds,
                 _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius,
-                _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsPrecision);
+                _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsPrecision,
+                _sharedGamePlayConfig.MinEntityId);
 
             foreach (var kvp in teamFloors)
             {

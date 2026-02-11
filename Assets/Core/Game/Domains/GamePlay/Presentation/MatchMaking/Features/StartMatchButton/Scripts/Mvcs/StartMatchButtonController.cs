@@ -45,6 +45,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatc
             SetButtonStartState();
         }
 
+        public void SetIsEnabled(bool isEnabled)
+        {
+            _view.SetIsDisabledOverlayShown(!isEnabled);
+        }
+
         private void OnTimerTick(double percent, TimeSpan timeLeft)
         {
             _view.SetCountdownText(Mathf.CeilToInt((float) timeLeft.TotalSeconds).ToString());

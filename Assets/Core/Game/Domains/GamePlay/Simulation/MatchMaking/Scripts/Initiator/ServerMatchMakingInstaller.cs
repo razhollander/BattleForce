@@ -1,6 +1,8 @@
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchEligibilityLogic;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloor;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTracker;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
@@ -27,6 +29,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _diContainer.Bind<IPlayerInputsPacketsHandler>().To<MatchMakingPlayerInputsPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersOnTeamFloorTrackerService>().To<PlayersOnTeamFloorTrackerService>().AsSingle().NonLazy();
             _diContainer.Bind<IStartMatchWallController>().To<StartMatchWallController>().AsSingle().NonLazy();
+            _diContainer.Bind<ITeamFloorDataService>().To<TeamFloorDataService>().AsSingle().NonLazy();
+            _diContainer.Bind<IStartMatchEligibilityLogicService>().To<StartMatchEligibilityLogicService>().AsSingle().NonLazy();
         }
 
         public void UninstallBindings()
