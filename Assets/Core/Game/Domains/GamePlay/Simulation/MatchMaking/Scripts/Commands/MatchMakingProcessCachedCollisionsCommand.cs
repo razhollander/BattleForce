@@ -68,39 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
                 HandleBulletStartMatchWallCollision(objectA, objectB, collisionEvent.Contact);
             }
 
-            HandleIfAnyPlayerChangedTeamFloor();
             _physicsSimulator.ClearCachedCollisions();
-        }
-
-        private void HandleIfAnyPlayerChangedTeamFloor()
-        {
-            foreach (var playerState in _matchMakingDataService.SimulationState.Players.AsSpan())
-            {
-                var playerId = playerState.Id;
-                var newTeamId = _playersOnTeamFloorTrackerService.GetPlayerTeam(playerId);
-                var didPlayerSwitchTeams = playerState.TeamId != newTeamId;
-                
-                if (didPlayerSwitchTeams)
-                {
-                    HandlePlayerChangedTeam(playerState, newTeamId);
-                }
-            }
-        }
-
-        private void HandlePlayerChangedTeam(MatchMakingPlayerStateS2C playerState, ushort newTeamId)
-        {
-            var previousIsEligibleToStartMatch = _matchMakingDataService.SimulationState.StartMatchWall.IsEnabled;
-            playerState.TeamId = newTeamId;
-            var newIsEligibleToStartMatch = _startMatchEligibilityLogicService.IsEligibleToStartMatch();
-
-            if (newIsEligibleToStartMatch != previousIsEligibleToStartMatch)
-            {
-                _matchMakingDataService.SimulationState.StartMatchWall.IsEnabled = newIsEligibleToStartMatch;
-                _netEventsDataService.AddStartMatchEligibleChangedNetEvent(_processedTick, newIsEligibleToStartMatch);
-            }
-            
-            _startMatchWallController.TryStopCountdown(_processedTick);
-            _netEventsDataService.AddPlayerSwitchTeamNetEvent(_processedTick, playerState.Id, newTeamId);
         }
 
         private void HandlePlayerStartMatchWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

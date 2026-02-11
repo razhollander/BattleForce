@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -12,6 +13,7 @@ using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -30,11 +32,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
         private readonly ConcurrentPool<JoinRequestPacketC2S> _joinedRequestPacketsPool;
         private readonly ConcurrentPool<JoinResponsePacketS2C> _joinedResponsePacketsPool;
         private readonly NetworkConfig _networkConfig;
+        private readonly HandleIfStartMatchEligiblityChangedCommand _handleIfStartMatchEligiblityChangedCommand;
         public PacketTypeC2S PacketType => PacketTypeC2S.JoinRequest;
 
         public MatchMakingPlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
-            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
+            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ICommandFactory commandFactory)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -46,6 +49,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             _playerJoinedPacketsPerPeer = new CapacityDict<NetPeer, JoinRequestPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _joinedRequestPacketsPool = new ConcurrentPool<JoinRequestPacketC2S>(() => new JoinRequestPacketC2S(), networkConfig.MaxCap.JoinRequestPackets);
             _joinedResponsePacketsPool = new ConcurrentPool<JoinResponsePacketS2C>(() => new JoinResponsePacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount), networkConfig.MaxCap.JoinRequestPackets);
+            _handleIfStartMatchEligiblityChangedCommand = commandFactory.CreateCommandVoid<HandleIfStartMatchEligiblityChangedCommand>();
+
         }
 
         public void InitEntryPoint()
@@ -80,7 +85,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                     joinResponse.IsSuccess = true;
                     joinResponse.IsMatchMaking = true;
                     var playerTeamId = (ushort) (_matchDataService.SimulationState.Players.Count % _sharedGamePlayConfig.MaxTeamsAmount + 1);
-                    var position = DonutQuadrantWalls.GetTeamFloorCenter(playerTeamId, _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius);
+                    var position = DonutQuadrantWalls.GetTeamFloorCenter(_sharedGamePlayConfig.TeamIds, playerTeamId, _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius);
                     var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerTeamId);
                     var playerId = playerState.Id;
                     joinResponse.LocalPlayerId = playerId;
@@ -89,6 +94,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                     peer.Tag = playerId;
                     _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius);
                     _networkManager.AddPlayerPeer(playerId, peer);
+                    _handleIfStartMatchEligiblityChangedCommand.SetTick(processedTick).Execute();
                     _netEventsDataService.StartSavingPlayerEvents(playerId);
                     _netEventsDataService.AddMatchMakingPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);
                     _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);

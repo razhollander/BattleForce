@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Extensions;
 using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
@@ -9,17 +10,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
 {
     public class PlayersOnTeamFloorTrackerService : IPlayersOnTeamFloorTrackerService
     {
-        private const int MAX_OVERLAPPING_FLOORS = 32;
-        
         private readonly CapacityDict<ushort, FixedUnorderedList<ushort>> _playerTeamContacts;
         private readonly ConcurrentPool<FixedUnorderedList<ushort>> _contactsPool;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
+        private readonly SimulationGamePlayConfig _gamePlayConfig;
 
-        public PlayersOnTeamFloorTrackerService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public PlayersOnTeamFloorTrackerService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
         {
             var maxPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             _playerTeamContacts = new CapacityDict<ushort, FixedUnorderedList<ushort>>(maxPlayers);
-            _contactsPool = new ConcurrentPool<FixedUnorderedList<ushort>>(() => new FixedUnorderedList<ushort>(MAX_OVERLAPPING_FLOORS), maxPlayers);
+            _gamePlayConfig = gamePlayConfig;
+            _contactsPool = new ConcurrentPool<FixedUnorderedList<ushort>>(() => new FixedUnorderedList<ushort>(gamePlayConfig.MaxOverllapingFloors), maxPlayers);
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
@@ -39,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
             }
             else
             {
-                LogService.LogError($"Contact is full! Player is touching above: {MAX_OVERLAPPING_FLOORS} floor");
+                LogService.LogError($"Contact is full! Player is touching above: {_gamePlayConfig.MaxOverllapingFloors} floor");
             }
         }
 

@@ -17,5 +17,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float ShootCooldownMultiplierWhenDead = 2;
         public float StageRestartDelaySeconds = 3f;
         public int GemsCollectedForTeamAlive = 1;
+        public int MaxOverllapingFloors = 32;
     }
 }

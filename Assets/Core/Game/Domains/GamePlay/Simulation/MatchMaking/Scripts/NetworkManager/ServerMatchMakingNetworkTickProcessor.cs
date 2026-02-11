@@ -44,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private StepTimersCommand _stepTimersCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private MatchMakingFullTickPacketS2C _fullTickPacket;
+        private HandleIfAnyPlayerChangedTeamFloorCommand _handleIfAnyPlayerChangedTeamFloorCommand;
         private Stopwatch _sw;
         private long _last;
 
@@ -71,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _fullTickPacket = new MatchMakingFullTickPacketS2C();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
+            _handleIfAnyPlayerChangedTeamFloorCommand = _commandFactory.CreateCommandVoid<HandleIfAnyPlayerChangedTeamFloorCommand>();
             _tickService.RegisterObserver(this);
         }
 
@@ -104,7 +106,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 var stepDeltaTime = _networkConfig.DeltaTime;
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick);
-                _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute(); 
+                _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
+                _handleIfAnyPlayerChangedTeamFloorCommand.SetTick(currentTick).Execute();
                 MoveToMatchStateIfCountdownEnded();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(currentTick);
@@ -116,7 +119,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 throw;
             }
         }
-
+        
         private void MoveToMatchStateIfCountdownEnded()
         {
             if (!_startMatchWallController.DidFinishCountingDown)

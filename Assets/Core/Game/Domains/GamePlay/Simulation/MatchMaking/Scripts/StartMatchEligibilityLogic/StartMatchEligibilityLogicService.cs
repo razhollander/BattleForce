@@ -34,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchEl
                 _cachedDifferentTeamIdsAssignedToPlayers.Add(playerState.TeamId);
             }
 
-            return _cachedDifferentTeamIdsAssignedToPlayers.Count > 1;
+            return _cachedDifferentTeamIdsAssignedToPlayers.Count > 1 || _matchMakingDataService.SimulationState.Players.Count == 1;
         }
     }
 }
