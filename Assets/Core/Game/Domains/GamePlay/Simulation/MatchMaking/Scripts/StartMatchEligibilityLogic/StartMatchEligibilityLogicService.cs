@@ -26,7 +26,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchEl
             _cachedDifferentTeamIdsAssignedToPlayers.Clear();
             foreach (var playerState in _matchMakingDataService.SimulationState.Players.AsSpan())
             {
-                if (playerState.TeamId == _sharedGamePlayConfig.NoTeamId)
+                var isPlayerInNoTeam = playerState.TeamId == _sharedGamePlayConfig.NoTeamId;
+
+                if (isPlayerInNoTeam)
                 {
                     return false;
                 }

@@ -45,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private MatchMakingFullTickPacketS2C _fullTickPacket;
         private HandleIfAnyPlayerChangedTeamFloorCommand _handleIfAnyPlayerChangedTeamFloorCommand;
+        private HandleIfStartMatchEligiblityChangedCommand _handleIfStartMatchEligiblityChangedCommand;
         private Stopwatch _sw;
         private long _last;
 
@@ -73,6 +74,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
             _handleIfAnyPlayerChangedTeamFloorCommand = _commandFactory.CreateCommandVoid<HandleIfAnyPlayerChangedTeamFloorCommand>();
+            _handleIfStartMatchEligiblityChangedCommand = _commandFactory.CreateCommandVoid<HandleIfStartMatchEligiblityChangedCommand>();
             _tickService.RegisterObserver(this);
         }
 
@@ -108,6 +110,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 var processPlayersInputsResult = ProcessPackets(currentTick);
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
                 _handleIfAnyPlayerChangedTeamFloorCommand.SetTick(currentTick).Execute();
+                _handleIfStartMatchEligiblityChangedCommand.SetTick(currentTick).Execute();
                 MoveToMatchStateIfCountdownEnded();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(currentTick);

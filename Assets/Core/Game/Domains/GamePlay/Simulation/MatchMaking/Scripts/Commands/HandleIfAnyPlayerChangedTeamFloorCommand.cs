@@ -14,7 +14,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands
         private IStartMatchWallController _startMatchWallController;
         private INetEventsDataService _netEventsDataService;
         private ICommandFactory _commandFactory;
-        private HandleIfStartMatchEligiblityChangedCommand _handleIfStartMatchEligiblityChangedCommand;
         
         private int _tick;
 
@@ -31,7 +30,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands
             _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
-            _handleIfStartMatchEligiblityChangedCommand = _commandFactory.CreateCommandVoid<HandleIfStartMatchEligiblityChangedCommand>();
         }
 
         public void Execute()
@@ -54,7 +52,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands
             playerState.TeamId = newTeamId;
             _startMatchWallController.TryStopCountdown(_tick);
             _netEventsDataService.AddPlayerSwitchTeamNetEvent(_tick, playerState.Id, newTeamId);
-            _handleIfStartMatchEligiblityChangedCommand.SetTick(_tick).Execute();
         }
     }
 }
