@@ -4,9 +4,15 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Scripts.Extensions;
+using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
+using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 {
@@ -17,6 +23,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         private ITickProcessor _tickProcessor;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private ITickCounterService _tickCounterService;
+        private IMatchPlayerControllers _matchPlayerControllers;
+        private IMatchDataService _matchDataService;
+        private IWorldCameraController _worldCameraController;
 
         public override void ResolveDependencies()
         {
@@ -25,6 +34,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
              _tickProcessor = _diContainer.Resolve<ITickProcessor>();
              _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
              _tickCounterService = _diContainer.Resolve<ITickCounterService>();
+             _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
         }
 
         public void Execute()
@@ -37,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             LogService.LogTopic(
                 $"Sending: isMoveRightInputPressed:{isMoveRightInputPressed},isMoveLeftInputPressed:{isMoveLeftInputPressed},isShootInputPressed:{isShootInputPressed}",
                 LogTopicType.ClientNetwork);
+
             var playerInputPacket = new MatchPlayerInputPacketC2S
             {
                 Tick = _tickCounterService.CurrentClientTick,
@@ -45,10 +58,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 IsMoveRightInputPressed = isMoveRightInputPressed,
                 IsShootInputPressed = isShootInputPressed,
                 IsTalentInputPressed = isTalentInputPressed,
-                IsSwitchTalentInputPressed = isSwitchTalentInputPressed
+                IsSwitchTalentInputPressed = isSwitchTalentInputPressed,
+                AimDirection = CalculateAimDirection()
             };
             
             _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchPlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
+        }
+
+        private Vector2 CalculateAimDirection()
+        {
+            var localPlayerId = _matchDataService.LocalPlayer.PlayerId;
+            var playerPos = _matchPlayerControllers.GetPlayerPosition(localPlayerId);
+            var mousePos = Input.mousePosition;
+            var mouseWorldPos = _worldCameraController.ScreenToWorldPoint(mousePos).ToVector2XY();
+            return (mouseWorldPos - playerPos).normalized.ToNumericsVector2();
         }
     }
 }

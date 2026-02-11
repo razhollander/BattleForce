@@ -47,8 +47,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerTransformState = playerModel.Spaceship.Transform;
             var playerPosition = playerTransformState.Position.ToUnity();
             var playerRotation = playerTransformState.Direction.ToUnityVector2().ToQuaternion();
-            var interpolationFactor = _gamePlayConfig.InterpolationFactor;
-            _playerView.InterpolateTransform(playerPosition, playerRotation, interpolationFactor);
+            var decay = _gamePlayConfig.ExponentialDecay;
+            _playerView.InterpolateTransform(playerPosition, playerRotation, decay);
+            _playerView.InterpolateAimRotation(playerModel.Spaceship.TalentsState.AimDirection, decay);
         }
 
         public void UpdateBulletCooldown()
@@ -57,8 +58,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerShootState = playerModel.Spaceship.Shoot;
             var maxShootCooldown = playerShootState.MaxCooldown;
             var cooldownSecondsLeft = playerShootState.CooldownSecondsLeft;
-            var interpolationFactor = _gamePlayConfig.InterpolationFactor;
-            _playerView.InterpolateBulletLoading(cooldownSecondsLeft, maxShootCooldown, interpolationFactor);
+            var exponentialDecay = _gamePlayConfig.ExponentialDecay;
+            _playerView.InterpolateBulletLoading(cooldownSecondsLeft, maxShootCooldown, exponentialDecay);
             if (Mathf.Approximately(cooldownSecondsLeft, maxShootCooldown))
             {
                 RestoreBulletEffect();

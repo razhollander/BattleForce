@@ -4,6 +4,8 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRin
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.Pools;
+using CoreDomain.Scripts.Services.Logger.Base;
+using CoreDomain.Scripts.Utils;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
@@ -14,8 +16,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private SpriteRenderer _availableBulletSpriteRenderer;
         [SerializeField] private SimpleHealthBar _healthBar; // todo move to the match domain
         [SerializeField] private GameObject _healthBarGameObject; // todo move to the match domain
-        [SerializeField] private PlayerLoadingRing _playerLoadingRing;
+        [SerializeField] private PlayerLoadingRingView playerLoadingRingView;
         [SerializeField] private Transform _spaceShipTransform;
+        [SerializeField] private Transform _aimArrowTransform;
         [SerializeField] private TextMeshProUGUI _playerNameText;
 
         public Action Despawn { get; set; }
@@ -31,9 +34,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _availableBulletSpriteRenderer.color = color;
         }
 
-        public void InterpolateBulletLoading(float cooldownLeft, float maxCooldown, float lerpFactor)
+        public void InterpolateBulletLoading(float cooldownLeft, float maxCooldown, float decay)
         {
-            _playerLoadingRing.SetRingScale(cooldownLeft/maxCooldown, lerpFactor);
+            playerLoadingRingView.SetRingScale(cooldownLeft/maxCooldown, decay);
         }
         
         public void SetPositionAndRotation(Vector2 position, Quaternion rotation)
@@ -52,10 +55,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _healthBar.UpdateBar(health, maxHealth);
         }
 
-        public void InterpolateTransform(Vector2 playerPosition, Quaternion playerRotation, float lerpFactor)
+        public void InterpolateTransform(Vector2 playerPosition, Quaternion playerRotation, float decay)
         {
-            var lerpedPosition = Vector2.Lerp(transform.position, playerPosition, lerpFactor);
-            var lerpedRotation = Quaternion.Lerp(_spaceShipTransform.rotation, playerRotation, lerpFactor);
+            var lerpedPosition = MathUtils.ExpDecay(transform.position, playerPosition, decay, Time.deltaTime);
+            var lerpedRotation = MathUtils.ExpDecay(_spaceShipTransform.rotation, playerRotation, decay, Time.deltaTime);
             SetPositionAndRotation(lerpedPosition, lerpedRotation);
         }
 
@@ -87,6 +90,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetIsHealthBarShown(bool isShown)
         {
             _healthBarGameObject.SetActive(isShown);
+        }
+        
+        public void InterpolateAimRotation(System.Numerics.Vector2 direction, float decay)
+        {
+            if (direction.LengthSquared() < 0.0001f)
+            {
+                LogService.LogError("Direction is too small (0) to interpolate");
+                return;
+            }
+
+            var targetRotation = direction.ToQuaternion();
+            _aimArrowTransform.rotation = MathUtils.ExpDecay(
+                _aimArrowTransform.rotation, 
+                targetRotation, 
+                decay,
+                Time.deltaTime
+            );
         }
     }
 }

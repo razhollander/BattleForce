@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts
         {
             foreach (var bulletController in _bulletControllers)
             {
-                bulletController.InterpolatePosition(_gamePlayConfig.InterpolationFactor);
+                bulletController.InterpolatePosition(_gamePlayConfig.ExponentialDecay);
             }
         }
         

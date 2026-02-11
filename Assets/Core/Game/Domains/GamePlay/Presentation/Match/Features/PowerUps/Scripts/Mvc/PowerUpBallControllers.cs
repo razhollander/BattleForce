@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
         {
             foreach (var controller in _controllers)
             {
-                controller.InterpolatePosition(_gamePlayConfig.InterpolationFactor);
+                controller.InterpolatePosition(_gamePlayConfig.ExponentialDecay);
             }
         }
 

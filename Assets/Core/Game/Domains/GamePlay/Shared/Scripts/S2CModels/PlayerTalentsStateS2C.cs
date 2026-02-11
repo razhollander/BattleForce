@@ -1,5 +1,7 @@
+using System.Numerics;
 using Core.Scripts.Utils.CustomCollections;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
+using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
@@ -7,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     public class PlayerTalentsStateS2C
     {
         public int SelectedTalentIndex;
+        public Vector2 AimDirection;
         public FixedOrderedList<TalentStateS2C> Talents;
 
         public ref TalentStateS2C GetCurrentSelectedTalent()
@@ -22,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)SelectedTalentIndex);
+            writer.PutVector2AsAngle16(AimDirection);
             writer.Put((byte)Talents.Count);
 
             foreach (var talent in Talents.AsSpan())
@@ -33,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public void Deserialize(NetDataReader reader)
         {
             SelectedTalentIndex = reader.GetByte();
+            AimDirection = reader.GetVector2FromAngle16();
             var talentsCount = (int)reader.GetByte();
             Talents.Clear();
 
@@ -45,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
         public void SerializeDeltas(NetDataWriter writer)
         {
+            writer.PutVector2AsAngle16(AimDirection);
             writer.Put((byte)Talents.Count);
 
             foreach (var talent in Talents.AsSpan())
@@ -55,6 +61,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
         public void DeserializeDeltas(NetDataReader reader)
         {
+            AimDirection = reader.GetVector2FromAngle16();
             var talentsCount = (int)reader.GetByte();
             Talents.Clear();
 

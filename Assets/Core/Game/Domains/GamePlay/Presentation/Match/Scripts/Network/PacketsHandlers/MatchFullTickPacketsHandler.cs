@@ -9,6 +9,7 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
@@ -349,6 +350,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 player.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
                 player.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
                 player.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
+                player.Spaceship.TalentsState = playerState.Spaceship.TalentsState;
             }
         }
 

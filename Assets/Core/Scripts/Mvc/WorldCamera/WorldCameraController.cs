@@ -41,5 +41,10 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             LogService.LogTopic($"Shake camera with intensity {intensity} for {duration} seconds", LogTopicType.Camera);
             _worldCameraView.ShakeCamera(intensity, duration, _stateMachineService.CurrentState().CancellationTokenSource).Forget();
         }
+
+        public Vector3 ScreenToWorldPoint(Vector3 position)
+        {
+            return _worldCameraView.ScreenToWorldPoint(position);
+        }
     }
 }
