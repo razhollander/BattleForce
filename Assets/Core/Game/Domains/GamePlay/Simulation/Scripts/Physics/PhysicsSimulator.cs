@@ -486,7 +486,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var hasCollision = false;
             var lowerBound = center - new Vector2(radius, radius);
             var upperBound = center + new Vector2(radius, radius);
-            var aabb = new Box2D.NetStandard.Collision.AABB(lowerBound, upperBound);
+            var aabb = new AABB(lowerBound, upperBound);
 
             _world.QueryAABB(fixture =>
             {
@@ -507,15 +507,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                         input.transformB = fixture.Body.GetTransform();
                         input.translationB = Vector2.Zero;
 
-                        if (Contact.ShapeCast(out _, input))
+                        if (Contact.ShapeCast(out _, input)) // todo: this generates garbage inside, need to pool Symplex
                         {
                             hasCollision = true;
-                            _circleShapePool.Return(circleShape);
-                            return false;
                         }
 
                         _circleShapePool.Return(circleShape);
-                        return true;
+                        return !hasCollision;
                     }
                 }
 
@@ -541,7 +539,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var min = Vector2.Min(Vector2.Min(v1, v2), Vector2.Min(v3, v4));
             var max = Vector2.Max(Vector2.Max(v1, v2), Vector2.Max(v3, v4));
 
-            var aabb = new Box2D.NetStandard.Collision.AABB(min, max);
+            var aabb = new AABB(min, max);
 
             _world.QueryAABB(fixture =>
             {
@@ -564,12 +562,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                         if (Contact.ShapeCast(out _, input))
                         {
                             hasCollision = true;
-                            _polygonShapePool.Return(polygonShape);
-                            return false;
                         }
 
                         _polygonShapePool.Return(polygonShape);
-                        return true;
+                        return !hasCollision;
                     }
                 }
 
@@ -622,7 +618,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var shape = _circleShapePool.Get();
             shape.Reset();
             return shape;
-             // return new CircleShape();
         }
 
         public void AddStartMatchWall(ushort id, Vector2 position, float radius)
