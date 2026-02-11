@@ -569,7 +569,7 @@ namespace Box2D.NetStandard.Dynamics.Contacts
             }
         }
 
-        public bool ShapeCast(out ShapeCastOutput output, in ShapeCastInput input)
+        public static bool ShapeCast(out ShapeCastOutput output, in ShapeCastInput input)
         {
             output.iterations = 0;
             output.lambda = 1.0f;
