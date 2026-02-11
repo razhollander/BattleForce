@@ -60,12 +60,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             
             var bodyDataA = (PhysicsBodyData)fixtureA.Body.UserData;
             var bodyDataB = (PhysicsBodyData)fixtureB.Body.UserData;
-            var idA = bodyDataA.Id;
-            var idB = bodyDataB.Id;
             var velocityA = fixtureA.GetBody().GetLinearVelocity();
             var velocityB = fixtureB.GetBody().GetLinearVelocity();
             
-            var key = new EventKey(idA, idB, type);
+            var key = new EventKey(bodyDataA, bodyDataB, type);
             if (_noneEqualEvents.Add(key))
             {
                 ref var physicsCollisionEvent = ref _events.AddAndGet();
@@ -86,26 +84,57 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         
         private readonly struct EventKey : IEquatable<EventKey>
         {
-            private readonly int _lowId;
-            private readonly int _highId;
+            private readonly ushort _lowId;
+            private readonly ushort _highId;
+            private readonly PhysicsBodyType _lowType;
+            private readonly PhysicsBodyType _highType;
             private readonly PhysicsEventEventType _type;
 
-            public EventKey(int idA, int idB, PhysicsEventEventType type)
+            public EventKey(PhysicsBodyData bodyA, PhysicsBodyData bodyB, PhysicsEventEventType type)
             {
-                if (idA <= idB) { _lowId = idA; _highId = idB; }
-                else { _lowId = idB; _highId = idA; }
+                bool aIsLow;
+                if (bodyA.Id < bodyB.Id)
+                {
+                    aIsLow = true;
+                }
+                else if (bodyA.Id > bodyB.Id)
+                {
+                    aIsLow = false;
+                }
+                else
+                {
+                    // IDs equal, compare types to ensure deterministic order
+                    aIsLow = bodyA.PhysicsBodyType <= bodyB.PhysicsBodyType;
+                }
+
+                if (aIsLow)
+                {
+                    _lowId = bodyA.Id;
+                    _lowType = bodyA.PhysicsBodyType;
+                    _highId = bodyB.Id;
+                    _highType = bodyB.PhysicsBodyType;
+                }
+                else
+                {
+                    _lowId = bodyB.Id;
+                    _lowType = bodyB.PhysicsBodyType;
+                    _highId = bodyA.Id;
+                    _highType = bodyA.PhysicsBodyType;
+                }
 
                 _type = type;
             }
 
             public bool Equals(EventKey other)
-                => _lowId == other._lowId && _highId == other._highId && _type == other._type;
+                => _lowId == other._lowId && _highId == other._highId &&
+                   _lowType == other._lowType && _highType == other._highType &&
+                   _type == other._type;
 
             public override bool Equals(object obj) => obj is EventKey other && Equals(other);
 
             public override string ToString()
             {
-                return $"_lowId : {_lowId}, _highId : {_highId}, _type : {_type}";
+                return $"Low: ({_lowType}:{_lowId}), High: ({_highType}:{_highId}), Type: {_type}";
             }
 
             public override int GetHashCode()
@@ -115,6 +144,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     int h = 17;
                     h = (h * 31) + _lowId;
                     h = (h * 31) + _highId;
+                    h = (h * 31) + (int)_lowType;
+                    h = (h * 31) + (int)_highType;
                     h = (h * 31) + (int)_type;
                     return h;
                 }

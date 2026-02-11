@@ -554,5 +554,60 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _world = CreateWorld();
             ClearCachedCollisions();
         }
+
+        public Body AddCaster(ushort id, Vector2 position, float radius)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.Caster);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var circleShape = GetCircleShape();
+            circleShape.Radius = radius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = circleShape;
+            fixtureDef.density = 1.0f;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.Caster.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.Caster.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(circleShape);
+
+            return body;
+        }
+
+        public Body AddCaster(ushort id, Vector2 position, float width, float height, Vector2 rotation)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.angle = rotation.ToAngleRadians();
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.Caster);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var polygonShape = GetPolygonShape();
+            polygonShape.SetAsBox(width * 0.5f, height * 0.5f);
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = polygonShape;
+            fixtureDef.density = 1.0f;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.Caster.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.Caster.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(polygonShape);
+
+            return body;
+        }
     }
 }

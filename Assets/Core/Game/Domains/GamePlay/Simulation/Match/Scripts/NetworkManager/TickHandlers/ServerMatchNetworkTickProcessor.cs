@@ -12,6 +12,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Network;
@@ -38,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly ITickService _tickService;
         private readonly IHeadLessQuitterController _headLessQuitterController;
         private readonly IStageDataService _stageDataService;
+        private readonly IPhysicsCasterService _physicsCasterService;
 
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
@@ -54,7 +56,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IServerNetworkManager networkManager,
             IMatchPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IMatchPlayerJoinPacketsHandler iIMatchPlayerJoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
-            ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController, IStageDataService stageDataService)
+            ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController, IStageDataService stageDataService,
+            IPhysicsCasterService physicsCasterService)
         {
             _networkConfig = networkConfig;
             _sharedGamePlayConfig = sharedGamePlayConfig;
@@ -68,6 +71,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _tickService = tickService;
             _headLessQuitterController = headLessQuitterController;
             _stageDataService = stageDataService;
+            _physicsCasterService = physicsCasterService;
             _fullTickPacket = new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig);
             _cachedStartMatchPacket = new StartMatchPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount);
             _startStagePacket = new StartStagePacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount);
@@ -123,12 +127,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick);
+                _physicsCasterService.ClearResults();
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(currentTick);
                 SendStartMatchToNotAcknowledgedPlayers(currentTick);
+                _physicsCasterService.ClearCasters();
                 _headLessQuitterController.QuitIfTimeOut();
             }
             catch (Exception e)

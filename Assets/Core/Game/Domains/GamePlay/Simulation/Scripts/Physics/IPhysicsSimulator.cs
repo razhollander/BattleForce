@@ -31,5 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         bool IsSquareHitAnyBodyTypes(Vector2 squarePosition, float squareHalfWidth, params PhysicsBodyType[] bodyTypes);
         void AddStartMatchWall(ushort id, Vector2 position, float radius);
         void ClearAllData();
+        Body AddCaster(ushort id, Vector2 position, float radius);
+        Body AddCaster(ushort id, Vector2 position, float width, float height, Vector2 rotation);
     }
 }

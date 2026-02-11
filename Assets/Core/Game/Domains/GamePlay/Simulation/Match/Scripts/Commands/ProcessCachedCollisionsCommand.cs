@@ -8,6 +8,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private INetEventsDataService _netEventsDataService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IPlayersTalentsManager _playersTalentsManager;
+        private IPhysicsCasterService _physicsCasterService;
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
@@ -43,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
+            _physicsCasterService = _diContainer.Resolve<IPhysicsCasterService>();
         }
 
         public void Execute()
@@ -62,6 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var objectB = collisionEvent.BodyDataB;
 
                 HandlePlayerLavaCollision(objectA, objectB, collisionEvent.Type);
+                HandleCasterCollision(objectA, objectB, collisionEvent.Type, collisionEvent.Contact);
 
                 if (collisionEvent.Type != PhysicsEventEventType.Begin)
                 {
@@ -77,6 +81,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandleCasterCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, PhysicsEventEventType eventType, Contact contact)
+        {
+            if (objectA.PhysicsBodyType == PhysicsBodyType.Caster)
+            {
+                _physicsCasterService.CacheCollision(objectA.Id, objectB, eventType, contact);
+            }
+            if (objectB.PhysicsBodyType == PhysicsBodyType.Caster)
+            {
+                _physicsCasterService.CacheCollision(objectB.Id, objectA, eventType, contact);
+            }
         }
 
         private void HandleBulletWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

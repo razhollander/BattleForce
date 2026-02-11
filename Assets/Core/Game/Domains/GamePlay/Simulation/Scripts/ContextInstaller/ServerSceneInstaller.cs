@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
 using UnityEngine;
@@ -30,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<IServerNetworkManager>().To<ServerNetworkManager>().AsSingle().NonLazy();
             Container.Bind<INetEventsDataService>().To<NetEventsDataService>().AsSingle().NonLazy();
             Container.Bind<IPhysicsSimulator>().To<PhysicsSimulator>().AsSingle().NonLazy();
+            Container.Bind<IPhysicsCasterService>().To<PhysicsCasterService>().AsSingle().NonLazy();
             Container.Bind<ISimulationStateMachine>().To<SimulationStateMachine>().AsSingle().NonLazy();
             Container.Bind<ISimulationPersistentData>().To<SimulationPersistentData>().AsSingle().NonLazy();
             Container.Bind<IHeadLessQuitterController>().To<HeadLessQuitterController>().AsSingle().NonLazy();
