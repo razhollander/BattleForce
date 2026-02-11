@@ -56,7 +56,7 @@ MonoBehaviour:
   PositionIterations: 8
   ServerPlayerInputPacketsBuffer: 2
   DefaultHostPort: 49153
-  IpAddress: 109.67.156.134
+  IpAddress: 10.193.70.46
   OnlyLocal: 1
   ConntectionKey: BattleForceGame
   HeadlessQuitTimeoutSeconds: 30
