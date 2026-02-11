@@ -1,6 +1,7 @@
 using System.Numerics;
 using Core.Scripts.Utils.CustomCollections;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
+using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels

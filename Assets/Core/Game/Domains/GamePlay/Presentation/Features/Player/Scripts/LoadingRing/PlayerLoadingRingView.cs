@@ -1,9 +1,10 @@
 using CoreDomain.Scripts.Services.Logger.Base;
+using CoreDomain.Scripts.Utils;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing
 {
-    public class PlayerLoadingRing : MonoBehaviour
+    public class PlayerLoadingRingView : MonoBehaviour
     {
         //private float MAX_SCALE = 1f;
         // private const int ArcEmptyValue = 180;
@@ -31,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
         }
 
         
-        public void SetRingScale(float scale, float lerpFactor)
+        public void SetRingScale(float scale, float decay)
         {
             if (Mathf.Approximately(_currentScale,scale))
             {
@@ -39,9 +40,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
             }
 
             var shouldLerp = scale < _currentScale;
-            if (shouldLerp)
+            if (shouldLerp)// todo: bad, this isn't the view responsibility 
             {
-                _currentScale = Mathf.Lerp(_currentScale,scale, lerpFactor);
+                _currentScale = MathUtils.ExpDecay(_currentScale,scale, decay, Time.deltaTime);
             }
             else
             {

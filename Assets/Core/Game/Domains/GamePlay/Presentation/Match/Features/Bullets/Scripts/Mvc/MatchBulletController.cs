@@ -34,11 +34,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts
             _bulletView.SetColor(color);
         }
 
-        public void InterpolatePosition(float interpolationFactor)
+        public void InterpolatePosition(float decay)
         {
             var bulletModel = _matchDataService.GetBullet(BulletId);
             var bulletPosition = bulletModel.Position.ToUnity();
-            _bulletView.InterpolatePosition(bulletPosition, interpolationFactor);
+            _bulletView.InterpolatePosition(bulletPosition, decay);
         }
 
         public void Destroy()

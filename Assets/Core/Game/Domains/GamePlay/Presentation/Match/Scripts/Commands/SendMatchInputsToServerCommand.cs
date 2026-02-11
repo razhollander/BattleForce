@@ -46,19 +46,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 LogTopicType.ClientNetwork);
 
             var aimDirection = System.Numerics.Vector2.Zero;
+
             if (_matchDataService.LocalPlayer != null)
             {
-                var localPlayerId = _matchDataService.LocalPlayer.Id;
+                var localPlayerId = _matchDataService.LocalPlayer.PlayerId;
                 var playerTransform = _matchPlayerControllers.GetPlayerTransform(localPlayerId);
-                if (playerTransform != null)
-                {
-                    var mousePos = Input.mousePosition;
-                    var mouseWorldPos = Camera.main.ScreenToWorldPoint(mousePos);
-                    mouseWorldPos.z = 0;
-                    var playerPos = playerTransform.position;
-                    var direction = (mouseWorldPos - playerPos).normalized;
-                    aimDirection = new System.Numerics.Vector2(direction.x, direction.y);
-                }
+                var mousePos = Input.mousePosition;
+                var mouseWorldPos = Camera.main.ScreenToWorldPoint(mousePos);
+                mouseWorldPos.z = 0;
+                var playerPos = playerTransform.position;
+                var direction = (mouseWorldPos - playerPos).normalized;
+                aimDirection = new System.Numerics.Vector2(direction.x, direction.y);
             }
 
             var playerInputPacket = new MatchPlayerInputPacketC2S
