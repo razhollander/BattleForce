@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
@@ -47,6 +49,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 controller.Destroy();
             }
             _playerControllers.Clear();
+        }
+
+        public void UpdatePlayerTalents(ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> talents)
+        {
+            
         }
     }
 }

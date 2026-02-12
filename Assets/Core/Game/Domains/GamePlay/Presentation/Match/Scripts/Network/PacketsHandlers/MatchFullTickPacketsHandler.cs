@@ -143,7 +143,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void ProcessTalentCardObtainedEvents(FixedUnorderedList<TalentCardObtainedNetEventS2C> talentCardObtainedNetEvents)
+        private void ProcessTalentCardObtainedEvents(FixedClassUnorderedList<TalentCardObtainedNetEventS2C> talentCardObtainedNetEvents)
         {
             _cachedUnprocessedTalentCardObtainedEvents.Clear();
 

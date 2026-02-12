@@ -36,18 +36,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _talentControllersPerPlayer.Remove(playerId);
         }
 
-        public bool TryAddTalentToPlayer(TalentType talentType, ushort playerId)
+        public bool TryAddTalentToPlayer(TalentType talentType, ushort playerId, out TalentStateS2C newTalent)
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var didPlayerReachMaxTalents = playerState.Spaceship.TalentsState.Talents.Count == _sharedGamePlayConfig.MaxConcurrentTalentsForPlayer;
 
+            if (DoesPlayerHaveTalent(playerState, talentType))
+            {
+                newTalent = default;
+                return false;
+            }
+            
+            var didPlayerReachMaxTalents = playerState.Spaceship.TalentsState.Talents.Count == _sharedGamePlayConfig.MaxConcurrentTalentsForPlayer;
             if (didPlayerReachMaxTalents)
             {
-                return TryReplaceTalentWithCurrentSelectedTalent(talentType, playerState);
+                newTalent = ReplaceTalentWithCurrentSelectedTalent(talentType, playerState);
+            }
+            else
+            {
+                newTalent = AddTalentToPlayer(talentType, playerState);
+            }
+            
+            return true;
+        }
+
+        private bool DoesPlayerHaveTalent(PlayerStateS2C playerState, TalentType talentType)
+        {
+            foreach (var talentState in playerState.Spaceship.TalentsState.Talents.AsSpan())
+            {
+                if (talentType == talentState.TalentType)
+                {
+                    return true;
+                }
             }
 
-            AddTalentToPlayer(talentType, playerState);
-            return true;
+            return false;
         }
 
         public void SwitchTalent(ushort playerId)
@@ -66,14 +88,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             }
         }
 
-        private void AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)
+        private TalentStateS2C AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)
         {
             ref var newTalent = ref playerState.Spaceship.TalentsState.Talents.AddAndGet();
             var maxCooldown = _gamePlayConfig.Talents.CooldownPerTalentType[talentType];
             newTalent.Setup(talentType, maxCooldown);
+            return newTalent;
         }
 
-        private bool TryReplaceTalentWithCurrentSelectedTalent(TalentType talentType, PlayerStateS2C playerState)
+        private TalentStateS2C ReplaceTalentWithCurrentSelectedTalent(TalentType talentType, PlayerStateS2C playerState)
         {
             ref var currentSelectedTalent = ref playerState.Spaceship.TalentsState.Talents.Get(playerState.Spaceship.TalentsState.SelectedTalentIndex);
             var talentController = _talentControllersPerPlayer[playerState.Id].GetTalentByType(currentSelectedTalent.TalentType);
@@ -85,7 +108,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             
             var maxCooldown = _gamePlayConfig.Talents.CooldownPerTalentType[talentType];
             currentSelectedTalent.Setup(talentType, maxCooldown);
-            return true;
+            return currentSelectedTalent;
         }
     }
 }

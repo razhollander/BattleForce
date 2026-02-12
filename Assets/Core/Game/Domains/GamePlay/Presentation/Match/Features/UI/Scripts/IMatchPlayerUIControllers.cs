@@ -1,3 +1,6 @@
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Utils.CustomCollections;
+
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
     public interface IMatchPlayerUIControllers
@@ -7,5 +10,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         void HidePlayerHealthBar(ushort playerId);
         void SwitchToPlayerDeadState(ushort playerId);
         void DestroyAll();
+        void UpdatePlayerTalents(ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> talents);
     }
 }

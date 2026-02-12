@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Utils.CustomCollections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,13 +21,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private Transform _talentsContainer;
         [SerializeField] private MatchPlayerTalentUIView _talentViewPrefab;
 
-        private readonly List<MatchPlayerTalentUIView> _talentViews = new List<MatchPlayerTalentUIView>();
+        private MatchPlayerTalentUIView[] _talentViews;
 
-        public void Setup(string playerName, Color color)
+        public void Setup(string playerName, Color color, int maxTalentsAmount)
         {
             _nameText.text = playerName;
             _spaceshipImage.color = color;
             UpdateMoney(0);
+            CreateTalents(maxTalentsAmount);
+        }
+
+        private void CreateTalents(int maxTalentsAmount)
+        {
+            _talentViews = new MatchPlayerTalentUIView[maxTalentsAmount];
+
+            for (int i = 0; i < maxTalentsAmount; i++)
+            {
+                var view = Instantiate(_talentViewPrefab, _talentsContainer);
+                view.Setup(null); // Pass icon if available
+                _talentViews[i] = view;
+            }
         }
 
         public void SetOpacity(float alpha)
@@ -49,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _healthBar.gameObject.SetActive(false);
         }
 
-        public void UpdateTalents(PlayerTalentsStateS2C talentsState)
+        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents)
         {
             // Ensure enough views
             int requiredCount = talentsState.Talents.Count;

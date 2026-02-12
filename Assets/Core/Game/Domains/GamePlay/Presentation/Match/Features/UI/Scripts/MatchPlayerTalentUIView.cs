@@ -15,7 +15,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private Image _talentImage;
         [SerializeField] private Vector3 _normalScale = Vector3.one;
         [SerializeField] private Vector3 _selectedScale = new Vector3(1.2f, 1.2f, 1.2f);
+        [SerializeField] private Sprite _noneTalentSprite;
+        [SerializeField] private CanvasGroup _canvasGroup;
 
+        public void SetNoneTalent()
+        {
+            _talentImage.sprite = _noneTalentSprite;
+            _canvasGroup.alpha = 0.5f;
+        }
+        
+        public void SetIsSelected(bool isSelected)
+        {
+            _background.sprite = isSelected ? _selectedBackground : _normalBackground;
+            _talentImage.transform.localScale = isSelected ? _selectedScale : _normalScale;
+        }
+        
         public void Setup(Sprite icon)
         {
             _talentImage.sprite = icon;

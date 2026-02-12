@@ -213,9 +213,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
             else
             {
-                //_playersTalentsManager.TryAddTalentToPlayer(talentCard.TalentType, bulletModel.BelongToPlayerId);
-                _netEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, bulletModel.BelongToPlayerId);
-                DestroyTalentCard(talentCard, cardBody);
+                var hitByPlayerId = bulletModel.BelongToPlayerId;
+
+                if (_playersTalentsManager.TryAddTalentToPlayer(talentCard.TalentType, hitByPlayerId, out _))
+                {
+                    var playerTalents = _matchDataService.SimulationState.GetPlayerById(hitByPlayerId).Spaceship.TalentsState.Talents;
+                    _netEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, hitByPlayerId, playerTalents);
+                    DestroyTalentCard(talentCard, cardBody);
+                }
             }
         }
 
