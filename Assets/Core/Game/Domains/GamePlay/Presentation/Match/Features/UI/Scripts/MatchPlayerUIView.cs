@@ -63,16 +63,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _healthBar.gameObject.SetActive(false);
         }
 
-        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents)
+        public void UpdateTalents(TalentVisualData[] talents)
         {
-            // for (int i = 0; i < requiredCount; i++)
-            // {
-            //     var view = _talentViews[i];
-            //     view.gameObject.SetActive(true);
-            //     var talent = talentsState.Talents.Get(i);
-            //     bool isSelected = (i == talentsState.SelectedTalentIndex);
-            //     view.UpdateView(talent, isSelected);
-            // }
+            for (int i = 0; i < _talentViews.Length; i++)
+            {
+                var view = _talentViews[i];
+
+                if (i > talents.Length - 1)
+                {
+                    view.SetNoneTalent();
+                }
+                else
+                {
+                    view.SetTalent(talents[i]);
+                }
+            }
         }
     }
 }

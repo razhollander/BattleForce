@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8108297fc3d84ef2a0e7d8ea74fbfae9, type: 3}
   m_Name: TalentsConfig
   m_EditorClassIdentifier: 
+  TalentCardHealth: 2
   CooldownPerTalentType:
-    m_keys: 01000000020000000300000004000000
+    m_keys: 010000000200000003000000040000000500000006000000
     m_values:
+    - 10
+    - 10
     - 10
     - 10
     - 10
@@ -28,3 +31,5 @@ MonoBehaviour:
     PulsePower: 10
     _pulseRectWidth: 5
     _pulseRectHeight: 10
+  TalentCardWidth: 1.602175
+  TalentCardHeight: 2.382844

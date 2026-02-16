@@ -31,43 +31,32 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _talentImage.transform.localScale = isSelected ? _selectedScale : _normalScale;
         }
         
-        public void SetupTalent(Sprite icon)
+        public void SetTalent(TalentVisualData talentVisualData)
         {
             _cooldownText.gameObject.SetActive(true);
-            _talentImage.sprite = icon;
+            _talentImage.sprite = talentVisualData.Icon;
             _canvasGroup.alpha = 1f;
             _cooldownOverlay.enabled = false;
+
+            UpdateCooldown(talentVisualData.MaxCooldown, talentVisualData.CooldownLeft, talentVisualData.IsOnCooldown);
         }
-
-        public void UpdateView(TalentStateS2C talentState, bool isSelected)
+        
+        public void UpdateCooldown(float maxCooldown, float cooldownLeft, bool isOnCooldown)
         {
-            bool isOnCooldown = talentState.IsOnCooldown();
-
-            if (talentState.MaxCooldown > 0 && isOnCooldown)
+            if (isOnCooldown)
             {
-                float progress = talentState.CooldownSecondsLeft / talentState.MaxCooldown;
+                var progress = cooldownLeft / maxCooldown;
                 _cooldownOverlay.enabled = true;
                 _cooldownOverlay.fillAmount = Mathf.Clamp01(progress);
+                _cooldownText.gameObject.SetActive(true);
+                _cooldownText.text = Mathf.CeilToInt(cooldownLeft).ToString();
             }
             else
             {
                 _cooldownOverlay.enabled = false;
                 _cooldownOverlay.fillAmount = 0;
-            }
-
-            if (isOnCooldown && talentState.CooldownSecondsLeft > 0)
-            {
-                _cooldownText.gameObject.SetActive(true);
-                _cooldownText.text = Mathf.CeilToInt(talentState.CooldownSecondsLeft).ToString();
-            }
-            else
-            {
                 _cooldownText.gameObject.SetActive(false);
-            }
-
-            _background.sprite = isSelected ? _selectedBackground : _normalBackground;
-
-            _talentImage.transform.localScale = isSelected ? _selectedScale : _normalScale;
+            }        
         }
     }
 }

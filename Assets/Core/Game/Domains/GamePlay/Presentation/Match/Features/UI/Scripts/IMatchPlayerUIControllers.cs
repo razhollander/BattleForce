@@ -10,6 +10,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         void HidePlayerHealthBar(ushort playerId);
         void SwitchToPlayerDeadState(ushort playerId);
         void DestroyAll();
-        void UpdatePlayerTalents(ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> talents);
+        void UpdatePlayerTalents(ushort playerId, FixedOrderedList<TalentStateS2C> talents);
     }
 }

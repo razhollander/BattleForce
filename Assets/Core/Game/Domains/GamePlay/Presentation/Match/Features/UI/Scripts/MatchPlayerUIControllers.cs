@@ -53,9 +53,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _playerControllers.Clear();
         }
 
-        public void UpdatePlayerTalents(ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> talents)
+        public void UpdatePlayerTalents(ushort playerId, FixedOrderedList<TalentStateS2C> talents)
         {
-            
+            _playerControllers[playerId].UpdateTalents(talents);
         }
     }
 }

@@ -572,7 +572,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     if (talentCardObtainedNetEvents[i].OccuredOnTick < tick)
                     {
                         talentCardObtainedNetEvents.RemoveAt(i);
-                        LogService.LogError("Server remove talent card obtained!");
                     }
                 }
             }
@@ -584,7 +583,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     if (talentCardHitNetEvents[i].OccuredOnTick < tick)
                     {
                         talentCardHitNetEvents.RemoveAt(i);
-                        LogService.LogError("Server remove talent card hit!");
                     }
                 }
             }
