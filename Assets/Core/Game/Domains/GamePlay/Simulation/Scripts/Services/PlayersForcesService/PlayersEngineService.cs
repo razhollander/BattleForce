@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesSe
                 return;
             }
 
-            var isPlayerIdle = playerSpaceshipState.Transform.Velocity.Length() < _simulationGamePlayConfig.PlayerSpaceship.IdleMovementSpeed;
+            var isPlayerIdle = playerSpaceshipState.Transform.Velocity.Length() < _simulationGamePlayConfig.PlayerSpaceship.TurnEngineOnWhenReachVelocity;
             if (isPlayerIdle)
             {
                 playerSpaceshipState.IsEngineOn = true;

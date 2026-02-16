@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float VelocityDecelerationPerSecond = 1f;
         public float SpinDecelerationPerSecond = 1f;
         public float MinSpin = 0.01f;
-        public float IdleMovementSpeed = 0.25f;
+        public float MinVelocity = 0.01f;
+        public float TurnEngineOnWhenReachVelocity = 0.25f;
     }
 }

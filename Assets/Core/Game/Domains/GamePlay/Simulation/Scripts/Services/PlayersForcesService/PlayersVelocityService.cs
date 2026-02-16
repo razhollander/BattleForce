@@ -43,6 +43,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesSe
         {
             var playerMovementSpeed = playerSpaceshipState.Transform.Velocity.Length();
             var newSpeed = playerMovementSpeed - _simulationGamePlayConfig.PlayerSpaceship.VelocityDecelerationPerSecond * deltaTIme;
+            if (newSpeed < _simulationGamePlayConfig.PlayerSpaceship.MinVelocity)
+            {
+                newSpeed = 0;
+            }
+            
             playerSpaceshipState.Transform.Velocity = playerSpaceshipState.Transform.Velocity.Normalize() * newSpeed;
         }
     }
