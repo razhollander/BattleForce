@@ -38,10 +38,18 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             OccuredOnTick = reader.GetInt();
             TalentCardId = reader.GetUShort();
             ObtainedByPlayerId = reader.GetUShort();
-            Talents = new FixedOrderedList<TalentStateS2C>(reader.GetByte());
-            
-            foreach (var talent in Talents.AsSpan())
+            var talentsCount = reader.GetByte();
+
+            if (Talents == null || Talents.Capacity < talentsCount)
             {
+                Talents = new FixedOrderedList<TalentStateS2C>(talentsCount > 0 ? talentsCount : 1);
+            }
+            
+            Talents.Clear();
+
+            for(int i = 0; i < talentsCount; i++)
+            {
+                ref var talent = ref Talents.AddAndGet();
                 talent.Deserialize(reader);
             }
         }
