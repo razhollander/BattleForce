@@ -54,6 +54,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _view.UpdateTalents(ConvertTalentsToVisualData(talents));
         }
 
+        public void SetSelectedTalent(int index)
+        {
+            var playerState = _matchDataService.GetPlayer(_playerId);
+            var talentState = playerState.Spaceship.TalentsState.Talents[index];
+            var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentState.TalentType];
+            _view.SetSelectedTalent(talentSprite);
+        }
+
         private TalentVisualData[] ConvertTalentsToVisualData(FixedOrderedList<TalentStateS2C> talents)
         {
             var talentsVisualData = new TalentVisualData[talents.Count];

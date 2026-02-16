@@ -11,5 +11,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         void SwitchToPlayerDeadState(ushort playerId);
         void DestroyAll();
         void UpdatePlayerTalents(ushort playerId, FixedOrderedList<TalentStateS2C> talents);
+        void SetPlayerSelectedTalent(ushort playerId, int index);
     }
 }

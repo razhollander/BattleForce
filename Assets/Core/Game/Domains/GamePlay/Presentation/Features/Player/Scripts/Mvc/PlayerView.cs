@@ -20,8 +20,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _spaceShipTransform;
         [SerializeField] private Transform _aimArrowTransform;
         [SerializeField] private TextMeshProUGUI _playerNameText;
+        [SerializeField] private UnityEngine.UI.Image _selectedTalentImage;
 
         public Action Despawn { get; set; }
+
+        public void SetTalentImage(Sprite sprite)
+        {
+            _selectedTalentImage.sprite = sprite;
+        }
 
         public void SetPlayerName(string playerName)
         {

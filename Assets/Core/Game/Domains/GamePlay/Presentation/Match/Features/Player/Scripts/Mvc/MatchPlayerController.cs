@@ -39,6 +39,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
+            SetSelectedTalent(playerModel.Spaceship.TalentsState.SelectedTalentIndex);
+        }
+
+        public void SetSelectedTalent(int index)
+        {
+            var playerModel = _matchDataService.GetPlayer(PlayerId);
+            var talentState = playerModel.Spaceship.TalentsState.Talents[index];
+            var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentState.TalentType];
+            _playerView.SetTalentImage(talentSprite);
         }
 
         public void UpdateTransform()

@@ -247,5 +247,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.TeamLostNetEvents.Add(teamLostNetEvent);
             }
         }
+
+        public void ProcessTalentSwitchEvents(CapacityList<TalentSwitchNetEventS2C> talentSwitchNetEvents)
+        {
+            if (talentSwitchNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var talentSwitchNetEvent in talentSwitchNetEvents)
+            {
+                _cachedPresentationEventsService.TalentSwitchNetEvents.Add(talentSwitchNetEvent);
+            }
+        }
     }
 }

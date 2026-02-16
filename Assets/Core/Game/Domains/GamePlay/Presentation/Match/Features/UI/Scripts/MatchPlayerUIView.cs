@@ -79,5 +79,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 }
             }
         }
+
+        public void SetSelectedTalent(Sprite sprite)
+        {
+            foreach (var talentView in _talentViews)
+            {
+                talentView.SetIsSelected(talentView.Icon == sprite);
+            }
+        }
     }
 }

@@ -58,5 +58,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             _playerControllers[playerId].UpdateTalents(talents);
         }
+
+        public void SetPlayerSelectedTalent(ushort playerId, int index)
+        {
+            _playerControllers[playerId].SetSelectedTalent(index);
+        }
     }
 }

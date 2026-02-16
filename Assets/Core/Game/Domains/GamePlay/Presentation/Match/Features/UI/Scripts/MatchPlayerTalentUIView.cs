@@ -18,6 +18,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private Sprite _noneTalentSprite;
         [SerializeField] private CanvasGroup _canvasGroup;
 
+        public Sprite Icon => _talentImage.sprite;
+
         public void SetNoneTalent()
         {
             _talentImage.sprite = _noneTalentSprite;
