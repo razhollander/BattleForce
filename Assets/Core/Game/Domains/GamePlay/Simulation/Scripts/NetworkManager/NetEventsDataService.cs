@@ -429,6 +429,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public void AddTalentCardObtainedNetEvent(int onTick, ushort cardId, ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> talents)
         {
+            LogService.LogError($"Server Add talent card obtained! {cardId}");
+
             foreach (var kvp in TalentCardObtainedNetEventsPerPlayer)
             {
                 var packet = kvp.Value.AddAndGet();
@@ -441,6 +443,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public void AddTalentCardHitNetEvent(int onTick, ushort cardId, ushort cardHealth)
         {
+            LogService.LogError("Server Add talent card hit!");
             foreach (var kvp in TalentCardHitNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
@@ -569,6 +572,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     if (talentCardObtainedNetEvents[i].OccuredOnTick < tick)
                     {
                         talentCardObtainedNetEvents.RemoveAt(i);
+                        LogService.LogError("Server remove talent card obtained!");
                     }
                 }
             }
@@ -580,6 +584,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     if (talentCardHitNetEvents[i].OccuredOnTick < tick)
                     {
                         talentCardHitNetEvents.RemoveAt(i);
+                        LogService.LogError("Server remove talent card hit!");
                     }
                 }
             }

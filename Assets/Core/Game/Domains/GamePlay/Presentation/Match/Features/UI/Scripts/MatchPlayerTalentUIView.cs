@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             _talentImage.sprite = _noneTalentSprite;
             _canvasGroup.alpha = 0.5f;
+            _cooldownText.gameObject.SetActive(false);
         }
         
         public void SetIsSelected(bool isSelected)
@@ -32,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         
         public void SetupTalent(Sprite icon)
         {
+            _cooldownText.gameObject.SetActive(true);
             _talentImage.sprite = icon;
             _canvasGroup.alpha = 1f;
             _cooldownOverlay.enabled = false;

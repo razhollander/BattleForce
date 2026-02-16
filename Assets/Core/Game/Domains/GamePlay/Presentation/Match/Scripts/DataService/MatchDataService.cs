@@ -88,6 +88,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 
         public void RemoveTalentCard(ushort cardId)
         {
+            LogService.LogError("Client remove talent card obtained!");
             var talentCardModel = TalentCards.Find(x => x.Id == cardId);
 
             if (talentCardModel == null)

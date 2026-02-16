@@ -174,6 +174,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var talentCardObtainedNetEvent in talentCardObtainedNetEvents)
             {
                 var cardId = talentCardObtainedNetEvent.TalentCardId;
+                LogService.LogError($"Client got talent card obtained! cardId:{cardId}");
                 _matchDataService.RemoveTalentCard(cardId);
                 _cachedPresentationEventsService.TalentCardObtainedNetEvents.Add(talentCardObtainedNetEvent);
             }
@@ -189,6 +190,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var talentCardHitNetEvent in talentCardHitNetEvents)
             {
                 _cachedPresentationEventsService.TalentCardHitNetEvents.Add(talentCardHitNetEvent);
+                LogService.LogError($"Client got talent card hit! cardId: {talentCardHitNetEvent.TalentCardId}");
                 _matchDataService.GetTalentCard(talentCardHitNetEvent.TalentCardId).Health = talentCardHitNetEvent.TalentCardHealth;
             }
         }
