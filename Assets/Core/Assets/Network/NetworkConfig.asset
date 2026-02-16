@@ -50,13 +50,14 @@ MonoBehaviour:
     StartMatchNetEvents: 32
     StageEndNetEvents: 32
     PlayerDiedNetEvents: 32
+    StartMatchEligibleChangedNetEvents: 32
   TicksPerSeconds: 60
   DeltaTime: 0.016666668
   PhysicsVelocityIterations: 8
   PositionIterations: 8
   ServerPlayerInputPacketsBuffer: 2
   DefaultHostPort: 49153
-  IpAddress: 10.193.70.46
+  IpAddress: 109.67.156.134
   OnlyLocal: 1
   ConntectionKey: BattleForceGame
   HeadlessQuitTimeoutSeconds: 30

@@ -71,7 +71,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             try
             {
                 await StartServer(cancellationTokenSource, true, playbackName);
-                StartClient(true, cancellationTokenSource, true, playbackName);
+                StartClient(NetUtils.LOCAL_HOST_IP_ADDRESS, true, cancellationTokenSource, true, playbackName);
                 _uiView.Hide();
             }
             catch (Exception e)
@@ -116,7 +116,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             try
             {
                 await StartServer(cancellationTokenSource, false);
-                StartClient(true, cancellationTokenSource, false);
+                StartClient(NetUtils.LOCAL_HOST_IP_ADDRESS, true, cancellationTokenSource, false);
                 _uiView.Hide();
             }
             catch (OperationCanceledException)
@@ -139,10 +139,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             LogService.LogTopic("Finished starting Server", LogTopicType.ClientNetwork);
         }
         
-        private void StartClient(bool isHost, CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled, string playbackName = "")
+        private void StartClient(string ip, bool isHost, CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled, string playbackName = "")
         {
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
-            var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;
             var port = _uiView.Port;
             var playerName = _uiView.PlayerName;
             
@@ -166,7 +165,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private void OnClientClicked()
         {
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
-            StartClient(false, cancellationTokenSource, false);
+            var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;
+            StartClient(ip, false, cancellationTokenSource, false);
             _uiView.Hide();
         }
     }
