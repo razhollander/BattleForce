@@ -33,10 +33,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         
         public void SetTalent(TalentVisualData talentVisualData)
         {
-            _cooldownText.gameObject.SetActive(true);
             _talentImage.sprite = talentVisualData.Icon;
             _canvasGroup.alpha = 1f;
-            _cooldownOverlay.enabled = false;
 
             UpdateCooldown(talentVisualData.MaxCooldown, talentVisualData.CooldownLeft, talentVisualData.IsOnCooldown);
         }

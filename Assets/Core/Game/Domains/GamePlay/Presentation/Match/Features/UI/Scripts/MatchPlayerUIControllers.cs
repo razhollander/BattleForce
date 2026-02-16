@@ -26,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId, _gamePlayConfig, _sharedGamePlayConfig);
             newPlayerController.CreateView(_view.PlayerUIView, _view.PlayersContainer);
+            newPlayerController.UpdateTalents(_matchDataService.GetPlayer(playerId).Spaceship.TalentsState.Talents);
             _playerControllers.Add(playerId, newPlayerController);
         }
 
