@@ -14,6 +14,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
+using Core.Scripts.Services.UnityThreadDispatcher;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -25,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
     {
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkConfig _networkConfig;
+        private readonly IUnityMainThreadDispatcher _unityMainThreadDispatcher;
         private World _world;
         private readonly CollisionEventCacheListener _collisionEventCacheListener;
 
@@ -34,10 +36,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private readonly ConcurrentPool<CircleShape> _circleShapePool;
         private readonly ConcurrentPool<Filter> _filterPool;
 
-        public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig)
+        public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig, IUnityMainThreadDispatcher unityMainThreadDispatcher)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _networkConfig = networkConfig;
+            _unityMainThreadDispatcher = unityMainThreadDispatcher;
             _collisionEventCacheListener = new CollisionEventCacheListener(_networkConfig);
 
             _bodyDefPool = new ConcurrentPool<BodyDef>(() => new BodyDef(), _networkConfig.MaxCap.ConcurrentBodyCount);
@@ -523,14 +526,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return hasCollision;
         }
 
-        public bool RectangleCast(Vector2 center, Vector2 size, float angle, params PhysicsBodyType[] bodyTypes)
+        public bool RectangleCast(Vector2 center, Vector2 size, float angleRadians, params PhysicsBodyType[] bodyTypes)
         {
+            _unityMainThreadDispatcher.EnqueueDraw(()=>DebugDrawUtils.DrawRotatedRect(center, size, angleRadians));
             var hasCollision = false;
 
             var hx = size.X * 0.5f;
             var hy = size.Y * 0.5f;
 
-            var rot = Matrix3x2.CreateRotation(angle);
+            var rot = Matrix3x2.CreateRotation(angleRadians);
             var v1 = Vector2.Transform(new Vector2(-hx, -hy), rot) + center;
             var v2 = Vector2.Transform(new Vector2(hx, -hy), rot) + center;
             var v3 = Vector2.Transform(new Vector2(hx, hy), rot) + center;
@@ -574,7 +578,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             return hasCollision;
         }
-
+        
         public void ManagedOnGUI()
         {
             
