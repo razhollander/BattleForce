@@ -1,19 +1,23 @@
 using System.Numerics;
+using Core.Scripts.Utils.CustomCollections;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public struct TalentCardObtainedNetEventS2C : INetSerializable
+    public class TalentCardObtainedNetEventS2C : INetSerializable
     {
         public int OccuredOnTick;
         public ushort TalentCardId;
         public ushort ObtainedByPlayerId;
+        public FixedOrderedList<TalentStateS2C> Talents;
 
-        public TalentCardObtainedNetEventS2C(int occuredOnTick, ushort talentCardId, ushort obtainedByPlayerId)
+        public TalentCardObtainedNetEventS2C(int maxTalentsPerPlayerAmount)
         {
-            OccuredOnTick = occuredOnTick;
-            TalentCardId = talentCardId;
-            ObtainedByPlayerId = obtainedByPlayerId;
+            Talents = new FixedOrderedList<TalentStateS2C>(maxTalentsPerPlayerAmount);
+        }
+
+        public TalentCardObtainedNetEventS2C()
+        {
         }
 
         public void Serialize(NetDataWriter writer)
@@ -21,6 +25,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             writer.Put(OccuredOnTick);
             writer.Put(TalentCardId);
             writer.Put(ObtainedByPlayerId);
+            writer.Put((byte)Talents.Count);
+
+            foreach (var talent in Talents.AsSpan())
+            {
+                talent.Serialize(writer);
+            }
         }
 
         public void Deserialize(NetDataReader reader)
@@ -28,6 +38,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             OccuredOnTick = reader.GetInt();
             TalentCardId = reader.GetUShort();
             ObtainedByPlayerId = reader.GetUShort();
+            var talentsCount = reader.GetByte();
+            Talents.Clear();
+
+            for(int i = 0; i < talentsCount; i++)
+            {
+                ref var talent = ref Talents.AddAndGet();
+                talent.Deserialize(reader);
+            }
         }
     }
 }

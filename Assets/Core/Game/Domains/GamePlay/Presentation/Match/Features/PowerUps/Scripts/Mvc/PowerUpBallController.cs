@@ -36,11 +36,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
             return _powerUpBallView.transform.position;
         }
 
-        public void InterpolatePosition(float lerpFactor)
+        public void InterpolatePosition(float decay)
         {
             var powerUpBall = _matchDataService.GetPowerUpBall(PowerUpBallId);
             var position = powerUpBall.Position;
-            _powerUpBallView.InterpolatePosition(position, lerpFactor);
+            _powerUpBallView.InterpolatePosition(position, decay);
         }
     }
 }

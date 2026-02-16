@@ -79,7 +79,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return GetPlayer(playerId).GetPosition();
         }
 
-        public Transform GetPlayerTranform(ushort playerId)
+        public Transform GetPlayerTransform(ushort playerId)
         {
             return GetPlayer(playerId).GetTransform();
         }

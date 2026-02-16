@@ -13,7 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth);
         void SetPlayerTransform(ushort playerId, Vector2 position, Vector2 direction);
         UnityEngine.Vector2 GetPlayerPosition(ushort playerId);
-        Transform GetPlayerTranform(ushort playerId);
+        Transform GetPlayerTransform(ushort playerId);
         void HidePlayerHealthBar(ushort playerId);
         void DestroyAll();
     }

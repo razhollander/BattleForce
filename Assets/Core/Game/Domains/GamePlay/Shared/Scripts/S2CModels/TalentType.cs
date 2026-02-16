@@ -8,6 +8,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         Bomb = 3,
         SentryGun = 4,
         DashPulse = 5,
-        KO
+        KO = 6,
     }
 }

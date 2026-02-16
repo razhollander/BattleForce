@@ -1,5 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Utils.CustomCollections;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
@@ -9,20 +11,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         private readonly IMatchDataService _matchDataService;
         private readonly ushort _playerId;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private MatchPlayerUIView _view;
 
-        public MatchPlayerUIController(IMatchDataService matchDataService, ushort playerId, PresentationGamePlayConfig gamePlayConfig)
+        public MatchPlayerUIController(IMatchDataService matchDataService, ushort playerId, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _matchDataService = matchDataService;
             _playerId = playerId;
             _gamePlayConfig = gamePlayConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void CreateView(MatchPlayerUIView viewPrefab, Transform parent)
         {
             _view = Object.Instantiate(viewPrefab, parent);
             var playerModel = _matchDataService.GetPlayer(_playerId);
-            _view.Setup(playerModel.PlayerName, _gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
+            _view.Setup(playerModel.PlayerName, _gamePlayConfig.ColorPerTeamId[playerModel.TeamId], _sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
         }
 
         public void SetHealth(ushort currentHealth, ushort maxHealth)
@@ -44,5 +48,36 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             Object.Destroy(_view.gameObject);
         }
+
+        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents)
+        {
+            _view.UpdateTalents(ConvertTalentsToVisualData(talents));
+        }
+
+        private TalentVisualData[] ConvertTalentsToVisualData(FixedOrderedList<TalentStateS2C> talents)
+        {
+            var talentsVisualData = new TalentVisualData[talents.Count];
+
+            for (int i = 0; i < talentsVisualData.Length; i++)
+            {
+                var talentVisualData = new TalentVisualData();
+                var talentState = talents[i];
+                talentVisualData.Icon = _gamePlayConfig.TalentCards.TalentSprites[talentState.TalentType];
+                talentVisualData.CooldownLeft = talentState.CooldownSecondsLeft;
+                talentVisualData.MaxCooldown = talentState.MaxCooldown;
+                talentVisualData.IsOnCooldown = talentState.IsOnCooldown();
+                talentsVisualData[i] = talentVisualData;
+            }
+
+            return talentsVisualData;
+        }
+    }
+
+    public class TalentVisualData
+    {
+        public Sprite Icon;
+        public float MaxCooldown;
+        public float CooldownLeft;
+        public bool IsOnCooldown;
     }
 }

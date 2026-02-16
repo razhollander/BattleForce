@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
@@ -9,19 +11,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         private readonly MatchPlayerUIControllersView _view;
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly Dictionary<ushort, MatchPlayerUIController> _playerControllers = new Dictionary<ushort, MatchPlayerUIController>();
 
-        public MatchPlayerUIControllers(MatchPlayerUIControllersView view, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig)
+        public MatchPlayerUIControllers(MatchPlayerUIControllersView view, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _view = view;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void AddPlayer(ushort playerId)
         {
-            var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId, _gamePlayConfig);
+            var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId, _gamePlayConfig, _sharedGamePlayConfig);
             newPlayerController.CreateView(_view.PlayerUIView, _view.PlayersContainer);
+            newPlayerController.UpdateTalents(_matchDataService.GetPlayer(playerId).Spaceship.TalentsState.Talents);
             _playerControllers.Add(playerId, newPlayerController);
         }
 
@@ -47,6 +52,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 controller.Destroy();
             }
             _playerControllers.Clear();
+        }
+
+        public void UpdatePlayerTalents(ushort playerId, FixedOrderedList<TalentStateS2C> talents)
+        {
+            _playerControllers[playerId].UpdateTalents(talents);
         }
     }
 }

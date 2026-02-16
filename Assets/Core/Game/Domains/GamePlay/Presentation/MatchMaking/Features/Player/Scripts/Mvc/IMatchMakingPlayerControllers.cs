@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
         void ShootBulletEffectForPlayer(ushort playerId);
         void SetPlayerTransform(ushort playerId, Vector2 position, Vector2 direction);
         UnityEngine.Vector2 GetPlayerPosition(ushort playerId);
-        Transform GetPlayerTranform(ushort playerId);
+        Transform GetPlayerTransform(ushort playerId);
         void UpdatePlayerColor(ushort playerId, Color color);
     }
 }

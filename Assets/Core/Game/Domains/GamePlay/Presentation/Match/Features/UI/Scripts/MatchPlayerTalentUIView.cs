@@ -15,42 +15,46 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private Image _talentImage;
         [SerializeField] private Vector3 _normalScale = Vector3.one;
         [SerializeField] private Vector3 _selectedScale = new Vector3(1.2f, 1.2f, 1.2f);
+        [SerializeField] private Sprite _noneTalentSprite;
+        [SerializeField] private CanvasGroup _canvasGroup;
 
-        public void Setup(Sprite icon)
+        public void SetNoneTalent()
         {
-            _talentImage.sprite = icon;
-            _cooldownOverlay.enabled = false;
+            _talentImage.sprite = _noneTalentSprite;
+            _canvasGroup.alpha = 0.5f;
+            _cooldownText.gameObject.SetActive(false);
         }
-
-        public void UpdateView(TalentStateS2C talentState, bool isSelected)
+        
+        public void SetIsSelected(bool isSelected)
         {
-            bool isOnCooldown = talentState.IsOnCooldown();
+            _background.sprite = isSelected ? _selectedBackground : _normalBackground;
+            _talentImage.transform.localScale = isSelected ? _selectedScale : _normalScale;
+        }
+        
+        public void SetTalent(TalentVisualData talentVisualData)
+        {
+            _talentImage.sprite = talentVisualData.Icon;
+            _canvasGroup.alpha = 1f;
 
-            if (talentState.MaxCooldown > 0 && isOnCooldown)
+            UpdateCooldown(talentVisualData.MaxCooldown, talentVisualData.CooldownLeft, talentVisualData.IsOnCooldown);
+        }
+        
+        public void UpdateCooldown(float maxCooldown, float cooldownLeft, bool isOnCooldown)
+        {
+            if (isOnCooldown)
             {
-                float progress = talentState.CooldownSecondsLeft / talentState.MaxCooldown;
+                var progress = cooldownLeft / maxCooldown;
                 _cooldownOverlay.enabled = true;
                 _cooldownOverlay.fillAmount = Mathf.Clamp01(progress);
+                _cooldownText.gameObject.SetActive(true);
+                _cooldownText.text = Mathf.CeilToInt(cooldownLeft).ToString();
             }
             else
             {
                 _cooldownOverlay.enabled = false;
                 _cooldownOverlay.fillAmount = 0;
-            }
-
-            if (isOnCooldown && talentState.CooldownSecondsLeft > 0)
-            {
-                _cooldownText.gameObject.SetActive(true);
-                _cooldownText.text = Mathf.CeilToInt(talentState.CooldownSecondsLeft).ToString();
-            }
-            else
-            {
                 _cooldownText.gameObject.SetActive(false);
-            }
-
-            _background.sprite = isSelected ? _selectedBackground : _normalBackground;
-
-            _talentImage.transform.localScale = isSelected ? _selectedScale : _normalScale;
+            }        
         }
     }
 }

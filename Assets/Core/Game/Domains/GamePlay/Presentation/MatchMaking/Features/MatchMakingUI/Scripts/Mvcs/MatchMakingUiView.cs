@@ -5,12 +5,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.MatchMaki
 {
     public class MatchMakingUiView : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI _ipAddressText;
+        [SerializeField] private TextMeshProUGUI _publicIpAddressText;
+        [SerializeField] private TextMeshProUGUI _localIpAddressText;
         [SerializeField] private TextMeshProUGUI _portText;
 
-        public void Setup(string ipAddress, string port)
+        public void Setup(string publicIpAddress,string localIpAddress, string port)
         {
-            _ipAddressText.text = "IP Address:" + ipAddress;
+            _publicIpAddressText.text = "Public IP:" + publicIpAddress;
+            _localIpAddressText.text = "Local IP:" + localIpAddress;
             _portText.text = "Port: "+ port;
         }
     }

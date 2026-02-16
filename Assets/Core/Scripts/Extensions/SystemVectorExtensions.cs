@@ -10,6 +10,16 @@ namespace Core.Scripts.Extensions
             return Mathf.Atan2(direction.Y, direction.X);
         }
         
+        public static float ToAngleDegrees(this Vector2 direction)
+        {
+            return Mathf.Atan2(direction.Y, direction.X) * Mathf.Rad2Deg;
+        }
+
+        public static Quaternion ToQuaternion(this Vector2 direction)
+        {
+            return Quaternion.Euler(0, 0, direction.ToAngleDegrees());
+        }
+        
         public static Vector2 FromAngleRadians(this float angle)
         {
             return new Vector2(

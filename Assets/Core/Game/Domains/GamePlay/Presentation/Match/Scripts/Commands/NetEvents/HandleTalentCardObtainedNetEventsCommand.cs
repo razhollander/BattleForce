@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ITalentCardControllers _talentCardControllers;
         private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
         private IMatchPlayerControllers _playerControllers;
+        private IMatchPlayerUIControllers _matchPlayerUIControllers;
 
         public override void ResolveDependencies()
         {
@@ -20,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _talentCardObtainedEffectController = _diContainer.Resolve<ITalentCardObtainedEffectController>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
+            _matchPlayerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
         }
 
         public void Execute()
@@ -33,9 +36,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var talentCardObtainedNetEvent in talentCardObtainedNetEvents)
             {
                 var talentCardPosition = _talentCardControllers.GetTalentCardPosition(talentCardObtainedNetEvent.TalentCardId);
-                var playerPosition = _playerControllers.GetPlayerPosition(talentCardObtainedNetEvent.ObtainedByPlayerId);
+                var obtainedByPlayerId = talentCardObtainedNetEvent.ObtainedByPlayerId;
+                var playerPosition = _playerControllers.GetPlayerPosition(obtainedByPlayerId);
                 _talentCardObtainedEffectController.PlayEffect(talentCardPosition, playerPosition);
                 _talentCardControllers.DestroyTalentCard(talentCardObtainedNetEvent.TalentCardId);
+                _matchPlayerUIControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.Talents);
             }
             
             talentCardObtainedNetEvents.Clear();
