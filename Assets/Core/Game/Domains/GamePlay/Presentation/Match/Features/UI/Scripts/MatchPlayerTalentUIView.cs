@@ -30,9 +30,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _talentImage.transform.localScale = isSelected ? _selectedScale : _normalScale;
         }
         
-        public void Setup(Sprite icon)
+        public void SetupTalent(Sprite icon)
         {
             _talentImage.sprite = icon;
+            _canvasGroup.alpha = 1f;
             _cooldownOverlay.enabled = false;
         }
 

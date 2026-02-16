@@ -38,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             for (int i = 0; i < maxTalentsAmount; i++)
             {
                 var view = Instantiate(_talentViewPrefab, _talentsContainer);
-                view.Setup(null); // Pass icon if available
+                view.SetNoneTalent();
                 _talentViews[i] = view;
             }
         }
@@ -65,30 +65,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 
         public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents)
         {
-            // Ensure enough views
-            int requiredCount = talentsState.Talents.Count;
-            while (_talentViews.Count < requiredCount)
-            {
-                var view = Instantiate(_talentViewPrefab, _talentsContainer);
-                view.Setup(null); // Pass icon if available
-                _talentViews.Add(view);
-            }
-
-            // Hide extras
-            for (int i = requiredCount; i < _talentViews.Count; i++)
-            {
-                _talentViews[i].gameObject.SetActive(false);
-            }
-
-            // Update views
-            for (int i = 0; i < requiredCount; i++)
-            {
-                var view = _talentViews[i];
-                view.gameObject.SetActive(true);
-                var talent = talentsState.Talents.Get(i);
-                bool isSelected = (i == talentsState.SelectedTalentIndex);
-                view.UpdateView(talent, isSelected);
-            }
+            // for (int i = 0; i < requiredCount; i++)
+            // {
+            //     var view = _talentViews[i];
+            //     view.gameObject.SetActive(true);
+            //     var talent = talentsState.Talents.Get(i);
+            //     bool isSelected = (i == talentsState.SelectedTalentIndex);
+            //     view.UpdateView(talent, isSelected);
+            // }
         }
     }
 }
