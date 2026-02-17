@@ -34,7 +34,7 @@ namespace Core.Plugins.box2d_netstandard_2._4.examples.Box2D.WorldTests
 
         private void OnDrawGizmos()
         {
-#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
+#if UNITY_EDITOR && DEBUG_DRAW_ENABLED
             _world?.DrawDebugData();
 #endif
         }

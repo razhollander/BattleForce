@@ -6,7 +6,7 @@ using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Contacts;
 using Box2D.NetStandard.Dynamics.Fixtures;
 using Box2D.NetStandard.Dynamics.World;
-#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
+#if UNITY_EDITOR && DEBUG_DRAW_ENABLED
 using Box2D.NetStandard.Dynamics.World.Callbacks;
 #endif
 using Box2D.WorldTests;
@@ -209,7 +209,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private static TestDebugDrawer CreateTestDebugDrawer()
         {
             var testDebugDrawer = new TestDebugDrawer();
-#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
+#if UNITY_EDITOR && DEBUG_DRAW_ENABLED
             testDebugDrawer.AppendFlags(DrawFlags.Aabb);
             testDebugDrawer.AppendFlags(DrawFlags.Joint);
             testDebugDrawer.AppendFlags(DrawFlags.Pair);

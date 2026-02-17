@@ -9,11 +9,11 @@ namespace Core.Scripts.Editor.EditorConfig
     {
         private const string InfoLogsDefineSymbol = "INFO_LOGS_ENABLED";
         private const string ErrorLogsDefineSymbol = "ERROR_LOGS_ENABLED";
-        private const string PhysicsDebugDrawDefineSymbol = "PHYSICS_DEBUG_DRAW_ENABLED";
+        private const string DebugDrawDefineSymbol = "DEBUG_DRAW_ENABLED";
         private bool _areInfoLogsEnabled;
         private bool _areErrorLogsEnabled;
         private bool _simulateNetworkLatency;
-        private bool _arePhysicsDebugDrawEnabled;
+        private bool _areDebugDrawEnabled;
 
         [MenuItem("PracticAPI/Config")]
         public static void ShowWindow()
@@ -26,7 +26,7 @@ namespace Core.Scripts.Editor.EditorConfig
         {
             _areInfoLogsEnabled = EditorUtils.IsSymbolEnabled(InfoLogsDefineSymbol);
             _areErrorLogsEnabled = EditorUtils.IsSymbolEnabled(ErrorLogsDefineSymbol);
-            _arePhysicsDebugDrawEnabled = EditorUtils.IsSymbolEnabled(PhysicsDebugDrawDefineSymbol);
+            _areDebugDrawEnabled = EditorUtils.IsSymbolEnabled(DebugDrawDefineSymbol);
         }
         
         private void OnGUI()
@@ -35,7 +35,7 @@ namespace Core.Scripts.Editor.EditorConfig
 
             _areInfoLogsEnabled = EditorGUILayout.Toggle("Are Info Logs Enabled", _areInfoLogsEnabled);
             _areErrorLogsEnabled = EditorGUILayout.Toggle("Are Error Logs Enabled", _areErrorLogsEnabled);
-            _arePhysicsDebugDrawEnabled = EditorGUILayout.Toggle("Are Physics Debug Draw Enabled", _arePhysicsDebugDrawEnabled);
+            _areDebugDrawEnabled = EditorGUILayout.Toggle("Are Debug Draw Enabled", _areDebugDrawEnabled);
             if (EditorGUILayout.LinkButton("Refresh"))
             {
                 TryRefreshDefineSymbols();
@@ -56,7 +56,7 @@ namespace Core.Scripts.Editor.EditorConfig
         {
             var areCurrentInfoLogsEnabled = EditorUtils.IsSymbolEnabled(InfoLogsDefineSymbol);
             var areCurrentErrorLogsEnabled = EditorUtils.IsSymbolEnabled(ErrorLogsDefineSymbol);
-            var areCurrentPhysicsDebugDrawEnabled = EditorUtils.IsSymbolEnabled(PhysicsDebugDrawDefineSymbol);
+            var areCurrentDebugDrawEnabled = EditorUtils.IsSymbolEnabled(DebugDrawDefineSymbol);
             var definesToRemoveList = new List<string>();
             var definesToAddList = new List<string>();
             if (areCurrentInfoLogsEnabled != _areInfoLogsEnabled)
@@ -83,15 +83,15 @@ namespace Core.Scripts.Editor.EditorConfig
                 }
             }
             
-            if (areCurrentPhysicsDebugDrawEnabled != _arePhysicsDebugDrawEnabled)
+            if (areCurrentDebugDrawEnabled != _areDebugDrawEnabled)
             {
-                if (_arePhysicsDebugDrawEnabled)
+                if (_areDebugDrawEnabled)
                 {
-                    definesToAddList.Add(PhysicsDebugDrawDefineSymbol);
+                    definesToAddList.Add(DebugDrawDefineSymbol);
                 }
                 else
                 {
-                    definesToRemoveList.Add(PhysicsDebugDrawDefineSymbol);
+                    definesToRemoveList.Add(DebugDrawDefineSymbol);
                 }
             }
 

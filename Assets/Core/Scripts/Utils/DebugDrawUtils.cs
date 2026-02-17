@@ -6,7 +6,7 @@ namespace Core.Scripts.Utils
 {
     public static class DebugDrawUtils
     {
-        [Conditional("PHYSICS_DEBUG_DRAW_ENABLED")]
+        [Conditional("DEBUG_DRAW_ENABLED")]
         public static void DrawRotatedRect(System.Numerics.Vector2 centerNum, System.Numerics.Vector2 sizeNum, float angleRadians)
         {
             // 1. Convert System.Numerics to Unity types

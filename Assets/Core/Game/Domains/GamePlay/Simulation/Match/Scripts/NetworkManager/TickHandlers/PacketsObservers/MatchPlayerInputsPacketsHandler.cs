@@ -268,8 +268,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
                 playerModel.Spaceship.Shoot = shootState;
                 CreateBulletForPlayer(processedTick, playerModel);
-                var center = playerModel.Spaceship.Transform.Position;
-                var rectSize = new System.Numerics.Vector2(5, 10);
+                var rectSize = new System.Numerics.Vector2(10, 5);
+                var rectDistanceFromPlayer = playerModel.Spaceship.Transform.Radius + rectSize.X / 2;
+                var center = playerModel.Spaceship.Transform.Position+rectDistanceFromPlayer*playerModel.Spaceship.TalentsState.AimDirection;
 
                 float angleRadians = playerModel.Spaceship.TalentsState.AimDirection.ToAngleRadians();
                 if (_physicsSimulator.RectangleCast(center, rectSize, angleRadians,
