@@ -29,6 +29,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         Body GetPowerUpBall(ushort powerUpBallId);
         void RemoveBody(Body body);
         bool IsSquareHitAnyBodyTypes(Vector2 squarePosition, float squareHalfWidth, params PhysicsBodyType[] bodyTypes);
+        bool CircleCast(Vector2 center, float radius, params PhysicsBodyType[] bodyTypes);
+        bool RectangleCast(Vector2 center, Vector2 size, float angleRadians, params PhysicsBodyType[] bodyTypes);
         void AddStartMatchWall(ushort id, Vector2 position, float radius);
         void ClearAllData();
     }

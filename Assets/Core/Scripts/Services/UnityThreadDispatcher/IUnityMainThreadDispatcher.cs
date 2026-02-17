@@ -6,5 +6,7 @@ namespace Core.Scripts.Services.UnityThreadDispatcher
     {
         void InitEntryPoint();
         void Enqueue(Action action);
+        [Obsolete("Don't use this! Use EnqueueDraw")]
+        void EnqueueDrawInternal(Action action);
     }
 }

@@ -11,6 +11,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
+using Core.Scripts.Services.UnityThreadDispatcher;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -45,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly HandleTalentInputPressedCommand _handleTalentInputPressedCommand;
         private readonly IPlayersTalentsManager _playersTalentsManager;
         private readonly IPlaybackRecorderService _playerbackRecorderService;
+        private readonly IUnityMainThreadDispatcher _unityMainThreadDispatcher;
 
         public bool DidReceiveAnyInputFromPlayer(ushort playerId)
         {
@@ -53,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService)
+            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, IUnityMainThreadDispatcher unityMainThreadDispatcher)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -65,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _commandFactory = commandFactory;
             _playersTalentsManager = playersTalentsManager;
             _playerbackRecorderService = playerbackRecorderService;
+            _unityMainThreadDispatcher = unityMainThreadDispatcher;
             _handleTalentInputPressedCommand = _commandFactory.CreateCommandVoid<HandleTalentInputPressedCommand>();
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, MatchPlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -265,9 +268,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
                 playerModel.Spaceship.Shoot = shootState;
                 CreateBulletForPlayer(processedTick, playerModel);
-            }
-        }
+                var center = playerModel.Spaceship.Transform.Position;
+                var rectSize = new System.Numerics.Vector2(5, 10);
 
+                float angleRadians = playerModel.Spaceship.TalentsState.AimDirection.ToAngleRadians();
+                if (_physicsSimulator.RectangleCast(center, rectSize, angleRadians,
+                        PhysicsBodyType.Wall))
+                {
+                    LogService.LogError("Hit!");
+                }
+            }
+            
+        }
+        
         private void CreateBulletForPlayer(int processedTick, PlayerStateS2C playerModel)
         {
             var bullet = _matchDataService.AddBullet(playerModel.Id, playerModel.Spaceship.Transform.GetHeadPosition(),
