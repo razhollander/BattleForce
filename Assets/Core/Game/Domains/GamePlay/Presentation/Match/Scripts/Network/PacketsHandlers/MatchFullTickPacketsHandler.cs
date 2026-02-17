@@ -372,7 +372,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 player.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
                 player.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
                 player.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
-                player.Spaceship.TalentsState = playerState.Spaceship.TalentsState;
+
+                player.Spaceship.TalentsState.SelectedTalentIndex = playerState.Spaceship.TalentsState.SelectedTalentIndex;
+                player.Spaceship.TalentsState.AimDirection = playerState.Spaceship.TalentsState.AimDirection;
+
+                var sourceTalents = playerState.Spaceship.TalentsState.Talents;
+                var destinationTalents = player.Spaceship.TalentsState.Talents;
+                var count = System.Math.Min(sourceTalents.Count, destinationTalents.Count);
+                for (var i = 0; i < count; i++)
+                {
+                    ref var destinationTalent = ref destinationTalents.Get(i);
+                    destinationTalent.CooldownSecondsLeft = sourceTalents[i].CooldownSecondsLeft;
+                }
             }
         }
 
