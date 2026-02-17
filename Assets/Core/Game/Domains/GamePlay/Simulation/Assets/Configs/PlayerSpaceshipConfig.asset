@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerSpaceshipConfig
   m_EditorClassIdentifier: 
   StartHealth: 1
-  TargetMovementSpeed: 0
+  TargetMovementSpeed: 5
   RotationSpeed: 150
   ShootCooldown: 0.7
   DefaultPlayerRadius: 0.65
@@ -21,4 +21,5 @@ MonoBehaviour:
   VelocityDecelerationPerSecond: 1
   SpinDecelerationPerSecond: 1
   MinSpin: 0.01
-  IdleMovementSpeed: 0.25
+  MinVelocity: 0.01
+  TurnEngineOnWhenReachVelocity: 0.25

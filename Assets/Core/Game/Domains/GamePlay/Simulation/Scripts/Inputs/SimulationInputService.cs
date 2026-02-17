@@ -1,5 +1,6 @@
 using Core.Scripts.Utils.CustomCollections;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
 {

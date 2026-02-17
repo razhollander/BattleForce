@@ -46,7 +46,7 @@ namespace Box2D.NetStandard.Collision
             _radius = radius;
         }
 
-        internal void Set(in Shape shape, in int index)
+        public void Set(in Shape shape, in int index)
         {
             switch (shape)
             {

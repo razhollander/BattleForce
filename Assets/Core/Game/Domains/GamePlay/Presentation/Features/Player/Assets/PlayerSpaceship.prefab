@@ -784,6 +784,7 @@ MonoBehaviour:
   _spaceShipTransform: {fileID: 6367321170785206256}
   _aimArrowTransform: {fileID: 8455100147721814953}
   _playerNameText: {fileID: 2447704602733785927}
+  _selectedTalentImage: {fileID: 5923260587429490229}
 --- !u!1 &8268790909231806898
 GameObject:
   m_ObjectHideFlags: 0

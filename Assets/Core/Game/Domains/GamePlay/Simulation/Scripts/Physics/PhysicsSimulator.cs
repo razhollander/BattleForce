@@ -1,9 +1,12 @@
 using System.Numerics;
+using Box2D.NetStandard.Collision;
 using Box2D.NetStandard.Collision.Shapes;
+using Box2D.NetStandard.Common;
 using Box2D.NetStandard.Dynamics.Bodies;
+using Box2D.NetStandard.Dynamics.Contacts;
 using Box2D.NetStandard.Dynamics.Fixtures;
 using Box2D.NetStandard.Dynamics.World;
-#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
+#if UNITY_EDITOR && DEBUG_DRAW_ENABLED
 using Box2D.NetStandard.Dynamics.World.Callbacks;
 #endif
 using Box2D.WorldTests;
@@ -11,6 +14,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
+using Core.Scripts.Services.UnityThreadDispatcher;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -22,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
     {
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkConfig _networkConfig;
+        private readonly IUnityMainThreadDispatcher _unityMainThreadDispatcher;
         private World _world;
         private readonly CollisionEventCacheListener _collisionEventCacheListener;
 
@@ -31,10 +36,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private readonly ConcurrentPool<CircleShape> _circleShapePool;
         private readonly ConcurrentPool<Filter> _filterPool;
 
-        public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig)
+        public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig, IUnityMainThreadDispatcher unityMainThreadDispatcher)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _networkConfig = networkConfig;
+            _unityMainThreadDispatcher = unityMainThreadDispatcher;
             _collisionEventCacheListener = new CollisionEventCacheListener(_networkConfig);
 
             _bodyDefPool = new ConcurrentPool<BodyDef>(() => new BodyDef(), _networkConfig.MaxCap.ConcurrentBodyCount);
@@ -203,7 +209,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private static TestDebugDrawer CreateTestDebugDrawer()
         {
             var testDebugDrawer = new TestDebugDrawer();
-#if UNITY_EDITOR && PHYSICS_DEBUG_DRAW_ENABLED
+#if UNITY_EDITOR && DEBUG_DRAW_ENABLED
             testDebugDrawer.AppendFlags(DrawFlags.Aabb);
             testDebugDrawer.AppendFlags(DrawFlags.Joint);
             testDebugDrawer.AppendFlags(DrawFlags.Pair);
@@ -478,6 +484,101 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return hasCollisionWithAnyBodyType;
         }
 
+        public bool CircleCast(Vector2 center, float radius, params PhysicsBodyType[] bodyTypes)
+        {
+            var hasCollision = false;
+            var lowerBound = center - new Vector2(radius, radius);
+            var upperBound = center + new Vector2(radius, radius);
+            var aabb = new AABB(lowerBound, upperBound);
+
+            _world.QueryAABB(fixture =>
+            {
+                var bodyData = (PhysicsBodyData)fixture.Body.UserData;
+
+                for (int i = 0; i < bodyTypes.Length; i++)
+                {
+                    if (bodyData.PhysicsBodyType == bodyTypes[i])
+                    {
+                        var circleShape = GetCircleShape();
+                        circleShape.Radius = radius;
+                        circleShape.Center = Vector2.Zero;
+
+                        var input = new ShapeCastInput();
+                        input.proxyA.Set(circleShape, 0);
+                        input.proxyB.Set(fixture.Shape, 0);
+                        input.transformA = new Transform(center, Matrix3x2.Identity);
+                        input.transformB = fixture.Body.GetTransform();
+                        input.translationB = Vector2.Zero;
+
+                        if (Contact.ShapeCast(out _, input)) // todo: this generates garbage inside, need to pool Symplex
+                        {
+                            hasCollision = true;
+                        }
+
+                        _circleShapePool.Return(circleShape);
+                        return !hasCollision;
+                    }
+                }
+
+                return true;
+            }, aabb);
+
+            return hasCollision;
+        }
+
+        public bool RectangleCast(Vector2 center, Vector2 size, float angleRadians, params PhysicsBodyType[] bodyTypes)
+        {
+            _unityMainThreadDispatcher.EnqueueDraw(()=>DebugDrawUtils.DrawRotatedRect(center, size, angleRadians));
+            var hasCollision = false;
+
+            var hx = size.X * 0.5f;
+            var hy = size.Y * 0.5f;
+
+            var rot = Matrix3x2.CreateRotation(angleRadians);
+            var v1 = Vector2.Transform(new Vector2(-hx, -hy), rot) + center;
+            var v2 = Vector2.Transform(new Vector2(hx, -hy), rot) + center;
+            var v3 = Vector2.Transform(new Vector2(hx, hy), rot) + center;
+            var v4 = Vector2.Transform(new Vector2(-hx, hy), rot) + center;
+
+            var min = Vector2.Min(Vector2.Min(v1, v2), Vector2.Min(v3, v4));
+            var max = Vector2.Max(Vector2.Max(v1, v2), Vector2.Max(v3, v4));
+
+            var aabb = new AABB(min, max);
+
+            _world.QueryAABB(fixture =>
+            {
+                var bodyData = (PhysicsBodyData)fixture.Body.UserData;
+
+                for (int i = 0; i < bodyTypes.Length; i++)
+                {
+                    if (bodyData.PhysicsBodyType == bodyTypes[i])
+                    {
+                        var polygonShape = GetPolygonShape();
+                        polygonShape.SetAsBox(hx, hy);
+
+                        var input = new ShapeCastInput();
+                        input.proxyA.Set(polygonShape, 0);
+                        input.proxyB.Set(fixture.Shape, 0);
+                        input.transformA = new Transform(center, rot);
+                        input.transformB = fixture.Body.GetTransform();
+                        input.translationB = Vector2.Zero;
+
+                        if (Contact.ShapeCast(out _, input))
+                        {
+                            hasCollision = true;
+                        }
+
+                        _polygonShapePool.Return(polygonShape);
+                        return !hasCollision;
+                    }
+                }
+
+                return true;
+            }, aabb);
+
+            return hasCollision;
+        }
+        
         public void ManagedOnGUI()
         {
             
@@ -521,7 +622,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var shape = _circleShapePool.Get();
             shape.Reset();
             return shape;
-             // return new CircleShape();
         }
 
         public void AddStartMatchWall(ushort id, Vector2 position, float radius)
