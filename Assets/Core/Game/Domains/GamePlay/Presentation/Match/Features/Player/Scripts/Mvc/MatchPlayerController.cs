@@ -39,7 +39,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
-            SetSelectedTalent(playerModel.Spaceship.TalentsState.SelectedTalentIndex);
+
+            if (playerModel.Spaceship.TalentsState.Talents.Count > 0)
+            {
+                SetSelectedTalent(playerModel.Spaceship.TalentsState.SelectedTalentIndex);
+            }
         }
 
         public void SetSelectedTalent(int index)

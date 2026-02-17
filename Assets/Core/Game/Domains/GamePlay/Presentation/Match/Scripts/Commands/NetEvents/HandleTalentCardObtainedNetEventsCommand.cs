@@ -40,7 +40,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var playerPosition = _playerControllers.GetPlayerPosition(obtainedByPlayerId);
                 _talentCardObtainedEffectController.PlayEffect(talentCardPosition, playerPosition);
                 _talentCardControllers.DestroyTalentCard(talentCardObtainedNetEvent.TalentCardId);
-                _matchPlayerUIControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.Talents);
+                _matchPlayerUIControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.PlayerTalents);
+
+                var isFirstTalentObtained = talentCardObtainedNetEvent.PlayerTalents.Count == 1;
+                if (isFirstTalentObtained)
+                {
+                    _playerControllers.SetPlayerSelectedTalent(obtainedByPlayerId, 0);
+                }
             }
             
             talentCardObtainedNetEvents.Clear();

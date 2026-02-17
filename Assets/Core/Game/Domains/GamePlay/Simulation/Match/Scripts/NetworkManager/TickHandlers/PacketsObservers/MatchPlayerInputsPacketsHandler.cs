@@ -152,8 +152,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
                 if (_simulationInputService.WasInputDownThisTick(playerId, InputType.SwitchTalent))
                 {
-                    _playersTalentsManager.SwitchTalent(playerId);
-                    _netEventsDataService.AddTalentSwitchNetEvent(processedTick, playerId, playerState.Spaceship.TalentsState.SelectedTalentIndex);
+                    if (_playersTalentsManager.TrySwitchToNextTalent(playerId))
+                    {
+                        _netEventsDataService.AddTalentSwitchNetEvent(processedTick, playerId, playerState.Spaceship.TalentsState.SelectedTalentIndex);
+                    }
                 }
 
                 if (_lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastPlayerInput))

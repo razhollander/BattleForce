@@ -263,7 +263,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return false;
         }
         
-        public void SerializeTransforms(NetDataWriter writer)
+        public void SerializeDeltas(NetDataWriter writer)
         {
             var playerCount = Players.Count;
             writer.Put((byte) playerCount);

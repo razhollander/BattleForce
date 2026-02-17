@@ -100,7 +100,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetPlayerSelectedTalent(ushort playerId, int index)
         {
-            _playerControllers[playerId].SetSelectedTalent(index);
+            GetPlayer(playerId).SetSelectedTalent(index);
         }
     }
 }

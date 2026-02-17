@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
@@ -57,6 +58,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         public void UpdatePlayerTalents(ushort playerId, FixedOrderedList<TalentStateS2C> talents)
         {
             _playerControllers[playerId].UpdateTalents(talents);
+            int selectedTalentIndex = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.SelectedTalentIndex;
+            LogService.LogError($"client: UpdatePlayerTalents, selectedTalentIndex:{selectedTalentIndex}");
+            SetPlayerSelectedTalent(playerId, selectedTalentIndex);
         }
 
         public void SetPlayerSelectedTalent(ushort playerId, int index)

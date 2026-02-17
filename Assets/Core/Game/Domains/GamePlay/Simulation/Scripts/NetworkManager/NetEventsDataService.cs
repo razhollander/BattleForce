@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
@@ -444,15 +445,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddTalentCardObtainedNetEvent(int onTick, ushort cardId, ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> talents)
+        public void AddTalentCardObtainedNetEvent(int onTick, ushort cardId, ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> playerTalents)
         {
+
             foreach (var kvp in TalentCardObtainedNetEventsPerPlayer)
             {
                 var packet = kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.TalentCardId = cardId;
                 packet.ObtainedByPlayerId = obtainedByPlayerId;
-                packet.Talents = talents;
+                packet.PlayerTalents = playerTalents;
+                LogService.LogError($"server: AddTalentCardObtainedNetEvent, packet:{packet.ToJson()}");
             }
         }
 

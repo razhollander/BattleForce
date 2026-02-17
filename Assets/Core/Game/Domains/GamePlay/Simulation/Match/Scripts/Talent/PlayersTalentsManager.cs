@@ -72,13 +72,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             return false;
         }
 
-        public void SwitchTalent(ushort playerId)
+        public bool TrySwitchToNextTalent(ushort playerId)
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             var talents = playerState.Spaceship.TalentsState;
-            if (talents.Talents.Count == 0)
+            if (talents.Talents.Count <=1)
             {
-                return;
+                return false;
             }
 
             talents.SelectedTalentIndex++;
@@ -86,6 +86,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             {
                 talents.SelectedTalentIndex = 0;
             }
+
+            return true;
         }
 
         private TalentStateS2C AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)

@@ -175,6 +175,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 var cardId = talentCardObtainedNetEvent.TalentCardId;
                 _matchDataService.RemoveTalentCard(cardId);
+                var playerTalents = _matchDataService.GetPlayer(talentCardObtainedNetEvent.ObtainedByPlayerId).Spaceship.TalentsState.Talents;
+                playerTalents.Clear();
+                foreach (var newPlayerTalent in talentCardObtainedNetEvent.PlayerTalents.AsSpan())
+                {
+                    ref var playerTalent = ref playerTalents.AddAndGet();
+                    playerTalent = newPlayerTalent;
+                }
+                
+                LogService.LogError($"client: ProcessTalentCardObtainedEvents, talentCardObtainedNetEvent:{talentCardObtainedNetEvent.ToJson()}");
                 _cachedPresentationEventsService.TalentCardObtainedNetEvents.Add(talentCardObtainedNetEvent);
             }
         }

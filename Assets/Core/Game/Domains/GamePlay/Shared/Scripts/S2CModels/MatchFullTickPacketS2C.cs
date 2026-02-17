@@ -68,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(Tick);
-            CurrentSimulationState.SerializeTransforms(writer);
+            CurrentSimulationState.SerializeDeltas(writer);
             SerializedPlayerJoinedEvents(writer);
             SerializedBulletSpawnedEvents(writer);
             SerializedPlayerTakeDamageEvents(writer);
