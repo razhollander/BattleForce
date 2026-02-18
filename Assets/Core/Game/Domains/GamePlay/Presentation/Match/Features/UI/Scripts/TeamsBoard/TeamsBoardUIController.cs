@@ -37,5 +37,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         {
             _view.UpdateTeamGems(teamId, gems);
         }
+
+        public void UpdateTeamBolts(ushort teamId, int bolts)
+        {
+            _view.UpdateTeamBolts(teamId, bolts);
+        }
     }
 }

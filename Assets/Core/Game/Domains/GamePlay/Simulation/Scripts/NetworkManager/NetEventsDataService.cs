@@ -35,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedClassUnorderedList<StageEndNetEventS2C>> StageEndNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<TeamLostNetEventS2C>> TeamLostNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<TalentSwitchNetEventS2C>> TalentSwitchNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<GainBoltsNetEventS2C>> GainBoltsNetEventsPerPlayer { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -54,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedClassUnorderedList<StageEndNetEventS2C>> _stageEndNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>> _teamLostNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>> _talentSwitchNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<GainBoltsNetEventS2C>> _gainBoltsNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -76,6 +78,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             StageEndNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<StageEndNetEventS2C>>(maxConcurrentPlayers);
             TeamLostNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<TeamLostNetEventS2C>>(maxConcurrentPlayers);
             TalentSwitchNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<TalentSwitchNetEventS2C>>(maxConcurrentPlayers);
+            GainBoltsNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<GainBoltsNetEventS2C>>(maxConcurrentPlayers);
 
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
@@ -112,6 +115,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }, maxConcurrentPlayers);
             _teamLostNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>>(() => new FixedUnorderedList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount), maxConcurrentPlayers);
             _talentSwitchNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>>(() => new FixedUnorderedList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
+            _gainBoltsNetEventsListPool = new ConcurrentPool<FixedUnorderedList<GainBoltsNetEventS2C>>(() => new FixedUnorderedList<GainBoltsNetEventS2C>(networkConfig.MaxCap.GainBoltsNetEvents), maxConcurrentPlayers);
         }
 
 
@@ -278,6 +282,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
+
+            if (!GainBoltsNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                GainBoltsNetEventsPerPlayer.Add(playerId, _gainBoltsNetEventsListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {playerId}");
+            }
         }
         
         public void StopSavingPlayerEvents(ushort playerId)
@@ -336,6 +349,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var startMatchEligibleChangedList = StartMatchEligibleChangedNetEventsPerPlayer[playerId];
             startMatchEligibleChangedList.Clear();
             _startMatchEligibleChangedListPool.Return(startMatchEligibleChangedList);
+
+            var gainBoltsList = GainBoltsNetEventsPerPlayer[playerId];
+            gainBoltsList.Clear();
+            _gainBoltsNetEventsListPool.Return(gainBoltsList);
         
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
@@ -355,6 +372,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             TeamLostNetEventsPerPlayer.Remove(playerId);
             TalentSwitchNetEventsPerPlayer.Remove(playerId);
             StartMatchEligibleChangedNetEventsPerPlayer.Remove(playerId);
+            GainBoltsNetEventsPerPlayer.Remove(playerId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -701,6 +719,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
+
+            if (GainBoltsNetEventsPerPlayer.TryGetValue(playerId, out var gainBoltsNetEvents))
+            {
+                for (int i = gainBoltsNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (gainBoltsNetEvents[i].OccuredOnTick < tick)
+                    {
+                        gainBoltsNetEvents.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
@@ -772,6 +801,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 packet.OccuredOnTick = onTick;
                 packet.PlayerId = playerId;
                 packet.NewTalentIndex = newTalentIndex;
+            }
+        }
+
+        public void AddGainBoltsNetEvent(int onTick, ushort playerId, int gainedAmount, int totalTeamBolts)
+        {
+            foreach (var kvp in GainBoltsNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
+                packet.GainedAmount = gainedAmount;
+                packet.TotalTeamBolts = totalTeamBolts;
             }
         }
     }

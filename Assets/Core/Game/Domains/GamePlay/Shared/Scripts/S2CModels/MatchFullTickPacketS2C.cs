@@ -26,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedClassUnorderedList<StageEndNetEventS2C> StageEndNetEvents;
         public FixedUnorderedList<TeamLostNetEventS2C> TeamLostNetEvents;
         public FixedUnorderedList<TalentSwitchNetEventS2C> TalentSwitchNetEvents;
+        public FixedUnorderedList<GainBoltsNetEventS2C> GainBoltsNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -48,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             StageEndNetEvents = new FixedClassUnorderedList<StageEndNetEventS2C>(maxCap.StageEndNetEvents, () => new StageEndNetEventS2C(sharedGamePlayConfig.MaxTeamsAmount));
             TeamLostNetEvents = new FixedUnorderedList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
             TalentSwitchNetEvents = new FixedUnorderedList<TalentSwitchNetEventS2C>(maxCap.TalentSwitchNetEvents);
+            GainBoltsNetEvents = new FixedUnorderedList<GainBoltsNetEventS2C>(maxCap.GainBoltsNetEvents);
         }
 
 
@@ -82,6 +84,16 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedStageEndEvents(writer);
             SerializedTeamLostEvents(writer);
             SerializedTalentSwitchEvents(writer);
+            SerializedGainBoltsEvents(writer);
+        }
+
+        private void SerializedGainBoltsEvents(NetDataWriter writer)
+        {
+            writer.Put((byte) GainBoltsNetEvents.Count);
+            foreach (var evt in GainBoltsNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
         }
 
         private void SerializedTalentSwitchEvents(NetDataWriter writer)
@@ -173,6 +185,18 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedStageEndEvents(reader);
             DeserializedTeamLostEvents(reader);
             DeserializedTalentSwitchEvents(reader);
+            DeserializedGainBoltsEvents(reader);
+        }
+
+        private void DeserializedGainBoltsEvents(NetDataReader reader)
+        {
+            GainBoltsNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref GainBoltsNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
         }
 
         private void DeserializedTalentSwitchEvents(NetDataReader reader)

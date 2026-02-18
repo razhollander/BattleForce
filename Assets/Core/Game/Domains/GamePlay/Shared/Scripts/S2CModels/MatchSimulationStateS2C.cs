@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentCardS2C> TalentCards;
         public FixedUnorderedList<PowerUpBallS2C> PowerUpBalls;
         public Dictionary<ushort, int> GemsPerTeamId;
+        public Dictionary<ushort, int> BoltsPerTeam;
         public int EnvironmentLayoutIndex;
         public StageType StageType;
 
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
             PowerUpBalls = new FixedUnorderedList<PowerUpBallS2C>(maxPowerUpBalls);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
+            BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -57,6 +59,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             writer.Put((ushort)GemsPerTeamId.Count);
             foreach (var kvp in GemsPerTeamId)
+            {
+                writer.Put(kvp.Key);
+                writer.Put(kvp.Value);
+            }
+
+            writer.Put((ushort)BoltsPerTeam.Count);
+            foreach (var kvp in BoltsPerTeam)
             {
                 writer.Put(kvp.Key);
                 writer.Put(kvp.Value);
@@ -107,6 +116,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 var teamId = reader.GetUShort();
                 var jems = reader.GetInt();
                 GemsPerTeamId.Add(teamId, jems);
+            }
+
+            BoltsPerTeam.Clear();
+            var boltsCount = reader.GetUShort();
+            for (int i = 0; i < boltsCount; i++)
+            {
+                var teamId = reader.GetUShort();
+                var bolts = reader.GetInt();
+                BoltsPerTeam.Add(teamId, bolts);
             }
 
             EnvironmentLayoutIndex = reader.GetByte();

@@ -42,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateLavaWalls();
             CreateTalentCards();
             ResetPlayers();
+            ResetBolts();
 
             _stageDataService.IsStageEnded = false;
             _stageDataService.StageRestartTimer = -1;
@@ -140,6 +141,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var talentCardId = talentCard.Id;
                 _matchDataService.AddTalentCard(talentCardId, talentCardPosition, talentCard.TalentType, _gamePlayConfig.Talents.TalentCardHealth);
                 _physicsSimulator.AddTalentCard(talentCardId, talentCardPosition, _gamePlayConfig.Talents.TalentCardWidth, _gamePlayConfig.Talents.TalentCardHeight);
+            }
+        }
+
+        private void ResetBolts()
+        {
+            _matchDataService.SimulationState.BoltsPerTeam.Clear();
+            foreach (var teamId in _matchDataService.TeamIds)
+            {
+                _matchDataService.SimulationState.BoltsPerTeam.Add(teamId, _gamePlayConfig.StartingBoltsPerTeam);
             }
         }
     }

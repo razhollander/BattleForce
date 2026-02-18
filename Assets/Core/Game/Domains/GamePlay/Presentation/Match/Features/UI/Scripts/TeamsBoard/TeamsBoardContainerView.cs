@@ -21,5 +21,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         {
             _boardViewsPerTeam[teamId].UpdateGems(gems);
         }
+
+        public void UpdateTeamBolts(ushort teamId, int bolts)
+        {
+            _boardViewsPerTeam[teamId].UpdateBolts(bolts);
+        }
     }
 }

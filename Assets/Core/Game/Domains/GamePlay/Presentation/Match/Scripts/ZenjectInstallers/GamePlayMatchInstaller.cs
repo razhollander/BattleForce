@@ -10,6 +10,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mv
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.FX.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
@@ -37,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private EnvironmentWallView _environmentWallViewPrefab;
         [SerializeField] private StageEndedUiView _stageEndedUiView;
         [SerializeField] private TeamsBoardContainerView _teamsBoardContainerView;
+        [SerializeField] private GainBoltFxView _gainBoltFxViewPrefab;
 
         public override void InstallBindings()
         {
@@ -67,6 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<MatchEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
             Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();
             Container.BindInterfacesTo<TeamsBoardUIController>().AsSingle().WithArguments(_teamsBoardContainerView).NonLazy();
+            Container.BindInterfacesTo<GainBoltFxController>().AsSingle().WithArguments(_gainBoltFxViewPrefab).NonLazy();
         }
     }
 }

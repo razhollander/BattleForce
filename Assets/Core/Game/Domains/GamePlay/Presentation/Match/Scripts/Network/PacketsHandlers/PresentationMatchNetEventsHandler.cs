@@ -273,5 +273,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.TalentSwitchNetEvents.Add(talentSwitchNetEvent);
             }
         }
+
+        public void ProcessGainBoltsNetEvents(CapacityList<GainBoltsNetEventS2C> gainBoltsNetEvents)
+        {
+            if (gainBoltsNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var gainBoltsNetEvent in gainBoltsNetEvents)
+            {
+                _cachedPresentationEventsService.GainBoltsNetEvents.Add(gainBoltsNetEvent);
+            }
+        }
     }
 }

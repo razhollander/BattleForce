@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mv
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.FX.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
@@ -38,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IClientMatchPresentationTickProcessor _clientMatchPresentationTickProcessor;
         private IStartStagePacketHandler _startStagePacketHandler;
         private ITeamsBoardUIController _teamsBoardUIController;
+        private IGainBoltFxController _gainBoltFxController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -62,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _clientMatchPresentationTickProcessor = _diContainer.Resolve<IClientMatchPresentationTickProcessor>();
             _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
+            _gainBoltFxController = _diContainer.Resolve<IGainBoltFxController>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -81,6 +84,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
                 .Execute();
             _matchDataService.SetLocalPlayer(_enterData.LocalPlayerId);
             _teamsBoardUIController.InitEntryPoint();
+            _gainBoltFxController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }

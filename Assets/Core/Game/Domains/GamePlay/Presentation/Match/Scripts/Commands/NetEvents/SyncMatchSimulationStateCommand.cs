@@ -30,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchPlayerControllers _playerControllers;
         private IMatchPlayerUIControllers _playerUIControllers;
         private IWorldCameraController _worldCameraController;
+        private ITeamsBoardUIController _teamsBoardUIController;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -52,6 +53,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
+            _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
         }
 
         public void Execute()
@@ -81,6 +83,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateLavaWalls();
             CreateTalentCards();
             CreatePowerUpBalls();
+            UpdateTeamScores();
+        }
+
+        private void UpdateTeamScores()
+        {
+            foreach (var kvp in _simulationState.GemsPerTeamId)
+            {
+                _teamsBoardUIController.UpdateTeamGems(kvp.Key, kvp.Value);
+            }
+            foreach (var kvp in _simulationState.BoltsPerTeam)
+            {
+                _teamsBoardUIController.UpdateTeamBolts(kvp.Key, kvp.Value);
+            }
         }
 
         private void CreatePowerUpBalls()

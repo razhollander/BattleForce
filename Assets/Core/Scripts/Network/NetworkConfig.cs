@@ -67,5 +67,6 @@ namespace Core.Scripts.Network
         public int PlayerDiedNetEvents = 32;
         public int StartMatchEligibleChangedNetEvents = 32;
         public int TalentSwitchNetEvents = 128;
+        public int GainBoltsNetEvents = 128;
     }
 }

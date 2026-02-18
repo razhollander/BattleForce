@@ -26,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
+        private PlayerGainedBoltsCommand _playerGainedBoltsCommand;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
         {
@@ -40,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
+            _playerGainedBoltsCommand = _commandFactory.CreateCommandVoid<PlayerGainedBoltsCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
@@ -175,6 +177,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playerHitCommand
                 .SetPlayerId(playerId)
                 .SetHitDamage(_gamePlayConfig.PlayerBullet.HitDamage)
+                .SetProcessedTick(_processedTick)
+                .Execute();
+
+            _playerGainedBoltsCommand
+                .SetPlayerId(bulletModel.BelongToPlayerId)
+                .SetGainedAmount(_gamePlayConfig.BoltsPerHit)
                 .SetProcessedTick(_processedTick)
                 .Execute();
         }
