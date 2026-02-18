@@ -366,19 +366,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         private void UpdatePlayersDeltas(MatchSimulationStateS2C simulationState)
         {
-            foreach (var player in _matchDataService.Players)
+            foreach (var playerModel in _matchDataService.Players)
             {
-                var playerState = simulationState.GetPlayerById(player.PlayerId);
-                player.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
-                player.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
-                player.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
-                player.Spaceship.TalentsState.SelectedTalentIndex = playerState.Spaceship.TalentsState.SelectedTalentIndex;
-                player.Spaceship.TalentsState.AimDirection = playerState.Spaceship.TalentsState.AimDirection;
+                var playerState = simulationState.GetPlayerById(playerModel.PlayerId);
+                playerModel.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
+                playerModel.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
+                playerModel.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
+                playerModel.Spaceship.TalentsState.AimDirection = playerState.Spaceship.TalentsState.AimDirection;
 
                 var sourceTalents = playerState.Spaceship.TalentsState.Talents;
-                var destinationTalents = player.Spaceship.TalentsState.Talents;
-                var count = System.Math.Min(sourceTalents.Count, destinationTalents.Count);
-                for (var i = 0; i < count; i++)
+                var destinationTalents = playerModel.Spaceship.TalentsState.Talents;
+                var talentsAmount = destinationTalents.Count;
+
+                if (sourceTalents.Count != destinationTalents.Count)
+                {
+                    LogService.LogError($"For some reason there's a different amount of talents for player {playerModel.PlayerId} in state {sourceTalents.Count} and in presentation {destinationTalents.Count}");
+                    talentsAmount =  System.Math.Min(sourceTalents.Count, destinationTalents.Count);
+                }
+                
+                for (var i = 0; i < talentsAmount; i++)
                 {
                     ref var destinationTalent = ref destinationTalents.Get(i);
                     destinationTalent.CooldownSecondsLeft = sourceTalents[i].CooldownSecondsLeft;

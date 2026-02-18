@@ -98,9 +98,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerControllers.Clear();
         }
 
-        public void SetPlayerSelectedTalent(ushort playerId, int index)
+        public void SetPlayerTalentSelected(ushort playerId, int talentIndex)
         {
-            GetPlayer(playerId).SetSelectedTalent(index);
+            GetPlayer(playerId).SetSelectedTalent(talentIndex);
         }
     }
 }

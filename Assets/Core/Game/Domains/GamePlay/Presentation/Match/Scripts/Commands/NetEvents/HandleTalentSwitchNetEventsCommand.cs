@@ -29,8 +29,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var talentSwitchEvent in talentSwitchEvents)
             {
-                _playerControllers.SetPlayerSelectedTalent(talentSwitchEvent.PlayerId, talentSwitchEvent.NewTalentIndex);
-                _playerUIControllers.SetPlayerSelectedTalent(talentSwitchEvent.PlayerId, talentSwitchEvent.NewTalentIndex);
+                var playerId = talentSwitchEvent.PlayerId;
+                var newTalentIndex = talentSwitchEvent.NewTalentIndex;
+                _playerControllers.SetPlayerTalentSelected(playerId, newTalentIndex);
+                _playerUIControllers.SetPlayerSelectedTalent(playerId, newTalentIndex);
             }
 
             talentSwitchEvents.Clear();

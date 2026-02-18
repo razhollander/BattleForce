@@ -13,14 +13,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         {
             writer.Put(OccuredOnTick);
             writer.Put(PlayerId);
-            writer.Put(NewTalentIndex);
+            writer.Put((byte)NewTalentIndex);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
             PlayerId = reader.GetUShort();
-            NewTalentIndex = reader.GetInt();
+            NewTalentIndex = reader.GetByte();
         }
 
         public int CompareTo(TalentSwitchNetEventS2C other)

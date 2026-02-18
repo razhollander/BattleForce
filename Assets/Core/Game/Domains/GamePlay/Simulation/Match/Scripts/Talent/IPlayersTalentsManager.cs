@@ -6,7 +6,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
     {
         void AddPlayer(ushort playerId);
         void RemovePlayer(ushort playerId);
-        bool TryAddTalentToPlayer(TalentType talentType, ushort playerId, out TalentStateS2C newTalent);
+        bool TryAddTalentToPlayer(TalentType talentType, ushort playerId, out TalentStateS2C newTalent, out bool didReplaceExistingTalent);
         bool TrySwitchToNextTalent(ushort playerId);
     }
 }

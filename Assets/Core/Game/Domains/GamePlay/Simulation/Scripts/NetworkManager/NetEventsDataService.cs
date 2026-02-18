@@ -445,9 +445,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddTalentCardObtainedNetEvent(int onTick, ushort cardId, ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> playerTalents)
+        public void AddTalentCardObtainedNetEvent(int onTick, ushort cardId, ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> playerTalents, bool didReplaceTalent)
         {
-
             foreach (var kvp in TalentCardObtainedNetEventsPerPlayer)
             {
                 var packet = kvp.Value.AddAndGet();
@@ -455,7 +454,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 packet.TalentCardId = cardId;
                 packet.ObtainedByPlayerId = obtainedByPlayerId;
                 packet.PlayerTalents = playerTalents;
-                LogService.LogError($"server: AddTalentCardObtainedNetEvent, packet:{packet.ToJson()}");
+                packet.DidReplaceTalent = didReplaceTalent;
             }
         }
 

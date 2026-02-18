@@ -58,8 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         public void UpdatePlayerTalents(ushort playerId, FixedOrderedList<TalentStateS2C> talents)
         {
             _playerControllers[playerId].UpdateTalents(talents);
-            int selectedTalentIndex = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.SelectedTalentIndex;
-            LogService.LogError($"client: UpdatePlayerTalents, selectedTalentIndex:{selectedTalentIndex}");
+            var selectedTalentIndex = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.SelectedTalentIndex;
             SetPlayerSelectedTalent(playerId, selectedTalentIndex);
         }
 

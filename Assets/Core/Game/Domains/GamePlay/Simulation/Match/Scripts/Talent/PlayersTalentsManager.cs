@@ -36,9 +36,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _talentControllersPerPlayer.Remove(playerId);
         }
 
-        public bool TryAddTalentToPlayer(TalentType talentType, ushort playerId, out TalentStateS2C newTalent)
+        public bool TryAddTalentToPlayer(TalentType talentType, ushort playerId, out TalentStateS2C newTalent, out bool didReplaceExistingTalent)
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+            didReplaceExistingTalent = false;
 
             if (DoesPlayerHaveTalent(playerState, talentType))
             {
@@ -50,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             if (didPlayerReachMaxTalents)
             {
                 newTalent = ReplaceTalentWithCurrentSelectedTalent(talentType, playerState);
+                didReplaceExistingTalent = true;
             }
             else
             {

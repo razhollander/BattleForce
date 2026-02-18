@@ -10,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         public ushort TalentCardId;
         public ushort ObtainedByPlayerId;
         public FixedOrderedList<TalentStateS2C> PlayerTalents;
+        public bool DidReplaceTalent;
 
         public TalentCardObtainedNetEventS2C(int maxTalentsPerPlayerAmount)
         {
@@ -25,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             writer.Put(OccuredOnTick);
             writer.Put(TalentCardId);
             writer.Put(ObtainedByPlayerId);
+            writer.Put(DidReplaceTalent);
             writer.Put((byte)PlayerTalents.Count);
 
             foreach (var talent in PlayerTalents.AsSpan())
@@ -38,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             OccuredOnTick = reader.GetInt();
             TalentCardId = reader.GetUShort();
             ObtainedByPlayerId = reader.GetUShort();
+            DidReplaceTalent = reader.GetBool();
             var talentsCount = reader.GetByte();
             PlayerTalents.Clear();
 

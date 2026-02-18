@@ -148,9 +148,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState);
                 playerState.Spaceship.TalentsState.AimDirection = playerInputPacket.AimDirection;
 
-                _simulationInputService.SetInputs(playerId, InputType.SwitchTalent, playerInputPacket.IsSwitchTalentInputPressed);
+                _simulationInputService.SetPlayerInput(playerId, PlayerInputType.SwitchTalent, playerInputPacket.IsSwitchTalentInputPressed);
 
-                if (_simulationInputService.WasInputDownThisTick(playerId, InputType.SwitchTalent))
+                if (_simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.SwitchTalent))
                 {
                     if (_playersTalentsManager.TrySwitchToNextTalent(playerId))
                     {

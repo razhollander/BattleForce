@@ -80,11 +80,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             }
         }
 
-        public void SetSelectedTalent(Sprite sprite)
+        public void SetSelectedTalent(int selectedTalentIndex)
         {
-            foreach (var talentView in _talentViews)
+            for (int i = 0; i < _talentViews.Length; i++)
             {
-                talentView.SetIsSelected(talentView.Icon == sprite);
+                var talentView = _talentViews[i];
+                talentView.SetIsSelected(selectedTalentIndex == i);
             }
         }
     }

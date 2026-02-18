@@ -1,89 +1,98 @@
 using Core.Scripts.Utils.CustomCollections;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
 {
     public class SimulationInputService : ISimulationInputService
     {
-        private readonly CapacityDict<ushort, InputState> _inputStates;
+        private readonly CapacityDict<ushort, PlayerInputStates> _inputStatesPerPlayer;
 
         public SimulationInputService(NetworkConfig networkConfig)
         {
-            _inputStates = new CapacityDict<ushort, InputState>(networkConfig.MaxCap.ConcurrentPlayers);
+            _inputStatesPerPlayer = new CapacityDict<ushort, PlayerInputStates>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
-        public void SetInputs(ushort playerId, InputType inputType, bool isPressed)
+        public void AddPlayer(ushort playerId)
         {
-            InputState inputState;
-            if (!_inputStates.TryGetValue(playerId, out inputState))
+            var playerInputStates = new PlayerInputStates();
+            _inputStatesPerPlayer.Add(playerId, playerInputStates);
+        }
+        
+        public void SetPlayerInput(ushort playerId, PlayerInputType inputType, bool isPressed)
+        {
+            if (!_inputStatesPerPlayer.TryGetValue(playerId, out var inputStates))
             {
-                inputState = new InputState();
-                _inputStates.Add(playerId, inputState);
+                LogService.LogError($"InputState not found for playerId: {playerId}");
+                return;
             }
 
             switch (inputType)
             {
-                case InputType.SwitchTalent:
-                    inputState.SwitchTalent.Update(isPressed);
+                case PlayerInputType.SwitchTalent:
+                    inputStates.SwitchTalent.Update(isPressed);
                     break;
             }
         }
 
-        public bool WasInputDownThisTick(ushort playerId, InputType inputType)
+        public bool WasInputDownThisTick(ushort playerId, PlayerInputType inputType)
         {
-            if (!_inputStates.TryGetValue(playerId, out var inputState))
+            if (!_inputStatesPerPlayer.TryGetValue(playerId, out var inputStates))
             {
+                LogService.LogError($"InputState not found for playerId: {playerId}");
                 return false;
             }
 
             switch (inputType)
             {
-                case InputType.SwitchTalent:
-                    return inputState.SwitchTalent.WasDownThisTick;
+                case PlayerInputType.SwitchTalent:
+                    return inputStates.SwitchTalent.WasDownThisTick;
                 default:
                     return false;
             }
         }
 
-        public bool WasInputReleasedThisTick(ushort playerId, InputType inputType)
+        public bool WasInputReleasedThisTick(ushort playerId, PlayerInputType inputType)
         {
-            if (!_inputStates.TryGetValue(playerId, out var inputState))
+            if (!_inputStatesPerPlayer.TryGetValue(playerId, out var inputStates))
             {
+                LogService.LogError($"InputState not found for playerId: {playerId}");
                 return false;
             }
 
             switch (inputType)
             {
-                case InputType.SwitchTalent:
-                    return inputState.SwitchTalent.WasReleasedThisTick;
+                case PlayerInputType.SwitchTalent:
+                    return inputStates.SwitchTalent.WasReleasedThisTick;
                 default:
                     return false;
             }
         }
 
-        public bool IsInputPressed(ushort playerId, InputType inputType)
+        public bool IsInputPressed(ushort playerId, PlayerInputType inputType)
         {
-            if (!_inputStates.TryGetValue(playerId, out var inputState))
+            if (!_inputStatesPerPlayer.TryGetValue(playerId, out var inputStates))
             {
+                LogService.LogError($"InputState not found for playerId: {playerId}");
                 return false;
             }
 
             switch (inputType)
             {
-                case InputType.SwitchTalent:
-                    return inputState.SwitchTalent.IsPressed;
+                case PlayerInputType.SwitchTalent:
+                    return inputStates.SwitchTalent.IsPressed;
                 default:
                     return false;
             }
         }
 
-        private class InputState
+        private class PlayerInputStates
         {
-            public SingleInputState SwitchTalent = new SingleInputState();
+            public TickInputState SwitchTalent = new TickInputState();
         }
 
-        private class SingleInputState
+        private struct TickInputState
         {
             public bool IsPressed;
             public bool WasDownThisTick;

@@ -1,6 +1,6 @@
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
 {
-    public enum InputType
+    public enum PlayerInputType
     {
         None,
         SwitchTalent

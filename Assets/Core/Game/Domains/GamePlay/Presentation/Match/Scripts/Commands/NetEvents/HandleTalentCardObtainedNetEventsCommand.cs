@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -15,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
         private IMatchPlayerControllers _playerControllers;
         private IMatchPlayerUIControllers _matchPlayerUIControllers;
+        private IMatchDataService _matchDataService;
 
         public override void ResolveDependencies()
         {
@@ -23,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _talentCardObtainedEffectController = _diContainer.Resolve<ITalentCardObtainedEffectController>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _matchPlayerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
+            _matchDataService = _diContainer.Resolve<IMatchDataService>();
         }
 
         public void Execute()
@@ -41,11 +44,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _talentCardObtainedEffectController.PlayEffect(talentCardPosition, playerPosition);
                 _talentCardControllers.DestroyTalentCard(talentCardObtainedNetEvent.TalentCardId);
                 _matchPlayerUIControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.PlayerTalents);
-
+                
                 var isFirstTalentObtained = talentCardObtainedNetEvent.PlayerTalents.Count == 1;
-                if (isFirstTalentObtained)
+                if (isFirstTalentObtained || talentCardObtainedNetEvent.DidReplaceTalent)
                 {
-                    _playerControllers.SetPlayerSelectedTalent(obtainedByPlayerId, 0);
+                    _playerControllers.SetPlayerTalentSelected(obtainedByPlayerId, _matchDataService.GetPlayer(obtainedByPlayerId).Spaceship.TalentsState.SelectedTalentIndex);
                 }
             }
             
