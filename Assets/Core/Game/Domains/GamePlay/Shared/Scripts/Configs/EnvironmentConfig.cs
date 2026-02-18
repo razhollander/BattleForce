@@ -46,5 +46,22 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
 #endif
         }
+
+        public void SetEnvironmentSprings(Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.EnvironmentSpringS2C[] environmentSprings, int index)
+        {
+             if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetEnvironmentSpringsJson(environmentSprings.ToJson());
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetEnvironmentSpringsJson(environmentSprings.ToJson());
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
     }
 }

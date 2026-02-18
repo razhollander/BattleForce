@@ -44,6 +44,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsBodyType.PlayerBullet);
                     break;
+                case PhysicsBodyType.EnvironmentSpring:
+                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    break;
                 default:
                     collisionMask = 0xFFFF;
                     break;

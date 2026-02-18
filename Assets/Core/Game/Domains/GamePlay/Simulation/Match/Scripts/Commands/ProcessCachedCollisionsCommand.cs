@@ -74,9 +74,50 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerBulletCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerEnvironmentSpringCollision(objectA, objectB, collisionEvent.Contact);
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandlePlayerEnvironmentSpringCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isPlayerToSpring = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.EnvironmentSpring;
+            var isSpringToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.EnvironmentSpring && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerToSpring && !isSpringToPlayer)
+            {
+                return;
+            }
+
+            ushort playerId;
+            ushort springId;
+            Body springBody;
+
+            if (isPlayerToSpring)
+            {
+                playerId = objectA.Id;
+                springId = objectB.Id;
+                springBody = contact.FixtureB.Body;
+            }
+            else
+            {
+                playerId = objectB.Id;
+                springId = objectA.Id;
+                springBody = contact.FixtureA.Body;
+            }
+
+            var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+            var springAngle = springBody.GetAngle();
+            var pushDirection = springAngle.FromAngleRadians();
+
+            var forceMagnitude = _gamePlayConfig.EnvironmentSpring.Force;
+            var force = pushDirection * forceMagnitude;
+
+            playerState.Spaceship.Transform.Velocity += force;
+            playerState.Spaceship.Transform.Direction = pushDirection;
+
+            _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
         }
 
         private void HandleBulletWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

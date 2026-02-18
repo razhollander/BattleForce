@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
     {
         public Vector2 EnvironmentHalfSize { get; private set; }
         public TalentCardS2C[] TalentCards { get; private set; }
+        public EnvironmentSpringS2C[] EnvironmentSprings { get; private set; }
         public WallConfig[] LavaWallConfigs { get; private set; }
         public WallConfig[] WallConfigs { get; private set; }
         
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             WallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetWalls();
             LavaWallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetLavaWalls();
             TalentCards = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetTalentCards();
+            EnvironmentSprings = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentSprings();
             EnvironmentHalfSize = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentHalfSize();
         }
     }

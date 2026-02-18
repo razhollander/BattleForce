@@ -25,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<PowerUpBallObtainedNetEventS2C> PowerUpObtainedNetEvents;
         public FixedClassUnorderedList<StageEndNetEventS2C> StageEndNetEvents;
         public FixedUnorderedList<TeamLostNetEventS2C> TeamLostNetEvents;
+        public FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C> EnvironmentSpringPlayerCollisionNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -46,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PowerUpObtainedNetEvents = new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(maxCap.PowerUpObtainedNetEvents);
             StageEndNetEvents = new FixedClassUnorderedList<StageEndNetEventS2C>(maxCap.StageEndNetEvents, () => new StageEndNetEventS2C(sharedGamePlayConfig.MaxTeamsAmount));
             TeamLostNetEvents = new FixedUnorderedList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
+            EnvironmentSpringPlayerCollisionNetEvents = new FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>(maxCap.EnvironmentSpringPlayerCollisionNetEvents);
         }
 
 
@@ -79,6 +81,16 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedPowerUpObtainedEvents(writer);
             SerializedStageEndEvents(writer);
             SerializedTeamLostEvents(writer);
+            SerializedEnvironmentSpringPlayerCollisionEvents(writer);
+        }
+
+        private void SerializedEnvironmentSpringPlayerCollisionEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)EnvironmentSpringPlayerCollisionNetEvents.Count);
+            foreach (var evt in EnvironmentSpringPlayerCollisionNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
         }
 
         private void SerializedTeamLostEvents(NetDataWriter writer)
@@ -160,6 +172,18 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedPowerUpObtainedEvents(reader);
             DeserializedStageEndEvents(reader);
             DeserializedTeamLostEvents(reader);
+            DeserializedEnvironmentSpringPlayerCollisionEvents(reader);
+        }
+
+        private void DeserializedEnvironmentSpringPlayerCollisionEvents(NetDataReader reader)
+        {
+            EnvironmentSpringPlayerCollisionNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref EnvironmentSpringPlayerCollisionNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
         }
 
         private void DeserializedTeamLostEvents(NetDataReader reader)
