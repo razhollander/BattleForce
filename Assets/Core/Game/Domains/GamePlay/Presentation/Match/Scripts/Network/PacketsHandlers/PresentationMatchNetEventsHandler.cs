@@ -175,7 +175,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 var cardId = talentCardObtainedNetEvent.TalentCardId;
                 _matchDataService.RemoveTalentCard(cardId);
+                UpdatePlayerTalentsFromCardObtainedEvent(talentCardObtainedNetEvent);
                 _cachedPresentationEventsService.TalentCardObtainedNetEvents.Add(talentCardObtainedNetEvent);
+            }
+        }
+
+        private void UpdatePlayerTalentsFromCardObtainedEvent(TalentCardObtainedNetEventS2C talentCardObtainedNetEvent)
+        {
+            var playerTalents = _matchDataService.GetPlayer(talentCardObtainedNetEvent.ObtainedByPlayerId).Spaceship.TalentsState.Talents;
+            playerTalents.Clear();
+            foreach (var newPlayerTalent in talentCardObtainedNetEvent.PlayerTalents.AsSpan())
+            {
+                ref var playerTalent = ref playerTalents.AddAndGet();
+                playerTalent = newPlayerTalent;
             }
         }
 
@@ -245,6 +257,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var teamLostNetEvent in teamLostNetEvents)
             {
                 _cachedPresentationEventsService.TeamLostNetEvents.Add(teamLostNetEvent);
+            }
+        }
+
+        public void ProcessTalentSwitchEvents(CapacityList<TalentSwitchNetEventS2C> talentSwitchNetEvents)
+        {
+            if (talentSwitchNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var talentSwitchNetEvent in talentSwitchNetEvents)
+            {
+                _matchDataService.GetPlayer(talentSwitchNetEvent.PlayerId).Spaceship.TalentsState.SelectedTalentIndex = talentSwitchNetEvent.NewTalentIndex;
+                _cachedPresentationEventsService.TalentSwitchNetEvents.Add(talentSwitchNetEvent);
             }
         }
     }

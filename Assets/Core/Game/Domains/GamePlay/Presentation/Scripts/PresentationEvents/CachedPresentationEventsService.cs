@@ -18,5 +18,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents { get; set; } = new();
         public List<StageEndNetEventS2C> StageEndNetEvents { get; set; } = new();
         public List<TeamLostNetEventS2C> TeamLostNetEvents { get; set; } = new();
+        public List<TalentSwitchNetEventS2C> TalentSwitchNetEvents { get; set; } = new();
     }
 }

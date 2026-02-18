@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -28,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
+        private readonly ISimulationInputService _simulationInputService;
         private readonly CapacityDict<NetPeer, JoinRequestPacketC2S> _playerJoinedPacketsPerPeer;
         private readonly ConcurrentPool<JoinRequestPacketC2S> _joinedRequestPacketsPool;
         private readonly ConcurrentPool<JoinResponsePacketS2C> _joinedResponsePacketsPool;
@@ -36,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
 
         public MatchMakingPlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
-            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ICommandFactory commandFactory)
+            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ISimulationInputService simulationInputService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -44,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             _physicsSimulator = physicsSimulator;
             _netEventsDataService = iNetEventsDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
+            _simulationInputService = simulationInputService;
             _networkConfig = networkConfig;
             _playerJoinedPacketsPerPeer = new CapacityDict<NetPeer, JoinRequestPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _joinedRequestPacketsPool = new ConcurrentPool<JoinRequestPacketC2S>(() => new JoinRequestPacketC2S(), networkConfig.MaxCap.JoinRequestPackets);
@@ -89,6 +92,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                     joinResponse.MatchMakingSimulationState = _matchDataService.SimulationState;
                     joinResponse.OccuredOnTick = processedTick;
                     peer.Tag = playerId;
+                    
+                    _simulationInputService.AddPlayer(playerId);
                     _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius);
                     _networkManager.AddPlayerPeer(playerId, peer);
                     _netEventsDataService.StartSavingPlayerEvents(playerId);

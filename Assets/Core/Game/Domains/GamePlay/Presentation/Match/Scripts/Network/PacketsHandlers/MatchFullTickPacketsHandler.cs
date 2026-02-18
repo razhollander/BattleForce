@@ -39,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PowerUpBallObtainedNetEventS2C> _cachedUnprocessedPowerUpBallObtainedEvents;
         private readonly CapacityList<StageEndNetEventS2C> _cachedUnprocessedStageEndEvents;
         private readonly CapacityList<TeamLostNetEventS2C> _cachedUnprocessedTeamLostEvents;
+        private readonly CapacityList<TalentSwitchNetEventS2C> _cachedUnprocessedTalentSwitchEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
@@ -64,6 +65,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPowerUpBallObtainedEvents = new CapacityList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents);
             _cachedUnprocessedStageEndEvents = new CapacityList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents);
             _cachedUnprocessedTeamLostEvents = new CapacityList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
+            _cachedUnprocessedTalentSwitchEvents = new CapacityList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -100,6 +102,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPlayerDiedEvents(latestFullTickPacket.PlayerDiedNetEvents);
             ProcessStageEndEvents(latestFullTickPacket.StageEndNetEvents);
             ProcessTeamLostEvents(latestFullTickPacket.TeamLostNetEvents);
+            ProcessTalentSwitchEvents(latestFullTickPacket.TalentSwitchNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
@@ -324,6 +327,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        private void ProcessTalentSwitchEvents(FixedUnorderedList<TalentSwitchNetEventS2C> talentSwitchNetEvents)
+        {
+            _cachedUnprocessedTalentSwitchEvents.Clear();
+
+            foreach (var netEvent in talentSwitchNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedTalentSwitchEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedTalentSwitchEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedTalentSwitchEvents.Sort();
+                _presentationNetEventsHandler.ProcessTalentSwitchEvents(_cachedUnprocessedTalentSwitchEvents);
+            }
+        }
+
         private void ProcessStageEndEvents(FixedClassUnorderedList<StageEndNetEventS2C> stageEndNetEvents)
         {
             _cachedUnprocessedStageEndEvents.Clear();
@@ -344,13 +366,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         private void UpdatePlayersDeltas(MatchSimulationStateS2C simulationState)
         {
-            foreach (var player in _matchDataService.Players)
+            foreach (var playerModel in _matchDataService.Players)
             {
-                var playerState = simulationState.GetPlayerById(player.PlayerId);
-                player.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
-                player.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
-                player.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
-                player.Spaceship.TalentsState = playerState.Spaceship.TalentsState;
+                var playerState = simulationState.GetPlayerById(playerModel.PlayerId);
+                playerModel.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
+                playerModel.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
+                playerModel.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
+                playerModel.Spaceship.TalentsState.AimDirection = playerState.Spaceship.TalentsState.AimDirection;
+
+                var sourceTalents = playerState.Spaceship.TalentsState.Talents;
+                var destinationTalents = playerModel.Spaceship.TalentsState.Talents;
+                var talentsAmount = destinationTalents.Count;
+
+                if (sourceTalents.Count != destinationTalents.Count)
+                {
+                    LogService.LogError($"For some reason there's a different amount of talents for player {playerModel.PlayerId} in state {sourceTalents.Count} and in presentation {destinationTalents.Count}");
+                    talentsAmount =  System.Math.Min(sourceTalents.Count, destinationTalents.Count);
+                }
+                
+                for (var i = 0; i < talentsAmount; i++)
+                {
+                    ref var destinationTalent = ref destinationTalents.Get(i);
+                    destinationTalent.CooldownSecondsLeft = sourceTalents[i].CooldownSecondsLeft;
+                }
             }
         }
 
