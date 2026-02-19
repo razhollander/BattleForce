@@ -34,15 +34,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var evt in events)
             {
                 var player = _matchDataService.GetPlayer(evt.PlayerId);
-                if (player == null)
-                {
-                    LogService.LogError($"Player {evt.PlayerId} not found for GainBoltsNetEvent!");
-                    continue;
-                }
-
                 _teamsBoardUIController.UpdateTeamBolts(player.TeamId, evt.TotalTeamBolts);
 
-                var playerPosition = (UnityEngine.Vector3)player.Spaceship.Transform.Position.ToUnityVector2();
+                var playerPosition = player.Spaceship.Transform.Position.ToUnityVector2();
                 _gainBoltFxController.ShowFx(evt.GainedAmount, playerPosition);
             }
 

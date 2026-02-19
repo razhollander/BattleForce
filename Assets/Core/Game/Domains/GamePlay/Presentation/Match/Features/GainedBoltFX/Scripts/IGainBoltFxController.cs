@@ -5,6 +5,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FX.Scripts
     public interface IGainBoltFxController
     {
         void InitEntryPoint();
-        void ShowFx(int amount, Vector3 position);
+        void ShowFx(int amount, Vector2 position);
     }
 }

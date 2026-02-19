@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FX.Scripts
             _container = new GameObject("GainBoltFxContainer").transform;
         }
 
-        public void ShowFx(int amount, Vector3 position)
+        public void ShowFx(int amount, Vector2 position)
         {
             var view = GetView();
             view.Show(amount, position);

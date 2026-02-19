@@ -10,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FX.Scripts
         [SerializeField] private float _moveDistance = 1.0f;
         [SerializeField] private float _duration = 1.0f;
 
-        public void Show(int amount, Vector3 position)
+        public void Show(int amount, Vector2 position)
         {
             transform.position = position;
             _text.text = $"+{amount}";
