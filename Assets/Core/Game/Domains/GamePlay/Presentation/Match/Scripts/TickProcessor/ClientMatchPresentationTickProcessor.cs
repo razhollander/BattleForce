@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleStageEndNetEventsCommand _handleStageEndNetEventsCommand;
         private readonly HandleTeamLostNetEventsCommand _handleTeamLostNetEventsCommand;
         private readonly HandleTalentSwitchNetEventsCommand _handleTalentSwitchNetEventsCommand;
+        private readonly HandleEnvironmentSpringPlayerCollisionNetEventsCommand _handleEnvironmentSpringPlayerCollisionNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchDataService matchDataService)
@@ -50,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleStageEndNetEventsCommand = commandFactory.CreateCommandVoid<HandleStageEndNetEventsCommand>();
             _handleTeamLostNetEventsCommand = commandFactory.CreateCommandVoid<HandleTeamLostNetEventsCommand>();
             _handleTalentSwitchNetEventsCommand = commandFactory.CreateCommandVoid<HandleTalentSwitchNetEventsCommand>();
+            _handleEnvironmentSpringPlayerCollisionNetEventsCommand = commandFactory.CreateCommandVoid<HandleEnvironmentSpringPlayerCollisionNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -75,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleStageEndNetEventsCommand.Execute();
             _handleTeamLostNetEventsCommand.Execute();
             _handleTalentSwitchNetEventsCommand.Execute();
+            _handleEnvironmentSpringPlayerCollisionNetEventsCommand.Execute();
 
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();

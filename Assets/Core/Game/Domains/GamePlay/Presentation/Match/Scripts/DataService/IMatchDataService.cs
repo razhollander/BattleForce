@@ -31,6 +31,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchPowerUpBallModel AddPowerUpBall(ushort powerUpBallId, UnityEngine.Vector2 position);
         void RemovePowerUpBall(ushort powerUpBallId);
         MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort lavaWallId);
+        MatchEnvironmentSpringModel AddSpring(ushort id, UnityEngine.Vector2 position, float rotation, UnityEngine.Vector2 size);
+        MatchEnvironmentSpringModel GetEnvironmentSpring(ushort springId);
         void ClearAll();
     }
 }

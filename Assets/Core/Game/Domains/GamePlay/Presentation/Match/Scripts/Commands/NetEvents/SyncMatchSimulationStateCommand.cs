@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
@@ -20,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchDataService _matchDataService;
         private IMatchBulletControllers _bulletControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
+        private IMatchEnvironmentSpringControllers _environmentSpringControllers;
         private ITalentCardControllers _talentCardControllers;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
@@ -42,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
+            _environmentSpringControllers = _diContainer.Resolve<IMatchEnvironmentSpringControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
@@ -66,6 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService.ClearAll();
             _bulletControllers.DestroyAll();
             _environmentWallsControllers.DestroyAll();
+            _environmentSpringControllers.DestroyAll();
             _environmentLavaWallsControllers.DestroyAll();
             _talentCardControllers.DestroyAll();
             _powerUpBallControllers.DestroyAll();
@@ -78,9 +82,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreatePlayers();
             CreateBullets();
             CreateWalls();
+            CreateSprings();
             CreateLavaWalls();
             CreateTalentCards();
             CreatePowerUpBalls();
+        }
+
+        private void CreateSprings()
+        {
+            var springs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetEnvironmentSprings();
+            var size = _gameplayConfig.EnvironmentSpring.Size;
+            foreach (var spring in springs)
+            {
+                _matchDataService.AddSpring(spring.Id, spring.Position.ToUnityVector2(), spring.RotationAngle, size);
+                _environmentSpringControllers.CreateSpring(spring.Id);
+            }
         }
 
         private void CreatePowerUpBalls()

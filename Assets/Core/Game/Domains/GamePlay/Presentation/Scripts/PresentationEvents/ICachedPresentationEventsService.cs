@@ -19,5 +19,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<StageEndNetEventS2C> StageEndNetEvents { get; set; }
         List<TeamLostNetEventS2C> TeamLostNetEvents { get; set; }
         List<TalentSwitchNetEventS2C> TalentSwitchNetEvents { get; set; }
+        List<EnvironmentSpringPlayerCollisionNetEventS2C> EnvironmentSpringPlayerCollisionNetEvents { get; set; }
     }
 }

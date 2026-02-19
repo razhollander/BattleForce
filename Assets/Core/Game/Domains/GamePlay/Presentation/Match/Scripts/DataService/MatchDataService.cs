@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchPlayerBulletModel> Bullets { get; private set; }
         public List<MatchEnvironmentWallModel> EnvironmentWalls { get; private set; }
         public List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; private set; }
+        public List<MatchEnvironmentSpringModel> EnvironmentSprings { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
 
@@ -29,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             Bullets = new List<MatchPlayerBulletModel>(networkConfig.MaxCap.ConcurrentBullets);
             EnvironmentWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
             EnvironmentLavaWalls = new List<MatchEnvironmentLavaWallModel>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls);
+            EnvironmentSprings = new List<MatchEnvironmentSpringModel>(32);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
             PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
@@ -47,6 +49,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort wallId)
         {
             return EnvironmentLavaWalls.Find(x => x.Id == wallId);
+        }
+
+        public MatchEnvironmentSpringModel GetEnvironmentSpring(ushort springId)
+        {
+            return EnvironmentSprings.Find(x => x.Id == springId);
         }
 
         public void RemoveBullet(ushort bulletId)
@@ -140,6 +147,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newWall;
         }
 
+        public MatchEnvironmentSpringModel AddSpring(ushort id, UnityEngine.Vector2 position, float rotation, UnityEngine.Vector2 size)
+        {
+            var newSpring = new MatchEnvironmentSpringModel(id, position, rotation, size);
+            EnvironmentSprings.Add(newSpring);
+            return newSpring;
+        }
+
         public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius)
         {
             var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, position, radius);
@@ -158,6 +172,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             Bullets.Clear();
             EnvironmentWalls.Clear();
             EnvironmentLavaWalls.Clear();
+            EnvironmentSprings.Clear();
             TalentCards.Clear();
             PowerUpBalls.Clear();
         }

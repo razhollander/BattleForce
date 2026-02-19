@@ -273,5 +273,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.TalentSwitchNetEvents.Add(talentSwitchNetEvent);
             }
         }
+
+        public void ProcessEnvironmentSpringPlayerCollisionEvents(CapacityList<EnvironmentSpringPlayerCollisionNetEventS2C> environmentSpringPlayerCollisionNetEvents)
+        {
+            if (environmentSpringPlayerCollisionNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var environmentSpringPlayerCollisionNetEvent in environmentSpringPlayerCollisionNetEvents)
+            {
+                _cachedPresentationEventsService.EnvironmentSpringPlayerCollisionNetEvents.Add(environmentSpringPlayerCollisionNetEvent);
+            }
+        }
     }
 }

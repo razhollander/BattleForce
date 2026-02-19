@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
+namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {
-    [CreateAssetMenu(fileName = "EnvironmentSpringConfig", menuName = "BF/Simulation/Environment Spring Config")]
+    [CreateAssetMenu(fileName = "EnvironmentSpringConfig", menuName = "BF/Shared/Environment Spring Config")]
     public class EnvironmentSpringConfig : ScriptableObject
     {
         public float Force = 20f;
