@@ -2,8 +2,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
 {
     public interface ITeamsBoardUIController
     {
-        void InitEntryPoint();
         void UpdateTeamGems(ushort teamId, int gems);
         void UpdateTeamBolts(ushort teamId, int bolts);
+        void CreateTeamBoard(ushort teamId);
+        void DestroyAll();
     }
 }

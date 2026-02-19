@@ -38,7 +38,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ICommandFactory _commandFactory;
         private IClientMatchPresentationTickProcessor _clientMatchPresentationTickProcessor;
         private IStartStagePacketHandler _startStagePacketHandler;
-        private ITeamsBoardUIController _teamsBoardUIController;
         private IGainBoltFxController _gainBoltFxController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
@@ -63,7 +62,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _clientMatchPresentationTickProcessor = _diContainer.Resolve<IClientMatchPresentationTickProcessor>();
             _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
-            _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
             _gainBoltFxController = _diContainer.Resolve<IGainBoltFxController>();
         }
 
@@ -83,7 +81,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
                 .SetSimulationState(_enterData.InitialState)
                 .Execute();
             _matchDataService.SetLocalPlayer(_enterData.LocalPlayerId);
-            _teamsBoardUIController.InitEntryPoint();
             _gainBoltFxController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();

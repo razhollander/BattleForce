@@ -56,6 +56,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesSe
             var newSpeed = Mathf.Clamp(velocityLength, 0, targetMovementSpeed);
             transformState.Velocity = transformState.Velocity / velocityLength * newSpeed;
             playerSpaceshipState.Transform = transformState;
+            
+            // var transformState = playerSpaceshipState.Transform;
+            // var targetMovementSpeed = _simulationGamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
+            // var lookDirection = transformState.Direction;
+            // var currentForwardSpeed = System.Numerics.Vector2.Dot(transformState.Velocity, lookDirection);
+            // var isBelowTargetMovementSpeed = currentForwardSpeed < targetMovementSpeed;
+            // if (!isBelowTargetMovementSpeed)
+            // {
+            //     return;
+            // }
+            //
+            // var engineForce = _simulationGamePlayConfig.PlayerSpaceship.EngineAcceleration * deltaTIme * lookDirection;
+            // transformState.Velocity += engineForce;
+            // playerSpaceshipState.Transform = transformState;
         }
     }
 }

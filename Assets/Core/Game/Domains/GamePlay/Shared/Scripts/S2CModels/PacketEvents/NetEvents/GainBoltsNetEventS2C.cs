@@ -13,17 +13,17 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put(PlayerId);
-            writer.Put(GainedAmount);
-            writer.Put(TotalTeamBolts);
+            writer.Put((byte)PlayerId);
+            writer.Put((ushort)GainedAmount);
+            writer.Put((ushort)TotalTeamBolts);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            PlayerId = reader.GetUShort();
-            GainedAmount = reader.GetInt();
-            TotalTeamBolts = reader.GetInt();
+            PlayerId = reader.GetByte();
+            GainedAmount = reader.GetUShort();
+            TotalTeamBolts = reader.GetUShort();
         }
 
         public int CompareTo(GainBoltsNetEventS2C other)

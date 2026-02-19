@@ -26,5 +26,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         {
             _boardViewsPerTeam[teamId].UpdateBolts(bolts);
         }
+
+        public void DestroyAll()
+        {
+            foreach (var boardUIView in _boardViewsPerTeam)
+            {
+                Destroy(boardUIView.Value.gameObject);
+            }
+            
+            _boardViewsPerTeam.Clear();
+        }
     }
 }

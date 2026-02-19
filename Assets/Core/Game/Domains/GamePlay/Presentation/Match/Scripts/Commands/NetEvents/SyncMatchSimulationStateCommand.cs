@@ -5,12 +5,14 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -73,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _powerUpBallControllers.DestroyAll();
             _playerControllers.DestroyAll();
             _playerUIControllers.DestroyAll();
+            _teamsBoardUIController.DestroyAll();
         }
 
         private void CreateAll()
@@ -83,18 +86,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateLavaWalls();
             CreateTalentCards();
             CreatePowerUpBalls();
-            UpdateTeamScores();
+            CreateTeamBoards();
         }
 
-        private void UpdateTeamScores()
+        private void CreateTeamBoards()
         {
-            foreach (var kvp in _simulationState.GemsPerTeamId)
+            foreach (ushort teamId in _matchDataService.TeamIds)
             {
-                _teamsBoardUIController.UpdateTeamGems(kvp.Key, kvp.Value);
-            }
-            foreach (var kvp in _simulationState.BoltsPerTeam)
-            {
-                _teamsBoardUIController.UpdateTeamBolts(kvp.Key, kvp.Value);
+                _teamsBoardUIController.CreateTeamBoard(teamId);
             }
         }
 

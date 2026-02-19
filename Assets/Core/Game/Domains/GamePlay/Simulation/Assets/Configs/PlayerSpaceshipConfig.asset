@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e86b0b155d584114940d1f5769902cd0, type: 3}
   m_Name: PlayerSpaceshipConfig
   m_EditorClassIdentifier: 
-  StartHealth: 1
+  StartHealth: 5
   TargetMovementSpeed: 5
   RotationSpeed: 150
   ShootCooldown: 0.7
   DefaultPlayerRadius: 0.65
-  EngineAcceleration: 100
-  VelocityDecelerationPerSecond: 1
-  SpinDecelerationPerSecond: 1
-  MinSpin: 0.01
+  EngineAcceleration: 70
+  VelocityDecelerationPerSecond: 50
+  SpinDecelerationPerSecond: 0.05
+  MinSpin: 1
   MinVelocity: 0.01
   TurnEngineOnWhenReachVelocity: 0.25

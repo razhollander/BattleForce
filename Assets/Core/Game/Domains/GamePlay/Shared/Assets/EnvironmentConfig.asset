@@ -50,3 +50,5 @@ MonoBehaviour:
         "Bomb" },   { "Id": 4, "Position": { "X": -35.0, "Y": -15.0 }, "TalentType":
         "SentryGun" },   { "Id": 5, "Position": { "X": 20.0, "Y": 0.0 }, "TalentType":
         "DashPulse" } ] '
+      _environmentSpringsJson: '[   { "Id": 1, "Position": { "X": -5.0, "Y": 5.0
+        }, "Rotation": "35" }]'

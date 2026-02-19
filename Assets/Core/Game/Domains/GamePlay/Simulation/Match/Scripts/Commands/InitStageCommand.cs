@@ -41,8 +41,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateWalls();
             CreateLavaWalls();
             CreateTalentCards();
+            CreateEnvironmentSprings();
             ResetPlayers();
-            ResetBolts();
 
             _stageDataService.IsStageEnded = false;
             _stageDataService.StageRestartTimer = -1;
@@ -144,12 +144,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
         }
 
-        private void ResetBolts()
+        private void CreateEnvironmentSprings()
         {
-            _matchDataService.SimulationState.BoltsPerTeam.Clear();
-            foreach (var teamId in _matchDataService.TeamIds)
+            var environmentSprings = _matchDataService.Environment.EnvironmentSprings;
+            if (environmentSprings.IsNullOrEmpty())
             {
-                _matchDataService.SimulationState.BoltsPerTeam.Add(teamId, _gamePlayConfig.StartingBoltsPerTeam);
+                return;
+            }
+
+            foreach (var environmentSpring in environmentSprings)
+            {
+                var springId = environmentSpring.Id;
+                var springPosition = environmentSpring.Position;
+                var springRotation = environmentSpring.RotationAngle;
+                var size = new Vector2(_gamePlayConfig.EnvironmentSpring.Size.x, _gamePlayConfig.EnvironmentSpring.Size.y);
+                _physicsSimulator.AddEnvironmentSpring(springId, springPosition, springRotation, size);
             }
         }
     }
