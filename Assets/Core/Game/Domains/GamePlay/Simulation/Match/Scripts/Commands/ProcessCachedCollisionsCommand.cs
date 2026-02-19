@@ -8,6 +8,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -115,8 +116,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var force = pushDirection * forceMagnitude;
             LogService.LogError("Spring collision force: " + force + "");
             playerState.Spaceship.Transform.Velocity += force;
-            playerState.Spaceship.Transform.AngularVelocity += _gamePlayConfig.EnvironmentSpring.Spin;
+            var randomSpin = RNG.NextFloat(_gamePlayConfig.EnvironmentSpring.MinSpin, _gamePlayConfig.EnvironmentSpring.MaxSpin);
+            playerState.Spaceship.Transform.AngularVelocity += randomSpin;
             playerState.Spaceship.Transform.Direction = pushDirection;
+            playerState.Spaceship.IsEngineOn = false;
 
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
         }
