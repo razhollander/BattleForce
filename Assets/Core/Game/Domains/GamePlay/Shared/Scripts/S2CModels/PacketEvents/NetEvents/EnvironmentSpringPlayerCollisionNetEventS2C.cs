@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put(SpringId);
+            writer.Put((byte)SpringId);
             writer.Put(PlayerId);
             writer.PutVector2Quantized(NewPlayerDirection);
         }
@@ -23,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            SpringId = reader.GetUShort();
+            SpringId = reader.GetByte();
             PlayerId = reader.GetUShort();
             NewPlayerDirection = reader.GetVector2Quantized();
         }

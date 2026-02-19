@@ -157,8 +157,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var springId = environmentSpring.Id;
                 var springPosition = environmentSpring.Position;
                 var springRotation = environmentSpring.Rotation;
-                var springSize = new Vector2(_gamePlayConfig.EnvironmentSpring.Size.x, _gamePlayConfig.EnvironmentSpring.Size.y);
-                _physicsSimulator.AddEnvironmentSpring(springId, springPosition, springRotation, springSize);
+                _physicsSimulator.AddEnvironmentSpring(springId, springPosition, springRotation, _gamePlayConfig.EnvironmentSpring.Size);
             }
         }
     }

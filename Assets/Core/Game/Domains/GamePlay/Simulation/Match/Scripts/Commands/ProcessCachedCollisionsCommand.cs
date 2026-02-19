@@ -114,7 +114,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             var forceMagnitude = _gamePlayConfig.EnvironmentSpring.Force;
             var force = pushDirection * forceMagnitude;
-            LogService.LogError("Spring collision force: " + force + "");
             playerState.Spaceship.Transform.Velocity += force;
             var randomSpin = RNG.NextFloat(_gamePlayConfig.EnvironmentSpring.MinSpin, _gamePlayConfig.EnvironmentSpring.MaxSpin);
             playerState.Spaceship.Transform.AngularVelocity += randomSpin;

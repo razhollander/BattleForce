@@ -1,4 +1,5 @@
 using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
@@ -8,6 +9,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float Force = 20f;
         public float MaxSpin = 55f;
         public float MinSpin = 50f;
-        public Vector2 Size = new Vector2(1f, 1f);
+        public System.Numerics.Vector2 Size = new Vector2(1f, 1f);
     }
 }
