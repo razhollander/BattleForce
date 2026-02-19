@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: EnvironmentSpringConfig
   m_EditorClassIdentifier: 
   Force: 40
-  Spin: 50
-  Size: {x: 5, y: 1}
+  MaxSpin: 65
+  MinSpin: 50
+  Size: {x: 10, y: 1}

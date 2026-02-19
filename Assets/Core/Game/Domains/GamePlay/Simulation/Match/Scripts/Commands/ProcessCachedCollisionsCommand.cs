@@ -12,6 +12,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -93,25 +94,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             ushort playerId;
             ushort springId;
-            Body springBody;
 
             if (isPlayerToSpring)
             {
                 playerId = objectA.Id;
                 springId = objectB.Id;
-                springBody = contact.FixtureB.Body;
             }
             else
             {
                 playerId = objectB.Id;
                 springId = objectA.Id;
-                springBody = contact.FixtureA.Body;
             }
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var springAngle = springBody.GetAngle();
-            var pushDirection = springAngle.FromAngleRadians();
+            var springAngle = 0f;
+            for (int i = 0; i < _matchDataService.Environment.EnvironmentSprings.Length; i++)
+            {
+                if (_matchDataService.Environment.EnvironmentSprings[i].Id != springId)
+                {
+                    continue;
+                }
+                springAngle =  _matchDataService.Environment.EnvironmentSprings[i].RotationAngle+90;
+                break;
+            }
 
+            springAngle *= Mathf.Deg2Rad;
+            var pushDirection = springAngle.FromAngleRadians();
             var forceMagnitude = _gamePlayConfig.EnvironmentSpring.Force;
             var force = pushDirection * forceMagnitude;
             playerState.Spaceship.Transform.Velocity += force;
