@@ -649,6 +649,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _circleShapePool.Return(circleShape);
         }
 
+        public void AddEnvironmentSpring(ushort id, Vector2 position, float rotation, Vector2 size)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = position;
+            bodyDef.angle = rotation * (float)System.Math.PI / 180f;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.EnvironmentSpring);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var shape = GetPolygonShape();
+            shape.SetAsBox(size.X * 0.5f, size.Y * 0.5f);
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+
+            fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentSpring.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.EnvironmentSpring.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(shape);
+        }
+
         public void ClearAllData()
         {
             _world = CreateWorld();

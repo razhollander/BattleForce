@@ -41,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateWalls();
             CreateLavaWalls();
             CreateTalentCards();
+            CreateEnvironmentSprings();
             ResetPlayers();
 
             _stageDataService.IsStageEnded = false;
@@ -140,6 +141,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var talentCardId = talentCard.Id;
                 _matchDataService.AddTalentCard(talentCardId, talentCardPosition, talentCard.TalentType, _gamePlayConfig.Talents.TalentCardHealth);
                 _physicsSimulator.AddTalentCard(talentCardId, talentCardPosition, _gamePlayConfig.Talents.TalentCardWidth, _gamePlayConfig.Talents.TalentCardHeight);
+            }
+        }
+
+        private void CreateEnvironmentSprings()
+        {
+            var environmentSprings = _matchDataService.Environment.EnvironmentSprings;
+            if (environmentSprings.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var environmentSpring in environmentSprings)
+            {
+                var springId = environmentSpring.Id;
+                var springPosition = environmentSpring.Position;
+                var springRotation = environmentSpring.RotationAngle;
+                var size = new Vector2(_gamePlayConfig.EnvironmentSpring.Size.x, _gamePlayConfig.EnvironmentSpring.Size.y);
+                _physicsSimulator.AddEnvironmentSpring(springId, springPosition, springRotation, size);
             }
         }
     }

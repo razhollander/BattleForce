@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         Lava = 5,
         PowerUpBall = 6,
         TeamFloor = 7,
-        StartMatchWall = 8
+        StartMatchWall = 8,
+        EnvironmentSpring = 9
     }
 }

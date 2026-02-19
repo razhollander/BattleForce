@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
+namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
 {
     public class EnvironmentGenerator : MonoBehaviour
     {
