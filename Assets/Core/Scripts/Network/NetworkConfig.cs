@@ -66,6 +66,7 @@ namespace Core.Scripts.Network
         public int StageEndNetEvents = 32;
         public int PlayerDiedNetEvents = 32;
         public int StartMatchEligibleChangedNetEvents = 32;
-        public int EnvironmentSpringPlayerCollisionNetEvents = 32;
+        public int TalentSwitchNetEvents = 128;
+        public int EnvironmentSpringPlayerCollisionNetEvents = 64;
     }
 }

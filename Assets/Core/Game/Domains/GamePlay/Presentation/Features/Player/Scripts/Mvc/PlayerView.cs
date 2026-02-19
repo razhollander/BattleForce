@@ -7,6 +7,7 @@ using CoreDomain.Scripts.Helpers.Pools;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Utils;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 {
@@ -18,10 +19,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private GameObject _healthBarGameObject; // todo move to the match domain
         [SerializeField] private PlayerLoadingRingView playerLoadingRingView;
         [SerializeField] private Transform _spaceShipTransform;
-        [SerializeField] private Transform _aimArrowTransform;
+        [SerializeField] private Transform _aimArrowTransform; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
+        [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
 
         public Action Despawn { get; set; }
+
+        public void SetTalentSprite(Sprite sprite)
+        {
+            _selectedTalentImage.sprite = sprite;
+        }
 
         public void SetPlayerName(string playerName)
         {

@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 
-namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
+namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
 {
     public class WallGenerator : MonoBehaviour
     {

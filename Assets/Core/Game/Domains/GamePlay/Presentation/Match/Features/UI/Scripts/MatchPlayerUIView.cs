@@ -79,5 +79,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 }
             }
         }
+
+        public void SetSelectedTalent(int selectedTalentIndex)
+        {
+            for (int i = 0; i < _talentViews.Length; i++)
+            {
+                var talentView = _talentViews[i];
+                talentView.SetIsSelected(selectedTalentIndex == i);
+            }
+        }
     }
 }

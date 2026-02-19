@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
@@ -33,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<StartMatchEligibleChangedNetEventS2C>> StartMatchEligibleChangedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedClassUnorderedList<StageEndNetEventS2C>> StageEndNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<TeamLostNetEventS2C>> TeamLostNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<TalentSwitchNetEventS2C>> TalentSwitchNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>> EnvironmentSpringPlayerCollisionNetEventsPerPlayer { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
@@ -52,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<StartMatchEligibleChangedNetEventS2C>> _startMatchEligibleChangedListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<StageEndNetEventS2C>> _stageEndNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>> _teamLostNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>> _talentSwitchNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>> _environmentSpringPlayerCollisionListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
@@ -74,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             StartMatchEligibleChangedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<StartMatchEligibleChangedNetEventS2C>>(maxConcurrentPlayers);
             StageEndNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<StageEndNetEventS2C>>(maxConcurrentPlayers);
             TeamLostNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<TeamLostNetEventS2C>>(maxConcurrentPlayers);
+            TalentSwitchNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<TalentSwitchNetEventS2C>>(maxConcurrentPlayers);
             EnvironmentSpringPlayerCollisionNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>>(maxConcurrentPlayers);
 
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
@@ -110,6 +114,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 return list;
             }, maxConcurrentPlayers);
             _teamLostNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>>(() => new FixedUnorderedList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount), maxConcurrentPlayers);
+            _talentSwitchNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>>(() => new FixedUnorderedList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
             _environmentSpringPlayerCollisionListPool = new ConcurrentPool<FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>>(() => new FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>(networkConfig.MaxCap.EnvironmentSpringPlayerCollisionNetEvents), maxConcurrentPlayers);
         }
 
@@ -260,6 +265,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 LogService.LogError($"Player already exists! {playerId}");
             }
 
+            if (!TalentSwitchNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                TalentSwitchNetEventsPerPlayer.Add(playerId, _talentSwitchNetEventsListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {playerId}");
+            }
+
             if (!StartMatchEligibleChangedNetEventsPerPlayer.ContainsKey(playerId))
             {
                 StartMatchEligibleChangedNetEventsPerPlayer.Add(playerId, _startMatchEligibleChangedListPool.Get());
@@ -329,6 +343,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var teamLostList = TeamLostNetEventsPerPlayer[playerId];
             teamLostList.Clear();
             _teamLostNetEventsListPool.Return(teamLostList);
+            var talentSwitchList = TalentSwitchNetEventsPerPlayer[playerId];
+            talentSwitchList.Clear();
+            _talentSwitchNetEventsListPool.Return(talentSwitchList);
             var startMatchEligibleChangedList = StartMatchEligibleChangedNetEventsPerPlayer[playerId];
             startMatchEligibleChangedList.Clear();
             _startMatchEligibleChangedListPool.Return(startMatchEligibleChangedList);
@@ -352,6 +369,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             StopMatchCountdownNetEventsPerPlayer.Remove(playerId);
             StageEndNetEventsPerPlayer.Remove(playerId);
             TeamLostNetEventsPerPlayer.Remove(playerId);
+            TalentSwitchNetEventsPerPlayer.Remove(playerId);
             StartMatchEligibleChangedNetEventsPerPlayer.Remove(playerId);
             EnvironmentSpringPlayerCollisionNetEventsPerPlayer.Remove(playerId);
         }
@@ -444,7 +462,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddTalentCardObtainedNetEvent(int onTick, ushort cardId, ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> talents)
+        public void AddTalentCardObtainedNetEvent(int onTick, ushort cardId, ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> playerTalents, bool didReplaceTalent)
         {
             foreach (var kvp in TalentCardObtainedNetEventsPerPlayer)
             {
@@ -452,7 +470,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 packet.OccuredOnTick = onTick;
                 packet.TalentCardId = cardId;
                 packet.ObtainedByPlayerId = obtainedByPlayerId;
-                packet.Talents = talents;
+                packet.PlayerTalents = playerTalents;
+                packet.DidReplaceTalent = didReplaceTalent;
             }
         }
 
@@ -678,6 +697,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 }
             }
 
+            if (TalentSwitchNetEventsPerPlayer.TryGetValue(playerId, out var talentSwitchNetEvents))
+            {
+                for (int i = talentSwitchNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (talentSwitchNetEvents[i].OccuredOnTick < tick)
+                    {
+                        talentSwitchNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
             if (StartMatchEligibleChangedNetEventsPerPlayer.TryGetValue(playerId, out var startMatchEligibleChangedNetEvents))
             {
                 for (int i = startMatchEligibleChangedNetEvents.Count - 1; i >= 0; i--)
@@ -759,6 +789,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 packet.LosingTeamId = losingTeamId;
                 packet.TotalGemsPerTeam = totalGemsPerTeam;
                 packet.GemsGainedPerTeam = gemsGainedPerTeam;
+            }
+        }
+
+        public void AddTalentSwitchNetEvent(int onTick, ushort playerId, int newTalentIndex)
+        {
+            foreach (var kvp in TalentSwitchNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
+                packet.NewTalentIndex = newTalentIndex;
             }
         }
 

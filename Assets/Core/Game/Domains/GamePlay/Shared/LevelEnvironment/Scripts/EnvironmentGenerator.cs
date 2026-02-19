@@ -5,7 +5,7 @@ using Core.Scripts.Extensions;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Editor.LevelEnvironment.Scripts
+namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
 {
     public class EnvironmentGenerator : MonoBehaviour
     {
