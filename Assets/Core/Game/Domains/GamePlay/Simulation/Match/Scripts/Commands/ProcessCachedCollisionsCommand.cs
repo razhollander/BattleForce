@@ -113,8 +113,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             var forceMagnitude = _gamePlayConfig.EnvironmentSpring.Force;
             var force = pushDirection * forceMagnitude;
-
+            LogService.LogError("Spring collision force: " + force + "");
             playerState.Spaceship.Transform.Velocity += force;
+            playerState.Spaceship.Transform.AngularVelocity += _gamePlayConfig.EnvironmentSpring.Spin;
             playerState.Spaceship.Transform.Direction = pushDirection;
 
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);

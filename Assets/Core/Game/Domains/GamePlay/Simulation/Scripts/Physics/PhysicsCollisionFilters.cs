@@ -13,7 +13,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsBodyType.PlayerBullet)
                                     | GetCollisionMask(PhysicsBodyType.Lava)
                                     | GetCollisionMask(PhysicsBodyType.TeamFloor)
-                                    | GetCollisionMask(PhysicsBodyType.StartMatchWall);
+                                    | GetCollisionMask(PhysicsBodyType.StartMatchWall)
+                                    | GetCollisionMask(PhysicsBodyType.EnvironmentSpring);
                     break;
                 case PhysicsBodyType.PlayerBullet:
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall)

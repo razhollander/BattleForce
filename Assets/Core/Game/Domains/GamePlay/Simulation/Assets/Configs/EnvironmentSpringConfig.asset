@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68fb1a1fd85d14d1899bf55e73a85cf7, type: 3}
   m_Name: EnvironmentSpringConfig
   m_EditorClassIdentifier: 
-  Force: 200
+  Force: 40
+  Spin: 50
   Size: {x: 5, y: 1}

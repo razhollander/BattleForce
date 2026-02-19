@@ -55,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 _playersDecelerationLogic.DeceleratePlayerSpin(playerState.Spaceship, stepDeltaTime);
                 _playersEngineLogic.TurnOnEngineIfPlayerIdle(playerState.Spaceship);
                 _playersEngineLogic.TryAddEngineForceToPlayer(playerState.Spaceship, stepDeltaTime);
+                // playerState.Spaceship.Transform.Velocity = playerState.Spaceship.Transform.Velocity.Length() * playerState.Spaceship.Transform.Direction;
             }
             
             ApplyMatchModelToPhysicsSimulation();

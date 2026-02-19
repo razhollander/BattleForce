@@ -34,8 +34,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesSe
             if (playerSpaceshipState.Transform.AngularVelocity != 0)
             {
                 // Velocity (deg/s) * Time (s) = Rotation for this frame (deg)
-                var rotationDegrees = playerSpaceshipState.Transform.AngularVelocity * deltaTime;
-                playerSpaceshipState.Transform.Direction.Rotate(rotationDegrees);
+                var rotationDegrees = playerSpaceshipState.Transform.AngularVelocity;// * deltaTime;
+                playerSpaceshipState.Transform.Direction = playerSpaceshipState.Transform.Direction.Rotate(rotationDegrees);
             }
         }
         

@@ -6,6 +6,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
     public class EnvironmentSpringConfig : ScriptableObject
     {
         public float Force = 20f;
+        public float Spin = 20f;
         public Vector2 Size = new Vector2(1f, 1f);
     }
 }

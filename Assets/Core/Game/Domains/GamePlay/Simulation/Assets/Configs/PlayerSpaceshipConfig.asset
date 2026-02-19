@@ -17,9 +17,9 @@ MonoBehaviour:
   RotationSpeed: 150
   ShootCooldown: 0.7
   DefaultPlayerRadius: 0.65
-  EngineAcceleration: 100
-  VelocityDecelerationPerSecond: 1
-  SpinDecelerationPerSecond: 1
-  MinSpin: 0.01
+  EngineAcceleration: 70
+  VelocityDecelerationPerSecond: 50
+  SpinDecelerationPerSecond: 0.05
+  MinSpin: 1
   MinVelocity: 0.01
   TurnEngineOnWhenReachVelocity: 0.25
