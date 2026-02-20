@@ -23,9 +23,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _boardViewsPerTeam[teamId].UpdateGems(gems);
         }
 
-        public void UpdateTeamBolts(ushort teamId, int bolts, CancellationTokenSource cancellationTokenSource)
+        public void UpdateTeamBolts(ushort teamId, int teamBolts, CancellationTokenSource cancellationTokenSource)
         {
-            _boardViewsPerTeam[teamId].UpdateBolts(bolts, cancellationTokenSource);
+            _boardViewsPerTeam[teamId].UpdateBolts(teamBolts, cancellationTokenSource);
         }
 
         public void DestroyAll()

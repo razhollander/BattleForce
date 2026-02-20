@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
@@ -24,24 +26,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.
         
         public void PlayEffect(int boltsAmount, Vector2 position, Transform parent)
         {
-            _ = PlayEffectAsync(boltsAmount, position, parent);
+            PlayEffectAsync(boltsAmount, position, parent, _stateMachineService.CurrentState().CancellationTokenSource).Forget();
         }
 
-        private async Awaitable PlayEffectAsync(int boltsAmount, Vector2 position, Transform parent)
+        private async Awaitable PlayEffectAsync(int boltsAmount, Vector2 position, Transform parent, CancellationTokenSource cancellationTokenSource)
         {
             var view = _effectsPool.Spawn();
-
-            try
-            {
-                await view.PlayAndDespawn(boltsAmount, position, parent, _stateMachineService.CurrentState().CancellationTokenSource);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception ex)
-            {
-                LogService.LogError(ex.Message);
-            }
+            await view.PlayAndDespawn(boltsAmount, position, parent, cancellationTokenSource);
         }
     }
 }

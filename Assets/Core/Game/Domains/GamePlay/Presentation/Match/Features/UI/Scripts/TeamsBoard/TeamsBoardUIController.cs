@@ -25,9 +25,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _view.UpdateTeamGems(teamId, gems);
         }
 
-        public void UpdateTeamBolts(ushort teamId, int bolts)
+        public void UpdateTeamBolts(ushort teamId, int teamBolts)
         {
-            _view.UpdateTeamBolts(teamId, bolts, _stateMachineService.CurrentState().CancellationTokenSource);
+            _view.UpdateTeamBolts(teamId, teamBolts, _stateMachineService.CurrentState().CancellationTokenSource);
         }
 
         public void CreateTeamBoard(ushort teamId, int teamGems, int teamBolts)

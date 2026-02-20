@@ -256,6 +256,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var teamLostNetEvent in teamLostNetEvents)
             {
+                foreach (var gemsPerTeam in teamLostNetEvent.TotalGemsPerTeam)
+                {
+                    _matchDataService.SetTeamGems(gemsPerTeam.Key, gemsPerTeam.Value);
+                }
                 _cachedPresentationEventsService.TeamLostNetEvents.Add(teamLostNetEvent);
             }
         }
@@ -283,6 +287,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var gainBoltsNetEvent in gainBoltsNetEvents)
             {
+                var playerTeamId = _matchDataService.GetPlayerTeamId(gainBoltsNetEvent.PlayerId);
+                _matchDataService.SetTeamBolts(playerTeamId, gainBoltsNetEvent.TotalTeamBolts);
                 _cachedPresentationEventsService.GainBoltsNetEvents.Add(gainBoltsNetEvent);
             }
         }
