@@ -85,7 +85,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
 
         public Transform GetTransform()
         {
-            return _playerView.GetTransform();
+            return _playerView.GetSpaceShipTransform();
         }
 
         public void SetColor(Color color)

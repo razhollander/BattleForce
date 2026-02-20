@@ -187,7 +187,7 @@ GameObject:
   - component: {fileID: 5135958356321049185}
   - component: {fileID: 5904124016507781903}
   m_Layer: 0
-  m_Name: GainedBoltFX
+  m_Name: GainBoltEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -223,4 +223,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _text: {fileID: 5315841126385511110}
   _moveDistance: 1
-  _duration: 1
+  _showDuration: 1
+  _textFaceInDuration: 0.2
+  _textFaceOutDuration: 0.2

@@ -1,10 +1,12 @@
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.FX.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainedBoltEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -12,35 +14,38 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private ITeamsBoardUIController _teamsBoardUIController;
-        private IGainBoltFxController _gainBoltFxController;
+        private IGainBoltEffectController _gainBoltEffectController;
         private IMatchDataService _matchDataService;
+        private IMatchPlayerControllers _matchPlayerControllers;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
-            _gainBoltFxController = _diContainer.Resolve<IGainBoltFxController>();
+            _gainBoltEffectController = _diContainer.Resolve<IGainBoltEffectController>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
         }
 
         public void Execute()
         {
-            var events = _cachedPresentationEventsService.GainBoltsNetEvents;
-            if (events.IsNullOrEmpty())
+            var gainBoltsNetEvents = _cachedPresentationEventsService.GainBoltsNetEvents;
+            if (gainBoltsNetEvents.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var evt in events)
+            foreach (var gainBoltsEvent in gainBoltsNetEvents)
             {
-                var player = _matchDataService.GetPlayer(evt.PlayerId);
-                _teamsBoardUIController.UpdateTeamBolts(player.TeamId, evt.TotalTeamBolts);
+                var player = _matchDataService.GetPlayer(gainBoltsEvent.PlayerId);
+                _teamsBoardUIController.UpdateTeamBolts(player.TeamId, gainBoltsEvent.TotalTeamBolts);
 
-                var playerPosition = player.Spaceship.Transform.Position.ToUnityVector2();
-                _gainBoltFxController.ShowFx(evt.GainedAmount, playerPosition);
+                var playerTransform = _matchPlayerControllers.GetPlayerTransform(gainBoltsEvent.PlayerId);
+                var effectSpawnPosition = playerTransform.position.ToVector2XY() + player.Spaceship.Transform.Radius * Vector2.up;
+                _gainBoltEffectController.PlayEffect(gainBoltsEvent.GainedAmount, effectSpawnPosition, playerTransform);
             }
 
-            events.Clear();
+            gainBoltsNetEvents.Clear();
         }
     }
 }

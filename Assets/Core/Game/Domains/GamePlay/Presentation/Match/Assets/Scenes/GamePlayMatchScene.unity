@@ -978,7 +978,7 @@ MonoBehaviour:
   _environmentWallViewPrefab: {fileID: 1848450532861189530, guid: 1636cc9bec8694334b3401f1fbe5547b, type: 3}
   _stageEndedUiView: {fileID: 1138906650}
   _teamsBoardContainerView: {fileID: 1138906651}
-  _gainBoltFxViewPrefab: {fileID: 5904124016507781903, guid: 3a610ff1711a84992ac57463dd23197a, type: 3}
+  gainBoltEffectViewPrefab: {fileID: 5904124016507781903, guid: 3a610ff1711a84992ac57463dd23197a, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
