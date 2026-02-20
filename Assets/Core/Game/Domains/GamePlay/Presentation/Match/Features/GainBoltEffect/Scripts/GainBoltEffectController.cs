@@ -4,7 +4,7 @@ using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainedBoltEffect.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts
 {
     public class GainBoltEffectController : IGainBoltEffectController
     {

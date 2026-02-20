@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainedBoltEffect.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts
 {
     public interface IGainBoltEffectController
     {

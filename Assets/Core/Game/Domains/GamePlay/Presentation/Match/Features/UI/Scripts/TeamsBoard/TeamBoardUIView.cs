@@ -11,14 +11,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         [SerializeField] private TextMeshProUGUI _gemCountText;
         [SerializeField] private CountableTextView _boltsCountText;
         [SerializeField] private Image _backgroundImage;
-
-        private CancellationTokenSource _boltsCancellationTokenSource = new();
-
-        public void Setup(Color teamColor)
+        
+        public void Setup(Color teamColor, int teamGems, int teamBolts)
         {
             _backgroundImage.color = teamColor;
-            UpdateGems(0);
-            _boltsCountText.SetNumber(0);
+            UpdateGems(teamGems);
+            _boltsCountText.SetNumber(teamBolts);
         }
 
         public void UpdateGems(int gems)
@@ -26,18 +24,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _gemCountText.text = gems.ToString();
         }
 
-        public void UpdateBolts(int bolts, bool immediate = false)
+        public void UpdateBolts(int bolts, CancellationTokenSource cancellationTokenSource, bool immediate = false)
         {
-            _boltsCancellationTokenSource.Cancel();
-            _boltsCancellationTokenSource.Dispose();
-            _boltsCancellationTokenSource = new CancellationTokenSource();
-            _boltsCountText.CountToNumber(bolts, _boltsCancellationTokenSource, immediate);
-        }
-
-        private void OnDestroy()
-        {
-            _boltsCancellationTokenSource.Cancel();
-            _boltsCancellationTokenSource.Dispose();
+            _boltsCountText.CountToNumber(bolts, cancellationTokenSource, immediate);
         }
     }
 }

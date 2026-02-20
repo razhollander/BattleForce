@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard
@@ -10,10 +11,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         
         private readonly Dictionary<ushort, TeamBoardUIView> _boardViewsPerTeam = new Dictionary<ushort, TeamBoardUIView>();
 
-        public void CreateTeamBoard(ushort teamId, Color color)
+        public void CreateTeamBoard(ushort teamId, Color color, int teamGems, int teamBolts)
         {
             var teamView = Object.Instantiate(_teamBoardUIViewPrefab, _container);
-            teamView.Setup(color);
+            teamView.Setup(color, teamGems, teamBolts);
             _boardViewsPerTeam.Add(teamId, teamView);
         }
 
@@ -22,9 +23,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _boardViewsPerTeam[teamId].UpdateGems(gems);
         }
 
-        public void UpdateTeamBolts(ushort teamId, int bolts)
+        public void UpdateTeamBolts(ushort teamId, int bolts, CancellationTokenSource cancellationTokenSource)
         {
-            _boardViewsPerTeam[teamId].UpdateBolts(bolts);
+            _boardViewsPerTeam[teamId].UpdateBolts(bolts, cancellationTokenSource);
         }
 
         public void DestroyAll()

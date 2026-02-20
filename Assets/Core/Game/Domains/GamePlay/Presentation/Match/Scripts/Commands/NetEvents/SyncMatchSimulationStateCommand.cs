@@ -93,7 +93,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             foreach (ushort teamId in _matchDataService.TeamIds)
             {
-                _teamsBoardUIController.CreateTeamBoard(teamId);
+                _teamsBoardUIController.CreateTeamBoard(teamId, _simulationState.GemsPerTeamId[teamId], _simulationState.BoltsPerTeam[teamId]);
             }
         }
 

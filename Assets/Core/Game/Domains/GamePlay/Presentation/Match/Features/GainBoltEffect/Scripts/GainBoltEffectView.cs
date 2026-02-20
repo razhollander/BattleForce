@@ -1,11 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
+using Core.Scripts.Extensions;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Helpers.Pools;
 using DG.Tweening;
+using NUnit.Framework;
 using TMPro;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainedBoltEffect.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts
 {
     public class GainBoltEffectView : MonoBehaviour, IPoolable
     {
@@ -14,6 +18,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainedBoltEffec
         [SerializeField] private float _showDuration = 1.0f;
         [SerializeField] private float _textFaceInDuration = 0.2f;
         [SerializeField] private float _textFaceOutDuration = 0.2f;
+        
+        private readonly List<Awaitable> _animationTasks = new List<Awaitable>(2);
 
         public async Awaitable PlayAndDespawn(int boltsAmount, Vector2 position, Transform parent, CancellationTokenSource cancellationTokenSource)
         {
@@ -25,9 +31,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainedBoltEffec
             color.a = 0;
             _text.color = color;
             var endYValue = transform.localPosition.y + _moveDistance;
-            transform.DOLocalMoveY(endYValue, _showDuration).SetEase(Ease.OutQuad);
-            _text.DOFade(1, _textFaceInDuration).OnComplete(() => { _text.DOFade(0, _textFaceOutDuration).SetDelay(_showDuration - _textFaceInDuration-_textFaceOutDuration).OnComplete(() => { gameObject.SetActive(false); }); });
-            await Awaitable.WaitForSecondsAsync(_showDuration, cancellationToken: cancellationTokenSource.Token);
+            _animationTasks.Clear();
+            _animationTasks.Add(transform.DOLocalMoveY(endYValue, _showDuration).SetEase(Ease.OutQuad).WithCancellationSafe(cancellationTokenSource.Token));
+            _animationTasks.Add(_text.DOFade(1, _textFaceInDuration).OnComplete(() =>
+            {
+                _text.DOFade(0, _textFaceOutDuration).SetDelay(_showDuration - _textFaceInDuration - _textFaceOutDuration);
+            }).WithCancellationSafe(cancellationTokenSource.Token));
+            
+            await _animationTasks.WhenAll();
             Despawn();
         }
 

@@ -1,8 +1,7 @@
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
 using CoreDomain.Scripts.Helpers.Pools;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainedBoltEffect.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts
 {
     public class GainBoltEffectPool: PrefabsPool<GainBoltEffectView>
     {
