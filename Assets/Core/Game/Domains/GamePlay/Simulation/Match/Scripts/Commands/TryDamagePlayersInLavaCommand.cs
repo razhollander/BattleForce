@@ -35,7 +35,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 _playersInLavaTrackerService.ResetPlayerTimePassedSinceLastDamageTaken(playerId);
                 _playerHitCommand
-                    .SetPlayerId(playerId)
+                    .SetPlayerIdGotHit(playerId)
+                    .SetWasHitByAnotherPlayer(false)
                     .SetProcessedTick(_processedTick)
                     .SetHitDamage(_gamePlayConfig.Lava.DamageAmount)
                     .Execute();

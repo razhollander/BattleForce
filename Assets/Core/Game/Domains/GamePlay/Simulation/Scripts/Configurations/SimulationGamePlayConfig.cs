@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public int GemsCollectedForTeamAlive = 1;
         public int MaxOverllapingFloors = 32;
         public int StartingBoltsPerTeam = 0;
-        public int BoltsPerHit = 1;
+        public int BoltsGainedPerHit = 50;
+        public int BoltsGainedPerKill = 50;
     }
 }
