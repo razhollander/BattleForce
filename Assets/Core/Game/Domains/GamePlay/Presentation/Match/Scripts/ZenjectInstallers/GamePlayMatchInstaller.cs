@@ -73,11 +73,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<TeamsBoardUIController>().AsSingle().WithArguments(_teamsBoardContainerView).NonLazy();
 
             Container.Bind<MatchEnvironmentTeleportGateControllers>().AsSingle().WithArguments(_gamePlayConfig.EnvironmentTeleportGate.Prefab).NonLazy();
-            Container.BindMemoryPool<PlayerTeleportFXView, PlayerTeleportFXView.Pool>()
-                .WithInitialSize(10)
-                .FromComponentInNewPrefab(_gamePlayConfig.PlayerTeleportFX.Prefab)
-                .UnderTransformGroup("PlayerTeleportFX");
-            Container.Bind<PlayerTeleportFXController>().AsSingle().NonLazy();
+            Container.Bind<PlayerTeleportFXController>().AsSingle().WithArguments(_gamePlayConfig.PlayerTeleportFX.Prefab).NonLazy();
         }
     }
 }

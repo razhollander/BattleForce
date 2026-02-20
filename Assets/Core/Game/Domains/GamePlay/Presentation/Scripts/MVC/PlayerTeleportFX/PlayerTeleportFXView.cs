@@ -1,6 +1,7 @@
-using UnityEngine;
+using System;
 using System.Collections;
-using Core.Scripts.Utils.Pools;
+using CoreDomain.Scripts.Helpers.Pools;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.PlayerTeleportFX
 {
@@ -9,16 +10,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.PlayerTeleportFX
         [SerializeField] private float ShowDuration = 0.5f;
         [SerializeField] private ParticleSystem _particleSystem;
 
-        private System.Action<PlayerTeleportFXView> _returnToPool;
-
-        public void Init(System.Action<PlayerTeleportFXView> returnToPool)
-        {
-            _returnToPool = returnToPool;
-        }
+        public Action Despawn { get; set; }
 
         public void Play()
         {
-            gameObject.SetActive(true);
             if (_particleSystem != null)
             {
                 _particleSystem.Play();
@@ -29,21 +24,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.PlayerTeleportFX
         private IEnumerator ReturnToPoolRoutine()
         {
             yield return new WaitForSeconds(ShowDuration);
-            _returnToPool?.Invoke(this);
+            Despawn?.Invoke();
         }
 
-        public void OnReturnToPool()
+        public void OnCreated()
+        {
+        }
+
+        public void OnSpawned()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void OnDespawned()
         {
             gameObject.SetActive(false);
-        }
-
-        public void OnGetFromPool()
-        {
-            // Reset state if needed
-        }
-
-        public class Pool : MonoMemoryPool<PlayerTeleportFXView>
-        {
         }
     }
 }

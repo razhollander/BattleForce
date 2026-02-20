@@ -18,6 +18,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.EnvironmentTeleportGate;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.PlayerTeleportFX;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPoint
 {
@@ -40,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IStartStagePacketHandler _startStagePacketHandler;
         private ITeamsBoardUIController _teamsBoardUIController;
         private Scripts.MVC.EnvironmentTeleportGate.MatchEnvironmentTeleportGateControllers _teleportGateControllers;
+        private PlayerTeleportFXController _playerTeleportFXController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -65,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
             _teleportGateControllers = _diContainer.Resolve<Scripts.MVC.EnvironmentTeleportGate.MatchEnvironmentTeleportGateControllers>();
+            _playerTeleportFXController = _diContainer.Resolve<PlayerTeleportFXController>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -79,6 +82,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
+            _playerTeleportFXController.InitEntryPoint();
             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
                 .SetSimulationState(_enterData.InitialState)
                 .Execute();
