@@ -1,6 +1,7 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -19,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private SimulationGamePlayConfig _gamePlayConfig;
         private IStageDataService _stageDataService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
+        private ITeleportGateService _teleportGateService;
 
         public override void ResolveDependencies()
         {
@@ -27,12 +29,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
+            _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
         }
 
         public void Execute()
         {
             _physicsSimulator.ClearAllData();
             _playersInLavaTrackerService.ClearAllData();
+            _teleportGateService.ClearData();
             
             _matchDataService.SimulationState.Bullets.Clear();
             _matchDataService.SimulationState.PowerUpBalls.Clear();
@@ -42,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateLavaWalls();
             CreateTalentCards();
             CreateEnvironmentSprings();
+            CreateTeleportGates();
             ResetPlayers();
 
             _stageDataService.IsStageEnded = false;
@@ -159,6 +164,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var springRotation = environmentSpring.RotationAngle;
                 var size = new Vector2(_gamePlayConfig.EnvironmentSpring.Size.x, _gamePlayConfig.EnvironmentSpring.Size.y);
                 _physicsSimulator.AddEnvironmentSpring(springId, springPosition, springRotation, size);
+            }
+        }
+
+        private void CreateTeleportGates()
+        {
+            var teleportGates = _matchDataService.Environment.TeleportGates;
+            if (teleportGates.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var pair in teleportGates)
+            {
+                // Gate A
+                ushort gateAId = (ushort)(pair.Id * 2);
+                _physicsSimulator.AddTeleportGate(gateAId, pair.GateAPosition, pair.GateARotation, pair.Size);
+
+                // Gate B
+                ushort gateBId = (ushort)(pair.Id * 2 + 1);
+                _physicsSimulator.AddTeleportGate(gateBId, pair.GateBPosition, pair.GateBRotation, pair.Size);
             }
         }
     }

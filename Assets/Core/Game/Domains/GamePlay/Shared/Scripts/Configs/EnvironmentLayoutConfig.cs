@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [UnityEngine.SerializeField] private string _lavaWallsJson;
         [UnityEngine.SerializeField] private string _talentCardsJson;
         [UnityEngine.SerializeField] private string _environmentSpringsJson;
+        [UnityEngine.SerializeField] private string _teleportGatesJson;
 
         public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
         {
@@ -49,6 +50,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             _environmentSpringsJson = environmentSpringsJson;
         }
 
+        public void SetTeleportGatesJson(string teleportGatesJson)
+        {
+            _teleportGatesJson = teleportGatesJson;
+        }
+
         public TalentCardS2C[] GetTalentCards()
         {
             return _talentCardsJson.FromJson<TalentCardS2C[]>();
@@ -57,6 +63,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public EnvironmentSpringS2C[] GetEnvironmentSprings()
         {
             return _environmentSpringsJson.FromJson<EnvironmentSpringS2C[]>();
+        }
+
+        public EnvironmentTeleportGatePairS2C[] GetTeleportGates()
+        {
+            return _teleportGatesJson.FromJson<EnvironmentTeleportGatePairS2C[]>();
         }
     }
 }

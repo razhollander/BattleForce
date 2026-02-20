@@ -12,6 +12,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
         [EditableRef] public TalentCardsConfig TalentCards;
         [EditableRef] public PowerUpsConfig PowerUps;
         [EditableRef] public TeamFloorConfig TeamFloor;
+        [EditableRef] public EnvironmentTeleportGateConfig EnvironmentTeleportGate;
+        [EditableRef] public PlayerTeleportFXConfig PlayerTeleportFX;
         public SerializableDictionary<int, Color> ColorPerTeamId;
     }
 }

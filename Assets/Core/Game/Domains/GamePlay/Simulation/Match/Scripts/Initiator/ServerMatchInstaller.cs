@@ -8,6 +8,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
 using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
@@ -34,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<IPlayersDecelerationLogic>().To<PlayersDecelerationLogic>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersEngineLogic>().To<PlayersEngineLogic>().AsSingle().NonLazy();
             _diContainer.Bind<ISimulationInputService>().To<SimulationInputService>().AsSingle();
+            _diContainer.Bind<ITeleportGateService>().To<TeleportGateService>().AsSingle();
         }
 
         public void UninstallBindings() // not sure this is needed

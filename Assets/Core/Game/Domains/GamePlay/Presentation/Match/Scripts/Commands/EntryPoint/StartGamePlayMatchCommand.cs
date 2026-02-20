@@ -17,6 +17,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.EnvironmentTeleportGate;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPoint
 {
@@ -38,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IClientMatchPresentationTickProcessor _clientMatchPresentationTickProcessor;
         private IStartStagePacketHandler _startStagePacketHandler;
         private ITeamsBoardUIController _teamsBoardUIController;
+        private Scripts.MVC.EnvironmentTeleportGate.MatchEnvironmentTeleportGateControllers _teleportGateControllers;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -62,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _clientMatchPresentationTickProcessor = _diContainer.Resolve<IClientMatchPresentationTickProcessor>();
             _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
+            _teleportGateControllers = _diContainer.Resolve<Scripts.MVC.EnvironmentTeleportGate.MatchEnvironmentTeleportGateControllers>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)

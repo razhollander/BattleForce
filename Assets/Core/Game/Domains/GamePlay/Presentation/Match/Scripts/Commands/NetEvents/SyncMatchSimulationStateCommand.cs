@@ -11,6 +11,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.EnvironmentTeleportGate;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -30,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchPlayerControllers _playerControllers;
         private IMatchPlayerUIControllers _playerUIControllers;
         private IWorldCameraController _worldCameraController;
+        private Scripts.MVC.EnvironmentTeleportGate.MatchEnvironmentTeleportGateControllers _teleportGateControllers;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -52,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
+            _teleportGateControllers = _diContainer.Resolve<Scripts.MVC.EnvironmentTeleportGate.MatchEnvironmentTeleportGateControllers>();
         }
 
         public void Execute()
@@ -71,6 +74,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _powerUpBallControllers.DestroyAll();
             _playerControllers.DestroyAll();
             _playerUIControllers.DestroyAll();
+            _teleportGateControllers.DestroyAll();
         }
 
         private void CreateAll()
@@ -81,6 +85,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateLavaWalls();
             CreateTalentCards();
             CreatePowerUpBalls();
+            CreateTeleportGates();
+        }
+
+        private void CreateTeleportGates()
+        {
+            var gates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetTeleportGates();
+            if (gates == null) return;
+
+            foreach (var pair in gates)
+            {
+                // The pair.Color is Vector3 (Shared). We need to convert to UnityEngine.Color.
+                var pairColor = new UnityEngine.Color(pair.Color.X, pair.Color.Y, pair.Color.Z, 1f);
+                var size = pair.Size.ToUnityVector2();
+
+                // Create Gate A
+                _teleportGateControllers.CreateGate(pair.Id, false, pair.GateAPosition, pair.GateARotation, size, pairColor);
+
+                // Create Gate B
+                _teleportGateControllers.CreateGate(pair.Id, true, pair.GateBPosition, pair.GateBRotation, size, pairColor);
+            }
         }
 
         private void CreatePowerUpBalls()

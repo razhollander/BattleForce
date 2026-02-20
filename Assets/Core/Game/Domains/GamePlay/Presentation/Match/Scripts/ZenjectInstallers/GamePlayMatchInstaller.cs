@@ -16,8 +16,11 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.EnvironmentTeleportGate;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.PlayerTeleportFX;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using UnityEngine;
 using Zenject;
@@ -37,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private EnvironmentWallView _environmentWallViewPrefab;
         [SerializeField] private StageEndedUiView _stageEndedUiView;
         [SerializeField] private TeamsBoardContainerView _teamsBoardContainerView;
+        [SerializeField] private PresentationGamePlayConfig _gamePlayConfig;
 
         public override void InstallBindings()
         {
@@ -67,6 +71,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<MatchEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
             Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();
             Container.BindInterfacesTo<TeamsBoardUIController>().AsSingle().WithArguments(_teamsBoardContainerView).NonLazy();
+
+            Container.Bind<MatchEnvironmentTeleportGateControllers>().AsSingle().WithArguments(_gamePlayConfig.EnvironmentTeleportGate.Prefab).NonLazy();
+            Container.BindMemoryPool<PlayerTeleportFXView, PlayerTeleportFXView.Pool>()
+                .WithInitialSize(10)
+                .FromComponentInNewPrefab(_gamePlayConfig.PlayerTeleportFX.Prefab)
+                .UnderTransformGroup("PlayerTeleportFX");
+            Container.Bind<PlayerTeleportFXController>().AsSingle().NonLazy();
         }
     }
 }
