@@ -114,7 +114,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     continue;
                 }
-                springAngle =  _matchDataService.Environment.EnvironmentSprings[i].RotationAngle+90;
+                springAngle =  _matchDataService.Environment.EnvironmentSprings[i].DirectionAngle;
                 break;
             }
 

@@ -46,7 +46,7 @@ MonoBehaviour:
         "SentryGun" },   { "Id": 5, "Position": { "X": 20.0, "Y": 0.0 }, "TalentType":
         "DashPulse" } ] '
       _environmentSpringsJson: '[   { "Id": 1, "Position": { "X": -5.0, "Y": 5.0
-        }, "RotationAngle": "35" }]'
+        }, "DirectionAngle": "135" }]'
     - _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
         "Y": -28.16       },       {         "X": -43.804464,         "Y": -28.16      

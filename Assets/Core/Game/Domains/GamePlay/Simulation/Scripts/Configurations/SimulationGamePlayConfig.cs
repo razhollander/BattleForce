@@ -1,4 +1,5 @@
 using ASoliman.Utils.EditableRefs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
