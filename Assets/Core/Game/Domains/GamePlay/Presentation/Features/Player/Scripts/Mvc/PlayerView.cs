@@ -22,6 +22,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _aimArrowTransform; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
+        
+        private Transform _transform;
 
         public Action Despawn { get; set; }
 
@@ -76,6 +78,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void OnCreated()
         {
+            _transform = transform;
         }
         
         public void OnSpawned()
@@ -89,9 +92,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             gameObject.SetActive(false);
         }
         
-        public Transform GetTransform()
+        public Transform GetSpaceShipTransform()
         {
             return _spaceShipTransform;
+        }
+        
+        public Transform GetTransform()
+        {
+            return _transform;
         }
 
         public void SetIsHealthBarShown(bool isShown)

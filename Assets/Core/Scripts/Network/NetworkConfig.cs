@@ -68,5 +68,6 @@ namespace Core.Scripts.Network
         public int StartMatchEligibleChangedNetEvents = 32;
         public int TalentSwitchNetEvents = 128;
         public int EnvironmentSpringPlayerCollisionNetEvents = 64;
+        public int GainBoltsNetEvents = 128;
     }
 }

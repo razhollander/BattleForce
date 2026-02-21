@@ -6,12 +6,14 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -32,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchPlayerControllers _playerControllers;
         private IMatchPlayerUIControllers _playerUIControllers;
         private IWorldCameraController _worldCameraController;
+        private ITeamsBoardUIController _teamsBoardUIController;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -55,6 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
+            _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
         }
 
         public void Execute()
@@ -75,6 +79,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _powerUpBallControllers.DestroyAll();
             _playerControllers.DestroyAll();
             _playerUIControllers.DestroyAll();
+            _teamsBoardUIController.DestroyAll();
         }
 
         private void CreateAll()
@@ -86,15 +91,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateLavaWalls();
             CreateTalentCards();
             CreatePowerUpBalls();
+            CreateTeamBoards();
+        }
+
+        private void CreateTeamBoards()
+        {
+            foreach (ushort teamId in _matchDataService.TeamIds)
+            {
+                var teamGems = _simulationState.GemsPerTeamId[teamId];
+                var teamBolts = _simulationState.BoltsPerTeam[teamId];
+                _matchDataService.SetTeamBolts(teamId, teamBolts);
+                _matchDataService.SetTeamGems(teamId, teamGems);
+                _teamsBoardUIController.CreateTeamBoard(teamId, teamGems, teamBolts);
+            }
         }
 
         private void CreateSprings()
         {
             var springs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetEnvironmentSprings();
-            var size = _gameplayConfig.EnvironmentSpring.Size;
+            
             foreach (var spring in springs)
             {
-                _matchDataService.AddSpring(spring.Id, spring.Position.ToUnityVector2(), spring.RotationAngle, size);
+                _matchDataService.AddSpring(spring.Id, spring.Position.ToUnityVector2(), spring.RotationAngle);
                 _environmentSpringControllers.CreateSpring(spring.Id);
             }
         }

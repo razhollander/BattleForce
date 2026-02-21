@@ -26,8 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var collisionEvent in environmentSpringPlayerCollisionNetEvents)
             {
-                var spring = _environmentSpringControllers.GetSpring(collisionEvent.SpringId);
-                spring?.PlayBounceAnimation();
+                _environmentSpringControllers.PlaySpringBounceAnimation(collisionEvent.SpringId);
             }
 
             environmentSpringPlayerCollisionNetEvents.Clear();

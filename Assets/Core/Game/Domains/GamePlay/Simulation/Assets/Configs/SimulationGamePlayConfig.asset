@@ -25,3 +25,5 @@ MonoBehaviour:
   StageRestartDelaySeconds: 3
   GemsCollectedForTeamAlive: 1
   MaxOverllapingFloors: 32
+  StartingBoltsPerTeam: 0
+  BoltsPerHit: 50

@@ -24,6 +24,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchPlayerModel LocalPlayer { get; private set; }
         public bool IsPlayerJoined => LocalPlayer != null;
         public HashSet<ushort> TeamIds  {get; private set; }
+        public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }
+        public Dictionary<ushort, int> GemsPerTeam  {get; private set; }
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             Players = new List<MatchPlayerModel>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -34,6 +36,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
             PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
+            BoltsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
+            GemsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -123,6 +127,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         {
             return Players.Find(x => x.PlayerId == playerId);
         }
+        
+        public ushort GetPlayerTeamId(ushort playerId)
+        {
+            return Players.Find(x => x.PlayerId == playerId).TeamId;
+        }
 
         public MatchPlayerModel AddPlayer(PlayerStateS2C playerState)
         {
@@ -130,6 +139,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, playerState.Spaceship);
             Players.Add(newPlayer);
             TeamIds.Add(playerTeamId);
+            BoltsPerTeam.Add(playerTeamId, 0);
+            GemsPerTeam.Add(playerTeamId, 0);
             return newPlayer;
         }
 
@@ -147,9 +158,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newWall;
         }
 
-        public MatchEnvironmentSpringModel AddSpring(ushort id, UnityEngine.Vector2 position, float rotation, UnityEngine.Vector2 size)
+        public MatchEnvironmentSpringModel AddSpring(ushort id, UnityEngine.Vector2 position, float rotation)
         {
-            var newSpring = new MatchEnvironmentSpringModel(id, position, rotation, size);
+            var newSpring = new MatchEnvironmentSpringModel(id, position, rotation);
             EnvironmentSprings.Add(newSpring);
             return newSpring;
         }
@@ -175,6 +186,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentSprings.Clear();
             TalentCards.Clear();
             PowerUpBalls.Clear();
+            BoltsPerTeam.Clear();
+            GemsPerTeam.Clear();
+        }
+
+        public void SetTeamBolts(ushort teamId, int totalTeamBolts)
+        {
+            BoltsPerTeam[teamId] = totalTeamBolts;
+        }
+
+        public void SetTeamGems(ushort teamId, int totalTeamGems)
+        {
+            GemsPerTeam[teamId] = totalTeamGems;
         }
     }
 }
