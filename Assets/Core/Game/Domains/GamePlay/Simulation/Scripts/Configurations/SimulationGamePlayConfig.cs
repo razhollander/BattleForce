@@ -19,5 +19,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float StageRestartDelaySeconds = 3f;
         public int GemsCollectedForTeamAlive = 1;
         public int MaxOverllapingFloors = 32;
+        public int StartingBoltsPerTeam = 0;
+        public int BoltsGainedPerHit = 50;
+        public int BoltsGainedPerKill = 50;
     }
 }

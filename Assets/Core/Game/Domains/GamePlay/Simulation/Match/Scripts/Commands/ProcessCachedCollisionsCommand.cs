@@ -225,7 +225,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             DestroyBullet(bulletModel, bulletBody);
             _playerHitCommand
-                .SetPlayerId(playerId)
+                .SetPlayerIdGotHit(playerId)
+                .SetWasHitByAnotherPlayer(true, bulletModel.BelongToPlayerId)
                 .SetHitDamage(_gamePlayConfig.PlayerBullet.HitDamage)
                 .SetProcessedTick(_processedTick)
                 .Execute();

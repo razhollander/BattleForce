@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Core.Scripts.Utils;
 
 namespace Core.Scripts.Services.Timer.Scripts
 {
@@ -13,7 +14,7 @@ namespace Core.Scripts.Services.Timer.Scripts
             CancelTimer(settings.Label);
             var timer = new Timer(settings, RemoveActiveTimer, cancellationToken);
             AddActiveTimer(timer);
-            _ =timer.StartCountdown();
+            timer.StartCountdown().Forget();
         }
 
         public void PauseTimer(string label)

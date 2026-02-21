@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchPowerUpBallModel> PowerUpBalls { get; }
         HashSet<ushort> TeamIds {get; }
         MatchPlayerModel GetPlayer(ushort playerId);
+        ushort GetPlayerTeamId(ushort playerId);
         MatchPlayerModel LocalPlayer { get; }
         bool IsPlayerJoined { get; }
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
@@ -32,5 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         void RemovePowerUpBall(ushort powerUpBallId);
         MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort lavaWallId);
         void ClearAll();
+        void SetTeamBolts(ushort teamId, int totalTeamBolts);
+        void SetTeamGems(ushort teamId, int totalTeamGems);
     }
 }

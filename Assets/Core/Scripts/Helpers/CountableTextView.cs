@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using TMPro;
 using UnityEngine;
@@ -46,7 +47,7 @@ namespace CoreDomain.Scripts.Helpers
             }
             else
             {
-                _ = CountAddedNumber(newNumber - _savedTotalNumber, cancellationTokenSource);
+                CountAddedNumber(newNumber - _savedTotalNumber, cancellationTokenSource).Forget();
             }
 
             _savedTotalNumber = newNumber;
@@ -57,25 +58,8 @@ namespace CoreDomain.Scripts.Helpers
             _viewTotalNumber += addedNumber;
             RefreshText();
         }
-
-        private async Awaitable CountAddedNumber(int numberAdded, CancellationTokenSource cancellationTokenSource)
-        {
-            try
-            {
-                await CountAddedNumberAsync(numberAdded, cancellationTokenSource);
-            }
-            catch (OperationCanceledException)
-            {
-                LogService.Log("Operation CountAddedNumber was cancelled");
-            }
-            catch (Exception e)
-            {
-                LogService.LogError(e.Message);
-                throw;
-            }
-        }
         
-        private async Awaitable CountAddedNumberAsync(int numberAdded, CancellationTokenSource cancellationTokenSource)
+        private async Awaitable CountAddedNumber(int numberAdded, CancellationTokenSource cancellationTokenSource)
         {
             var numberLeftToAdd = numberAdded;
             var isPositive = numberAdded >= 0;
