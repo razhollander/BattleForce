@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IMatchBulletControllers _bulletControllers;
         private ITickProcessor _tickProcessor;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
-        private IMatchEnvironmentSpringControllers _environmentSpringControllers;
+        private IEnvironmentSpringControllers _environmentSpringControllers;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private IMatchDataService _matchDataService;
         private ICommandFactory _commandFactory;
@@ -58,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
-            _environmentSpringControllers = _diContainer.Resolve<IMatchEnvironmentSpringControllers>();
+            _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();

@@ -6,13 +6,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Models
     {
         public ushort Id;
         public Vector2 Position;
-        public float Rotation;
+        public float DirectionAngle;
 
-        public MatchEnvironmentSpringModel(ushort id, Vector2 position, float rotation)
+        public MatchEnvironmentSpringModel(ushort id, Vector2 position, float directionAngle)
         {
             Id = id;
             Position = position;
-            Rotation = rotation;
+            DirectionAngle = directionAngle;
         }
     }
 }

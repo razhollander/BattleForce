@@ -155,9 +155,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             foreach (var environmentSpring in environmentSprings)
             {
                 var springId = environmentSpring.Id;
-                var springPosition = environmentSpring.Position;
-                var springRotation = environmentSpring.RotationAngle;
-                _physicsSimulator.AddEnvironmentSpring(springId, springPosition, springRotation, _gamePlayConfig.EnvironmentSpring.Size.ToNumericsVector2());
+                var springDirectionAngle = environmentSpring.DirectionAngle;
+                var springRotationAngle = environmentSpring.DirectionAngle+90;
+                var springSize = _gamePlayConfig.EnvironmentSpring.Size.ToNumericsVector2();
+                var springDirection = springDirectionAngle.AngleToVector();
+                var springPosition = environmentSpring.Position;// + springDirection * springSize.Y*0.5f;
+                _physicsSimulator.AddEnvironmentSpring(springId, springPosition, springRotationAngle, springSize);
             }
         }
     }

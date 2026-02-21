@@ -10,27 +10,27 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
     {
         public ushort Id;
         public Vector2 Position;
-        public float RotationAngle;
+        public float DirectionAngle;
 
-        public EnvironmentSpringS2C(ushort id, Vector2 position, float rotationAngle)
+        public EnvironmentSpringS2C(ushort id, Vector2 position, float directionAngle)
         {
             Id = id;
             Position = position;
-            RotationAngle = rotationAngle;
+            DirectionAngle = directionAngle;
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(Id);
             writer.PutVector2Quantized(Position);
-            writer.Put(RotationAngle);
+            writer.Put(DirectionAngle);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             Id = reader.GetUShort();
             Position = reader.GetVector2Quantized();
-            RotationAngle = reader.GetFloat();
+            DirectionAngle = reader.GetFloat();
         }
     }
 }

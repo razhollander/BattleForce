@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc
 {
-    public class MatchEnvironmentSpringControllers : IMatchEnvironmentSpringControllers
+    public class EnvironmentSpringControllers : IEnvironmentSpringControllers
     {
         private readonly IMatchDataService _matchDataService;
         private readonly EnvironmentSpringView _environmentSpringViewPrefab;
@@ -14,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
         private readonly Dictionary<ushort, MatchEnvironmentSpringController> _springControllers = new Dictionary<ushort, MatchEnvironmentSpringController>();
         private GameObject _springsParent;
 
-        public MatchEnvironmentSpringControllers(IMatchDataService matchDataService, EnvironmentSpringView environmentSpringViewPrefab, IStateMachineService stateMachineService)
+        public EnvironmentSpringControllers(IMatchDataService matchDataService, EnvironmentSpringView environmentSpringViewPrefab, IStateMachineService stateMachineService)
         {
             _matchDataService = matchDataService;
             _environmentSpringViewPrefab = environmentSpringViewPrefab;
@@ -30,19 +30,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
         {
             var springController = new MatchEnvironmentSpringController();
             var springModel = _matchDataService.GetEnvironmentSpring(springId);
-            springController.CreateView(_environmentSpringViewPrefab, _springsParent.transform, springModel.Position, springModel.Rotation);
+            springController.CreateView(_environmentSpringViewPrefab, _springsParent.transform, springModel.Position, springModel.DirectionAngle);
             _springControllers.Add(springId, springController);
-        }
-
-        public MatchEnvironmentSpringController GetSpring(ushort springId)
-        {
-            if (_springControllers.TryGetValue(springId, out var controller))
-            {
-                return controller;
-            }
-            
-            LogService.LogError("Spring with id: " + springId + " not found!");
-            return null;
         }
 
         public void DestroyAll()

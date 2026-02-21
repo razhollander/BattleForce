@@ -7,12 +7,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 {
     public class HandleEnvironmentSpringPlayerCollisionNetEventsCommand : BaseCommand, ICommandVoid
     {
-        private IMatchEnvironmentSpringControllers _environmentSpringControllers;
+        private IEnvironmentSpringControllers _environmentSpringControllers;
         private ICachedPresentationEventsService _cachedPresentationEventsService;
 
         public override void ResolveDependencies()
         {
-            _environmentSpringControllers = _diContainer.Resolve<IMatchEnvironmentSpringControllers>();
+            _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
         }
 

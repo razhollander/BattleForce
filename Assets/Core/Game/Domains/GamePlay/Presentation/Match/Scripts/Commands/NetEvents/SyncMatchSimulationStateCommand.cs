@@ -23,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchDataService _matchDataService;
         private IMatchBulletControllers _bulletControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
-        private IMatchEnvironmentSpringControllers _environmentSpringControllers;
+        private IEnvironmentSpringControllers _environmentSpringControllers;
         private ITalentCardControllers _talentCardControllers;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
@@ -47,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
-            _environmentSpringControllers = _diContainer.Resolve<IMatchEnvironmentSpringControllers>();
+            _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
@@ -112,7 +112,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             
             foreach (var spring in springs)
             {
-                _matchDataService.AddSpring(spring.Id, spring.Position.ToUnityVector2(), spring.RotationAngle);
+                _matchDataService.AddSpring(spring.Id, spring.Position.ToUnityVector2(), spring.DirectionAngle);
                 _environmentSpringControllers.CreateSpring(spring.Id);
             }
         }
