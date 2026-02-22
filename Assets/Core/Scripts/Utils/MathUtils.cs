@@ -38,22 +38,60 @@ namespace CoreDomain.Scripts.Utils
 
             return Quaternion.Slerp(a, b, t);
         }
-        
-        public static System.Numerics.Vector2 GetTeleportedVelocity(System.Numerics.Vector2 currentVelocity, System.Numerics.Vector2 enterNormal, System.Numerics.Vector2 exitNormal)
+
+        public static class TeleportsLogic
         {
-            // 1. The direction 'into' the entrance is the opposite of its normal
-            var entranceForward = -enterNormal;
+            /// <summary>
+            /// Calculates the world-space exit point based on where the entity hit the entrance.
+            /// </summary>
+            /// <param name="collisionPoint">The exact world position of the collision.</param>
+            /// <param name="enterCenter">The center point of the entrance portal.</param>
+            /// <param name="enterNormal">The surface normal of the entrance portal (facing out).</param>
+            /// <param name="exitCenter">The center point of the target portal.</param>
+            /// <param name="exitNormal">The surface normal of the target portal (facing out).</param>
+            /// <returns>The translated world-space position at the exit portal.</returns>
+            public static System.Numerics.Vector2 GetRelativeExitPoint(
+                System.Numerics.Vector2 collisionPoint, 
+                System.Numerics.Vector2 enterCenter, 
+                System.Numerics.Vector2 enterNormal, 
+                System.Numerics.Vector2 exitCenter, 
+                System.Numerics.Vector2 exitNormal)
+            {
+                // 1. Get the offset from the center of the entrance portal
+                var localOffset = collisionPoint - enterCenter;
 
-            // 2. Calculate the angle of both directions in degrees
-            // Using Atan2 to get the full 360-degree range
-            float angleEntrance = (float)(Mathf.Atan2(entranceForward.Y, entranceForward.X) * (180 / Mathf.PI));
-            float angleExit = (float)(Mathf.Atan2(exitNormal.Y, exitNormal.X) * (180 / Mathf.PI));
+                // 2. Calculate the rotation delta.
+                // We want to map the direction "into" the entrance (-enterNormal)
+                // to the direction "out of" the exit (exitNormal).
+                float angleInto = (float)(Mathf.Atan2(enterNormal.Y, enterNormal.X) * 180.0 / Mathf.PI);
+                float angleOut = (float)(Mathf.Atan2(exitNormal.Y, exitNormal.X) * 180.0 / Mathf.PI);
 
-            // 3. Find the difference (The rotation required to get from Entrance to Exit)
-            float deltaDegrees = angleExit - angleEntrance;
+                // This is the degree difference in CCW
+                float deltaDegrees = angleOut - angleInto;
 
-            // 4. Use your Rotate method to transform the velocity by that difference
-            return currentVelocity.Rotate(deltaDegrees);
+                // 3. Rotate the local offset so it is oriented correctly relative to the exit's facing
+                var rotatedOffset = localOffset.Rotate(deltaDegrees);
+
+                // 4. Position the entity relative to the exit portal's center
+                return exitCenter + rotatedOffset;
+            }
+            
+            public static System.Numerics.Vector2 GetTeleportedVelocity(System.Numerics.Vector2 currentVelocity, System.Numerics.Vector2 enterNormal, System.Numerics.Vector2 exitNormal)
+            {
+                // 1. The direction 'into' the entrance is the opposite of its normal
+                var entranceForward = -enterNormal;
+
+                // 2. Calculate the angle of both directions in degrees
+                // Using Atan2 to get the full 360-degree range
+                float angleEntrance = (float)(Mathf.Atan2(entranceForward.Y, entranceForward.X) * (180 / Mathf.PI));
+                float angleExit = (float)(Mathf.Atan2(exitNormal.Y, exitNormal.X) * (180 / Mathf.PI));
+
+                // 3. Find the difference (The rotation required to get from Entrance to Exit)
+                float deltaDegrees = angleExit - angleEntrance;
+
+                // 4. Use your Rotate method to transform the velocity by that difference
+                return currentVelocity.Rotate(deltaDegrees);
+            }
         }
     }
 }

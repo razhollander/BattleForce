@@ -138,35 +138,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             contact.GetWorldManifold(out var manifold);
             var enterPoint = manifold.points[0]; // Approximation, use first point
 
-            // Calculate relative offset from source gate center
-            var sourceRotationRad = sourceGateRotation * ((float)System.Math.PI / 180f);
-            var cosSource = (float)System.Math.Cos(-sourceRotationRad);
-            var sinSource = (float)System.Math.Sin(-sourceRotationRad);
+            // // Calculate relative offset from source gate center
+            // var sourceRotationRad = sourceGateRotation * ((float)System.Math.PI / 180f);
+            // var cosSource = (float)System.Math.Cos(-sourceRotationRad);
+            // var sinSource = (float)System.Math.Sin(-sourceRotationRad);
+            //
+            // var relativeVector = enterPoint - sourceGatePosition;
+            //
+            // // Rotate back to local space (un-rotate by source rotation)
+            // var localOffsetX = relativeVector.X * cosSource - relativeVector.Y * sinSource;
+            // var localOffsetY = relativeVector.X * sinSource + relativeVector.Y * cosSource;
+            // var localOffset = new System.Numerics.Vector2(localOffsetX, localOffsetY);
+            //
+            // // Calculate target position
+            // var targetRotationRad = targetGateRotation * ((float)System.Math.PI / 180f);
+            // var cosTarget = (float)System.Math.Cos(targetRotationRad);
+            // var sinTarget = (float)System.Math.Sin(targetRotationRad);
+            //
+            // // Rotate local offset by target rotation
+            // var rotatedOffsetX = localOffset.X * cosTarget - localOffset.Y * sinTarget;
+            // var rotatedOffsetY = localOffset.X * sinTarget + localOffset.Y * cosTarget;
+            // var rotatedOffset = new System.Numerics.Vector2(rotatedOffsetX, rotatedOffsetY);
 
-            var relativeVector = enterPoint - sourceGatePosition;
-
-            // Rotate back to local space (un-rotate by source rotation)
-            var localOffsetX = relativeVector.X * cosSource - relativeVector.Y * sinSource;
-            var localOffsetY = relativeVector.X * sinSource + relativeVector.Y * cosSource;
-            var localOffset = new System.Numerics.Vector2(localOffsetX, localOffsetY);
-
-            // Calculate target position
-            var targetRotationRad = targetGateRotation * ((float)System.Math.PI / 180f);
-            var cosTarget = (float)System.Math.Cos(targetRotationRad);
-            var sinTarget = (float)System.Math.Sin(targetRotationRad);
-
-            // Rotate local offset by target rotation
-            var rotatedOffsetX = localOffset.X * cosTarget - localOffset.Y * sinTarget;
-            var rotatedOffsetY = localOffset.X * sinTarget + localOffset.Y * cosTarget;
-            var rotatedOffset = new System.Numerics.Vector2(rotatedOffsetX, rotatedOffsetY);
-
-            var destinationPoint = targetGatePosition;// + rotatedOffset;
+            var destinationPoint = MathUtils.TeleportsLogic.GetRelativeExitPoint(playerState.Spaceship.Transform.Position, sourceGatePosition, sourceGateRotation.ToRadians().AngleToVector(), targetGatePosition, targetGateRotation.ToRadians().AngleToVector());// + rotatedOffset;
 
             // Teleport Player
             playerState.Spaceship.Transform.Position = destinationPoint;
-            var newDirection = MathUtils.GetTeleportedVelocity(playerState.Spaceship.Transform.Direction, sourceGateRotation.ToRadians().AngleToVector(), targetGateRotation.ToRadians().AngleToVector());
+            var newDirection = MathUtils.TeleportsLogic.GetTeleportedVelocity(playerState.Spaceship.Transform.Direction, sourceGateRotation.ToRadians().AngleToVector(), targetGateRotation.ToRadians().AngleToVector());
             playerState.Spaceship.Transform.Direction = newDirection;
-            var newVelocity = MathUtils.GetTeleportedVelocity(playerState.Spaceship.Transform.Velocity, sourceGateRotation.ToRadians().AngleToVector(), targetGateRotation.ToRadians().AngleToVector());
+            var newVelocity = MathUtils.TeleportsLogic.GetTeleportedVelocity(playerState.Spaceship.Transform.Velocity, sourceGateRotation.ToRadians().AngleToVector(), targetGateRotation.ToRadians().AngleToVector());
             playerState.Spaceship.Transform.Velocity = newVelocity;
              
             // Update physics body
