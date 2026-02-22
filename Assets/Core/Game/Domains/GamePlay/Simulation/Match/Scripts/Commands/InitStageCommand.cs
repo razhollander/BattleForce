@@ -45,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.TalentCards.Clear();
 
             CreateWalls();
+            CreateBulletPassWalls();
             CreateLavaWalls();
             CreateTalentCards();
             CreateEnvironmentSprings();
@@ -97,7 +98,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                  var y = RNG.NextFloat(-halfSize.Y + radius, halfSize.Y - radius);
                  var pos = new Vector2(x, y);
 
-                 if (!_physicsSimulator.IsSquareHitAnyBodyTypes(pos, radius, PhysicsBodyType.Wall, PhysicsBodyType.Lava, PhysicsBodyType.StartMatchWall))
+                 if (!_physicsSimulator.IsSquareHitAnyBodyTypes(pos, radius, PhysicsBodyType.Wall, PhysicsBodyType.Lava, PhysicsBodyType.StartMatchWall, PhysicsBodyType.BulletPassWall))
                  {
                      return pos;
                  }
@@ -115,6 +116,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var wallId = wallConfig.Id;
                 var wallPoints = wallConfig.Points;
                 _physicsSimulator.AddWall(wallId, wallPoints);
+            }
+        }
+
+        private void CreateBulletPassWalls()
+        {
+            var bulletPassWallConfigs = _matchDataService.Environment.BulletPassWallConfigs;
+            if (bulletPassWallConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var wallConfig in bulletPassWallConfigs)
+            {
+                var wallId = wallConfig.Id;
+                var wallPoints = wallConfig.Points;
+                _physicsSimulator.AddBulletPassWall(wallId, wallPoints);
             }
         }
 

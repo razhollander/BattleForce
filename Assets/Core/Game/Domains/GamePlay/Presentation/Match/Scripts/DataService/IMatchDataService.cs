@@ -21,11 +21,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         bool IsPlayerJoined { get; }
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
         MatchEnvironmentWallModel AddWall(WallConfig wallConfig);
+        MatchEnvironmentWallModel AddBulletPassWall(WallConfig wallConfig);
         MatchEnvironmentLavaWallModel AddLavalWall(WallConfig wallConfig);
         void SetLocalPlayer(int playerId);
         MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius);
         MatchPlayerBulletModel GetBullet(ushort bulletId);
         MatchEnvironmentWallModel GetEnvironmentWall(ushort wallId);
+        MatchEnvironmentWallModel GetBulletPassWall(ushort wallId);
         void RemoveBullet(ushort bulletId);
         MatchTalentCardModel GetTalentCard(ushort cardId);
         MatchTalentCardModel AddTalentCard(ushort talentCardId, UnityEngine.Vector2 talentCardPosition, TalentType talentCardTalentType, ushort talentCardHealth);

@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public EnvironmentSpringS2C[] EnvironmentSprings { get; private set; }
         public EnvironmentTeleportGatePairS2C[] TeleportGates { get; private set; }
         public WallConfig[] LavaWallConfigs { get; private set; }
+        public WallConfig[] BulletPassWallConfigs { get; private set; }
         public WallConfig[] WallConfigs { get; private set; }
         
         public EnvironmentSpringS2C GetSpring(ushort springId)
@@ -50,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public void InitEntryPoint(int environmentLayoutIndex)
         {
             WallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetWalls();
+            BulletPassWallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetBulletPassWalls();
             LavaWallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetLavaWalls();
             TalentCards = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetTalentCards();
             EnvironmentSprings = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentSprings();

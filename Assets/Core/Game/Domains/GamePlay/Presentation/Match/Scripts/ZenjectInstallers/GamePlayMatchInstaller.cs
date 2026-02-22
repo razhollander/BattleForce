@@ -38,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private MatchPlayerUIControllersView _matchPlayerUIControllersView;
         [SerializeField] private BulletView _bulletViewPrefab;
         [SerializeField] private EnvironmentWallView _environmentWallViewPrefab;
+        [SerializeField] private EnvironmentBulletPassWallView _environmentBulletPassWallViewPrefab;
         [SerializeField] private EnvironmentSpringView _environmentSpringViewPrefab;
         [SerializeField] private EnvironmentTeleportGateView _environmentTeleportGateViewPrefab;
         [SerializeField] private StageEndedUiView _stageEndedUiView;
@@ -72,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<MatchPlayerUIControllers>().AsSingle().WithArguments(_matchPlayerUIControllersView).NonLazy();
             Container.BindInterfacesTo<MatchBulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
+            Container.BindInterfacesTo<MatchEnvironmentBulletPassWallsControllers>().AsSingle().WithArguments(_environmentBulletPassWallViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpringControllers>().AsSingle().WithArguments(_environmentSpringViewPrefab).NonLazy();
             Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();
             Container.BindInterfacesTo<TeamsBoardUIController>().AsSingle().WithArguments(_teamsBoardContainerView).NonLazy();

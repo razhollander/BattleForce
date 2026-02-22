@@ -30,6 +30,23 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 #endif
         }
 
+        public void SetBulletPassWalls(WallConfig[] wallConfigs, int index)
+        {
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetBulletPassWallsJson(wallConfigs.ToJson());
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetBulletPassWallsJson(wallConfigs.ToJson());
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
+
         public void SetLavaWalls(WallConfig[] wallConfigs, int index)
         {
             if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))

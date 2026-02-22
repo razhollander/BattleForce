@@ -9,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
     {
         [UnityEngine.SerializeField] private string _environmentHalfSizeJson;
         [UnityEngine.SerializeField] private string _wallsJson;
+        [UnityEngine.SerializeField] private string _bulletPassWallsJson;
         [UnityEngine.SerializeField] private string _lavaWallsJson;
         [UnityEngine.SerializeField] private string _talentCardsJson;
         [UnityEngine.SerializeField] private string _environmentSpringsJson;
@@ -30,6 +31,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             return _wallsJson.FromJson<WallConfig[]>();
         }
 
+        public WallConfig[] GetBulletPassWalls()
+        {
+            return _bulletPassWallsJson.FromJson<WallConfig[]>();
+        }
+
         public WallConfig[] GetLavaWalls()
         {
             return _lavaWallsJson.FromJson<WallConfig[]>();
@@ -38,6 +44,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public void SetWallsJson(string wallsJson)
         {
             _wallsJson = wallsJson;
+        }
+
+        public void SetBulletPassWallsJson(string bulletPassWallsJson)
+        {
+            _bulletPassWallsJson = bulletPassWallsJson;
         }
 
         public void SetLavaWallsJson(string lavaWallsJson)

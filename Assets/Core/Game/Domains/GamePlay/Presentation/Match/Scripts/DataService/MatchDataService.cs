@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchPlayerModel> Players { get; private set; }
         public List<MatchPlayerBulletModel> Bullets { get; private set; }
         public List<MatchEnvironmentWallModel> EnvironmentWalls { get; private set; }
+        public List<MatchEnvironmentWallModel> BulletPassWalls { get; private set; }
         public List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; private set; }
         public List<MatchEnvironmentSpringModel> EnvironmentSprings { get; private set; }
         public List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; private set; }
@@ -32,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             Players = new List<MatchPlayerModel>(networkConfig.MaxCap.ConcurrentPlayers);
             Bullets = new List<MatchPlayerBulletModel>(networkConfig.MaxCap.ConcurrentBullets);
             EnvironmentWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
+            BulletPassWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
             EnvironmentLavaWalls = new List<MatchEnvironmentLavaWallModel>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls);
             EnvironmentSprings = new List<MatchEnvironmentSpringModel>(32);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
@@ -50,6 +52,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchEnvironmentWallModel GetEnvironmentWall(ushort wallId)
         {
             return EnvironmentWalls.Find(x => x.Id == wallId);
+        }
+
+        public MatchEnvironmentWallModel GetBulletPassWall(ushort wallId)
+        {
+            return BulletPassWalls.Find(x => x.Id == wallId);
         }
         
         public MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort wallId)
@@ -153,6 +160,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newWall;
         }
 
+        public MatchEnvironmentWallModel AddBulletPassWall(WallConfig wallConfig)
+        {
+            var newWall = new MatchEnvironmentWallModel(wallConfig.Id, wallConfig.Points);
+            BulletPassWalls.Add(newWall);
+            return newWall;
+        }
+
         public MatchEnvironmentLavaWallModel AddLavalWall(WallConfig wallConfig)
         {
             var newWall = new MatchEnvironmentLavaWallModel(wallConfig.Id, wallConfig.Points);
@@ -184,6 +198,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             Players.Clear();
             Bullets.Clear();
             EnvironmentWalls.Clear();
+            BulletPassWalls.Clear();
             EnvironmentLavaWalls.Clear();
             EnvironmentSprings.Clear();
             TalentCards.Clear();

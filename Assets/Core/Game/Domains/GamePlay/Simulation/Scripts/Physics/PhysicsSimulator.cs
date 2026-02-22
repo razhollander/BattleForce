@@ -250,6 +250,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(wallShape);
         }
 
+        public void AddBulletPassWall(ushort id, Vector2[] points)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = Vector2.Zero;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.BulletPassWall);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var wallShape = GetPolygonShape();
+            wallShape.Set(points);
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = wallShape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.BulletPassWall.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.BulletPassWall.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(wallShape);
+        }
+
         public void AddLavaWall(ushort id, Vector2[] points)
         {
             var bodyDef = GetBodyDef();

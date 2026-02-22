@@ -24,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchDataService _matchDataService;
         private IMatchBulletControllers _bulletControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
+        private IMatchEnvironmentBulletPassWallsControllers _environmentBulletPassWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
         private ITalentCardControllers _talentCardControllers;
         private SharedGamePlayConfig _sharedGamePlayConfig;
@@ -49,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
+            _environmentBulletPassWallsControllers = _diContainer.Resolve<IMatchEnvironmentBulletPassWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
@@ -76,6 +78,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService.ClearAll();
             _bulletControllers.DestroyAll();
             _environmentWallsControllers.DestroyAll();
+            _environmentBulletPassWallsControllers.DestroyAll();
             _environmentSpringControllers.DestroyAll();
             _environmentLavaWallsControllers.DestroyAll();
             _talentCardControllers.DestroyAll();
@@ -91,6 +94,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreatePlayers();
             CreateBullets();
             CreateWalls();
+            CreateBulletPassWalls();
             CreateSprings();
             CreateLavaWalls();
             CreateTalentCards();
@@ -182,6 +186,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var wallModel = _matchDataService.AddWall(wall);
                 _environmentWallsControllers.CreateWall(wallModel.Id);
+            }
+        }
+
+        private void CreateBulletPassWalls()
+        {
+            var walls = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetBulletPassWalls();
+            if (walls == null)
+            {
+                return;
+            }
+
+            foreach (var wall in walls)
+            {
+                var wallModel = _matchDataService.AddBulletPassWall(wall);
+                _environmentBulletPassWallsControllers.CreateBulletPassWall(wallModel.Id);
             }
         }
         

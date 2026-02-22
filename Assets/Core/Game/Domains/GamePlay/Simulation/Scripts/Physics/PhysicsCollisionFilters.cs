@@ -15,7 +15,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsBodyType.TeamFloor)
                                     | GetCollisionMask(PhysicsBodyType.StartMatchWall)
                                     | GetCollisionMask(PhysicsBodyType.EnvironmentSpring)
-                                    | GetCollisionMask(PhysicsBodyType.EnvironmentTeleportGate);
+                                    | GetCollisionMask(PhysicsBodyType.EnvironmentTeleportGate)
+                                    | GetCollisionMask(PhysicsBodyType.BulletPassWall);
                     break;
                 case PhysicsBodyType.PlayerBullet:
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
@@ -37,7 +38,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     break;
                 case PhysicsBodyType.PowerUpBall:
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
-                                    | GetCollisionMask(PhysicsBodyType.PlayerBullet);
+                                    | GetCollisionMask(PhysicsBodyType.PlayerBullet)
+                                    | GetCollisionMask(PhysicsBodyType.BulletPassWall);
                     break;
                 case PhysicsBodyType.TeamFloor:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
@@ -51,6 +53,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     break;
                 case PhysicsBodyType.EnvironmentTeleportGate:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    break;
+                case PhysicsBodyType.BulletPassWall:
+                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsBodyType.PowerUpBall);
                     break;
                 default:
                     collisionMask = 0xFFFF;
