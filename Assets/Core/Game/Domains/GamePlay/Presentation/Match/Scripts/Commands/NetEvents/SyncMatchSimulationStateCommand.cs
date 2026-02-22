@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
@@ -13,7 +14,6 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.EnvironmentTeleportGate;
 using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -129,15 +129,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var pair in gates)
             {
-                // The pair.Color is Vector3 (Shared). We need to convert to UnityEngine.Color.
-                var pairColor = new UnityEngine.Color(pair.Color.X, pair.Color.Y, pair.Color.Z, 1f);
                 var size = pair.Size.ToUnityVector2();
 
                 // Create Gate A
-                _teleportGateControllers.CreateGate(pair.Id, false, pair.GateAPosition, pair.GateARotation, size, pairColor);
+                _teleportGateControllers.CreateGate(pair.Id, false, pair.GateAPosition, pair.GateARotation, size, pair.Color);
 
                 // Create Gate B
-                _teleportGateControllers.CreateGate(pair.Id, true, pair.GateBPosition, pair.GateBRotation, size, pairColor);
+                _teleportGateControllers.CreateGate(pair.Id, true, pair.GateBPosition, pair.GateBRotation, size, pair.Color);
             }
         }
 

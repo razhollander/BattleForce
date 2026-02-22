@@ -977,9 +977,11 @@ MonoBehaviour:
   _bulletViewPrefab: {fileID: 5098656257286592944, guid: 6d7e26fd88ce749758e4f78e408ac5ee, type: 3}
   _environmentWallViewPrefab: {fileID: 1848450532861189530, guid: 1636cc9bec8694334b3401f1fbe5547b, type: 3}
   _environmentSpringViewPrefab: {fileID: 93229460892055424, guid: a47adcf1f670f4a6a8efa288168538ff, type: 3}
+  _environmentTeleportGateViewPrefab: {fileID: 1761154982624354696, guid: 6c46cbea1185e47d2a3c2054da34cee5, type: 3}
   _stageEndedUiView: {fileID: 1138906650}
   _teamsBoardContainerView: {fileID: 1138906651}
   gainBoltEffectViewPrefab: {fileID: 5904124016507781903, guid: 3a610ff1711a84992ac57463dd23197a, type: 3}
+  _playerTeleportFXViewPrefab: {fileID: 5393333576666438519, guid: 9ed99fee5b48d4f88bc8062e974117a7, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

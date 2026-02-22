@@ -47,6 +47,11 @@ MonoBehaviour:
         "DashPulse" } ] '
       _environmentSpringsJson: '[   { "Id": 1, "Position": { "X": -5.0, "Y": 5.0
         }, "DirectionAngle": "135" }]'
+      _teleportGatesJson: '[{   "Id": 1,   "GateAPosition": {     "X": -4.5,    
+        "Y": 7.0   },   "GateARotation": 90.0,   "GateBPosition": {     "X": -3.25,    
+        "Y": -3.0   },   "GateBRotation": 270.0,   "Color": {     "R": 0.5,     "G":
+        0.0,     "B": 1.0,     "A": 1.0   },   "Size": {     "X": 2.5,     "Y": 5.0  
+        } }]'
     - _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
         "Y": -28.16       },       {         "X": -43.804464,         "Y": -28.16      
@@ -66,3 +71,4 @@ MonoBehaviour:
       _lavaWallsJson: 
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _teleportGatesJson: 

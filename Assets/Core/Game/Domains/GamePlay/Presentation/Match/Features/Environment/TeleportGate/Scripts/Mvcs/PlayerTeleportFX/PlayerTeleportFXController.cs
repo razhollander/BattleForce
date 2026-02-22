@@ -1,7 +1,7 @@
 using UnityEngine;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.PlayerTeleportFX
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.PlayerTeleportFX
 {
     public class PlayerTeleportFXController
     {

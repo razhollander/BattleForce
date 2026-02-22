@@ -1,7 +1,9 @@
 using System;
-using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
+using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
+using Vector3 = System.Numerics.Vector3;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 {
@@ -13,10 +15,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public float GateARotation;
         public Vector2 GateBPosition;
         public float GateBRotation;
-        public Vector3 Color; // x=r, y=g, z=b
+        public Color Color; // x=r, y=g, z=b
         public Vector2 Size; // x=width, y=height
 
-        public EnvironmentTeleportGatePairS2C(ushort id, Vector2 gateAPosition, float gateARotation, Vector2 gateBPosition, float gateBRotation, Vector3 color, Vector2 size)
+        public EnvironmentTeleportGatePairS2C(ushort id, Vector2 gateAPosition, float gateARotation, Vector2 gateBPosition, float gateBRotation, Color color, Vector2 size)
         {
             Id = id;
             GateAPosition = gateAPosition;

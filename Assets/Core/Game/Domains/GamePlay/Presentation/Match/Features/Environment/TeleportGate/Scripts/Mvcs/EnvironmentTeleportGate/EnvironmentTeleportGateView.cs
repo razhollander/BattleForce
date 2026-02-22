@@ -1,7 +1,7 @@
-using UnityEngine;
 using DG.Tweening;
+using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.EnvironmentTeleportGate
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate
 {
     public class EnvironmentTeleportGateView : MonoBehaviour
     {

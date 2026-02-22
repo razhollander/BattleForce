@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.EnvironmentTeleportGate;
 using UnityEngine;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.EnvironmentTeleportGate
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate
 {
     public class MatchEnvironmentTeleportGateControllers
     {
