@@ -17,22 +17,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         public void Setup(Sprite sprite, Vector2 size)
         {
             _renderer.sprite = sprite;
-            _visuals.localScale = new Vector3(size.x, size.y, 1f);
             _idleSize = size;
+            ResetToIdleScale();
         }
 
+        private void ResetToIdleScale()
+        {
+            _visuals.localScale = new Vector3(_idleSize.x, _idleSize.y, 1f);
+        }
+        
         public async Awaitable PlayBounceAnimation(CancellationTokenSource cancellationTokenSource)
         {
             _bounceAnimationCancellationTokenSource?.Cancel();
             _bounceAnimationCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
-            _visuals.localScale = new Vector3(_idleSize.x, _idleSize.y, 1f);
-            // var halfAnimationDuration = _animationDuration * 0.5f;
+            ResetToIdleScale();
             await _visuals.DOScale(_idleSize*_animationScale, _animationDuration)
                 .SetLoops(2, LoopType.Yoyo)
                 .SetEase(Ease.InOutSine)
                 .WithCancellationSafe(cancellationTokenSource.Token);
-            // await _visuals.DOScale(_idleSize * _animationScale, halfAnimationDuration).WithCancellationSafe(cancellationTokenSource.Token);
-            // await _visuals.DOScale(_idleSize, halfAnimationDuration).WithCancellationSafe(cancellationTokenSource.Token);
         }
 
         public void Destroy()
