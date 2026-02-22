@@ -92,10 +92,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _playerTeleportEffectController.InitEntryPoint();
             _environmentTeleportGateControllers.InitEntryPoint();
             _rotatingWheelControllers.InitEntryPoint();
-            _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
-                .SetSimulationState(_enterData.InitialState)
-                .Execute();
+            
+             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
+                 .SetSimulationState(_enterData.InitialState)
+                 .Execute();
             _matchDataService.SetLocalPlayer(_enterData.LocalPlayerId);
+            
             _gainBoltEffectController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();

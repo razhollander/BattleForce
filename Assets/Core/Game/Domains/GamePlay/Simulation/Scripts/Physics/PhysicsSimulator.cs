@@ -649,12 +649,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _circleShapePool.Return(circleShape);
         }
 
-        public void AddEnvironmentSpring(ushort id, Vector2 position, float rotation, Vector2 size)
+        public void AddEnvironmentSpring(ushort id, Vector2 position, float rotationDegrees, Vector2 size)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
             bodyDef.position = position;
-            bodyDef.angle = rotation * (float)System.Math.PI / 180f;
+            bodyDef.angle = rotationDegrees.ToRadians();
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.EnvironmentSpring);
 
             var body = _world.CreateBody(bodyDef);
@@ -705,7 +705,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(shape);
         }
 
-        public void UpdateBodyTransform(PhysicsBodyType type, ushort id, Vector2 position, float rotation)
+        public void UpdateBodyTransform(PhysicsBodyType type, ushort id, Vector2 position, float rotationDegrees)
         {
             var currentBody = _world.GetBodyList();
 
@@ -715,7 +715,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
                 if (bodyData.PhysicsBodyType == type && bodyData.Id == id)
                 {
-                    currentBody.SetTransform(position, rotation * (float)System.Math.PI / 180f);
+                    currentBody.SetTransform(position, rotationDegrees.ToRadians());
                     return;
                 }
 

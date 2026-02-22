@@ -1,12 +1,9 @@
 using System.Collections.Generic;
-using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Network;
-using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
@@ -20,11 +17,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private readonly MatchEnvironmentDataService _environmentDataService;
         public MatchEnvironmentDataService Environment => _environmentDataService;
         public HashSet<ushort> TeamIds { get; private set; }
-        public List<EnvironmentRotatingWheelController> RotatingWheels { get; private set; }
 
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
         {
-            var chosenEnvironmentIndex = gamePlayConfig.ChosenEnvironmentIndex;
             _environmentDataService = new MatchEnvironmentDataService(sharedGamePlayConfig);
             _simulationState = new MatchSimulationStateS2C(
                 networkConfig.MaxCap.ConcurrentPlayers,
@@ -36,14 +31,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
-            _simulationState.EnvironmentLayoutIndex = chosenEnvironmentIndex;
             _simulationState.StageType = StageType.DeathMatch;
-            RotatingWheels = new List<EnvironmentRotatingWheelController>();
         }
 
-        public void InitEntryPoint()
+        public void InitEnvironmentLayout(int environmentLayoutIndex)
         {
-            _environmentDataService.InitEntryPoint(_simulationState.EnvironmentLayoutIndex);
+            _simulationState.EnvironmentLayoutIndex = environmentLayoutIndex;
+            _environmentDataService.InitEnvironmentLayout(environmentLayoutIndex);
         }
 
         public PlayerStateS2C AddPlayer(ushort playerId, ushort teamId, string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,

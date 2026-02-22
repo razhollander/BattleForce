@@ -30,7 +30,8 @@ namespace Core.Scripts.Network
         public int ConcurrentEvironmentTeleportPairs = 4;
         public int PointsInEvironmentWall = 8;
         public int PacketTypes = 256; // if one day this is changed to a bigger number, need to parse packet types as ushort instead of byte
-        
+        public int ConcurrentEnvironmentRotatingWheels = 16;
+
         //physics Box2D
         public int ConcurrentTimeOfImpactContacts = 32;
         public int ConcurrentBodyCount = 512;

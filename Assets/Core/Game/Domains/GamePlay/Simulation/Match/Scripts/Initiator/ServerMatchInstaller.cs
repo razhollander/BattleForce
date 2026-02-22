@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.EnvironmentRotatingWheel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
@@ -35,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<IPlayersDecelerationLogic>().To<PlayersDecelerationLogic>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersEngineLogic>().To<PlayersEngineLogic>().AsSingle().NonLazy();
             _diContainer.Bind<ITeleportGateService>().To<TeleportGateCooldownService>().AsSingle();
+            _diContainer.Bind<IEnvironmentRotatingWheelControllers>().To<EnvironmentRotatingWheelControllers>().AsSingle();
         }
 
         public void UninstallBindings() // not sure this is needed

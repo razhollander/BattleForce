@@ -163,7 +163,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var springAngle = _matchDataService.Environment.GetSpring(springId).DirectionAngle.ToRadians();
+            var springAngle = _matchDataService.Environment.GetSpring(springId).WorldDirectionAngle.ToRadians();
             var pushDirection = springAngle.FromAngleRadians();
             var forceMagnitude = _gamePlayConfig.EnvironmentSpring.Force;
             var force = pushDirection * forceMagnitude;

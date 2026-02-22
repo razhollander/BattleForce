@@ -1,6 +1,7 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Scripts.Extensions;
 using Core.Scripts.Extensions.Linq;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -14,13 +15,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public EnvironmentTeleportGatePairS2C[] TeleportGates { get; private set; }
         public WallConfig[] LavaWallConfigs { get; private set; }
         public WallConfig[] WallConfigs { get; private set; }
-        public EnvironmentRotatingWheelConfig[] RotatingWheelConfigs { get; private set; }
-        
+        public EnvironmentRotatingWheelConfig[] RotatingWheels { get; private set; }
+
         public EnvironmentSpringS2C GetSpring(ushort springId)
         {
+            if (!RotatingWheels.IsNullOrEmpty())
+            {
+                for (int i = 0; i < RotatingWheels.Length; i++)
+                {
+                    for (int j = 0; j < RotatingWheels[i].Springs.Length; j++)
+                    {
+                        if (RotatingWheels[i].Springs[j].Id == springId)
+                        {
+                            return RotatingWheels[i].Springs[j];
+                        }
+                    }
+                }
+            }
+
             return EnvironmentSprings.FindWithId(springId);
         }
-        
+
         public EnvironmentTeleportGatePairS2C GetTeleportGatePair(ushort teleportGatePairId)
         {
             return TeleportGates.FindWithId(teleportGatePairId);
@@ -48,14 +63,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
-        public void InitEntryPoint(int environmentLayoutIndex)
+        public void InitEnvironmentLayout(int environmentLayoutIndex)
         {
             WallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetWalls();
             LavaWallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetLavaWalls();
             TalentCards = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetTalentCards();
             EnvironmentSprings = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentSprings();
             TeleportGates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetTeleportGates();
-            RotatingWheelConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetRotatingWheels();
+            RotatingWheels = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetRotatingWheels();
             EnvironmentHalfSize = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentHalfSize();
         }
     }

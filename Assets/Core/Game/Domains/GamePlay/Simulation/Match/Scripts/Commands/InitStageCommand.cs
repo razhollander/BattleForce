@@ -1,6 +1,6 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Controllers;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.EnvironmentRotatingWheel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.Bullets.Clear();
             _matchDataService.SimulationState.PowerUpBalls.Clear();
             _matchDataService.SimulationState.TalentCards.Clear();
-            _matchDataService.RotatingWheels.Clear();
+            _matchDataService.InitEnvironmentLayout(_gamePlayConfig.ChosenEnvironmentIndex);
 
             CreateWalls();
             CreateLavaWalls();
@@ -167,7 +167,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             foreach (var environmentSpring in environmentSprings)
             {
                 var springId = environmentSpring.Id;
-                var springRotationAngle = environmentSpring.DirectionAngle + 90;
+                var springRotationAngle = environmentSpring.RotationAngle;
                 var springSize = _gamePlayConfig.EnvironmentSpring.Size.ToNumericsVector2();
                 var springPosition = environmentSpring.Position;
                 _physicsSimulator.AddEnvironmentSpring(springId, springPosition, springRotationAngle, springSize);
@@ -192,14 +192,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void CreateRotatingWheels()
         {
-            var rotatingWheelsConfigs = _matchDataService.Environment.RotatingWheelConfigs;
-            if (rotatingWheelsConfigs == null) return;
+            var rotatingWheelsConfigs = _matchDataService.Environment.RotatingWheels;
+            if (rotatingWheelsConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
 
             foreach (var wheelConfig in rotatingWheelsConfigs)
             {
-                var controller = new EnvironmentRotatingWheelController(wheelConfig, _physicsSimulator);
-                _matchDataService.RotatingWheels.Add(controller);
-
                 var wheelCenter = wheelConfig.CenterPosition;
                 var rotationSpeed = wheelConfig.RotationSpeed;
 

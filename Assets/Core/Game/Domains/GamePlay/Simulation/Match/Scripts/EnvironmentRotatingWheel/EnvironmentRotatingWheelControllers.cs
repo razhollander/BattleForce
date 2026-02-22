@@ -1,30 +1,39 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Controllers
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.EnvironmentRotatingWheel
 {
-    public class EnvironmentRotatingWheelController
+    public class EnvironmentRotatingWheelControllers : IEnvironmentRotatingWheelControllers
     {
-        private readonly EnvironmentRotatingWheelConfig _config;
+        private readonly IMatchDataService _matchDataService;
         private readonly IPhysicsSimulator _physicsSimulator;
 
-        public EnvironmentRotatingWheelController(EnvironmentRotatingWheelConfig config, IPhysicsSimulator physicsSimulator)
+        public EnvironmentRotatingWheelControllers(IMatchDataService matchDataService, IPhysicsSimulator physicsSimulator)
         {
-            _config = config;
+            _matchDataService = matchDataService;
             _physicsSimulator = physicsSimulator;
         }
 
-        public void UpdateRotationAccordingToTick(int tick, float deltaTime)
+        public void StepAllWheelsRotation(int tick, float deltaTime)
         {
-            var rotationSpeed = _config.RotationSpeed;
-            var wheelCenter = _config.CenterPosition;
+            foreach (var rotatingWheel in _matchDataService.Environment.RotatingWheels)
+            {
+                UpdateRotationAccordingToTick(tick, deltaTime, rotatingWheel);
+            }
+        }
+        
+        private void UpdateRotationAccordingToTick(int tick, float deltaTime, EnvironmentRotatingWheelConfig rotatingWheelConfig)
+        {
+            var rotationSpeed = rotatingWheelConfig.RotationSpeed;
+            var wheelCenter = rotatingWheelConfig.CenterPosition;
 
             // Walls (Assuming walls are centered at (0,0) relative to wheel)
-            if (_config.Walls != null)
+            if (rotatingWheelConfig.Walls != null)
             {
-                foreach (var wall in _config.Walls)
+                foreach (var wall in rotatingWheelConfig.Walls)
                 {
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
                         tick,
@@ -36,14 +45,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Controllers
                         out var newPos,
                         out var newRot
                     );
+                    
                     _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Wall, wall.Id, newPos, newRot);
                 }
             }
 
             // Lava Walls
-            if (_config.LavaWalls != null)
+            if (rotatingWheelConfig.LavaWalls != null)
             {
-                 foreach (var wall in _config.LavaWalls)
+                foreach (var wall in rotatingWheelConfig.LavaWalls)
                 {
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
                         tick,
@@ -55,14 +65,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Controllers
                         out var newPos,
                         out var newRot
                     );
+
                     _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Lava, wall.Id, newPos, newRot);
                 }
             }
 
             // Springs
-            if (_config.Springs != null)
+            if (rotatingWheelConfig.Springs != null)
             {
-                foreach (var spring in _config.Springs)
+                foreach (var spring in rotatingWheelConfig.Springs)
                 {
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
                         tick,
@@ -70,10 +81,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Controllers
                         deltaTime,
                         wheelCenter,
                         spring.Position,
-                        spring.DirectionAngle, // Springs have a direction
+                        spring.RotationAngle, // Springs have a direction
                         out var newPos,
                         out var newRot
                     );
+
+                    spring.WorldRotationAngle = newRot;
                     _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.EnvironmentSpring, spring.Id, newPos, newRot);
                 }
             }
