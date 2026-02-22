@@ -1,10 +1,11 @@
+using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public struct BulletSpawnNetEventS2C : INetSerializable
+    public struct BulletSpawnNetEventS2C : INetSerializable, IComparable<BulletSpawnNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort BulletId;
@@ -37,6 +38,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             BelongToPlayerId = reader.GetByte();
             Position = reader.GetVector2Quantized();
             BulletRadius = reader.GetFloat16();
+        }
+        
+        public int CompareTo(BulletSpawnNetEventS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }

@@ -188,6 +188,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedTalentCardObtainedEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedTalentCardObtainedEvents.Sort();
                 _presentationNetEventsHandler.ProcessTalentCardObtainedEvents(_cachedUnprocessedTalentCardObtainedEvents);
             }
         }
@@ -206,6 +207,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedPlayerSwapEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedPlayerSwapEvents.Sort();
                 _presentationNetEventsHandler.ProcessPlayerSwapEvents(_cachedUnprocessedPlayerSwapEvents);
             }
         }
@@ -224,6 +226,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedBulletDestroyedEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedBulletDestroyedEvents.Sort();
                 _presentationNetEventsHandler.ProcessBulletDestroyedEvents(_cachedUnprocessedBulletDestroyedEvents);
             }
         }
@@ -242,6 +245,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedPlayerTakeDamageEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedPlayerTakeDamageEvents.Sort();
                 _presentationNetEventsHandler.ProcessPlayerTakeDamageEvents(_cachedUnprocessedPlayerTakeDamageEvents);
             }
         }
@@ -260,6 +264,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedPlayerDiedEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedPlayerDiedEvents.Sort();
                 _presentationNetEventsHandler.ProcessPlayerDiedEvents(_cachedUnprocessedPlayerDiedEvents);
             }
         }
@@ -279,6 +284,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedPlayerRejoinedEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedPlayerRejoinedEvents.Sort();
                 _presentationNetEventsHandler.ProcessPlayerRejoinedEvents(_cachedUnprocessedPlayerRejoinedEvents);
             }
         }
@@ -297,6 +303,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedBulletSpawnedEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedBulletSpawnedEvents.Sort();
                 _presentationNetEventsHandler.ProcessBulletSpawnEvents(_cachedUnprocessedBulletSpawnedEvents);
             }
         }
@@ -315,6 +322,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedPowerUpBallSpawnedEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedPowerUpBallSpawnedEvents.Sort();
                 _presentationNetEventsHandler.ProcessPowerUpSpawnedEvents(_cachedUnprocessedPowerUpBallSpawnedEvents);
             }
         }
@@ -333,6 +341,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedPowerUpBallObtainedEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedPowerUpBallObtainedEvents.Sort();
                 _presentationNetEventsHandler.ProcessPowerUpObtainedEvents(_cachedUnprocessedPowerUpBallObtainedEvents);
             }
         }
@@ -351,6 +360,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedTeamLostEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedTeamLostEvents.Sort();
                 _presentationNetEventsHandler.ProcessTeamLostEvents(_cachedUnprocessedTeamLostEvents);
             }
         }
@@ -388,6 +398,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedEnvironmentSpringPlayerCollisionEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedEnvironmentSpringPlayerCollisionEvents.Sort();
                 _presentationNetEventsHandler.ProcessEnvironmentSpringPlayerCollisionEvents(_cachedUnprocessedEnvironmentSpringPlayerCollisionEvents);
             }
         }
@@ -406,6 +417,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedStageEndEvents.IsNullOrEmpty())
             {
+                _cachedUnprocessedStageEndEvents.Sort();
                 _presentationNetEventsHandler.ProcessStageEndEvents(_cachedUnprocessedStageEndEvents);
             }
         }

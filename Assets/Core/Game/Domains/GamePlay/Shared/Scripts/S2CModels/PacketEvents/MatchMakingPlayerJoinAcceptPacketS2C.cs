@@ -1,10 +1,11 @@
+using System;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Scripts.Network;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
 {
-    public class MatchMakingPlayerJoinAcceptPacketS2C : INetSerializable
+    public class MatchMakingPlayerJoinAcceptPacketS2C : INetSerializable, IComparable<MatchMakingPlayerJoinAcceptPacketS2C>
     {
         public int OccuredOnTick;
         public bool IsLocal;
@@ -38,6 +39,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
             {
                 SimulationState.Deserialize(reader);
             }
+        }
+
+        public int CompareTo(MatchMakingPlayerJoinAcceptPacketS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }

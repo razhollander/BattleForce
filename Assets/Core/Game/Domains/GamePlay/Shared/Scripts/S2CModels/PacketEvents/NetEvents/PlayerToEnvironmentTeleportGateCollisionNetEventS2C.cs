@@ -6,7 +6,7 @@ using LiteNetLib.Utils;
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 {
     [Serializable]
-    public struct PlayerToEnvironmentTeleportGateCollisionNetEventS2C : INetSerializable
+    public struct PlayerToEnvironmentTeleportGateCollisionNetEventS2C : INetSerializable, IComparable<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort PlayerId;
@@ -30,6 +30,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             TeleportGatePairId = reader.GetUShort();
             EnterPoint = reader.GetVector2Quantized();
             ExitPoint = reader.GetVector2Quantized();
+        }
+
+        public int CompareTo(PlayerToEnvironmentTeleportGateCollisionNetEventS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }

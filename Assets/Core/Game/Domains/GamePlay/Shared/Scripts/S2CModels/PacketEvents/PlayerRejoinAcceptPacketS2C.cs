@@ -1,9 +1,10 @@
+using System;
 using Core.Scripts.Network;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
 {
-    public class PlayerRejoinAcceptPacketS2C : INetSerializable
+    public class PlayerRejoinAcceptPacketS2C : INetSerializable, IComparable<PlayerRejoinAcceptPacketS2C>
     {
         public int OccuredOnTick;
         public bool IsLocal;
@@ -37,6 +38,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
             {
                 SimulationState.Deserialize(reader);
             }
+        }
+
+        public int CompareTo(PlayerRejoinAcceptPacketS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }

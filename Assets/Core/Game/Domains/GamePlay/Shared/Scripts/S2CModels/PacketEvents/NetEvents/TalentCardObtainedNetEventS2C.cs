@@ -1,10 +1,11 @@
+using System;
 using System.Numerics;
 using Core.Scripts.Utils.CustomCollections;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public class TalentCardObtainedNetEventS2C : INetSerializable
+    public class TalentCardObtainedNetEventS2C : INetSerializable, IComparable<TalentCardObtainedNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort TalentCardId;
@@ -49,6 +50,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
                 ref var talent = ref PlayerTalents.AddAndGet();
                 talent.Deserialize(reader);
             }
+        }
+
+        public int CompareTo(TalentCardObtainedNetEventS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }
