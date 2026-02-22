@@ -24,11 +24,23 @@ namespace Core.Scripts.Extensions
             return new Vector2(vec.x, vec.z);
         }
         
+        /// <summary>
+        /// Rotates Counter-Clockwise
+        /// </summary>
+        /// <param name="direction"></param>
+        /// <param name="degrees"></param>
+        /// <returns></returns>
         public static Vector2 Rotate(this Vector2 direction, float degrees)
         {
             return Quaternion.Euler(0, 0, degrees) * direction;
         }
         
+        /// <summary>
+        /// Rotates Counter-Clockwise
+        /// </summary>
+        /// <param name="direction"></param>
+        /// <param name="degrees"></param>
+        /// <returns></returns>
         public static System.Numerics.Vector2 Rotate(this System.Numerics.Vector2 direction, float degrees)
         {
             var rad = degrees * Mathf.Deg2Rad;

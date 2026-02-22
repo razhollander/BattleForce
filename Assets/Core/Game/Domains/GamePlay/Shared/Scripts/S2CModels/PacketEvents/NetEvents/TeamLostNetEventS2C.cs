@@ -1,10 +1,11 @@
+using System;
 using System.Collections.Generic;
 using Core.Scripts.Network;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
 {
-    public struct TeamLostNetEventS2C : INetSerializable
+    public struct TeamLostNetEventS2C : INetSerializable, IComparable<TeamLostNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort LosingTeamId;
@@ -53,6 +54,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
                 var gained = reader.GetInt();
                 GemsGainedPerTeam.Add(teamId, gained);
             }
+        }
+
+        public int CompareTo(TeamLostNetEventS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }

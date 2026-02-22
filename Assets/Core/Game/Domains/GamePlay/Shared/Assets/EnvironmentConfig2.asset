@@ -45,8 +45,15 @@ MonoBehaviour:
         "Bomb" },   { "Id": 4, "Position": { "X": -35.0, "Y": -15.0 }, "TalentType":
         "SentryGun" },   { "Id": 5, "Position": { "X": 20.0, "Y": 0.0 }, "TalentType":
         "DashPulse" } ] '
-      _environmentSpringsJson: '[   { "Id": 1, "Position": { "X": -5.0, "Y": 5.0
-        }, "DirectionAngle": "135" }]'
+      _environmentSpringsJson: '[   { "Id": 1, "Position": { "X": 8.0, "Y": 5.0 },
+        "DirectionAngle": "135" }]'
+      _teleportGatesJson: '[   {     "Id": 1,     "GateA": {       "Position": {        
+        "X": -4.5,         "Y": 7       },       "NormalRotation": 270     },    
+        "GateB": {       "Position": {         "X": 3.25,         "Y": -3       },      
+        "NormalRotation": 90     }   },   {     "Id": 2,     "GateA": {       "Position":
+        {         "X": -4.5,         "Y": -3       },       "NormalRotation": 90    
+        },     "GateB": {       "Position": {         "X": 3.25,         "Y": 7      
+        },       "NormalRotation": 270     }   } ]'
     - _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
         "Y": -28.16       },       {         "X": -43.804464,         "Y": -28.16      
@@ -66,3 +73,4 @@ MonoBehaviour:
       _lavaWallsJson: 
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _teleportGatesJson: 

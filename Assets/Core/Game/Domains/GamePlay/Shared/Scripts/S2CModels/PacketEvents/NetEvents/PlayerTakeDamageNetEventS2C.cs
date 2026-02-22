@@ -1,8 +1,9 @@
+using System;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public struct PlayerTakeDamageNetEventS2C : INetSerializable
+    public struct PlayerTakeDamageNetEventS2C : INetSerializable, IComparable<PlayerTakeDamageNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort PlayerId;
@@ -26,6 +27,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             PlayerHealth = reader.GetByte();
             HitDamage = reader.GetByte();
             IsAlive = reader.GetBool();
+        }
+
+        public int CompareTo(PlayerTakeDamageNetEventS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }

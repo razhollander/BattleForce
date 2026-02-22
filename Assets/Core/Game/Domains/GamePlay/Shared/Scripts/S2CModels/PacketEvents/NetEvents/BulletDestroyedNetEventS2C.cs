@@ -1,10 +1,11 @@
+using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public struct BulletDestroyedNetEventS2C : INetSerializable
+    public struct BulletDestroyedNetEventS2C : INetSerializable, IComparable<BulletDestroyedNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort BulletId;
@@ -29,6 +30,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             OccuredOnTick = reader.GetInt();
             BulletId = reader.GetUShort();
             Position = reader.GetVector2Quantized();
-        } 
+        }
+
+        public int CompareTo(BulletDestroyedNetEventS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
+        }
     }
 }

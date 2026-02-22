@@ -1,3 +1,4 @@
+using System;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Contacts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
@@ -5,6 +6,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -12,7 +14,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
-using UnityEngine;
+using CoreDomain.Scripts.Utils;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -25,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private INetEventsDataService _netEventsDataService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IPlayersTalentsManager _playersTalentsManager;
+        private ITeleportGateService _teleportGateService;
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
@@ -45,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
+            _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
         }
 
         public void Execute()
@@ -76,13 +80,65 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerBulletCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
-                HandlePlayerEnvironmentSpringCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerEnvironmentSpringCollision(objectA, objectB);
+                HandlePlayerTeleportGateCollision(objectA, objectB);
             }
 
             _physicsSimulator.ClearCachedCollisions();
         }
 
-        private void HandlePlayerEnvironmentSpringCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        private void HandlePlayerTeleportGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isPlayerToGate = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.EnvironmentTeleportGate;
+            var isGateToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.EnvironmentTeleportGate && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerToGate && !isGateToPlayer)
+            {
+                return;
+            }
+
+            ushort playerId;
+            ushort gateBodyId;
+
+            if (isPlayerToGate)
+            {
+                playerId = objectA.Id;
+                gateBodyId = objectB.Id;
+            }
+            else
+            {
+                playerId = objectB.Id;
+                gateBodyId = objectA.Id;
+            }
+
+            if (_teleportGateService.IsTeleportOnCooldown(playerId, _processedTick))
+            {
+                return;
+            }
+
+            var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+            var teleportPairData = _matchDataService.Environment.GetTeleportGatePairOfGate(gateBodyId);
+            var isGateB = teleportPairData.GateBId == gateBodyId;
+            var enterGatePosition = isGateB ? teleportPairData.GateB.Position : teleportPairData.GateA.Position;
+            var enterGateRotation = isGateB ? teleportPairData.GateB.NormalRotation : teleportPairData.GateA.NormalRotation;
+            var exitGatePosition = isGateB ? teleportPairData.GateA.Position : teleportPairData.GateB.Position;
+            var exitGateRotation = isGateB ? teleportPairData.GateA.NormalRotation : teleportPairData.GateB.NormalRotation;
+            var enterPoint = playerState.Spaceship.Transform.Position;
+
+            var enterGateNormal = enterGateRotation.ToRadians().AngleToVector();
+            var exitGateNormal = exitGateRotation.ToRadians().AngleToVector();
+            var exitPoint = MathUtils.TeleportsLogic.GetRelativeExitPoint(enterPoint, enterGatePosition, enterGateNormal, exitGatePosition, exitGateNormal);
+            playerState.Spaceship.Transform.Position = exitPoint;
+            var newDirection = MathUtils.TeleportsLogic.ConvertVectorTelativeToExitTeleport(playerState.Spaceship.Transform.Direction, enterGateNormal, exitGateNormal);
+            playerState.Spaceship.Transform.Direction = newDirection;
+            var newVelocity = MathUtils.TeleportsLogic.ConvertVectorTelativeToExitTeleport(playerState.Spaceship.Transform.Velocity, enterGateNormal, exitGateNormal);
+            playerState.Spaceship.Transform.Velocity = newVelocity;
+            
+            _teleportGateService.RegisterTeleport(playerId, _processedTick);
+            _netEventsDataService.AddPlayerToEnvironmentTeleportGateCollisionNetEvent(_processedTick, teleportPairData.Id, enterPoint, exitPoint, playerId);
+        }
+
+        private void HandlePlayerEnvironmentSpringCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
             var isPlayerToSpring = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.EnvironmentSpring;
             var isSpringToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.EnvironmentSpring && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
@@ -107,18 +163,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var springAngle = 0f;
-            for (int i = 0; i < _matchDataService.Environment.EnvironmentSprings.Length; i++)
-            {
-                if (_matchDataService.Environment.EnvironmentSprings[i].Id != springId)
-                {
-                    continue;
-                }
-                springAngle =  _matchDataService.Environment.EnvironmentSprings[i].DirectionAngle;
-                break;
-            }
-
-            springAngle *= Mathf.Deg2Rad;
+            var springAngle = _matchDataService.Environment.GetSpring(springId).DirectionAngle.ToRadians();
             var pushDirection = springAngle.FromAngleRadians();
             var forceMagnitude = _gamePlayConfig.EnvironmentSpring.Force;
             var force = pushDirection * forceMagnitude;

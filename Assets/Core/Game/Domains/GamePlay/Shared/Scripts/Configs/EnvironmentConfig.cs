@@ -63,5 +63,22 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
 #endif
         }
+
+        public void SetTeleportGates(Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.EnvironmentTeleportGatePairS2C[] teleportGates, int index)
+        {
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetTeleportGatesJson(teleportGates.ToJson());
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetTeleportGatesJson(teleportGates.ToJson());
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
     }
 }

@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
 {
-    public class StageEndNetEventS2C : INetSerializable
+    public class StageEndNetEventS2C : INetSerializable, IComparable<StageEndNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort WinningTeamId;
@@ -58,6 +59,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
                 var jems = reader.GetByte();
                 TotalJemsPerTeam.Add(teamId, jems);
             }
+        }
+
+        public int CompareTo(StageEndNetEventS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }

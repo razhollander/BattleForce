@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         PowerUpBall = 6,
         TeamFloor = 7,
         StartMatchWall = 8,
-        EnvironmentSpring = 9
+        EnvironmentSpring = 9,
+        EnvironmentTeleportGate = 10
     }
 }

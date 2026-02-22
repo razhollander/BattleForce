@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ExponentialDecay: 30
   TalentCards: {fileID: 11400000, guid: bc656062d5cec4fdfa7c7c7784cfd7df, type: 2}
-  PowerUps: {fileID: 11400000, guid: 0bf6f91347e23451b8e8625c8c7e6a42, type: 2}
   TeamFloor: {fileID: 11400000, guid: c4cc2d03286a1424da9b1d4ea5299300, type: 2}
-  EnvironmentSpring: {fileID: 11400000, guid: f5e079ad119bc4e0faccf5c96bb9a9b7, type: 2}
+  Teleports: {fileID: 11400000, guid: 524ce82838156428ab0c05a22c0196d1, type: 2}
   ColorPerTeamId:
     m_keys: 0100000002000000030000000400000005000000
     m_values:

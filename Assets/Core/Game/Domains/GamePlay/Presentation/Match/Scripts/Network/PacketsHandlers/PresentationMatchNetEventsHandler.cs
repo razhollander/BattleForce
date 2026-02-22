@@ -10,6 +10,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
@@ -303,6 +304,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 var playerTeamId = _matchDataService.GetPlayerTeamId(gainBoltsNetEvent.PlayerId);
                 _matchDataService.SetTeamBolts(playerTeamId, gainBoltsNetEvent.TotalTeamBolts);
                 _cachedPresentationEventsService.GainBoltsNetEvents.Add(gainBoltsNetEvent);
+            }
+        }
+
+        public void ProcessPlayerToEnvironmentTeleportCollisionEvents(CapacityList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> playerToEnvironmentTeleportCollisionEvents)
+        {
+            if (playerToEnvironmentTeleportCollisionEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerToEnvironmentTeleportCollisionEvent in playerToEnvironmentTeleportCollisionEvents)
+            {
+                _matchDataService.GetPlayer(playerToEnvironmentTeleportCollisionEvent.PlayerId).Spaceship.Transform.Position = playerToEnvironmentTeleportCollisionEvent.ExitPoint;
+                _cachedPresentationEventsService.PlayerToEnvironmentTeleportGateCollisionNetEvents.Add(playerToEnvironmentTeleportCollisionEvent);
             }
         }
     }
