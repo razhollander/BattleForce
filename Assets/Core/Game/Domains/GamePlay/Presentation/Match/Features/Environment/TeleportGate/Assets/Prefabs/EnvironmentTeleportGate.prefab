@@ -47,6 +47,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _visuals: {fileID: 5748503713841141370}
   _renderer: {fileID: 5119700104229755946}
+  _animationScale: 1.2
+  _animationDuration: 0.2
 --- !u!1 &6409818763090221950
 GameObject:
   m_ObjectHideFlags: 0

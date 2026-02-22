@@ -1,7 +1,9 @@
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 
@@ -49,10 +51,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
             return teleportGateView;
         }
 
-        public void PlayTeleportAnimation()
+        public void PlayTeleportAnimation(CancellationTokenSource cancellationTokenSource)
         {
-            _gateAView.PlayTeleportAnimation();
-            _gateBView.PlayTeleportAnimation();
+            _gateAView.PlayBounceAnimation(cancellationTokenSource).Forget();
+            _gateBView.PlayBounceAnimation(cancellationTokenSource).Forget();
         }
         
         public void Destroy()
