@@ -1,3 +1,4 @@
+using Core.Scripts.Extensions;
 using UnityEngine;
 
 namespace CoreDomain.Scripts.Utils
@@ -36,6 +37,23 @@ namespace CoreDomain.Scripts.Utils
             float t = 1f - Mathf.Exp(-decay * deltaTime);
 
             return Quaternion.Slerp(a, b, t);
+        }
+        
+        public static System.Numerics.Vector2 GetTeleportedVelocity(System.Numerics.Vector2 currentVelocity, System.Numerics.Vector2 enterNormal, System.Numerics.Vector2 exitNormal)
+        {
+            // 1. The direction 'into' the entrance is the opposite of its normal
+            var entranceForward = -enterNormal;
+
+            // 2. Calculate the angle of both directions in degrees
+            // Using Atan2 to get the full 360-degree range
+            float angleEntrance = (float)(Mathf.Atan2(entranceForward.Y, entranceForward.X) * (180 / Mathf.PI));
+            float angleExit = (float)(Mathf.Atan2(exitNormal.Y, exitNormal.X) * (180 / Mathf.PI));
+
+            // 3. Find the difference (The rotation required to get from Entrance to Exit)
+            float deltaDegrees = angleExit - angleEntrance;
+
+            // 4. Use your Rotate method to transform the velocity by that difference
+            return currentVelocity.Rotate(deltaDegrees);
         }
     }
 }

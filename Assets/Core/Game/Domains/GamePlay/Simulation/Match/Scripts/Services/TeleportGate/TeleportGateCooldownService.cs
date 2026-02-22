@@ -4,13 +4,13 @@ using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate
 {
-    public class TeleportGateService : ITeleportGateService
+    public class TeleportGateCooldownService : ITeleportGateService
     {
         private readonly CapacityDict<ushort, int> _lastTeleportTickPerPlayer;
         private readonly SimulationGamePlayConfig _config;
         private readonly NetworkConfig _networkConfig;
 
-        public TeleportGateService(SimulationGamePlayConfig config, NetworkConfig networkConfig)
+        public TeleportGateCooldownService(SimulationGamePlayConfig config, NetworkConfig networkConfig)
         {
             _config = config;
             _networkConfig = networkConfig;
@@ -29,15 +29,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportG
             }
         }
 
-        public bool CanTeleport(ushort playerId, int currentTick)
+        public bool IsTeleportOnCooldown(ushort playerId, int currentTick)
         {
             if (_lastTeleportTickPerPlayer.TryGetValue(playerId, out var lastTick))
             {
                 // Calculate cooldown in ticks
                 int cooldownTicks = (int)(_config.TeleportGateCooldown * _networkConfig.TicksPerSeconds);
-                return (currentTick - lastTick) >= cooldownTicks;
+                return (currentTick - lastTick) < cooldownTicks;
             }
-            return true;
+            return false;
         }
 
         public void ClearData()

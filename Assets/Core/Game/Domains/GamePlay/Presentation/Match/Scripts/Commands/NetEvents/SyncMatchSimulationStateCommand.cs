@@ -132,10 +132,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var size = pair.Size.ToUnityVector2();
 
                 // Create Gate A
-                _teleportGateControllers.CreateGate(pair.Id, false, pair.GateAPosition, pair.GateARotation, size, pair.Color);
+                _teleportGateControllers.CreateGate(pair.Id, false, pair.GateAPosition, pair.GateANormalRotation, size, pair.Color);
 
                 // Create Gate B
-                _teleportGateControllers.CreateGate(pair.Id, true, pair.GateBPosition, pair.GateBRotation, size, pair.Color);
+                _teleportGateControllers.CreateGate(pair.Id, true, pair.GateBPosition, pair.GateBNormalRotation, size, pair.Color);
             }
         }
 

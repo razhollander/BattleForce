@@ -13,5 +13,10 @@ namespace Core.Scripts.Extensions
         {
             return new System.Numerics.Vector2(Mathf.Cos(angleRadians), Mathf.Sin(angleRadians));    
         }
+        
+        public static float ToRadians(this float angleDegrees)
+        {
+            return angleDegrees * Mathf.Deg2Rad;    
+        }
     }
 }

@@ -177,8 +177,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var pair in teleportGates)
             {
-                _physicsSimulator.AddTeleportGate(pair.GateAId, pair.GateAPosition, pair.GateARotation, pair.Size);
-                _physicsSimulator.AddTeleportGate(pair.GateBId, pair.GateBPosition, pair.GateBRotation, pair.Size);
+                _physicsSimulator.AddTeleportGate(pair.GateAId, pair.GateAPosition, pair.GateANormalRotation, pair.Size);
+                _physicsSimulator.AddTeleportGate(pair.GateBId, pair.GateBPosition, pair.GateBNormalRotation, pair.Size);
             }
         }
     }

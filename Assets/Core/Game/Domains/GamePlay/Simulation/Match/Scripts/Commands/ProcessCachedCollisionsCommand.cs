@@ -1,3 +1,4 @@
+using System;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Contacts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
@@ -13,7 +14,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
-using UnityEngine;
+using CoreDomain.Scripts.Utils;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -110,7 +111,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 gateBodyId = objectA.Id;
             }
 
-            if (!_teleportGateService.CanTeleport(playerId, _processedTick))
+            if (_teleportGateService.IsTeleportOnCooldown(playerId, _processedTick))
             {
                 return;
             }
@@ -129,9 +130,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             var pair = _matchDataService.Environment.GetTeleportGatePair(pairId);
             var sourceGatePosition = isGateB ? pair.GateBPosition : pair.GateAPosition;
-            var sourceGateRotation = isGateB ? pair.GateBRotation : pair.GateARotation;
+            var sourceGateRotation = isGateB ? pair.GateBNormalRotation : pair.GateANormalRotation;
             var targetGatePosition = isGateB ? pair.GateAPosition : pair.GateBPosition;
-            var targetGateRotation = isGateB ? pair.GateARotation : pair.GateBRotation;
+            var targetGateRotation = isGateB ? pair.GateANormalRotation : pair.GateBNormalRotation;
 
             // Calculate collision point (EnterPoint)
             contact.GetWorldManifold(out var manifold);
@@ -163,6 +164,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             // Teleport Player
             playerState.Spaceship.Transform.Position = destinationPoint;
+            var newDirection = MathUtils.GetTeleportedVelocity(playerState.Spaceship.Transform.Direction, sourceGateRotation.ToRadians().AngleToVector(), targetGateRotation.ToRadians().AngleToVector());
+            playerState.Spaceship.Transform.Direction = newDirection;
+            var newVelocity = MathUtils.GetTeleportedVelocity(playerState.Spaceship.Transform.Velocity, sourceGateRotation.ToRadians().AngleToVector(), targetGateRotation.ToRadians().AngleToVector());
+            playerState.Spaceship.Transform.Velocity = newVelocity;
              
             // Update physics body
             //_physicsSimulator.SetPlayerVelocity(playerId, playerState.Spaceship.Transform.Velocity); // Ensure velocity persists or modify if needed
@@ -219,8 +224,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var springAngle = _matchDataService.Environment.GetSpring(springId).DirectionAngle;
-            springAngle *= Mathf.Deg2Rad;
+            var springAngle = _matchDataService.Environment.GetSpring(springId).DirectionAngle.ToRadians();
             var pushDirection = springAngle.FromAngleRadians();
             var forceMagnitude = _gamePlayConfig.EnvironmentSpring.Force;
             var force = pushDirection * forceMagnitude;
