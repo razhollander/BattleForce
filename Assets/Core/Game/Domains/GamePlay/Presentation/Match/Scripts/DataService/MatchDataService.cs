@@ -17,21 +17,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchPlayerBulletModel> Bullets { get; private set; }
         public List<MatchEnvironmentWallModel> EnvironmentWalls { get; private set; }
         public List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; private set; }
+        public List<MatchEnvironmentSpringModel> EnvironmentSprings { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
 
         public MatchPlayerModel LocalPlayer { get; private set; }
         public bool IsPlayerJoined => LocalPlayer != null;
         public HashSet<ushort> TeamIds  {get; private set; }
+        public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }
+        public Dictionary<ushort, int> GemsPerTeam  {get; private set; }
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             Players = new List<MatchPlayerModel>(networkConfig.MaxCap.ConcurrentPlayers);
             Bullets = new List<MatchPlayerBulletModel>(networkConfig.MaxCap.ConcurrentBullets);
             EnvironmentWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
             EnvironmentLavaWalls = new List<MatchEnvironmentLavaWallModel>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls);
+            EnvironmentSprings = new List<MatchEnvironmentSpringModel>(32);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
             PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
+            BoltsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
+            GemsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -47,6 +53,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort wallId)
         {
             return EnvironmentLavaWalls.Find(x => x.Id == wallId);
+        }
+
+        public MatchEnvironmentSpringModel GetEnvironmentSpring(ushort springId)
+        {
+            return EnvironmentSprings.Find(x => x.Id == springId);
         }
 
         public void RemoveBullet(ushort bulletId)
@@ -116,6 +127,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         {
             return Players.Find(x => x.PlayerId == playerId);
         }
+        
+        public ushort GetPlayerTeamId(ushort playerId)
+        {
+            return Players.Find(x => x.PlayerId == playerId).TeamId;
+        }
 
         public MatchPlayerModel AddPlayer(PlayerStateS2C playerState)
         {
@@ -123,6 +139,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, playerState.Spaceship);
             Players.Add(newPlayer);
             TeamIds.Add(playerTeamId);
+            BoltsPerTeam.Add(playerTeamId, 0);
+            GemsPerTeam.Add(playerTeamId, 0);
             return newPlayer;
         }
 
@@ -138,6 +156,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             var newWall = new MatchEnvironmentLavaWallModel(wallConfig.Id, wallConfig.Points);
             EnvironmentLavaWalls.Add(newWall);
             return newWall;
+        }
+
+        public MatchEnvironmentSpringModel AddSpring(ushort id, UnityEngine.Vector2 position, float directionAngle)
+        {
+            var newSpring = new MatchEnvironmentSpringModel(id, position, directionAngle);
+            EnvironmentSprings.Add(newSpring);
+            return newSpring;
         }
 
         public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius)
@@ -158,8 +183,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             Bullets.Clear();
             EnvironmentWalls.Clear();
             EnvironmentLavaWalls.Clear();
+            EnvironmentSprings.Clear();
             TalentCards.Clear();
             PowerUpBalls.Clear();
+            BoltsPerTeam.Clear();
+            GemsPerTeam.Clear();
+        }
+
+        public void SetTeamBolts(ushort teamId, int totalTeamBolts)
+        {
+            BoltsPerTeam[teamId] = totalTeamBolts;
+        }
+
+        public void SetTeamGems(ushort teamId, int totalTeamGems)
+        {
+            GemsPerTeam[teamId] = totalTeamGems;
         }
     }
 }

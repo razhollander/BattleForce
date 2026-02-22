@@ -229,6 +229,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.TeamLostNetEvents = _netEventsDataService.TeamLostNetEventsPerPlayer[playerId];
                 _fullTickPacket.TalentSwitchNetEvents = _netEventsDataService.TalentSwitchNetEventsPerPlayer[playerId];
                 _fullTickPacket.EnvironmentSpringPlayerCollisionNetEvents = _netEventsDataService.EnvironmentSpringPlayerCollisionNetEventsPerPlayer[playerId];
+                _fullTickPacket.GainBoltsNetEvents = _netEventsDataService.GainBoltsNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

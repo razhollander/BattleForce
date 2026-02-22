@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -124,7 +125,7 @@ namespace Core.Scripts.Utils
             return await awaitable.Awaitable;
         }
 
-        public static async Awaitable WhenAll(this Awaitable[] awaitables)
+        public static async Awaitable WhenAll(this ICollection<Awaitable> awaitables)
         {
             foreach (var awaitable in awaitables)
             {

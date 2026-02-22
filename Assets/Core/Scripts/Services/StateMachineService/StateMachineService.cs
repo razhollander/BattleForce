@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Mvc.LoadingScreen;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
@@ -30,39 +31,28 @@ namespace CoreDomain.Scripts.Services.StateMachineService
 
         public void SwitchState(IGameState newState)
         {
-            _ = SwitchStateAsync(newState);
+            SwitchStateAsync(newState).Forget();
         }
 
         private async Awaitable SwitchStateAsync(IGameState newState)
         {
-            try
-            {
-                var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(Application.exitCancellationToken);
+            var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(Application.exitCancellationToken);
 
-                if (_currentGameState == null)
-                {
-                    LogService.LogError("No state to switch from, need to initialize a game state first!");
-                    return;
-                }
-                
-                _loadingScreenController.Show();
-                await _currentGameState.ExitState(cancellationTokenSource);
-                _ = _loadingScreenController.SetLoadingSlider(0.5f, cancellationTokenSource);
-                _currentGameState = newState;
-                await _currentGameState.LoadState(cancellationTokenSource);
-                await _loadingScreenController.SetLoadingSlider(1, cancellationTokenSource);
-                _loadingScreenController.Hide();
-                await _currentGameState.StartState(cancellationTokenSource);
-            }
-            catch (OperationCanceledException)
+            if (_currentGameState == null)
             {
-                LogService.Log("Switching state operation was cancelled");
+                LogService.LogError("No state to switch from, need to initialize a game state first!");
+
+                return;
             }
-            catch (Exception e)
-            {
-                LogService.LogError(e.Message);
-                throw;
-            }
+
+            _loadingScreenController.Show();
+            await _currentGameState.ExitState(cancellationTokenSource);
+            _ = _loadingScreenController.SetLoadingSlider(0.5f, cancellationTokenSource);
+            _currentGameState = newState;
+            await _currentGameState.LoadState(cancellationTokenSource);
+            await _loadingScreenController.SetLoadingSlider(1, cancellationTokenSource);
+            _loadingScreenController.Hide();
+            await _currentGameState.StartState(cancellationTokenSource);
         }
     }
 }

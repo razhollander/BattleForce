@@ -34,7 +34,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             writer.Put(GateARotation);
             writer.PutVector2Quantized(GateBPosition);
             writer.Put(GateBRotation);
-            writer.PutVector3(Color);
             writer.PutVector2Quantized(Size);
         }
 
@@ -45,7 +44,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             GateARotation = reader.GetFloat();
             GateBPosition = reader.GetVector2Quantized();
             GateBRotation = reader.GetFloat();
-            Color = reader.GetVector3();
             Size = reader.GetVector2Quantized();
         }
     }

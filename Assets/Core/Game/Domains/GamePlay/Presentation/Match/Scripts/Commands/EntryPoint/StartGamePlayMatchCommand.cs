@@ -1,13 +1,14 @@
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
@@ -34,12 +35,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IMatchBulletControllers _bulletControllers;
         private ITickProcessor _tickProcessor;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
+        private IEnvironmentSpringControllers _environmentSpringControllers;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private IMatchDataService _matchDataService;
         private ICommandFactory _commandFactory;
         private IClientMatchPresentationTickProcessor _clientMatchPresentationTickProcessor;
         private IStartStagePacketHandler _startStagePacketHandler;
-        private ITeamsBoardUIController _teamsBoardUIController;
+        private IGainBoltEffectController _gainBoltEffectController;
         private Scripts.MVC.EnvironmentTeleportGate.MatchEnvironmentTeleportGateControllers _teleportGateControllers;
         private PlayerTeleportFXController _playerTeleportFXController;
 
@@ -60,12 +62,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
+            _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _clientMatchPresentationTickProcessor = _diContainer.Resolve<IClientMatchPresentationTickProcessor>();
             _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
-            _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
+            _gainBoltEffectController = _diContainer.Resolve<IGainBoltEffectController>();
             _teleportGateControllers = _diContainer.Resolve<Scripts.MVC.EnvironmentTeleportGate.MatchEnvironmentTeleportGateControllers>();
             _playerTeleportFXController = _diContainer.Resolve<PlayerTeleportFXController>();
         }
@@ -82,12 +85,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
+            _environmentSpringControllers.InitEntryPoint();
             _playerTeleportFXController.InitEntryPoint();
             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
                 .SetSimulationState(_enterData.InitialState)
                 .Execute();
             _matchDataService.SetLocalPlayer(_enterData.LocalPlayerId);
-            _teamsBoardUIController.InitEntryPoint();
+            _gainBoltEffectController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }

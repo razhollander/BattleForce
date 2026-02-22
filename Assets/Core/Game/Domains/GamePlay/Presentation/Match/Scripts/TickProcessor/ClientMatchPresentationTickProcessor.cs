@@ -29,6 +29,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleStageEndNetEventsCommand _handleStageEndNetEventsCommand;
         private readonly HandleTeamLostNetEventsCommand _handleTeamLostNetEventsCommand;
         private readonly HandleTalentSwitchNetEventsCommand _handleTalentSwitchNetEventsCommand;
+        private readonly HandleGainBoltsNetEventCommand _handleGainBoltsNetEventCommand;
+        private readonly HandleEnvironmentSpringPlayerCollisionNetEventsCommand _handleEnvironmentSpringPlayerCollisionNetEventsCommand;
         private readonly HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
@@ -51,6 +53,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleStageEndNetEventsCommand = commandFactory.CreateCommandVoid<HandleStageEndNetEventsCommand>();
             _handleTeamLostNetEventsCommand = commandFactory.CreateCommandVoid<HandleTeamLostNetEventsCommand>();
             _handleTalentSwitchNetEventsCommand = commandFactory.CreateCommandVoid<HandleTalentSwitchNetEventsCommand>();
+            _handleGainBoltsNetEventCommand = commandFactory.CreateCommandVoid<HandleGainBoltsNetEventCommand>();
+            _handleEnvironmentSpringPlayerCollisionNetEventsCommand = commandFactory.CreateCommandVoid<HandleEnvironmentSpringPlayerCollisionNetEventsCommand>();
             _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand>();
         }
         
@@ -77,6 +81,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleStageEndNetEventsCommand.Execute();
             _handleTeamLostNetEventsCommand.Execute();
             _handleTalentSwitchNetEventsCommand.Execute();
+            _handleGainBoltsNetEventCommand.Execute();
+            _handleEnvironmentSpringPlayerCollisionNetEventsCommand.Execute();
             _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand.Execute();
 
             _playerControllers.UpdatePlayersTransform();

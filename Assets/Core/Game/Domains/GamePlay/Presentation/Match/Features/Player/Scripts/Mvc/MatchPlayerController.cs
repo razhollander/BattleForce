@@ -104,9 +104,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return _playerView.GetPosition();
         }
 
-        public Transform GetTransform()
+        public Transform GetSpaceShipTransform()
         {
-            return _playerView.GetTransform();
+            return _playerView.GetSpaceShipTransform();
         }
 
         public void SetIsHealthBarShown(bool isShown)
@@ -117,6 +117,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void Destroy()
         {
             _playerView.Despawn();
+        }
+
+        public Transform GetTransform()
+        {
+            return _playerView.GetTransform();
         }
     }
 }

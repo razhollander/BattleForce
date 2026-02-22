@@ -1,4 +1,5 @@
 using ASoliman.Utils.EditableRefs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
@@ -19,6 +20,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float StageRestartDelaySeconds = 3f;
         public int GemsCollectedForTeamAlive = 1;
         public int MaxOverllapingFloors = 32;
+        public int StartingBoltsPerTeam = 0;
+        public int BoltsGainedPerHit = 50;
+        public int BoltsGainedPerKill = 50;
         public float TeleportGateCooldown = 0.5f;
     }
 }
