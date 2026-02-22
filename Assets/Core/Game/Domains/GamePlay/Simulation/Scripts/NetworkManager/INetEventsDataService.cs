@@ -58,6 +58,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddTalentSwitchNetEvent(int onTick, ushort playerId, int newTalentIndex);
         void AddEnvironmentSpringPlayerCollisionNetEvent(int onTick, ushort springId, ushort playerId, Vector2 newPlayerDirection);
         void AddGainBoltsNetEvent(int onTick, ushort playerId, int gainedAmount, int totalTeamBolts);
-        void AddPlayerToEnvironmentTeleportGateCollisionNetEvent(int onTick, ushort pairId, Vector2 enterPoint, Vector2 destinationPoint, ushort playerId);
+        void AddPlayerToEnvironmentTeleportGateCollisionNetEvent(int onTick, ushort teleportPairId, Vector2 enterPoint, Vector2 exitPoint, ushort playerId);
     }
 }

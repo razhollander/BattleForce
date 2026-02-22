@@ -884,16 +884,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddPlayerToEnvironmentTeleportGateCollisionNetEvent(int onTick, ushort pairId, Vector2 enterPoint, Vector2 destinationPoint, ushort playerId)
+        public void AddPlayerToEnvironmentTeleportGateCollisionNetEvent(int onTick, ushort teleportPairId, Vector2 enterPoint, Vector2 exitPoint, ushort playerId)
         {
             foreach (var kvp in PlayerToEnvironmentTeleportGateCollisionNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.PlayerId = playerId;
                 packet.OccuredOnTick = onTick;
-                packet.TeleportGatePairId = pairId;
+                packet.TeleportGatePairId = teleportPairId;
                 packet.EnterPoint = enterPoint;
-                packet.DestinationPoint = destinationPoint;
+                packet.ExitPoint = exitPoint;
             }
         }
     }

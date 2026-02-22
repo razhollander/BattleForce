@@ -25,6 +25,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             return TeleportGates.FindWithId(teleportGatePairId);
         }
         
+        public EnvironmentTeleportGatePairS2C GetTeleportGatePairOfGate(ushort teleportGateId)
+        {
+            for (int i = 0; i < TeleportGates.Length; i++)
+            {
+                var teleportGatePair = TeleportGates[i];
+
+                if (teleportGatePair.GateBId == teleportGateId || teleportGatePair.GateAId == teleportGateId)
+                {
+                    return teleportGatePair;
+                }
+            }
+
+            throw new System.Exception("No teleport gate pair found for gate id: " + teleportGateId);
+        }
+        
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         
         public MatchEnvironmentDataService(SharedGamePlayConfig sharedGamePlayConfig)

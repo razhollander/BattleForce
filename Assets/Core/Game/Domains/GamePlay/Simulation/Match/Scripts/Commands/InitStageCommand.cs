@@ -21,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IStageDataService _stageDataService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private ITeleportGateService _teleportGateService;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
 
         public override void ResolveDependencies()
         {
@@ -30,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public void Execute()
@@ -177,8 +179,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var pair in teleportGates)
             {
-                _physicsSimulator.AddTeleportGate(pair.GateAId, pair.GateAPosition, pair.GateANormalRotation, pair.Size);
-                _physicsSimulator.AddTeleportGate(pair.GateBId, pair.GateBPosition, pair.GateBNormalRotation, pair.Size);
+                var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size.ToNumericsVector2();
+                _physicsSimulator.AddTeleportGate(pair.GateAId, pair.GateA.Position, pair.GateA.NormalRotation, gateSize);
+                _physicsSimulator.AddTeleportGate(pair.GateBId, pair.GateB.Position, pair.GateB.NormalRotation, gateSize);
             }
         }
     }

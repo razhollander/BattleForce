@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     public class HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
-        private MatchEnvironmentTeleportGateControllers _gateControllers;
+        private EnvironmentTeleportGateControllers _teleportGateControllers;
         private PlayerTeleportFXController _fxController;
         private IMatchPlayerControllers _playerControllers;
         private ICachedPresentationEventsService _cachedPresentationEventsService;
@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
-            _gateControllers = _diContainer.Resolve<MatchEnvironmentTeleportGateControllers>();
+            _teleportGateControllers = _diContainer.Resolve<EnvironmentTeleportGateControllers>();
             _fxController = _diContainer.Resolve<PlayerTeleportFXController>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
@@ -28,35 +28,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            foreach (var environmentTeleportGateCollisionNetEvent in _cachedPresentationEventsService.PlayerToEnvironmentTeleportGateCollisionNetEvents)
+            if (_cachedPresentationEventsService.PlayerToEnvironmentTeleportGateCollisionNetEvents.IsNullOrEmpty())
             {
-               HandleEvent(environmentTeleportGateCollisionNetEvent);
+                return;
             }
-        }
-
-        private void HandleEvent(PlayerToEnvironmentTeleportGateCollisionNetEventS2C evt)
-        {
-            var playerId = evt.PlayerId;
-            // Identify gates
-            var pairId = evt.TeleportGatePairId;
-            var gateA = _gateControllers.GetGate(pairId, false);
-            var gateB = _gateControllers.GetGate(pairId, true);
-
-            if (gateA != null && gateB != null)
+            
+            foreach (var teleportGateCollisionEvent in _cachedPresentationEventsService.PlayerToEnvironmentTeleportGateCollisionNetEvents)
             {
-                gateA.PlayAnimation();
-                gateB.PlayAnimation();
-            }
-
-            // FX
-            _fxController.PlayFX(evt.EnterPoint.ToUnityVector2());
-            _fxController.PlayFX(evt.DestinationPoint.ToUnityVector2());
-
-            // Snap Player Position
-            var playerState = _matchDataService.GetPlayer(playerId);
-            if (playerState != null)
-            {
-                 _playerControllers.SetPlayerTransform(playerId, evt.DestinationPoint, playerState.Spaceship.Transform.Direction);
+                var playerId = teleportGateCollisionEvent.PlayerId;
+                var teleportPairId = teleportGateCollisionEvent.TeleportGatePairId;
+                _teleportGateControllers.PlayTeleportAnimation(teleportPairId);
+                _fxController.PlayFX(teleportGateCollisionEvent.EnterPoint.ToUnityVector2());
+                _fxController.PlayFX(teleportGateCollisionEvent.ExitPoint.ToUnityVector2());
+                var playerState = _matchDataService.GetPlayer(playerId);
+                _playerControllers.SetPlayerTransform(playerId, playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction);
             }
         }
     }

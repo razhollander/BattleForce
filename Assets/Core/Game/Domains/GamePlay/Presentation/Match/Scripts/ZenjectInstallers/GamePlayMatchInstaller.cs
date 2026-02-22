@@ -76,7 +76,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();
             Container.BindInterfacesTo<TeamsBoardUIController>().AsSingle().WithArguments(_teamsBoardContainerView).NonLazy();
             Container.BindInterfacesTo<GainBoltEffectController>().AsSingle().WithArguments(gainBoltEffectViewPrefab).NonLazy();
-            Container.Bind<MatchEnvironmentTeleportGateControllers>().AsSingle().WithArguments(_environmentTeleportGateViewPrefab).NonLazy();
+            Container.Bind<EnvironmentTeleportGateControllers>().AsSingle().WithArguments(_environmentTeleportGateViewPrefab).NonLazy();
             Container.Bind<PlayerTeleportFXController>().AsSingle().WithArguments(_playerTeleportFXViewPrefab).NonLazy();
         }
     }

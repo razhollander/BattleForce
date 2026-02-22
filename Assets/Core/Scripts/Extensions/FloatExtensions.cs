@@ -4,9 +4,9 @@ namespace Core.Scripts.Extensions
 {
     public static class FloatExtensions
     {
-        public static Quaternion AngleToQuaternion(this float angle)
+        public static Quaternion AngleToQuaternion(this float angleDegrees)
         {
-            return Quaternion.Euler(0f, 0f, angle);    
+            return Quaternion.Euler(0f, 0f, angleDegrees);    
         }
         
         public static System.Numerics.Vector2 AngleToVector(this float angleRadians)

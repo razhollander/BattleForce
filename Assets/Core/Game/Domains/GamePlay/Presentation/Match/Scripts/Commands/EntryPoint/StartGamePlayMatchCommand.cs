@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IClientMatchPresentationTickProcessor _clientMatchPresentationTickProcessor;
         private IStartStagePacketHandler _startStagePacketHandler;
         private IGainBoltEffectController _gainBoltEffectController;
-        private MatchEnvironmentTeleportGateControllers _teleportGateControllers;
+        private EnvironmentTeleportGateControllers _teleportGateControllers;
         private PlayerTeleportFXController _playerTeleportFXController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
@@ -69,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _clientMatchPresentationTickProcessor = _diContainer.Resolve<IClientMatchPresentationTickProcessor>();
             _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
             _gainBoltEffectController = _diContainer.Resolve<IGainBoltEffectController>();
-            _teleportGateControllers = _diContainer.Resolve<MatchEnvironmentTeleportGateControllers>();
+            _teleportGateControllers = _diContainer.Resolve<EnvironmentTeleportGateControllers>();
             _playerTeleportFXController = _diContainer.Resolve<PlayerTeleportFXController>();
         }
 

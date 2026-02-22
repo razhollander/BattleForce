@@ -8,32 +8,32 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         [SerializeField] private Transform _visuals;
         [SerializeField] private SpriteRenderer _renderer;
 
-        private Vector3 _originalScale;
-
         public void SetSize(Vector2 size)
         {
             _visuals.localScale = new Vector3(size.x, size.y, 1f);
-            _originalScale = _visuals.localScale;
         }
 
-        public void SetColor(Color color)
+        public void Setup(Sprite sprite, Vector2 size)
         {
-            if (_renderer != null)
-            {
-                _renderer.color = color;
-            }
+            _renderer.sprite = sprite;
+            _visuals.localScale = new Vector3(size.x, size.y, 1f);
         }
 
         public void PlayTeleportAnimation()
         {
             _visuals.DOKill();
-            _visuals.localScale = _originalScale;
+            _visuals.localScale = Vector2.one;
 
-            _visuals.DOScale(_originalScale * 1.2f, 0.1f)
+            _visuals.DOScale(Vector2.one * 1.2f, 0.2f)
                 .OnComplete(() =>
                 {
-                    _visuals.DOScale(_originalScale, 0.1f);
+                    _visuals.DOScale(Vector2.one, 0.2f);
                 });
+        }
+
+        public void Destroy()
+        {
+            Destroy(gameObject);
         }
     }
 }

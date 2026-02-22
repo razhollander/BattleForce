@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchPlayerUIControllers _playerUIControllers;
         private IWorldCameraController _worldCameraController;
         private ITeamsBoardUIController _teamsBoardUIController;
-        private MatchEnvironmentTeleportGateControllers _teleportGateControllers;
+        private EnvironmentTeleportGateControllers _teleportGateControllers;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -61,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
-            _teleportGateControllers = _diContainer.Resolve<MatchEnvironmentTeleportGateControllers>();
+            _teleportGateControllers = _diContainer.Resolve<EnvironmentTeleportGateControllers>();
         }
 
         public void Execute()
@@ -125,17 +125,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private void CreateTeleportGates()
         {
             var gates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetTeleportGates();
-            if (gates == null) return;
+            if (gates.IsNullOrEmpty())
+            {
+                return;
+            }
 
             foreach (var pair in gates)
             {
-                var size = pair.Size.ToUnityVector2();
-
-                // Create Gate A
-                _teleportGateControllers.CreateGate(pair.Id, false, pair.GateAPosition, pair.GateANormalRotation, size, pair.Color);
-
-                // Create Gate B
-                _teleportGateControllers.CreateGate(pair.Id, true, pair.GateBPosition, pair.GateBNormalRotation, size, pair.Color);
+                var size = _sharedGamePlayConfig.EnvironmentTeleport.Size;
+                _matchDataService.AddTeleportPair(pair.Id, pair.GateAId, pair.GateA.Position, pair.GateA.NormalRotation, pair.GateBId, pair.GateB.Position, pair.GateB.NormalRotation, size.ToNumericsVector2());
+                _teleportGateControllers.CreateGatePair(pair.Id);
             }
         }
 

@@ -80,14 +80,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerBulletCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
-                HandlePlayerEnvironmentSpringCollision(objectA, objectB, collisionEvent.Contact);
-                HandlePlayerTeleportGateCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerEnvironmentSpringCollision(objectA, objectB);
+                HandlePlayerTeleportGateCollision(objectA, objectB);
             }
 
             _physicsSimulator.ClearCachedCollisions();
         }
 
-        private void HandlePlayerTeleportGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        private void HandlePlayerTeleportGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
             var isPlayerToGate = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.TeleportGate;
             var isGateToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.TeleportGate && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
@@ -117,89 +117,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            // Determine pair ID and whether it's A or B
-            // IDs are: GateA = pairId * 2, GateB = pairId * 2 + 1
-            ushort pairId = (ushort)(gateBodyId / 2);
-            bool isGateB = (gateBodyId % 2) == 1;
+            var teleportPairData = _matchDataService.Environment.GetTeleportGatePairOfGate(gateBodyId);
+            var isGateB = teleportPairData.GateBId == gateBodyId;
+            var enterGatePosition = isGateB ? teleportPairData.GateB.Position : teleportPairData.GateA.Position;
+            var enterGateRotation = isGateB ? teleportPairData.GateB.NormalRotation : teleportPairData.GateA.NormalRotation;
+            var exitGatePosition = isGateB ? teleportPairData.GateA.Position : teleportPairData.GateB.Position;
+            var exitGateRotation = isGateB ? teleportPairData.GateA.NormalRotation : teleportPairData.GateB.NormalRotation;
+            var enterPoint = playerState.Spaceship.Transform.Position;
 
-            // if (pairId >= teleportGates.Length)
-            // {
-            //     LogService.LogError($"TeleportGate collision with invalid PairId: {pairId}. Gates count: {teleportGates.Length}");
-            //     return;
-            // }
-
-            var pair = _matchDataService.Environment.GetTeleportGatePair(pairId);
-            var sourceGatePosition = isGateB ? pair.GateBPosition : pair.GateAPosition;
-            var sourceGateRotation = isGateB ? pair.GateBNormalRotation : pair.GateANormalRotation;
-            var targetGatePosition = isGateB ? pair.GateAPosition : pair.GateBPosition;
-            var targetGateRotation = isGateB ? pair.GateANormalRotation : pair.GateBNormalRotation;
-
-            // Calculate collision point (EnterPoint)
-            contact.GetWorldManifold(out var manifold);
-            var enterPoint = manifold.points[0]; // Approximation, use first point
-
-            // // Calculate relative offset from source gate center
-            // var sourceRotationRad = sourceGateRotation * ((float)System.Math.PI / 180f);
-            // var cosSource = (float)System.Math.Cos(-sourceRotationRad);
-            // var sinSource = (float)System.Math.Sin(-sourceRotationRad);
-            //
-            // var relativeVector = enterPoint - sourceGatePosition;
-            //
-            // // Rotate back to local space (un-rotate by source rotation)
-            // var localOffsetX = relativeVector.X * cosSource - relativeVector.Y * sinSource;
-            // var localOffsetY = relativeVector.X * sinSource + relativeVector.Y * cosSource;
-            // var localOffset = new System.Numerics.Vector2(localOffsetX, localOffsetY);
-            //
-            // // Calculate target position
-            // var targetRotationRad = targetGateRotation * ((float)System.Math.PI / 180f);
-            // var cosTarget = (float)System.Math.Cos(targetRotationRad);
-            // var sinTarget = (float)System.Math.Sin(targetRotationRad);
-            //
-            // // Rotate local offset by target rotation
-            // var rotatedOffsetX = localOffset.X * cosTarget - localOffset.Y * sinTarget;
-            // var rotatedOffsetY = localOffset.X * sinTarget + localOffset.Y * cosTarget;
-            // var rotatedOffset = new System.Numerics.Vector2(rotatedOffsetX, rotatedOffsetY);
-
-            var destinationPoint = MathUtils.TeleportsLogic.GetRelativeExitPoint(playerState.Spaceship.Transform.Position, sourceGatePosition, sourceGateRotation.ToRadians().AngleToVector(), targetGatePosition, targetGateRotation.ToRadians().AngleToVector());// + rotatedOffset;
-
-            // Teleport Player
-            playerState.Spaceship.Transform.Position = destinationPoint;
-            var newDirection = MathUtils.TeleportsLogic.GetTeleportedVelocity(playerState.Spaceship.Transform.Direction, sourceGateRotation.ToRadians().AngleToVector(), targetGateRotation.ToRadians().AngleToVector());
+            var enterGateNormal = enterGateRotation.ToRadians().AngleToVector();
+            var exitGateNormal = exitGateRotation.ToRadians().AngleToVector();
+            var exitPoint = MathUtils.TeleportsLogic.GetRelativeExitPoint(enterPoint, enterGatePosition, enterGateNormal, exitGatePosition, exitGateNormal);
+            playerState.Spaceship.Transform.Position = exitPoint;
+            var newDirection = MathUtils.TeleportsLogic.ConvertVectorTelativeToExitTeleport(playerState.Spaceship.Transform.Direction, enterGateNormal, exitGateNormal);
             playerState.Spaceship.Transform.Direction = newDirection;
-            var newVelocity = MathUtils.TeleportsLogic.GetTeleportedVelocity(playerState.Spaceship.Transform.Velocity, sourceGateRotation.ToRadians().AngleToVector(), targetGateRotation.ToRadians().AngleToVector());
+            var newVelocity = MathUtils.TeleportsLogic.ConvertVectorTelativeToExitTeleport(playerState.Spaceship.Transform.Velocity, enterGateNormal, exitGateNormal);
             playerState.Spaceship.Transform.Velocity = newVelocity;
-             
-            // Update physics body
-            //_physicsSimulator.SetPlayerVelocity(playerId, playerState.Spaceship.Transform.Velocity); // Ensure velocity persists or modify if needed
-            // Wait, SetPlayerVelocity only sets velocity. We need to set position.
-            // The simulation loop copies data FROM simulation state TO physics simulator usually?
-            // Let's check IPhysicsSimulator.CopyDataToSimulation.
-            // It copies FROM physics TO simulation state usually, or updates physics body from state?
-            // IPhysicsSimulator.CopyDataToSimulation takes SimulationStateS2C.
-            // Wait, PhysicsSimulator.CopyDataToSimulation seems to copy FROM State TO Physics.
-            // In ServerMatchNetworkTickProcessor (which calls ProcessCachedCollisionsCommand), it usually:
-            // 1. Process Inputs -> Updates Velocity in Physics.
-            // 2. Step Physics.
-            // 3. Process Collisions -> Updates State (e.g. bounce).
-            // 4. Send State.
-
-            // If we modify State Position here, will it be reflected in Physics?
-            // If the physics engine is authoritative for position, modifying State Position might be overwritten next frame if we don't update Physics Body Position.
-            // PhysicsSimulator.GetPlayer(playerId).SetTransform(destinationPoint, angle);
-            // var playerBody = _physicsSimulator.GetPlayer(playerId);
-            // if (playerBody != null)
-            // {
-            //     playerBody.SetTransform(destinationPoint, playerBody.GetAngle());
-            // }
-
-            //var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-              //  .Spaceship.Transform.Position = destinationPoint;
+            
             _teleportGateService.RegisterTeleport(playerId, _processedTick);
             LogService.LogError("Collided with teleport gate!");
-            _netEventsDataService.AddPlayerToEnvironmentTeleportGateCollisionNetEvent(_processedTick, pairId, enterPoint, destinationPoint, playerId);
+            _netEventsDataService.AddPlayerToEnvironmentTeleportGateCollisionNetEvent(_processedTick, teleportPairData.Id, enterPoint, exitPoint, playerId);
         }
 
-        private void HandlePlayerEnvironmentSpringCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        private void HandlePlayerEnvironmentSpringCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
             var isPlayerToSpring = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.EnvironmentSpring;
             var isSpringToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.EnvironmentSpring && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;

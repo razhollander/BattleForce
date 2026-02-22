@@ -316,6 +316,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var playerToEnvironmentTeleportCollisionEvent in playerToEnvironmentTeleportCollisionEvents)
             {
+                _matchDataService.GetPlayer(playerToEnvironmentTeleportCollisionEvent.PlayerId).Spaceship.Transform.Position = playerToEnvironmentTeleportCollisionEvent.ExitPoint;
                 _cachedPresentationEventsService.PlayerToEnvironmentTeleportGateCollisionNetEvents.Add(playerToEnvironmentTeleportCollisionEvent);
             }
         }

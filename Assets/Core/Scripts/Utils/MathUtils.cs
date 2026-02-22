@@ -76,7 +76,7 @@ namespace CoreDomain.Scripts.Utils
                 return exitCenter + rotatedOffset;
             }
             
-            public static System.Numerics.Vector2 GetTeleportedVelocity(System.Numerics.Vector2 currentVelocity, System.Numerics.Vector2 enterNormal, System.Numerics.Vector2 exitNormal)
+            public static System.Numerics.Vector2 ConvertVectorTelativeToExitTeleport(System.Numerics.Vector2 currentVelocity, System.Numerics.Vector2 enterNormal, System.Numerics.Vector2 exitNormal)
             {
                 // 1. The direction 'into' the entrance is the opposite of its normal
                 var entranceForward = -enterNormal;

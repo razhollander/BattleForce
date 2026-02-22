@@ -11,6 +11,7 @@ public class SharedGamePlayConfig : ScriptableObject
     [EditableRef] public EnvironmentConfig Environment; 
     public MatchMakingEnvironmentLayoutConfig MatchMakingEnvironment;
     [EditableRef] public PowerUpsSharedConfig PowerUps;
+    [EditableRef] public EnvironmentTeleportConfig EnvironmentTeleport;
     public int MaxSavedPlaybacks = 10;
     public ushort NoTeamId = 5;
     public List<ushort> TeamIds = new List<ushort>() {1, 2, 3, 4};

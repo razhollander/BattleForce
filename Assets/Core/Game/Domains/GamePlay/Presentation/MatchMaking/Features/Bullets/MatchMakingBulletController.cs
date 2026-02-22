@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets
             _bulletView = _bulletPool.Spawn();
             _bulletView.name = "Bullet_" + BulletId;
             _bulletView.transform.SetParent(_bulletsParent);
-            _bulletView.SetPosition(position.ToUnity());
+            _bulletView.SetPosition(position.ToUnityVector2());
             _bulletView.SetRadius(radius);
             _bulletView.SetColor(color);
         }
@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets
         public void InterpolatePosition(float decay)
         {
             var bulletModel = _matchDataService.GetBullet(BulletId);
-            var bulletPosition = bulletModel.Position.ToUnity();
+            var bulletPosition = bulletModel.Position.ToUnityVector2();
             _bulletView.InterpolatePosition(bulletPosition, decay);
         }
 
