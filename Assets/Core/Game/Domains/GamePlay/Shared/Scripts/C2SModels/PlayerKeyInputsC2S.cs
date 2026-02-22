@@ -1,5 +1,6 @@
 using System;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
+using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.ClientToServerModels
@@ -38,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Shared.ClientToServerModels
             {
                 writer.Put((byte)InputKeys[i]); 
             }
-            writer.Put(AimDirection);
+            writer.PutFloat16(AimDirection);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -51,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Shared.ClientToServerModels
             {
                 InputKeys[i] = (InputKeyType)reader.GetByte();
             }
-            AimDirection = reader.GetFloat();
+            AimDirection = reader.GetFloat16();
         }
         
         public int CompareTo(PlayerKeyInputsC2S other)

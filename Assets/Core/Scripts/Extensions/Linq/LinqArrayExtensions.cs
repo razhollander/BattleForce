@@ -1,10 +1,27 @@
 using System;
 using System.Collections.Generic;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Scripts.Extensions.Linq
 {
     public static partial class LinqExtensions
     {
+        public static T FindWithId<T>(this T[] source, ushort id) where T : IEquatable<ushort>
+        {
+            for (int i = 0; i < source.Length; i++)
+            {
+                var environmentSpring = source[i];
+
+                if (environmentSpring.Equals(id))
+                {
+                    return environmentSpring;
+                }
+            }
+
+            LogService.LogError("No found with id: " + id + "");
+            return default;
+        }
+        
         public static bool Any<T>(this T[] source)
         {
             return source.Length > 0;

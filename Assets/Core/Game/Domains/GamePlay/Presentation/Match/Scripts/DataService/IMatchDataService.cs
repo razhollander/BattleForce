@@ -1,9 +1,10 @@
 using System.Collections.Generic;
-using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 {
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchPlayerBulletModel> Bullets { get; }
         List<MatchPowerUpBallModel> PowerUpBalls { get; }
         List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; }
+        List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; }
         HashSet<ushort> TeamIds {get; }
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
@@ -39,5 +41,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);
         void SetTeamGems(ushort teamId, int totalTeamGems);
+
+        void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition,
+            float gateBNormalRotation, Vector2 size);
+
+        MatchEnvironmentTeleportPairModel GetTeleportPair(ushort teleportPairId);
     }
 }

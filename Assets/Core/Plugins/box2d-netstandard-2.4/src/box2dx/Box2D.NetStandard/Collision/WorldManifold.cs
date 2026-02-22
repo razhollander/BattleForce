@@ -45,8 +45,8 @@ namespace Box2D.NetStandard.Collision
         /// <summary>
         ///  World contact point (point of intersection).
         /// </summary>
-        internal Vector2[] points = new Vector2[Settings.MaxManifoldPoints];
-
+        /*internal*/ public Vector2[] points = new Vector2[Settings.MaxManifoldPoints];
+        
         /// Evaluate the manifold with supplied transforms. This assumes
         /// modest motion from the original state. This does not change the
         /// point count, impulses, etc. The radii must come from the shapes

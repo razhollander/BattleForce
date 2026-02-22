@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleTalentSwitchNetEventsCommand _handleTalentSwitchNetEventsCommand;
         private readonly HandleGainBoltsNetEventCommand _handleGainBoltsNetEventCommand;
         private readonly HandleEnvironmentSpringPlayerCollisionNetEventsCommand _handleEnvironmentSpringPlayerCollisionNetEventsCommand;
+        private readonly HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchDataService matchDataService,
@@ -58,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleTalentSwitchNetEventsCommand = commandFactory.CreateCommandVoid<HandleTalentSwitchNetEventsCommand>();
             _handleGainBoltsNetEventCommand = commandFactory.CreateCommandVoid<HandleGainBoltsNetEventCommand>();
             _handleEnvironmentSpringPlayerCollisionNetEventsCommand = commandFactory.CreateCommandVoid<HandleEnvironmentSpringPlayerCollisionNetEventsCommand>();
+            _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -85,6 +87,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleTalentSwitchNetEventsCommand.Execute();
             _handleGainBoltsNetEventCommand.Execute();
             _handleEnvironmentSpringPlayerCollisionNetEventsCommand.Execute();
+            _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand.Execute();
 
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();

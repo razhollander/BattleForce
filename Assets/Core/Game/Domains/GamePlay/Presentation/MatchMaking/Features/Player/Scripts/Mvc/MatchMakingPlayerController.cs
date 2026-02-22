@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             _playerView.SetPlayerName(playerModel.PlayerName);
             var playerTransform = playerModel.Spaceship.Transform;
             _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
-            _playerView.SetPositionAndRotation(playerTransform.Position.ToUnity(),
+            _playerView.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
         }
 
@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             var playerTransformState = playerModel.Spaceship.Transform;
-            var playerPosition = playerTransformState.Position.ToUnity();
+            var playerPosition = playerTransformState.Position.ToUnityVector2();
             var playerRotation = playerTransformState.Direction.ToUnityVector2().ToQuaternion();
             var exponentialDecay = _gamePlayConfig.ExponentialDecay;
             _playerView.InterpolateTransform(playerPosition, playerRotation, exponentialDecay);

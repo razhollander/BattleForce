@@ -11,9 +11,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
         //public float InterpolationFactor = 0.85f;
         public float ExponentialDecay = 15; // usefull range 1-25, 1=slow, 25=fast
         [EditableRef] public TalentCardsConfig TalentCards;
-        [EditableRef] public PowerUpsConfig PowerUps;
         [EditableRef] public TeamFloorConfig TeamFloor;
-        [EditableRef] public EnvironmentSpringConfig EnvironmentSpring;
+        [EditableRef] public EnvironmentTeleportConfig Teleports;
         public SerializableDictionary<int, Color> ColorPerTeamId;
     }
 }

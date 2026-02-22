@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -22,6 +23,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private SimulationGamePlayConfig _gamePlayConfig;
         private IStageDataService _stageDataService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
+        private ITeleportGateService _teleportGateService;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
 
         public override void ResolveDependencies()
         {
@@ -30,12 +33,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
+            _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public void Execute()
         {
             _physicsSimulator.ClearAllData();
             _playersInLavaTrackerService.ClearAllData();
+            _teleportGateService.ClearData();
             
             _matchDataService.SimulationState.Bullets.Clear();
             _matchDataService.SimulationState.PowerUpBalls.Clear();
@@ -46,6 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateLavaWalls();
             CreateTalentCards();
             CreateEnvironmentSprings();
+            CreateTeleportGates();
             CreateRotatingWheels();
             ResetPlayers();
 
@@ -160,12 +167,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             foreach (var environmentSpring in environmentSprings)
             {
                 var springId = environmentSpring.Id;
-                var springDirectionAngle = environmentSpring.DirectionAngle;
-                var springRotationAngle = environmentSpring.DirectionAngle+90;
+                var springRotationAngle = environmentSpring.DirectionAngle + 90;
                 var springSize = _gamePlayConfig.EnvironmentSpring.Size.ToNumericsVector2();
-                var springDirection = springDirectionAngle.AngleToVector();
-                var springPosition = environmentSpring.Position;// + springDirection * springSize.Y*0.5f;
+                var springPosition = environmentSpring.Position;
                 _physicsSimulator.AddEnvironmentSpring(springId, springPosition, springRotationAngle, springSize);
+            }
+        }
+
+        private void CreateTeleportGates()
+        {
+            var teleportGates = _matchDataService.Environment.TeleportGates;
+            if (teleportGates.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var pair in teleportGates)
+            {
+                var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size.ToNumericsVector2();
+                _physicsSimulator.AddTeleportGate(pair.GateAId, pair.GateA.Position, pair.GateA.NormalRotation, gateSize);
+                _physicsSimulator.AddTeleportGate(pair.GateBId, pair.GateB.Position, pair.GateB.NormalRotation, gateSize);
             }
         }
 

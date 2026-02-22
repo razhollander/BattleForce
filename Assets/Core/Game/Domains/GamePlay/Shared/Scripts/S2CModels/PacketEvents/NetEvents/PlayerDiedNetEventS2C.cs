@@ -1,9 +1,10 @@
+using System;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public struct PlayerDiedNetEventS2C : INetSerializable
+    public struct PlayerDiedNetEventS2C : INetSerializable, IComparable<PlayerDiedNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort PlayerId;
@@ -24,6 +25,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             PlayerId = reader.GetByte();
             PlayerMaxShootCooldown = reader.GetFloat16();
             PlayerShootCooldownSecondsLeft = reader.GetFloat16();
+        }
+
+        public int CompareTo(PlayerDiedNetEventS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }

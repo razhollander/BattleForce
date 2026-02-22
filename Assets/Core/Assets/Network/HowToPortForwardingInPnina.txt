@@ -1,0 +1,4 @@
+Go to http://10.100.102.1/2.0/gui/#/login/
+User: home
+Password: Home013
+Press Login -> Select Your device (you know which one by its local ip)-> port forwarding

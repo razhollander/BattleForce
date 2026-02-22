@@ -1,10 +1,11 @@
+using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public struct PlayersSwapNetEventS2C : INetSerializable
+    public struct PlayersSwapNetEventS2C : INetSerializable, IComparable<PlayersSwapNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort CasterPlayerId;
@@ -45,6 +46,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             OtherPosition = reader.GetVector2Quantized();
             CasterDirection = reader.GetVector2FromAngle16();
             OtherDirection = reader.GetVector2FromAngle16();
+        }
+
+        public int CompareTo(PlayersSwapNetEventS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }

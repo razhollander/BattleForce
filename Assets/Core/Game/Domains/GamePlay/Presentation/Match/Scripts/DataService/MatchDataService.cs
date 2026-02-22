@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchEnvironmentWallModel> EnvironmentWalls { get; private set; }
         public List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; private set; }
         public List<MatchEnvironmentSpringModel> EnvironmentSprings { get; private set; }
+        public List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; private set; }
         public List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
@@ -40,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             BoltsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             GemsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
+            EnvironmentTeleportPairs = new List<MatchEnvironmentTeleportPairModel>(networkConfig.MaxCap.ConcurrentEvironmentTeleportPairs);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -198,6 +200,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             PowerUpBalls.Clear();
             BoltsPerTeam.Clear();
             GemsPerTeam.Clear();
+            EnvironmentTeleportPairs.Clear();
         }
 
         public void SetTeamBolts(ushort teamId, int totalTeamBolts)
@@ -208,6 +211,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public void SetTeamGems(ushort teamId, int totalTeamGems)
         {
             GemsPerTeam[teamId] = totalTeamGems;
+        }
+
+        public void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition, float gateBNormalRotation, Vector2 size)
+        {
+            var teleportPairModel = new MatchEnvironmentTeleportPairModel(teleportPairId, gateAId, gateAPosition, gateANormalRotation, gateBId ,gateBPosition, gateBNormalRotation, size);
+            EnvironmentTeleportPairs.Add(teleportPairModel);
+        }
+
+        public MatchEnvironmentTeleportPairModel GetTeleportPair(ushort teleportPairId)
+        {
+            return EnvironmentTeleportPairs.Find(x => x.Id == teleportPairId);
         }
     }
 }

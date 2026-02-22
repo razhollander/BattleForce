@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.RotatingWheels.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
@@ -37,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchPlayerUIControllers _playerUIControllers;
         private IWorldCameraController _worldCameraController;
         private ITeamsBoardUIController _teamsBoardUIController;
+        private IEnvironmentTeleportGateControllers _teleportGateControllers;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -62,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
+            _teleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
         }
 
         public void Execute()
@@ -84,6 +87,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _playerControllers.DestroyAll();
             _playerUIControllers.DestroyAll();
             _teamsBoardUIController.DestroyAll();
+            _teleportGateControllers.DestroyAll();
         }
 
         private void CreateAll()
@@ -97,6 +101,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateTalentCards();
             CreatePowerUpBalls();
             CreateTeamBoards();
+            CreateTeleportGates();
         }
 
         private void CreateTeamBoards()
@@ -119,6 +124,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 _matchDataService.AddSpring(spring.Id, spring.Position.ToUnityVector2(), spring.DirectionAngle);
                 _environmentSpringControllers.CreateSpring(spring.Id);
+            }
+        }
+
+        private void CreateTeleportGates()
+        {
+            var gates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetTeleportGates();
+            if (gates.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var pair in gates)
+            {
+                var size = _sharedGamePlayConfig.EnvironmentTeleport.Size;
+                _matchDataService.AddTeleportPair(pair.Id, pair.GateAId, pair.GateA.Position, pair.GateA.NormalRotation, pair.GateBId, pair.GateB.Position, pair.GateB.NormalRotation, size.ToNumericsVector2());
+                _teleportGateControllers.CreateGatePair(pair.Id);
             }
         }
 
