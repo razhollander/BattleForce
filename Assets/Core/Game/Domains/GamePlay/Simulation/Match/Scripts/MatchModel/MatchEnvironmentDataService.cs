@@ -1,6 +1,8 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Scripts.Extensions.Linq;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
 {
@@ -12,6 +14,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public EnvironmentTeleportGatePairS2C[] TeleportGates { get; private set; }
         public WallConfig[] LavaWallConfigs { get; private set; }
         public WallConfig[] WallConfigs { get; private set; }
+        
+        public EnvironmentSpringS2C GetSpring(ushort springId)
+        {
+            return EnvironmentSprings.FindWithId(springId);
+        }
+        
+        public EnvironmentTeleportGatePairS2C GetTeleportGatePair(ushort teleportGatePairId)
+        {
+            return TeleportGates.FindWithId(teleportGatePairId);
+        }
         
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         

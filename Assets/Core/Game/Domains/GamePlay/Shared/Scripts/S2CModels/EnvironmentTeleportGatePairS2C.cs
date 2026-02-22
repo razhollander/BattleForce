@@ -3,12 +3,12 @@ using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
-using Vector3 = System.Numerics.Vector3;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 {
     [Serializable]
-    public struct EnvironmentTeleportGatePairS2C : INetSerializable
+    public struct EnvironmentTeleportGatePairS2C : INetSerializable, IEquatable<ushort>
+
     {
         public ushort Id;
         public Vector2 GateAPosition;
@@ -47,6 +47,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             GateBPosition = reader.GetVector2Quantized();
             GateBRotation = reader.GetFloat();
             Size = reader.GetVector2Quantized();
+        }
+
+        public bool Equals(ushort otherId)
+        {
+            return Id == otherId;
         }
     }
 }

@@ -6,7 +6,7 @@ using LiteNetLib.Utils;
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 {
     [Serializable]
-    public struct EnvironmentSpringS2C : INetSerializable
+    public struct EnvironmentSpringS2C : INetSerializable, IEquatable<ushort>
     {
         public ushort Id;
         public Vector2 Position;
@@ -31,6 +31,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             Id = reader.GetUShort();
             Position = reader.GetVector2Quantized();
             DirectionAngle = reader.GetFloat();
+        }
+
+        public bool Equals(ushort otherId)
+        {
+            return Id == otherId;
         }
     }
 }

@@ -110,26 +110,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 gateBodyId = objectA.Id;
             }
 
-            if (!_teleportGateService.CanTeleport(playerId, _processedTick))
-            {
-                return;
-            }
+            // if (!_teleportGateService.CanTeleport(playerId, _processedTick))
+            // {
+            //     return;
+            // }
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var teleportGates = _matchDataService.Environment.TeleportGates;
-
             // Determine pair ID and whether it's A or B
             // IDs are: GateA = pairId * 2, GateB = pairId * 2 + 1
             ushort pairId = (ushort)(gateBodyId / 2);
             bool isGateB = (gateBodyId % 2) == 1;
 
-            if (pairId >= teleportGates.Length)
-            {
-                LogService.LogError($"TeleportGate collision with invalid PairId: {pairId}. Gates count: {teleportGates.Length}");
-                return;
-            }
+            // if (pairId >= teleportGates.Length)
+            // {
+            //     LogService.LogError($"TeleportGate collision with invalid PairId: {pairId}. Gates count: {teleportGates.Length}");
+            //     return;
+            // }
 
-            var pair = teleportGates[pairId];
+            var pair = _matchDataService.Environment.GetTeleportGatePair(pairId);
             var sourceGatePosition = isGateB ? pair.GateBPosition : pair.GateAPosition;
             var sourceGateRotation = isGateB ? pair.GateBRotation : pair.GateARotation;
             var targetGatePosition = isGateB ? pair.GateAPosition : pair.GateBPosition;
@@ -167,7 +165,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             playerState.Spaceship.Transform.Position = destinationPoint;
 
             // Update physics body
-            _physicsSimulator.SetPlayerVelocity(playerId, playerState.Spaceship.Transform.Velocity); // Ensure velocity persists or modify if needed
+            //_physicsSimulator.SetPlayerVelocity(playerId, playerState.Spaceship.Transform.Velocity); // Ensure velocity persists or modify if needed
             // Wait, SetPlayerVelocity only sets velocity. We need to set position.
             // The simulation loop copies data FROM simulation state TO physics simulator usually?
             // Let's check IPhysicsSimulator.CopyDataToSimulation.
@@ -183,13 +181,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             // If we modify State Position here, will it be reflected in Physics?
             // If the physics engine is authoritative for position, modifying State Position might be overwritten next frame if we don't update Physics Body Position.
             // PhysicsSimulator.GetPlayer(playerId).SetTransform(destinationPoint, angle);
-            var playerBody = _physicsSimulator.GetPlayer(playerId);
-            if (playerBody != null)
-            {
-                playerBody.SetTransform(destinationPoint, playerBody.GetAngle());
-            }
+            // var playerBody = _physicsSimulator.GetPlayer(playerId);
+            // if (playerBody != null)
+            // {
+            //     playerBody.SetTransform(destinationPoint, playerBody.GetAngle());
+            // }
 
-            _teleportGateService.RegisterTeleport(playerId, _processedTick);
+            //var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+              //  .Spaceship.Transform.Position = destinationPoint;
+            //_teleportGateService.RegisterTeleport(playerId, _processedTick);
+            LogService.LogError("Collided with teleport gate!");
             _netEventsDataService.AddPlayerToEnvironmentTeleportGateCollisionNetEvent(_processedTick, pairId, enterPoint, destinationPoint, playerId);
         }
 
@@ -218,17 +219,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var springAngle = 0f;
-            for (int i = 0; i < _matchDataService.Environment.EnvironmentSprings.Length; i++)
-            {
-                if (_matchDataService.Environment.EnvironmentSprings[i].Id != springId)
-                {
-                    continue;
-                }
-                springAngle =  _matchDataService.Environment.EnvironmentSprings[i].DirectionAngle;
-                break;
-            }
-
+            var springAngle = _matchDataService.Environment.GetSpring(springId).DirectionAngle;
             springAngle *= Mathf.Deg2Rad;
             var pushDirection = springAngle.FromAngleRadians();
             var forceMagnitude = _gamePlayConfig.EnvironmentSpring.Force;
