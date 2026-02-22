@@ -81,11 +81,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Rot
                 controller.Destroy();
             }
             _controllers.Clear();
-            if (_parent != null)
-            {
-                Object.Destroy(_parent);
-                _parent = null;
-            }
         }
     }
 }

@@ -54,6 +54,15 @@ MonoBehaviour:
         {         "X": -4.5,         "Y": -3       },       "NormalRotation": 90    
         },     "GateB": {       "Position": {         "X": 3.25,         "Y": 7      
         },       "NormalRotation": 270     }   } ]'
+      _rotatingWheelsJson: '[{   "Id": 500,   "CenterPosition": {     "X": 10.0,    
+        "Y": 10.0   },   "RotationSpeed": 45.0,   "Walls": [     {       "Id": 1,      
+        "Points": [         { "X": -2.0, "Y": 2.0 },         { "X": 2.0, "Y": 2.0
+        }       ]     },     {       "Id": 2,       "Points": [         { "X": 2.0,
+        "Y": -2.0 },         { "X": -2.0, "Y": -2.0 }       ]     }   ],   "LavaWalls":
+        [     {       "Id": 10,       "Points": [         { "X": 0.0, "Y": 0.0 },        
+        { "X": 1.0, "Y": 1.0 }       ]     }   ],   "Springs": [     {       "Id":
+        201,       "Position": {         "X": 5.0,         "Y": 0.0       },      
+        "DirectionAngle": 90.0     }   ] }]'
     - _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
         "Y": -28.16       },       {         "X": -43.804464,         "Y": -28.16      
@@ -74,3 +83,4 @@ MonoBehaviour:
       _talentCardsJson: 
       _environmentSpringsJson: 
       _teleportGatesJson: 
+      _rotatingWheelsJson: 

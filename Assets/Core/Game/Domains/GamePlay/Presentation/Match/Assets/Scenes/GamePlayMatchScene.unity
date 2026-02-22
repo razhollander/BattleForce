@@ -976,6 +976,7 @@ MonoBehaviour:
   _matchPlayerUIControllersView: {fileID: 1138906649}
   _bulletViewPrefab: {fileID: 5098656257286592944, guid: 6d7e26fd88ce749758e4f78e408ac5ee, type: 3}
   _environmentWallViewPrefab: {fileID: 1848450532861189530, guid: 1636cc9bec8694334b3401f1fbe5547b, type: 3}
+  _rotatingWheelViewPrefab: {fileID: 1692463645964559957, guid: 77378acf9d06b4ee59f87899e9840981, type: 3}
   _environmentSpringViewPrefab: {fileID: 93229460892055424, guid: a47adcf1f670f4a6a8efa288168538ff, type: 3}
   _environmentTeleportGateViewPrefab: {fileID: 1761154982624354696, guid: 6c46cbea1185e47d2a3c2054da34cee5, type: 3}
   _stageEndedUiView: {fileID: 1138906650}
