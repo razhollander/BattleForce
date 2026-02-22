@@ -7,7 +7,7 @@ using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate
 {
-    public class EnvironmentTeleportGateControllers
+    public class EnvironmentTeleportGateControllers : IEnvironmentTeleportGateControllers
     {
         private readonly IMatchDataService _matchDataService;
         private readonly EnvironmentTeleportGateView _prefab;

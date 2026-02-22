@@ -6,7 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWal
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.PlayerTeleportFX;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.PlayerTeleportEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private StageEndedUiView _stageEndedUiView;
         [SerializeField] private TeamsBoardContainerView _teamsBoardContainerView;
         [SerializeField] private GainBoltEffectView gainBoltEffectViewPrefab;
-        [SerializeField] private PlayerTeleportFXView _playerTeleportFXViewPrefab;
+        [SerializeField] private PlayerTeleportEffectView playerTeleportEffectViewPrefab;
 
         public override void InstallBindings()
         {
@@ -76,8 +76,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();
             Container.BindInterfacesTo<TeamsBoardUIController>().AsSingle().WithArguments(_teamsBoardContainerView).NonLazy();
             Container.BindInterfacesTo<GainBoltEffectController>().AsSingle().WithArguments(gainBoltEffectViewPrefab).NonLazy();
-            Container.Bind<EnvironmentTeleportGateControllers>().AsSingle().WithArguments(_environmentTeleportGateViewPrefab).NonLazy();
-            Container.Bind<PlayerTeleportFXController>().AsSingle().WithArguments(_playerTeleportFXViewPrefab).NonLazy();
+            Container.BindInterfacesTo<EnvironmentTeleportGateControllers>().AsSingle().WithArguments(_environmentTeleportGateViewPrefab).NonLazy();
+            Container.BindInterfacesTo<PlayerTeleportEffectController>().AsSingle().WithArguments(playerTeleportEffectViewPrefab).NonLazy();
         }
     }
 }
