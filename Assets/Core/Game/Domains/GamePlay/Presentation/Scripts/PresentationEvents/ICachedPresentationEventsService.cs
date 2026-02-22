@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
@@ -21,5 +23,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<TalentSwitchNetEventS2C> TalentSwitchNetEvents { get; set; }
         List<GainBoltsNetEventS2C> GainBoltsNetEvents { get; set; }
         List<EnvironmentSpringPlayerCollisionNetEventS2C> EnvironmentSpringPlayerCollisionNetEvents { get; set; }
+        List<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> PlayerToEnvironmentTeleportGateCollisionNetEvents { get; set; }
     }
 }

@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchPlayerUIControllers _playerUIControllers;
         private IWorldCameraController _worldCameraController;
         private ITeamsBoardUIController _teamsBoardUIController;
-        private Scripts.MVC.EnvironmentTeleportGate.MatchEnvironmentTeleportGateControllers _teleportGateControllers;
+        private MatchEnvironmentTeleportGateControllers _teleportGateControllers;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -61,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
-            _teleportGateControllers = _diContainer.Resolve<Scripts.MVC.EnvironmentTeleportGate.MatchEnvironmentTeleportGateControllers>();
+            _teleportGateControllers = _diContainer.Resolve<MatchEnvironmentTeleportGateControllers>();
         }
 
         public void Execute()

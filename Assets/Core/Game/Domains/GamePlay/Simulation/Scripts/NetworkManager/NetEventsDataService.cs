@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -888,6 +889,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             foreach (var kvp in PlayerToEnvironmentTeleportGateCollisionNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
+                packet.PlayerId = playerId;
                 packet.OccuredOnTick = onTick;
                 packet.TeleportGatePairId = pairId;
                 packet.EnterPoint = enterPoint;

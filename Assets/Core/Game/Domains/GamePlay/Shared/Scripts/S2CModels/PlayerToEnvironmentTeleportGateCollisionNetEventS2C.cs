@@ -9,13 +9,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
     public struct PlayerToEnvironmentTeleportGateCollisionNetEventS2C : INetSerializable
     {
         public int OccuredOnTick;
+        public ushort PlayerId;
         public ushort TeleportGatePairId;
         public Vector2 EnterPoint;
         public Vector2 DestinationPoint;
 
-        public PlayerToEnvironmentTeleportGateCollisionNetEventS2C(int occuredOnTick, ushort teleportGatePairId, Vector2 enterPoint, Vector2 destinationPoint)
+        public PlayerToEnvironmentTeleportGateCollisionNetEventS2C(int occuredOnTick, ushort playerId,  ushort teleportGatePairId, Vector2 enterPoint, Vector2 destinationPoint)
         {
             OccuredOnTick = occuredOnTick;
+            PlayerId = playerId;
             TeleportGatePairId = teleportGatePairId;
             EnterPoint = enterPoint;
             DestinationPoint = destinationPoint;
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
+            writer.Put((byte)PlayerId);
             writer.Put(TeleportGatePairId);
             writer.PutVector2Quantized(EnterPoint);
             writer.PutVector2Quantized(DestinationPoint);
@@ -32,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
+            PlayerId = reader.GetByte();
             TeleportGatePairId = reader.GetUShort();
             EnterPoint = reader.GetVector2Quantized();
             DestinationPoint = reader.GetVector2Quantized();

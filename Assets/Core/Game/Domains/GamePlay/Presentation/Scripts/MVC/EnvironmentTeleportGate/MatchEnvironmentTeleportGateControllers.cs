@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.MVC.EnvironmentTelepor
             _parent = new GameObject("EnvironmentTeleportGates").transform;
         }
 
-        public EnvironmentTeleportGateController CreateGate(ushort pairId, bool isGateB, Vector2 position, float rotation, Vector2 size, Color color)
+        public EnvironmentTeleportGateController CreateGate(ushort pairId, bool isGateB, System.Numerics.Vector2 position, float rotation, Vector2 size, Color color)
         {
             var view = _container.InstantiatePrefabForComponent<EnvironmentTeleportGateView>(_prefab, _parent);
             var model = new EnvironmentTeleportGateModel(pairId, isGateB, position, rotation);
