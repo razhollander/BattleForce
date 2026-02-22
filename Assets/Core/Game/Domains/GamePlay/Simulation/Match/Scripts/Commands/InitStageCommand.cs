@@ -1,4 +1,6 @@
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
@@ -9,6 +11,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -37,11 +40,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.Bullets.Clear();
             _matchDataService.SimulationState.PowerUpBalls.Clear();
             _matchDataService.SimulationState.TalentCards.Clear();
+            _matchDataService.RotatingWheels.Clear();
 
             CreateWalls();
             CreateLavaWalls();
             CreateTalentCards();
             CreateEnvironmentSprings();
+            CreateRotatingWheels();
             ResetPlayers();
 
             _stageDataService.IsStageEnded = false;
@@ -161,6 +166,59 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var springDirection = springDirectionAngle.AngleToVector();
                 var springPosition = environmentSpring.Position;// + springDirection * springSize.Y*0.5f;
                 _physicsSimulator.AddEnvironmentSpring(springId, springPosition, springRotationAngle, springSize);
+            }
+        }
+
+        private void CreateRotatingWheels()
+        {
+            var rotatingWheelsConfigs = _matchDataService.Environment.RotatingWheelConfigs;
+            if (rotatingWheelsConfigs == null) return;
+
+            foreach (var wheelConfig in rotatingWheelsConfigs)
+            {
+                var controller = new EnvironmentRotatingWheelController(wheelConfig, _physicsSimulator);
+                _matchDataService.RotatingWheels.Add(controller);
+
+                var wheelCenter = wheelConfig.CenterPosition;
+                var rotationSpeed = wheelConfig.RotationSpeed;
+
+                if (wheelConfig.Walls != null)
+                {
+                    foreach (var wall in wheelConfig.Walls)
+                    {
+                        _physicsSimulator.AddWall(wall.Id, wall.Points);
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            0, rotationSpeed, 0, wheelCenter, Vector2.Zero, 0,
+                            out var initialPos, out var initialRot
+                        );
+                        _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Wall, wall.Id, initialPos, initialRot);
+                    }
+                }
+
+                if (wheelConfig.LavaWalls != null)
+                {
+                    foreach (var wall in wheelConfig.LavaWalls)
+                    {
+                        _physicsSimulator.AddLavaWall(wall.Id, wall.Points);
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            0, rotationSpeed, 0, wheelCenter, Vector2.Zero, 0,
+                            out var initialPos, out var initialRot
+                        );
+                        _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Lava, wall.Id, initialPos, initialRot);
+                    }
+                }
+
+                if (wheelConfig.Springs != null)
+                {
+                    foreach (var spring in wheelConfig.Springs)
+                    {
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            0, rotationSpeed, 0, wheelCenter, spring.Position, spring.DirectionAngle,
+                            out var initialPos, out var initialRot
+                        );
+                        _physicsSimulator.AddEnvironmentSpring(spring.Id, initialPos, initialRot, _gamePlayConfig.EnvironmentSpring.Size.ToNumericsVector2());
+                    }
+                }
             }
         }
     }

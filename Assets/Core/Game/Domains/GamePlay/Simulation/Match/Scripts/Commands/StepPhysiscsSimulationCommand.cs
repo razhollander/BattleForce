@@ -56,6 +56,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 _playersEngineLogic.TurnOnEngineIfPlayerIdle(playerState.Spaceship);
                 _playersEngineLogic.TryAddEngineForceToPlayer(playerState.Spaceship, stepDeltaTime);
             }
+
+            foreach (var wheel in _matchDataService.RotatingWheels)
+            {
+                wheel.UpdateRotationAccordingToTick(_tick, stepDeltaTime);
+            }
             
             ApplyMatchModelToPhysicsSimulation();
             _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);

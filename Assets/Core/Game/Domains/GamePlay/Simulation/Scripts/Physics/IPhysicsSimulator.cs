@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         bool RectangleCast(Vector2 center, Vector2 size, float angleRadians, params PhysicsBodyType[] bodyTypes);
         void AddStartMatchWall(ushort id, Vector2 position, float radius);
         void AddEnvironmentSpring(ushort id, Vector2 position, float rotation, Vector2 size);
+        void UpdateBodyTransform(PhysicsBodyType type, ushort id, Vector2 position, float rotation);
         void ClearAllData();
     }
 }

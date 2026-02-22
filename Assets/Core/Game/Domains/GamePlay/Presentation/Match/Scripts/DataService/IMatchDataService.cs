@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchPlayerModel> Players { get; }
         List<MatchPlayerBulletModel> Bullets { get; }
         List<MatchPowerUpBallModel> PowerUpBalls { get; }
+        List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; }
         HashSet<ushort> TeamIds {get; }
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
@@ -34,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort lavaWallId);
         MatchEnvironmentSpringModel AddSpring(ushort id, UnityEngine.Vector2 position, float directionAngle);
         MatchEnvironmentSpringModel GetEnvironmentSpring(ushort springId);
+        MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(EnvironmentRotatingWheelConfig config);
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);
         void SetTeamGems(ushort teamId, int totalTeamGems);

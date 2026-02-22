@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.RotatingWheels.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
@@ -24,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchBulletControllers _bulletControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
+        private IMatchEnvironmentRotatingWheelControllers _rotatingWheelControllers;
         private ITalentCardControllers _talentCardControllers;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
@@ -48,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
+            _rotatingWheelControllers = _diContainer.Resolve<IMatchEnvironmentRotatingWheelControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
@@ -74,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _bulletControllers.DestroyAll();
             _environmentWallsControllers.DestroyAll();
             _environmentSpringControllers.DestroyAll();
+            _rotatingWheelControllers.DestroyAll();
             _environmentLavaWallsControllers.DestroyAll();
             _talentCardControllers.DestroyAll();
             _powerUpBallControllers.DestroyAll();
@@ -89,6 +93,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateWalls();
             CreateSprings();
             CreateLavaWalls();
+            CreateRotatingWheels();
             CreateTalentCards();
             CreatePowerUpBalls();
             CreateTeamBoards();
@@ -172,6 +177,66 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var lavaWallModel = _matchDataService.AddLavalWall(lavaWall);
                 _environmentLavaWallsControllers.CreateLavaWall(lavaWallModel.Id);
             }
+        }
+
+        private void CreateRotatingWheels()
+        {
+            var wheels = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetRotatingWheels();
+            if (wheels == null) return;
+
+            foreach (var wheelConfig in wheels)
+            {
+                var wheelModel = _matchDataService.AddEnvironmentRotatingWheel(wheelConfig);
+                var wheelCenter = wheelModel.CenterPosition;
+                var rotationSpeed = wheelModel.RotationSpeed;
+
+                // Create initial state (tick 0)
+                // Register children with INITIAL WORLD positions/rotations.
+                // View creation uses these world positions, parenting handles the rest.
+
+                if (wheelConfig.Walls != null)
+                {
+                    foreach (var wallConfig in wheelConfig.Walls)
+                    {
+                        // Walls in config have points. Assuming points are relative to Wheel Center.
+                        // We register them as is? AddWall registers points.
+                        // If EnvironmentWallView uses points relative to its transform...
+                        // And we parent it to Wheel...
+                        // We want the Wall View to be at WheelPos.
+                        // So we register a WallModel (which creates ID).
+                        // Note: We don't transform points here because View parenting handles it?
+                        // BUT AddWall returns a Model.
+                        // MatchEnvironmentWallsControllers uses AddWall(config).
+                        // Wait, AddWall(config) uses config points.
+                        // If config points are relative to wheel, and we parent to wheel, it works.
+                        // So we just register.
+                        _matchDataService.AddWall(wallConfig);
+                    }
+                }
+
+                if (wheelConfig.LavaWalls != null)
+                {
+                    foreach (var wallConfig in wheelConfig.LavaWalls)
+                    {
+                        _matchDataService.AddLavalWall(wallConfig);
+                    }
+                }
+
+                if (wheelConfig.Springs != null)
+                {
+                    foreach (var springConfig in wheelConfig.Springs)
+                    {
+                        // Calculate initial world position/rotation
+                        Core.Game.Domains.GamePlay.Shared.Scripts.Utils.EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            0, rotationSpeed, 0, wheelConfig.CenterPosition, springConfig.Position, springConfig.DirectionAngle,
+                            out var worldPos, out var worldRot
+                        );
+
+                        _matchDataService.AddSpring(springConfig.Id, worldPos.ToUnityVector2(), worldRot);
+                    }
+                }
+            }
+            _rotatingWheelControllers.CreateRotatingWheels();
         }
     }
 }

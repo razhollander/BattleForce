@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Controllers;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
@@ -8,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
     public interface IMatchDataService 
     {
         MatchSimulationStateS2C SimulationState { get; }
+        List<EnvironmentRotatingWheelController> RotatingWheels { get; }
         MatchEnvironmentDataService Environment { get; }
         //SimulationStateS2C PreviousSimulationState { get; }
         PlayerStateS2C AddPlayer(ushort playerId, ushort teamId, string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,

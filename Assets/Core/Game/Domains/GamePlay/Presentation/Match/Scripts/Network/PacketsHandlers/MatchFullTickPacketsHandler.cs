@@ -11,6 +11,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 {
     public class MatchFullTickPacketsHandler : IFullTickPacketsHandler
     {
+        private readonly NetworkConfig _networkConfig;
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationMatchNetEventsHandler _presentationNetEventsHandler;
@@ -50,6 +52,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             IMatchDataService matchDataService, ICachedPresentationEventsService iCachedPresentationEventsService,
             IClientMatchPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService)
         {
+            _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
 
@@ -113,6 +116,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
             UpdatePowerUpBallsTransform(simulationState);
+            UpdateRotatingWheels(latestTickReceivedFromServer);
 
             LastProcessedTickFromServer = latestTickReceivedFromServer;
 
@@ -122,6 +126,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
 
             _fullTickPackets.Clear();
+        }
+
+        private void UpdateRotatingWheels(int tick)
+        {
+            var deltaTime = _networkConfig.DeltaTime;
+            foreach (var wheelModel in _matchDataService.RotatingWheels)
+            {
+                wheelModel.CurrentRotation = EnvironmentRotatingWheelUtils.CalculateRotation(tick, wheelModel.RotationSpeed, deltaTime);
+                var wheelCenter = wheelModel.Config.CenterPosition;
+                var rotationSpeed = wheelModel.RotationSpeed;
+
+                if (wheelModel.Config.Springs != null)
+                {
+                    foreach (var springConfig in wheelModel.Config.Springs)
+                    {
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            tick, rotationSpeed, deltaTime, wheelCenter, springConfig.Position, springConfig.DirectionAngle,
+                            out var worldPos, out var worldRot
+                        );
+
+                        var springModel = _matchDataService.GetEnvironmentSpring(springConfig.Id);
+                        if (springModel != null)
+                        {
+                            springModel.Position = worldPos.ToUnityVector2();
+                            springModel.DirectionAngle = worldRot;
+                        }
+                    }
+                }
+            }
         }
 
         private void UpdatePowerUpBallsTransform(MatchSimulationStateS2C simulationState)

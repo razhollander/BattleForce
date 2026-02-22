@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.RotatingWheels.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
@@ -14,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly IMatchPlayerControllers _playerControllers;
         private readonly IMatchBulletControllers _bulletControllers;
+        private readonly IMatchEnvironmentRotatingWheelControllers _rotatingWheelControllers;
         private readonly IPowerUpBallControllers _powerUpBallControllers;
         private readonly IMatchDataService _matchDataService;
         private readonly IWorldCameraController _worldCameraController;
@@ -33,11 +35,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleEnvironmentSpringPlayerCollisionNetEventsCommand _handleEnvironmentSpringPlayerCollisionNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchDataService matchDataService)
+            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchDataService matchDataService,
+            IMatchEnvironmentRotatingWheelControllers rotatingWheelControllers)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
             _bulletControllers = bulletControllers;
+            _rotatingWheelControllers = rotatingWheelControllers;
             _powerUpBallControllers = powerUpBallControllers;
             _matchDataService = matchDataService;
             _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
@@ -86,6 +90,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
+            _rotatingWheelControllers.UpdateRotation();
             
             _handleTalentCardObtainedNetEventsCommand.Execute();
         }

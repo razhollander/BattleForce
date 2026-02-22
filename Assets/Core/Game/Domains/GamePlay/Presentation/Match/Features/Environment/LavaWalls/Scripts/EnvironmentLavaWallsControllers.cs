@@ -24,10 +24,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
             _lavaWallsParent = new GameObject("EnvironmentLavaWallsParent");
         }
 
-        public void CreateLavaWall(ushort wallId)
+        public void CreateLavaWall(ushort wallId, Transform parent = null)
         {
             var lavaWallController = new EnvironmentLavaWallController(wallId, _matchDataService);
-            lavaWallController.CreateWallView(_lavaWallViewPrefab, _lavaWallsParent.transform);
+            lavaWallController.CreateWallView(_lavaWallViewPrefab, parent != null ? parent : _lavaWallsParent.transform);
             _lavaWallControllers.Add(lavaWallController);
         }
 

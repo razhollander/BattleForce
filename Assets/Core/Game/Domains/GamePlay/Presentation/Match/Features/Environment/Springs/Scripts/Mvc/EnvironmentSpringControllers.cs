@@ -26,11 +26,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
             _springsParent = new GameObject("EnvironmentSpringsParent");
         }
 
-        public void CreateSpring(ushort springId)
+        public void CreateSpring(ushort springId, Transform parent = null)
         {
             var springController = new MatchEnvironmentSpringController();
             var springModel = _matchDataService.GetEnvironmentSpring(springId);
-            springController.CreateView(_environmentSpringViewPrefab, _springsParent.transform, springModel.Position, springModel.DirectionAngle);
+            springController.CreateView(_environmentSpringViewPrefab, parent != null ? parent : _springsParent.transform, springModel.Position, springModel.DirectionAngle);
             _springControllers.Add(springId, springController);
         }
 

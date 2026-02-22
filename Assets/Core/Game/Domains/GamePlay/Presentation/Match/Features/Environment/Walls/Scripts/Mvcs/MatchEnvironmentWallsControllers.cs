@@ -25,10 +25,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
             _wallsParent = new GameObject("EnvironmentWallsParent");
         }
 
-        public void CreateWall(ushort wallId)
+        public void CreateWall(ushort wallId, Transform parent = null)
         {
             var wallController = new MatchEnvironmentWallController(wallId, _matchDataService);
-            wallController.CreateWallView(_wallViewPrefab, _wallsParent.transform);
+            wallController.CreateWallView(_wallViewPrefab, parent != null ? parent : _wallsParent.transform);
             _wallControllers.Add(wallController);
         }
 

@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Network;
 using UnityEngine;
@@ -18,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private readonly MatchEnvironmentDataService _environmentDataService;
         public MatchEnvironmentDataService Environment => _environmentDataService;
         public HashSet<ushort> TeamIds { get; private set; }
+        public List<EnvironmentRotatingWheelController> RotatingWheels { get; private set; }
 
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
         {
@@ -35,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.EnvironmentLayoutIndex = chosenEnvironmentIndex;
             _simulationState.StageType = StageType.DeathMatch;
+            RotatingWheels = new List<EnvironmentRotatingWheelController>();
         }
 
         public void InitEntryPoint()

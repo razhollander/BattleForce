@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchEnvironmentWallModel> EnvironmentWalls { get; private set; }
         public List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; private set; }
         public List<MatchEnvironmentSpringModel> EnvironmentSprings { get; private set; }
+        public List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
 
@@ -33,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
             EnvironmentLavaWalls = new List<MatchEnvironmentLavaWallModel>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls);
             EnvironmentSprings = new List<MatchEnvironmentSpringModel>(32);
+            RotatingWheels = new List<MatchEnvironmentRotatingWheelModel>(8);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
             PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
@@ -165,6 +167,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newSpring;
         }
 
+        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(EnvironmentRotatingWheelConfig config)
+        {
+            var newWheel = new MatchEnvironmentRotatingWheelModel(config);
+            RotatingWheels.Add(newWheel);
+            return newWheel;
+        }
+
         public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius)
         {
             var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, position, radius);
@@ -184,6 +193,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentWalls.Clear();
             EnvironmentLavaWalls.Clear();
             EnvironmentSprings.Clear();
+            RotatingWheels.Clear();
             TalentCards.Clear();
             PowerUpBalls.Clear();
             BoltsPerTeam.Clear();

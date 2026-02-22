@@ -677,6 +677,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(shape);
         }
 
+        public void UpdateBodyTransform(PhysicsBodyType type, ushort id, Vector2 position, float rotation)
+        {
+            var currentBody = _world.GetBodyList();
+
+            while (currentBody != null)
+            {
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                if (bodyData.PhysicsBodyType == type && bodyData.Id == id)
+                {
+                    currentBody.SetTransform(position, rotation * (float)System.Math.PI / 180f);
+                    return;
+                }
+
+                currentBody = currentBody.GetNext();
+            }
+
+            LogService.LogError($"Couldn't find body of type {type} with id {id}");
+        }
+
         public void ClearAllData()
         {
             _world = CreateWorld();

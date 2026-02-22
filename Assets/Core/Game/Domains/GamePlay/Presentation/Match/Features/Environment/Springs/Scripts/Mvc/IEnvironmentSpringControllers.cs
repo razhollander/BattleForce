@@ -3,7 +3,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
     public interface IEnvironmentSpringControllers
     {
         void InitEntryPoint();
-        void CreateSpring(ushort springId);
+        void CreateSpring(ushort springId, UnityEngine.Transform parent = null);
         void DestroyAll();
         void PlaySpringBounceAnimation(ushort springId);
     }

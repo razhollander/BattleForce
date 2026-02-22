@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [UnityEngine.SerializeField] private string _lavaWallsJson;
         [UnityEngine.SerializeField] private string _talentCardsJson;
         [UnityEngine.SerializeField] private string _environmentSpringsJson;
+        [UnityEngine.SerializeField] private string _rotatingWheelsJson;
 
         public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
         {
@@ -49,6 +50,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             _environmentSpringsJson = environmentSpringsJson;
         }
 
+        public void SetRotatingWheelsJson(string rotatingWheelsJson)
+        {
+            _rotatingWheelsJson = rotatingWheelsJson;
+        }
+
         public TalentCardS2C[] GetTalentCards()
         {
             return _talentCardsJson.FromJson<TalentCardS2C[]>();
@@ -57,6 +63,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public EnvironmentSpringS2C[] GetEnvironmentSprings()
         {
             return _environmentSpringsJson.FromJson<EnvironmentSpringS2C[]>();
+        }
+
+        public EnvironmentRotatingWheelConfig[] GetRotatingWheels()
+        {
+            return _rotatingWheelsJson.FromJson<EnvironmentRotatingWheelConfig[]>();
         }
     }
 }

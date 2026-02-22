@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public EnvironmentSpringS2C[] EnvironmentSprings { get; private set; }
         public WallConfig[] LavaWallConfigs { get; private set; }
         public WallConfig[] WallConfigs { get; private set; }
+        public EnvironmentRotatingWheelConfig[] RotatingWheelConfigs { get; private set; }
         
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         
@@ -25,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             LavaWallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetLavaWalls();
             TalentCards = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetTalentCards();
             EnvironmentSprings = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentSprings();
+            RotatingWheelConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetRotatingWheels();
             EnvironmentHalfSize = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentHalfSize();
         }
     }
