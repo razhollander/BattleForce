@@ -110,10 +110,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 gateBodyId = objectA.Id;
             }
 
-            // if (!_teleportGateService.CanTeleport(playerId, _processedTick))
-            // {
-            //     return;
-            // }
+            if (!_teleportGateService.CanTeleport(playerId, _processedTick))
+            {
+                return;
+            }
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             // Determine pair ID and whether it's A or B
@@ -159,11 +159,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var rotatedOffsetY = localOffset.X * sinTarget + localOffset.Y * cosTarget;
             var rotatedOffset = new System.Numerics.Vector2(rotatedOffsetX, rotatedOffsetY);
 
-            var destinationPoint = targetGatePosition + rotatedOffset;
+            var destinationPoint = targetGatePosition;// + rotatedOffset;
 
             // Teleport Player
             playerState.Spaceship.Transform.Position = destinationPoint;
-
+             
             // Update physics body
             //_physicsSimulator.SetPlayerVelocity(playerId, playerState.Spaceship.Transform.Velocity); // Ensure velocity persists or modify if needed
             // Wait, SetPlayerVelocity only sets velocity. We need to set position.
@@ -189,7 +189,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             //var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
               //  .Spaceship.Transform.Position = destinationPoint;
-            //_teleportGateService.RegisterTeleport(playerId, _processedTick);
+            _teleportGateService.RegisterTeleport(playerId, _processedTick);
             LogService.LogError("Collided with teleport gate!");
             _netEventsDataService.AddPlayerToEnvironmentTeleportGateCollisionNetEvent(_processedTick, pairId, enterPoint, destinationPoint, playerId);
         }

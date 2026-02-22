@@ -160,11 +160,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             foreach (var environmentSpring in environmentSprings)
             {
                 var springId = environmentSpring.Id;
-                var springDirectionAngle = environmentSpring.DirectionAngle;
-                var springRotationAngle = environmentSpring.DirectionAngle+90;
+                var springRotationAngle = environmentSpring.DirectionAngle + 90;
                 var springSize = _gamePlayConfig.EnvironmentSpring.Size.ToNumericsVector2();
-                var springDirection = springDirectionAngle.AngleToVector();
-                var springPosition = environmentSpring.Position;// + springDirection * springSize.Y*0.5f;
+                var springPosition = environmentSpring.Position;
                 _physicsSimulator.AddEnvironmentSpring(springId, springPosition, springRotationAngle, springSize);
             }
         }
@@ -179,13 +177,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var pair in teleportGates)
             {
-                // Gate A
-                ushort gateAId = (ushort)(pair.Id * 2);
-                _physicsSimulator.AddTeleportGate(gateAId, pair.GateAPosition, pair.GateARotation, pair.Size);
-
-                // Gate B
-                ushort gateBId = (ushort)(pair.Id * 2 + 1);
-                _physicsSimulator.AddTeleportGate(gateBId, pair.GateBPosition, pair.GateBRotation, pair.Size);
+                _physicsSimulator.AddTeleportGate(pair.GateAId, pair.GateAPosition, pair.GateARotation, pair.Size);
+                _physicsSimulator.AddTeleportGate(pair.GateBId, pair.GateBPosition, pair.GateBRotation, pair.Size);
             }
         }
     }

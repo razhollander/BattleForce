@@ -17,7 +17,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public float GateBRotation;
         public Color Color; // x=r, y=g, z=b
         public Vector2 Size; // x=width, y=height
-
+        public ushort GateAId => (ushort) (Id * 2);
+        public ushort GateBId => (ushort) (Id * 2 + 1);
         public EnvironmentTeleportGatePairS2C(ushort id, Vector2 gateAPosition, float gateARotation, Vector2 gateBPosition, float gateBRotation, Color color, Vector2 size)
         {
             Id = id;
