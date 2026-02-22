@@ -43,6 +43,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var playerState = _matchDataService.GetPlayer(playerId);
                 _playerControllers.SetPlayerTransform(playerId, playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction);
             }
+            
+            _cachedPresentationEventsService.PlayerToEnvironmentTeleportGateCollisionNetEvents.Clear();
         }
     }
 }
