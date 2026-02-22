@@ -682,8 +682,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
             bodyDef.position = position;
-            bodyDef.angle = rotation * (float)System.Math.PI / 180f;
-            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.TeleportGate);
+            bodyDef.angle = rotation.ToRadians();
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.EnvironmentTeleportGate);
 
             var body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
@@ -697,8 +697,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
 
-            fixtureDef.filter.categoryBits = PhysicsBodyType.TeleportGate.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.TeleportGate.GetCollisionMask();
+            fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentTeleportGate.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.EnvironmentTeleportGate.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);

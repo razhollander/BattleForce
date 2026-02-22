@@ -19,22 +19,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportG
 
         public void RegisterTeleport(ushort playerId, int currentTick)
         {
-            if (_lastTeleportTickPerPlayer.ContainsKey(playerId))
-            {
-                _lastTeleportTickPerPlayer[playerId] = currentTick;
-            }
-            else
-            {
-                _lastTeleportTickPerPlayer.Add(playerId, currentTick);
-            }
+            _lastTeleportTickPerPlayer[playerId] = currentTick;
         }
 
         public bool IsTeleportOnCooldown(ushort playerId, int currentTick)
         {
             if (_lastTeleportTickPerPlayer.TryGetValue(playerId, out var lastTick))
             {
-                // Calculate cooldown in ticks
-                int cooldownTicks = (int)(_config.TeleportGateCooldown * _networkConfig.TicksPerSeconds);
+                var cooldownTicks = (int)(_config.TeleportGateCooldownInSeconds * _networkConfig.TicksPerSeconds);
                 return (currentTick - lastTick) < cooldownTicks;
             }
             return false;

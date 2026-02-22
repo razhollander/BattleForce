@@ -1,5 +1,3 @@
-using Core.Scripts.Utils.CustomCollections;
-
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate
 {
     public interface ITeleportGateService

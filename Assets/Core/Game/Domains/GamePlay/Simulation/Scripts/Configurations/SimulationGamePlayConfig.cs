@@ -23,6 +23,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public int StartingBoltsPerTeam = 0;
         public int BoltsGainedPerHit = 50;
         public int BoltsGainedPerKill = 50;
-        public float TeleportGateCooldown = 0.5f;
+        public float TeleportGateCooldownInSeconds = 0.5f;
     }
 }

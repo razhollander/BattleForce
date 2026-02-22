@@ -43,13 +43,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public void Serialize(NetDataWriter writer)
         {
             writer.PutVector2Quantized(Position);
-            writer.Put(NormalRotation);
+            writer.PutFloat16(NormalRotation);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             Position = reader.GetVector2Quantized();
-            NormalRotation = reader.GetFloat();
+            NormalRotation = reader.GetFloat16();
         }
     }
 }

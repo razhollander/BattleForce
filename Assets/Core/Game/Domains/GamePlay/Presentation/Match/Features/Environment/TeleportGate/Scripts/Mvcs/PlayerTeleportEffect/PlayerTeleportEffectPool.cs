@@ -8,7 +8,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         protected override string ParentGameObjectName => "PlayerTeleportEffectParent";
 
         public PlayerTeleportEffectPool(PlayerTeleportEffectView view, DiContainer diContainer) : base(
-            new PoolData(6, 1), diContainer, view)
+            new PoolData(6, 2), diContainer, view)
         {
         }
     }

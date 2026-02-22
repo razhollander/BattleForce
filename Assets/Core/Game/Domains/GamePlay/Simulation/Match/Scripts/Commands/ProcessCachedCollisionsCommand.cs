@@ -89,8 +89,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void HandlePlayerTeleportGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
-            var isPlayerToGate = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.TeleportGate;
-            var isGateToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.TeleportGate && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            var isPlayerToGate = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.EnvironmentTeleportGate;
+            var isGateToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.EnvironmentTeleportGate && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
 
             if (!isPlayerToGate && !isGateToPlayer)
             {
@@ -135,7 +135,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             playerState.Spaceship.Transform.Velocity = newVelocity;
             
             _teleportGateService.RegisterTeleport(playerId, _processedTick);
-            LogService.LogError("Collided with teleport gate!");
             _netEventsDataService.AddPlayerToEnvironmentTeleportGateCollisionNetEvent(_processedTick, teleportPairData.Id, enterPoint, exitPoint, playerId);
         }
 

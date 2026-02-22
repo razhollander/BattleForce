@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         public void PlayEffect(Vector2 position)
         {
             var view = _pool.Spawn();
-            view.transform.position = new Vector3(position.x, position.y, -5);
+            view.transform.position = position;
             view.PlayAndDespawn(_stateMachineService.CurrentState().CancellationTokenSource).Forget();
         }
     }
