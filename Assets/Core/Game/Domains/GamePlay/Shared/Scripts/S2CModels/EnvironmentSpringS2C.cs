@@ -23,6 +23,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         }
         
         [NonSerialized]
+        public Vector2 WorldPosition;
+        [NonSerialized]
         public float WorldDirectionAngle;
         
         [OnDeserialized]

@@ -1,4 +1,3 @@
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.EnvironmentRotatingWheel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService;
@@ -15,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersDecelerationLogic _playersDecelerationLogic;
         private IPlayersEngineLogic _playersEngineLogic;
         private ICommandFactory _commandFactory;
-        private IEnvironmentRotatingWheelControllers _environmentRotatingWheelControllers;
+        private StepAllWheelsRotationCommand _stepAllWheelsRotationCommand;
         
         private float _deltaTime;
         private int _tick;
@@ -41,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersEngineLogic = _diContainer.Resolve<IPlayersEngineLogic>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
-            _environmentRotatingWheelControllers = _diContainer.Resolve<IEnvironmentRotatingWheelControllers>();
+            _stepAllWheelsRotationCommand = _commandFactory.CreateCommandVoid<StepAllWheelsRotationCommand>();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
         }
 
@@ -60,8 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 _playersEngineLogic.TryAddEngineForceToPlayer(playerState.Spaceship, stepDeltaTime);
             }
 
-            _environmentRotatingWheelControllers.StepAllWheelsRotation(_tick, stepDeltaTime);
-            
+            _stepAllWheelsRotationCommand.SetTime(_tick, stepDeltaTime).Execute();
             ApplyMatchModelToPhysicsSimulation();
             _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
             ApplyPhysicsSimulationToMatchModel();

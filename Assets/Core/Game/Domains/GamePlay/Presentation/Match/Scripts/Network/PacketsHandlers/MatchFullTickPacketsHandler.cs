@@ -155,7 +155,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             var deltaTime = _networkConfig.DeltaTime;
             foreach (var wheelModel in _matchDataService.RotatingWheels)
             {
-                wheelModel.CurrentRotation = EnvironmentRotatingWheelUtils.CalculateRotation(tick, wheelModel.RotationSpeed, deltaTime);
+                wheelModel.CurrentRotation = EnvironmentRotatingWheelUtils.CalculateRotationDuringTick(tick, wheelModel.RotationSpeed, deltaTime);
                 var wheelCenter = wheelModel.Config.CenterPosition;
                 var rotationSpeed = wheelModel.RotationSpeed;
 

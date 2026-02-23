@@ -1,18 +1,17 @@
-using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.EnvironmentRotatingWheel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
-using Vector2 = System.Numerics.Vector2;
+using System.Numerics;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -25,6 +24,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private ITeleportGateService _teleportGateService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
+        private ITickService _tickService;
+        private NetworkConfig _networkConfig;
 
         public override void ResolveDependencies()
         {
@@ -35,6 +36,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
+            _tickService = _diContainer.Resolve<ITickService>();
+            _networkConfig = _diContainer.Resolve<NetworkConfig>();
         }
 
         public void Execute()
@@ -198,43 +201,46 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
+            var currentTick = _tickService.CurrentTick;
+            var deltaTime = _networkConfig.DeltaTime;
+            
             foreach (var wheelConfig in rotatingWheelsConfigs)
             {
                 var wheelCenter = wheelConfig.CenterPosition;
                 var rotationSpeed = wheelConfig.RotationSpeed;
 
-                if (wheelConfig.Walls != null)
+                if (!wheelConfig.Walls.IsNullOrEmpty())
                 {
                     foreach (var wall in wheelConfig.Walls)
                     {
                         _physicsSimulator.AddWall(wall.Id, wall.Points);
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            0, rotationSpeed, 0, wheelCenter, Vector2.Zero, 0,
-                            out var initialPos, out var initialRot
+                            currentTick, rotationSpeed, deltaTime, wheelCenter, Vector2.Zero, 0,
+                            out var newPosition, out var newRotation
                         );
-                        _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Wall, wall.Id, initialPos, initialRot);
+                        _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Wall, wall.Id, newPosition, newRotation);
                     }
                 }
 
-                if (wheelConfig.LavaWalls != null)
+                if (!wheelConfig.LavaWalls.IsNullOrEmpty())
                 {
                     foreach (var wall in wheelConfig.LavaWalls)
                     {
                         _physicsSimulator.AddLavaWall(wall.Id, wall.Points);
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            0, rotationSpeed, 0, wheelCenter, Vector2.Zero, 0,
+                            currentTick, rotationSpeed, deltaTime, wheelCenter, Vector2.Zero, 0,
                             out var initialPos, out var initialRot
                         );
                         _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Lava, wall.Id, initialPos, initialRot);
                     }
                 }
 
-                if (wheelConfig.Springs != null)
+                if (!wheelConfig.Springs.IsNullOrEmpty())
                 {
                     foreach (var spring in wheelConfig.Springs)
                     {
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            0, rotationSpeed, 0, wheelCenter, spring.Position, spring.DirectionAngle,
+                            currentTick, rotationSpeed, deltaTime, wheelCenter, spring.Position, spring.DirectionAngle,
                             out var initialPos, out var initialRot
                         );
                         _physicsSimulator.AddEnvironmentSpring(spring.Id, initialPos, initialRot, _gamePlayConfig.EnvironmentSpring.Size.ToNumericsVector2());

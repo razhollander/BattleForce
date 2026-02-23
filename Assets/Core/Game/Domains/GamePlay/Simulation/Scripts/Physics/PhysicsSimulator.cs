@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using Box2D.NetStandard.Collision;
 using Box2D.NetStandard.Collision.Shapes;
@@ -707,22 +708,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         public void UpdateBodyTransform(PhysicsBodyType type, ushort id, Vector2 position, float rotationDegrees)
         {
-            var currentBody = _world.GetBodyList();
+            GetBody(type, id).SetTransform(position, rotationDegrees.ToRadians());
+        }
 
+        private Body GetBody(PhysicsBodyType type, ushort id)
+        {
+            var currentBody = _world.GetBodyList();
             while (currentBody != null)
             {
                 var bodyData = (PhysicsBodyData) currentBody.UserData;
 
                 if (bodyData.PhysicsBodyType == type && bodyData.Id == id)
                 {
-                    currentBody.SetTransform(position, rotationDegrees.ToRadians());
-                    return;
+                    return currentBody;
                 }
-
+                
                 currentBody = currentBody.GetNext();
             }
 
-            LogService.LogError($"Couldn't find body of type {type} with id {id}");
+            throw new Exception($"No body was found with the given id: {id} and type: {type}");
         }
         
         public void ClearAllData()

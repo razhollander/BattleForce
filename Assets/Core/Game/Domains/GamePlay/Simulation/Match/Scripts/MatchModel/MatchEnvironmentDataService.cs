@@ -19,21 +19,36 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
 
         public EnvironmentSpringS2C GetSpring(ushort springId)
         {
-            if (!RotatingWheels.IsNullOrEmpty())
+            if (TryFindSpringInRotatingWheels(springId, out var spring))
             {
-                for (int i = 0; i < RotatingWheels.Length; i++)
+                return spring;
+            }
+
+            return EnvironmentSprings.FindWithId(springId);
+        }
+
+        private bool TryFindSpringInRotatingWheels(ushort springId, out EnvironmentSpringS2C spring)
+        {
+            spring = default;
+            if (RotatingWheels.IsNullOrEmpty())
+            {
+                return false;
+            }
+
+            for (int i = 0; i < RotatingWheels.Length; i++)
+            {
+                for (int j = 0; j < RotatingWheels[i].Springs.Length; j++)
                 {
-                    for (int j = 0; j < RotatingWheels[i].Springs.Length; j++)
+                    if (RotatingWheels[i].Springs[j].Id == springId)
                     {
-                        if (RotatingWheels[i].Springs[j].Id == springId)
-                        {
-                            return RotatingWheels[i].Springs[j];
-                        }
+                        spring = RotatingWheels[i].Springs[j];
+
+                        return true;
                     }
                 }
             }
 
-            return EnvironmentSprings.FindWithId(springId);
+            return false;
         }
 
         public EnvironmentTeleportGatePairS2C GetTeleportGatePair(ushort teleportGatePairId)
