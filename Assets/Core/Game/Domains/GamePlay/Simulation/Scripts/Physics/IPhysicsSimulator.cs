@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Scripts.Utils.CustomCollections;
 
@@ -19,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public FixedUnorderedList<PhysicsCollisionEvent> GetCachedCollisions();
         public void ClearCachedCollisions();
         void InitExitPoint();
-        void CopyDataToSimulation(MatchSimulationStateS2C simulationState);
+        void CopyDataToSimulation(MatchSimulationStateS2C simulationState, FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls, FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls, FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings);
         void CopyDataToSimulation(MatchMakingSimulationStateS2C simulationState);
         Body GetPlayer(ushort playerId);
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);

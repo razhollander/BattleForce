@@ -1,8 +1,9 @@
+using System;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
-    public class PlayerStateS2C
+    public class PlayerStateS2C : IEquatable<ushort>
     {
         public ushort Id;
         public string Name;
@@ -43,6 +44,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             Id = reader.GetByte();
             Spaceship.DeserializeDeltas(reader);
+        }
+
+        public bool Equals(ushort otherId)
+        {
+            return Id == otherId;
         }
     }
 }

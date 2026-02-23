@@ -12,6 +12,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public float RotationSpeed;
         public WallConfig[] Walls;
         public WallConfig[] LavaWalls;
-        public EnvironmentSpringS2C[] Springs;
+        public EnvironmentSpringConfig[] Springs;
     }
 }

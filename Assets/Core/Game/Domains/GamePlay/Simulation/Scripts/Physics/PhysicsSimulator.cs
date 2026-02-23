@@ -12,8 +12,10 @@ using Box2D.NetStandard.Dynamics.World.Callbacks;
 #endif
 using Box2D.WorldTests;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Scripts.Extensions;
+using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
 using Core.Scripts.Services.UnityThreadDispatcher;
 using Core.Scripts.Utils;
@@ -61,11 +63,75 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
 
-        public void CopyDataToSimulation(MatchSimulationStateS2C simulationState)
+        public void CopyDataToSimulation(MatchSimulationStateS2C simulationState, 
+            FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls,
+            FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls, 
+            FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings)
         {
-            CopyPlayersStates(simulationState);
-            CopyBulletsStates(simulationState.Bullets);
-            CopyPowerUpsStates(simulationState);
+            var currentBody = _world.GetBodyList();
+
+            while (currentBody != null)
+            {
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                switch (bodyData.PhysicsBodyType)
+                {
+                    case PhysicsBodyType.PlayerSpaceship: CopyPlayerStateToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.PlayerBullet: CopyBulletStateToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.PowerUpBall: CopyPowerUpStateToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.Wall: CopyWallStateToBody(currentBody, bodyData.Id, environmentWalls); break;
+                    case PhysicsBodyType.Lava: CopyLavaStateToBody(currentBody, bodyData.Id, environmentLavaWalls); break;
+                    case PhysicsBodyType.EnvironmentSpring: CopySpringStateToBody(currentBody, bodyData.Id, environmentSprings); break;
+                }
+
+                currentBody = currentBody.GetNext();
+            }
+            
+            // _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Wall, wall.Id, newPos, newRot);
+            // _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Lava, lavaWall.Id, newPos, newRot);
+            // _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.EnvironmentSpring, spring.Id, worldPosition, newRotation);
+            // CopyPlayersStates(simulationState);
+            // CopyBulletsStates(simulationState.Bullets);
+            // CopyPowerUpsStates(simulationState);
+        }
+
+        private void CopyPowerUpStateToBody(Body powerUpBody, ushort powerUpId, MatchSimulationStateS2C simulationState)
+        {
+            var powerUpState = simulationState.PowerUpBalls.FindWithId(powerUpId);
+            powerUpBody.SetTransform(powerUpState.Position, 0);
+            powerUpBody.SetLinearVelocity(powerUpState.Velocity);
+        }
+
+        private void CopyBulletStateToBody(Body bulletBody, ushort bulletId, MatchSimulationStateS2C simulationState)
+        {
+            var bulletState = simulationState.Bullets.FindWithId(bulletId);
+            bulletBody.SetTransform(bulletState.Position, bulletState.Direction.ToAngleRadians());
+            bulletBody.SetLinearVelocity(bulletState.Velocity);
+        }
+
+        private void CopySpringStateToBody(Body springBody, ushort springId, FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings)
+        {
+            var environmentSpring = environmentSprings.FindWithId(springId);
+            springBody.SetTransform(environmentSpring.Transform.WorldPosition, environmentSpring.Transform.WorldRotationDegrees.ToRadians());       
+        }
+
+        private void CopyLavaStateToBody(Body lavaBody, ushort lavaWallId, FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls)
+        {
+            var environmentLavaWall = environmentLavaWalls.FindWithId(lavaWallId);
+            lavaBody.SetTransform(environmentLavaWall.Transform.WorldPosition, environmentLavaWall.Transform.WorldRotationDegrees.ToRadians());
+        }
+
+        private void CopyWallStateToBody(Body wallBody, ushort wallId, FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls)
+        {
+            var environmentWall = environmentWalls.FindWithId(wallId);
+            wallBody.SetTransform(environmentWall.Transform.WorldPosition, environmentWall.Transform.WorldRotationDegrees.ToRadians());
+        }
+
+        private void CopyPlayerStateToBody(Body playerBody, ushort playerId, MatchSimulationStateS2C simulationState)
+        {
+            var playerState = simulationState.Players.FindWithId(playerId);
+            playerBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
+            playerBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
         }
 
         public void CopyDataToSimulation(MatchMakingSimulationStateS2C simulationState)

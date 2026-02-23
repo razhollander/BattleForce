@@ -1,5 +1,6 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -10,7 +11,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     public class StepAllWheelsRotationCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
-        private IPhysicsSimulator _physicsSimulator;
         private int _tick;
         private float _deltaTime;
 
@@ -24,26 +24,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
-            _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
         }
 
         public void Execute()
         {
-            foreach (var rotatingWheel in _matchDataService.Environment.RotatingWheels)
+            foreach (var rotatingWheel in _matchDataService.EnvironmentData.RotatingWheels.AsSpan())
             {
                 UpdateRotationAccordingToTick(_tick, _deltaTime, rotatingWheel);
             }
         }
 
-        private void UpdateRotationAccordingToTick(int tick, float deltaTime, EnvironmentRotatingWheelConfig rotatingWheelConfig)
+        private void UpdateRotationAccordingToTick(int tick, float deltaTime, EnvironmentRotatingWheelS2C rotatingWheel)
         {
-            var rotationSpeed = rotatingWheelConfig.RotationSpeed;
-            var wheelCenter = rotatingWheelConfig.CenterPosition;
-
-            if (rotatingWheelConfig.Walls != null)
+            var rotationSpeed = rotatingWheel.RotationSpeed;
+            var wheelCenter = rotatingWheel.CenterPosition;
+            if (!rotatingWheel.WallIds.IsEmpty)
             {
-                foreach (var wall in rotatingWheelConfig.Walls)
+                foreach (var wallId in rotatingWheel.WallIds.AsSpan())
                 {
+                    var wall = _matchDataService.EnvironmentData.GetWall(wallId);
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
                         tick,
                         rotationSpeed,
@@ -51,20 +50,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         wheelCenter,
                         Vector2.Zero,
                         0,
-                        out var newPos,
-                        out var newRot
+                        out var newPosition,
+                        out var newRotation
                     );
 
-                    wall.WorldRotationAngle = newRot;
-                    wall.WorldPosition = newPos;
-                    _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Wall, wall.Id, newPos, newRot);
+                    wall.Transform.WorldRotationDegrees = newRotation;
+                    wall.Transform.WorldPosition = newPosition;
                 }
             }
 
-            if (rotatingWheelConfig.LavaWalls != null)
+            if (!rotatingWheel.LavaWallIds.IsEmpty)
             {
-                foreach (var lavaWall in rotatingWheelConfig.LavaWalls)
+                foreach (var lavaWallId in rotatingWheel.LavaWallIds.AsSpan())
                 {
+                    var lavaWall = _matchDataService.EnvironmentData.GetLavaWall(lavaWallId);
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
                         tick,
                         rotationSpeed,
@@ -72,34 +71,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         wheelCenter,
                         Vector2.Zero,
                         0,
-                        out var newPos,
-                        out var newRot
+                        out var newPosition,
+                        out var newRotation
                     );
 
-                    lavaWall.WorldRotationAngle = newRot;
-                    lavaWall.WorldPosition = newPos;
-                    _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Lava, lavaWall.Id, newPos, newRot);
+                    lavaWall.Transform.WorldRotationDegrees = newRotation;
+                    lavaWall.Transform.WorldPosition = newPosition;
                 }
             }
 
-            if (rotatingWheelConfig.Springs != null)
+            if (!rotatingWheel.SpringIds.IsEmpty)
             {
-                foreach (var spring in rotatingWheelConfig.Springs) // todo for ai, create new SpringState/WallState and use them instead of using and updating the configs
+                foreach (var springId in rotatingWheel.SpringIds.AsSpan()) // todo for ai, create new SpringState/WallState and use them instead of using and updating the configs
                 {
+                    var spring = _matchDataService.EnvironmentData.GetSpring(springId);
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
                         tick,
                         rotationSpeed,
                         deltaTime,
                         wheelCenter,
-                        spring.Position,
-                        spring.RotationAngle,
-                        out var newPos,
-                        out var newRot
+                        spring.Transform.LocalPosition,
+                        spring.Transform.LocalRotationDegrees,
+                        out var worldPosition,
+                        out var newRotation
                     );
 
-                    spring.WorldRotationAngle = newRot;
-                    spring.WorldPosition = newPos;
-                    _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.EnvironmentSpring, spring.Id, newPos, newRot);
+                    spring.Transform.WorldRotationDegrees = newRotation;
+                    spring.Transform.WorldPosition = worldPosition;
                 }
             }
         }

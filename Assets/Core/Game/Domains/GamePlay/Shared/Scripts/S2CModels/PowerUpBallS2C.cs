@@ -6,7 +6,7 @@ using LiteNetLib.Utils;
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
     [Serializable]
-    public struct PowerUpBallS2C : INetSerializable
+    public struct PowerUpBallS2C : INetSerializable, IEquatable<ushort>
     {
         public ushort Id;
         public Vector2 Position;
@@ -45,6 +45,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             Id = reader.GetUShort();
             Position = reader.GetVector2Quantized();
+        }
+
+        public bool Equals(ushort otherId)
+        {
+            return Id == otherId;
         }
     }
 }

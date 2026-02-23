@@ -34,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<IPlayersDecelerationLogic>().To<PlayersDecelerationLogic>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersEngineLogic>().To<PlayersEngineLogic>().AsSingle().NonLazy();
             _diContainer.Bind<ITeleportGateService>().To<TeleportGateCooldownService>().AsSingle();
+            _diContainer.Bind<IMatchEnvironmentConfigDataService>().To<MatchEnvironmentConfigDataService>().AsSingle();
         }
 
         public void UninstallBindings() // not sure this is needed

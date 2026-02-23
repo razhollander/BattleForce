@@ -1,24 +1,53 @@
 using System;
 using System.Collections.Generic;
+using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Scripts.Extensions.Linq
 {
     public static partial class LinqExtensions
     {
+        public static T FindWithId<T>(this FixedClassUnorderedList<T> source, ushort id) where T : class, IEquatable<ushort>
+        {
+            foreach (var item in source.AsSpan())
+            {
+                if (item.Equals(id))
+                {
+                    return item;
+                }
+            }
+
+            LogService.LogError("No item found with id: " + id);
+            return default;
+        }
+        
+        public static T FindWithId<T>(this FixedUnorderedList<T> source, ushort id) where T : IEquatable<ushort>
+        {
+            foreach (var item in source.AsSpan())
+            {
+                if (item.Equals(id))
+                {
+                    return item;
+                }
+            }
+
+            LogService.LogError("No item found with id: " + id);
+            return default;
+        }
+        
         public static T FindWithId<T>(this T[] source, ushort id) where T : IEquatable<ushort>
         {
             for (int i = 0; i < source.Length; i++)
             {
-                var environmentSpring = source[i];
+                var itemId = source[i];
 
-                if (environmentSpring.Equals(id))
+                if (itemId.Equals(id))
                 {
-                    return environmentSpring;
+                    return itemId;
                 }
             }
 
-            LogService.LogError("No found with id: " + id + "");
+            LogService.LogError("No item found with id: " + id);
             return default;
         }
         

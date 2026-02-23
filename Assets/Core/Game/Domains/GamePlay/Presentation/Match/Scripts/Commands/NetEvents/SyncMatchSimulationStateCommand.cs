@@ -129,17 +129,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         private void CreateTeleportGates()
         {
-            var gates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetTeleportGates();
-            if (gates.IsNullOrEmpty())
+            var teleportGatePairConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetTeleportGates();
+            if (teleportGatePairConfigs.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var pair in gates)
+            foreach (var teleportGatePairConfig in teleportGatePairConfigs)
             {
-                var size = _sharedGamePlayConfig.EnvironmentTeleport.Size;
-                _matchDataService.AddTeleportPair(pair.Id, pair.GateAId, pair.GateA.Position, pair.GateA.NormalRotation, pair.GateBId, pair.GateB.Position, pair.GateB.NormalRotation, size.ToNumericsVector2());
-                _teleportGateControllers.CreateGatePair(pair.Id);
+                var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size;
+                _matchDataService.AddTeleportPair(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateBId, teleportGatePairConfig.GateB.Position, teleportGatePairConfig.GateB.NormalRotation, gateSize.ToNumericsVector2());
+                _teleportGateControllers.CreateGatePair(teleportGatePairConfig.Id);
             }
         }
 

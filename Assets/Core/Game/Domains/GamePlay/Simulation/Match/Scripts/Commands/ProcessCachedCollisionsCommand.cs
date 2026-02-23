@@ -117,8 +117,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var teleportPairData = _matchDataService.Environment.GetTeleportGatePairOfGate(gateBodyId);
-            var isGateB = teleportPairData.GateBId == gateBodyId;
+            var teleportPairData = _matchDataService.EnvironmentData.GetTeleportGatePairOfGate(gateBodyId);
+            var isGateB = teleportPairData.GateB.Id == gateBodyId;
             var enterGatePosition = isGateB ? teleportPairData.GateB.Position : teleportPairData.GateA.Position;
             var enterGateRotation = isGateB ? teleportPairData.GateB.NormalRotation : teleportPairData.GateA.NormalRotation;
             var exitGatePosition = isGateB ? teleportPairData.GateA.Position : teleportPairData.GateB.Position;
@@ -163,12 +163,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var springAngle = _matchDataService.Environment.GetSpring(springId).WorldDirectionAngle.ToRadians();
+            var springAngle = _matchDataService.EnvironmentData.GetSpring(springId).WorldDirectionDegrees.ToRadians();
             var pushDirection = springAngle.FromAngleRadians();
-            var forceMagnitude = _gamePlayConfig.EnvironmentSpring.Force;
+            var forceMagnitude = _gamePlayConfig.EnvironmentSprings.Force;
             var force = pushDirection * forceMagnitude;
             playerState.Spaceship.Transform.Velocity += force;
-            var randomSpin = RNG.NextFloat(_gamePlayConfig.EnvironmentSpring.MinSpin, _gamePlayConfig.EnvironmentSpring.MaxSpin);
+            var randomSpin = RNG.NextFloat(_gamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfig.EnvironmentSprings.MaxSpin);
             playerState.Spaceship.Transform.AngularVelocity += randomSpin;
             playerState.Spaceship.Transform.Direction = pushDirection;
             playerState.Spaceship.IsEngineOn = false;

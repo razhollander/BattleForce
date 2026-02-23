@@ -14,13 +14,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public MatchSimulationStateS2C SimulationState => _simulationState;
         private ushort _lastBulletCreatedId = 0;
         private ushort _lastPowerUpBallCreatedId = 0;
-        private readonly MatchEnvironmentDataService _environmentDataService;
-        public MatchEnvironmentDataService Environment => _environmentDataService;
+        public MatchEnvironmentDataService EnvironmentData { get; private set; }
         public HashSet<ushort> TeamIds { get; private set; }
 
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
         {
-            _environmentDataService = new MatchEnvironmentDataService(sharedGamePlayConfig);
+            EnvironmentData = new MatchEnvironmentDataService(networkConfig);
             _simulationState = new MatchSimulationStateS2C(
                 networkConfig.MaxCap.ConcurrentPlayers,
                 networkConfig.MaxCap.ConcurrentBullets,
@@ -32,12 +31,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.StageType = StageType.DeathMatch;
-        }
-
-        public void InitEnvironmentLayout(int environmentLayoutIndex)
-        {
-            _simulationState.EnvironmentLayoutIndex = environmentLayoutIndex;
-            _environmentDataService.InitEnvironmentLayout(environmentLayoutIndex);
         }
 
         public PlayerStateS2C AddPlayer(ushort playerId, ushort teamId, string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,

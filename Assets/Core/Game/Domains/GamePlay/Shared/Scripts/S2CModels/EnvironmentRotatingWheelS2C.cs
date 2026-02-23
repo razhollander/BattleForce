@@ -1,36 +1,54 @@
 using System;
 using System.Numerics;
-using Core.Game.Domains.GamePlay.Shared.Extensions;
-using LiteNetLib.Utils;
+using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 {
-    [Serializable]
-    public struct EnvironmentRotatingWheelS2C : INetSerializable
+    public class EnvironmentRotatingWheelS2C : IEquatable<ushort>
     {
         public ushort Id;
         public Vector2 CenterPosition;
         public float RotationSpeed;
+        public FixedUnorderedList<ushort> WallIds;
+        public FixedUnorderedList<ushort> LavaWallIds;
+        public FixedUnorderedList<ushort> SpringIds;
 
-        public EnvironmentRotatingWheelS2C(ushort id, Vector2 centerPosition, float rotationSpeed)
+        public EnvironmentRotatingWheelS2C(MaxCap.EnvironmentRotatingWheel maxCap)
         {
-            Id = id;
-            CenterPosition = centerPosition;
-            RotationSpeed = rotationSpeed;
+            WallIds = new FixedUnorderedList<ushort>(maxCap.MaxWalls);
+            LavaWallIds = new FixedUnorderedList<ushort>(maxCap.MaxLavaWalls);
+            SpringIds = new FixedUnorderedList<ushort>(maxCap.MaxSprings);
         }
 
-        public void Serialize(NetDataWriter writer)
+        public void ClearData()
         {
-            writer.Put(Id);
-            writer.PutVector2Quantized(CenterPosition);
-            writer.Put(RotationSpeed);
+            WallIds.Clear();
+            LavaWallIds.Clear();
+            SpringIds.Clear();
+        }
+        
+        public bool Equals(ushort otherId)
+        {
+            return Id == otherId;
         }
 
-        public void Deserialize(NetDataReader reader)
+        public void AddWall(ushort wallId)
         {
-            Id = reader.GetUShort();
-            CenterPosition = reader.GetVector2Quantized();
-            RotationSpeed = reader.GetFloat();
+            ref var wall = ref WallIds.AddAndGet();
+            wall = wallId;
+        }
+
+        public void AddLavaWall(ushort lavaWallId)
+        {
+            ref var lavaWall = ref LavaWallIds.AddAndGet();
+            lavaWall = lavaWallId;
+        }
+        
+        public void AddSpring(ushort springId)
+        {
+            ref var spring = ref SpringIds.AddAndGet();
+            spring = springId;
         }
     }
 }

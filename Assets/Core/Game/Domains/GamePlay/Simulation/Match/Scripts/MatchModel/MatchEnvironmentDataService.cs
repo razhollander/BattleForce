@@ -1,68 +1,92 @@
 using System.Numerics;
-using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
-using Core.Scripts.Extensions;
 using Core.Scripts.Extensions.Linq;
-using CoreDomain.Scripts.Services.Logger.Base;
+using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
 {
+    /// <summary>
+    /// Everything here is pernament in the stage, and its position is determinstic and can't be changed by the user
+    /// </summary>
     public class MatchEnvironmentDataService
     {
-        public Vector2 EnvironmentHalfSize { get; private set; }
-        public TalentCardS2C[] TalentCards { get; private set; }
-        public EnvironmentSpringS2C[] EnvironmentSprings { get; private set; }
-        public EnvironmentTeleportGatePairS2C[] TeleportGates { get; private set; }
-        public WallConfig[] LavaWallConfigs { get; private set; }
-        public WallConfig[] WallConfigs { get; private set; }
-        public EnvironmentRotatingWheelConfig[] RotatingWheels { get; private set; }
+        private readonly FixedClassUnorderedList<EnvironmentSpringS2C> _springs;
+        private readonly FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> _teleportGates;
+        private readonly FixedClassUnorderedList<EnvironmentWallS2C> _lavaWalls;
+        private readonly FixedClassUnorderedList<EnvironmentWallS2C> _walls;
+        private readonly FixedClassUnorderedList<EnvironmentRotatingWheelS2C> _rotatingWheels;
 
-        public EnvironmentSpringS2C GetSpring(ushort springId)
+        public FixedClassUnorderedList<EnvironmentRotatingWheelS2C> RotatingWheels => _rotatingWheels;
+        public FixedClassUnorderedList<EnvironmentSpringS2C> Springs => _springs;
+        public FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> TeleportGates => _teleportGates;
+        public FixedClassUnorderedList<EnvironmentWallS2C> LavaWalls => _lavaWalls;
+        public FixedClassUnorderedList<EnvironmentWallS2C> Walls => _walls;
+
+        public MatchEnvironmentDataService(NetworkConfig networkConfig)
         {
-            if (TryFindSpringInRotatingWheels(springId, out var spring))
-            {
-                return spring;
-            }
-
-            return EnvironmentSprings.FindWithId(springId);
+            _springs = new FixedClassUnorderedList<EnvironmentSpringS2C>(networkConfig.MaxCap.ConcurrentEvironmentSprings, ()=> new EnvironmentSpringS2C());
+            _teleportGates = new FixedClassUnorderedList<EnvironmentTeleportGatePairS2C>(networkConfig.MaxCap.ConcurrentEvironmentTeleportPairs, ()=> new EnvironmentTeleportGatePairS2C());
+            _lavaWalls = new FixedClassUnorderedList<EnvironmentWallS2C>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls, ()=> new EnvironmentWallS2C());
+            _walls = new FixedClassUnorderedList<EnvironmentWallS2C>(networkConfig.MaxCap.ConcurrentEvironmentWalls, ()=> new EnvironmentWallS2C());
+            _rotatingWheels = new FixedClassUnorderedList<EnvironmentRotatingWheelS2C>(networkConfig.MaxCap.ConcurrentEnvironmentRotatingWheels, ()=> new EnvironmentRotatingWheelS2C(networkConfig.MaxCap.EnvironmentRotatingWheelCap));
         }
 
-        private bool TryFindSpringInRotatingWheels(ushort springId, out EnvironmentSpringS2C spring)
+        public void ClearData()
         {
-            spring = default;
-            if (RotatingWheels.IsNullOrEmpty())
+            _springs.Clear();
+            _teleportGates.Clear();
+            _lavaWalls.Clear();
+            _walls.Clear();
+
+            foreach (var rotatingWheel in _rotatingWheels.AsSpan())
             {
-                return false;
+                rotatingWheel.ClearData();
             }
-
-            for (int i = 0; i < RotatingWheels.Length; i++)
-            {
-                for (int j = 0; j < RotatingWheels[i].Springs.Length; j++)
-                {
-                    if (RotatingWheels[i].Springs[j].Id == springId)
-                    {
-                        spring = RotatingWheels[i].Springs[j];
-
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            _rotatingWheels.Clear();
         }
-
-        public EnvironmentTeleportGatePairS2C GetTeleportGatePair(ushort teleportGatePairId)
+        
+        public void AddWall(ushort wallId, Vector2 position, Vector2[] Points)
         {
-            return TeleportGates.FindWithId(teleportGatePairId);
+            var wall = _walls.AddAndGet();
+            wall.Id = wallId;
+            wall.SetPoints(Points);
+            wall.Transform.WorldPosition = position;
         }
+        
+        public void AddLavaWall(ushort lavaWallId, Vector2 position, Vector2[] Points)
+        {
+            var lavaWall = _lavaWalls.AddAndGet();
+            lavaWall.Id = lavaWallId;
+            lavaWall.SetPoints(Points);
+            lavaWall.Transform.WorldPosition = position;
+        }
+        
+        public void AddSpring(ushort springId, Vector2 springLocalPosition, Vector2 springWorldPosition, float localRotationDegrees, float worldRotationDegrees)
+        {
+            var spring = _springs.AddAndGet();
+            spring.Id = springId;
+            spring.Transform.LocalRotationDegrees = localRotationDegrees;
+            spring.Transform.WorldRotationDegrees = worldRotationDegrees;
+            spring.Transform.LocalPosition = springLocalPosition;
+            spring.Transform.WorldPosition = springWorldPosition;
+        }
+        
+        public EnvironmentRotatingWheelS2C AddRotatingWheel(ushort rotatingWheelId, Vector2 centerPosition, float rotationSpeed)
+        {
+            var rotatingWheel = _rotatingWheels.AddAndGet();
+            rotatingWheel.Id = rotatingWheelId;
+            rotatingWheel.RotationSpeed = rotationSpeed;
+            rotatingWheel.CenterPosition = centerPosition;
+            return rotatingWheel;
+        }
+        
         
         public EnvironmentTeleportGatePairS2C GetTeleportGatePairOfGate(ushort teleportGateId)
         {
-            for (int i = 0; i < TeleportGates.Length; i++)
+            foreach (var teleportGatePair in _teleportGates.AsSpan())
             {
-                var teleportGatePair = TeleportGates[i];
-
-                if (teleportGatePair.GateBId == teleportGateId || teleportGatePair.GateAId == teleportGateId)
+                if (teleportGatePair.GateB.Id == teleportGateId || teleportGatePair.GateA.Id == teleportGateId)
                 {
                     return teleportGatePair;
                 }
@@ -70,23 +94,37 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
 
             throw new System.Exception("No teleport gate pair found for gate id: " + teleportGateId);
         }
-        
-        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        
-        public MatchEnvironmentDataService(SharedGamePlayConfig sharedGamePlayConfig)
+
+        public EnvironmentSpringS2C GetSpring(ushort springId)
         {
-            _sharedGamePlayConfig = sharedGamePlayConfig;
+            return _springs.FindWithId(springId);
+        }
+        
+        public EnvironmentTeleportGatePairS2C GetTeleportGatePair(ushort teleportGatePairId)
+        {
+            return _teleportGates.FindWithId(teleportGatePairId);
+        }
+        
+        public EnvironmentWallS2C GetLavaWall(ushort lavaWallId)
+        {
+            return _lavaWalls.FindWithId(lavaWallId);
+        }
+        
+        public EnvironmentWallS2C GetWall(ushort wallId)
+        {
+            return _walls.FindWithId(wallId);
         }
 
-        public void InitEnvironmentLayout(int environmentLayoutIndex)
+        public void AddTeleportGatePair(ushort teleportPairId, ushort gateAId, ushort gateBId, Vector2 gateAPosition, float gateANormalRotation, Vector2 gateBPosition, float gateBNormalRotation)
         {
-            WallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetWalls();
-            LavaWallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetLavaWalls();
-            TalentCards = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetTalentCards();
-            EnvironmentSprings = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentSprings();
-            TeleportGates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetTeleportGates();
-            RotatingWheels = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetRotatingWheels();
-            EnvironmentHalfSize = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentHalfSize();
+            var teleportGatePair = _teleportGates.AddAndGet();
+            teleportGatePair.Id = teleportPairId;
+            teleportGatePair.GateA.NormalRotation = gateANormalRotation;
+            teleportGatePair.GateA.Position = gateAPosition;
+            teleportGatePair.GateA.Id = gateAId;
+            teleportGatePair.GateB.NormalRotation = gateBNormalRotation;
+            teleportGatePair.GateB.Position = gateBPosition;
+            teleportGatePair.GateB.Id = gateBId;
         }
     }
 }

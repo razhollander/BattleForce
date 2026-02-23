@@ -69,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void ApplyMatchModelToPhysicsSimulation()
         {
-            _physicsSimulator.CopyDataToSimulation(_matchDataService.SimulationState);
+            _physicsSimulator.CopyDataToSimulation(_matchDataService.SimulationState, _matchDataService.EnvironmentData.Walls, _matchDataService.EnvironmentData.LavaWalls, _matchDataService.EnvironmentData.Springs);
         }
 
         private void ApplyPhysicsSimulationToMatchModel()

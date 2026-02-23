@@ -1,10 +1,11 @@
+using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
-    public struct PlayerBulletS2C : INetSerializable
+    public struct PlayerBulletS2C : INetSerializable, IEquatable<ushort>
     {
         public ushort Id;
         public ushort BelongToPlayerId;
@@ -39,6 +40,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             Id = reader.GetUShort();
             Position = reader.GetVector2Quantized();
+        }
+
+        public bool Equals(ushort otherId)
+        {
+            return Id == otherId;
         }
     }
 }
