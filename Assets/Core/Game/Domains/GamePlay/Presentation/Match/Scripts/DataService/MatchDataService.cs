@@ -161,9 +161,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newWall;
         }
 
-        public MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localDirectionAngle, float worldDirectionAngle)
+        public MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle)
         {
-            var newSpring = new MatchEnvironmentSpringModel(id, localPosition, worldPosition, localDirectionAngle, worldDirectionAngle);
+            var newSpring = new MatchEnvironmentSpringModel(id, localPosition, worldPosition, localRotationAngle, worldRotationAngle);
             EnvironmentSprings.Add(newSpring);
             return newSpring;
         }

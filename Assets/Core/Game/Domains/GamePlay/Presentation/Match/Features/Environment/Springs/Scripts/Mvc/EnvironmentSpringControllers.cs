@@ -31,14 +31,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
         {
             var springController = new MatchEnvironmentSpringController();
             var springModel = _matchDataService.GetEnvironmentSpring(springId);
-            springController.CreateView(_environmentSpringViewPrefab, _springsParent.transform, springModel.WorldPosition.ToUnityVector2(), springModel.WorldDirectionAngle);
+            springController.CreateView(_environmentSpringViewPrefab, _springsParent.transform, springModel.WorldPosition.ToUnityVector2(), springModel.WorldRotationAngle);
             _springControllers.Add(springId, springController);
         }
 
         public void UpdateSpringTransform(ushort springId)
         {
             var springModel = _matchDataService.GetEnvironmentSpring(springId);
-            _springControllers[springId].UpdateViewTransform(springModel.WorldPosition.ToUnityVector2(), springModel.WorldDirectionAngle);
+            _springControllers[springId].UpdateViewTransform(springModel.WorldPosition.ToUnityVector2(), springModel.WorldRotationAngle);
         }
         
         public void DestroyAll()

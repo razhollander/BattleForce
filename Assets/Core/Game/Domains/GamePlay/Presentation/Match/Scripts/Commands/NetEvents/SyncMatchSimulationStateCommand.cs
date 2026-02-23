@@ -129,7 +129,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             
             foreach (var spring in springs)
             {
-                _matchDataService.AddSpring(spring.Id, Vector2.Zero, spring.Position, 0, spring.DirectionAngle);
+                _matchDataService.AddSpring(spring.Id, Vector2.Zero, spring.Position, 0, spring.RotationAngle);
                 _environmentSpringControllers.CreateSpring(spring.Id);
             }
         }

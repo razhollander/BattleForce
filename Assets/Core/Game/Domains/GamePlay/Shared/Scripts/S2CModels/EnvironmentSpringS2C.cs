@@ -8,11 +8,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         
         public ushort Id;
         public EnvironmentTransformS2C Transform;
-
-        public float LocalDirectionDegrees
-        {
-            get { return Transform.LocalRotationDegrees-RotationToDirectionDegrees; }
-        }
         
         public float WorldDirectionDegrees
         {
