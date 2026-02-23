@@ -3,7 +3,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
     public interface IMatchEnvironmentWallsControllers
     {
         void InitEntryPoint();
-        void CreateWall(ushort wallId, UnityEngine.Transform parent = null);
+        void CreateWall(ushort wallId);
         void DestroyAll();
+        void UpdateWallTransform(ushort wallId);
     }
 }

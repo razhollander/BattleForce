@@ -3,8 +3,6 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.RotatingWheels.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.RotatingWheels.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
@@ -40,7 +38,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private MatchPlayerUIControllersView _matchPlayerUIControllersView;
         [SerializeField] private BulletView _bulletViewPrefab;
         [SerializeField] private EnvironmentWallView _environmentWallViewPrefab;
-        [SerializeField] private MatchEnvironmentRotatingWheelView _rotatingWheelViewPrefab;
         [SerializeField] private EnvironmentSpringView _environmentSpringViewPrefab;
         [SerializeField] private EnvironmentTeleportGateView _environmentTeleportGateViewPrefab;
         [SerializeField] private StageEndedUiView _stageEndedUiView;
@@ -75,7 +72,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<MatchPlayerUIControllers>().AsSingle().WithArguments(_matchPlayerUIControllersView).NonLazy();
             Container.BindInterfacesTo<MatchBulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
-            Container.BindInterfacesTo<MatchEnvironmentRotatingWheelControllers>().AsSingle().WithArguments(_rotatingWheelViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpringControllers>().AsSingle().WithArguments(_environmentSpringViewPrefab).NonLazy();
             Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();
             Container.BindInterfacesTo<TeamsBoardUIController>().AsSingle().WithArguments(_teamsBoardContainerView).NonLazy();

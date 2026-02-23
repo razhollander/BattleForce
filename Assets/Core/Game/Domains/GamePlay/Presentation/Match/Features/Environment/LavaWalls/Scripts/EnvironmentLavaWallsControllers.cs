@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Scripts.Extensions.Linq;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts
@@ -38,6 +39,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
                 lavaWallController.Destroy();
             }
             _lavaWallControllers.Clear();
+        }
+
+        public void UpdateLavaWallTransform(ushort lavaWallId)
+        {
+            var lavaWallModel = _matchDataService.GetEnvironmentLavaWall(lavaWallId);
+            _lavaWallControllers.FindWithId(lavaWallId).UpdateTransform(lavaWallModel.WorldPosition, lavaWallModel.WorldRotationAngle);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
@@ -26,14 +27,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
             _springsParent = new GameObject("EnvironmentSpringsParent");
         }
 
-        public void CreateSpring(ushort springId, Transform parent = null)
+        public void CreateSpring(ushort springId)
         {
             var springController = new MatchEnvironmentSpringController();
             var springModel = _matchDataService.GetEnvironmentSpring(springId);
-            springController.CreateView(_environmentSpringViewPrefab, parent != null ? parent : _springsParent.transform, springModel.Position, springModel.DirectionAngle);
+            springController.CreateView(_environmentSpringViewPrefab, _springsParent.transform, springModel.WorldPosition.ToUnityVector2(), springModel.WorldDirectionAngle);
             _springControllers.Add(springId, springController);
         }
 
+        public void UpdateSpringTransform(ushort springId)
+        {
+            var springModel = _matchDataService.GetEnvironmentSpring(springId);
+            _springControllers[springId].UpdateViewTransform(springModel.WorldPosition.ToUnityVector2(), springModel.WorldDirectionAngle);
+        }
+        
         public void DestroyAll()
         {
             foreach (var controller in _springControllers.Values)

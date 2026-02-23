@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
@@ -59,12 +60,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataServic
 
         public MatchEnvironmentWallModel AddWall(WallConfig wallConfig)
         {
-            var newWall = new MatchEnvironmentWallModel(wallConfig.Id, wallConfig.Points, wallConfig.Position);
+            var newWall = new MatchEnvironmentWallModel(wallConfig.Id, wallConfig.Points, Vector2.Zero,  wallConfig.Position, 0);
             EnvironmentWalls.Add(newWall);
             return newWall;
         }
 
-        public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, System.Numerics.Vector2 position, float radius)
+        public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius)
         {
             var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, position, radius);
             Bullets.Add(newBullet);

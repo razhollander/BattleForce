@@ -155,25 +155,54 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             var deltaTime = _networkConfig.DeltaTime;
             foreach (var wheelModel in _matchDataService.RotatingWheels)
             {
-                wheelModel.CurrentRotation = EnvironmentRotatingWheelUtils.CalculateRotationDuringTick(tick, wheelModel.RotationSpeed, deltaTime);
-                var wheelCenter = wheelModel.Config.CenterPosition;
+                var wheelCenter = wheelModel.CenterPosition;
                 var rotationSpeed = wheelModel.RotationSpeed;
 
-                if (wheelModel.Config.Springs != null)
+                if (!wheelModel.WallIds.IsNullOrEmpty())
                 {
-                    foreach (var springConfig in wheelModel.Config.Springs)
+                    foreach (var wallId in wheelModel.WallIds)
                     {
+                        var wallModel = _matchDataService.GetEnvironmentWall(wallId);
+
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            tick, rotationSpeed, deltaTime, wheelCenter, springConfig.Position, springConfig.DirectionAngle,
+                            tick, rotationSpeed, deltaTime, wheelCenter, wallModel.WorldPosition, 0,
                             out var worldPos, out var worldRot
                         );
 
-                        var springModel = _matchDataService.GetEnvironmentSpring(springConfig.Id);
-                        if (springModel != null)
-                        {
-                            springModel.Position = worldPos.ToUnityVector2();
-                            springModel.DirectionAngle = worldRot;
-                        }
+                        wallModel.WorldPosition = worldPos;
+                        wallModel.WorldRotationAngle = worldRot;
+                    }
+                }
+                
+                if (!wheelModel.LavaWallIds.IsNullOrEmpty())
+                {
+                    foreach (var lavaWallId in wheelModel.LavaWallIds)
+                    {
+                        var lavaWallModel = _matchDataService.GetEnvironmentLavaWall(lavaWallId);
+
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            tick, rotationSpeed, deltaTime, wheelCenter, lavaWallModel.WorldPosition, 0,
+                            out var worldPos, out var worldRot
+                        );
+
+                        lavaWallModel.WorldPosition = worldPos;
+                        lavaWallModel.WorldRotationAngle = worldRot;
+                    }
+                }
+                
+                if (!wheelModel.SpringIds.IsNullOrEmpty())
+                {
+                    foreach (var springId in wheelModel.SpringIds)
+                    {
+                        var springModel = _matchDataService.GetEnvironmentSpring(springId);
+
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            tick, rotationSpeed, deltaTime, wheelCenter, springModel.WorldPosition, springModel.LocalDirectionAngle,
+                            out var worldPos, out var worldRot
+                        );
+
+                        springModel.WorldPosition = worldPos;
+                        springModel.WorldDirectionAngle = worldRot;
                     }
                 }
             }

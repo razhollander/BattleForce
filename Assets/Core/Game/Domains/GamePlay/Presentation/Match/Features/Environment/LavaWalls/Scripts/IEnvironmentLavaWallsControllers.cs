@@ -5,5 +5,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
         void InitEntryPoint();
         void CreateLavaWall(ushort wallId, UnityEngine.Transform parent = null);
         void DestroyAll();
+        void UpdateLavaWallTransform(ushort lavaWallId);
     }
 }

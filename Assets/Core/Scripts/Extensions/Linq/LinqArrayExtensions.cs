@@ -35,6 +35,20 @@ namespace Core.Scripts.Extensions.Linq
             return default;
         }
         
+        public static T FindWithId<T>(this IList<T> source, ushort id) where T : IEquatable<ushort>
+        {
+            foreach (var item in source)
+            {
+                if (item.Equals(id))
+                {
+                    return item;
+                }
+            }
+
+            LogService.LogError("No item found with id: " + id);
+            return default;
+        }
+        
         public static T FindWithId<T>(this T[] source, ushort id) where T : IEquatable<ushort>
         {
             for (int i = 0; i < source.Length; i++)

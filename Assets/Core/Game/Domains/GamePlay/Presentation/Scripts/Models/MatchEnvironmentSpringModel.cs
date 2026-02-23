@@ -1,18 +1,22 @@
-using UnityEngine;
+using System.Numerics;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Models
 {
     public class MatchEnvironmentSpringModel
     {
         public ushort Id;
-        public Vector2 Position;
-        public float DirectionAngle;
-
-        public MatchEnvironmentSpringModel(ushort id, Vector2 position, float directionAngle)
+        public Vector2 LocalPosition;
+        public Vector2 WorldPosition;
+        public float LocalDirectionAngle;
+        public float WorldDirectionAngle;
+        
+        public MatchEnvironmentSpringModel(ushort id, Vector2 localPosition, Vector2 worldPosition, float localDirectionAngle, float worldDirectionAngle)
         {
             Id = id;
-            Position = position;
-            DirectionAngle = directionAngle;
+            LocalPosition = localPosition;
+            WorldPosition = worldPosition;
+            LocalDirectionAngle = localDirectionAngle;
+            WorldDirectionAngle = worldDirectionAngle;
         }
     }
 }

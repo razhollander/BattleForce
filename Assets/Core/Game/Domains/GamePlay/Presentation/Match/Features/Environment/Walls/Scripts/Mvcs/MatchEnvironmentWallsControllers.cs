@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Scripts.Extensions.Linq;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs
@@ -25,10 +26,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
             _wallsParent = new GameObject("EnvironmentWallsParent");
         }
 
-        public void CreateWall(ushort wallId, Transform parent = null)
+        public void CreateWall(ushort wallId)
         {
             var wallController = new MatchEnvironmentWallController(wallId, _matchDataService);
-            wallController.CreateWallView(_wallViewPrefab, parent != null ? parent : _wallsParent.transform);
+            wallController.CreateWallView(_wallViewPrefab, _wallsParent.transform);
             _wallControllers.Add(wallController);
         }
 
@@ -39,6 +40,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
                 wallController.Destroy();
             }
             _wallControllers.Clear();
+        }
+
+        public void UpdateWallTransform(ushort wallId)
+        {
+            var wallModel = _matchDataService.GetEnvironmentWall(wallId);
+            _wallControllers.FindWithId(wallId).UpdateTransform(wallModel.WorldPosition, wallModel.WorldRotationAngle);
         }
     }
 }
