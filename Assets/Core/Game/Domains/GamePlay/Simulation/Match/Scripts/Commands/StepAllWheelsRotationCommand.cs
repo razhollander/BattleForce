@@ -48,8 +48,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         rotationSpeed,
                         deltaTime,
                         wheelCenter,
-                        Vector2.Zero,
-                        0,
+                        wall.Transform.LocalPosition,
+                        wall.Transform.LocalRotationDegrees,
                         out var newPosition,
                         out var newRotation
                     );
@@ -69,8 +69,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         rotationSpeed,
                         deltaTime,
                         wheelCenter,
-                        Vector2.Zero,
-                        0,
+                        lavaWall.Transform.LocalPosition,
+                        lavaWall.Transform.LocalRotationDegrees,
                         out var newPosition,
                         out var newRotation
                     );

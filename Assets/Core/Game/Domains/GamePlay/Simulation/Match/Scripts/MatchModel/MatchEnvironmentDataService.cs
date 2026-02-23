@@ -46,30 +46,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             _rotatingWheels.Clear();
         }
         
-        public void AddWall(ushort wallId, Vector2 position, Vector2[] Points)
+        public void AddWall(ushort wallId, Vector2[] Points, Vector2 localPosition, Vector2 worldPosition, float worldRotationDegrees)
         {
             var wall = _walls.AddAndGet();
             wall.Id = wallId;
             wall.SetPoints(Points);
-            wall.Transform.WorldPosition = position;
+            wall.Transform.WorldRotationDegrees = worldRotationDegrees;
+            wall.Transform.LocalPosition = localPosition;
+            wall.Transform.WorldPosition = worldPosition;
         }
         
-        public void AddLavaWall(ushort lavaWallId, Vector2 position, Vector2[] Points)
+        public void AddLavaWall(ushort lavaWallId, Vector2[] Points, Vector2 localPosition, Vector2 worldPosition, float worldRotationDegrees)
         {
             var lavaWall = _lavaWalls.AddAndGet();
             lavaWall.Id = lavaWallId;
             lavaWall.SetPoints(Points);
-            lavaWall.Transform.WorldPosition = position;
+            lavaWall.Transform.WorldRotationDegrees = worldRotationDegrees;
+            lavaWall.Transform.LocalPosition = localPosition;
+            lavaWall.Transform.WorldPosition = worldPosition;
         }
         
-        public void AddSpring(ushort springId, Vector2 springLocalPosition, Vector2 springWorldPosition, float localRotationDegrees, float worldRotationDegrees)
+        public void AddSpring(ushort springId, Vector2 localPosition, Vector2 worldPosition, float localRotationDegrees, float worldRotationDegrees)
         {
             var spring = _springs.AddAndGet();
             spring.Id = springId;
             spring.Transform.LocalRotationDegrees = localRotationDegrees;
             spring.Transform.WorldRotationDegrees = worldRotationDegrees;
-            spring.Transform.LocalPosition = springLocalPosition;
-            spring.Transform.WorldPosition = springWorldPosition;
+            spring.Transform.LocalPosition = localPosition;
+            spring.Transform.WorldPosition = worldPosition;
         }
         
         public EnvironmentRotatingWheelS2C AddRotatingWheel(ushort rotatingWheelId, Vector2 centerPosition, float rotationSpeed)

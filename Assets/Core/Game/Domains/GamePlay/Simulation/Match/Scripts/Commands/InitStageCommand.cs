@@ -128,16 +128,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var wallConfig in wallConfigs)
             {
-                AddWallToEnvironment(wallConfig);
+                AddWallToEnvironment(wallConfig.Id, wallConfig.Points, wallConfig.Position, wallConfig.Position, 0);
             }
         }
 
-        private void AddWallToEnvironment(WallConfig wallConfig)
+        private void AddWallToEnvironment(ushort wallId, Vector2[] wallPoints, Vector2 lavaWallLocalPosition, Vector2 lavaWallWorldPosition, float lavaWallWorldRotationAngle)
         {
-            var wallId = wallConfig.Id;
-            var wallPoints = wallConfig.Points;
-            _matchDataService.EnvironmentData.AddWall(wallId, Vector2.Zero, wallPoints);
-            _physicsSimulator.AddWall(wallId, wallPoints);
+            _matchDataService.EnvironmentData.AddWall(wallId, wallPoints, lavaWallLocalPosition, lavaWallWorldPosition, lavaWallWorldRotationAngle);
+            _physicsSimulator.AddWall(wallId, wallPoints, lavaWallWorldPosition);
         }
 
         private void CreateLavaWalls()
@@ -150,16 +148,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var lavaWallConfig in lavaWallConfigs)
             {
-                AddLavaWallToEnvironment(lavaWallConfig);
+                AddLavaWallToEnvironment(lavaWallConfig.Id, lavaWallConfig.Points, lavaWallConfig.Position, lavaWallConfig.Position, 0);
             }
         }
 
-        private void AddLavaWallToEnvironment(WallConfig lavaWallConfig)
+        private void AddLavaWallToEnvironment(ushort lavaWallId, Vector2[] lavaWallPoints, Vector2 lavaWallLocalPosition, Vector2 lavaWallWorldPosition, float lavaWallWorldRotationAngle)
         {
-            var lavaWallId = lavaWallConfig.Id;
-            var lavaWallPoints = lavaWallConfig.Points;
-            _matchDataService.EnvironmentData.AddLavaWall(lavaWallId, Vector2.Zero, lavaWallPoints);
-            _physicsSimulator.AddLavaWall(lavaWallId, lavaWallPoints);
+            _matchDataService.EnvironmentData.AddLavaWall(lavaWallId, lavaWallPoints, lavaWallLocalPosition, lavaWallWorldPosition, lavaWallWorldRotationAngle);
+            _physicsSimulator.AddLavaWall(lavaWallId, lavaWallPoints, lavaWallWorldPosition);
         }
 
         private void CreateTalentCards()
@@ -238,15 +234,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     foreach (var wallConfig in wheelConfig.Walls)
                     {
-                        AddWallToEnvironment(wallConfig);
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            currentTick, rotationSpeed, deltaTime, wheelCenter, Vector2.Zero, 0,
-                            out var newPosition, out var newRotation
+                            currentTick, rotationSpeed, deltaTime, wheelCenter, wallConfig.Position, 0,
+                            out var worldPosition, out var worldRotation
                         );
                         
                         var wallId = wallConfig.Id;
+                        AddWallToEnvironment(wallId, wallConfig.Points, wallConfig.Position, worldPosition, worldRotation);
                         rotatingWheel.AddWall(wallId);
-                        _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Wall, wallId, newPosition, newRotation);
                     }
                 }
 
@@ -254,15 +249,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     foreach (var lavaWallConfig in wheelConfig.LavaWalls)
                     {
-                        AddLavaWallToEnvironment(lavaWallConfig);
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            currentTick, rotationSpeed, deltaTime, wheelCenter, Vector2.Zero, 0,
-                            out var initialPos, out var initialRot
+                            currentTick, rotationSpeed, deltaTime, wheelCenter, lavaWallConfig.Position, 0,
+                            out var worldPosition, out var worldRotation
                         );
 
                         var lavaWallId = lavaWallConfig.Id;
+                        AddLavaWallToEnvironment(lavaWallId, lavaWallConfig.Points, lavaWallConfig.Position, worldPosition, worldRotation);
                         rotatingWheel.AddLavaWall(lavaWallId);
-                        _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Lava, lavaWallId, initialPos, initialRot);
                     }
                 }
 

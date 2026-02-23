@@ -13,9 +13,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void InitEntryPoint();
         void Step(float deltaTime, int velocityIterations, int positionIterations);
         void SetPlayerVelocity(ushort playerId, Vector2 velocity);
-        void AddWall(ushort id, Vector2[] points);
-        void AddLavaWall(ushort id, Vector2[] points);
-        void AddTeamFloor(ushort id, Vector2[] points);
+        void AddWall(ushort id, Vector2[] points, Vector2 position);
+        void AddLavaWall(ushort id, Vector2[] points, Vector2 position);
+        void AddTeamFloor(ushort id, Vector2[] points, Vector2 position);
         void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius);
         public FixedUnorderedList<PhysicsCollisionEvent> GetCachedCollisions();
         public void ClearCachedCollisions();

@@ -150,14 +150,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 
         public MatchEnvironmentWallModel AddWall(WallConfig wallConfig)
         {
-            var newWall = new MatchEnvironmentWallModel(wallConfig.Id, wallConfig.Points);
+            var newWall = new MatchEnvironmentWallModel(wallConfig.Id, wallConfig.Points, wallConfig.Position);
             EnvironmentWalls.Add(newWall);
             return newWall;
         }
 
         public MatchEnvironmentLavaWallModel AddLavalWall(WallConfig wallConfig)
         {
-            var newWall = new MatchEnvironmentLavaWallModel(wallConfig.Id, wallConfig.Points);
+            var newWall = new MatchEnvironmentLavaWallModel(wallConfig.Id, wallConfig.Points, wallConfig.Position);
             EnvironmentLavaWalls.Add(newWall);
             return newWall;
         }

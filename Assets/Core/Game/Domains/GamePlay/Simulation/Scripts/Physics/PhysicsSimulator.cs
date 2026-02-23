@@ -292,11 +292,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             GetPlayer(playerId).SetLinearVelocity(velocity);
         }
 
-        public void AddWall(ushort id, Vector2[] points)
+        public void AddWall(ushort id, Vector2[] points, Vector2 position)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
-            bodyDef.position = Vector2.Zero; // Assume walls are absolute-world positioned
+            bodyDef.position = position;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.Wall);
 
             var body = _world.CreateBody(bodyDef);
@@ -317,11 +317,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(wallShape);
         }
 
-        public void AddLavaWall(ushort id, Vector2[] points)
+        public void AddLavaWall(ushort id, Vector2[] points, Vector2 position)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
-            bodyDef.position = Vector2.Zero;
+            bodyDef.position = position;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.Lava);
 
             var body = _world.CreateBody(bodyDef);
@@ -343,11 +343,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(lavaShape);
         }
 
-        public void AddTeamFloor(ushort id, Vector2[] points)
+        public void AddTeamFloor(ushort id, Vector2[] points, Vector2 position)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
-            bodyDef.position = Vector2.Zero;
+            bodyDef.position = position;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.TeamFloor);
 
             var body = _world.CreateBody(bodyDef);

@@ -25,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
             var pointsUnityVector2 = lavaWallModel.Points.Select(x => x.ToUnityVector2()).ToArray();
             var mesh = MeshUtils.BuildMesh(pointsUnityVector2, 2);
             _lavaWallView.SetMesh(mesh);
+            _lavaWallView.transform.localPosition = lavaWallModel.LocalPosition.ToUnityVector2();
         }
 
         public void Destroy()

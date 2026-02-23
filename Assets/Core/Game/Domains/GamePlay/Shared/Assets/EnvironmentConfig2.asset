@@ -54,17 +54,22 @@ MonoBehaviour:
         {         "X": -4.5,         "Y": -3       },       "NormalRotation": 90    
         },     "GateB": {       "Position": {         "X": 3.25,         "Y": 7      
         },       "NormalRotation": 270     }   } ]'
-      _rotatingWheelsJson: '[{   "Id": 101,   "CenterPosition": {     "X": 9.0,    
-        "Y": 9.0   },   "RotationSpeed": 30.0,   "Walls": [     {       "Id": 1,      
-        "Points": [         { "X": -5.0, "Y": 0.5 },         { "X": 5.0, "Y": 0.5
-        },         { "X": 5.0, "Y": -0.5 },         { "X": -5.0, "Y": -0.5 }      
-        ]     }   ],   "LavaWalls": [     {       "Id": 50,       "Points": [        
-        { "X": -3.0, "Y": 3.0 },         { "X": 3.0, "Y": 3.0 },         { "X": 3.0,
-        "Y": -3.0 },         { "X": -3.0, "Y": -3.0 }       ]     }   ],   "Springs":
-        [     {       "Id": 50,       "Position": {         "X": 5.0,         "Y":
-        0.0       },       "DirectionAngle": 0.0     },     {       "Id": 51,      
-        "Position": {         "X": -5.0,         "Y": 0.0       },       "DirectionAngle":
-        180.0     }   ] }]'
+      _rotatingWheelsJson: '[   {     "Id": 101,     "CenterPosition": {       "X":
+        9,       "Y": 9     },     "RotationSpeed": 30,     "Walls": [       {        
+        "Id": 1,         "Position": {             "X": 1,             "Y": 1          
+        },         "Points": [           {             "X": -5,             "Y":
+        0.5           },           {             "X": 5,             "Y": 0.5          
+        },           {             "X": 5,             "Y": -0.5           },          
+        {             "X": -5,             "Y": -0.5           }         ]      
+        }     ],     "LavaWalls": [       {         "Id": 50,         "Points": [          
+        {             "X": -3,             "Y": 3           },           {            
+        "X": 3,             "Y": 3           },           {             "X": 3,            
+        "Y": -3           },           {             "X": -3,             "Y": -3          
+        }         ]       }     ],     "Springs": [       {         "Id": 50,        
+        "Position": {           "X": 5,           "Y": 0         },         "DirectionAngle":
+        0       },       {         "Id": 51,         "Position": {           "X":
+        -5,           "Y": 0         },         "DirectionAngle": 180       }    
+        ]   } ]'
     - _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
         "Y": -28.16       },       {         "X": -43.804464,         "Y": -28.16      

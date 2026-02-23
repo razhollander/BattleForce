@@ -67,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
                 foreach (var wallConfig in wallConfigs)
                 {
                     _teamFloorDataService.FloorIdToTeamId.Add(wallConfig.Id, teamId);
-                    _physicsSimulator.AddTeamFloor(wallConfig.Id, wallConfig.Points);
+                    _physicsSimulator.AddTeamFloor(wallConfig.Id, wallConfig.Points, wallConfig.Position);
                 }
             }
         }
@@ -80,7 +80,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             {
                 var wallId = wallConfig.Id;
                 var wallPoints = wallConfig.Points;
-                _physicsSimulator.AddWall(wallId, wallPoints);
+                _physicsSimulator.AddWall(wallId, wallPoints, wallConfig.Position);
             }
         }
     }

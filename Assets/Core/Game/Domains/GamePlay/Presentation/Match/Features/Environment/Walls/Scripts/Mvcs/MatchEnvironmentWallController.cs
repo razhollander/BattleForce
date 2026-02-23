@@ -26,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
             var pointsUnityVector2 = wallModel.Points.Select(x => x.ToUnityVector2()).ToArray();
             var mesh = MeshUtils.BuildMesh(pointsUnityVector2, 0);
             _wallView.SetMesh(mesh);
+            _wallView.transform.localPosition = wallModel.LocalPosition.ToUnityVector2();
         }
 
         public void Destroy()

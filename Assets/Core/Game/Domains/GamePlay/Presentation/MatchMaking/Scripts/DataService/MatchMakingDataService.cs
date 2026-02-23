@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataServic
 
         public MatchEnvironmentWallModel AddWall(WallConfig wallConfig)
         {
-            var newWall = new MatchEnvironmentWallModel(wallConfig.Id, wallConfig.Points);
+            var newWall = new MatchEnvironmentWallModel(wallConfig.Id, wallConfig.Points, wallConfig.Position);
             EnvironmentWalls.Add(newWall);
             return newWall;
         }
