@@ -165,7 +165,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                         var wallModel = _matchDataService.GetEnvironmentWall(wallId);
 
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            tick, rotationSpeed, deltaTime, wheelCenter, wallModel.WorldPosition, 0,
+                            tick, rotationSpeed, deltaTime, wheelCenter, wallModel.LocalPosition, 0,
                             out var worldPos, out var worldRot
                         );
 
@@ -181,7 +181,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                         var lavaWallModel = _matchDataService.GetEnvironmentLavaWall(lavaWallId);
 
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            tick, rotationSpeed, deltaTime, wheelCenter, lavaWallModel.WorldPosition, 0,
+                            tick, rotationSpeed, deltaTime, wheelCenter, lavaWallModel.LocalPosition, 0,
                             out var worldPos, out var worldRot
                         );
 
@@ -197,7 +197,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                         var springModel = _matchDataService.GetEnvironmentSpring(springId);
 
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            tick, rotationSpeed, deltaTime, wheelCenter, springModel.WorldPosition, springModel.LocalDirectionAngle,
+                            tick, rotationSpeed, deltaTime, wheelCenter, springModel.LocalPosition, springModel.LocalDirectionAngle,
                             out var worldPos, out var worldRot
                         );
 
