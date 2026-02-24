@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public FixedUnorderedList<PhysicsCollisionEvent> GetCachedCollisions();
         public void ClearCachedCollisions();
         void InitExitPoint();
-        void CopyDataToSimulation(MatchSimulationStateS2C simulationState, FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls, FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls, FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings);
+        void CopyDataToSimulation(MatchSimulationStateS2C simulationState, FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls, FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls, FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings, FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> environmentTeleportGates);
         void CopyDataToSimulation(MatchMakingSimulationStateS2C simulationState);
         Body GetPlayer(ushort playerId);
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);

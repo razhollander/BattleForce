@@ -207,7 +207,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             foreach (var teleportGatePairConfig in teleportGatePairConfigs)
             {
                 var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size.ToNumericsVector2();
-                _matchDataService.EnvironmentData.AddTeleportGatePair(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateBId, teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position, teleportGatePairConfig.GateB.NormalRotation);
+                _matchDataService.EnvironmentData.AddTeleportGatePair(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateBId, teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position, teleportGatePairConfig.GateB.NormalRotation, teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position, teleportGatePairConfig.GateB.NormalRotation);
                 _physicsSimulator.AddTeleportGate(teleportGatePairConfig.GateAId, teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, gateSize);
                 _physicsSimulator.AddTeleportGate(teleportGatePairConfig.GateBId, teleportGatePairConfig.GateB.Position, teleportGatePairConfig.GateB.NormalRotation, gateSize);
             }
@@ -271,6 +271,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         var springId = springConfig.Id;
                         AddSpringToEnvironment(springId, springConfig.Position, worldPosition, springConfig.RotationAngle, worldRotation);
                         rotatingWheel.AddSpring(springId);
+                    }
+                }
+
+                if (!wheelConfig.TeleportGatePairs.IsNullOrEmpty())
+                {
+                    foreach (var teleportPairConfig in wheelConfig.TeleportGatePairs)
+                    {
+                        var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size.ToNumericsVector2();
+
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            currentTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateA.Position, teleportPairConfig.GateA.NormalRotation,
+                            out var worldPositionA, out var worldRotationA);
+
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            currentTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateB.Position, teleportPairConfig.GateB.NormalRotation,
+                            out var worldPositionB, out var worldRotationB);
+
+                        var pairId = teleportPairConfig.Id;
+                        _matchDataService.EnvironmentData.AddTeleportGatePair(
+                            pairId,
+                            teleportPairConfig.GateAId,
+                            teleportPairConfig.GateBId,
+                            teleportPairConfig.GateA.Position,
+                            teleportPairConfig.GateA.NormalRotation,
+                            teleportPairConfig.GateB.Position,
+                            teleportPairConfig.GateB.NormalRotation,
+                            worldPositionA,
+                            worldRotationA,
+                            worldPositionB,
+                            worldRotationB
+                        );
+                        _physicsSimulator.AddTeleportGate(teleportPairConfig.GateAId, worldPositionA, worldRotationA, gateSize);
+                        _physicsSimulator.AddTeleportGate(teleportPairConfig.GateBId, worldPositionB, worldRotationB, gateSize);
+                        rotatingWheel.AddTeleportGatePair(pairId);
                     }
                 }
             }

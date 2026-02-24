@@ -205,6 +205,30 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                         springModel.WorldRotationAngle = worldRot;
                     }
                 }
+
+                if (!wheelModel.TeleportGatePairIds.IsNullOrEmpty())
+                {
+                    foreach (var pairId in wheelModel.TeleportGatePairIds)
+                    {
+                        var teleportPairModel = _matchDataService.GetTeleportPair(pairId);
+
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            tick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateA.LocalPosition, teleportPairModel.GateA.LocalRotation,
+                            out var worldPosA, out var worldRotA
+                        );
+
+                        teleportPairModel.GateA.WorldPosition = worldPosA;
+                        teleportPairModel.GateA.WorldRotation = worldRotA;
+
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            tick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateB.LocalPosition, teleportPairModel.GateB.LocalRotation,
+                            out var worldPosB, out var worldRotB
+                        );
+
+                        teleportPairModel.GateB.WorldPosition = worldPosB;
+                        teleportPairModel.GateB.WorldRotation = worldRotB;
+                    }
+                }
             }
         }
         

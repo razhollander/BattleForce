@@ -100,6 +100,42 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     spring.Transform.WorldPosition = worldPosition;
                 }
             }
+
+            if (!rotatingWheel.TeleportGatePairIds.IsEmpty)
+            {
+                foreach (var pairId in rotatingWheel.TeleportGatePairIds.AsSpan())
+                {
+                    var teleportGatePair = _matchDataService.EnvironmentData.GetTeleportGatePair(pairId);
+
+                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                        tick,
+                        rotationSpeed,
+                        deltaTime,
+                        wheelCenter,
+                        teleportGatePair.GateA.Position,
+                        teleportGatePair.GateA.NormalRotation,
+                        out var worldPositionA,
+                        out var worldRotationA
+                    );
+
+                    teleportGatePair.GateA.WorldPosition = worldPositionA;
+                    teleportGatePair.GateA.WorldRotation = worldRotationA;
+
+                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                        tick,
+                        rotationSpeed,
+                        deltaTime,
+                        wheelCenter,
+                        teleportGatePair.GateB.Position,
+                        teleportGatePair.GateB.NormalRotation,
+                        out var worldPositionB,
+                        out var worldRotationB
+                    );
+
+                    teleportGatePair.GateB.WorldPosition = worldPositionB;
+                    teleportGatePair.GateB.WorldRotation = worldRotationB;
+                }
+            }
         }
     }
 }

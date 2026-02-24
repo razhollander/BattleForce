@@ -11,8 +11,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
         public List<ushort> WallIds { get; private set; } 
         public List<ushort> LavaWallIds { get; private set; }
         public List<ushort> SpringIds { get; private set; }
+        public List<ushort> TeleportGatePairIds;
 
-        public MatchEnvironmentRotatingWheelModel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds)
+        public MatchEnvironmentRotatingWheelModel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> teleportGatePairIds)
         {
             Id = id;
             CenterPosition = centerPosition;
@@ -20,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
             WallIds = wallIds;
             LavaWallIds = lavaWallIds;
             SpringIds = springIds;
+            TeleportGatePairIds = teleportGatePairIds;
         }
     }
 }

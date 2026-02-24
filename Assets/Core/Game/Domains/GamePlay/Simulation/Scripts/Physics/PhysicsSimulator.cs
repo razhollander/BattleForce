@@ -66,7 +66,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public void CopyDataToSimulation(MatchSimulationStateS2C simulationState, 
             FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls,
             FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls, 
-            FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings)
+            FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings,
+            FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> environmentTeleportGates)
         {
             var currentBody = _world.GetBodyList();
 
@@ -82,17 +83,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     case PhysicsBodyType.Wall: CopyWallStateToBody(currentBody, bodyData.Id, environmentWalls); break;
                     case PhysicsBodyType.Lava: CopyLavaStateToBody(currentBody, bodyData.Id, environmentLavaWalls); break;
                     case PhysicsBodyType.EnvironmentSpring: CopySpringStateToBody(currentBody, bodyData.Id, environmentSprings); break;
+                    case PhysicsBodyType.EnvironmentTeleportGate: CopyTeleportGateStateToBody(currentBody, bodyData.Id, environmentTeleportGates); break;
                 }
 
                 currentBody = currentBody.GetNext();
             }
-            
-            // _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Wall, wall.Id, newPos, newRot);
-            // _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.Lava, lavaWall.Id, newPos, newRot);
-            // _physicsSimulator.UpdateBodyTransform(PhysicsBodyType.EnvironmentSpring, spring.Id, worldPosition, newRotation);
-            // CopyPlayersStates(simulationState);
-            // CopyBulletsStates(simulationState.Bullets);
-            // CopyPowerUpsStates(simulationState);
         }
 
         private void CopyPowerUpStateToBody(Body powerUpBody, ushort powerUpId, MatchSimulationStateS2C simulationState)
@@ -113,6 +108,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var environmentSpring = environmentSprings.FindWithId(springId);
             springBody.SetTransform(environmentSpring.Transform.WorldPosition, environmentSpring.Transform.WorldRotationDegrees.ToRadians());       
+        }
+
+        private void CopyTeleportGateStateToBody(Body teleportGateBody, ushort teleportGateId, FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> environmentTeleportGates)
+        {
+            foreach (var teleportGatePair in environmentTeleportGates.AsSpan())
+            {
+                if (teleportGatePair.GateA.Id == teleportGateId)
+                {
+                    teleportGateBody.SetTransform(teleportGatePair.GateA.WorldPosition, teleportGatePair.GateA.WorldRotation.ToRadians());
+                    return;
+                }
+
+                if (teleportGatePair.GateB.Id == teleportGateId)
+                {
+                    teleportGateBody.SetTransform(teleportGatePair.GateB.WorldPosition, teleportGatePair.GateB.WorldRotation.ToRadians());
+                    return;
+                }
+            }
+
+            throw new Exception("No teleport gate pair found for gate id: " + teleportGateId);
         }
 
         private void CopyLavaStateToBody(Body lavaBody, ushort lavaWallId, FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls)

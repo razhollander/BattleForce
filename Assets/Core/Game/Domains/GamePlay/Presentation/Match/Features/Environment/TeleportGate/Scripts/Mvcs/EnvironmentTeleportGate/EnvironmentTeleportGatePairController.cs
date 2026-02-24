@@ -46,9 +46,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         private EnvironmentTeleportGateView CreateGateView(EnvironmentTeleportGateView teleportGateViewPrefab, Transform parent, MatchEnvironmentTeleportGateModel teleportGateModel)
         {
             var teleportGateView = Object.Instantiate(teleportGateViewPrefab, parent);
-            teleportGateView.transform.position = teleportGateModel.Position.ToUnityVector2();
-            teleportGateView.transform.rotation = teleportGateModel.NormalRotation.AngleToQuaternion();
+            teleportGateView.transform.position = teleportGateModel.WorldPosition.ToUnityVector2();
+            teleportGateView.transform.rotation = teleportGateModel.WorldRotation.AngleToQuaternion();
             return teleportGateView;
+        }
+
+        public void UpdateViewTransform()
+        {
+            var teleportPairModel = _matchDataService.GetTeleportPair(TeleportPairId);
+            _gateAView.transform.position = teleportPairModel.GateA.WorldPosition.ToUnityVector2();
+            _gateAView.transform.rotation = teleportPairModel.GateA.WorldRotation.AngleToQuaternion();
+            _gateBView.transform.position = teleportPairModel.GateB.WorldPosition.ToUnityVector2();
+            _gateBView.transform.rotation = teleportPairModel.GateB.WorldRotation.AngleToQuaternion();
         }
 
         public void PlayTeleportAnimation(CancellationTokenSource cancellationTokenSource)

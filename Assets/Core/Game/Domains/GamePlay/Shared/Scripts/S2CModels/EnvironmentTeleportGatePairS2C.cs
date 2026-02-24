@@ -20,5 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public int Id;
         public Vector2 Position;
         public float NormalRotation;
+        public Vector2 WorldPosition;
+        public float WorldRotation;
     }
 }
