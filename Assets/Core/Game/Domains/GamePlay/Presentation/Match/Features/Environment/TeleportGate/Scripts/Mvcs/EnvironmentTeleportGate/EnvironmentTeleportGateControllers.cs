@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
 
         public void UpdateTeleportGateTransform(ushort pairId)
         {
-            GetGate(pairId).UpdateViewTransform();
+            GetGate(pairId).InterpulateGatesTransforms();
         }
     }
 }

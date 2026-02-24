@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
+using CoreDomain.Scripts.Utils;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate
@@ -46,18 +47,39 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         private EnvironmentTeleportGateView CreateGateView(EnvironmentTeleportGateView teleportGateViewPrefab, Transform parent, MatchEnvironmentTeleportGateModel teleportGateModel)
         {
             var teleportGateView = Object.Instantiate(teleportGateViewPrefab, parent);
-            teleportGateView.transform.position = teleportGateModel.WorldPosition.ToUnityVector2();
-            teleportGateView.transform.rotation = teleportGateModel.WorldRotation.AngleToQuaternion();
+            SetTransform(teleportGateView.transform, teleportGateModel.WorldPosition.ToUnityVector2(), teleportGateModel.WorldRotation.AngleToQuaternion());
             return teleportGateView;
         }
 
-        public void UpdateViewTransform()
+        public void InterpulateGatesTransforms()
         {
             var teleportPairModel = _matchDataService.GetTeleportPair(TeleportPairId);
-            _gateAView.transform.position = teleportPairModel.GateA.WorldPosition.ToUnityVector2();
-            _gateAView.transform.rotation = teleportPairModel.GateA.WorldRotation.AngleToQuaternion();
-            _gateBView.transform.position = teleportPairModel.GateB.WorldPosition.ToUnityVector2();
-            _gateBView.transform.rotation = teleportPairModel.GateB.WorldRotation.AngleToQuaternion();
+            InterpulateTransform(_gateAView.transform, teleportPairModel.GateA.WorldPosition.ToUnityVector2(), teleportPairModel.GateA.WorldRotation);
+            InterpulateTransform(_gateBView.transform, teleportPairModel.GateB.WorldPosition.ToUnityVector2(), teleportPairModel.GateB.WorldRotation);
+        }
+        
+        private void InterpulateTransform(Transform transform, Vector2 position, float rotationDegrees)
+        {
+            var direction = rotationDegrees.ToRadians().AngleToVector();
+            var targetRotation = direction.ToQuaternion();
+            var deltaTime = Time.deltaTime;
+            var decay = _gamePlayConfig.ExponentialDecay;
+            
+            var interpulatedRotation = MathUtils.ExpDecay(
+                transform.rotation, 
+                targetRotation, 
+                decay,
+                deltaTime
+            );
+            
+            var interpulatedPosition = MathUtils.ExpDecay(transform.position, position, decay, deltaTime);
+            SetTransform(transform, interpulatedPosition, interpulatedRotation);
+        }
+        
+        private void SetTransform(Transform transform, Vector2 position, Quaternion rotation)
+        {
+            transform.position = position;
+            transform.rotation = rotation;
         }
 
         public void PlayTeleportAnimation(CancellationTokenSource cancellationTokenSource)
