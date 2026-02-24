@@ -63,7 +63,7 @@ namespace CoreDomain.Scripts.Utils
                 // 2. Calculate the rotation delta.
                 // We want to map the direction "into" the entrance (-enterNormal)
                 // to the direction "out of" the exit (exitNormal).
-                float angleInto = (float)(Mathf.Atan2(enterNormal.Y, enterNormal.X) * 180.0 / Mathf.PI);
+                float angleInto = (float)(Mathf.Atan2(-enterNormal.Y, -enterNormal.X) * 180.0 / Mathf.PI);
                 float angleOut = (float)(Mathf.Atan2(exitNormal.Y, exitNormal.X) * 180.0 / Mathf.PI);
 
                 // This is the degree difference in CCW
