@@ -18,8 +18,14 @@ MonoBehaviour:
     ConcurrentTalentCards: 128
     ConcurrentEvironmentWalls: 64
     ConcurrentEvironmentLavaWalls: 16
-    PointsInEvironmentWall: 8
+    ConcurrentEvironmentTeleportPairs: 4
+    ConcurrentEvironmentSprings: 32
     PacketTypes: 256
+    ConcurrentEnvironmentRotatingWheels: 16
+    EnvironmentRotatingWheelCap:
+      MaxWalls: 32
+      MaxLavaWalls: 16
+      MaxSprings: 8
     ConcurrentTimeOfImpactContacts: 32
     ConcurrentBodyCount: 512
     ConcurrentContactCount: 256
@@ -51,8 +57,12 @@ MonoBehaviour:
     StageEndNetEvents: 32
     PlayerDiedNetEvents: 32
     StartMatchEligibleChangedNetEvents: 32
+    TalentSwitchNetEvents: 128
+    EnvironmentSpringPlayerCollisionNetEvents: 64
+    GainBoltsNetEvents: 128
+    PlayerToEnvironmentTeleportGateCollisionNetEvents: 64
   TicksPerSeconds: 60
-  DeltaTime: 0.016666668
+  DeltaTime: 0.01666667
   PhysicsVelocityIterations: 8
   PositionIterations: 8
   ServerPlayerInputPacketsBuffer: 2

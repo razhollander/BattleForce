@@ -70,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.Bullets.Clear();
             _matchDataService.SimulationState.PowerUpBalls.Clear();
             _matchDataService.SimulationState.TalentCards.Clear();
+            _matchDataService.EnvironmentData.ClearData();
         }
 
         private void ResetPlayers()

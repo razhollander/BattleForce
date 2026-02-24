@@ -8,13 +8,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
     [System.Serializable]
     public class EnvironmentLayoutConfig
     {
-        [SerializeField] private string _environmentHalfSizeJson;
-        [SerializeField] private string _wallsJson;
-        [SerializeField] private string _lavaWallsJson;
-        [SerializeField] private string _talentCardsJson;
-        [SerializeField] private string _environmentSpringsJson;
-        [SerializeField] private string _teleportGatesJson;
-        [SerializeField] private string _rotatingWheelsJson;
+        [TextArea(1, 5)] [SerializeField] private string _environmentHalfSizeJson;
+        [TextArea(1, 5)] [SerializeField] private string _wallsJson;
+        [TextArea(1, 5)] [SerializeField] private string _lavaWallsJson;
+        [TextArea(1, 5)] [SerializeField] private string _talentCardsJson;
+        [TextArea(1, 5)] [SerializeField] private string _environmentSpringsJson;
+        [TextArea(1, 5)] [SerializeField] private string _teleportGatesJson;
+        [TextArea(1, 5)] [SerializeField] private string _rotatingWheelsJson;
 
         public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
         {

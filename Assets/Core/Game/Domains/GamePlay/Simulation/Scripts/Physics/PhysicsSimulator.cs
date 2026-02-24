@@ -151,30 +151,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         public void CopyDataToSimulation(MatchMakingSimulationStateS2C simulationState)
         {
-            CopyPlayersStates(simulationState.Players);
-            CopyBulletsStates(simulationState.Bullets);
+            var currentBody = _world.GetBodyList();
+
+            while (currentBody != null)
+            {
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                switch (bodyData.PhysicsBodyType)
+                {
+                    case PhysicsBodyType.PlayerSpaceship: CopyPlayerStateToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.PlayerBullet: CopyBulletStateToBody(currentBody, bodyData.Id, simulationState); break;
+                }
+
+                currentBody = currentBody.GetNext();
+            }
         }
         
-        private void CopyPlayersStates(FixedClassUnorderedList<MatchMakingPlayerStateS2C> players)
+        private void CopyPlayerStateToBody(Body playerBody, ushort playerId, MatchMakingSimulationStateS2C simulationState)
         {
-            foreach (var playerState in players.AsSpan())
-            {
-                var currentBody = _world.GetBodyList();
-
-                while (currentBody != null)
-                {
-                    var bodyData = (PhysicsBodyData) currentBody.UserData;
-
-                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerState.Id)
-                    {
-                        currentBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians()); 
-                        currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
-                        break;
-                    }
-
-                    currentBody = currentBody.GetNext();
-                }
-            }
+            var playerState = simulationState.Players.FindWithId(playerId);
+            playerBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
+            playerBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
+        }
+        
+        private void CopyBulletStateToBody(Body bulletBody, ushort bulletId, MatchMakingSimulationStateS2C simulationState)
+        {
+            var bulletState = simulationState.Bullets.FindWithId(bulletId);
+            bulletBody.SetTransform(bulletState.Position, bulletState.Direction.ToAngleRadians());
+            bulletBody.SetLinearVelocity(bulletState.Velocity);
         }
 
         public Body GetPlayer(ushort playerId)
@@ -195,73 +199,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             LogService.LogError($"Couldn't find player {playerId}");
             return null;
-        }
-
-        private void CopyPlayersStates(MatchSimulationStateS2C simulationState)
-        {
-            foreach (var playerState in simulationState.Players.AsSpan())
-            {
-                var currentBody = _world.GetBodyList();
-
-                while (currentBody != null)
-                {
-                    var bodyData = (PhysicsBodyData) currentBody.UserData;
-
-                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerState.Id)
-                    {
-                        currentBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
-                        currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
-                        break;
-                    }
-
-                    currentBody = currentBody.GetNext();
-                }
-            }
-        }
-
-        private void CopyPowerUpsStates(MatchSimulationStateS2C simulationState)
-        {
-            foreach (var powerUp in simulationState.PowerUpBalls.AsSpan())
-            {
-                var powerUpBody = _world.GetBodyList();
-
-                while (powerUpBody != null)
-                {
-                    var bodyData = (PhysicsBodyData) powerUpBody.UserData;
-
-                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUp.Id)
-                    {
-                        powerUpBody.SetTransform(powerUp.Position, 0);
-                        powerUpBody.SetLinearVelocity(powerUp.Velocity);
-                        break;
-                    }
-
-                    powerUpBody = powerUpBody.GetNext();
-                }
-            }
-        }
-
-        private void CopyBulletsStates(FixedUnorderedList<PlayerBulletS2C> bullets)
-        {
-            foreach (var bullet in bullets.AsSpan())
-            {
-                var bulletBody = _world.GetBodyList();
-
-                while (bulletBody != null)
-                {
-                    var bodyData = (PhysicsBodyData) bulletBody.UserData;
-
-                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerBullet && bodyData.Id == bullet.Id)
-                    {
-                        bulletBody.SetTransform(bullet.Position, bullet.Direction.ToAngleRadians());
-                        bulletBody.SetLinearVelocity(bullet.Velocity);
-
-                        break;
-                    }
-
-                    bulletBody = bulletBody.GetNext();
-                }
-            }
         }
 
         public void Step(float deltaTime, int velocityIterations, int positionIterations)
@@ -785,29 +722,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
             _polygonShapePool.Return(shape);
-        }
-
-        public void UpdateBodyTransform(PhysicsBodyType type, ushort id, Vector2 position, float rotationDegrees)
-        {
-            GetBody(type, id).SetTransform(position, rotationDegrees.ToRadians());
-        }
-
-        private Body GetBody(PhysicsBodyType type, ushort id)
-        {
-            var currentBody = _world.GetBodyList();
-            while (currentBody != null)
-            {
-                var bodyData = (PhysicsBodyData) currentBody.UserData;
-
-                if (bodyData.PhysicsBodyType == type && bodyData.Id == id)
-                {
-                    return currentBody;
-                }
-                
-                currentBody = currentBody.GetNext();
-            }
-
-            throw new Exception($"No body was found with the given id: {id} and type: {type}");
         }
         
         public void ClearAllData()

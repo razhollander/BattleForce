@@ -170,7 +170,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 
         public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(EnvironmentRotatingWheelConfig config)
         {
-            var newWheel = new MatchEnvironmentRotatingWheelModel(config.Id, config.CenterPosition, config.RotationSpeed, config.Walls.Select(x=>x.Id).ToList(), config.LavaWalls.Select(x=>x.Id).ToList(), config.Springs.Select(x=>x.Id).ToList(), config.TeleportGatePairs.Select(x=>x.Id).ToList());
+            var newWheel = new MatchEnvironmentRotatingWheelModel(config.Id, config.CenterPosition, config.RotationSpeed, 
+                config.Walls.Select(x=>x.Id).ToList(), 
+                config.LavaWalls.Select(x=>x.Id).ToList(), 
+                config.Springs.Select(x=>x.Id).ToList(),
+                config.TeleportGatePairs.Select(x=>x.Id).ToList());
             RotatingWheels.Add(newWheel);
             return newWheel;
         }

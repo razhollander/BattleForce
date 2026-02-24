@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -12,14 +13,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
         private readonly IMatchDataService _matchDataService;
         private readonly EnvironmentSpringView _environmentSpringViewPrefab;
         private readonly IStateMachineService _stateMachineService;
+        private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly Dictionary<ushort, MatchEnvironmentSpringController> _springControllers = new Dictionary<ushort, MatchEnvironmentSpringController>();
         private GameObject _springsParent;
 
-        public EnvironmentSpringControllers(IMatchDataService matchDataService, EnvironmentSpringView environmentSpringViewPrefab, IStateMachineService stateMachineService)
+        public EnvironmentSpringControllers(IMatchDataService matchDataService, EnvironmentSpringView environmentSpringViewPrefab, IStateMachineService stateMachineService, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
             _environmentSpringViewPrefab = environmentSpringViewPrefab;
             _stateMachineService = stateMachineService;
+            _gamePlayConfig = gamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -29,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
 
         public void CreateSpring(ushort springId)
         {
-            var springController = new MatchEnvironmentSpringController();
+            var springController = new MatchEnvironmentSpringController(_gamePlayConfig);
             var springModel = _matchDataService.GetEnvironmentSpring(springId);
             springController.CreateView(_environmentSpringViewPrefab, _springsParent.transform, springModel.WorldPosition.ToUnityVector2(), springModel.WorldRotationAngle);
             _springControllers.Add(springId, springController);
@@ -38,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
         public void UpdateSpringTransform(ushort springId)
         {
             var springModel = _matchDataService.GetEnvironmentSpring(springId);
-            _springControllers[springId].UpdateViewTransform(springModel.WorldPosition.ToUnityVector2(), springModel.WorldRotationAngle);
+            _springControllers[springId].InterpulateTransform(springModel.WorldPosition.ToUnityVector2(), springModel.WorldRotationAngle);
         }
         
         public void DestroyAll()

@@ -14,10 +14,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
         private readonly List<EnvironmentLavaWallController> _lavaWallControllers = new ();
         private GameObject _lavaWallsParent;
         
-        public EnvironmentLavaWallsControllers(IMatchDataService matchDataService, EnvironmentLavaWallView lavaWallViewPrefab)
+        public EnvironmentLavaWallsControllers(IMatchDataService matchDataService, EnvironmentLavaWallView lavaWallViewPrefab, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
             _lavaWallViewPrefab = lavaWallViewPrefab;
+            _gamePlayConfig = gamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -25,10 +26,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
             _lavaWallsParent = new GameObject("EnvironmentLavaWallsParent");
         }
 
-        public void CreateLavaWall(ushort wallId, Transform parent = null)
+        public void CreateLavaWall(ushort wallId)
         {
-            var lavaWallController = new EnvironmentLavaWallController(wallId, _matchDataService);
-            lavaWallController.CreateWallView(_lavaWallViewPrefab, parent != null ? parent : _lavaWallsParent.transform);
+            var lavaWallController = new EnvironmentLavaWallController(wallId, _matchDataService, _gamePlayConfig);
+            lavaWallController.CreateWallView(_lavaWallViewPrefab, _lavaWallsParent.transform);
             _lavaWallControllers.Add(lavaWallController);
         }
 
@@ -44,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
         public void UpdateLavaWallTransform(ushort lavaWallId)
         {
             var lavaWallModel = _matchDataService.GetEnvironmentLavaWall(lavaWallId);
-            _lavaWallControllers.FindWithId(lavaWallId).UpdateTransform(lavaWallModel.WorldPosition, lavaWallModel.WorldRotationAngle);
+            _lavaWallControllers.FindWithId(lavaWallId).InterpulateTransform(lavaWallModel.WorldPosition, lavaWallModel.WorldRotationAngle);
         }
     }
 }
