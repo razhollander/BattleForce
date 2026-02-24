@@ -119,14 +119,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 rotationSpeed,
                 deltaTime,
                 wheelCenter,
-                teleportGate.Position,
-                teleportGate.NormalRotation,
+                teleportGate.Transform.LocalPosition,
+                teleportGate.Transform.LocalRotationDegrees,
                 out var worldPosition,
                 out var worldRotation
             );
 
-            teleportGate.WorldPosition = worldPosition;
-            teleportGate.WorldNormalRotation = worldRotation;
+            teleportGate.Transform.WorldPosition = worldPosition;
+            teleportGate.Transform.WorldRotationDegrees = worldRotation;
         }
     }
 }

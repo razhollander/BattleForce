@@ -125,15 +125,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         {
             var teleportGatePair = _teleportGates.AddAndGet();
             teleportGatePair.Id = teleportPairId;
-            teleportGatePair.GateA.NormalRotation = gateANormalRotation;
-            teleportGatePair.GateA.Position = gateAPosition;
-            teleportGatePair.GateA.WorldPosition = gateAWorldPosition;
-            teleportGatePair.GateA.WorldNormalRotation = gateAWorldRotation;
+            teleportGatePair.GateA.Transform.LocalRotationDegrees = gateANormalRotation;
+            teleportGatePair.GateA.Transform.LocalPosition = gateAPosition;
+            teleportGatePair.GateA.Transform.WorldPosition = gateAWorldPosition;
+            teleportGatePair.GateA.Transform.WorldRotationDegrees = gateAWorldRotation;
             teleportGatePair.GateA.Id = gateAId;
-            teleportGatePair.GateB.NormalRotation = gateBNormalRotation;
-            teleportGatePair.GateB.Position = gateBPosition;
-            teleportGatePair.GateB.WorldPosition = gateBWorldPosition;
-            teleportGatePair.GateB.WorldNormalRotation = gateBWorldRotation;
+            teleportGatePair.GateB.Transform.LocalRotationDegrees = gateBNormalRotation;
+            teleportGatePair.GateB.Transform.LocalPosition = gateBPosition;
+            teleportGatePair.GateB.Transform.WorldPosition = gateBWorldPosition;
+            teleportGatePair.GateB.Transform.WorldRotationDegrees = gateBWorldRotation;
             teleportGatePair.GateB.Id = gateBId;
         }
     }
