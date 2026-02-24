@@ -103,39 +103,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             if (!rotatingWheel.TeleportGatePairIds.IsEmpty)
             {
-                foreach (var pairId in rotatingWheel.TeleportGatePairIds.AsSpan())
+                foreach (var teleportGatePairId in rotatingWheel.TeleportGatePairIds.AsSpan())
                 {
-                    var teleportGatePair = _matchDataService.EnvironmentData.GetTeleportGatePair(pairId);
-
-                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        tick,
-                        rotationSpeed,
-                        deltaTime,
-                        wheelCenter,
-                        teleportGatePair.GateA.Position,
-                        teleportGatePair.GateA.NormalRotation,
-                        out var worldPositionA,
-                        out var worldRotationA
-                    );
-
-                    teleportGatePair.GateA.WorldPosition = worldPositionA;
-                    teleportGatePair.GateA.WorldNormalRotation = worldRotationA;
-
-                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        tick,
-                        rotationSpeed,
-                        deltaTime,
-                        wheelCenter,
-                        teleportGatePair.GateB.Position,
-                        teleportGatePair.GateB.NormalRotation,
-                        out var worldPositionB,
-                        out var worldRotationB
-                    );
-
-                    teleportGatePair.GateB.WorldPosition = worldPositionB;
-                    teleportGatePair.GateB.WorldNormalRotation = worldRotationB;
+                    var teleportGatePair = _matchDataService.EnvironmentData.GetTeleportGatePair(teleportGatePairId);
+                    StepTeleportGateInWheel(tick, deltaTime, rotationSpeed, wheelCenter, ref teleportGatePair.GateA);
+                    StepTeleportGateInWheel(tick, deltaTime, rotationSpeed, wheelCenter, ref teleportGatePair.GateB);
                 }
             }
+        }
+
+        private static void StepTeleportGateInWheel(int tick, float deltaTime, float rotationSpeed, Vector2 wheelCenter, ref EnvironmentTeleportGateS2C teleportGate)
+        {
+            EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                tick,
+                rotationSpeed,
+                deltaTime,
+                wheelCenter,
+                teleportGate.Position,
+                teleportGate.NormalRotation,
+                out var worldPosition,
+                out var worldRotation
+            );
+
+            teleportGate.WorldPosition = worldPosition;
+            teleportGate.WorldNormalRotation = worldRotation;
         }
     }
 }

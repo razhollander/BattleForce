@@ -29,33 +29,33 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         public void CreateGateViews(EnvironmentTeleportGateView teleportGateView, Transform parent)
         {
             var teleportPairModel = _matchDataService.GetTeleportPair(TeleportPairId);
-            
-            _gateAView = CreateGateView(teleportGateView, parent, teleportPairModel.GateA);
-            _gateBView = CreateGateView(teleportGateView, parent, teleportPairModel.GateB);
+            var gateSize = teleportPairModel.Size.ToUnityVector2();
+            _gateAView = CreateGateView(teleportGateView, parent, teleportPairModel.GateA, gateSize);
+            _gateBView = CreateGateView(teleportGateView, parent, teleportPairModel.GateB, gateSize);
+        }
+
+        private EnvironmentTeleportGateView CreateGateView(EnvironmentTeleportGateView teleportGateViewPrefab, Transform parent, MatchEnvironmentTeleportGateModel teleportGateModel, Vector2 gateSize)
+        {
+            var teleportGateView = Object.Instantiate(teleportGateViewPrefab, parent);
 
             if (_gamePlayConfig.Teleports.TeleportSpritesPerId.TryGetValue(TeleportPairId, out var teleportSprite))
             {
-                _gateAView.Setup(teleportSprite, teleportPairModel.Size.ToUnityVector2());
-                _gateBView.Setup(teleportSprite, teleportPairModel.Size.ToUnityVector2());
+                teleportGateView.Setup(teleportSprite, gateSize);
+                SetTransform(teleportGateView.Transform, teleportGateModel.WorldPosition.ToUnityVector2(), teleportGateModel.WorldRotation.AngleToQuaternion());
             }
             else
             {
                 LogService.LogError("No teleport sprite found for teleport pair id: " + TeleportPairId);
             }
-        }
-
-        private EnvironmentTeleportGateView CreateGateView(EnvironmentTeleportGateView teleportGateViewPrefab, Transform parent, MatchEnvironmentTeleportGateModel teleportGateModel)
-        {
-            var teleportGateView = Object.Instantiate(teleportGateViewPrefab, parent);
-            SetTransform(teleportGateView.transform, teleportGateModel.WorldPosition.ToUnityVector2(), teleportGateModel.WorldRotation.AngleToQuaternion());
+            
             return teleportGateView;
         }
 
         public void InterpulateGatesTransforms()
         {
             var teleportPairModel = _matchDataService.GetTeleportPair(TeleportPairId);
-            InterpulateTransform(_gateAView.transform, teleportPairModel.GateA.WorldPosition.ToUnityVector2(), teleportPairModel.GateA.WorldRotation);
-            InterpulateTransform(_gateBView.transform, teleportPairModel.GateB.WorldPosition.ToUnityVector2(), teleportPairModel.GateB.WorldRotation);
+            InterpulateTransform(_gateAView.Transform, teleportPairModel.GateA.WorldPosition.ToUnityVector2(), teleportPairModel.GateA.WorldRotation);
+            InterpulateTransform(_gateBView.Transform, teleportPairModel.GateB.WorldPosition.ToUnityVector2(), teleportPairModel.GateB.WorldRotation);
         }
         
         private void InterpulateTransform(Transform transform, Vector2 position, float rotationDegrees)

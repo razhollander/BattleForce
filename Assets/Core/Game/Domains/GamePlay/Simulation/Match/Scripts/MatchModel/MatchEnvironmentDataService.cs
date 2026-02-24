@@ -119,7 +119,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             return _walls.FindWithId(wallId);
         }
 
-        public void AddTeleportGatePair(ushort teleportPairId, ushort gateAId, ushort gateBId, Vector2 gateAPosition, float gateANormalRotation, Vector2 gateBPosition, float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation)
+        public void AddTeleportGatePair(ushort teleportPairId, ushort gateAId, ushort gateBId, Vector2 gateAPosition, float gateANormalRotation, Vector2 gateBPosition,
+            float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation)
+
         {
             var teleportGatePair = _teleportGates.AddAndGet();
             teleportGatePair.Id = teleportPairId;

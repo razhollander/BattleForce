@@ -3,7 +3,6 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
-using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
@@ -38,18 +37,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 {
                     _environmentWallsControllers.UpdateWallTransform(wallId);
                 }
-                
+
                 foreach (var springId in rotatingWheelModel.SpringIds)
                 {
                     _environmentSpringControllers.UpdateSpringTransform(springId);
                 }
 
-                if (!rotatingWheelModel.TeleportGatePairIds.IsNullOrEmpty())
+                foreach (var pairId in rotatingWheelModel.TeleportGatePairIds)
                 {
-                    foreach (var pairId in rotatingWheelModel.TeleportGatePairIds)
-                    {
-                        _environmentTeleportGateControllers.UpdateTeleportGateTransform(pairId);
-                    }
+                    _environmentTeleportGateControllers.UpdateTeleportGateTransform(pairId);
                 }
             }
         }
