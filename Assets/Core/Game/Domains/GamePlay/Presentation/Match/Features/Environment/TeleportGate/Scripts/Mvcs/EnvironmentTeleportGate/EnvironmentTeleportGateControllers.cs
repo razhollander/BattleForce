@@ -56,5 +56,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         {
             GetGate(pairId).PlayTeleportAnimation(_stateMachineService.CurrentState().CancellationTokenSource);
         }
+
+        public void UpdateTeleportGateTransform(ushort pairId)
+        {
+            GetGate(pairId).InterpulateGatesTransforms();
+        }
     }
 }

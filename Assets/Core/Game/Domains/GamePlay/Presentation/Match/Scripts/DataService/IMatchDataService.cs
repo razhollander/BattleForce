@@ -40,10 +40,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);
         void SetTeamGems(ushort teamId, int totalTeamGems);
-
         void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition,
-            float gateBNormalRotation, Vector2 size);
-
+            float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation, Vector2 size);
         MatchEnvironmentTeleportPairModel GetTeleportPair(ushort teleportPairId);
     }
 }
