@@ -173,7 +173,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             var newWheel = new MatchEnvironmentRotatingWheelModel(config.Id, config.CenterPosition, config.RotationSpeed, 
                 config.Walls.Select(x=>x.Id).ToList(), 
                 config.LavaWalls.Select(x=>x.Id).ToList(), 
-                config.Springs.Select(x=>x.Id).ToList());
+                config.Springs.Select(x=>x.Id).ToList(),
+                config.TeleportGatePairs.Select(x=>x.Id).ToList());
             RotatingWheels.Add(newWheel);
             return newWheel;
         }
@@ -215,9 +216,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             GemsPerTeam[teamId] = totalTeamGems;
         }
 
-        public void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition, float gateBNormalRotation, Vector2 size)
+        public void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition, float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation, Vector2 size)
         {
-            var teleportPairModel = new MatchEnvironmentTeleportPairModel(teleportPairId, gateAId, gateAPosition, gateANormalRotation, gateBId ,gateBPosition, gateBNormalRotation, size);
+            var teleportPairModel = new MatchEnvironmentTeleportPairModel(teleportPairId, gateAId, gateAPosition, gateANormalRotation, gateBId, gateBPosition, gateBNormalRotation, gateAWorldPosition, gateAWorldRotation, gateBWorldPosition, gateBWorldRotation, size);
             EnvironmentTeleportPairs.Add(teleportPairModel);
         }
 

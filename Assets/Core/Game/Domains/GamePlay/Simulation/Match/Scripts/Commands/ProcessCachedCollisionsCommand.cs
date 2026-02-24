@@ -119,10 +119,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             var teleportPairData = _matchDataService.EnvironmentData.GetTeleportGatePairOfGate(gateBodyId);
             var isGateB = teleportPairData.GateB.Id == gateBodyId;
-            var enterGatePosition = isGateB ? teleportPairData.GateB.Position : teleportPairData.GateA.Position;
-            var enterGateRotation = isGateB ? teleportPairData.GateB.NormalRotation : teleportPairData.GateA.NormalRotation;
-            var exitGatePosition = isGateB ? teleportPairData.GateA.Position : teleportPairData.GateB.Position;
-            var exitGateRotation = isGateB ? teleportPairData.GateA.NormalRotation : teleportPairData.GateB.NormalRotation;
+            var enterGatePosition = isGateB ? teleportPairData.GateB.Transform.WorldPosition : teleportPairData.GateA.Transform.WorldPosition;
+            var enterGateRotation = isGateB ? teleportPairData.GateB.Transform.WorldRotationDegrees : teleportPairData.GateA.Transform.WorldRotationDegrees;
+            var exitGatePosition = isGateB ? teleportPairData.GateA.Transform.WorldPosition : teleportPairData.GateB.Transform.WorldPosition;
+            var exitGateRotation = isGateB ? teleportPairData.GateA.Transform.WorldRotationDegrees : teleportPairData.GateB.Transform.WorldRotationDegrees;
             var enterPoint = playerState.Spaceship.Transform.Position;
 
             var enterGateNormal = enterGateRotation.ToRadians().AngleToVector();

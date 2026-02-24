@@ -6,5 +6,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         EnvironmentTeleportGatePairController CreateGatePair(ushort pairId);
         void DestroyAll();
         void PlayTeleportAnimation(ushort pairId);
+        void UpdateTeleportGateTransform(ushort pairId);
     }
 }
