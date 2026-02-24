@@ -9,11 +9,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Models
         public Vector2 WorldPosition;
         public float LocalRotationAngle;
         public float WorldRotationAngle;
-
-        public float WorldDirectionAngle
-        {
-            get { return WorldRotationAngle-90; }
-        }
         
         public MatchEnvironmentSpringModel(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle)
         {

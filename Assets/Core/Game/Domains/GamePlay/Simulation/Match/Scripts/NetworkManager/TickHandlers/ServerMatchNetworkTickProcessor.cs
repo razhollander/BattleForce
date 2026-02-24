@@ -131,15 +131,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         private void TryHandleStageEnded(int currentTick, float stepDeltaTime)
         {
-            if (_stageDataService.IsStageEnded)
+            if (!_stageDataService.IsStageEnded)
             {
-                _stageDataService.StageRestartTimer -= stepDeltaTime;
-                if (_stageDataService.StageRestartTimer <= 0)
-                {
-                    _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
-                    SendStartStageToAllPlayers(currentTick);
-                }
+                return;
             }
+
+            _stageDataService.StageRestartTimer -= stepDeltaTime;
+            var didRestartTimerEnded = _stageDataService.StageRestartTimer <= 0;
+            if (!didRestartTimerEnded)
+            {
+                return;
+            }
+
+            _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
+            SendStartStageToAllPlayers(currentTick);
         }
 
         private void SendStartStageToAllPlayers(int processedTick)
