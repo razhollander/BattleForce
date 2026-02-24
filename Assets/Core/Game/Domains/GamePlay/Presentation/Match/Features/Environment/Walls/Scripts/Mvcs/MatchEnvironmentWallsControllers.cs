@@ -15,10 +15,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
         private readonly List<MatchEnvironmentWallController> _wallControllers = new ();
         private GameObject _wallsParent;
         
-        public MatchEnvironmentWallsControllers(IMatchDataService matchDataService, EnvironmentWallView wallViewPrefab)
+        public MatchEnvironmentWallsControllers(IMatchDataService matchDataService, EnvironmentWallView wallViewPrefab, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
             _wallViewPrefab = wallViewPrefab;
+            _gamePlayConfig = gamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -28,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
 
         public void CreateWall(ushort wallId)
         {
-            var wallController = new MatchEnvironmentWallController(wallId, _matchDataService);
+            var wallController = new MatchEnvironmentWallController(wallId, _matchDataService, _gamePlayConfig);
             wallController.CreateWallView(_wallViewPrefab, _wallsParent.transform);
             _wallControllers.Add(wallController);
         }
@@ -45,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
         public void UpdateWallTransform(ushort wallId)
         {
             var wallModel = _matchDataService.GetEnvironmentWall(wallId);
-            _wallControllers.FindWithId(wallId).UpdateTransform(wallModel.WorldPosition, wallModel.WorldRotationAngle);
+            _wallControllers.FindWithId(wallId).InterpulateTransform(wallModel.WorldPosition, wallModel.WorldRotationAngle);
         }
     }
 }
