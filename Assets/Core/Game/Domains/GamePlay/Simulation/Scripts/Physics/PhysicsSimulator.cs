@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using Box2D.NetStandard.Collision;
 using Box2D.NetStandard.Collision.Shapes;
@@ -11,8 +12,10 @@ using Box2D.NetStandard.Dynamics.World.Callbacks;
 #endif
 using Box2D.WorldTests;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Scripts.Extensions;
+using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
 using Core.Scripts.Services.UnityThreadDispatcher;
 using Core.Scripts.Utils;
@@ -60,39 +63,100 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
 
-        public void CopyDataToSimulation(MatchSimulationStateS2C simulationState)
+        public void CopyDataToSimulation(MatchSimulationStateS2C simulationState, 
+            FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls,
+            FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls, 
+            FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings)
         {
-            CopyPlayersStates(simulationState);
-            CopyBulletsStates(simulationState.Bullets);
-            CopyPowerUpsStates(simulationState);
+            var currentBody = _world.GetBodyList();
+
+            while (currentBody != null)
+            {
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                switch (bodyData.PhysicsBodyType)
+                {
+                    case PhysicsBodyType.PlayerSpaceship: CopyPlayerStateToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.PlayerBullet: CopyBulletStateToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.PowerUpBall: CopyPowerUpStateToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.Wall: CopyWallStateToBody(currentBody, bodyData.Id, environmentWalls); break;
+                    case PhysicsBodyType.Lava: CopyLavaStateToBody(currentBody, bodyData.Id, environmentLavaWalls); break;
+                    case PhysicsBodyType.EnvironmentSpring: CopySpringStateToBody(currentBody, bodyData.Id, environmentSprings); break;
+                }
+
+                currentBody = currentBody.GetNext();
+            }
+        }
+
+        private void CopyPowerUpStateToBody(Body powerUpBody, ushort powerUpId, MatchSimulationStateS2C simulationState)
+        {
+            var powerUpState = simulationState.PowerUpBalls.FindWithId(powerUpId);
+            powerUpBody.SetTransform(powerUpState.Position, 0);
+            powerUpBody.SetLinearVelocity(powerUpState.Velocity);
+        }
+
+        private void CopyBulletStateToBody(Body bulletBody, ushort bulletId, MatchSimulationStateS2C simulationState)
+        {
+            var bulletState = simulationState.Bullets.FindWithId(bulletId);
+            bulletBody.SetTransform(bulletState.Position, bulletState.Direction.ToAngleRadians());
+            bulletBody.SetLinearVelocity(bulletState.Velocity);
+        }
+
+        private void CopySpringStateToBody(Body springBody, ushort springId, FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings)
+        {
+            var environmentSpring = environmentSprings.FindWithId(springId);
+            springBody.SetTransform(environmentSpring.Transform.WorldPosition, environmentSpring.Transform.WorldRotationDegrees.ToRadians());       
+        }
+
+        private void CopyLavaStateToBody(Body lavaBody, ushort lavaWallId, FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls)
+        {
+            var environmentLavaWall = environmentLavaWalls.FindWithId(lavaWallId);
+            lavaBody.SetTransform(environmentLavaWall.Transform.WorldPosition, environmentLavaWall.Transform.WorldRotationDegrees.ToRadians());
+        }
+
+        private void CopyWallStateToBody(Body wallBody, ushort wallId, FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls)
+        {
+            var environmentWall = environmentWalls.FindWithId(wallId);
+            wallBody.SetTransform(environmentWall.Transform.WorldPosition, environmentWall.Transform.WorldRotationDegrees.ToRadians());
+        }
+
+        private void CopyPlayerStateToBody(Body playerBody, ushort playerId, MatchSimulationStateS2C simulationState)
+        {
+            var playerState = simulationState.Players.FindWithId(playerId);
+            playerBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
+            playerBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
         }
 
         public void CopyDataToSimulation(MatchMakingSimulationStateS2C simulationState)
         {
-            CopyPlayersStates(simulationState.Players);
-            CopyBulletsStates(simulationState.Bullets);
+            var currentBody = _world.GetBodyList();
+
+            while (currentBody != null)
+            {
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                switch (bodyData.PhysicsBodyType)
+                {
+                    case PhysicsBodyType.PlayerSpaceship: CopyPlayerStateToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.PlayerBullet: CopyBulletStateToBody(currentBody, bodyData.Id, simulationState); break;
+                }
+
+                currentBody = currentBody.GetNext();
+            }
         }
         
-        private void CopyPlayersStates(FixedClassUnorderedList<MatchMakingPlayerStateS2C> players)
+        private void CopyPlayerStateToBody(Body playerBody, ushort playerId, MatchMakingSimulationStateS2C simulationState)
         {
-            foreach (var playerState in players.AsSpan())
-            {
-                var currentBody = _world.GetBodyList();
-
-                while (currentBody != null)
-                {
-                    var bodyData = (PhysicsBodyData) currentBody.UserData;
-
-                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerState.Id)
-                    {
-                        currentBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians()); 
-                        currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
-                        break;
-                    }
-
-                    currentBody = currentBody.GetNext();
-                }
-            }
+            var playerState = simulationState.Players.FindWithId(playerId);
+            playerBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
+            playerBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
+        }
+        
+        private void CopyBulletStateToBody(Body bulletBody, ushort bulletId, MatchMakingSimulationStateS2C simulationState)
+        {
+            var bulletState = simulationState.Bullets.FindWithId(bulletId);
+            bulletBody.SetTransform(bulletState.Position, bulletState.Direction.ToAngleRadians());
+            bulletBody.SetLinearVelocity(bulletState.Velocity);
         }
 
         public Body GetPlayer(ushort playerId)
@@ -113,73 +177,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             LogService.LogError($"Couldn't find player {playerId}");
             return null;
-        }
-
-        private void CopyPlayersStates(MatchSimulationStateS2C simulationState)
-        {
-            foreach (var playerState in simulationState.Players.AsSpan())
-            {
-                var currentBody = _world.GetBodyList();
-
-                while (currentBody != null)
-                {
-                    var bodyData = (PhysicsBodyData) currentBody.UserData;
-
-                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && bodyData.Id == playerState.Id)
-                    {
-                        currentBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
-                        currentBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
-                        break;
-                    }
-
-                    currentBody = currentBody.GetNext();
-                }
-            }
-        }
-
-        private void CopyPowerUpsStates(MatchSimulationStateS2C simulationState)
-        {
-            foreach (var powerUp in simulationState.PowerUpBalls.AsSpan())
-            {
-                var powerUpBody = _world.GetBodyList();
-
-                while (powerUpBody != null)
-                {
-                    var bodyData = (PhysicsBodyData) powerUpBody.UserData;
-
-                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUp.Id)
-                    {
-                        powerUpBody.SetTransform(powerUp.Position, 0);
-                        powerUpBody.SetLinearVelocity(powerUp.Velocity);
-                        break;
-                    }
-
-                    powerUpBody = powerUpBody.GetNext();
-                }
-            }
-        }
-
-        private void CopyBulletsStates(FixedUnorderedList<PlayerBulletS2C> bullets)
-        {
-            foreach (var bullet in bullets.AsSpan())
-            {
-                var bulletBody = _world.GetBodyList();
-
-                while (bulletBody != null)
-                {
-                    var bodyData = (PhysicsBodyData) bulletBody.UserData;
-
-                    if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerBullet && bodyData.Id == bullet.Id)
-                    {
-                        bulletBody.SetTransform(bullet.Position, bullet.Direction.ToAngleRadians());
-                        bulletBody.SetLinearVelocity(bullet.Velocity);
-
-                        break;
-                    }
-
-                    bulletBody = bulletBody.GetNext();
-                }
-            }
         }
 
         public void Step(float deltaTime, int velocityIterations, int positionIterations)
@@ -225,11 +222,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             GetPlayer(playerId).SetLinearVelocity(velocity);
         }
 
-        public void AddWall(ushort id, Vector2[] points)
+        public void AddWall(ushort id, Vector2[] points, Vector2 position)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
-            bodyDef.position = Vector2.Zero; // Assume walls are absolute-world positioned
+            bodyDef.position = position;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.Wall);
 
             var body = _world.CreateBody(bodyDef);
@@ -250,11 +247,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(wallShape);
         }
 
-        public void AddLavaWall(ushort id, Vector2[] points)
+        public void AddLavaWall(ushort id, Vector2[] points, Vector2 position)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
-            bodyDef.position = Vector2.Zero;
+            bodyDef.position = position;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.Lava);
 
             var body = _world.CreateBody(bodyDef);
@@ -276,11 +273,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(lavaShape);
         }
 
-        public void AddTeamFloor(ushort id, Vector2[] points)
+        public void AddTeamFloor(ushort id, Vector2[] points, Vector2 position)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
-            bodyDef.position = Vector2.Zero;
+            bodyDef.position = position;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.TeamFloor);
 
             var body = _world.CreateBody(bodyDef);
@@ -649,12 +646,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _circleShapePool.Return(circleShape);
         }
 
-        public void AddEnvironmentSpring(ushort id, Vector2 position, float rotation, Vector2 size)
+        public void AddEnvironmentSpring(ushort id, Vector2 position, float rotationDegrees, Vector2 size)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Static;
             bodyDef.position = position;
-            bodyDef.angle = rotation * (float)System.Math.PI / 180f;
+            bodyDef.angle = rotationDegrees.ToRadians();
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.EnvironmentSpring);
 
             var body = _world.CreateBody(bodyDef);
@@ -704,7 +701,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _fixtureDefPool.Return(fixtureDef);
             _polygonShapePool.Return(shape);
         }
-
+        
         public void ClearAllData()
         {
             _world = CreateWorld();

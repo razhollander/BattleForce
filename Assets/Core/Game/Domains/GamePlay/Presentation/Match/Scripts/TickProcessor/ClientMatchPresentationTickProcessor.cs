@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using CoreDomain.Scripts.Mvc.WorldCamera;
@@ -15,7 +16,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly IMatchPlayerControllers _playerControllers;
         private readonly IMatchBulletControllers _bulletControllers;
         private readonly IPowerUpBallControllers _powerUpBallControllers;
-        private readonly IMatchDataService _matchDataService;
         private readonly IWorldCameraController _worldCameraController;
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
@@ -32,15 +32,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleGainBoltsNetEventCommand _handleGainBoltsNetEventCommand;
         private readonly HandleEnvironmentSpringPlayerCollisionNetEventsCommand _handleEnvironmentSpringPlayerCollisionNetEventsCommand;
         private readonly HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand;
+        private readonly UpdateObjectTransformInsideRotatingWheelsCommand _updateObjectTransformInsideRotatingWheelsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchDataService matchDataService)
+            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
             _bulletControllers = bulletControllers;
             _powerUpBallControllers = powerUpBallControllers;
-            _matchDataService = matchDataService;
             _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
             _handlePlayerTakeDamangeNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
             _handlePlayerDiedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerDiedNetEventsCommand>();
@@ -56,6 +56,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleGainBoltsNetEventCommand = commandFactory.CreateCommandVoid<HandleGainBoltsNetEventCommand>();
             _handleEnvironmentSpringPlayerCollisionNetEventsCommand = commandFactory.CreateCommandVoid<HandleEnvironmentSpringPlayerCollisionNetEventsCommand>();
             _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand>();
+            _updateObjectTransformInsideRotatingWheelsCommand = commandFactory.CreateCommandVoid<UpdateObjectTransformInsideRotatingWheelsCommand>();
         }
         
         public void InitEntryPoint()
@@ -89,6 +90,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
+            _updateObjectTransformInsideRotatingWheelsCommand.Execute();
             
             _handleTalentCardObtainedNetEventsCommand.Execute();
         }

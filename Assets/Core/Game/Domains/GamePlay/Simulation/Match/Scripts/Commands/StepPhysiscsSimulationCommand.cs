@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersDecelerationLogic _playersDecelerationLogic;
         private IPlayersEngineLogic _playersEngineLogic;
         private ICommandFactory _commandFactory;
+        private StepAllWheelsRotationCommand _stepAllWheelsRotationCommand;
         
         private float _deltaTime;
         private int _tick;
@@ -39,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersEngineLogic = _diContainer.Resolve<IPlayersEngineLogic>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _stepAllWheelsRotationCommand = _commandFactory.CreateCommandVoid<StepAllWheelsRotationCommand>();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
         }
 
@@ -56,7 +58,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 _playersEngineLogic.TurnOnEngineIfPlayerIdle(playerState.Spaceship);
                 _playersEngineLogic.TryAddEngineForceToPlayer(playerState.Spaceship, stepDeltaTime);
             }
-            
+
+            _stepAllWheelsRotationCommand.SetTime(_tick, stepDeltaTime).Execute();
             ApplyMatchModelToPhysicsSimulation();
             _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
             ApplyPhysicsSimulationToMatchModel();
@@ -66,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void ApplyMatchModelToPhysicsSimulation()
         {
-            _physicsSimulator.CopyDataToSimulation(_matchDataService.SimulationState);
+            _physicsSimulator.CopyDataToSimulation(_matchDataService.SimulationState, _matchDataService.EnvironmentData.Walls, _matchDataService.EnvironmentData.LavaWalls, _matchDataService.EnvironmentData.Springs);
         }
 
         private void ApplyPhysicsSimulationToMatchModel()

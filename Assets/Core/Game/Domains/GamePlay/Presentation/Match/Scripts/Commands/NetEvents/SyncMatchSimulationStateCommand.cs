@@ -1,3 +1,4 @@
+using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
@@ -9,12 +10,14 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Scripts.Extensions;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -37,6 +40,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IWorldCameraController _worldCameraController;
         private ITeamsBoardUIController _teamsBoardUIController;
         private IEnvironmentTeleportGateControllers _teleportGateControllers;
+        private IFullTickPacketsHandler _fullTickPacketsHandler;
+        private NetworkConfig _networkConfig;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -62,6 +67,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
             _teleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
+            _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
+            _networkConfig = _diContainer.Resolve<NetworkConfig>();
         }
 
         public void Execute()
@@ -93,6 +100,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateWalls();
             CreateSprings();
             CreateLavaWalls();
+            CreateRotatingWheels();
             CreateTalentCards();
             CreatePowerUpBalls();
             CreateTeamBoards();
@@ -114,27 +122,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private void CreateSprings()
         {
             var springs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetEnvironmentSprings();
+            if (springs.IsNullOrEmpty())
+            {
+                return;
+            }
             
             foreach (var spring in springs)
             {
-                _matchDataService.AddSpring(spring.Id, spring.Position.ToUnityVector2(), spring.DirectionAngle);
+                _matchDataService.AddSpring(spring.Id, Vector2.Zero, spring.Position, 0, spring.RotationAngle);
                 _environmentSpringControllers.CreateSpring(spring.Id);
             }
         }
 
         private void CreateTeleportGates()
         {
-            var gates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetTeleportGates();
-            if (gates.IsNullOrEmpty())
+            var teleportGatePairConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetTeleportGates();
+            if (teleportGatePairConfigs.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var pair in gates)
+            foreach (var teleportGatePairConfig in teleportGatePairConfigs)
             {
-                var size = _sharedGamePlayConfig.EnvironmentTeleport.Size;
-                _matchDataService.AddTeleportPair(pair.Id, pair.GateAId, pair.GateA.Position, pair.GateA.NormalRotation, pair.GateBId, pair.GateB.Position, pair.GateB.NormalRotation, size.ToNumericsVector2());
-                _teleportGateControllers.CreateGatePair(pair.Id);
+                var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size;
+                _matchDataService.AddTeleportPair(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateBId, teleportGatePairConfig.GateB.Position, teleportGatePairConfig.GateB.NormalRotation, gateSize.ToNumericsVector2());
+                _teleportGateControllers.CreateGatePair(teleportGatePairConfig.Id);
             }
         }
 
@@ -178,9 +190,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private void CreateWalls()
         {
             var walls = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetWalls();
+            if (walls.IsNullOrEmpty())
+            {
+                return;
+            }
+            
             foreach (var wall in walls)
             {
-                var wallModel = _matchDataService.AddWall(wall);
+                var wallModel = _matchDataService.AddWall(wall.Id, wall.Points, Vector2.Zero, wall.Position, 0);
                 _environmentWallsControllers.CreateWall(wallModel.Id);
             }
         }
@@ -188,10 +205,74 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private void CreateLavaWalls()
         {
             var lavaWalls = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetLavaWalls();
+            if (lavaWalls.IsNullOrEmpty())
+            {
+                return;
+            }
+            
             foreach (var lavaWall in lavaWalls)
             {
-                var lavaWallModel = _matchDataService.AddLavalWall(lavaWall);
+                var lavaWallModel = _matchDataService.AddLavalWall(lavaWall.Id, lavaWall.Points, Vector2.Zero, lavaWall.Position, 0);
                 _environmentLavaWallsControllers.CreateLavaWall(lavaWallModel.Id);
+            }
+        }
+
+        private void CreateRotatingWheels()
+        {
+            var wheels = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetRotatingWheels();
+            if (wheels.IsNullOrEmpty())
+            {
+                return;
+            }
+            var lastProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer;
+            var deltaTime = _networkConfig.DeltaTime;
+
+            foreach (var wheelConfig in wheels)
+            {
+                var wheelModel = _matchDataService.AddEnvironmentRotatingWheel(wheelConfig);
+                var rotationSpeed = wheelModel.RotationSpeed;
+                
+                if (wheelConfig.Walls != null)
+                {
+                    foreach (var wallConfig in wheelConfig.Walls)
+                    {
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            lastProcessedTickFromServer, rotationSpeed, deltaTime, wheelConfig.CenterPosition, wallConfig.Position, 0,
+                            out var worldPosition, out var worldRotation
+                        );
+                        
+                        _matchDataService.AddWall(wallConfig.Id, wallConfig.Points, wallConfig.Position, worldPosition, worldRotation);
+                        _environmentWallsControllers.CreateWall(wallConfig.Id);
+                    }
+                }
+
+                if (wheelConfig.LavaWalls != null)
+                {
+                    foreach (var lavaWallConfig in wheelConfig.LavaWalls)
+                    {
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            lastProcessedTickFromServer, rotationSpeed, deltaTime, wheelConfig.CenterPosition, lavaWallConfig.Position, 0,
+                            out var worldPosition, out var worldRotation
+                        );
+                        
+                        _matchDataService.AddLavalWall(lavaWallConfig.Id, lavaWallConfig.Points, lavaWallConfig.Position, worldPosition, worldRotation);
+                        _environmentLavaWallsControllers.CreateLavaWall(lavaWallConfig.Id);
+                    }
+                }
+
+                if (wheelConfig.Springs != null)
+                {
+                    foreach (var springConfig in wheelConfig.Springs)
+                    {
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            lastProcessedTickFromServer, rotationSpeed, deltaTime, wheelConfig.CenterPosition, springConfig.Position, springConfig.RotationAngle,
+                            out var worldPosition, out var worldRotation
+                        );
+
+                        _matchDataService.AddSpring(springConfig.Id, springConfig.Position, worldPosition, springConfig.RotationAngle, worldRotation);
+                        _environmentSpringControllers.CreateSpring(springConfig.Id);
+                    }
+                }
             }
         }
     }

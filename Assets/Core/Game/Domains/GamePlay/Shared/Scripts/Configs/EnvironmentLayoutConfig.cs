@@ -1,18 +1,20 @@
-using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Extensions;
+using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {
     [System.Serializable]
     public class EnvironmentLayoutConfig
     {
-        [UnityEngine.SerializeField] private string _environmentHalfSizeJson;
-        [UnityEngine.SerializeField] private string _wallsJson;
-        [UnityEngine.SerializeField] private string _lavaWallsJson;
-        [UnityEngine.SerializeField] private string _talentCardsJson;
-        [UnityEngine.SerializeField] private string _environmentSpringsJson;
-        [UnityEngine.SerializeField] private string _teleportGatesJson;
+        [TextArea(1, 5)] [SerializeField] private string _environmentHalfSizeJson;
+        [TextArea(1, 5)] [SerializeField] private string _wallsJson;
+        [TextArea(1, 5)] [SerializeField] private string _lavaWallsJson;
+        [TextArea(1, 5)] [SerializeField] private string _talentCardsJson;
+        [TextArea(1, 5)] [SerializeField] private string _environmentSpringsJson;
+        [TextArea(1, 5)] [SerializeField] private string _teleportGatesJson;
+        [TextArea(1, 5)] [SerializeField] private string _rotatingWheelsJson;
 
         public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
         {
@@ -55,19 +57,29 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             _teleportGatesJson = teleportGatesJson;
         }
 
-        public TalentCardS2C[] GetTalentCards()
+        public void SetRotatingWheelsJson(string rotatingWheelsJson)
         {
-            return _talentCardsJson.FromJson<TalentCardS2C[]>();
+            _rotatingWheelsJson = rotatingWheelsJson;
         }
 
-        public EnvironmentSpringS2C[] GetEnvironmentSprings()
+        public TalentCardConfig[] GetTalentCards()
         {
-            return _environmentSpringsJson.FromJson<EnvironmentSpringS2C[]>();
+            return _talentCardsJson.FromJson<TalentCardConfig[]>();
         }
 
-        public EnvironmentTeleportGatePairS2C[] GetTeleportGates()
+        public EnvironmentSpringConfig[] GetEnvironmentSprings()
         {
-            return _teleportGatesJson.FromJson<EnvironmentTeleportGatePairS2C[]>();
+            return _environmentSpringsJson.FromJson<EnvironmentSpringConfig[]>();
+        }
+
+        public EnvironmentTeleportGatePairConfig[] GetTeleportGates()
+        {
+            return _teleportGatesJson.FromJson<EnvironmentTeleportGatePairConfig[]>();
+        }
+
+        public EnvironmentRotatingWheelConfig[] GetRotatingWheels()
+        {
+            return _rotatingWheelsJson.FromJson<EnvironmentRotatingWheelConfig[]>();
         }
     }
 }

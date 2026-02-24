@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {
-    [CreateAssetMenu(fileName = "EnvironmentSpringConfig", menuName = "BF/Shared/Environment Spring Config")]
-    public class EnvironmentSpringConfig : ScriptableObject
+    [CreateAssetMenu(fileName = "EnvironmentSpringConfig", menuName = "BF/Shared/Environment Springs Config")]
+    public class EnvironmentSpringsConfig : ScriptableObject
     {
         public float Force = 20f;
         public float MaxSpin = 55f;

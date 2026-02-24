@@ -4,7 +4,6 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Network;
-using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
@@ -15,14 +14,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public MatchSimulationStateS2C SimulationState => _simulationState;
         private ushort _lastBulletCreatedId = 0;
         private ushort _lastPowerUpBallCreatedId = 0;
-        private readonly MatchEnvironmentDataService _environmentDataService;
-        public MatchEnvironmentDataService Environment => _environmentDataService;
+        public MatchEnvironmentDataService EnvironmentData { get; private set; }
         public HashSet<ushort> TeamIds { get; private set; }
 
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
         {
-            var chosenEnvironmentIndex = gamePlayConfig.ChosenEnvironmentIndex;
-            _environmentDataService = new MatchEnvironmentDataService(sharedGamePlayConfig);
+            EnvironmentData = new MatchEnvironmentDataService(networkConfig);
             _simulationState = new MatchSimulationStateS2C(
                 networkConfig.MaxCap.ConcurrentPlayers,
                 networkConfig.MaxCap.ConcurrentBullets,
@@ -33,13 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
-            _simulationState.EnvironmentLayoutIndex = chosenEnvironmentIndex;
             _simulationState.StageType = StageType.DeathMatch;
-        }
-
-        public void InitEntryPoint()
-        {
-            _environmentDataService.InitEntryPoint(_simulationState.EnvironmentLayoutIndex);
         }
 
         public PlayerStateS2C AddPlayer(ushort playerId, ushort teamId, string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,

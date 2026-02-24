@@ -17,11 +17,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private SimulationGamePlayConfig _gamePlayConfig;
         private IPowerUpsSpawnerService _iPowerUpsSpawnerService;
-
-        private int _processedTick;
         private IPhysicsSimulator _physicsSimulator;
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
+        private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
+        
+        private int _processedTick;
 
         public TrySpawnPowerUpBallsCommand SetProcessedTick(int processedTick)
         {
@@ -36,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
+            _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
         }
 
         public void Execute()
@@ -91,7 +93,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             position = Vector2.Zero;
             var maxAttempts = MAX_ATTEMPTS_TO_FIND_FREE_SPAWN_POSITION;
-            var environmentHalfSize = _matchDataService.Environment.EnvironmentHalfSize;
+            var environmentHalfSize = _matchEnvironmentConfigDataService.EnvironmentHalfSize;
             var powerUpsRadius = _gamePlayConfig.PowerUps.Radius;
 
             for (var i = 0; i < maxAttempts; i++)

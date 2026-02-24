@@ -111,16 +111,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _networkManager.PollEvents();
                 var stepDeltaTime = _networkConfig.DeltaTime;
 
-                if (_stageDataService.IsStageEnded)
-                {
-                    _stageDataService.StageRestartTimer -= stepDeltaTime;
-                    if (_stageDataService.StageRestartTimer <= 0)
-                    {
-                        _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
-                        SendStartStageToAllPlayers(currentTick);
-                    }
-                }
-
+                TryHandleStageEnded(currentTick, stepDeltaTime);
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick);
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
@@ -136,6 +127,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 LogService.LogError("Got error! " + e);
                 throw;
             }
+        }
+
+        private void TryHandleStageEnded(int currentTick, float stepDeltaTime)
+        {
+            if (!_stageDataService.IsStageEnded)
+            {
+                return;
+            }
+
+            _stageDataService.StageRestartTimer -= stepDeltaTime;
+            var didRestartTimerEnded = _stageDataService.StageRestartTimer <= 0;
+            if (!didRestartTimerEnded)
+            {
+                return;
+            }
+
+            _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
+            SendStartStageToAllPlayers(currentTick);
         }
 
         private void SendStartStageToAllPlayers(int processedTick)

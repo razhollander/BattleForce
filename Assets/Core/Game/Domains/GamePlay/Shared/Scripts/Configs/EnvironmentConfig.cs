@@ -47,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 #endif
         }
 
-        public void SetEnvironmentSprings(Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.EnvironmentSpringS2C[] environmentSprings, int index)
+        public void SetEnvironmentSprings(S2CModels.EnvironmentSpringConfig[] environmentSprings, int index)
         {
              if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
             {

@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environme
             {
                 var pointsUnityVector2 = wall.Points.Select(x => x.ToUnityVector2()).ToArray();
                 var mesh = MeshUtils.BuildMesh(pointsUnityVector2, 2);
-                _teamFloorsView.CreateFloor(mesh, wall.Id, _gamePlayConfig.TeamFloor.TeamFloorMaterialPerTeamId[_teamId]);
+                _teamFloorsView.CreateFloor(mesh, wall.Id, _gamePlayConfig.TeamFloor.TeamFloorMaterialPerTeamId[_teamId], wall.Position.ToUnityVector2());
             }
         }
         

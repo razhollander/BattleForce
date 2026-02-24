@@ -17,7 +17,7 @@ MonoBehaviour:
   Talents: {fileID: 11400000, guid: 08bd0956437f34e4d857566956653f2e, type: 2}
   Lava: {fileID: 11400000, guid: 7c1289f5735214c4b89bd8c0ea511f75, type: 2}
   PowerUps: {fileID: 11400000, guid: f3f1e9d59a8914447bcbb1a5299d3b37, type: 2}
-  EnvironmentSpring: {fileID: 11400000, guid: f5e079ad119bc4e0faccf5c96bb9a9b7, type: 2}
+  EnvironmentSprings: {fileID: 11400000, guid: f5e079ad119bc4e0faccf5c96bb9a9b7, type: 2}
   Physics: {fileID: 0}
   ChosenEnvironmentIndex: 0
   StartMatchCountdownDuration: 1
@@ -26,4 +26,6 @@ MonoBehaviour:
   GemsCollectedForTeamAlive: 1
   MaxOverllapingFloors: 32
   StartingBoltsPerTeam: 0
-  BoltsPerHit: 50
+  BoltsGainedPerHit: 50
+  BoltsGainedPerKill: 50
+  TeleportGateCooldownInSeconds: 0.5

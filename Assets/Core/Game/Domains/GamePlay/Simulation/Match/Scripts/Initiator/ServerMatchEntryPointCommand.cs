@@ -66,7 +66,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         {
             InitRNG();
             InitTickService();
-            _matchDataService.InitEntryPoint();
             _playerInputsPacketsHandler.InitEntryPoint();
             _matchPlayerJoinPacketsHandler.InitEntryPoint();
             InitPlayers(_simulationMatchEnterData);

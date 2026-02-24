@@ -6,6 +6,9 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
+    /// <summary>
+    /// This class holds all the data needed to recreate a state snapshot of the game. nothing else.
+    /// </summary>
     public class MatchSimulationStateS2C
     {
         public FixedClassUnorderedList<PlayerStateS2C> Players;

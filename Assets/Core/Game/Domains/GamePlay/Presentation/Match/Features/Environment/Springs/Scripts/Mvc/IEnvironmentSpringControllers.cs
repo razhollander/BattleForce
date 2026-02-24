@@ -6,5 +6,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
         void CreateSpring(ushort springId);
         void DestroyAll();
         void PlaySpringBounceAnimation(ushort springId);
+        void UpdateSpringTransform(ushort springId);
     }
 }

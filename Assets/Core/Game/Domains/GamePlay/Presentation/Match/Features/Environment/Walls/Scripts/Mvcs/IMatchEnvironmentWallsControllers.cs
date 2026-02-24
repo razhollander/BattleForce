@@ -5,5 +5,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
         void InitEntryPoint();
         void CreateWall(ushort wallId);
         void DestroyAll();
+        void UpdateWallTransform(ushort wallId);
     }
 }

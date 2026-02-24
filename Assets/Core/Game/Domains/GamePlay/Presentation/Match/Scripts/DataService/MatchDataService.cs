@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
-using Core.Scripts.Extensions.Linq;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -19,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; private set; }
         public List<MatchEnvironmentSpringModel> EnvironmentSprings { get; private set; }
         public List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; private set; }
+        public List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
 
@@ -33,7 +33,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             Bullets = new List<MatchPlayerBulletModel>(networkConfig.MaxCap.ConcurrentBullets);
             EnvironmentWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
             EnvironmentLavaWalls = new List<MatchEnvironmentLavaWallModel>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls);
-            EnvironmentSprings = new List<MatchEnvironmentSpringModel>(32);
+            EnvironmentSprings = new List<MatchEnvironmentSpringModel>(networkConfig.MaxCap.ConcurrentEvironmentSprings);
+            RotatingWheels = new List<MatchEnvironmentRotatingWheelModel>(networkConfig.MaxCap.ConcurrentEnvironmentRotatingWheels);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
             PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
@@ -146,25 +147,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newPlayer;
         }
 
-        public MatchEnvironmentWallModel AddWall(WallConfig wallConfig)
+        public MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle)
         {
-            var newWall = new MatchEnvironmentWallModel(wallConfig.Id, wallConfig.Points);
+            var newWall = new MatchEnvironmentWallModel(id, points, localPosition, worldPosition, worldRotationAngle);
             EnvironmentWalls.Add(newWall);
             return newWall;
         }
 
-        public MatchEnvironmentLavaWallModel AddLavalWall(WallConfig wallConfig)
+        public MatchEnvironmentLavaWallModel AddLavalWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle)
         {
-            var newWall = new MatchEnvironmentLavaWallModel(wallConfig.Id, wallConfig.Points);
+            var newWall = new MatchEnvironmentLavaWallModel(id, points, localPosition, worldPosition, worldRotationAngle);
             EnvironmentLavaWalls.Add(newWall);
             return newWall;
         }
 
-        public MatchEnvironmentSpringModel AddSpring(ushort id, UnityEngine.Vector2 position, float directionAngle)
+        public MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle)
         {
-            var newSpring = new MatchEnvironmentSpringModel(id, position, directionAngle);
+            var newSpring = new MatchEnvironmentSpringModel(id, localPosition, worldPosition, localRotationAngle, worldRotationAngle);
             EnvironmentSprings.Add(newSpring);
             return newSpring;
+        }
+
+        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(EnvironmentRotatingWheelConfig config)
+        {
+            var newWheel = new MatchEnvironmentRotatingWheelModel(config.Id, config.CenterPosition, config.RotationSpeed, 
+                config.Walls.Select(x=>x.Id).ToList(), 
+                config.LavaWalls.Select(x=>x.Id).ToList(), 
+                config.Springs.Select(x=>x.Id).ToList());
+            RotatingWheels.Add(newWheel);
+            return newWheel;
         }
 
         public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius)
@@ -186,6 +197,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentWalls.Clear();
             EnvironmentLavaWalls.Clear();
             EnvironmentSprings.Clear();
+            RotatingWheels.Clear();
             TalentCards.Clear();
             PowerUpBalls.Clear();
             BoltsPerTeam.Clear();
