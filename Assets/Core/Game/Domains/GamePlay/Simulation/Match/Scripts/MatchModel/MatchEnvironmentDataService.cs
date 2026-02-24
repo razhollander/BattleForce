@@ -126,12 +126,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             teleportGatePair.GateA.NormalRotation = gateANormalRotation;
             teleportGatePair.GateA.Position = gateAPosition;
             teleportGatePair.GateA.WorldPosition = gateAWorldPosition;
-            teleportGatePair.GateA.WorldRotation = gateAWorldRotation;
+            teleportGatePair.GateA.WorldNormalRotation = gateAWorldRotation;
             teleportGatePair.GateA.Id = gateAId;
             teleportGatePair.GateB.NormalRotation = gateBNormalRotation;
             teleportGatePair.GateB.Position = gateBPosition;
             teleportGatePair.GateB.WorldPosition = gateBWorldPosition;
-            teleportGatePair.GateB.WorldRotation = gateBWorldRotation;
+            teleportGatePair.GateB.WorldNormalRotation = gateBWorldRotation;
             teleportGatePair.GateB.Id = gateBId;
         }
     }

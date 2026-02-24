@@ -116,13 +116,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             {
                 if (teleportGatePair.GateA.Id == teleportGateId)
                 {
-                    teleportGateBody.SetTransform(teleportGatePair.GateA.WorldPosition, teleportGatePair.GateA.WorldRotation.ToRadians());
+                    teleportGateBody.SetTransform(teleportGatePair.GateA.WorldPosition, teleportGatePair.GateA.WorldNormalRotation.ToRadians());
                     return;
                 }
 
                 if (teleportGatePair.GateB.Id == teleportGateId)
                 {
-                    teleportGateBody.SetTransform(teleportGatePair.GateB.WorldPosition, teleportGatePair.GateB.WorldRotation.ToRadians());
+                    teleportGateBody.SetTransform(teleportGatePair.GateB.WorldPosition, teleportGatePair.GateB.WorldNormalRotation.ToRadians());
                     return;
                 }
             }

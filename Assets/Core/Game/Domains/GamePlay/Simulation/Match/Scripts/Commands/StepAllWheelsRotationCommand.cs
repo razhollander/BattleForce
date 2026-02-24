@@ -119,7 +119,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     );
 
                     teleportGatePair.GateA.WorldPosition = worldPositionA;
-                    teleportGatePair.GateA.WorldRotation = worldRotationA;
+                    teleportGatePair.GateA.WorldNormalRotation = worldRotationA;
 
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
                         tick,
@@ -133,7 +133,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     );
 
                     teleportGatePair.GateB.WorldPosition = worldPositionB;
-                    teleportGatePair.GateB.WorldRotation = worldRotationB;
+                    teleportGatePair.GateB.WorldNormalRotation = worldRotationB;
                 }
             }
         }
