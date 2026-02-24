@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         public Dictionary<ushort, int> GemsCollectedPerTeam { get; private set; }
         public bool IsStageEnded { get; set; }
         public float StageRestartTimer { get; set; }
+        public float PreparationPhaseTimer { get; set; }
 
         public StageDataService(IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig)
         {

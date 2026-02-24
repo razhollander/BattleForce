@@ -24,5 +24,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public int BoltsGainedPerHit = 50;
         public int BoltsGainedPerKill = 50;
         public float TeleportGateCooldownInSeconds = 0.5f;
+        public float PreparationPhaseDuration = 5f;
     }
 }

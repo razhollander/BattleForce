@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<TalentSwitchNetEventS2C> TalentSwitchNetEvents;
         public FixedUnorderedList<GainBoltsNetEventS2C> GainBoltsNetEvents;
         public FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> PlayerToEnvironmentTeleportGateCollisionNetEvents;
+        public FixedUnorderedList<PreparationPhaseEndedNetEventS2C> PreparationPhaseEndedNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -54,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             EnvironmentSpringPlayerCollisionNetEvents = new FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>(maxCap.EnvironmentSpringPlayerCollisionNetEvents);
             GainBoltsNetEvents = new FixedUnorderedList<GainBoltsNetEventS2C>(maxCap.GainBoltsNetEvents);
             PlayerToEnvironmentTeleportGateCollisionNetEvents = new FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(maxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents);
+            PreparationPhaseEndedNetEvents = new FixedUnorderedList<PreparationPhaseEndedNetEventS2C>(maxCap.PreparationPhaseEndedNetEvents);
         }
 
 
@@ -91,6 +93,16 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedEnvironmentSpringPlayerCollisionEvents(writer);
             SerializedGainBoltsEvents(writer);
             SerializedPlayerToEnvironmentTeleportGateCollisionEvents(writer);
+            SerializedPreparationPhaseEndedEvents(writer);
+        }
+
+        private void SerializedPreparationPhaseEndedEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PreparationPhaseEndedNetEvents.Count);
+            foreach (var evt in PreparationPhaseEndedNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
         }
 
         private void SerializedGainBoltsEvents(NetDataWriter writer)
@@ -212,6 +224,18 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedEnvironmentSpringPlayerCollisionEvents(reader);
             DeserializedGainBoltsEvents(reader);
             DeserializedPlayerToEnvironmentTeleportGateCollisionEvents(reader);
+            DeserializedPreparationPhaseEndedEvents(reader);
+        }
+
+        private void DeserializedPreparationPhaseEndedEvents(NetDataReader reader)
+        {
+            PreparationPhaseEndedNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref PreparationPhaseEndedNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
         }
 
         private void DeserializedGainBoltsEvents(NetDataReader reader)

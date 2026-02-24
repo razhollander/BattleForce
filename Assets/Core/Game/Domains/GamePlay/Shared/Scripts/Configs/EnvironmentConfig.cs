@@ -80,5 +80,22 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
 #endif
         }
+
+        public void SetFieldBarriers(EnvironmentFieldBarrierConfig[] fieldBarriers, int index)
+        {
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetFieldBarriersJson(fieldBarriers.ToJson());
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetFieldBarriersJson(fieldBarriers.ToJson());
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
     }
 }

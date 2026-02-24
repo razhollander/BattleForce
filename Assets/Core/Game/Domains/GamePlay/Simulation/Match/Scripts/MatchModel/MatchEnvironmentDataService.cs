@@ -16,12 +16,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private readonly FixedClassUnorderedList<EnvironmentWallS2C> _lavaWalls;
         private readonly FixedClassUnorderedList<EnvironmentWallS2C> _walls;
         private readonly FixedClassUnorderedList<EnvironmentRotatingWheelS2C> _rotatingWheels;
+        private readonly FixedClassUnorderedList<MatchEnvironmentFieldBarrierModel> _fieldBarriers;
 
         public FixedClassUnorderedList<EnvironmentRotatingWheelS2C> RotatingWheels => _rotatingWheels;
         public FixedClassUnorderedList<EnvironmentSpringS2C> Springs => _springs;
         public FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> TeleportGates => _teleportGates;
         public FixedClassUnorderedList<EnvironmentWallS2C> LavaWalls => _lavaWalls;
         public FixedClassUnorderedList<EnvironmentWallS2C> Walls => _walls;
+        public FixedClassUnorderedList<MatchEnvironmentFieldBarrierModel> FieldBarriers => _fieldBarriers;
 
         public MatchEnvironmentDataService(NetworkConfig networkConfig)
         {
@@ -30,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             _lavaWalls = new FixedClassUnorderedList<EnvironmentWallS2C>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls, ()=> new EnvironmentWallS2C());
             _walls = new FixedClassUnorderedList<EnvironmentWallS2C>(networkConfig.MaxCap.ConcurrentEvironmentWalls, ()=> new EnvironmentWallS2C());
             _rotatingWheels = new FixedClassUnorderedList<EnvironmentRotatingWheelS2C>(networkConfig.MaxCap.ConcurrentEnvironmentRotatingWheels, ()=> new EnvironmentRotatingWheelS2C(networkConfig.MaxCap.EnvironmentRotatingWheelCap));
+            _fieldBarriers = new FixedClassUnorderedList<MatchEnvironmentFieldBarrierModel>(networkConfig.MaxCap.ConcurrentFieldBarriers, () => new MatchEnvironmentFieldBarrierModel());
         }
 
         public void ClearData()
@@ -38,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             _teleportGates.Clear();
             _lavaWalls.Clear();
             _walls.Clear();
+            _fieldBarriers.Clear();
 
             foreach (var rotatingWheel in _rotatingWheels.AsSpan())
             {
@@ -83,6 +87,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             rotatingWheel.RotationSpeed = rotationSpeed;
             rotatingWheel.CenterPosition = centerPosition;
             return rotatingWheel;
+        }
+
+        public void AddFieldBarrier(ushort id, ushort teamId, Vector2 position, Vector2 size, Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FieldBarrierShape shape)
+        {
+            var barrier = _fieldBarriers.AddAndGet();
+            barrier.Id = id;
+            barrier.TeamId = teamId;
+            barrier.Position = position;
+            barrier.Size = size;
+            barrier.Shape = shape;
         }
         
         

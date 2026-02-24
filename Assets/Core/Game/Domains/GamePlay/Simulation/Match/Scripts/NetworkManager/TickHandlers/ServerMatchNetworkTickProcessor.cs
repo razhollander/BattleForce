@@ -240,6 +240,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.EnvironmentSpringPlayerCollisionNetEvents = _netEventsDataService.EnvironmentSpringPlayerCollisionNetEventsPerPlayer[playerId];
                 _fullTickPacket.GainBoltsNetEvents = _netEventsDataService.GainBoltsNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerToEnvironmentTeleportGateCollisionNetEvents = _netEventsDataService.PlayerToEnvironmentTeleportGateCollisionNetEventsPerPlayer[playerId];
+                _fullTickPacket.PreparationPhaseEndedNetEvents = _netEventsDataService.PreparationPhaseEndedNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

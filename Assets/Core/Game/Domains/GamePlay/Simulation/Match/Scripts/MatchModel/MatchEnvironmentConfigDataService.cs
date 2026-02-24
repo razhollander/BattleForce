@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public WallConfig[] LavaWallConfigs { get; private set; }
         public WallConfig[] WallConfigs { get; private set; }
         public EnvironmentRotatingWheelConfig[] RotatingWheels { get; private set; }
+        public EnvironmentFieldBarrierConfig[] FieldBarrierConfigs { get; private set; }
 
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         
@@ -30,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             TeleportGates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetTeleportGates();
             RotatingWheels = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetRotatingWheels();
             EnvironmentHalfSize = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentHalfSize();
+            FieldBarrierConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetFieldBarriers();
         }
     }
 }
