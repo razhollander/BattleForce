@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 {
@@ -14,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchPowerUpBallModel> PowerUpBalls { get; }
         List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; }
         List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; }
+        List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; }
         HashSet<ushort> TeamIds {get; }
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
@@ -22,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
         MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
         MatchEnvironmentLavaWallModel AddLavalWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
+        MatchEnvironmentFieldBarrierModel AddFieldBarrier(ushort id, ushort teamId, Vector2 position, Vector2 size, FieldBarrierShape shape);
         void SetLocalPlayer(int playerId);
         MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius);
         MatchPlayerBulletModel GetBullet(ushort bulletId);
@@ -36,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort lavaWallId);
         MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle);
         MatchEnvironmentSpringModel GetEnvironmentSpring(ushort springId);
+        MatchEnvironmentFieldBarrierModel GetFieldBarrier(ushort id);
         MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(EnvironmentRotatingWheelConfig config);
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);

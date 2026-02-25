@@ -1,5 +1,6 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
@@ -42,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IEnvironmentTeleportGateControllers _teleportGateControllers;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private NetworkConfig _networkConfig;
+        private IEnvironmentFieldBarrierControllers _environmentFieldBarrierControllers;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -69,6 +71,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _teleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
+            _environmentFieldBarrierControllers = _diContainer.Resolve<IEnvironmentFieldBarrierControllers>();
         }
 
         public void Execute()
@@ -91,6 +94,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _playerUIControllers.DestroyAll();
             _teamsBoardUIController.DestroyAll();
             _teleportGateControllers.DestroyAll();
+            _environmentFieldBarrierControllers.DestroyAll();
         }
 
         private void CreateAll()
@@ -105,6 +109,33 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreatePowerUpBalls();
             CreateTeamBoards();
             CreateTeleportGates();
+            CreateFieldBarriers();
+        }
+
+        private void CreateFieldBarriers()
+        {
+            var barrierConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutIndex).GetFieldBarriers();
+            if (barrierConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var teamIds = new System.Collections.Generic.List<ushort>(_matchDataService.TeamIds);
+            teamIds.Sort();
+
+            int barrierIndex = 0;
+            foreach (var teamId in teamIds)
+            {
+                if (barrierIndex >= barrierConfigs.Length)
+                {
+                    break;
+                }
+
+                var config = barrierConfigs[barrierIndex];
+                _matchDataService.AddFieldBarrier((ushort)barrierIndex, teamId, config.Position, config.Size, config.Shape);
+                _environmentFieldBarrierControllers.CreateFieldBarrier((ushort)barrierIndex);
+                barrierIndex++;
+            }
         }
 
         private void CreateTeamBoards()

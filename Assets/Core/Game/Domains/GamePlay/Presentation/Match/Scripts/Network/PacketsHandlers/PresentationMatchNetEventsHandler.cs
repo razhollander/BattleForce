@@ -320,5 +320,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.PlayerToEnvironmentTeleportGateCollisionNetEvents.Add(playerToEnvironmentTeleportCollisionEvent);
             }
         }
+
+        public void ProcessPreparationPhaseEndedEvents(CapacityList<PreparationPhaseEndedNetEventS2C> preparationPhaseEndedNetEvents)
+        {
+            if (preparationPhaseEndedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var preparationPhaseEndedNetEvent in preparationPhaseEndedNetEvents)
+            {
+                _cachedPresentationEventsService.PreparationPhaseEndedNetEvents.Add(preparationPhaseEndedNetEvent);
+            }
+        }
     }
 }

@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -19,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchEnvironmentSpringModel> EnvironmentSprings { get; private set; }
         public List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; private set; }
         public List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; private set; }
+        public List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
 
@@ -41,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             BoltsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             GemsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             EnvironmentTeleportPairs = new List<MatchEnvironmentTeleportPairModel>(networkConfig.MaxCap.ConcurrentEvironmentTeleportPairs);
+            FieldBarriers = new List<MatchEnvironmentFieldBarrierModel>(networkConfig.MaxCap.ConcurrentFieldBarriers);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -161,6 +165,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newWall;
         }
 
+        public MatchEnvironmentFieldBarrierModel AddFieldBarrier(ushort id, ushort teamId, Vector2 position, Vector2 size, FieldBarrierShape shape)
+        {
+            var newBarrier = new MatchEnvironmentFieldBarrierModel(id, teamId, position, size, shape);
+            FieldBarriers.Add(newBarrier);
+            return newBarrier;
+        }
+
         public MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle)
         {
             var newSpring = new MatchEnvironmentSpringModel(id, localPosition, worldPosition, localRotationAngle, worldRotationAngle);
@@ -203,6 +214,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             BoltsPerTeam.Clear();
             GemsPerTeam.Clear();
             EnvironmentTeleportPairs.Clear();
+            FieldBarriers.Clear();
         }
 
         public void SetTeamBolts(ushort teamId, int totalTeamBolts)
@@ -224,6 +236,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchEnvironmentTeleportPairModel GetTeleportPair(ushort teleportPairId)
         {
             return EnvironmentTeleportPairs.Find(x => x.Id == teleportPairId);
+        }
+
+        public MatchEnvironmentFieldBarrierModel GetFieldBarrier(ushort id)
+        {
+            return FieldBarriers.Find(x => x.Id == id);
         }
     }
 }
