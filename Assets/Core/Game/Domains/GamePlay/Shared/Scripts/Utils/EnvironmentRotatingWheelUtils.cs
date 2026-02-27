@@ -7,7 +7,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Utils
     {
         public static float CalculateRotationDuringTick(int tick, float rotationSpeed, float deltaTime)
         {
-            return rotationSpeed * tick * deltaTime;
+            return (float)((double)rotationSpeed * tick * deltaTime % 360);
         }
 
         public static void CalculateChildTransform(
