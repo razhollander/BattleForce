@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHan
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
@@ -34,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private ICommandFactory _commandFactory;
         private NetworkConfig _networkConfig;
         private IStageDataService _stageDataService;
+        private ISimulationInputService _simulationInputService;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -60,6 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
+            _simulationInputService = _diContainer.Resolve<ISimulationInputService>();
         }
 
         public void Execute()
@@ -131,6 +134,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 var isPlayerConnected = _networkManager.IsPlayerPeerConencted(playerId);
                 _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown, isPlayerConnected);
                 _playersTalentsManager.AddPlayer(playerId);
+                _simulationInputService.AddPlayer(playerId);
             }
         }
     }
