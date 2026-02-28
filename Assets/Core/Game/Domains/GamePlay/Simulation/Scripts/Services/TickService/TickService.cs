@@ -37,11 +37,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
         {
             try
             {
-                CurrentTick++;
                 for (int i = _observers.Count - 1; i >= 0; i--)
                 {
                     _observers[i].OnTick(CurrentTick);
                 }
+                CurrentTick++;
             }
             catch (Exception e)
             {
