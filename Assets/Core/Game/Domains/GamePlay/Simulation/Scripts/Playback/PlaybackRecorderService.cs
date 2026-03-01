@@ -1,17 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using System.Linq;
 using Core.Game.Domains.GamePlay.Shared.Scripts;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
-using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
-using Newtonsoft.Json;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 {
@@ -19,7 +15,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
     {
         private readonly ITickService _tickService;
         private readonly IServerNetworkManager _networkManager;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly IPlaybackIOService _playbackIOService;
         private Dictionary<int, PlaybackTickData> _ticks = new Dictionary<int, PlaybackTickData>();
         private int _seed;
@@ -31,11 +26,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
         public int InitialTick => _initialTick;
         public bool IsPlaybackEnabled { get; private set; }
 
-        public PlaybackRecorderService(ITickService tickService, IServerNetworkManager networkManager, SimulationGamePlayConfig gamePlayConfig, IPlaybackIOService playbackIOService)
+        public PlaybackRecorderService(ITickService tickService, IServerNetworkManager networkManager, IPlaybackIOService playbackIOService)
         {
             _tickService = tickService;
             _networkManager = networkManager;
-            _gamePlayConfig = gamePlayConfig;
             _playbackIOService = playbackIOService;
         }
 
@@ -67,6 +61,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 
         private void SaveRecording()
         {
+            LogService.LogError($"_initialTick:{_initialTick}, firs tick: {_ticks.First().Key}");
             _playbackIOService.SavePlayback(_initialTick, _seed, _ticks, _players);
         }
 
@@ -105,6 +100,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
             {
                 tickData = new PlaybackTickData { Tick = serverTick };
                 _ticks[serverTick] = tickData;
+                LogService.LogError($"Recorded packet for tick {serverTick}");
             }
 
             tickData.Packets.Add(new RecordedPacket

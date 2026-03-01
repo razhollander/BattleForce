@@ -121,6 +121,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 SendCurrentTickStateToAllClients(currentTick);
                 SendStartMatchToNotAcknowledgedPlayers(currentTick);
                 _headLessQuitterController.QuitIfTimeOut();
+                LogService.LogError($"tick: {currentTick},{Environment.NewLine}Player pos: {_matchDataService.SimulationState.Players[0].Spaceship.Transform.Position}");
             }
             catch (Exception e)
             {

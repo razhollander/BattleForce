@@ -10,6 +10,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Services.UnityThreadDispatcher;
@@ -38,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ICommandFactory _commandFactory;
         private readonly ISimulationInputService _simulationInputService;
+        private readonly ITickService _tickService;
 
         private readonly CapacityDict<ushort, FixedUnorderedList<MatchPlayerInputPacketC2S>> _inputsPerPlayer;
         private readonly CapacityDict<ushort, int> _heighestProcessedTickPerPlayer;
@@ -57,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, IUnityMainThreadDispatcher unityMainThreadDispatcher, ISimulationInputService simulationInputService)
+            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, IUnityMainThreadDispatcher unityMainThreadDispatcher, ISimulationInputService simulationInputService, ITickService tickService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -71,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _playerbackRecorderService = playerbackRecorderService;
             _unityMainThreadDispatcher = unityMainThreadDispatcher;
             _simulationInputService = simulationInputService;
+            _tickService = tickService;
             _handleTalentInputPressedCommand = _commandFactory.CreateCommandVoid<HandleTalentInputPressedCommand>();
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, MatchPlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -142,6 +145,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     LogService.LogTopic($"Didn't find any last cached inputs for player {playerId}!", LogTopicType.ServerNetwork);
                     continue;
                 }
+                
+                LogService.LogError($"Input processed {playerInputPacket.ToJson()} on tick {processedTick}");
 
                 UpdatePlayerDirection(playerInputPacket, playerState);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
@@ -457,6 +462,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var inputsList = _inputsPerPlayer[playerId];
             ref var input = ref inputsList.AddAndGet();
             input = playerInputPacket;
+            LogService.LogError($"Input received {playerInputPacket.ToJson()} on tick {_tickService.CurrentTick}");
+
             if (playerInputPacket.IsShootInputPressed)
             {
                 //string time = DateTime.Now.ToString("HH:mm:ss.fff");

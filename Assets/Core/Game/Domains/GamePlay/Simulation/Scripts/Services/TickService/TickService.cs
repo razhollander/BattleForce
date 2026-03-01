@@ -12,7 +12,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
         private readonly NetworkConfig _networkConfig;
         private TimerFixedThreaded2 _fixedTimer;
         private readonly List<ITickObserver> _observers;
-        
+
+        private bool _isRunning = false;
         public int CurrentTick { get; private set; }
 
         public TickService(NetworkConfig networkConfig)
@@ -20,27 +21,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
             _networkConfig = networkConfig;
             _observers = new List<ITickObserver>(2);
         }
-
-        public void InitEntryPoint()
-        {
-            StartTick();
-        }
         
-        private void StartTick()
+        public void StartTick()
         {
+            if (_isRunning)
+            {
+                return;
+            }
+            
             var cancellationTokenSource = new CancellationTokenSource();
             _fixedTimer = new TimerFixedThreaded2("Server Thread", _networkConfig.TicksPerSeconds, OnTick);
             _fixedTimer.Start(cancellationTokenSource);
+            _isRunning = true;
         }
 
         private void OnTick()
         {
             try
             {
+                if (_observers.Count == 0)
+                {
+                    LogService.LogError("No observers registered!");
+                }
+                
                 for (int i = _observers.Count - 1; i >= 0; i--)
                 {
                     _observers[i].OnTick(CurrentTick);
                 }
+                
                 CurrentTick++;
             }
             catch (Exception e)
@@ -50,9 +58,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
             }
         }
 
-        public void InitExitPoint()
+        public void StopTick()
         {
             _fixedTimer.Stop();
+            _isRunning = false;
         }
 
         public void RegisterObserver(ITickObserver observer)
@@ -67,6 +76,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
 
         public void SetCurrentTick(int initialTick)
         {
+            LogService.LogError("Set current tick to:"+initialTick);
             CurrentTick = initialTick;
         }
     }

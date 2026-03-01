@@ -68,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         public void Execute()
         {
             InitRNG();
-            InitTickService();
+            SetCurrentTickIfPlayback();
             _playerInputsPacketsHandler.InitEntryPoint();
             _matchPlayerJoinPacketsHandler.InitEntryPoint();
             TrySwitchToPlayback();
@@ -77,6 +77,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _stageDataService.InitEntryPoint();
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
             _tickProcessor.InitEntryPoint();
+
+            AtLastStartThreadTickIfPlayback(); // must be called last! because this starts a new thread that simulates the game and *everything* should be ready before it starts for determinstic results
+        }
+
+        private void AtLastStartThreadTickIfPlayback() 
+        {
+            _tickService.StartTick();
         }
 
         private void InitRNG()
@@ -93,7 +100,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             }
         }
 
-        private void InitTickService()
+        private void SetCurrentTickIfPlayback()
         {
             if (_playbackRecorderService.IsPlaybackEnabled)
             {

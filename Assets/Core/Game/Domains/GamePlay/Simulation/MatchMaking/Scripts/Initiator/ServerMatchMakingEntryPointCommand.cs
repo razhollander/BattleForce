@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloor;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
@@ -20,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private IStartMatchWallController _startMatchWallController;
         private ITeamFloorDataService _teamFloorDataService;
+        private ITickService _tickService;
 
         public override void ResolveDependencies()
         {
@@ -31,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
             _teamFloorDataService = _diContainer.Resolve<ITeamFloorDataService>();
+            _tickService = _diContainer.Resolve<ITickService>();
         }
 
         public void Execute()
@@ -44,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             CreateStartMatchWall();
             
             _tickProcessor.InitEntryPoint();
+            _tickService.StartTick(); // for good order, call this last! because this starts a new thread that simulates the game and *everything* should be ready before it starts for determinstic results
         }
 
         private void CreateStartMatchWall()

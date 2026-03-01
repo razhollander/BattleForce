@@ -41,7 +41,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _playbackRecorderService.InitEntryPoint(_serverInitiatorEnterData.IsPlaybackEnabled, _serverInitiatorEnterData.PlaybackFileName);
             _physicsSimulator.InitEntryPoint();
             _simulationStateMachine.InitEntryPoint();
-            _tickService.InitEntryPoint();
             _simulationPersistentData.InitEntryPoint();
             _headLessQuitterController.InitEntryPoint();
 
