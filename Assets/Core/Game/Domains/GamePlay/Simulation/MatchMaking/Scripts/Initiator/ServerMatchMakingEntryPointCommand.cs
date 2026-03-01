@@ -47,7 +47,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             CreateStartMatchWall();
             
             _tickProcessor.InitEntryPoint();
-            _tickService.StartTick(); // for good order, call this last! because this starts a new thread that simulates the game and *everything* should be ready before it starts for determinstic results
         }
 
         private void CreateStartMatchWall()

@@ -55,7 +55,7 @@ MonoBehaviour:
         },     "GateB": {       "Position": {         "X": 3.25,         "Y": 7      
         },       "NormalRotation": 270     }   } ]'
       _rotatingWheelsJson: "[\n  {\n    \"Id\": 101,\n    \"CenterPosition\": {\n     
-        \"X\": 9,\n      \"Y\": 9\n    },\n    \"RotationSpeed\": 0,\n    \"Walls\":
+        \"X\": 9,\n      \"Y\": 9\n    },\n    \"RotationSpeed\": 10,\n    \"Walls\":
         [\n      {\n        \"Id\": 101,\n        \"Position\": {\n          \"X\":
         0,\n          \"Y\": 0\n        },\n        \"Points\": [\n          {\n           
         \"X\": -20,\n            \"Y\": 0.5\n          },\n          {\n           
@@ -80,7 +80,7 @@ MonoBehaviour:
         \"Y\": 0\n          },\n          \"NormalRotation\": 180,\n          \"WorldPosition\":
         {\n            \"X\": 0,\n            \"Y\": 0\n          },\n          \"WorldRotation\":
         0\n        }\n      }\n    ]\n  },\n  {\n    \"Id\": 201,\n    \"CenterPosition\":
-        {\n      \"X\": 9,\n      \"Y\": 9\n    },\n    \"RotationSpeed\": -0,\n   
+        {\n      \"X\": 9,\n      \"Y\": 9\n    },\n    \"RotationSpeed\": -10,\n   
         \"Walls\": [\n      {\n        \"Id\": 201,\n        \"Position\": {\n         
         \"X\": 0,\n          \"Y\": 0\n        },\n        \"Points\": [\n         
         {\n            \"X\": -20,\n            \"Y\": 0.5\n          },\n         
@@ -99,7 +99,7 @@ MonoBehaviour:
         }\n    ],\n    \"TeleportGatePairs\": [\n      {\n        \"Id\": 4,\n       
         \"GateA\": {\n          \"Id\": 4,\n          \"Position\": {\n           
         \"X\": 0,\n            \"Y\": 10\n          },\n          \"NormalRotation\":
-        90,\n          \"WorldPosition\": {\n            \"X\": 0,\n            \"Y\":
+        45,\n          \"WorldPosition\": {\n            \"X\": 0,\n            \"Y\":
         0\n          },\n          \"WorldRotation\": 0\n        },\n        \"GateB\":
         {\n          \"Id\": 5,\n          \"Position\": {\n            \"X\": 0,\n           
         \"Y\": -10\n          },\n          \"NormalRotation\": 270,\n          \"WorldPosition\":

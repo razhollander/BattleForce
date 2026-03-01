@@ -13,7 +13,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
         private TimerFixedThreaded2 _fixedTimer;
         private readonly List<ITickObserver> _observers;
 
-        private bool _isRunning = false;
         public int CurrentTick { get; private set; }
 
         public TickService(NetworkConfig networkConfig)
@@ -24,15 +23,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
         
         public void StartTick()
         {
-            if (_isRunning)
-            {
-                return;
-            }
-            
             var cancellationTokenSource = new CancellationTokenSource();
             _fixedTimer = new TimerFixedThreaded2("Server Thread", _networkConfig.TicksPerSeconds, OnTick);
             _fixedTimer.Start(cancellationTokenSource);
-            _isRunning = true;
         }
 
         private void OnTick()
@@ -54,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
             catch (Exception e)
             {
                 LogService.LogError("Got error in server thread! " + e);
+                StopTick();
                 throw;
             }
         }
@@ -61,7 +55,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
         public void StopTick()
         {
             _fixedTimer.Stop();
-            _isRunning = false;
         }
 
         public void RegisterObserver(ITickObserver observer)
