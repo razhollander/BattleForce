@@ -59,21 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 {
                     _addMatchPlayerCommand.SetPlayerState(playerRejoinAcceptNetEvent.PlayerState).Execute();
                 }
-                else
-                {
-                    // _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
-                    //     .SetSimulationState(playerRejoinAcceptNetEvent.SimulationState)
-                    //     .Execute();
-                    //SyncTickToServer(playerRejoinAcceptNetEvent);
-                    // SetupLocalPlayer(playerId);
-                }
             }
-        }
-
-        private void SetupLocalPlayer(int playerId)
-        {
-            _matchDataService.SetLocalPlayer(playerId);
-            _clientPresentationTickProcessor.InitEntryPoint();
         }
         
         public void ProcessBulletSpawnEvents(CapacityList<BulletSpawnNetEventS2C> bulletSpawnNetEvents)

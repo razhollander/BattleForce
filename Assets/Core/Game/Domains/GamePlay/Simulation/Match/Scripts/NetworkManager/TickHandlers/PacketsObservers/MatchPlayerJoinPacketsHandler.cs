@@ -65,7 +65,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     joinResponse.OccuredOnTick = processedTick;
                     peer.Tag = playerId;
                     
-                    _simulationInputService.AddPlayer(playerId);
                     _networkManager.AddPlayerPeer(playerId, peer);
                     _netEventsDataService.StartSavingPlayerEvents(playerId);
                     var nw = new NetDataWriter(true);

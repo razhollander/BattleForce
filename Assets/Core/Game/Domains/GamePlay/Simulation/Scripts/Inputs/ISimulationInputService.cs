@@ -7,5 +7,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
         bool WasInputDownThisTick(ushort playerId, PlayerInputType inputType);
         bool WasInputReleasedThisTick(ushort playerId, PlayerInputType inputType);
         bool IsInputPressed(ushort playerId, PlayerInputType inputType);
+        void Clear();
     }
 }

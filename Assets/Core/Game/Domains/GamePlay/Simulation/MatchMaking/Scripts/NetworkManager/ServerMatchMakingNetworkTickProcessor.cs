@@ -97,7 +97,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         public void InitExitPoint()
         {
             _tickService.UnregisterObserver(this);
-
         }
       
         public void OnTick(int currentTick)

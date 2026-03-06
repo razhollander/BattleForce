@@ -97,7 +97,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         {
             var newPowerUpBall = new MatchPowerUpBallModel(powerUpBallId, position);
             PowerUpBalls.Add(newPowerUpBall);
-            LogService.LogError("Add power up ball: " + newPowerUpBall.Id);
             return newPowerUpBall;
         }
 
@@ -124,7 +123,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 return;
             }
             
-            LogService.LogError("Remove power up ball: " + powerUpBallModel.Id);
             PowerUpBalls.Remove(powerUpBallModel);
         }
 

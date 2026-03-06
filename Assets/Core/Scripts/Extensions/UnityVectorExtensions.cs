@@ -43,13 +43,13 @@ namespace Core.Scripts.Extensions
         /// <returns></returns>
         public static System.Numerics.Vector2 Rotate(this System.Numerics.Vector2 direction, float degrees)
         {
-            var rad = degrees * (System.Math.PI / 180.0);
-            var sin = System.Math.Sin(rad);
-            var cos = System.Math.Cos(rad);
+            var rad = degrees * Mathf.Deg2Rad;
+            var sin = Mathf.Sin(rad);
+            var cos = Mathf.Cos(rad);
 
             return new System.Numerics.Vector2(
-                (float)(direction.X * cos - direction.Y * sin),
-                (float)(direction.X * sin + direction.Y * cos)
+                direction.X * cos - direction.Y * sin,
+                direction.X * sin + direction.Y * cos
             );
         }
 

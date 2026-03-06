@@ -7,7 +7,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
 {
     public class SimulationInputService : ISimulationInputService
     {
-        private readonly CapacityDict<ushort, PlayerInputStates> _inputStatesPerPlayer;
+        private readonly CapacityDict<ushort, PlayerInputStates> _inputStatesPerPlayer; // since the first moment of the match, all players which are in the match enter data should be asigned to this dict and only be removed from it once the match ends
 
         public SimulationInputService(NetworkConfig networkConfig)
         {
@@ -16,11 +16,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
 
         public void AddPlayer(ushort playerId)
         {
-            if (_inputStatesPerPlayer.ContainsKey(playerId))
-            {
-                return;
-            }
-
             var playerInputStates = new PlayerInputStates();
             _inputStatesPerPlayer.Add(playerId, playerInputStates);
         }
@@ -90,6 +85,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
                 default:
                     return false;
             }
+        }
+
+        public void Clear()
+        {
+            _inputStatesPerPlayer.Clear();   
         }
 
         private class PlayerInputStates
