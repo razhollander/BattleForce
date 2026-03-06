@@ -53,6 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.States
         private void ExitCurerntState()
         {
             _currentState?.Exit(); // todo: move closing the thread to the simulation gameplay domain
+            _currentState = null;
         }
         
         public void OnApplicationFocus(bool hasFocus)
