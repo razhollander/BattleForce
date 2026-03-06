@@ -121,7 +121,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 SendCurrentTickStateToAllClients(currentTick);
                 SendStartMatchToNotAcknowledgedPlayers(currentTick);
                 _headLessQuitterController.QuitIfTimeOut();
-                LogService.LogError($"tick: {currentTick},{Environment.NewLine}Player pos: {_matchDataService.SimulationState.Players[0].Spaceship.Transform.Position}");
             }
             catch (Exception e)
             {
@@ -145,7 +144,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
 
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
-            SendStartStageToAllPlayers(currentTick);
+            SendStartStageToAllPlayers(currentTick);// why do we send this and not add it as a NetEvent???
         }
 
         private void SendStartStageToAllPlayers(int processedTick)
@@ -157,7 +156,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     return;
                 }
                 
-                SendStartStagePacketToClient(playerState.Id, processedTick, DeliveryMethod.Unreliable);
+                SendStartStagePacketToClient(playerState.Id, processedTick, DeliveryMethod.ReliableUnordered);
             }
         }
         

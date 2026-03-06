@@ -77,16 +77,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             
             _commandFactory.CreateCommandVoid<SyncMatchMakingSimulationStateCommand>()
                 .SetSimulationState(_enterData.SimulationState).Execute();
-            SyncTickToServer(_enterData.ServerTick);
             _matchMakingDataService.SetLocalPlayer(_enterData.PlayerId);
             _clientPresentationTickProcessor.StartTick();
-        }
-        
-        private void SyncTickToServer(int serverTick)
-        {
-            var ticksPassedSinceServerSendPacket = (_networkManager.Ping / 1000f) / _networkConfig.DeltaTime;
-            var tickWouldBeOnServerWhenReceiveMyPackets = (int)(ticksPassedSinceServerSendPacket * 2) + serverTick;
-            _tickCounterService.SetTick(tickWouldBeOnServerWhenReceiveMyPackets);
         }
     }
 }

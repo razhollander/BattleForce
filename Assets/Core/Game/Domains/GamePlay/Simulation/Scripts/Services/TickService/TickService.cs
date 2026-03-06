@@ -69,7 +69,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
 
         public void SetCurrentTick(int initialTick)
         {
-            LogService.LogError("Set current tick to:"+initialTick);
             CurrentTick = initialTick;
         }
     }

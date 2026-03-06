@@ -446,6 +446,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var powerUpBallId = powerUpBall.Id;
             DestroyBullet(bulletModel, bulletBody);
             DestroyPowerUpBall(powerUpBallId, powerUpBody);
+            LogService.LogError($"Server: HandlePlayerBulletPowerUpCollision: power up id: {powerUpBallId}, bullet id: {bulletModel.Id}");
             _netEventsDataService.AddPowerUpObtainedNetEvent(_processedTick, powerUpBallId, bulletModel.BelongToPlayerId);
         }
 

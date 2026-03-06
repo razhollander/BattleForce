@@ -8,6 +8,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -67,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var powerUpBall = _matchDataService.AddPowerUpBall(position, velocity, powerUpType);
             _physicsSimulator.AddPowerUpBall(powerUpBall.Id, position, velocity, _gamePlayConfig.PowerUps.Radius);
             _netEventsDataService.AddPowerUpSpawnedNetEvent(_processedTick, powerUpBall.Id, position);
+            LogService.LogError($"Server: SpawnPowerUp: power up id: {powerUpBall.Id}");
         }
 
         private bool TryGenerateRandomPowerUpBall(out Vector2 position, out Vector2 velocity, out PowerUpType powerUpType)

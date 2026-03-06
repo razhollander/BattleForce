@@ -153,8 +153,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             
             _commandFactory.CreateCommandAsync<StartClientCommand>()
                 .SetIsHost(isHost)
-                .SetIsPlaybackEnabled(isPlaybackEnabled)
-                .SetPlaybackName(playbackName)
                 .SetServerAddress(ip,port)
                 .SetPlayerName(playerName)
                 .Execute(cancellationTokenSource).Forget();

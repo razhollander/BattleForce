@@ -145,8 +145,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     LogService.LogTopic($"Didn't find any last cached inputs for player {playerId}!", LogTopicType.ServerNetwork);
                     continue;
                 }
-                
-                LogService.LogError($"Input processed {playerInputPacket.ToJson()} on tick {processedTick}");
 
                 UpdatePlayerDirection(playerInputPacket, playerState);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
@@ -462,7 +460,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var inputsList = _inputsPerPlayer[playerId];
             ref var input = ref inputsList.AddAndGet();
             input = playerInputPacket;
-            LogService.LogError($"Input received {playerInputPacket.ToJson()} on tick {_tickService.CurrentTick}");
 
             if (playerInputPacket.IsShootInputPressed)
             {

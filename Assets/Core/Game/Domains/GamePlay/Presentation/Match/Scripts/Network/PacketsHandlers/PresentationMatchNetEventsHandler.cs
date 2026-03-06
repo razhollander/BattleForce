@@ -54,27 +54,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 LogService.LogTopic(
                     $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerId,
                     LogTopicType.ClientNetwork);
-                
-                if (isLocalPlayer)
-                {
-                    _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
-                        .SetSimulationState(playerRejoinAcceptNetEvent.SimulationState)
-                        .Execute();
-                    SyncTickToServer(playerRejoinAcceptNetEvent);
-                    SetupLocalPlayer(playerId);
-                }
-                else
+
+                if (!isLocalPlayer)
                 {
                     _addMatchPlayerCommand.SetPlayerState(playerRejoinAcceptNetEvent.PlayerState).Execute();
                 }
+                else
+                {
+                    // _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
+                    //     .SetSimulationState(playerRejoinAcceptNetEvent.SimulationState)
+                    //     .Execute();
+                    //SyncTickToServer(playerRejoinAcceptNetEvent);
+                    // SetupLocalPlayer(playerId);
+                }
             }
-        }
-
-        private void SyncTickToServer(PlayerRejoinAcceptPacketS2C playerRejoinAcceptNetEvent)
-        {
-            var ticksPassedSinceServerSendPacket = (_networkManager.Ping / 1000f) / _networkConfig.DeltaTime;
-            var tickWouldBeOnServerWhenReceiveMyPackets = (int)(ticksPassedSinceServerSendPacket * 2) + playerRejoinAcceptNetEvent.OccuredOnTick;
-            _tickCounterService.SetTick(tickWouldBeOnServerWhenReceiveMyPackets);
         }
 
         private void SetupLocalPlayer(int playerId)

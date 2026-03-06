@@ -61,7 +61,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 
         private void SaveRecording()
         {
-            LogService.LogError($"_initialTick:{_initialTick}, firs tick: {_ticks.First().Key}");
             _playbackIOService.SavePlayback(_initialTick, _seed, _ticks, _players);
         }
 
@@ -100,7 +99,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
             {
                 tickData = new PlaybackTickData { Tick = serverTick };
                 _ticks[serverTick] = tickData;
-                LogService.LogError($"Recorded packet for tick {serverTick}");
             }
 
             tickData.Packets.Add(new RecordedPacket
