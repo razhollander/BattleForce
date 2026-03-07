@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using CoreDomain.Scripts.Services.CommandFactory;
 using System;
 using System.Numerics;
+using Core.Scripts.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -121,18 +122,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void EnforcePlayerBarrier(Core.Game.Domains.GamePlay.Shared.S2CModels.PlayerStateS2C player, MatchEnvironmentFieldBarrierModel barrier)
         {
-            var position = player.Spaceship.Transform.Position;
-            if (IsPointInsideBarrier(position, barrier)) return;
+             var position = player.Spaceship.Transform.Position;
+            // if (IsPointInsideBarrier(position, barrier)) return;
 
             // Clamp position
             if (barrier.Shape == FieldBarrierShape.Circle)
             {
+                var playerRadius = player.Spaceship.Transform.Radius;
+                
                 var center = barrier.Position;
-                var radius = barrier.Size.X;
+                var barrierRadius = barrier.Size.X;
+
+// This is the maximum distance the CENTER of the player can be from the center of the barrier
+                var maxAllowedDistance = barrierRadius - playerRadius;
+
+// Ensure we don't get an error if the barrier is smaller than the player
+                if (maxAllowedDistance < 0) maxAllowedDistance = 0;
+
                 var direction = position - center;
-                if (direction.LengthSquared() > radius * radius)
+                float distanceSquared = direction.LengthSquared();
+
+                if (distanceSquared > maxAllowedDistance * maxAllowedDistance)
                 {
-                    player.Spaceship.Transform.Position = center + Vector2.Normalize(direction) * radius;
+                    // Snap the player to the edge of the inner "safe" radius
+                    player.Spaceship.Transform.Position = center + Vector2.Normalize(direction) * maxAllowedDistance;
                 }
             }
             else if (barrier.Shape == FieldBarrierShape.Rectangle)

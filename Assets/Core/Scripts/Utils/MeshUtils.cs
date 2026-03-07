@@ -4,6 +4,54 @@ using UnityEngine;
 
 public class MeshUtils
 {
+
+
+    /// <summary>
+    /// Creates a 2D Sprite using the geometry of a 3D Mesh.
+    /// </summary>
+    /// <param name="sourceMesh">The procedural mesh you want to convert.</param>
+    /// <param name="texture">The texture to apply to the sprite.</param>
+    /// <param name="pixelsPerUnit">Unity's standard is 100 pixels per world unit.</param>
+    /// <returns>A new Sprite with custom overridden geometry.</returns>
+    public static Sprite ConvertMeshToSprite(Mesh sourceMesh, Texture2D texture, float pixelsPerUnit = 100f)
+    {
+        if (sourceMesh == null || texture == null)
+        {
+            Debug.LogError("Mesh or Texture is missing!");
+            return null;
+        }
+
+        // 1. Create a base sprite to hold the data
+        Rect rect = new Rect(0, 0, texture.width, texture.height);
+        Vector2 pivot = new Vector2(0.5f, 0.5f); // Center pivot
+        Sprite newSprite = Sprite.Create(texture, rect, pivot, pixelsPerUnit);
+
+        // 2. Convert Vertices (Vector3[] -> Vector2[])
+        Vector3[] meshVertices = sourceMesh.vertices;
+        Vector2[] spriteVertices = new Vector2[meshVertices.Length];
+        
+        for (int i = 0; i < meshVertices.Length; i++)
+        {
+            spriteVertices[i] = new Vector2(meshVertices[i].x, meshVertices[i].y);
+        }
+
+        // 3. Convert Triangles (int[] -> ushort[])
+        int[] meshTriangles = sourceMesh.triangles;
+        ushort[] spriteTriangles = new ushort[meshTriangles.Length];
+        
+        for (int i = 0; i < meshTriangles.Length; i++)
+        {
+            // Unity Sprites have a strict limit of 65,535 vertices.
+            // If your mesh exceeds this, the ushort cast will fail/wrap around.
+            spriteTriangles[i] = (ushort)meshTriangles[i];
+        }
+
+        // 4. Inject the custom geometry into the Sprite
+        newSprite.OverrideGeometry(spriteVertices, spriteTriangles);
+
+        return newSprite;
+    }
+
     /// <summary>
     /// Creates and returns a mesh from a polygon. Input should be CCW (will flip if CW).
     /// Throws if triangulation fails (usually self-intersection or duplicate/collinear issues).
