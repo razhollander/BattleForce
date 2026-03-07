@@ -13,12 +13,14 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<ushort> WallIds;
         public FixedUnorderedList<ushort> LavaWallIds;
         public FixedUnorderedList<ushort> SpringIds;
+        public FixedUnorderedList<ushort> TeleportGatePairIds;
 
         public EnvironmentRotatingWheelS2C(MaxCap.EnvironmentRotatingWheel maxCap)
         {
             WallIds = new FixedUnorderedList<ushort>(maxCap.MaxWalls);
             LavaWallIds = new FixedUnorderedList<ushort>(maxCap.MaxLavaWalls);
             SpringIds = new FixedUnorderedList<ushort>(maxCap.MaxSprings);
+            TeleportGatePairIds = new FixedUnorderedList<ushort>(maxCap.MaxTeleportGatePairs);
         }
 
         public void ClearData()
@@ -26,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             WallIds.Clear();
             LavaWallIds.Clear();
             SpringIds.Clear();
+            TeleportGatePairIds.Clear();
         }
         
         public bool Equals(ushort otherId)
@@ -49,6 +52,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         {
             ref var spring = ref SpringIds.AddAndGet();
             spring = springId;
+        }
+
+        public void AddTeleportGatePair(ushort teleportGatePairId)
+        {
+            ref var gatePair = ref TeleportGatePairIds.AddAndGet();
+            gatePair = teleportGatePairId;
         }
     }
 }

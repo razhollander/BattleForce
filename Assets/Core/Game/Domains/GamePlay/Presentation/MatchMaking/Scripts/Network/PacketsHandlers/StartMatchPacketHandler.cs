@@ -2,7 +2,6 @@ using System;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Network;
@@ -22,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly IMatchMakingDataService _matchMakingDataService;
         private readonly ISceneLoaderService _sceneLoaderService;
         private readonly IStateMachineService _stateMachineService;
-        private StartMatchPacketS2C _startMatchPacket;
+        private readonly StartMatchPacketS2C _startMatchPacket;
         private bool _didReceiveStartMatchPacket;
         private bool _didSwitcToMatch;
 
@@ -62,9 +61,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private async Awaitable SwitchToMatch(GamePlayMatchInitiatorEnterData enterData)
         {
             _didSwitcToMatch = true;
-            await _sceneLoaderService.TryUnloadScene(SceneType.GamePlayMatchMakingScene, _stateMachineService.CurrentState().CancellationTokenSource);
-            await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchScene, enterData, _stateMachineService.CurrentState().CancellationTokenSource);
-            await _sceneLoaderService.StartScene(SceneType.GamePlayMatchScene, enterData, _stateMachineService.CurrentState().CancellationTokenSource);
+            var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
+            await _sceneLoaderService.TryUnloadScene(SceneType.GamePlayMatchMakingScene, cancellationTokenSource);
+            await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchScene, enterData, cancellationTokenSource);
+            await _sceneLoaderService.StartScene(SceneType.GamePlayMatchScene, enterData, cancellationTokenSource);
         }
 
         public void OnPacketReceived(NetDataReader reader)
@@ -73,12 +73,5 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             _didReceiveStartMatchPacket = true;
             LogService.LogTopic("Start Match accepted received", LogTopicType.ClientNetwork);
         }
-    }
-
-    public interface IStartMatchPacketHandler : IPacketsObserver
-    {
-        void InitEntryPoint();
-        void InitExitPoint();
-        void ProcessStartMatchPacket();
     }
 }

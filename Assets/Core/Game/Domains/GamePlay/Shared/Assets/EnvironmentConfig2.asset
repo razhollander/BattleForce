@@ -54,37 +54,57 @@ MonoBehaviour:
         {         "X": -4.5,         "Y": -3       },       "NormalRotation": 90    
         },     "GateB": {       "Position": {         "X": 3.25,         "Y": 7      
         },       "NormalRotation": 270     }   } ]'
-      _rotatingWheelsJson: '[   {     "Id": 101,     "CenterPosition": {       "X":
-        9,       "Y": 9     },     "RotationSpeed": 90,     "Walls": [       {        
-        "Id": 101,         "Position": {             "X": 0,             "Y": 0          
-        },         "Points": [           {             "X": -20,             "Y":
-        0.5           },           {             "X": 20,             "Y": 0.5          
-        },           {             "X": 20,             "Y": -0.5           },          
-        {             "X": -20,             "Y": -0.5           }         ]      
-        }     ],     "LavaWalls": [       {         "Id": 101,         "Points":
-        [           {             "X": -3,             "Y": 3           },          
-        {             "X": 3,             "Y": 3           },           {            
-        "X": 3,             "Y": -3           },           {             "X": -3,            
-        "Y": -3           }         ]       }     ],     "Springs": [       {        
-        "Id": 101,         "Position": {           "X": 5,           "Y": 0        
-        },         "DirectionAngle": 0       },       {         "Id": 102,        
-        "Position": {           "X": -5,           "Y": 0         },         "DirectionAngle":
-        180       }     ]   },   {     "Id": 201,     "CenterPosition": {       "X":
-        9,       "Y": 9     },     "RotationSpeed": -90,     "Walls": [       {        
-        "Id": 201,         "Position": {             "X": 0,             "Y": 0          
-        },         "Points": [           {             "X": -20,             "Y":
-        0.5           },           {             "X": 20,             "Y": 0.5          
-        },           {             "X": 20,             "Y": -0.5           },          
-        {             "X": -20,             "Y": -0.5           }         ]      
-        }     ],     "LavaWalls": [       {         "Id": 201,         "Points":
-        [           {             "X": -3,             "Y": 3           },          
-        {             "X": 3,             "Y": 3           },           {            
-        "X": 3,             "Y": -3           },           {             "X": -3,            
-        "Y": -3           }         ]       }     ],     "Springs": [       {        
-        "Id": 201,         "Position": {           "X": 5,           "Y": 0        
-        },         "DirectionAngle": 0       },       {         "Id": 202,        
-        "Position": {           "X": -5,           "Y": 0         },         "DirectionAngle":
-        180       }     ]   } ]'
+      _rotatingWheelsJson: "[\n  {\n    \"Id\": 101,\n    \"CenterPosition\": {\n     
+        \"X\": 9,\n      \"Y\": 9\n    },\n    \"RotationSpeed\": 10,\n    \"Walls\":
+        [\n      {\n        \"Id\": 101,\n        \"Position\": {\n          \"X\":
+        0,\n          \"Y\": 0\n        },\n        \"Points\": [\n          {\n           
+        \"X\": -20,\n            \"Y\": 0.5\n          },\n          {\n           
+        \"X\": 20,\n            \"Y\": 0.5\n          },\n          {\n           
+        \"X\": 20,\n            \"Y\": -0.5\n          },\n          {\n           
+        \"X\": -20,\n            \"Y\": -0.5\n          }\n        ]\n      }\n   
+        ],\n    \"LavaWalls\": [\n      {\n        \"Id\": 101,\n        \"Points\":
+        [\n          {\n            \"X\": -3,\n            \"Y\": 3\n          },\n         
+        {\n            \"X\": 3,\n            \"Y\": 3\n          },\n          {\n           
+        \"X\": 3,\n            \"Y\": -3\n          },\n          {\n           
+        \"X\": -3,\n            \"Y\": -3\n          }\n        ]\n      }\n    ],\n   
+        \"Springs\": [\n      {\n        \"Id\": 101,\n        \"Position\": {\n         
+        \"X\": 5,\n          \"Y\": 0\n        },\n        \"DirectionAngle\": 0\n     
+        },\n      {\n        \"Id\": 102,\n        \"Position\": {\n          \"X\":
+        -5,\n          \"Y\": 0\n        },\n        \"DirectionAngle\": 180\n     
+        }\n    ],\n    \"TeleportGatePairs\": [\n      {\n        \"Id\": 3,\n       
+        \"GateA\": {\n          \"Id\": 2,\n          \"Position\": {\n           
+        \"X\": 10,\n            \"Y\": 0\n          },\n          \"NormalRotation\":
+        0,\n          \"WorldPosition\": {\n            \"X\": 0,\n            \"Y\":
+        0\n          },\n          \"WorldRotation\": 0\n        },\n        \"GateB\":
+        {\n          \"Id\": 3,\n          \"Position\": {\n            \"X\": -10,\n           
+        \"Y\": 0\n          },\n          \"NormalRotation\": 180,\n          \"WorldPosition\":
+        {\n            \"X\": 0,\n            \"Y\": 0\n          },\n          \"WorldRotation\":
+        0\n        }\n      }\n    ]\n  },\n  {\n    \"Id\": 201,\n    \"CenterPosition\":
+        {\n      \"X\": 9,\n      \"Y\": 9\n    },\n    \"RotationSpeed\": -10,\n   
+        \"Walls\": [\n      {\n        \"Id\": 201,\n        \"Position\": {\n         
+        \"X\": 0,\n          \"Y\": 0\n        },\n        \"Points\": [\n         
+        {\n            \"X\": -20,\n            \"Y\": 0.5\n          },\n         
+        {\n            \"X\": 20,\n            \"Y\": 0.5\n          },\n         
+        {\n            \"X\": 20,\n            \"Y\": -0.5\n          },\n         
+        {\n            \"X\": -20,\n            \"Y\": -0.5\n          }\n       
+        ]\n      }\n    ],\n    \"LavaWalls\": [\n      {\n        \"Id\": 201,\n       
+        \"Points\": [\n          {\n            \"X\": -3,\n            \"Y\": 3\n         
+        },\n          {\n            \"X\": 3,\n            \"Y\": 3\n          },\n         
+        {\n            \"X\": 3,\n            \"Y\": -3\n          },\n         
+        {\n            \"X\": -3,\n            \"Y\": -3\n          }\n        ]\n     
+        }\n    ],\n    \"Springs\": [\n      {\n        \"Id\": 201,\n        \"Position\":
+        {\n          \"X\": 5,\n          \"Y\": 0\n        },\n        \"DirectionAngle\":
+        0\n      },\n      {\n        \"Id\": 202,\n        \"Position\": {\n         
+        \"X\": -5,\n          \"Y\": 0\n        },\n        \"DirectionAngle\": 180\n     
+        }\n    ],\n    \"TeleportGatePairs\": [\n      {\n        \"Id\": 4,\n       
+        \"GateA\": {\n          \"Id\": 4,\n          \"Position\": {\n           
+        \"X\": 0,\n            \"Y\": 10\n          },\n          \"NormalRotation\":
+        45,\n          \"WorldPosition\": {\n            \"X\": 0,\n            \"Y\":
+        0\n          },\n          \"WorldRotation\": 0\n        },\n        \"GateB\":
+        {\n          \"Id\": 5,\n          \"Position\": {\n            \"X\": 0,\n           
+        \"Y\": -10\n          },\n          \"NormalRotation\": 270,\n          \"WorldPosition\":
+        {\n            \"X\": 0,\n            \"Y\": 0\n          },\n          \"WorldRotation\":
+        0\n        }\n      }\n    ]\n  }\n]"
     - _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
         "Y": -28.16       },       {         "X": -43.804464,         "Y": -28.16      

@@ -12,12 +12,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         [SerializeField] private float _animationScale = 1.2f;
         [SerializeField] private float _animationDuration = 0.2f;
         private Vector2 _idleSize;
+        public Transform Transform;
         CancellationTokenSource _bounceAnimationCancellationTokenSource;
 
         public void Setup(Sprite sprite, Vector2 size)
         {
             _renderer.sprite = sprite;
             _idleSize = size;
+            Transform = transform;
             ResetToIdleScale();
         }
 

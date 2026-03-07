@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _simulationStateMachine.InitExitPoint();
             _headLessQuitterController.InitExitPoint();
             
-            _tickService.InitExitPoint(); // must be last this stops the thread
+            _tickService.StopTick(); // must be last this stops the thread
         }
     }
 }

@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -12,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
+        private IEnvironmentTeleportGateControllers _environmentTeleportGateControllers;
 
         public override void ResolveDependencies()
         {
@@ -19,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
+            _environmentTeleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
         }
 
         public void Execute()
@@ -34,10 +37,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 {
                     _environmentWallsControllers.UpdateWallTransform(wallId);
                 }
-                
+
                 foreach (var springId in rotatingWheelModel.SpringIds)
                 {
                     _environmentSpringControllers.UpdateSpringTransform(springId);
+                }
+
+                foreach (var pairId in rotatingWheelModel.TeleportGatePairIds)
+                {
+                    _environmentTeleportGateControllers.UpdateTeleportGateTransform(pairId);
                 }
             }
         }

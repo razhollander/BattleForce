@@ -72,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.Bullets.Clear();
             _matchDataService.SimulationState.PowerUpBalls.Clear();
             _matchDataService.SimulationState.TalentCards.Clear();
+            _matchDataService.EnvironmentData.ClearData();
         }
 
         private void ResetPlayers()
@@ -257,11 +258,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var teleportGatePairConfig in teleportGatePairConfigs)
             {
-                var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size.ToNumericsVector2();
-                _matchDataService.EnvironmentData.AddTeleportGatePair(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateBId, teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position, teleportGatePairConfig.GateB.NormalRotation);
-                _physicsSimulator.AddTeleportGate(teleportGatePairConfig.GateAId, teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, gateSize);
-                _physicsSimulator.AddTeleportGate(teleportGatePairConfig.GateBId, teleportGatePairConfig.GateB.Position, teleportGatePairConfig.GateB.NormalRotation, gateSize);
+                AddTeleportGatePairToEnvironment(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateBId, Vector2.Zero, 0, Vector2.Zero, 0,
+                    teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position,
+                    teleportGatePairConfig.GateB.NormalRotation);
             }
+        }
+        
+        private void AddTeleportGatePairToEnvironment(ushort teleportPairId, ushort gateAId, ushort gateBId, Vector2 gateAPosition, float gateANormalRotation, Vector2 gateBPosition,
+            float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation)
+        {
+            var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size.ToNumericsVector2();
+            _matchDataService.EnvironmentData.AddTeleportGatePair(teleportPairId, gateAId, gateBId, gateAPosition, gateANormalRotation, gateBPosition, gateBNormalRotation,
+                gateAWorldPosition, gateAWorldRotation, gateBWorldPosition, gateBWorldRotation);
+            _physicsSimulator.AddTeleportGate(gateAId, gateAWorldPosition, gateAWorldRotation, gateSize);
+            _physicsSimulator.AddTeleportGate(gateBId, gateBWorldPosition, gateBWorldRotation, gateSize);
         }
 
         private void CreateRotatingWheels()
@@ -322,6 +332,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         var springId = springConfig.Id;
                         AddSpringToEnvironment(springId, springConfig.Position, worldPosition, springConfig.RotationAngle, worldRotation);
                         rotatingWheel.AddSpring(springId);
+                    }
+                }
+
+                if (!wheelConfig.TeleportGatePairs.IsNullOrEmpty())
+                {
+                    foreach (var teleportPairConfig in wheelConfig.TeleportGatePairs)
+                    {
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            currentTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateA.Position, teleportPairConfig.GateA.NormalRotation,
+                            out var worldPositionA, out var worldRotationA);
+
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            currentTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateB.Position, teleportPairConfig.GateB.NormalRotation,
+                            out var worldPositionB, out var worldRotationB);
+
+                        var pairId = teleportPairConfig.Id;
+                        AddTeleportGatePairToEnvironment(pairId,
+                            teleportPairConfig.GateAId,
+                            teleportPairConfig.GateBId,
+                            teleportPairConfig.GateA.Position,
+                            teleportPairConfig.GateA.NormalRotation,
+                            teleportPairConfig.GateB.Position,
+                            teleportPairConfig.GateB.NormalRotation,
+                            worldPositionA,
+                            worldRotationA,
+                            worldPositionB,
+                            worldRotationB);
+                        rotatingWheel.AddTeleportGatePair(pairId);
                     }
                 }
             }

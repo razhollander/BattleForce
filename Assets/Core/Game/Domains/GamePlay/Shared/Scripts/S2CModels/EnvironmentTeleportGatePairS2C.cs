@@ -1,5 +1,4 @@
 using System;
-using System.Numerics;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 {
@@ -18,7 +17,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
     public struct EnvironmentTeleportGateS2C
     {
         public int Id;
-        public Vector2 Position;
-        public float NormalRotation;
+        public EnvironmentTransformS2C Transform;
     }
 }

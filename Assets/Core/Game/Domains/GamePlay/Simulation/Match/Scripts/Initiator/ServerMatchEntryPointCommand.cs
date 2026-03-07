@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHan
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
@@ -22,18 +23,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private IMatchPlayerJoinPacketsHandler _matchPlayerJoinPacketsHandler;
         private ITickProcessor _tickProcessor;
         private IMatchPlayerInputsPacketsHandler _playerInputsPacketsHandler;
-        private IPhysicsSimulator _physicsSimulator;
-        private SimulationGamePlayConfig _simulationGamePlayConfig;
         private IMatchDataService _matchDataService;
         private IPlaybackRecorderService _playbackRecorderService;
         private IPlayersTalentsManager _playersTalentsManager;
         private IServerNetworkManager _networkManager;
         private SimulationGamePlayConfig _gamePlayConfig;
-        private INetEventsDataService _netEventsDataService;
         private ITickService _tickService;
         private ICommandFactory _commandFactory;
         private NetworkConfig _networkConfig;
         private IStageDataService _stageDataService;
+        private ISimulationInputService _simulationInputService;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -48,32 +47,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _matchPlayerJoinPacketsHandler = _diContainer.Resolve<IMatchPlayerJoinPacketsHandler>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _playerInputsPacketsHandler = _diContainer.Resolve<IMatchPlayerInputsPacketsHandler>();
-            _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
-            _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _networkManager = _diContainer.Resolve<IServerNetworkManager>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
-            _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _tickService = _diContainer.Resolve<ITickService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
+            _simulationInputService = _diContainer.Resolve<ISimulationInputService>();
         }
 
         public void Execute()
         {
             InitRNG();
-            InitTickService();
+            SetCurrentTickIfPlayback();
             _playerInputsPacketsHandler.InitEntryPoint();
             _matchPlayerJoinPacketsHandler.InitEntryPoint();
+            TrySwitchToPlayback();
+
             InitPlayers(_simulationMatchEnterData);
             _stageDataService.InitEntryPoint();
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
-
-            TrySwitchToPlayback();
-            
             _tickProcessor.InitEntryPoint();
         }
 
@@ -91,7 +87,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             }
         }
 
-        private void InitTickService()
+        private void SetCurrentTickIfPlayback()
         {
             if (_playbackRecorderService.IsPlaybackEnabled)
             {
@@ -131,6 +127,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 var isPlayerConnected = _networkManager.IsPlayerPeerConencted(playerId);
                 _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown, isPlayerConnected);
                 _playersTalentsManager.AddPlayer(playerId);
+                _simulationInputService.AddPlayer(playerId);
             }
         }
     }

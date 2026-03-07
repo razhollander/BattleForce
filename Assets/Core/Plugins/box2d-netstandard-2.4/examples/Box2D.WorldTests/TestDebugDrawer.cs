@@ -17,7 +17,7 @@ namespace Box2D.WorldTests
             Quaternion rot = Quaternion.Euler(0f, 0f, angle * Mathf.Rad2Deg);
 
             Gizmos.color = Color.red;
-            Gizmos.DrawLine(p, p + rot * UnityEngine.Vector3.right * 0.5f * scale);
+            Gizmos.DrawLine(p, p + rot * Vector3.right * 0.5f * scale);
 
             Gizmos.color = Color.green;
             Gizmos.DrawLine(p, p + rot * Vector3.up * 0.5f * scale);
@@ -25,14 +25,14 @@ namespace Box2D.WorldTests
 
         public override void DrawPoint(in System.Numerics.Vector2 position, float size, in Box2D.NetStandard.Dynamics.World.Color color)
         {
-            Gizmos.color = new UnityEngine.Color(color.R, color.G, color.B, color.A);
+            Gizmos.color = new Color(color.R, color.G, color.B, color.A);
             Vector3 p = new Vector3(position.X, position.Y, 0f) * scale;
             Gizmos.DrawSphere(p, size * scale * 0.1f);
         }
 
-        public override void DrawPolygon(in Box2D.NetStandard.Common.Vec2[] vertices, int vertexCount, in Box2D.NetStandard.Dynamics.World.Color color)
+        public override void DrawPolygon(in Vec2[] vertices, int vertexCount, in Box2D.NetStandard.Dynamics.World.Color color)
         {
-            Gizmos.color = new UnityEngine.Color(color.R, color.G, color.B, color.A);
+            Gizmos.color = new Color(color.R, color.G, color.B, color.A);
 
             for (int i = 0; i < vertexCount; i++)
             {
@@ -42,9 +42,9 @@ namespace Box2D.WorldTests
             }
         }
 
-        public override void DrawSolidPolygon(in Box2D.NetStandard.Common.Vec2[] vertices, int vertexCount, in Box2D.NetStandard.Dynamics.World.Color color)
+        public override void DrawSolidPolygon(in Vec2[] vertices, int vertexCount, in Box2D.NetStandard.Dynamics.World.Color color)
         {
-            UnityEngine.Color fill = new UnityEngine.Color(color.R, color.G, color.B, 0.25f);
+            Color fill = new Color(color.R, color.G, color.B, 0.25f);
             Gizmos.color = fill;
 
             Vector3 center = Vector3.zero;
@@ -62,9 +62,9 @@ namespace Box2D.WorldTests
             }
         }
 
-        public override void DrawCircle(in Box2D.NetStandard.Common.Vec2 center, float radius, in Box2D.NetStandard.Dynamics.World.Color color)
+        public override void DrawCircle(in Vec2 center, float radius, in Box2D.NetStandard.Dynamics.World.Color color)
         {
-            Gizmos.color = new UnityEngine.Color(color.R, color.G, color.B, color.A);
+            Gizmos.color = new Color(color.R, color.G, color.B, color.A);
 
             Vector3 c = new Vector3(center.X, center.Y, 0f) * scale;
             float r = radius * scale;
@@ -80,11 +80,11 @@ namespace Box2D.WorldTests
             }
         }
 
-        public override void DrawSolidCircle(in Box2D.NetStandard.Common.Vec2 center, float radius, in Box2D.NetStandard.Common.Vec2 axis, in Box2D.NetStandard.Dynamics.World.Color color)
+        public override void DrawSolidCircle(in Vec2 center, float radius, in Vec2 axis, in Box2D.NetStandard.Dynamics.World.Color color)
         {
             DrawCircle(center, radius, color);
 
-            Gizmos.color = new UnityEngine.Color(color.R, color.G, color.B, color.A);
+            Gizmos.color = new Color(color.R, color.G, color.B, color.A);
 
             Vector3 c = new Vector3(center.X, center.Y, 0f) * scale;
             float r = radius * scale;
@@ -93,9 +93,9 @@ namespace Box2D.WorldTests
             Gizmos.DrawLine(c, c + axisDir * r);
         }
 
-        public override void DrawSegment(in Box2D.NetStandard.Common.Vec2 p1, in Box2D.NetStandard.Common.Vec2 p2, in Box2D.NetStandard.Dynamics.World.Color color)
+        public override void DrawSegment(in Vec2 p1, in Vec2 p2, in Box2D.NetStandard.Dynamics.World.Color color)
         {
-            Gizmos.color = new UnityEngine.Color(color.R, color.G, color.B, color.A);
+            Gizmos.color = new Color(color.R, color.G, color.B, color.A);
 
             Vector3 a = new Vector3(p1.X, p1.Y, 0f) * scale;
             Vector3 b = new Vector3(p2.X, p2.Y, 0f) * scale;

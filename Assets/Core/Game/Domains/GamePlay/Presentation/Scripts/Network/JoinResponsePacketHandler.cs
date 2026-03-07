@@ -6,15 +6,6 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 {
-    public interface IJoinResponsePacketHandler
-    {
-        bool DidReceiveJoinResponse { get; }
-        JoinResponsePacketS2C JoinResponse { get; }
-        void InitEntryPoint();
-        void InitExitPoint();
-        void Reset();
-    }
-
     public class JoinResponsePacketHandler : IPacketsObserver, IJoinResponsePacketHandler
     {
         private readonly NetworkConfig _networkConfig;
@@ -23,6 +14,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         
         public bool DidReceiveJoinResponse => JoinResponse != null;
         public JoinResponsePacketS2C JoinResponse { get; private set; }
+
+        public PacketTypeS2C PacketType => PacketTypeS2C.JoinResponse;
 
         public JoinResponsePacketHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager)
         {
@@ -35,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         {
             _networkManager.RegisterPacketsObserver(this);
         }
-        
+
         public void InitExitPoint()
         {
             _networkManager.UnregisterPacketsObserver(this);
@@ -46,8 +39,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             JoinResponse = null;
         }
 
-        public PacketTypeS2C PacketType => PacketTypeS2C.JoinResponse;
-        
         public void OnPacketReceived(NetDataReader reader)
         {
             JoinResponse = new JoinResponsePacketS2C(_networkConfig.MaxCap, _sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, _sharedGamePlayConfig.MaxTeamsAmount);

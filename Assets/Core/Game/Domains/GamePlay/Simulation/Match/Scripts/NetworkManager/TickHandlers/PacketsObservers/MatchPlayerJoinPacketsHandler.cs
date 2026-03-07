@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
@@ -67,15 +68,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     _simulationInputService.AddPlayer(playerId);
                     _networkManager.AddPlayerPeer(playerId, peer);
                     _netEventsDataService.StartSavingPlayerEvents(playerId);
-                    _netEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, existingPlayerState, _matchDataService.SimulationState);
-                    _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);
+                    var nw = new NetDataWriter(true);
+                    var nr = new NetDataReader();
+                    existingPlayerState.Serialize(nw);
+                    nr.SetSource(nw);
+                    var playerStateCopy = new PlayerStateS2C(3);
+                    playerStateCopy.Deserialize(nr);
+                    _netEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, playerStateCopy, _matchDataService.SimulationState);
                 }
                 else
                 {
                     joinResponse.IsSuccess = false;
-                    _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);
                 }
-                
+                _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);
+
                 LogService.LogTopic("Processed player rejoined: " + playerName, LogTopicType.ServerNetwork);
             }
 

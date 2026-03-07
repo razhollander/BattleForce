@@ -7,7 +7,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Utils
     {
         public static float CalculateRotationDuringTick(int tick, float rotationSpeed, float deltaTime)
         {
-            return rotationSpeed * tick * deltaTime;
+            // Use double to maintain precision for large tick values (e.g., > 16 million)
+            // and normalize the angle to avoid large float values in subsequent calculations.
+            double totalRotation = (double)tick * rotationSpeed * deltaTime;
+            return (float)(totalRotation % 360.0);
         }
 
         public static void CalculateChildTransform(
@@ -22,7 +25,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Utils
         {
             var angleDegrees = CalculateRotationDuringTick(tick, rotationSpeed, deltaTime);
             newPosition = initialChildLocalPosition.Rotate(angleDegrees) + wheelCenter;
-            newRotation = initialChildLocalRotatingDegrees + angleDegrees;
+
+            // Normalize the final rotation as well to keep it within bounds
+            newRotation = (initialChildLocalRotatingDegrees + angleDegrees) % 360f;
         }
     }
 }

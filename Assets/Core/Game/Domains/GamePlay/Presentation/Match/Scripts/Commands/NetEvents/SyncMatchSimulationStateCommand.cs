@@ -145,7 +145,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var teleportGatePairConfig in teleportGatePairConfigs)
             {
                 var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size;
-                _matchDataService.AddTeleportPair(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateBId, teleportGatePairConfig.GateB.Position, teleportGatePairConfig.GateB.NormalRotation, gateSize.ToNumericsVector2());
+                _matchDataService.AddTeleportPair(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateBId, teleportGatePairConfig.GateB.Position, teleportGatePairConfig.GateB.NormalRotation, teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position, teleportGatePairConfig.GateB.NormalRotation, gateSize.ToNumericsVector2());
                 _teleportGateControllers.CreateGatePair(teleportGatePairConfig.Id);
             }
         }
@@ -271,6 +271,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                         _matchDataService.AddSpring(springConfig.Id, springConfig.Position, worldPosition, springConfig.RotationAngle, worldRotation);
                         _environmentSpringControllers.CreateSpring(springConfig.Id);
+                    }
+                }
+
+                if (wheelConfig.TeleportGatePairs != null)
+                {
+                    foreach (var teleportPairConfig in wheelConfig.TeleportGatePairs)
+                    {
+                        var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size;
+
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            lastProcessedTickFromServer, rotationSpeed, deltaTime, wheelConfig.CenterPosition, teleportPairConfig.GateA.Position, teleportPairConfig.GateA.NormalRotation,
+                            out var worldPositionA, out var worldRotationA
+                        );
+
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            lastProcessedTickFromServer, rotationSpeed, deltaTime, wheelConfig.CenterPosition, teleportPairConfig.GateB.Position, teleportPairConfig.GateB.NormalRotation,
+                            out var worldPositionB, out var worldRotationB
+                        );
+
+                        _matchDataService.AddTeleportPair(teleportPairConfig.Id, teleportPairConfig.GateAId, teleportPairConfig.GateA.Position, teleportPairConfig.GateA.NormalRotation, teleportPairConfig.GateBId, teleportPairConfig.GateB.Position, teleportPairConfig.GateB.NormalRotation, worldPositionA, worldRotationA, worldPositionB, worldRotationB, gateSize.ToNumericsVector2());
+                        _teleportGateControllers.CreateGatePair(teleportPairConfig.Id);
                     }
                 }
             }

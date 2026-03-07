@@ -133,15 +133,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             return _walls.FindWithId(wallId);
         }
 
-        public void AddTeleportGatePair(ushort teleportPairId, ushort gateAId, ushort gateBId, Vector2 gateAPosition, float gateANormalRotation, Vector2 gateBPosition, float gateBNormalRotation)
+        public void AddTeleportGatePair(ushort teleportPairId, ushort gateAId, ushort gateBId, Vector2 gateAPosition, float gateANormalRotation, Vector2 gateBPosition,
+            float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation)
+
         {
             var teleportGatePair = _teleportGates.AddAndGet();
             teleportGatePair.Id = teleportPairId;
-            teleportGatePair.GateA.NormalRotation = gateANormalRotation;
-            teleportGatePair.GateA.Position = gateAPosition;
+            teleportGatePair.GateA.Transform.LocalRotationDegrees = gateANormalRotation;
+            teleportGatePair.GateA.Transform.LocalPosition = gateAPosition;
+            teleportGatePair.GateA.Transform.WorldPosition = gateAWorldPosition;
+            teleportGatePair.GateA.Transform.WorldRotationDegrees = gateAWorldRotation;
             teleportGatePair.GateA.Id = gateAId;
-            teleportGatePair.GateB.NormalRotation = gateBNormalRotation;
-            teleportGatePair.GateB.Position = gateBPosition;
+            teleportGatePair.GateB.Transform.LocalRotationDegrees = gateBNormalRotation;
+            teleportGatePair.GateB.Transform.LocalPosition = gateBPosition;
+            teleportGatePair.GateB.Transform.WorldPosition = gateBWorldPosition;
+            teleportGatePair.GateB.Transform.WorldRotationDegrees = gateBWorldRotation;
             teleportGatePair.GateB.Id = gateBId;
         }
     }
