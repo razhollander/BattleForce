@@ -345,7 +345,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 }
             }
 
-            throw new System.Exception($"No talent card for id {powerUpBallId}!");
+            throw new System.Exception($"No power ball for id {powerUpBallId}!");
         }
         
         public bool TryGetPowerUpBallIndexById(ushort powerUpBallId, out int powerUpBallIndex)

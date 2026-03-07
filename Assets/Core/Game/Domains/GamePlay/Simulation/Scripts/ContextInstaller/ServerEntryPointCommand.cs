@@ -11,7 +11,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
 {
-    public class ServerEntryPointCommand : BaseCommand, ICommandVoid
+    public class ServerEntryPointCommand : BaseCommand, ICommandVoid, ITickObserver
     {
         private IServerNetworkManager _serverNetworkManager;
         private IPhysicsSimulator _physicsSimulator;
@@ -37,12 +37,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         }
 
         public void Execute()
+        { 
+            _simulationPersistentData.InitEntryPoint();
+            _tickService.StartTick();
+            _tickService.RegisterObserver(this);
+        }
+
+        public void OnTick(int currentTick)
+        {
+            Init();
+        }
+
+        private void Init()
         {
             _playbackRecorderService.InitEntryPoint(_serverInitiatorEnterData.IsPlaybackEnabled, _serverInitiatorEnterData.PlaybackFileName);
             _physicsSimulator.InitEntryPoint();
             _simulationStateMachine.InitEntryPoint();
-            _tickService.InitEntryPoint();
-            _simulationPersistentData.InitEntryPoint();
             _headLessQuitterController.InitEntryPoint();
 
             if (_playbackRecorderService.IsPlaybackEnabled)
@@ -50,7 +60,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
                 var matchEnterData = new SimulationMatchEnterData(_playbackRecorderService.Players);
                 _simulationStateMachine.ChangeToMatch(matchEnterData);
             }
-            else if (PlayerPrefsSettings.ShouldSkipMatchMaking)
+            else if (_simulationPersistentData.ShouldSkipMatchMaking)
             {
                 _simulationStateMachine.ChangeToMatch(_defaultMatchEnterDataConfig.DefaultSimulationMatchEnterData);
             }
@@ -60,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             }
             
             _serverNetworkManager.InitEntryPoint(_serverInitiatorEnterData.Port);
+            _tickService.UnregisterObserver(this);
         }
 
         public ServerEntryPointCommand SetEnterData(ServerInitiatorEnterData serverInitiatorEnterData)

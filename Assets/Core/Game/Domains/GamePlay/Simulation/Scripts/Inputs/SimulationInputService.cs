@@ -16,10 +16,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
 
         public void AddPlayer(ushort playerId)
         {
+            if (_inputStatesPerPlayer.ContainsKey(playerId))
+            {
+                return;
+            }
+
             var playerInputStates = new PlayerInputStates();
             _inputStatesPerPlayer.Add(playerId, playerInputStates);
         }
-        
+
         public void SetPlayerInput(ushort playerId, PlayerInputType inputType, bool isPressed)
         {
             if (!_inputStatesPerPlayer.TryGetValue(playerId, out var inputStates))

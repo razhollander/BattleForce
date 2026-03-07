@@ -78,7 +78,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                 if (isPlayerAlreadyInMatch || isMaxPlayers)
                 {
                     joinResponse.IsSuccess = false;
-                    _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);
                 }
                 else
                 {
@@ -98,8 +97,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                     _networkManager.AddPlayerPeer(playerId, peer);
                     _netEventsDataService.StartSavingPlayerEvents(playerId);
                     _netEventsDataService.AddMatchMakingPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);
-                    _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);
                 }
+                
+                _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);
                 
                 LogService.LogTopic("Processed player joined: "+playerName, LogTopicType.ServerNetwork);
             }
