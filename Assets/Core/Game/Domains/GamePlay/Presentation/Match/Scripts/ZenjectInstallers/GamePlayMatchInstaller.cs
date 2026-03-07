@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
@@ -44,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private TeamsBoardContainerView _teamsBoardContainerView;
         [SerializeField] private GainBoltEffectView gainBoltEffectViewPrefab;
         [SerializeField] private PlayerTeleportEffectView playerTeleportEffectViewPrefab;
+        [SerializeField] private EnvironmentFieldBarrierView _environmentFieldBarrierViewPrefab;
 
         public override void InstallBindings()
         {
@@ -78,6 +80,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<GainBoltEffectController>().AsSingle().WithArguments(gainBoltEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentTeleportGateControllers>().AsSingle().WithArguments(_environmentTeleportGateViewPrefab).NonLazy();
             Container.BindInterfacesTo<PlayerTeleportEffectController>().AsSingle().WithArguments(playerTeleportEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<EnvironmentFieldBarrierControllers>().AsSingle().WithArguments(_environmentFieldBarrierViewPrefab).NonLazy();
         }
     }
 }

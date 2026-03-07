@@ -24,5 +24,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<GainBoltsNetEventS2C> GainBoltsNetEvents { get; set; }
         List<EnvironmentSpringPlayerCollisionNetEventS2C> EnvironmentSpringPlayerCollisionNetEvents { get; set; }
         List<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> PlayerToEnvironmentTeleportGateCollisionNetEvents { get; set; }
+        List<PreparationPhaseEndedNetEventS2C> PreparationPhaseEndedNetEvents { get; set; }
     }
 }
