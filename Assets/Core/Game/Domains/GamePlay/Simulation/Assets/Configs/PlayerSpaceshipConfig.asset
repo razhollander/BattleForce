@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e86b0b155d584114940d1f5769902cd0, type: 3}
   m_Name: PlayerSpaceshipConfig
   m_EditorClassIdentifier: 
-  StartHealth: 5
+  StartHealth: 1
   TargetMovementSpeed: 5
   RotationSpeed: 150
   ShootCooldown: 0.7

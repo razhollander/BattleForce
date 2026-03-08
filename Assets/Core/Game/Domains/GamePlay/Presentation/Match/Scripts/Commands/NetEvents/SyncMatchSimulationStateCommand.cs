@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
@@ -120,20 +121,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
-            var teamIds = new System.Collections.Generic.List<ushort>(_matchDataService.TeamIds);
+            var teamIds = new List<ushort>(_matchDataService.TeamIds);
             teamIds.Sort();
-
-            int barrierIndex = 0;
+            ushort barrierIndex = 0;
             foreach (var teamId in teamIds)
             {
-                if (barrierIndex >= barrierConfigs.Length)
-                {
-                    break;
-                }
-
-                var config = barrierConfigs[barrierIndex];
-                _matchDataService.AddFieldBarrier((ushort)barrierIndex, teamId, config.Position, config.Size, config.Shape);
-                _environmentFieldBarrierControllers.CreateFieldBarrier((ushort)barrierIndex);
+                var barrierConfig = barrierConfigs[barrierIndex];
+                _matchDataService.AddFieldBarrier(barrierIndex, teamId, barrierConfig.Position, barrierConfig.Size, barrierConfig.Shape);
+                _environmentFieldBarrierControllers.CreateFieldBarrier(barrierIndex);
                 barrierIndex++;
             }
         }

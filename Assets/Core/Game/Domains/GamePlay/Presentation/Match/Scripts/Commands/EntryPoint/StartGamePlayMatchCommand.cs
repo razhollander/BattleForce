@@ -1,5 +1,6 @@
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
@@ -44,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IGainBoltEffectController _gainBoltEffectController;
         private IPlayerTeleportEffectController _playerTeleportEffectController;
         private IEnvironmentTeleportGateControllers _environmentTeleportGateControllers;
+        private IEnvironmentFieldBarrierControllers _environmentFieldBarrierControllers;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -71,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _gainBoltEffectController = _diContainer.Resolve<IGainBoltEffectController>();
             _playerTeleportEffectController = _diContainer.Resolve<IPlayerTeleportEffectController>();
             _environmentTeleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
+            _environmentFieldBarrierControllers = _diContainer.Resolve<IEnvironmentFieldBarrierControllers>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -79,6 +82,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _startStagePacketHandler.InitEntryPoint();
             _talentCardControllers.InitEntryPoint();
             _environmentLavaWallsControllers.InitEntryPoint();
+            _environmentFieldBarrierControllers.InitEntryPoint();
             _talentCardObtainedEffectController.InitEntryPoint();
             _powerUpBallControllers.InitEntryPoint();
             _powerUpBallObtainedEffectController.InitEntryPoint();

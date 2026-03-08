@@ -2,8 +2,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Fie
 {
     public interface IEnvironmentFieldBarrierControllers
     {
+        void InitEntryPoint();
         void CreateFieldBarrier(ushort id);
         void DestroyAll();
-        void HideAll();
     }
 }

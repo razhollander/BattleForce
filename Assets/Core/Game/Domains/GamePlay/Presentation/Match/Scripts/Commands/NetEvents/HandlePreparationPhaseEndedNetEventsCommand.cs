@@ -24,8 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
-            _environmentFieldBarrierControllers.HideAll();
-
+            _environmentFieldBarrierControllers.DestroyAll();
             events.Clear();
         }
     }

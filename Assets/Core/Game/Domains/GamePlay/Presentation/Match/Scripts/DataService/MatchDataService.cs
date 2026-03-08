@@ -243,7 +243,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 
         public MatchEnvironmentFieldBarrierModel GetFieldBarrier(ushort id)
         {
-            return FieldBarriers.Find(x => x.Id == id);
+            var fieldBarrier = FieldBarriers.Find(x => x.Id == id);
+            if (fieldBarrier == null)
+            {
+                LogService.LogError($"Couldn't find field barrier with id {id}");
+            }
+            
+            return fieldBarrier;
         }
     }
 }

@@ -19,14 +19,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Fie
             _fieldBarrierViewPrefab = fieldBarrierViewPrefab;
             _gamePlayConfig = gamePlayConfig;
         }
+        
+        public void InitEntryPoint()
+        {
+            _parent = new GameObject("EnvironmentFieldBarriersParent");
+        }
 
         public void CreateFieldBarrier(ushort id)
         {
-            if (_parent == null)
-            {
-                _parent = new GameObject("EnvironmentFieldBarriersParent");
-            }
-
             var controller = new EnvironmentFieldBarrierController(id, _matchDataService, _gamePlayConfig);
             controller.CreateView(_fieldBarrierViewPrefab, _parent.transform);
             _controllers.Add(controller);
@@ -39,17 +39,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Fie
                 controller.Destroy();
             }
             _controllers.Clear();
-
-            if (_parent != null)
-            {
-                Object.Destroy(_parent);
-                _parent = null;
-            }
-        }
-
-        public void HideAll()
-        {
-            DestroyAll();
         }
     }
 }

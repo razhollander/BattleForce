@@ -1,5 +1,4 @@
 using ASoliman.Utils.EditableRefs;
-using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
 using UnityEngine;
 
@@ -13,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
         [EditableRef] public TalentCardsConfig TalentCards;
         [EditableRef] public TeamFloorConfig TeamFloor;
         [EditableRef] public EnvironmentTeleportConfig Teleports;
+        [EditableRef] public EnvironmentFieldBarriersConfig FieldBarriers;
         public SerializableDictionary<int, Color> ColorPerTeamId;
     }
 }
