@@ -52,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var teamId = _matchDataService.SimulationState.GetPlayerById(playerId).TeamId;
                 var barrier = GetBarrierForTeam(teamId);
 
-                if (!barrier.IsPointInsideBarrier(bullet.Position))
+                if (!barrier.IsCircleInsideBarrier(bullet.Position, bullet.Radius))
                 {
                     DestroyBullet(ref bullet);
                 }
@@ -70,26 +70,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void EnforcePlayerBarrier(PlayerStateS2C player, MatchEnvironmentFieldBarrierModel barrier)
         {
-            var position = player.Spaceship.Transform.Position;
-            // if (IsPointInsideBarrier(position, barrier)) return;
-
+            var playerPosition = player.Spaceship.Transform.Position;
+            var playerRadius = player.Spaceship.Transform.Radius;
+            
             switch (barrier.Shape)
             {
                 case FieldBarrierShape.Circle:
                 {
-                    var playerRadius = player.Spaceship.Transform.Radius;
-                
-                    var center = barrier.Position;
+                    var barrierPosition = barrier.Position;
                     var barrierRadius = barrier.Size.X;
-                    var maxAllowedDistance = barrierRadius - playerRadius;
-                    var direction = position - center;
-                    var distanceSquared = direction.LengthSquared();
-
+                    var maxAllowedDistance = Math.Max(0, barrierRadius - playerRadius); // Math.Max prevents negative distance if the barrier shrinks smaller than the player
+                    var offsetVector = playerPosition - barrierPosition;
+                    var distanceSquared = offsetVector.LengthSquared();
                     var isPlayerOutsideBarrier = distanceSquared > maxAllowedDistance * maxAllowedDistance;
-
                     if (isPlayerOutsideBarrier)
                     {
-                        player.Spaceship.Transform.Position = center + Vector2.Normalize(direction) * maxAllowedDistance;
+                        player.Spaceship.Transform.Position = barrierPosition + Vector2.Normalize(offsetVector) * maxAllowedDistance;
                     }
 
                     break;
@@ -98,12 +94,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     var center = barrier.Position;
                     var halfSize = barrier.Size * 0.5f;
-                    var min = center - halfSize;
-                    var max = center + halfSize;
+                    
+                    var safeHalfWidth = Math.Max(0, halfSize.X - playerRadius); // Ensure min and max don't cross over if the barrier gets extremely small. 
+                    var safeHalfHeight = Math.Max(0, halfSize.Y - playerRadius);
 
-                    var clampedX = Math.Clamp(position.X, min.X, max.X);
-                    var clampedY = Math.Clamp(position.Y, min.Y, max.Y);
-                    player.Spaceship.Transform.Position = new Vector2(clampedX, clampedY);
+                    var minX = center.X - safeHalfWidth;
+                    var maxX = center.X + safeHalfWidth;
+                    var minY = center.Y - safeHalfHeight;
+                    var maxY = center.Y + safeHalfHeight;
+                    
+                    var isOutsideX = playerPosition.X < minX || playerPosition.X > maxX;
+                    var isOutsideY = playerPosition.Y < minY || playerPosition.Y > maxY;
+                    var isPlayerOutSideOfBarrier = isOutsideX || isOutsideY;
+                    
+                    if (isPlayerOutSideOfBarrier)
+                    {
+                        var clampedX = Math.Clamp(playerPosition.X, minX, maxX);
+                        var clampedY = Math.Clamp(playerPosition.Y, minY, maxY);
+                        player.Spaceship.Transform.Position = new Vector2(clampedX, clampedY);
+                    }
 
                     break;
                 }
