@@ -98,7 +98,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             barrier.Size = size;
             barrier.Shape = shape;
         }
-        
+
+        public void RemoveAllFieldBarriers()
+        {
+            _fieldBarriers.Clear();
+        }
         
         public EnvironmentTeleportGatePairS2C GetTeleportGatePairOfGate(ushort teleportGateId)
         {

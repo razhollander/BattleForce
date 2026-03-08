@@ -14,14 +14,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public MatchEnvironmentFieldBarrierModel()
         {
         }
-
-        public MatchEnvironmentFieldBarrierModel(ushort id, ushort teamId, Vector2 position, Vector2 size, FieldBarrierShape shape)
+        
+        public bool IsPointInsideBarrier(Vector2 point)
         {
-            Id = id;
-            TeamId = teamId;
-            Position = position;
-            Size = size;
-            Shape = shape;
+            switch (Shape)
+            {
+                case FieldBarrierShape.Circle:
+                {
+                    var center = Position;
+                    var radius = Size.X;
+                    return Vector2.DistanceSquared(point, center) <= radius * radius;
+                }
+                case FieldBarrierShape.Rectangle:
+                {
+                    var center = Position;
+                    var halfSize = Size * 0.5f;
+                    var min = center - halfSize;
+                    var max = center + halfSize;
+                    return point.X >= min.X && point.X <= max.X && point.Y >= min.Y && point.Y <= max.Y;
+                }
+                default:
+                    return false;
+            }
         }
     }
 }

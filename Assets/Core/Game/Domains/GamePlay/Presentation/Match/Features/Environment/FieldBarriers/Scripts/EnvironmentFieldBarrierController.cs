@@ -1,14 +1,9 @@
-using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.LayerOrders;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
-using Core.Scripts.Utils;
-using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts
 {

@@ -398,7 +398,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var playerToEnvironmentTeleportGateCollisionList = PlayerToEnvironmentTeleportGateCollisionNetEventsPerPlayer[playerId];
             playerToEnvironmentTeleportGateCollisionList.Clear();
             _playerToEnvironmentTeleportGateCollisionListPool.Return(playerToEnvironmentTeleportGateCollisionList);
-
             var preparationPhaseEndedList = PreparationPhaseEndedNetEventsPerPlayer[playerId];
             preparationPhaseEndedList.Clear();
             _preparationPhaseEndedListPool.Return(preparationPhaseEndedList);

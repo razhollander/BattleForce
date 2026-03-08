@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using CoreDomain.Scripts.Services.CommandFactory;
 using System;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
@@ -32,81 +33,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public void Execute()
         {
             var barriers = _matchDataService.EnvironmentData.FieldBarriers;
-            if (barriers.Count == 0) return;
-
-            // Enforce Players
+            if (barriers.IsEmpty)
+            {
+                return;
+            }
+            
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
-                if (!player.Spaceship.IsAlive) continue;
-
                 var barrier = GetBarrierForTeam(player.TeamId);
-                if (barrier == null) continue;
-
                 EnforcePlayerBarrier(player, barrier);
             }
-
-            // Enforce Bullets
+            
             var bullets = _matchDataService.SimulationState.Bullets;
             for (int i = bullets.Count - 1; i >= 0; i--)
             {
                 ref var bullet = ref bullets.GetByIndex(i);
-
-                // Assuming player exists if bullet exists. If not, we might skip enforcement or just destroy.
-                // But we need TeamID.
-                // Bullet has BelongToPlayerId.
-                // We can iterate players to find team.
-
-                // Optimize: Map PlayerId -> TeamId? Or just lookup.
-                // SimulationState.GetPlayerById throws if not found? No, it returns reference or default?
-                // SimulationState.Players.FindWithId returns reference.
-                // If player disconnected, they might be removed?
-                // MatchSimulationStateS2C.Players is FixedUnorderedList.
-                // If player is removed, bullet should probably be destroyed anyway, but let's see.
-
-                // If TryGetPlayerById fails, we skip enforcement (or destroy).
-                // Existing code:
-                /*
-                public PlayerStateS2C GetPlayerById(ushort playerId)
-                {
-                    return Players.FindWithId(playerId);
-                }
-                */
-                // FindWithId usually iterates.
-
-                // Let's try get player.
-                // We should check if player exists.
-                // FixedUnorderedList doesn't have TryFindWithId easily exposed without iteration.
-                // But GetPlayerById might throw or return null/default if not found?
-                // Based on `ProcessCachedCollisionsCommand`, it seems safe to assume player exists or we handle it.
-                // But wait, if player disconnects, are they removed from SimulationState immediately?
-                // If so, we can't find team.
-                // If we can't find team, we can't enforce barrier.
-                // Maybe destroy bullet if player not found?
-
-                // I'll iterate players manually to avoid exception if GetPlayerById throws.
                 var playerId = bullet.BelongToPlayerId;
-                ushort teamId = 0;
-                bool playerFound = false;
-
-                foreach(var p in _matchDataService.SimulationState.Players.AsSpan())
-                {
-                    if (p.Id == playerId)
-                    {
-                        teamId = p.TeamId;
-                        playerFound = true;
-                        break;
-                    }
-                }
-
-                if (!playerFound) continue; // Skip if player not found (bullet might be orphaned, logic elsewhere handles it or it stays).
-
+                var teamId = _matchDataService.SimulationState.GetPlayerById(playerId).TeamId;
                 var barrier = GetBarrierForTeam(teamId);
-                if (barrier == null) continue;
 
-                if (!IsPointInsideBarrier(bullet.Position, barrier))
+                if (!barrier.IsPointInsideBarrier(bullet.Position))
                 {
                     DestroyBullet(ref bullet);
-                    bullets.RemoveAt(i);
                 }
             }
         }
@@ -120,74 +68,54 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             return null;
         }
 
-        private void EnforcePlayerBarrier(Core.Game.Domains.GamePlay.Shared.S2CModels.PlayerStateS2C player, MatchEnvironmentFieldBarrierModel barrier)
+        private void EnforcePlayerBarrier(PlayerStateS2C player, MatchEnvironmentFieldBarrierModel barrier)
         {
-             var position = player.Spaceship.Transform.Position;
+            var position = player.Spaceship.Transform.Position;
             // if (IsPointInsideBarrier(position, barrier)) return;
 
-            // Clamp position
-            if (barrier.Shape == FieldBarrierShape.Circle)
+            switch (barrier.Shape)
             {
-                var playerRadius = player.Spaceship.Transform.Radius;
-                
-                var center = barrier.Position;
-                var barrierRadius = barrier.Size.X;
-
-// This is the maximum distance the CENTER of the player can be from the center of the barrier
-                var maxAllowedDistance = barrierRadius - playerRadius;
-
-// Ensure we don't get an error if the barrier is smaller than the player
-                if (maxAllowedDistance < 0) maxAllowedDistance = 0;
-
-                var direction = position - center;
-                float distanceSquared = direction.LengthSquared();
-
-                if (distanceSquared > maxAllowedDistance * maxAllowedDistance)
+                case FieldBarrierShape.Circle:
                 {
-                    // Snap the player to the edge of the inner "safe" radius
-                    player.Spaceship.Transform.Position = center + Vector2.Normalize(direction) * maxAllowedDistance;
+                    var playerRadius = player.Spaceship.Transform.Radius;
+                
+                    var center = barrier.Position;
+                    var barrierRadius = barrier.Size.X;
+                    var maxAllowedDistance = barrierRadius - playerRadius;
+                    var direction = position - center;
+                    var distanceSquared = direction.LengthSquared();
+
+                    var isPlayerOutsideBarrier = distanceSquared > maxAllowedDistance * maxAllowedDistance;
+
+                    if (isPlayerOutsideBarrier)
+                    {
+                        player.Spaceship.Transform.Position = center + Vector2.Normalize(direction) * maxAllowedDistance;
+                    }
+
+                    break;
+                }
+                case FieldBarrierShape.Rectangle:
+                {
+                    var center = barrier.Position;
+                    var halfSize = barrier.Size * 0.5f;
+                    var min = center - halfSize;
+                    var max = center + halfSize;
+
+                    var clampedX = Math.Clamp(position.X, min.X, max.X);
+                    var clampedY = Math.Clamp(position.Y, min.Y, max.Y);
+                    player.Spaceship.Transform.Position = new Vector2(clampedX, clampedY);
+
+                    break;
                 }
             }
-            else if (barrier.Shape == FieldBarrierShape.Rectangle)
-            {
-                var center = barrier.Position;
-                var halfSize = barrier.Size * 0.5f;
-                var min = center - halfSize;
-                var max = center + halfSize;
-
-                var clampedX = Math.Clamp(position.X, min.X, max.X);
-                var clampedY = Math.Clamp(position.Y, min.Y, max.Y);
-                player.Spaceship.Transform.Position = new Vector2(clampedX, clampedY);
-            }
         }
 
-        private bool IsPointInsideBarrier(Vector2 point, MatchEnvironmentFieldBarrierModel barrier)
-        {
-             if (barrier.Shape == FieldBarrierShape.Circle)
-            {
-                var center = barrier.Position;
-                var radius = barrier.Size.X;
-                return Vector2.DistanceSquared(point, center) <= radius * radius;
-            }
-            else if (barrier.Shape == FieldBarrierShape.Rectangle)
-            {
-                var center = barrier.Position;
-                var halfSize = barrier.Size * 0.5f;
-                var min = center - halfSize;
-                var max = center + halfSize;
-                return point.X >= min.X && point.X <= max.X && point.Y >= min.Y && point.Y <= max.Y;
-            }
-            return false;
-        }
-
-        private void DestroyBullet(ref Core.Game.Domains.GamePlay.Shared.S2CModels.PlayerBulletS2C bullet)
+        private void DestroyBullet(ref PlayerBulletS2C bullet)
         {
             var body = _physicsSimulator.GetBullet(bullet.Id);
-            if (body != null)
-            {
-                _physicsSimulator.RemoveBody(body);
-            }
+            _physicsSimulator.RemoveBody(body);
             _netEventsDataService.AddBulletDestroyedNetEvent(_tick, bullet.Id, bullet.Position);
+            _matchDataService.SimulationState.RemoveBulletById(bullet.Id);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
-            _matchDataService.EnvironmentData.FieldBarriers.Clear();
+            _matchDataService.EnvironmentData.RemoveAllFieldBarriers();
             _netEventsDataService.AddPreparationPhaseEndedNetEvent(_tick);
         }
     }
