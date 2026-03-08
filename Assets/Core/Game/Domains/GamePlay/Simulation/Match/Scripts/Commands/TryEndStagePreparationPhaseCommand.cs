@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
-            if (!_preparationPhaseTimerService.IsTimerCompleted())
+            if (!_preparationPhaseTimerService.IsTimerCompleted() || !_stageDataService.IsInPreparationPhase)
             {
                 return;
             }
