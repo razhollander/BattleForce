@@ -4,6 +4,129 @@ using UnityEngine;
 
 public class MeshUtils
 {
+
+
+    /// <summary>
+    /// Creates a 2D Sprite using the geometry of a 3D Mesh.
+    /// </summary>
+    /// <param name="sourceMesh">The procedural mesh you want to convert.</param>
+    /// <param name="texture">The texture to apply to the sprite.</param>
+    /// <param name="pixelsPerUnit">Unity's standard is 100 pixels per world unit.</param>
+    /// <returns>A new Sprite with custom overridden geometry.</returns>
+    public static Sprite ConvertMeshToSprite(Mesh sourceMesh, Texture2D texture, float pixelsPerUnit = 100f)
+    {
+        if (sourceMesh == null || texture == null)
+        {
+            Debug.LogError("Mesh or Texture is missing!");
+            return null;
+        }
+
+        // 1. Create a base sprite to hold the data
+        Rect rect = new Rect(0, 0, texture.width, texture.height);
+        Vector2 pivot = new Vector2(0.5f, 0.5f); // Center pivot
+        Sprite newSprite = Sprite.Create(texture, rect, pivot, pixelsPerUnit);
+
+        // 2. Convert Vertices (Vector3[] -> Vector2[])
+        Vector3[] meshVertices = sourceMesh.vertices;
+        Vector2[] spriteVertices = new Vector2[meshVertices.Length];
+        
+        for (int i = 0; i < meshVertices.Length; i++)
+        {
+            spriteVertices[i] = new Vector2(meshVertices[i].x, meshVertices[i].y);
+        }
+
+        // 3. Convert Triangles (int[] -> ushort[])
+        int[] meshTriangles = sourceMesh.triangles;
+        ushort[] spriteTriangles = new ushort[meshTriangles.Length];
+        
+        for (int i = 0; i < meshTriangles.Length; i++)
+        {
+            // Unity Sprites have a strict limit of 65,535 vertices.
+            // If your mesh exceeds this, the ushort cast will fail/wrap around.
+            spriteTriangles[i] = (ushort)meshTriangles[i];
+        }
+
+        // 4. Inject the custom geometry into the Sprite
+        newSprite.OverrideGeometry(spriteVertices, spriteTriangles);
+
+        return newSprite;
+    }
+
+    public static Mesh CreateRectangleMesh(System.Numerics.Vector2 size, float z = 0f)
+    {
+        var halfSize = size * 0.5f;
+
+        var points = new[]
+        {
+            new Vector2(-halfSize.X, -halfSize.Y),
+            new Vector2(halfSize.X, -halfSize.Y),
+            new Vector2(halfSize.X, halfSize.Y),
+            new Vector2(-halfSize.X, halfSize.Y)
+        };
+
+        return MeshUtils.BuildMesh(points, z);
+    }
+    
+    public static Mesh CreateCircleMesh(float radius, float thickness, int circleSegments, float z = 0f)
+    {
+        var totalSegments = circleSegments;
+        var halfSegments = totalSegments / 2;
+
+        var innerRadius = radius;
+        var outerRadius = radius + thickness;
+            
+        // we create 2 half circles and not 1 single full circle because afterwards the triangluation doesn't support overlapping points
+        var topHalfPoints = GenerateHalfRingPoints(0f, 180f, halfSegments, innerRadius, outerRadius);
+        var topHalfMesh = MeshUtils.BuildMesh(topHalfPoints, z);
+            
+        var bottomHalfPoints = GenerateHalfRingPoints(180f, 360f, halfSegments, innerRadius, outerRadius);
+        var bottomHalfMesh = MeshUtils.BuildMesh(bottomHalfPoints, z);
+            
+        var combine = new CombineInstance[2];
+
+        combine[0].mesh = topHalfMesh;
+        combine[0].transform = Matrix4x4.identity;
+
+        combine[1].mesh = bottomHalfMesh;
+        combine[1].transform = Matrix4x4.identity;
+
+        var finalMesh = new Mesh();
+        finalMesh.CombineMeshes(combine, true, false);
+
+        UnityEngine.Object.Destroy(topHalfMesh);
+        UnityEngine.Object.Destroy(bottomHalfMesh);
+
+        return finalMesh;
+    }
+    
+    private static Vector2[] GenerateHalfRingPoints(float startAngle, float endAngle, int segments, float innerRadius, float outerRadius)
+    {
+        // A half ring needs (segments + 1) for the outer edge, and (segments + 1) for the inner edge
+        var points = new Vector2[(segments + 1) * 2];
+
+        // Outer Arc (Counter-Clockwise)
+        for (int i = 0; i <= segments; i++)
+        {
+            // Calculate interpolation factor (0.0 to 1.0)
+            float t = (float) i / segments;
+            float angle = Mathf.Lerp(startAngle, endAngle, t) * Mathf.Deg2Rad;
+            points[i] = new Vector2(Mathf.Cos(angle) * outerRadius, Mathf.Sin(angle) * outerRadius);
+        }
+
+        // Inner Arc (Clockwise)
+        for (int i = 0; i <= segments; i++)
+        {
+            // Calculate interpolation factor backwards (1.0 to 0.0)
+            float t = (float) (segments - i) / segments;
+            float angle = Mathf.Lerp(startAngle, endAngle, t) * Mathf.Deg2Rad;
+
+            // Offset by (segments + 1) to place them in the second half of the array
+            points[(segments + 1) + i] = new Vector2(Mathf.Cos(angle) * innerRadius, Mathf.Sin(angle) * innerRadius);
+        }
+
+        return points;
+    }
+    
     /// <summary>
     /// Creates and returns a mesh from a polygon. Input should be CCW (will flip if CW).
     /// Throws if triangulation fails (usually self-intersection or duplicate/collinear issues).

@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [TextArea(1, 5)] [SerializeField] private string _environmentSpringsJson;
         [TextArea(1, 5)] [SerializeField] private string _teleportGatesJson;
         [TextArea(1, 5)] [SerializeField] private string _rotatingWheelsJson;
+        [TextArea(1, 5)] [SerializeField] private string _fieldBarriersJson;
 
         public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
         {
@@ -62,6 +63,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             _rotatingWheelsJson = rotatingWheelsJson;
         }
 
+        public void SetFieldBarriersJson(string fieldBarriersJson)
+        {
+            _fieldBarriersJson = fieldBarriersJson;
+        }
+
         public TalentCardConfig[] GetTalentCards()
         {
             return _talentCardsJson.FromJson<TalentCardConfig[]>();
@@ -80,6 +86,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public EnvironmentRotatingWheelConfig[] GetRotatingWheels()
         {
             return _rotatingWheelsJson.FromJson<EnvironmentRotatingWheelConfig[]>();
+        }
+
+        public EnvironmentFieldBarrierConfig[] GetFieldBarriers()
+        {
+            return _fieldBarriersJson.FromJson<EnvironmentFieldBarrierConfig[]>();
         }
     }
 }

@@ -105,6 +105,14 @@ MonoBehaviour:
         \"Y\": -10\n          },\n          \"NormalRotation\": 270,\n          \"WorldPosition\":
         {\n            \"X\": 0,\n            \"Y\": 0\n          },\n          \"WorldRotation\":
         0\n        }\n      }\n    ]\n  }\n]"
+      _fieldBarriersJson: "[\n  {\n    \"Position\": { \"x\": -10.0, \"y\": -10.0
+        },\n    \"Size\": { \"x\": 5.0, \"y\": 5.0 },\n    \"Shape\": \"Circle\"\n 
+        },\n  {\n    \"Position\": { \"x\": 10.5, \"y\": 20.2 },\n    \"Size\": {
+        \"x\": 2.0, \"y\": 2.0 },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\":
+        { \"x\": -15.0, \"y\": -10.0 },\n    \"Size\": { \"x\": 8.5, \"y\": 8.5 },\n   
+        \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\": { \"x\": 50.0, \"y\":
+        0.5 },\n    \"Size\": { \"x\": 1.2, \"y\": 1.2 },\n    \"Shape\": \"Circle\"\n 
+        }\n]"
     - _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
         "Y": -28.16       },       {         "X": -43.804464,         "Y": -28.16      
@@ -126,3 +134,4 @@ MonoBehaviour:
       _environmentSpringsJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: 
+      _fieldBarriersJson: 

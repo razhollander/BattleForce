@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ITickService _tickService;
         private NetworkConfig _networkConfig;
         private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
+        private IPreparationPhaseTimerService _preparationPhaseTimerService;
 
         public override void ResolveDependencies()
         {
@@ -42,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _tickService = _diContainer.Resolve<ITickService>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
+            _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
         }
 
         public void Execute()
@@ -58,10 +60,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateEnvironmentSprings();
             CreateTeleportGates();
             CreateRotatingWheels();
+            CreateFieldBarriers();
             ResetPlayers();
 
             _stageDataService.IsStageEnded = false;
+            _stageDataService.IsInPreparationPhase = true;
             _stageDataService.StageRestartTimer = -1;
+            _preparationPhaseTimerService.RestartTimer();
             _stageDataService.ClearData();
         }
 
@@ -91,7 +96,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
                 player.Spaceship.Shoot.MaxCooldown = shootCooldown;
 
-                var position = GetRandomFreePosition(radius, halfSize);
+                var teamId = player.TeamId;
+                Vector2 position;
+
+                var barrier = GetBarrierForTeam(teamId);
+                if (barrier != null)
+                {
+                    position = barrier.Position;
+                }
+                else
+                {
+                    position = GetRandomFreePosition(radius, halfSize);
+                }
+
                 var direction = RNG.NextFloat(0, 360).AngleToVector();
                 var velocity = direction * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
 
@@ -103,6 +120,43 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.IsAlive = true;
                 
                 _physicsSimulator.AddPlayer(player.Id, player.TeamId, position, velocity, radius);
+            }
+        }
+
+        private Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel.MatchEnvironmentFieldBarrierModel GetBarrierForTeam(ushort teamId)
+        {
+            foreach (var barrier in _matchDataService.EnvironmentData.FieldBarriers.AsSpan())
+            {
+                if (barrier.TeamId == teamId)
+                {
+                    return barrier;
+                }
+            }
+            return null;
+        }
+
+        private void CreateFieldBarriers()
+        {
+            var barrierConfigs = _matchEnvironmentConfigDataService.FieldBarrierConfigs;
+            if (barrierConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var teamIds = new System.Collections.Generic.List<ushort>(_matchDataService.TeamIds);
+            teamIds.Sort();
+
+            int barrierIndex = 0;
+            foreach (var teamId in teamIds)
+            {
+                if (barrierIndex >= barrierConfigs.Length)
+                {
+                    break;
+                }
+
+                var config = barrierConfigs[barrierIndex];
+                _matchDataService.EnvironmentData.AddFieldBarrier((ushort)barrierIndex, teamId, config.Position, config.Size, config.Shape);
+                barrierIndex++;
             }
         }
 

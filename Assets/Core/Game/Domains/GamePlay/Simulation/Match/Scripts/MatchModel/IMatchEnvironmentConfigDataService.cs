@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         WallConfig[] LavaWallConfigs { get; }
         WallConfig[] WallConfigs { get; }
         EnvironmentRotatingWheelConfig[] RotatingWheels { get; }
+        EnvironmentFieldBarrierConfig[] FieldBarrierConfigs { get; }
         void InitEnvironmentLayout(int environmentLayoutIndex);
     }
 }

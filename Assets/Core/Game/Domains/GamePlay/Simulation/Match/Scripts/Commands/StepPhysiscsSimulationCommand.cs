@@ -15,7 +15,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersEngineLogic _playersEngineLogic;
         private ICommandFactory _commandFactory;
         private StepAllWheelsRotationCommand _stepAllWheelsRotationCommand;
-        
+        private EnforceFieldBarriersCommand _enforceFieldBarriersCommand;
+
         private float _deltaTime;
         private int _tick;
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
@@ -42,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _stepAllWheelsRotationCommand = _commandFactory.CreateCommandVoid<StepAllWheelsRotationCommand>();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
+            _enforceFieldBarriersCommand = _commandFactory.CreateCommandVoid<EnforceFieldBarriersCommand>();
         }
 
         public void Execute()
@@ -60,11 +62,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _stepAllWheelsRotationCommand.SetTime(_tick, stepDeltaTime).Execute();
+
             ApplyMatchModelToPhysicsSimulation();
             _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
             ApplyPhysicsSimulationToMatchModel();
             
             _processCachedCollisionsCommand.SetProcessedTick(_tick).Execute();
+            _enforceFieldBarriersCommand.SetTick(_tick).Execute();
         }
 
         private void ApplyMatchModelToPhysicsSimulation()
