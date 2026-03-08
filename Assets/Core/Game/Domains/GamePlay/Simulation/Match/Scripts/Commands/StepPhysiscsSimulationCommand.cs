@@ -16,8 +16,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ICommandFactory _commandFactory;
         private StepAllWheelsRotationCommand _stepAllWheelsRotationCommand;
         private EnforceFieldBarriersCommand _enforceFieldBarriersCommand;
-        private EndStagePreparationPhaseCommand _endStagePreparationPhaseCommand;
-        private Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage.IStageDataService _stageDataService;
 
         private float _deltaTime;
         private int _tick;
@@ -46,8 +44,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _stepAllWheelsRotationCommand = _commandFactory.CreateCommandVoid<StepAllWheelsRotationCommand>();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
             _enforceFieldBarriersCommand = _commandFactory.CreateCommandVoid<EnforceFieldBarriersCommand>();
-            _endStagePreparationPhaseCommand = _commandFactory.CreateCommandVoid<EndStagePreparationPhaseCommand>();
-            _stageDataService = _diContainer.Resolve<Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage.IStageDataService>();
         }
 
         public void Execute()
@@ -67,22 +63,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             _stepAllWheelsRotationCommand.SetTime(_tick, stepDeltaTime).Execute();
 
-            if (_stageDataService.PreparationPhaseTimer > 0)
-            {
-                _enforceFieldBarriersCommand.SetTick(_tick).Execute();
-                _stageDataService.PreparationPhaseTimer -= stepDeltaTime;
-
-                if (_stageDataService.PreparationPhaseTimer <= 0)
-                {
-                    _endStagePreparationPhaseCommand.SetTick(_tick).Execute();
-                }
-            }
-
             ApplyMatchModelToPhysicsSimulation();
             _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
             ApplyPhysicsSimulationToMatchModel();
             
             _processCachedCollisionsCommand.SetProcessedTick(_tick).Execute();
+            _enforceFieldBarriersCommand.SetTick(_tick).Execute();
         }
 
         private void ApplyMatchModelToPhysicsSimulation()

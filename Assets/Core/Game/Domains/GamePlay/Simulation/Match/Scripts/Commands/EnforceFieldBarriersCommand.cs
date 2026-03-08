@@ -6,7 +6,6 @@ using CoreDomain.Scripts.Services.CommandFactory;
 using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using Core.Scripts.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -38,37 +37,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
             
+            KeepPlayersInsideBarriers();
+            DestroyBulletsOutsideBarriers();
+        }
+
+        private void KeepPlayersInsideBarriers()
+        {
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
-                var barrier = GetBarrierForTeam(player.TeamId);
-                EnforcePlayerBarrier(player, barrier);
-            }
-            
-            var bullets = _matchDataService.SimulationState.Bullets;
-            for (int i = bullets.Count - 1; i >= 0; i--)
-            {
-                ref var bullet = ref bullets.GetByIndex(i);
-                var playerId = bullet.BelongToPlayerId;
-                var teamId = _matchDataService.SimulationState.GetPlayerById(playerId).TeamId;
-                var barrier = GetBarrierForTeam(teamId);
-
-                if (!barrier.IsCircleInsideBarrier(bullet.Position, bullet.Radius))
-                {
-                    DestroyBullet(ref bullet);
-                }
+                var barrier = _matchDataService.EnvironmentData.GetBarrierForTeam(player.TeamId);
+                KeepPlayerInsideBarrier(player, barrier);
             }
         }
 
-        private MatchEnvironmentFieldBarrierModel GetBarrierForTeam(ushort teamId)
-        {
-            foreach (var barrier in _matchDataService.EnvironmentData.FieldBarriers.AsSpan())
-            {
-                if (barrier.TeamId == teamId) return barrier;
-            }
-            return null;
-        }
-
-        private void EnforcePlayerBarrier(PlayerStateS2C player, MatchEnvironmentFieldBarrierModel barrier)
+        private void KeepPlayerInsideBarrier(PlayerStateS2C player, MatchEnvironmentFieldBarrierModel barrier)
         {
             var playerPosition = player.Spaceship.Transform.Position;
             var playerRadius = player.Spaceship.Transform.Radius;
@@ -115,6 +97,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     }
 
                     break;
+                }
+            }
+        }
+
+        private void DestroyBulletsOutsideBarriers()
+        {
+            var bullets = _matchDataService.SimulationState.Bullets;
+
+            for (int i = bullets.Count - 1; i >= 0; i--)
+            {
+                ref var bullet = ref bullets.GetByIndex(i);
+                var playerId = bullet.BelongToPlayerId;
+                var teamId = _matchDataService.SimulationState.GetPlayerById(playerId).TeamId;
+                var barrier = _matchDataService.EnvironmentData.GetBarrierForTeam(teamId);
+
+                if (!barrier.IsCircleInsideBarrier(bullet.Position, bullet.Radius))
+                {
+                    DestroyBullet(ref bullet);
                 }
             }
         }

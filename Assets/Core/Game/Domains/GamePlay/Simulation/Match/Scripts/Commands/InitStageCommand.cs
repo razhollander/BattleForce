@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ITickService _tickService;
         private NetworkConfig _networkConfig;
         private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
+        private IPreparationPhaseTimerService _preparationPhaseTimerService;
 
         public override void ResolveDependencies()
         {
@@ -42,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _tickService = _diContainer.Resolve<ITickService>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
+            _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
         }
 
         public void Execute()
@@ -62,8 +64,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ResetPlayers();
 
             _stageDataService.IsStageEnded = false;
+            _stageDataService.IsInPreparationPhase = true;
             _stageDataService.StageRestartTimer = -1;
-            _stageDataService.PreparationPhaseTimer = _gamePlayConfig.PreparationPhaseDuration;
+            _preparationPhaseTimerService.RestartTimer();
             _stageDataService.ClearData();
         }
 

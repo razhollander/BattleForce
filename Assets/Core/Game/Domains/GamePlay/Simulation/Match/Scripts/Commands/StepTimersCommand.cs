@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -12,6 +13,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPowerUpsSpawnerService _powerUpsSpawnerService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IHeadLessQuitterController _headLessQuitterController;
+        private IStageDataService _stageDataService;
+        private IPreparationPhaseTimerService _preparationPhaseTimerService;
         
         private float _deltaTime;
 
@@ -27,6 +30,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _powerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
+            _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
+            _stageDataService = _diContainer.Resolve<IStageDataService>();
         }
 
         public void Execute()
@@ -36,6 +41,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _powerUpsSpawnerService.StepTimer(_deltaTime);
             _playersInLavaTrackerService.StepTimePassedSinceLastDamageTaken(_deltaTime);
             _headLessQuitterController.StepTimer(_deltaTime);
+            StepPreperationPhaseTimer();
+        }
+
+        private void StepPreperationPhaseTimer()
+        {
+            if (!_stageDataService.IsInPreparationPhase)
+            {
+                return;
+            }
+            
+            _preparationPhaseTimerService.StepPreperationPhaseTimer(_deltaTime);
         }
 
         private void StepPlayersTalentsCooldowns(float deltaTime)

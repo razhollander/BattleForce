@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
 {
@@ -137,6 +138,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             return _walls.FindWithId(wallId);
         }
 
+        public MatchEnvironmentFieldBarrierModel GetBarrierForTeam(ushort teamId)
+        {
+            foreach (var barrier in FieldBarriers.AsSpan())
+            {
+                if (barrier.TeamId == teamId) return barrier;
+            }
+            
+            LogService.LogError("No field barrier found for team id: " + teamId);
+            return null;
+        }
+        
         public void AddTeleportGatePair(ushort teleportPairId, ushort gateAId, ushort gateBId, Vector2 gateAPosition, float gateANormalRotation, Vector2 gateBPosition,
             float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation)
 

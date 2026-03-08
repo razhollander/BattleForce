@@ -10,8 +10,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         public HashSet<ushort> LosingTeamIds { get; private set; }
         public Dictionary<ushort, int> GemsCollectedPerTeam { get; private set; }
         public bool IsStageEnded { get; set; }
+        public bool IsInPreparationPhase { get; set; }
         public float StageRestartTimer { get; set; }
-        public float PreparationPhaseTimer { get; set; }
 
         public StageDataService(IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig)
         {
