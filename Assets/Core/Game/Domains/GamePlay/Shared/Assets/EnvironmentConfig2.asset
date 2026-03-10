@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnvironmentConfig2
   m_EditorClassIdentifier: 
   _environmentLayoutConfigs:
-    m_keys: 0200000063000000010000000000000003000000
+    m_keys: 020000006300000001000000000000000300000004000000
     m_values:
     - _environmentName: 
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -643,3 +643,47 @@ MonoBehaviour:
         \"y\": 5\n    },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\":
         {\n      \"x\": 22,\n      \"y\": -14\n    },\n    \"Size\": {\n      \"x\":
         5,\n      \"y\": 5\n    },\n    \"Shape\": \"Circle\"\n  }\n]"
+    - _environmentName: Swiss
+      _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
+      _wallsJson: "[\n  {\n    \"Id\": 6,\n    \"Points\": [\n      { \"X\": -28.16,
+        \"Y\": -28.16 },\n      { \"X\": -24.64, \"Y\": -28.16 },\n      { \"X\":
+        -24.64, \"Y\": 28.16 },\n      { \"X\": -28.16, \"Y\": 28.16 }\n    ]\n 
+        },\n  {\n    \"Id\": 7,\n    \"Points\": [\n      { \"X\": 24.64, \"Y\":
+        -28.16 },\n      { \"X\": 28.16, \"Y\": -28.16 },\n      { \"X\": 28.16,
+        \"Y\": 28.16 },\n      { \"X\": 24.64, \"Y\": 28.16 }\n    ]\n  },\n  {\n   
+        \"Id\": 8,\n    \"Points\": [\n      { \"X\": -28.16, \"Y\": 24.64 },\n     
+        { \"X\": 28.16, \"Y\": 24.64 },\n      { \"X\": 28.16, \"Y\": 28.16 },\n     
+        { \"X\": -28.16, \"Y\": 28.16 }\n    ]\n  },\n  {\n    \"Id\": 9,\n    \"Points\":
+        [\n      { \"X\": -28.16, \"Y\": -28.16 },\n      { \"X\": 28.16, \"Y\":
+        -28.16 },\n      { \"X\": 28.16, \"Y\": -24.64 },\n      { \"X\": -28.16,
+        \"Y\": -24.64 }\n    ]\n  }\n]"
+      _lavaWallsJson: "[\n  {\n    \"Id\": 1,\n    \"Points\": [\n      { \"X\":
+        -4, \"Y\": -28.16 },\n      { \"X\": 4, \"Y\": -28.16 },\n      { \"X\":
+        4, \"Y\": 28.16 },\n      { \"X\": -4, \"Y\": 28.16 }\n    ]\n  },\n  {\n   
+        \"Id\": 2,\n    \"Points\": [\n      { \"X\": -28.16, \"Y\": -4 },\n     
+        { \"X\": 28.16, \"Y\": -4 },\n      { \"X\": 28.16, \"Y\": 4 },\n      {
+        \"X\": -28.16, \"Y\": 4 }\n    ]\n  }\n]"
+      _talentCardsJson: 
+      _environmentSpringsJson: 
+      _teleportGatesJson: "[\n  {\n    \"Id\": 1,\n    \"GateA\": { \"Position\":
+        { \"X\": -20, \"Y\": 24.64 }, \"NormalRotation\": 270 },\n    \"GateB\":
+        { \"Position\": { \"X\": -20, \"Y\": -24.64 }, \"NormalRotation\": 90 }\n 
+        },\n  {\n    \"Id\": 2,\n    \"GateA\": { \"Position\": { \"X\": 20, \"Y\":
+        24.64 }, \"NormalRotation\": 270 },\n    \"GateB\": { \"Position\": { \"X\":
+        20, \"Y\": -24.64 }, \"NormalRotation\": 90 }\n  },\n  {\n    \"Id\": 3,\n   
+        \"GateA\": { \"Position\": { \"X\": -24.64, \"Y\": 20 }, \"NormalRotation\":
+        0 },\n    \"GateB\": { \"Position\": { \"X\": 24.64, \"Y\": 20 }, \"NormalRotation\":
+        180 }\n  },\n  {\n    \"Id\": 4,\n    \"GateA\": { \"Position\": { \"X\":
+        -24.64, \"Y\": -20 }, \"NormalRotation\": 0 },\n    \"GateB\": { \"Position\":
+        { \"X\": 24.64, \"Y\": -20 }, \"NormalRotation\": 180 }\n  }\n]"
+      _rotatingWheelsJson: 
+      _fieldBarriersJson: "[\n  {\n    \"Position\": {\n      \"x\": -14.32,\n     
+        \"y\": 14.32\n    },\n    \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n   
+        },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\": {\n      \"x\":
+        14.32,\n      \"y\": -14.32\n    },\n    \"Size\": {\n      \"x\": 3.5,\n     
+        \"y\": 3.5\n    },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\":
+        {\n      \"x\": -14.32,\n      \"y\": -14.32\n    },\n    \"Size\": {\n     
+        \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\": \"Circle\"\n  },\n 
+        {\n    \"Position\": {\n      \"x\": 14.32,\n      \"y\": 14.32\n    },\n   
+        \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\":
+        \"Circle\"\n  }\n]"
