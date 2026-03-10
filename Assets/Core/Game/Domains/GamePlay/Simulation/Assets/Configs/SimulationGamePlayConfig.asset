@@ -19,7 +19,7 @@ MonoBehaviour:
   PowerUps: {fileID: 11400000, guid: f3f1e9d59a8914447bcbb1a5299d3b37, type: 2}
   EnvironmentSprings: {fileID: 11400000, guid: f5e079ad119bc4e0faccf5c96bb9a9b7, type: 2}
   Physics: {fileID: 0}
-  ChosenEnvironmentIndex: 0
+  ChosenEnvironmentIndex: 5
   StartMatchCountdownDuration: 1
   ShootCooldownMultiplierWhenDead: 2
   StageRestartDelaySeconds: 3
@@ -29,4 +29,4 @@ MonoBehaviour:
   BoltsGainedPerHit: 50
   BoltsGainedPerKill: 50
   TeleportGateCooldownInSeconds: 0.5
-  PreparationPhaseDuration: 5
+  PreparationPhaseDuration: 20

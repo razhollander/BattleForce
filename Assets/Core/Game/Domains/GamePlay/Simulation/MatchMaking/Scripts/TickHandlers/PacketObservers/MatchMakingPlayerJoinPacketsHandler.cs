@@ -77,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                 joinResponse.Clear();
                 if (isPlayerAlreadyInMatch || isMaxPlayers)
                 {
+                    LogService.LogError($"Cant join player because: isMaxPlayers: {isMaxPlayers}, isPlayerAlreadyInMatch: {isPlayerAlreadyInMatch}");
                     joinResponse.IsSuccess = false;
                 }
                 else
