@@ -74,7 +74,10 @@ namespace Core.Game.Domains.GamePlay.Shared
                 {
                     try
                     {
-                        _thread.Join();
+                        if (Thread.CurrentThread != _thread)
+                        {
+                            _thread.Join();
+                        }
                     }
                     catch (ThreadStateException) { }
                 }
