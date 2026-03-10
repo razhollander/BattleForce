@@ -171,31 +171,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         private void UpdatePlayerTalents(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState)
         {
-            foreach (var VARIABLE in playerState.Spaceship.TalentsState.Talents.AsSpan())
+            if (playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalent))
             {
-                
+                var isTalentOnCooldown = currentSelectedTalent.CooldownSecondsLeft < currentSelectedTalent.MaxCooldown;
+                if (isTalentOnCooldown)
+                {
+                    return;
+                }
             }
-            // if (!isTalentInputPressed)
-            // {
-            //     return;
-            // }
-            //
-            // ref var currentSelectedTalent = ref playerState.Spaceship.Talents.GetCurrentSelectedTalent();
-            // var isTalentOnCooldown = currentSelectedTalent.CooldownSecondsLeft < currentSelectedTalent.MaxCooldown;
-            // if (isTalentOnCooldown)
-            // {
-            //     return;
-            // }
-            //
-            // foreach (var VARIABLE in _)
-            // {
-            //     
-            // }
-            // _handleTalentInputPressedCommand
-            //     .SetPlayerState(playerState)
-            //     .SetTalent(currentSelectedTalent)
-            //     .SetTick(processedTick)
-            //     .Execute();
+            
+            _handleTalentInputPressedCommand
+                .SetPlayerState(playerState)
+                .SetTalent(currentSelectedTalent)
+                .SetTick(processedTick)
+                .Execute();
         }
 
         private CapacityDict<ushort, int> GetHeighestProcessedTickFromServerPerPlayer()

@@ -16,6 +16,18 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             return ref Talents.Get(SelectedTalentIndex);
         }
+        
+        public bool TryGetCurrentSelectedTalent(out TalentStateS2C selectedTalent)
+        {
+            if (Talents.Count > SelectedTalentIndex)
+            {
+                selectedTalent = default;
+                return false;
+            }
+            
+            selectedTalent = Talents.Get(SelectedTalentIndex);
+            return true;
+        }
 
         public PlayerTalentsStateS2C(int maxTalents)
         {
