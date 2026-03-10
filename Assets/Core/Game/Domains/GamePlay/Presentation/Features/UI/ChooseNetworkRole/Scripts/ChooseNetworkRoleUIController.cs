@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         public void InitEntryPoint()
         {
-            var playerName = PlayerPrefsSettings.ShouldSkipMatchMaking ? "Raz" : "Player_" + UnityEngine.Random.Range(1000, 9999);
+            var playerName = /*PlayerPrefsSettings.ShouldSkipMatchMaking ? "Raz" :*/ "Player_" + UnityEngine.Random.Range(1000, 9999);
             _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, _networkConfig.OnlyLocal, _networkConfig.IpAddress, _networkConfig.DefaultHostPort, playerName);
             PopulatePlaybacksDropdown();
 #if UNITY_SERVER
