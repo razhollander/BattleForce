@@ -47,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
             catch (Exception e)
             {
                 LogService.LogError("Got error in server thread! " + e);
-                StopTick();
+                //StopTick();
                 throw;
             }
         }

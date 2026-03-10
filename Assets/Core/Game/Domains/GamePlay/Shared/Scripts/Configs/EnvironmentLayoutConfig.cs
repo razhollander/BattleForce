@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
     [System.Serializable]
     public class EnvironmentLayoutConfig
     {
+        [SerializeField] private string _environmentName;
         [TextArea(1, 5)] [SerializeField] private string _environmentHalfSizeJson;
         [TextArea(1, 5)] [SerializeField] private string _wallsJson;
         [TextArea(1, 5)] [SerializeField] private string _lavaWallsJson;

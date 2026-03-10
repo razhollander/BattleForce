@@ -52,8 +52,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersInLavaTrackerService.ClearAllData();
             _teleportGateService.ClearData();
             ClearStageObjectsInSimulationState();
-            _matchEnvironmentConfigDataService.InitEnvironmentLayout(_gamePlayConfig.ChosenEnvironmentIndex);
-
+            var environmentLayoutIndex = _gamePlayConfig.ChosenEnvironmentIndex;
+            _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutIndex);
+            _matchDataService.SimulationState.EnvironmentLayoutIndex = environmentLayoutIndex;
             CreateWalls();
             CreateLavaWalls();
             CreateTalentCards();
