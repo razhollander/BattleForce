@@ -216,6 +216,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
 
             var currentSimulationState = _matchDataService.SimulationState;
+            currentSimulationState.IsInPreparationPhase = _stageDataService.IsInPreparationPhase;
             _fullTickPacket.Tick = processedTick;
             _fullTickPacket.CurrentSimulationState = currentSimulationState;
             //_fullTickPacket.PreviousSimulationState = _matchDataService.PreviousSimulationState;

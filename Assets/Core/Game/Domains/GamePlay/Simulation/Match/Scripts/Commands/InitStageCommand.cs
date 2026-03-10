@@ -287,6 +287,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var currentTick = _tickService.CurrentTick;
+            var calculationTick = _stageDataService.IsInPreparationPhase ? 0 : System.Math.Max(0, currentTick - _stageDataService.StartPhaseInitialTick);
             var deltaTime = _networkConfig.DeltaTime;
             
             foreach (var wheelConfig in rotatingWheelsConfigs)
@@ -300,7 +301,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     foreach (var wallConfig in wheelConfig.Walls)
                     {
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            currentTick, rotationSpeed, deltaTime, wheelCenter, wallConfig.Position, 0,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, wallConfig.Position, 0,
                             out var worldPosition, out var worldRotation
                         );
                         
@@ -315,7 +316,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     foreach (var lavaWallConfig in wheelConfig.LavaWalls)
                     {
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            currentTick, rotationSpeed, deltaTime, wheelCenter, lavaWallConfig.Position, 0,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, lavaWallConfig.Position, 0,
                             out var worldPosition, out var worldRotation
                         );
 
@@ -330,7 +331,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     foreach (var springConfig in wheelConfig.Springs)
                     {
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            currentTick, rotationSpeed, deltaTime, wheelCenter, springConfig.Position, springConfig.RotationAngle,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, springConfig.Position, springConfig.RotationAngle,
                             out var worldPosition, out var worldRotation);
 
                         var springId = springConfig.Id;
@@ -344,11 +345,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     foreach (var teleportPairConfig in wheelConfig.TeleportGatePairs)
                     {
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            currentTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateA.Position, teleportPairConfig.GateA.NormalRotation,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateA.Position, teleportPairConfig.GateA.NormalRotation,
                             out var worldPositionA, out var worldRotationA);
 
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            currentTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateB.Position, teleportPairConfig.GateB.NormalRotation,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateB.Position, teleportPairConfig.GateB.NormalRotation,
                             out var worldPositionB, out var worldRotationB);
 
                         var pairId = teleportPairConfig.Id;

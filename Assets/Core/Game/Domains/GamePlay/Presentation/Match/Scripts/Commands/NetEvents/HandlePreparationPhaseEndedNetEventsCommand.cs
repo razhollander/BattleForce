@@ -9,11 +9,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IEnvironmentFieldBarrierControllers _environmentFieldBarrierControllers;
+        private DataService.IMatchDataService _matchDataService;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _environmentFieldBarrierControllers = _diContainer.Resolve<IEnvironmentFieldBarrierControllers>();
+            _matchDataService = _diContainer.Resolve<DataService.IMatchDataService>();
         }
 
         public void Execute()
@@ -23,6 +25,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 return;
             }
+
+            var lastEvent = events[events.Count - 1];
+            _matchDataService.StartPhaseInitialTick = lastEvent.OccuredOnTick;
 
             _environmentFieldBarrierControllers.DestroyAll();
             events.Clear();
