@@ -19,6 +19,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public Dictionary<ushort, int> BoltsPerTeam;
         public int EnvironmentLayoutIndex;
         public StageType StageType;
+        public int StartPhaseInitialTick;
+        public bool IsInPreparationPhase;
 
         public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams)
         {
@@ -76,6 +78,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             writer.Put((byte)EnvironmentLayoutIndex);
             writer.Put((byte)StageType);
+            writer.Put(StartPhaseInitialTick);
+            writer.Put(IsInPreparationPhase);
         }
         
         public void Deserialize(NetDataReader reader)
@@ -132,6 +136,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             EnvironmentLayoutIndex = reader.GetByte();
             StageType = (StageType)reader.GetByte();
+            StartPhaseInitialTick = reader.GetInt();
+            IsInPreparationPhase = reader.GetBool();
         }
 
         public PlayerStateS2C GetPlayerById(ushort playerId)

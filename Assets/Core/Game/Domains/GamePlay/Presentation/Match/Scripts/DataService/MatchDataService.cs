@@ -28,6 +28,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchPlayerModel LocalPlayer { get; private set; }
         public bool IsPlayerJoined => LocalPlayer != null;
         public HashSet<ushort> TeamIds  {get; private set; }
+        public int StartPhaseInitialTick { get; set; }
+        public bool IsInPreparationPhase { get; set; }
         public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }
         public Dictionary<ushort, int> GemsPerTeam  {get; private set; }
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
