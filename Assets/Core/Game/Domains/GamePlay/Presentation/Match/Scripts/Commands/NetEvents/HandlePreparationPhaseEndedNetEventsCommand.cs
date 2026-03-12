@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Sirenix.Utilities;
@@ -24,7 +25,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
-            _environmentFieldBarrierControllers.DestroyAll();
+            foreach (var phaseEndedNetEvent in events)
+            {
+                _environmentFieldBarrierControllers.DestroyAll();
+            }
+            
             events.Clear();
         }
     }
