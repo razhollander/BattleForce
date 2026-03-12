@@ -65,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ResetPlayers();
 
             _stageDataService.IsStageEnded = false;
-            _stageDataService.IsInPreparationPhase = true;
+            _matchDataService.SimulationState.IsInPreparationPhase = true;
             _stageDataService.StageRestartTimer = -1;
             _preparationPhaseTimerService.RestartTimer();
             _stageDataService.ClearData();
@@ -287,7 +287,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var currentTick = _tickService.CurrentTick;
-            var calculationTick = _stageDataService.IsInPreparationPhase ? 0 : System.Math.Max(0, currentTick - _stageDataService.StartPhaseInitialTick);
+            var calculationTick = _matchDataService.SimulationState.IsInPreparationPhase ? 0 : currentTick - _matchDataService.SimulationState.StartPhaseInitialTick;
             var deltaTime = _networkConfig.DeltaTime;
             
             foreach (var wheelConfig in rotatingWheelsConfigs)

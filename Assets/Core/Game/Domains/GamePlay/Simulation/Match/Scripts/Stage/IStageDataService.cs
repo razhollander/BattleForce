@@ -5,8 +5,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
     public interface IStageDataService
     {
         HashSet<ushort> LosingTeamIds { get; }
-        bool IsInPreparationPhase { get; set;  }
-        int StartPhaseInitialTick { get; set; }
         void AddLosingTeam(ushort teamId);
         void AddWinnerTeam(ushort teamId);
         bool IsStageEnded { get; set; }

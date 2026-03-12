@@ -122,7 +122,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
             UpdatePowerUpBallsTransform(simulationState);
-            _matchDataService.IsInPreparationPhase = simulationState.IsInPreparationPhase;
             UpdateRotatingWheels(latestTickReceivedFromServer);
 
             LastProcessedTickFromServer = latestTickReceivedFromServer;
@@ -175,7 +174,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         private void UpdateRotatingWheels(int tick)
         {
-            var calculationTick = _matchDataService.IsInPreparationPhase ? 0 : System.Math.Max(0, tick - _matchDataService.StartPhaseInitialTick);
+            if (_matchDataService.IsInPreparationPhase)
+            {
+                return;
+            }
+            
+            var calculationTick = tick - _matchDataService.StartPhaseInitialTick;
             var deltaTime = _networkConfig.DeltaTime;
 
             foreach (var wheelModel in _matchDataService.RotatingWheels)

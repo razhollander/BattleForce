@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService;
 using Core.Scripts.Network;
@@ -16,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ICommandFactory _commandFactory;
         private StepAllWheelsRotationCommand _stepAllWheelsRotationCommand;
         private EnforceFieldBarriersCommand _enforceFieldBarriersCommand;
+        private IStageDataService _stageDataService;
 
         private float _deltaTime;
         private int _tick;
@@ -44,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _stepAllWheelsRotationCommand = _commandFactory.CreateCommandVoid<StepAllWheelsRotationCommand>();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
             _enforceFieldBarriersCommand = _commandFactory.CreateCommandVoid<EnforceFieldBarriersCommand>();
+            _stageDataService = _diContainer.Resolve<IStageDataService>();
         }
 
         public void Execute()
@@ -61,7 +64,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 _playersEngineLogic.TryAddEngineForceToPlayer(playerState.Spaceship, stepDeltaTime);
             }
 
-            _stepAllWheelsRotationCommand.SetTime(_tick, stepDeltaTime).Execute();
+            if (!_matchDataService.SimulationState.IsInPreparationPhase)
+            {
+                _stepAllWheelsRotationCommand.SetTime(_tick, stepDeltaTime).Execute();
+            }
 
             ApplyMatchModelToPhysicsSimulation();
             _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);

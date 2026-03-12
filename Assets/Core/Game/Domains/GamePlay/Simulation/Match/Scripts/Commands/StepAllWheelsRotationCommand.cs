@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
-            var calculationTick = _stageDataService.IsInPreparationPhase ? 0 : System.Math.Max(0, _tick - _stageDataService.StartPhaseInitialTick);
+            var calculationTick = _tick - _matchDataService.SimulationState.StartPhaseInitialTick;
             foreach (var rotatingWheel in _matchDataService.EnvironmentData.RotatingWheels.AsSpan())
             {
                 UpdateRotationAccordingToTick(calculationTick, _deltaTime, rotatingWheel);
