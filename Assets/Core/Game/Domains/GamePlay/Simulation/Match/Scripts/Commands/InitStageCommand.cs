@@ -26,7 +26,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private ITeleportGateService _teleportGateService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
-        private ITickService _tickService;
         private NetworkConfig _networkConfig;
         private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
@@ -40,7 +39,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
-            _tickService = _diContainer.Resolve<ITickService>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();

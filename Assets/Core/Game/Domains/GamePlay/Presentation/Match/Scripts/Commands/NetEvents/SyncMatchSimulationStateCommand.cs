@@ -253,7 +253,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
             var lastProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer;
-            var calculationTick = _matchDataService.IsInPreparationPhase ? 0 : System.Math.Max(0, lastProcessedTickFromServer - _matchDataService.StartPhaseInitialTick);
+            var calculationTick = _matchDataService.IsInPreparationPhase ? 0 : lastProcessedTickFromServer - _matchDataService.StartPhaseInitialTick;
             var deltaTime = _networkConfig.DeltaTime;
 
             foreach (var wheelConfig in wheels)
