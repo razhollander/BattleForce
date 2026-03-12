@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void StepPreperationPhaseTimer()
         {
-            if (!_stageDataService.IsInPreparationPhase)
+            if (!_matchDataService.SimulationState.IsInPreparationPhase)
             {
                 return;
             }

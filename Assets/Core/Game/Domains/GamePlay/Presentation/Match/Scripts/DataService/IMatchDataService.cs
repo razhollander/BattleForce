@@ -17,6 +17,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; }
         List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; }
         HashSet<ushort> TeamIds {get; }
+        int StartPhaseInitialTick { get; set; }
+        bool IsInPreparationPhase { get; set; }
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
         MatchPlayerModel LocalPlayer { get; }

@@ -30,12 +30,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
-            if (!_preparationPhaseTimerService.IsTimerCompleted() || !_stageDataService.IsInPreparationPhase)
+            if (!_preparationPhaseTimerService.IsTimerCompleted() || !_matchDataService.SimulationState.IsInPreparationPhase)
             {
                 return;
             }
 
-            _stageDataService.IsInPreparationPhase = false;
+            _matchDataService.SimulationState.IsInPreparationPhase = false;
+            _matchDataService.SimulationState.StartPhaseInitialTick = _tick;
             _matchDataService.EnvironmentData.RemoveAllFieldBarriers();
             _netEventsDataService.AddPreparationPhaseEndedNetEvent(_tick);
         }

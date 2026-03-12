@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -11,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     public class StepAllWheelsRotationCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
+        private IStageDataService _stageDataService;
         private int _tick;
         private float _deltaTime;
 
@@ -24,13 +26,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _stageDataService = _diContainer.Resolve<IStageDataService>();
         }
 
         public void Execute()
         {
+            var calculationTick = _tick - _matchDataService.SimulationState.StartPhaseInitialTick;
             foreach (var rotatingWheel in _matchDataService.EnvironmentData.RotatingWheels.AsSpan())
             {
-                UpdateRotationAccordingToTick(_tick, _deltaTime, rotatingWheel);
+                UpdateRotationAccordingToTick(calculationTick, _deltaTime, rotatingWheel);
             }
         }
 

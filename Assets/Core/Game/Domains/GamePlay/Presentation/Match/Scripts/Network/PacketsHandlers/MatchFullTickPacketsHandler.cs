@@ -174,6 +174,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         private void UpdateRotatingWheels(int tick)
         {
+            if (_matchDataService.IsInPreparationPhase)
+            {
+                return;
+            }
+            
+            var calculationTick = tick - _matchDataService.StartPhaseInitialTick;
             var deltaTime = _networkConfig.DeltaTime;
 
             foreach (var wheelModel in _matchDataService.RotatingWheels)
@@ -186,7 +192,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     var wallModel = _matchDataService.GetEnvironmentWall(wallId);
 
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        tick, rotationSpeed, deltaTime, wheelCenter, wallModel.LocalPosition, 0,
+                        calculationTick, rotationSpeed, deltaTime, wheelCenter, wallModel.LocalPosition, 0,
                         out var worldPos, out var worldRot
                     );
 
@@ -200,7 +206,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     var lavaWallModel = _matchDataService.GetEnvironmentLavaWall(lavaWallId);
 
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        tick, rotationSpeed, deltaTime, wheelCenter, lavaWallModel.LocalPosition, 0,
+                        calculationTick, rotationSpeed, deltaTime, wheelCenter, lavaWallModel.LocalPosition, 0,
                         out var worldPos, out var worldRot
                     );
 
@@ -214,7 +220,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     var springModel = _matchDataService.GetEnvironmentSpring(springId);
 
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        tick, rotationSpeed, deltaTime, wheelCenter, springModel.LocalPosition, springModel.LocalRotationAngle,
+                        calculationTick, rotationSpeed, deltaTime, wheelCenter, springModel.LocalPosition, springModel.LocalRotationAngle,
                         out var worldPos, out var worldRot
                     );
 
@@ -228,7 +234,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     var teleportPairModel = _matchDataService.GetTeleportPair(pairId);
 
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        tick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateA.LocalPosition, teleportPairModel.GateA.LocalRotation,
+                        calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateA.LocalPosition, teleportPairModel.GateA.LocalRotation,
                         out var worldPosA, out var worldRotA
                     );
 
@@ -236,7 +242,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     teleportPairModel.GateA.WorldRotation = worldRotA;
 
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        tick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateB.LocalPosition, teleportPairModel.GateB.LocalRotation,
+                        calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateB.LocalPosition, teleportPairModel.GateB.LocalRotation,
                         out var worldPosB, out var worldRotB
                     );
 

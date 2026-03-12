@@ -77,6 +77,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
+            _matchDataService.StartPhaseInitialTick = _simulationState.StartPhaseInitialTick;
+            _matchDataService.IsInPreparationPhase = _simulationState.IsInPreparationPhase;
             DestroyAll();
             CreateAll();
         }
@@ -251,6 +253,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
             var lastProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer;
+            var calculationTick = _matchDataService.IsInPreparationPhase ? 0 : lastProcessedTickFromServer - _matchDataService.StartPhaseInitialTick;
             var deltaTime = _networkConfig.DeltaTime;
 
             foreach (var wheelConfig in wheels)
@@ -263,7 +266,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     foreach (var wallConfig in wheelConfig.Walls)
                     {
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            lastProcessedTickFromServer, rotationSpeed, deltaTime, wheelConfig.CenterPosition, wallConfig.Position, 0,
+                            calculationTick, rotationSpeed, deltaTime, wheelConfig.CenterPosition, wallConfig.Position, 0,
                             out var worldPosition, out var worldRotation
                         );
                         
@@ -277,7 +280,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     foreach (var lavaWallConfig in wheelConfig.LavaWalls)
                     {
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            lastProcessedTickFromServer, rotationSpeed, deltaTime, wheelConfig.CenterPosition, lavaWallConfig.Position, 0,
+                            calculationTick, rotationSpeed, deltaTime, wheelConfig.CenterPosition, lavaWallConfig.Position, 0,
                             out var worldPosition, out var worldRotation
                         );
                         
@@ -291,7 +294,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     foreach (var springConfig in wheelConfig.Springs)
                     {
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            lastProcessedTickFromServer, rotationSpeed, deltaTime, wheelConfig.CenterPosition, springConfig.Position, springConfig.RotationAngle,
+                            calculationTick, rotationSpeed, deltaTime, wheelConfig.CenterPosition, springConfig.Position, springConfig.RotationAngle,
                             out var worldPosition, out var worldRotation
                         );
 
@@ -307,12 +310,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                         var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size;
 
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            lastProcessedTickFromServer, rotationSpeed, deltaTime, wheelConfig.CenterPosition, teleportPairConfig.GateA.Position, teleportPairConfig.GateA.NormalRotation,
+                            calculationTick, rotationSpeed, deltaTime, wheelConfig.CenterPosition, teleportPairConfig.GateA.Position, teleportPairConfig.GateA.NormalRotation,
                             out var worldPositionA, out var worldRotationA
                         );
 
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            lastProcessedTickFromServer, rotationSpeed, deltaTime, wheelConfig.CenterPosition, teleportPairConfig.GateB.Position, teleportPairConfig.GateB.NormalRotation,
+                            calculationTick, rotationSpeed, deltaTime, wheelConfig.CenterPosition, teleportPairConfig.GateB.Position, teleportPairConfig.GateB.NormalRotation,
                             out var worldPositionB, out var worldRotationB
                         );
 
