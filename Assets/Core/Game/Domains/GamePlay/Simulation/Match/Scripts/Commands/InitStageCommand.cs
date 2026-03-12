@@ -55,6 +55,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var environmentLayoutIndex = _gamePlayConfig.ChosenEnvironmentIndex;
             _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutIndex);
             _matchDataService.SimulationState.EnvironmentLayoutIndex = environmentLayoutIndex;
+            _matchDataService.SimulationState.IsInPreparationPhase = true;
+            _matchDataService.SimulationState.StartPhaseInitialTick = 0;
+            
             CreateWalls();
             CreateLavaWalls();
             CreateTalentCards();
@@ -65,7 +68,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ResetPlayers();
 
             _stageDataService.IsStageEnded = false;
-            _matchDataService.SimulationState.IsInPreparationPhase = true;
             _stageDataService.StageRestartTimer = -1;
             _preparationPhaseTimerService.RestartTimer();
             _stageDataService.ClearData();
@@ -285,9 +287,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 return;
             }
-
-            var currentTick = _tickService.CurrentTick;
-            var calculationTick = _matchDataService.SimulationState.IsInPreparationPhase ? 0 : currentTick - _matchDataService.SimulationState.StartPhaseInitialTick;
+            
+            var calculationTick = 0;
             var deltaTime = _networkConfig.DeltaTime;
             
             foreach (var wheelConfig in rotatingWheelsConfigs)
