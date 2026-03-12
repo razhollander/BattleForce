@@ -115,7 +115,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
                 TryHandleStageEnded(currentTick, stepDeltaTime);
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
-                var processPlayersInputsResult = ProcessPackets(currentTick);
+                var processPlayersInputsResult = ProcessPackets(currentTick, stepDeltaTime);
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
@@ -189,10 +189,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.StartMatch, _cachedStartMatchPacket, deliveryMethod);
         }
 
-        private ProcessPlayersInputsResult ProcessPackets(int processedTick)
+        private ProcessPlayersInputsResult ProcessPackets(int processedTick, float deltaTime)
         {
             _matchPlayerJoinPacketsHandler.ProcessPlayersJoined(processedTick);
-            return _playerInputsPacketsHandler.ProcessInputs(processedTick);
+            return _playerInputsPacketsHandler.ProcessInputs(processedTick, deltaTime);
         }
 
         private void RemoveOlderThanTickEventsPerPlayer(CapacityDict<ushort, int> heighestProcessedTickPerPlayer)

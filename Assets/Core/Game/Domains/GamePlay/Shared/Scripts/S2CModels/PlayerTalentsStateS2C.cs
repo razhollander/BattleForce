@@ -12,14 +12,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public Vector2 AimDirection;
         public FixedOrderedList<TalentStateS2C> Talents;
 
+        public PlayerTalentsStateS2C(int maxTalents)
+        {
+            Talents = new FixedOrderedList<TalentStateS2C>(maxTalents);
+        }
+
         public ref TalentStateS2C GetCurrentSelectedTalent()
         {
             return ref Talents.Get(SelectedTalentIndex);
         }
-        
+
         public bool TryGetCurrentSelectedTalent(out TalentStateS2C selectedTalent)
         {
-            if (Talents.Count > SelectedTalentIndex)
+            if (Talents.Count == 0)
             {
                 selectedTalent = default;
                 return false;
@@ -27,11 +32,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             
             selectedTalent = Talents.Get(SelectedTalentIndex);
             return true;
-        }
-
-        public PlayerTalentsStateS2C(int maxTalents)
-        {
-            Talents = new FixedOrderedList<TalentStateS2C>(maxTalents);
         }
 
         public void Serialize(NetDataWriter writer)

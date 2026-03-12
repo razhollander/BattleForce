@@ -72,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public TalentType TalentType => TalentType.Hammer;
         public bool IsCurrentlyActive => true;//todo change this
-        public void OnTick(bool isTalentInputPressed, int tick)
+        public void ProcessTalentInput(bool isTalentInputPressed, int tick, float deltaTime)
         {
             
         }

@@ -27,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var playersSwapEvent in playersSwapEvents)
             {
                 _playerControllers.SetPlayerTransform(playersSwapEvent.CasterPlayerId, playersSwapEvent.CasterPosition, playersSwapEvent.CasterDirection);
+                _playerControllers.SetPlayerTransform(playersSwapEvent.OtherPlayerId, playersSwapEvent.OtherPosition, playersSwapEvent.OtherDirection);
             }
             
             playersSwapEvents.Clear();
