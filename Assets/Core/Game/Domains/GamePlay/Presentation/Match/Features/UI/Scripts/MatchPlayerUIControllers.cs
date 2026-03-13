@@ -66,5 +66,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             _playerControllers[playerId].SetSelectedTalent(index);
         }
+
+        public void UpdatePlayersTalentsCooldowns()
+        {
+            foreach (var keyValuePair in _playerControllers)
+            {
+                var playerId = keyValuePair.Key;
+                var controller = keyValuePair.Value;
+                controller.UpdateTalents(_matchDataService.GetPlayer(playerId).Spaceship.TalentsState.Talents);
+            }
+        }
     }
 }

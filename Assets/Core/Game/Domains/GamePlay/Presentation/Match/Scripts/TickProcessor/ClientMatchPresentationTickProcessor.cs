@@ -34,14 +34,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand;
         private readonly UpdateObjectTransformInsideRotatingWheelsCommand _updateObjectTransformInsideRotatingWheelsCommand;
         private readonly HandlePreparationPhaseEndedNetEventsCommand _handlePreparationPhaseEndedNetEventsCommand;
+        private readonly Features.UI.Scripts.IMatchPlayerUIControllers _playerUIControllers;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers)
+            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, Features.UI.Scripts.IMatchPlayerUIControllers playerUIControllers)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
             _bulletControllers = bulletControllers;
             _powerUpBallControllers = powerUpBallControllers;
+            _playerUIControllers = playerUIControllers;
             _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
             _handlePlayerTakeDamangeNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
             _handlePlayerDiedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerDiedNetEventsCommand>();
@@ -91,6 +93,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
 
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();
+            _playerUIControllers.UpdatePlayersTalentsCooldowns();
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
             _updateObjectTransformInsideRotatingWheelsCommand.Execute();
