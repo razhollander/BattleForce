@@ -63,25 +63,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public void SerializeDeltas(NetDataWriter writer)
         {
             writer.PutVector2AsAngle16(AimDirection);
-            writer.Put((byte)Talents.Count);
-
-            foreach (var talent in Talents.AsSpan())
-            {
-                talent.SerializeDeltas(writer);
-            }
         }
 
         public void DeserializeDeltas(NetDataReader reader)
         {
             AimDirection = reader.GetVector2FromAngle16();
-            var talentsCount = (int)reader.GetByte();
-            Talents.Clear();
-
-            for (int i = 0; i < talentsCount; i++)
-            {
-                ref var talent = ref Talents.AddAndGet();
-                talent.DeserializeDeltas(reader);
-            }
         }
     }
 
@@ -120,14 +106,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             MaxCooldown = reader.GetFloat16();
         }
 
-        public void SerializeDeltas(NetDataWriter writer)
-        {
-            writer.PutFloat16(CooldownSecondsLeft);
-        }
 
-        public void DeserializeDeltas(NetDataReader reader)
-        {
-            CooldownSecondsLeft = reader.GetFloat16();
-        }
+
+
     }
 }
