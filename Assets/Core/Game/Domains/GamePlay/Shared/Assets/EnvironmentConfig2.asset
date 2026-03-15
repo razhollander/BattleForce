@@ -15,7 +15,7 @@ MonoBehaviour:
   _environmentLayoutConfigs:
     m_keys: 02000000630000000100000000000000030000000400000005000000
     m_values:
-    - _environmentName: 
+    - _environmentName: Default
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
         "Y": -28.16       },       {         "X": -43.804464,         "Y": -28.16      
