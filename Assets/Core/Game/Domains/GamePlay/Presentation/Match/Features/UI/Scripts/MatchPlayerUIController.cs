@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
@@ -12,14 +13,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         private readonly ushort _playerId;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
+        private readonly IMatchPlayerTimersService _matchPlayerTimersService;
         private MatchPlayerUIView _view;
 
-        public MatchPlayerUIController(IMatchDataService matchDataService, ushort playerId, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public MatchPlayerUIController(IMatchDataService matchDataService, ushort playerId, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig, IMatchPlayerTimersService matchPlayerTimersService)
         {
             _matchDataService = matchDataService;
             _playerId = playerId;
             _gamePlayConfig = gamePlayConfig;
             _sharedGamePlayConfig = sharedGamePlayConfig;
+            _matchPlayerTimersService = matchPlayerTimersService;
         }
 
         public void CreateView(MatchPlayerUIView viewPrefab, Transform parent)
@@ -68,9 +71,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 var talentVisualData = new TalentVisualData();
                 var talentState = talents[i];
                 talentVisualData.Icon = _gamePlayConfig.TalentCards.TalentSprites[talentState.TalentType];
-                talentVisualData.CooldownLeft = talentState.CooldownSecondsLeft;
+
+                talentVisualData.CooldownLeft = _matchPlayerTimersService.GetPlayerTalentTimer(_playerId, i);
                 talentVisualData.MaxCooldown = talentState.MaxCooldown;
-                talentVisualData.IsOnCooldown = talentState.IsOnCooldown();
+                talentVisualData.IsOnCooldown = talentVisualData.CooldownLeft > 0;
                 talentsVisualData[i] = talentVisualData;
             }
 

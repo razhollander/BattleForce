@@ -12,6 +12,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
@@ -30,10 +31,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly ICommandFactory _commandFactory;
         private readonly ITickCounterService _tickCounterService;
         private readonly AddMatchPlayerCommand _addMatchPlayerCommand;
+        private readonly IMatchPlayerTimersService _matchPlayerTimersService;
         
         public PresentationMatchNetEventsHandler(IMatchDataService matchDataService,
             ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager, NetworkConfig networkConfig,
-            IClientMatchPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService)
+            IClientMatchPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService, IMatchPlayerTimersService matchPlayerTimersService)
         {
             _matchDataService = matchDataService;
             _cachedPresentationEventsService = iCachedPresentationEventsService;
@@ -43,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _commandFactory = commandFactory;
             _tickCounterService = tickCounterService;
             _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
+            _matchPlayerTimersService = matchPlayerTimersService;
         }
 
         public void ProcessPlayerRejoinedEvents(CapacityList<PlayerRejoinAcceptPacketS2C> playerRejoinAcceptNetEvents)
@@ -154,6 +157,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 var otherPlayer = _matchDataService.GetPlayer(playerSwapEvent.OtherPlayerId);
                 otherPlayer.Spaceship.Transform.Position = playerSwapEvent.OtherPosition;
                 otherPlayer.Spaceship.Transform.Direction = playerSwapEvent.OtherDirection;
+
+                var talents = casterPlayer.Spaceship.TalentsState.Talents;
+                for (int i = 0; i < talents.Count; i++)
+                {
+                    if (talents[i].TalentType == TalentType.Swap)
+                    {
+                        _matchPlayerTimersService.StartPlayerTalentTimer(playerSwapEvent.CasterPlayerId, i, playerSwapEvent.OccuredOnTick);
+                        break;
+                    }
+                }
+
                 _cachedPresentationEventsService.PlayerSwapNetEvents.Add(playerSwapEvent);
             }
         }

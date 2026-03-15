@@ -51,14 +51,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public int LastProcessedTickFromServer { get; private set; }
 
         public MatchFullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
-            IMatchDataService matchDataService, ICachedPresentationEventsService iCachedPresentationEventsService,
+            IMatchDataService matchDataService, ICachedPresentationEventsService iCachedPresentationEventsService, Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer.IMatchPlayerTimersService matchPlayerTimersService,
             IClientMatchPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
 
-            _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, iCachedPresentationEventsService, networkManager, networkConfig, clientPresentationTickProcessor, commandFactory, tickCounterService);
+            _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, iCachedPresentationEventsService, networkManager, networkConfig, clientPresentationTickProcessor, commandFactory, tickCounterService, matchPlayerTimersService);
             _fullTickPackets = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerRejoinedEvents = new CapacityList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
@@ -567,11 +567,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     talentsAmount =  System.Math.Min(sourceTalents.Count, destinationTalents.Count);
                 }
                 
-                for (var i = 0; i < talentsAmount; i++)
-                {
-                    ref var destinationTalent = ref destinationTalents.Get(i);
-                    destinationTalent.CooldownSecondsLeft = sourceTalents[i].CooldownSecondsLeft;
-                }
+
             }
         }
 
