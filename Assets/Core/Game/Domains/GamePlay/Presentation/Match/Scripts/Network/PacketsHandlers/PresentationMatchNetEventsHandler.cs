@@ -164,7 +164,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 {
                     if (talents[i].TalentType == TalentType.Swap)
                     {
-                        _matchPlayerTimersService.StartPlayerTalentTimer(playerSwapEvent.CasterPlayerId, i, playerSwapEvent.OccuredOnTick);
+                        _matchPlayerTimersService.StartPlayerTalentTimer(playerSwapEvent.CasterPlayerId, i, playerSwapEvent.TalentCooldownEndTick);
                         break;
                     }
                 }

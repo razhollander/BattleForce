@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 
@@ -39,9 +40,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var closetPlayerToCaster = FindClosestPlayerToCaster(casterPlayerState, _matchDataService.SimulationState);
             SwapPlayersTransform(casterPlayerState, closetPlayerToCaster);
-            casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().CooldownSecondsLeft -= deltaTime;
+
+            var cooldownEndTick = TickUtils.GetTickInTime(tick, casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().MaxCooldown, deltaTime);
+            casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().CooldownEndTick = cooldownEndTick;
             _netEventsDataService.AddPlayersSwapEvent(tick, _casterPlayerId, closetPlayerToCaster.Id, casterPlayerState.Spaceship.Transform.Position,
-                closetPlayerToCaster.Spaceship.Transform.Position, casterPlayerState.Spaceship.Transform.Direction, closetPlayerToCaster.Spaceship.Transform.Direction);
+                closetPlayerToCaster.Spaceship.Transform.Position, casterPlayerState.Spaceship.Transform.Direction, closetPlayerToCaster.Spaceship.Transform.Direction, cooldownEndTick);
         }
 
         public void Stop()

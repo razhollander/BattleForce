@@ -2,8 +2,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer
 {
     public interface INetworkTimerService
     {
-        string StartTimer(int initialServerTick);
+        string StartTimer(int endServerTick);
         void CancelTimer(string timerGuid);
-        float GetTimerSecondsPassed(string timerGuid, int currentServerTick);
+        float GetTimerSecondsLeft(string timerGuid, int currentServerTick);
     }
 }

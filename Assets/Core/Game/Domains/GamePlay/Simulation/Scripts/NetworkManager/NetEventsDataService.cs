@@ -499,7 +499,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddPlayersSwapEvent(int onTick, ushort casterPlayerId, ushort otherPlayerId, Vector2 casterPlayerPosition, Vector2 otherPlayerPosition, Vector2 casterPlayerDirection, Vector2 otherPlayerDirection)
+        public void AddPlayersSwapEvent(int onTick, ushort casterPlayerId, ushort otherPlayerId, Vector2 casterPlayerPosition, Vector2 otherPlayerPosition, Vector2 casterPlayerDirection, Vector2 otherPlayerDirection, int talentCooldownEndTick)
         {
             foreach (var kvp in PlayerSwapNetEventsPerPlayer)
             {
@@ -511,6 +511,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 packet.OtherPosition = otherPlayerPosition;
                 packet.CasterDirection = casterPlayerDirection;
                 packet.OtherDirection = otherPlayerDirection;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
             }
         }
 

@@ -1,6 +1,8 @@
 using System.Linq;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
@@ -27,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly NetworkConfig _networkConfig;
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
+        private readonly IMatchPlayerTimersService _matchPlayerTimersService;
         private readonly PresentationMatchNetEventsHandler _presentationNetEventsHandler;
         private readonly CapacityDict<int, MatchFullTickPacketS2C> _fullTickPackets;
         private readonly CapacityList<PlayerRejoinAcceptPacketS2C> _cachedUnprocessedPlayerRejoinedEvents;
@@ -51,13 +54,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public int LastProcessedTickFromServer { get; private set; }
 
         public MatchFullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
-            IMatchDataService matchDataService, ICachedPresentationEventsService iCachedPresentationEventsService, Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer.IMatchPlayerTimersService matchPlayerTimersService,
+            IMatchDataService matchDataService, ICachedPresentationEventsService iCachedPresentationEventsService, IMatchPlayerTimersService matchPlayerTimersService,
             IClientMatchPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
-
+            _matchPlayerTimersService = matchPlayerTimersService;
             _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, iCachedPresentationEventsService, networkManager, networkConfig, clientPresentationTickProcessor, commandFactory, tickCounterService, matchPlayerTimersService);
             _fullTickPackets = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerRejoinedEvents = new CapacityList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
@@ -102,6 +105,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
             
             ProcessPlayerRejoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents);
+            ResetPlayersTalentsCooldownsTimersIfEndedCommand(latestTickReceivedFromServer);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
             ProcessPlayerTakeDamageEvents(latestFullTickPacket.PlayerTakeDamageNetEvents);
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
@@ -132,6 +136,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
 
             _fullTickPackets.Clear();
+        }
+
+        private void ResetPlayersTalentsCooldownsTimersIfEndedCommand(int latestTickReceivedFromServer)
+        {
+            foreach (var playerModel in _matchDataService.Players)
+            {
+                for (int i = 0; i < playerModel.Spaceship.TalentsState.Talents.Count; i++)
+                {
+                    ref var talentsState = ref playerModel.Spaceship.TalentsState.Talents.Get(i);
+                    var didCooldownEnd = talentsState.CooldownEndTick <= latestTickReceivedFromServer;
+                    if (didCooldownEnd)
+                    {
+                        talentsState.CooldownEndTick = 0;
+                        _matchPlayerTimersService.StopTimer()
+                    }
+                }
+                
+            }
         }
 
         private void ProcessEnvironmentTeleportPlayerCollisionEvents(FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> playerToEnvironmentTeleportGateCollisionNetEvents)

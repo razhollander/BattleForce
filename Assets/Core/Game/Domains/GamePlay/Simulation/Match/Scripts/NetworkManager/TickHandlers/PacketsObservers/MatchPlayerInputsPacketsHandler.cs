@@ -173,9 +173,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 return;
             }
-
-            var isTalentOnCooldown = currentSelectedTalent.CooldownSecondsLeft < currentSelectedTalent.MaxCooldown;
-            if (isTalentOnCooldown)
+            
+            if (currentSelectedTalent.IsOnCooldown())
             {
                 return;
             }

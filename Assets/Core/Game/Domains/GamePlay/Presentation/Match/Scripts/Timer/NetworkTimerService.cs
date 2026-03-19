@@ -16,10 +16,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer
             _networkConfig = networkConfig;
         }
 
-        public string StartTimer(int initialServerTick)
+        public string StartTimer(int endServerTick)
         {
             var guid = Guid.NewGuid().ToString();
-            _timers.Add(guid, initialServerTick);
+            _timers.Add(guid, endServerTick);
             return guid;
         }
 
@@ -34,16 +34,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer
             _timers.Remove(timerGuid);
         }
 
-        public float GetTimerSecondsPassed(string timerGuid, int currentServerTick)
+        public float GetTimerSecondsLeft(string timerGuid, int currentServerTick)
         {
-            if (!_timers.TryGetValue(timerGuid, out var initialServerTick))
+            if (!_timers.TryGetValue(timerGuid, out var endServerTick))
             {
                 LogService.LogError("No timer found with guid: " + timerGuid);
                 return 0f;
             }
 
-            var elapsedTicks =  currentServerTick - initialServerTick;
-            return elapsedTicks * _networkConfig.DeltaTime;
+            var tickLeft = endServerTick - currentServerTick;
+            return tickLeft * _networkConfig.DeltaTime;
         }
     }
 }

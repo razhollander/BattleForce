@@ -61,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             for (int i = 0; i < talents.Count; i++)
             {
-                var cooldownLeft = _matchPlayerTimersService.GetPlayerTalentTimer(_playerId, i, currentServerTick);
+                var cooldownLeft = _matchPlayerTimersService.GetPlayerTalentTimerSecondsLeft(_playerId, i, currentServerTick);
                 var isOnCooldown = cooldownLeft > 0;
                 var maxCooldown = talents[i].MaxCooldown;
                 _view.UpdateTalentCooldown(i, maxCooldown, cooldownLeft, isOnCooldown);
@@ -83,7 +83,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 var talentState = talents[i];
                 talentVisualData.Icon = _gamePlayConfig.TalentCards.TalentSprites[talentState.TalentType];
 
-                talentVisualData.CooldownLeft = _matchPlayerTimersService.GetPlayerTalentTimer(_playerId, i, currentServerTick);
+                talentVisualData.CooldownLeft = _matchPlayerTimersService.GetPlayerTalentTimerSecondsLeft(_playerId, i, currentServerTick);
                 talentVisualData.MaxCooldown = talentState.MaxCooldown;
                 talentVisualData.IsOnCooldown = talentVisualData.CooldownLeft > 0;
                 talentsVisualData[i] = talentVisualData;

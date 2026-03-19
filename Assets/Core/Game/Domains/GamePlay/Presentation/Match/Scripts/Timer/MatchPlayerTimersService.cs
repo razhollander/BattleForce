@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer
             return timers;
         }
 
-        public void StartPlayerTalentTimer(ushort playerId, int talentIndex, int initialServerTick)
+        public void StartPlayerTalentTimer(ushort playerId, int talentIndex, int endServerTick)
         {
             var timers = GetOrCreatePlayerTimers(playerId);
 
@@ -37,11 +37,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer
                 _networkTimerService.CancelTimer(existingGuid);
             }
 
-            var guid = _networkTimerService.StartTimer(initialServerTick);
+            var guid = _networkTimerService.StartTimer(endServerTick);
             timers.TalentTimers[talentIndex] = guid;
         }
 
-        public float GetPlayerTalentTimer(ushort playerId, int talentIndex, int currentServerTick)
+        public float GetPlayerTalentTimerSecondsLeft(ushort playerId, int talentIndex, int currentServerTick)
         {
             if (!_playerTimers.TryGetValue(playerId, out var timers))
             {
@@ -53,19 +53,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer
             {
                 return 0f;
             }
-
-            var elapsedTime = _networkTimerService.GetTimerSecondsPassed(guid, currentServerTick);
-            // var maxCooldown = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.Talents[talentIndex].MaxCooldown;
-            // var secondsLeft = maxCooldown - elapsedTime;
-            //
-            // if (secondsLeft <= 0)
-            // {
-            //     _networkTimerService.CancelTimer(guid);
-            //     timers.TalentTimers[talentIndex] = null;
-            //     return 0f;
-            // }
-
-            return elapsedTime;
+            
+            return  _networkTimerService.GetTimerSecondsLeft(guid, currentServerTick);;
         }
     }
 }

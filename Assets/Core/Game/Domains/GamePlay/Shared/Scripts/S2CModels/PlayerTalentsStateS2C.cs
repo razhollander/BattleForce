@@ -74,35 +74,34 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     public struct TalentStateS2C
     {
         public TalentType TalentType;
-        public float CooldownSecondsLeft;
+        public int CooldownEndTick;
         public float MaxCooldown;
-        public bool IsOnCooldown() => CooldownSecondsLeft < MaxCooldown;
+        public bool IsOnCooldown() => CooldownEndTick > 0;
 
-        public TalentStateS2C(TalentType talentType, float cooldownSecondsLeft, float maxCooldown)
+        public TalentStateS2C(TalentType talentType, float maxCooldown)
         {
             TalentType = talentType;
-            CooldownSecondsLeft = cooldownSecondsLeft;
             MaxCooldown = maxCooldown;
+            CooldownEndTick = 0;
         }
 
         public void Setup(TalentType talentType, float maxCooldown)
         {
             TalentType = talentType;
-            CooldownSecondsLeft = maxCooldown;
             MaxCooldown = maxCooldown;
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)TalentType);
-            writer.PutFloat16(CooldownSecondsLeft);
+            writer.Put(CooldownEndTick);
             writer.PutFloat16(MaxCooldown);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             TalentType = (TalentType)reader.GetByte();
-            CooldownSecondsLeft = reader.GetFloat16();
+            CooldownEndTick = reader.GetInt();
             MaxCooldown = reader.GetFloat16();
         }
 
