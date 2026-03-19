@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using ASoliman.Utils.EditableRefs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SharedGamePlayConfig", menuName = "BF/Shared/GamePlay Config")]
 public class SharedGamePlayConfig : ScriptableObject
 {
+    [EditableRef] public DefaultMatchEnterDataConfig DefaultMatchEnterDataConfig;
     public int MaxConcurrentTalentsForPlayer = 3;
     public int MaxTeamsAmount = 4;
     [EditableRef] public EnvironmentConfig Environment; 

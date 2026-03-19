@@ -1,6 +1,6 @@
 using System;
 
-namespace Core.Game.Domains.GamePlay.Shared.Scripts
+namespace Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData
 {
     [Serializable]
     public class EnterMatchPlayerData
