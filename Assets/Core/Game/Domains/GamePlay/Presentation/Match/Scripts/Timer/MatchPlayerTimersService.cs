@@ -7,14 +7,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer
     public class MatchPlayerTimersService : IMatchPlayerTimersService
     {
         private readonly INetworkTimerService _networkTimerService;
-        private readonly IMatchDataService _matchDataService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly Dictionary<ushort, MatchPlayerTimers> _playerTimers = new Dictionary<ushort, MatchPlayerTimers>();
 
-        public MatchPlayerTimersService(INetworkTimerService networkTimerService, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig)
+        public MatchPlayerTimersService(INetworkTimerService networkTimerService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _networkTimerService = networkTimerService;
-            _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
@@ -28,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer
             return timers;
         }
 
-        public void StartPlayerTalentTimer(ushort playerId, int talentIndex, int initialTick)
+        public void StartPlayerTalentTimer(ushort playerId, int talentIndex, int initialServerTick)
         {
             var timers = GetOrCreatePlayerTimers(playerId);
 
@@ -39,11 +37,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer
                 _networkTimerService.CancelTimer(existingGuid);
             }
 
-            var guid = _networkTimerService.StartTimer(initialTick);
+            var guid = _networkTimerService.StartTimer(initialServerTick);
             timers.TalentTimers[talentIndex] = guid;
         }
 
-        public float GetPlayerTalentTimer(ushort playerId, int talentIndex)
+        public float GetPlayerTalentTimer(ushort playerId, int talentIndex, int currentServerTick)
         {
             if (!_playerTimers.TryGetValue(playerId, out var timers))
             {
@@ -56,18 +54,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer
                 return 0f;
             }
 
-            var elapsedTime = _networkTimerService.GetTimerSecondsLeft(guid);
-            var maxCooldown = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.Talents[talentIndex].MaxCooldown;
-            var secondsLeft = maxCooldown - elapsedTime;
+            var elapsedTime = _networkTimerService.GetTimerSecondsPassed(guid, currentServerTick);
+            // var maxCooldown = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.Talents[talentIndex].MaxCooldown;
+            // var secondsLeft = maxCooldown - elapsedTime;
+            //
+            // if (secondsLeft <= 0)
+            // {
+            //     _networkTimerService.CancelTimer(guid);
+            //     timers.TalentTimers[talentIndex] = null;
+            //     return 0f;
+            // }
 
-            if (secondsLeft <= 0)
-            {
-                _networkTimerService.CancelTimer(guid);
-                timers.TalentTimers[talentIndex] = null;
-                return 0f;
-            }
-
-            return secondsLeft;
+            return elapsedTime;
         }
     }
 }

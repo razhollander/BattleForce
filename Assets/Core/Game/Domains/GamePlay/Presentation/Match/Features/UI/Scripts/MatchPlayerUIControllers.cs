@@ -3,7 +3,6 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
-using CoreDomain.Scripts.Services.Logger.Base;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
@@ -17,7 +16,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         private readonly IMatchPlayerTimersService _matchPlayerTimersService;
         private readonly Dictionary<ushort, MatchPlayerUIController> _playerControllers = new Dictionary<ushort, MatchPlayerUIController>();
 
-        public MatchPlayerUIControllers(MatchPlayerUIControllersView view, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig, IMatchPlayerTimersService matchPlayerTimersService)
+        public MatchPlayerUIControllers(MatchPlayerUIControllersView view, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
+            SharedGamePlayConfig sharedGamePlayConfig, IMatchPlayerTimersService matchPlayerTimersService)
         {
             _view = view;
             _matchDataService = matchDataService;
@@ -26,11 +26,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _matchPlayerTimersService = matchPlayerTimersService;
         }
 
-        public void AddPlayer(ushort playerId)
+        public void AddPlayer(ushort playerId, int currentServerTick)
         {
             var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId, _gamePlayConfig, _sharedGamePlayConfig, _matchPlayerTimersService);
             newPlayerController.CreateView(_view.PlayerUIView, _view.PlayersContainer);
-            newPlayerController.UpdateTalents(_matchDataService.GetPlayer(playerId).Spaceship.TalentsState.Talents);
+            newPlayerController.UpdateTalents(_matchDataService.GetPlayer(playerId).Spaceship.TalentsState.Talents, currentServerTick);
             _playerControllers.Add(playerId, newPlayerController);
         }
 
@@ -58,11 +58,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _playerControllers.Clear();
         }
 
-        public void UpdatePlayerTalents(ushort playerId, FixedOrderedList<TalentStateS2C> talents)
+        public void UpdatePlayerTalents(ushort playerId, FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
         {
-            _playerControllers[playerId].UpdateTalents(talents);
+            _playerControllers[playerId].UpdateTalents(talents, currentServerTick);
             var selectedTalentIndex = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.SelectedTalentIndex;
             SetPlayerSelectedTalent(playerId, selectedTalentIndex);
+        }
+
+        public void UpdatePlayersTalentCooldowns(int currentServerTick)
+        {
+            foreach (var playerController in _playerControllers)
+            {
+                playerController.Value.UpdateTalentsCooldown(_matchDataService.GetPlayer(playerController.Key).Spaceship.TalentsState.Talents, currentServerTick);
+            }
         }
 
         public void SetPlayerSelectedTalent(ushort playerId, int index)

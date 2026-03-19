@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using CoreDomain.Scripts.Services.Logger.Base;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -45,9 +46,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             {
                 var progress = cooldownLeft / maxCooldown;
                 _cooldownOverlay.enabled = true;
-                _cooldownOverlay.fillAmount = Mathf.Clamp01(progress);
+                LogService.LogError($"maxCooldown: {maxCooldown},cooldownLeft: {cooldownLeft}, progress: {progress}");
+                _cooldownOverlay.fillAmount = progress;
                 _cooldownText.gameObject.SetActive(true);
-                _cooldownText.text = Mathf.CeilToInt(cooldownLeft).ToString();
+                var text = cooldownLeft < 1 ? cooldownLeft.ToString("F2") : Mathf.FloorToInt(cooldownLeft).ToString();
+                _cooldownText.text = text;
             }
             else
             {

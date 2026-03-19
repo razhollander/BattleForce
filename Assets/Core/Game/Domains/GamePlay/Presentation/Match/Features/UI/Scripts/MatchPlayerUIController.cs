@@ -52,17 +52,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             Object.Destroy(_view.gameObject);
         }
 
-        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents)
+        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
         {
-            _view.UpdateTalents(ConvertTalentsToVisualData(talents));
+            _view.UpdateTalents(ConvertTalentsToVisualData(talents, currentServerTick));
         }
-
+        
+        public void UpdateTalentsCooldown(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
+        {
+            for (int i = 0; i < talents.Count; i++)
+            {
+                var cooldownLeft = _matchPlayerTimersService.GetPlayerTalentTimer(_playerId, i, currentServerTick);
+                var isOnCooldown = cooldownLeft > 0;
+                var maxCooldown = talents[i].MaxCooldown;
+                _view.UpdateTalentCooldown(i, maxCooldown, cooldownLeft, isOnCooldown);
+            }
+        }
+        
         public void SetSelectedTalent(int talentIndex)
         {
             _view.SetSelectedTalent(talentIndex);
         }
 
-        private TalentVisualData[] ConvertTalentsToVisualData(FixedOrderedList<TalentStateS2C> talents)
+        private TalentVisualData[] ConvertTalentsToVisualData(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
         {
             var talentsVisualData = new TalentVisualData[talents.Count];
 
@@ -72,7 +83,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 var talentState = talents[i];
                 talentVisualData.Icon = _gamePlayConfig.TalentCards.TalentSprites[talentState.TalentType];
 
-                talentVisualData.CooldownLeft = _matchPlayerTimersService.GetPlayerTalentTimer(_playerId, i);
+                talentVisualData.CooldownLeft = _matchPlayerTimersService.GetPlayerTalentTimer(_playerId, i, currentServerTick);
                 talentVisualData.MaxCooldown = talentState.MaxCooldown;
                 talentVisualData.IsOnCooldown = talentVisualData.CooldownLeft > 0;
                 talentsVisualData[i] = talentVisualData;

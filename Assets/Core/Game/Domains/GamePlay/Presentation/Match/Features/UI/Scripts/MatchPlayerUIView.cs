@@ -80,6 +80,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             }
         }
 
+        public void UpdateTalentCooldown(int talentIndex, float maxCooldown, float cooldownLeft, bool isOnCooldown)
+        {
+            _talentViews[talentIndex].UpdateCooldown(maxCooldown, cooldownLeft, isOnCooldown);
+        }
+
         public void SetSelectedTalent(int selectedTalentIndex)
         {
             for (int i = 0; i < _talentViews.Length; i++)
