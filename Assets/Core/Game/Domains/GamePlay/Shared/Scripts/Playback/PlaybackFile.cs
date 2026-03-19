@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Playback
 {

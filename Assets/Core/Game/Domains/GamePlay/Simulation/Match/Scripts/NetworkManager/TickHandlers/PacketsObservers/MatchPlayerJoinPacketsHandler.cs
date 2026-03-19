@@ -78,6 +78,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 }
                 else
                 {
+                    var isAlreadyConnected = isPlayerAlreadyInMatch && existingPlayerState.IsConnected;
+                    LogService.LogError($"Can't join server isPlayerAlreadyInMatch {isPlayerAlreadyInMatch}, IsConnected {isAlreadyConnected}, playerName {playerName}");
                     joinResponse.IsSuccess = false;
                 }
                 _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);

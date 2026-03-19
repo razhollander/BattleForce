@@ -1,6 +1,6 @@
 using CoreDomain.Scripts.CoreInitiator.Base;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
+namespace Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData
 {
     public class ServerInitiatorEnterData : IInitiatorEnterData
     {

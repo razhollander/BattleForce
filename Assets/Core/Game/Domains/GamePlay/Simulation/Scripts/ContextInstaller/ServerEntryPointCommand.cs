@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -20,9 +21,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ISimulationPersistentData _simulationPersistentData;
         private IHeadLessQuitterController _headLessQuitterController;
         private IPlaybackRecorderService _playbackRecorderService;
-        private DefaultMatchEnterDataConfig _defaultMatchEnterDataConfig;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
         
         private ServerInitiatorEnterData _serverInitiatorEnterData;
+
+        public ServerEntryPointCommand SetEnterData(ServerInitiatorEnterData serverInitiatorEnterData)
+        {
+            _serverInitiatorEnterData = serverInitiatorEnterData;
+            return this;
+        }
 
         public override void ResolveDependencies()
         {
@@ -33,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _simulationPersistentData = _diContainer.Resolve<ISimulationPersistentData>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
             _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
-            _defaultMatchEnterDataConfig = _diContainer.Resolve<DefaultMatchEnterDataConfig>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public void Execute()
@@ -62,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             }
             else if (_simulationPersistentData.ShouldSkipMatchMaking)
             {
-                _simulationStateMachine.ChangeToMatch(_defaultMatchEnterDataConfig.DefaultSimulationMatchEnterData);
+                _simulationStateMachine.ChangeToMatch(_sharedGamePlayConfig.DefaultMatchEnterDataConfig.DefaultSimulationMatchEnterData);
             }
             else
             {
@@ -71,12 +78,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             
             _serverNetworkManager.InitEntryPoint(_serverInitiatorEnterData.Port);
             _tickService.UnregisterObserver(this);
-        }
-
-        public ServerEntryPointCommand SetEnterData(ServerInitiatorEnterData serverInitiatorEnterData)
-        {
-            _serverInitiatorEnterData = serverInitiatorEnterData;
-            return this;
         }
     }
 }

@@ -6,8 +6,8 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -28,9 +28,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly NetworkConfig _networkConfig;
         private readonly IPlaybackIOService _playbackIOService;
         private readonly ICommandFactory _commandFactory;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, NetworkConfig networkConfig, IPlaybackIOService playbackIOService, ICommandFactory commandFactory)
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, NetworkConfig networkConfig, IPlaybackIOService playbackIOService, ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
@@ -39,11 +40,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _networkConfig = networkConfig;
             _playbackIOService = playbackIOService;
             _commandFactory = commandFactory;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void InitEntryPoint()
         {
-            var playerName = /*PlayerPrefsSettings.ShouldSkipMatchMaking ? "Raz" :*/ "Player_" + UnityEngine.Random.Range(1000, 9999);
+            var playerName = "Player_" + UnityEngine.Random.Range(1000, 9999);
             _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, _networkConfig.OnlyLocal, _networkConfig.IpAddress, _networkConfig.DefaultHostPort, playerName);
             PopulatePlaybacksDropdown();
 #if UNITY_SERVER
@@ -138,18 +140,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             await _sceneLoaderService.StartScene(SceneType.ServerScene, enterData, cancellationTokenSource);
             LogService.LogTopic("Finished starting Server", LogTopicType.ClientNetwork);
         }
-        
+
         private void StartClient(string ip, bool isHost, CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled, string playbackName = "")
         {
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             var port = _uiView.Port;
-            var playerName = _uiView.PlayerName;
-            
-            if (isPlaybackEnabled)
-            {
-                _playbackIOService.TryGetPlayback(playbackName, out var playbackFile);
-                playerName = playbackFile.Players[0].Name;
-            }
+            var playerName = GetPlayerName(isPlaybackEnabled, playbackName);
             
             _commandFactory.CreateCommandAsync<StartClientCommand>()
                 .SetIsHost(isHost)
@@ -159,7 +155,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
-        
+
+        private string GetPlayerName(bool isPlaybackEnabled, string playbackName = "")
+        {
+            var playerName = _uiView.PlayerName;
+
+            if (isPlaybackEnabled)
+            {
+                _playbackIOService.TryGetPlayback(playbackName, out var playbackFile);
+                playerName = playbackFile.Players[0].Name;
+            }
+            else if (PlayerPrefsSettings.ShouldSkipMatchMaking)
+            {
+                playerName = _sharedGamePlayConfig.DefaultMatchEnterDataConfig.DefaultSimulationMatchEnterData.Players[0].Name;
+            }
+
+            return playerName;
+        }
+
         private void OnClientClicked()
         {
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
