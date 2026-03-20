@@ -201,7 +201,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             foreach (var playerState in _simulationState.Players.AsSpan())
             {
-                _addMatchPlayerCommand.SetPlayerState(playerState).Execute();
+                _addMatchPlayerCommand.SetPlayerState(playerState).SetCurrentServerTick(_fullTickPacketsHandler.LastProcessedTickFromServer).Execute();
             }
         }
 

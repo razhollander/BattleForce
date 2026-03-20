@@ -27,7 +27,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 
         public void AddPlayer(ushort playerId)
         {
-            _talentControllersPerPlayer.Add(playerId, _talentControllersPool.Get());
+            var playerTalentControllers = _talentControllersPool.Get();
+            playerTalentControllers.SetCasterId(playerId);
+            _talentControllersPerPlayer.Add(playerId, playerTalentControllers);
         }
 
         public void RemovePlayer(ushort playerId)
@@ -92,6 +94,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             return true;
         }
 
+        public void ProcessPlayerTalentInput(ushort playerId, TalentType talentType, int tick, bool isTalentInputPressed, float deltaTime)
+        {
+            _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, isTalentInputPressed, tick, deltaTime);
+        }
+
         private TalentStateS2C AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)
         {
             ref var newTalent = ref playerState.Spaceship.TalentsState.Talents.AddAndGet();
@@ -103,13 +110,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private TalentStateS2C ReplaceTalentWithCurrentSelectedTalent(TalentType talentType, PlayerStateS2C playerState)
         {
             ref var currentSelectedTalent = ref playerState.Spaceship.TalentsState.Talents.Get(playerState.Spaceship.TalentsState.SelectedTalentIndex);
-            var talentController = _talentControllersPerPlayer[playerState.Id].GetTalentByType(currentSelectedTalent.TalentType);
-
-            if (talentController != null)
-            {
-                talentController.Stop();
-            }
-            
+            _talentControllersPerPlayer[playerState.Id].StopTalent(currentSelectedTalent.TalentType);
             var maxCooldown = _gamePlayConfig.Talents.CooldownPerTalentType[talentType];
             currentSelectedTalent.Setup(talentType, maxCooldown);
             return currentSelectedTalent;

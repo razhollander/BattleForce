@@ -3,6 +3,9 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
@@ -12,14 +15,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         private readonly ushort _playerId;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
+        private readonly NetworkConfig _networkConfig;
         private MatchPlayerUIView _view;
 
-        public MatchPlayerUIController(IMatchDataService matchDataService, ushort playerId, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public MatchPlayerUIController(IMatchDataService matchDataService, ushort playerId, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig)
         {
             _matchDataService = matchDataService;
             _playerId = playerId;
             _gamePlayConfig = gamePlayConfig;
             _sharedGamePlayConfig = sharedGamePlayConfig;
+            _networkConfig = networkConfig;
         }
 
         public void CreateView(MatchPlayerUIView viewPrefab, Transform parent)
@@ -49,17 +54,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             Object.Destroy(_view.gameObject);
         }
 
-        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents)
+        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
         {
-            _view.UpdateTalents(ConvertTalentsToVisualData(talents));
+            _view.UpdateTalents(ConvertTalentsToVisualData(talents, currentServerTick));
         }
-
+        
+        public void UpdateTalentsCooldown(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
+        {
+            for (int i = 0; i < talents.Count; i++)
+            {
+                var maxCooldown = talents[i].MaxCooldown;
+                var isOnCooldown = talents[i].IsOnCooldown();
+                var cooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talents[i].CooldownEndTick, _networkConfig.DeltaTime) : maxCooldown;
+                _view.UpdateTalentCooldown(i, maxCooldown, cooldownLeft, isOnCooldown);
+            }
+        }
+        
         public void SetSelectedTalent(int talentIndex)
         {
             _view.SetSelectedTalent(talentIndex);
         }
 
-        private TalentVisualData[] ConvertTalentsToVisualData(FixedOrderedList<TalentStateS2C> talents)
+        private TalentVisualData[] ConvertTalentsToVisualData(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
         {
             var talentsVisualData = new TalentVisualData[talents.Count];
 
@@ -68,9 +84,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 var talentVisualData = new TalentVisualData();
                 var talentState = talents[i];
                 talentVisualData.Icon = _gamePlayConfig.TalentCards.TalentSprites[talentState.TalentType];
-                talentVisualData.CooldownLeft = talentState.CooldownSecondsLeft;
-                talentVisualData.MaxCooldown = talentState.MaxCooldown;
-                talentVisualData.IsOnCooldown = talentState.IsOnCooldown();
+                 var isOnCooldown = talentState.IsOnCooldown();
+                talentVisualData.IsOnCooldown = isOnCooldown;
+                var maxCooldown = talentState.MaxCooldown;
+                talentVisualData.CooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.CooldownEndTick, _networkConfig.DeltaTime) : maxCooldown;
+                talentVisualData.MaxCooldown = maxCooldown;
                 talentsVisualData[i] = talentVisualData;
             }
 

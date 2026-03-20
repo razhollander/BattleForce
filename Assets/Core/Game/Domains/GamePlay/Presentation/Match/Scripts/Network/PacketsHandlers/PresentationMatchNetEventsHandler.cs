@@ -12,6 +12,8 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
@@ -24,28 +26,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
     {
         private readonly IMatchDataService _matchDataService;
         private readonly ICachedPresentationEventsService _cachedPresentationEventsService;
-        private readonly IClientNetworkManager _networkManager;
-        private readonly NetworkConfig _networkConfig;
-        private readonly IClientMatchPresentationTickProcessor _clientPresentationTickProcessor;
         private readonly ICommandFactory _commandFactory;
-        private readonly ITickCounterService _tickCounterService;
         private readonly AddMatchPlayerCommand _addMatchPlayerCommand;
         
         public PresentationMatchNetEventsHandler(IMatchDataService matchDataService,
-            ICachedPresentationEventsService iCachedPresentationEventsService, IClientNetworkManager networkManager, NetworkConfig networkConfig,
-            IClientMatchPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService)
+            ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory)
         {
             _matchDataService = matchDataService;
-            _cachedPresentationEventsService = iCachedPresentationEventsService;
-            _networkManager = networkManager;
-            _networkConfig = networkConfig;
-            _clientPresentationTickProcessor = clientPresentationTickProcessor;
+            _cachedPresentationEventsService = cachedPresentationEventsService;
             _commandFactory = commandFactory;
-            _tickCounterService = tickCounterService;
             _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
         }
 
-        public void ProcessPlayerRejoinedEvents(CapacityList<PlayerRejoinAcceptPacketS2C> playerRejoinAcceptNetEvents)
+        public void ProcessPlayerRejoinedEvents(CapacityList<PlayerRejoinAcceptPacketS2C> playerRejoinAcceptNetEvents, int currentServerTick)
         {
             foreach (var playerRejoinAcceptNetEvent in playerRejoinAcceptNetEvents)
             {
@@ -57,23 +50,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
                 if (!isLocalPlayer)
                 {
-                    _addMatchPlayerCommand.SetPlayerState(playerRejoinAcceptNetEvent.PlayerState).Execute();
-                }
-                else
-                {
-                    // _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
-                    //     .SetSimulationState(playerRejoinAcceptNetEvent.SimulationState)
-                    //     .Execute();
-                    //SyncTickToServer(playerRejoinAcceptNetEvent);
-                    // SetupLocalPlayer(playerId);
+                    _addMatchPlayerCommand.SetPlayerState(playerRejoinAcceptNetEvent.PlayerState).SetCurrentServerTick(currentServerTick).Execute();
                 }
             }
-        }
-
-        private void SetupLocalPlayer(int playerId)
-        {
-            _matchDataService.SetLocalPlayer(playerId);
-            _clientPresentationTickProcessor.InitEntryPoint();
         }
         
         public void ProcessBulletSpawnEvents(CapacityList<BulletSpawnNetEventS2C> bulletSpawnNetEvents)
@@ -151,9 +130,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 var casterPlayer = _matchDataService.GetPlayer(playerSwapEvent.CasterPlayerId);
                 casterPlayer.Spaceship.Transform.Position = playerSwapEvent.CasterPosition;
                 casterPlayer.Spaceship.Transform.Direction = playerSwapEvent.CasterDirection;
+                
                 var otherPlayer = _matchDataService.GetPlayer(playerSwapEvent.OtherPlayerId);
                 otherPlayer.Spaceship.Transform.Position = playerSwapEvent.OtherPosition;
                 otherPlayer.Spaceship.Transform.Direction = playerSwapEvent.OtherDirection;
+
+                var talents = casterPlayer.Spaceship.TalentsState.Talents;
+                for (int i = 0; i < talents.Count; i++)
+                {
+                    ref var talent = ref talents.Get(i);
+                    if (talent.TalentType == TalentType.Swap)
+                    {
+                        talent.CooldownEndTick = playerSwapEvent.TalentCooldownEndTick;
+                        break;
+                    }
+                }
+
                 _cachedPresentationEventsService.PlayerSwapNetEvents.Add(playerSwapEvent);
             }
         }

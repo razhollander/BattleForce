@@ -25,10 +25,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             var closetPlayerToCaster = FindClosestPlayerToCaster(casterPlayerState, _matchDataService.SimulationState);
             
-            SwapPlayersMatchData(casterPlayerState, ref closetPlayerToCaster);
+            //SwapPlayersMatchData(casterPlayerState, ref closetPlayerToCaster);
            
-            _netEventsDataService.AddPlayersSwapEvent(tick, _casterPlayerId, closetPlayerToCaster.Id, casterPlayerState.Spaceship.Transform.Position,
-                closetPlayerToCaster.Spaceship.Transform.Position, casterPlayerState.Spaceship.Transform.Direction, closetPlayerToCaster.Spaceship.Transform.Direction);
+            // _netEventsDataService.AddPlayersSwapEvent(tick, _casterPlayerId, closetPlayerToCaster.Id, casterPlayerState.Spaceship.Transform.Position,
+            //     closetPlayerToCaster.Spaceship.Transform.Position, casterPlayerState.Spaceship.Transform.Direction, closetPlayerToCaster.Spaceship.Transform.Direction);
         }
 
         private void SwapPlayersMatchData(PlayerStateS2C casterPlayerState, ref PlayerStateS2C closetPlayerToCaster)
@@ -72,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public TalentType TalentType => TalentType.Hammer;
         public bool IsCurrentlyActive => true;//todo change this
-        public void OnTick(bool isTalentInputPressed, int tick)
+        public void ProcessTalentInput(bool isTalentInputPressed, int tick, float deltaTime)
         {
             
         }

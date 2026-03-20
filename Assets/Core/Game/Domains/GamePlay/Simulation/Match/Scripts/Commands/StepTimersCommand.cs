@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -17,7 +18,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         
         private float _deltaTime;
+        private int _tick;
 
+        public StepTimersCommand SetStepTick(int tick)
+        {
+            _tick = tick;
+            return this;
+        }
+        
         public StepTimersCommand SetStepDeltaTime(float deltaTime)
         {
             _deltaTime = deltaTime;
@@ -37,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public void Execute()
         {
             StepPlayersShootCooldown(_deltaTime);
-            StepPlayersTalentsCooldowns(_deltaTime);
+            ResetPlayersTalentsCooldownsIfEnded();
             _powerUpsSpawnerService.StepTimer(_deltaTime);
             _playersInLavaTrackerService.StepTimePassedSinceLastDamageTaken(_deltaTime);
             _headLessQuitterController.StepTimer(_deltaTime);
@@ -54,25 +62,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _preparationPhaseTimerService.StepPreperationPhaseTimer(_deltaTime);
         }
 
-        private void StepPlayersTalentsCooldowns(float deltaTime)
+        private void ResetPlayersTalentsCooldownsIfEnded()
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
                 for (int i = 0; i < playerState.Spaceship.TalentsState.Talents.Count; i++)
                 {
                     var playerTalent = playerState.Spaceship.TalentsState.Talents[i];
-                    var isCurrentlyOnCooldown = playerTalent.CooldownSecondsLeft < playerTalent.MaxCooldown;
-
-                    if (isCurrentlyOnCooldown)
+                    if (!playerTalent.IsOnCooldown())
                     {
-                        playerTalent.CooldownSecondsLeft -= deltaTime;
+                        continue;
                     }
 
-                    if (playerTalent.CooldownSecondsLeft < 0)
+                    var didCooldownEnd = playerTalent.CooldownEndTick <= _tick;
+                    if (!didCooldownEnd)
                     {
-                        playerTalent.CooldownSecondsLeft = playerTalent.MaxCooldown;
+                        continue;
                     }
 
+                    playerTalent.ResetCooldownEndTick();
                     playerState.Spaceship.TalentsState.Talents[i] = playerTalent;
                 }
             }

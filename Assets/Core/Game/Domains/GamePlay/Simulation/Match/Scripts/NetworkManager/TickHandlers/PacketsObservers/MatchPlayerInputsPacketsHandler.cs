@@ -8,7 +8,6 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
@@ -36,7 +35,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ICommandFactory _commandFactory;
         private readonly ISimulationInputService _simulationInputService;
-        private readonly ITickService _tickService;
 
         private readonly CapacityDict<ushort, FixedUnorderedList<MatchPlayerInputPacketC2S>> _inputsPerPlayer;
         private readonly CapacityDict<ushort, int> _heighestProcessedTickPerPlayer;
@@ -54,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, ISimulationInputService simulationInputService, ITickService tickService)
+            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, ISimulationInputService simulationInputService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -67,7 +65,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _playersTalentsManager = playersTalentsManager;
             _playerbackRecorderService = playerbackRecorderService;
             _simulationInputService = simulationInputService;
-            _tickService = tickService;
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerPlayer = new CapacityDict<ushort, MatchPlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _inputsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<MatchPlayerInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -89,12 +86,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
 
-        public ProcessPlayersInputsResult ProcessInputs(int processedTick)
+        public ProcessPlayersInputsResult ProcessInputs(int processedTick, float deltaTime)
         {
             _cachedProcessPlayersInputsResult.Clear();
             LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer = GetHeighestProcessedTickFromServerPerPlayer();
-            _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick);
+            _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer = ProcessEarliestInputPerPlayers(processedTick, deltaTime); // todo move to a new command?
 
             return _cachedProcessPlayersInputsResult;
         }
@@ -125,7 +122,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
         }
 
-        private CapacityDict<ushort, MatchPlayerInputPacketC2S> ProcessEarliestInputPerPlayers(int processedTick)
+        private CapacityDict<ushort, MatchPlayerInputPacketC2S> ProcessEarliestInputPerPlayers(int processedTick, float deltaTime)
         {
             var earliestInputPerPlayers = PopEarliestInputsOfEachPlayer();
 
@@ -141,7 +138,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
                 UpdatePlayerDirection(playerInputPacket, playerState);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
-                UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState);
+                UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState, deltaTime);
                 playerState.Spaceship.TalentsState.AimDirection = playerInputPacket.AimDirection;
 
                 _simulationInputService.SetPlayerInput(playerId, PlayerInputType.SwitchTalent, playerInputPacket.IsSwitchTalentInputPressed);
@@ -164,38 +161,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             return earliestInputPerPlayers;
         }
 
-        private void UpdatePlayerTalent(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState)
+        private void UpdatePlayerTalent(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState, float deltaTime)
         {
-            UpdatePlayerTalents(processedTick, isTalentInputPressed, playerState);
-        }
-
-        private void UpdatePlayerTalents(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState)
-        {
-            foreach (var VARIABLE in playerState.Spaceship.TalentsState.Talents.AsSpan())
+            if (!playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalent))
             {
-                
+                return;
             }
-            // if (!isTalentInputPressed)
-            // {
-            //     return;
-            // }
-            //
-            // ref var currentSelectedTalent = ref playerState.Spaceship.Talents.GetCurrentSelectedTalent();
-            // var isTalentOnCooldown = currentSelectedTalent.CooldownSecondsLeft < currentSelectedTalent.MaxCooldown;
-            // if (isTalentOnCooldown)
-            // {
-            //     return;
-            // }
-            //
-            // foreach (var VARIABLE in _)
-            // {
-            //     
-            // }
-            // _handleTalentInputPressedCommand
-            //     .SetPlayerState(playerState)
-            //     .SetTalent(currentSelectedTalent)
-            //     .SetTick(processedTick)
-            //     .Execute();
+            
+            if (currentSelectedTalent.IsOnCooldown())
+            {
+                return;
+            }
+
+            _playersTalentsManager.ProcessPlayerTalentInput(playerState.Id, currentSelectedTalent.TalentType, processedTick, isTalentInputPressed, deltaTime);
         }
 
         private CapacityDict<ushort, int> GetHeighestProcessedTickFromServerPerPlayer()
@@ -281,7 +259,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     LogService.LogError("Hit!");
                 }
             }
-            
         }
         
         private void CreateBulletForPlayer(int processedTick, PlayerStateS2C playerModel)

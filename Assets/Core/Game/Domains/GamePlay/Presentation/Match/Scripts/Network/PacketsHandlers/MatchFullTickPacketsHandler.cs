@@ -1,6 +1,8 @@
 using System.Linq;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
@@ -51,14 +53,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public int LastProcessedTickFromServer { get; private set; }
 
         public MatchFullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
-            IMatchDataService matchDataService, ICachedPresentationEventsService iCachedPresentationEventsService,
-            IClientMatchPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService)
+            IMatchDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
-
-            _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, iCachedPresentationEventsService, networkManager, networkConfig, clientPresentationTickProcessor, commandFactory, tickCounterService);
+            _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory);
             _fullTickPackets = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerRejoinedEvents = new CapacityList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
@@ -101,7 +101,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 return;
             }
             
-            ProcessPlayerRejoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents);
+            ProcessPlayerRejoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents, latestTickReceivedFromServer);
+            ResetPlayersTalentsCooldownsTimersIfEnded(latestTickReceivedFromServer);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
             ProcessPlayerTakeDamageEvents(latestFullTickPacket.PlayerTakeDamageNetEvents);
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
@@ -132,6 +133,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
 
             _fullTickPackets.Clear();
+        }
+
+        private void ResetPlayersTalentsCooldownsTimersIfEnded(int latestTickReceivedFromServer)
+        {
+            foreach (var playerModel in _matchDataService.Players)
+            {
+                for (int i = 0; i < playerModel.Spaceship.TalentsState.Talents.Count; i++)
+                {
+                    ref var talentsState = ref playerModel.Spaceship.TalentsState.Talents.Get(i);
+                    var didCooldownEnd = talentsState.CooldownEndTick <= latestTickReceivedFromServer;
+                    if (didCooldownEnd)
+                    {
+                        talentsState.ResetCooldownEndTick();
+                    }
+                }
+            }
         }
 
         private void ProcessEnvironmentTeleportPlayerCollisionEvents(FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> playerToEnvironmentTeleportGateCollisionNetEvents)
@@ -376,7 +393,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         }
 
 
-        private void ProcessPlayerRejoinedEvents(FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C> playerRejoinAcceptNetEvents)
+        private void ProcessPlayerRejoinedEvents(FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C> playerRejoinAcceptNetEvents, int lastProcessedTickFromServer)
         {
             _cachedUnprocessedPlayerRejoinedEvents.Clear();
 
@@ -391,7 +408,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             if (!_cachedUnprocessedPlayerRejoinedEvents.IsNullOrEmpty())
             {
                 _cachedUnprocessedPlayerRejoinedEvents.Sort();
-                _presentationNetEventsHandler.ProcessPlayerRejoinedEvents(_cachedUnprocessedPlayerRejoinedEvents);
+                _presentationNetEventsHandler.ProcessPlayerRejoinedEvents(_cachedUnprocessedPlayerRejoinedEvents, lastProcessedTickFromServer);
             }
         }
 
@@ -556,22 +573,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 playerModel.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
                 playerModel.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
                 playerModel.Spaceship.TalentsState.AimDirection = playerState.Spaceship.TalentsState.AimDirection;
-
-                var sourceTalents = playerState.Spaceship.TalentsState.Talents;
-                var destinationTalents = playerModel.Spaceship.TalentsState.Talents;
-                var talentsAmount = destinationTalents.Count;
-
-                if (sourceTalents.Count != destinationTalents.Count)
-                {
-                    LogService.LogError($"For some reason there's a different amount of talents for player {playerModel.PlayerId} in state {sourceTalents.Count} and in presentation {destinationTalents.Count}");
-                    talentsAmount =  System.Math.Min(sourceTalents.Count, destinationTalents.Count);
-                }
-                
-                for (var i = 0; i < talentsAmount; i++)
-                {
-                    ref var destinationTalent = ref destinationTalents.Get(i);
-                    destinationTalent.CooldownSecondsLeft = sourceTalents[i].CooldownSecondsLeft;
-                }
             }
         }
 

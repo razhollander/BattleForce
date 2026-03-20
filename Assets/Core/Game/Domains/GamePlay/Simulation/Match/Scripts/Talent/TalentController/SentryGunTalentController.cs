@@ -6,7 +6,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
     {
         public TalentType TalentType => TalentType.SentryGun;
         public bool IsCurrentlyActive => true;//todo change this
-        public void OnTick(bool isTalentInputPressed, int tick)
+        public void ProcessTalentInput(bool isTalentInputPressed, int tick, float deltaTime)
         {
             
         }
@@ -14,6 +14,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         public void Stop()
         {
 
+        }
+
+        public void OnTick(int tick)
+        {
+            
         }
     }
 }

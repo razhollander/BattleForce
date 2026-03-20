@@ -6,7 +6,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
     {
         void InitEntryPoint();
         bool DidReceiveAnyInputFromPlayer(ushort playerId);
-        ProcessPlayersInputsResult ProcessInputs(int processedTick);
+        ProcessPlayersInputsResult ProcessInputs(int processedTick, float deltaTime);
         void InitExitPoint();
     }
 }

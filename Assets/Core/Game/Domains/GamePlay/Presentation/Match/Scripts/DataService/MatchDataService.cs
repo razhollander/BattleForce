@@ -103,7 +103,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         {
             var newPowerUpBall = new MatchPowerUpBallModel(powerUpBallId, position);
             PowerUpBalls.Add(newPowerUpBall);
-            LogService.LogError("Add power up ball: " + newPowerUpBall.Id);
             return newPowerUpBall;
         }
 

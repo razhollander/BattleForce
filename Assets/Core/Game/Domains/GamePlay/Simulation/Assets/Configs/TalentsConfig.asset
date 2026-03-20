@@ -16,12 +16,12 @@ MonoBehaviour:
   CooldownPerTalentType:
     m_keys: 010000000200000003000000040000000500000006000000
     m_values:
-    - 10
-    - 10
-    - 10
-    - 10
-    - 10
-    - 10
+    - 2
+    - 2
+    - 2
+    - 2
+    - 2
+    - 2
   HammerTalentConfig:
     HammerSpeed: 10
     HammerSize: 1

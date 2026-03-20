@@ -1,8 +1,7 @@
 using System;
-using Core.Game.Domains.GamePlay.Shared.Scripts;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
+namespace Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData
 {
     [CreateAssetMenu(fileName = "DefaultMatchEnterDataConfig", menuName = "BF/Simulation/Default Match Enter Data Config")]
     public class DefaultMatchEnterDataConfig : ScriptableObject
