@@ -114,7 +114,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 var stepDeltaTime = _networkConfig.DeltaTime;
 
                 TryHandleStageEnded(currentTick, stepDeltaTime);
-                _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
+                _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).SetStepTick(currentTick).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick, stepDeltaTime);
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();

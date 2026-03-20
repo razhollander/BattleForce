@@ -271,7 +271,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     LogService.LogError("Hit!");
                 }
             }
-            
         }
         
         private void CreateBulletForPlayer(int processedTick, PlayerStateS2C playerModel)

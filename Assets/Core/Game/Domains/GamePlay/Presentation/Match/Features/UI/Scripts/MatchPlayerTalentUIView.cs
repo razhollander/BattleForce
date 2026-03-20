@@ -46,7 +46,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             {
                 var progress = cooldownLeft / maxCooldown;
                 _cooldownOverlay.enabled = true;
-                LogService.LogError($"maxCooldown: {maxCooldown},cooldownLeft: {cooldownLeft}, progress: {progress}");
                 _cooldownOverlay.fillAmount = progress;
                 _cooldownText.gameObject.SetActive(true);
                 var text = cooldownLeft < 1 ? cooldownLeft.ToString("F2") : Mathf.FloorToInt(cooldownLeft).ToString();

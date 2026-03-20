@@ -79,6 +79,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
 
         public void ManagedUpdate()
         {
+            var lastProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer;
+
             _handleBulletSpawnNetEventsCommand.Execute();
             _handleBulletDestroyedNetEventsCommand.Execute();
             _handlePlayerTakeDamangeNetEventsCommand.Execute();
@@ -94,14 +96,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleEnvironmentSpringPlayerCollisionNetEventsCommand.Execute();
             _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand.Execute();
             _handlePreparationPhaseEndedNetEventsCommand.Execute();
-            _matchPlayerUIControllers.UpdatePlayersTalentCooldowns(_fullTickPacketsHandler.LastProcessedTickFromServer);
+            _matchPlayerUIControllers.UpdatePlayersTalentCooldowns(lastProcessedTickFromServer);
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
             _updateObjectTransformInsideRotatingWheelsCommand.Execute();
             
-            _handleTalentCardObtainedNetEventsCommand.Execute();
+            _handleTalentCardObtainedNetEventsCommand.SetCurrentServerTick(lastProcessedTickFromServer).Execute();
         }
     }
 }

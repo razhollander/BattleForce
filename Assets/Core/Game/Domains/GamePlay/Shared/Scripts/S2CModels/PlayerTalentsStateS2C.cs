@@ -73,11 +73,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
     public struct TalentStateS2C
     {
+        private const int NO_COOLDOWN_TICK = 0;
         public TalentType TalentType;
         public int CooldownEndTick;
         public float MaxCooldown;
-        public bool IsOnCooldown() => CooldownEndTick > 0;
-
+        public bool IsOnCooldown() => CooldownEndTick > NO_COOLDOWN_TICK;
+        public void ResetCooldownEndTick() => CooldownEndTick = NO_COOLDOWN_TICK;
         public TalentStateS2C(TalentType talentType, float maxCooldown)
         {
             TalentType = talentType;

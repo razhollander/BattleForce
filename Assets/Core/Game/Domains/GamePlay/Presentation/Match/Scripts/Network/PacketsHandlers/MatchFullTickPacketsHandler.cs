@@ -29,7 +29,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly NetworkConfig _networkConfig;
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
-        private readonly IMatchPlayerTimersService _matchPlayerTimersService;
         private readonly PresentationMatchNetEventsHandler _presentationNetEventsHandler;
         private readonly CapacityDict<int, MatchFullTickPacketS2C> _fullTickPackets;
         private readonly CapacityList<PlayerRejoinAcceptPacketS2C> _cachedUnprocessedPlayerRejoinedEvents;
@@ -54,14 +53,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public int LastProcessedTickFromServer { get; private set; }
 
         public MatchFullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
-            IMatchDataService matchDataService, ICachedPresentationEventsService iCachedPresentationEventsService, IMatchPlayerTimersService matchPlayerTimersService,
-            IClientMatchPresentationTickProcessor clientPresentationTickProcessor, ICommandFactory commandFactory, ITickCounterService tickCounterService)
+            IMatchDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
-            _matchPlayerTimersService = matchPlayerTimersService;
-            _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, iCachedPresentationEventsService, networkManager, networkConfig, clientPresentationTickProcessor, commandFactory, tickCounterService, matchPlayerTimersService);
+            _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory);
             _fullTickPackets = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerRejoinedEvents = new CapacityList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
@@ -104,8 +101,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 return;
             }
             
-            ProcessPlayerRejoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents);
-            ResetPlayersTalentsCooldownsTimersIfEndedCommand(latestTickReceivedFromServer);
+            ProcessPlayerRejoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents, latestTickReceivedFromServer);
+            ResetPlayersTalentsCooldownsTimersIfEnded(latestTickReceivedFromServer);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
             ProcessPlayerTakeDamageEvents(latestFullTickPacket.PlayerTakeDamageNetEvents);
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
@@ -138,7 +135,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _fullTickPackets.Clear();
         }
 
-        private void ResetPlayersTalentsCooldownsTimersIfEndedCommand(int latestTickReceivedFromServer)
+        private void ResetPlayersTalentsCooldownsTimersIfEnded(int latestTickReceivedFromServer)
         {
             foreach (var playerModel in _matchDataService.Players)
             {
@@ -148,11 +145,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     var didCooldownEnd = talentsState.CooldownEndTick <= latestTickReceivedFromServer;
                     if (didCooldownEnd)
                     {
-                        talentsState.CooldownEndTick = 0;
-                        _matchPlayerTimersService.StopTimer()
+                        talentsState.ResetCooldownEndTick();
                     }
                 }
-                
             }
         }
 
@@ -398,7 +393,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         }
 
 
-        private void ProcessPlayerRejoinedEvents(FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C> playerRejoinAcceptNetEvents)
+        private void ProcessPlayerRejoinedEvents(FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C> playerRejoinAcceptNetEvents, int lastProcessedTickFromServer)
         {
             _cachedUnprocessedPlayerRejoinedEvents.Clear();
 
@@ -413,7 +408,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             if (!_cachedUnprocessedPlayerRejoinedEvents.IsNullOrEmpty())
             {
                 _cachedUnprocessedPlayerRejoinedEvents.Sort();
-                _presentationNetEventsHandler.ProcessPlayerRejoinedEvents(_cachedUnprocessedPlayerRejoinedEvents);
+                _presentationNetEventsHandler.ProcessPlayerRejoinedEvents(_cachedUnprocessedPlayerRejoinedEvents, lastProcessedTickFromServer);
             }
         }
 

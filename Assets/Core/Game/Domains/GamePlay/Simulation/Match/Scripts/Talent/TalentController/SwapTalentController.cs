@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
@@ -42,7 +43,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             SwapPlayersTransform(casterPlayerState, closetPlayerToCaster);
 
             var cooldownEndTick = TickUtils.GetTickInTime(tick, casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().MaxCooldown, deltaTime);
-            casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().CooldownEndTick = cooldownEndTick;
+            ref var currentSelectedTalent = ref casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent();
+            LogService.LogError($"set end tick to: {cooldownEndTick}");
+            currentSelectedTalent.CooldownEndTick = cooldownEndTick;
             _netEventsDataService.AddPlayersSwapEvent(tick, _casterPlayerId, closetPlayerToCaster.Id, casterPlayerState.Spaceship.Transform.Position,
                 closetPlayerToCaster.Spaceship.Transform.Position, casterPlayerState.Spaceship.Transform.Direction, closetPlayerToCaster.Spaceship.Transform.Direction, cooldownEndTick);
         }

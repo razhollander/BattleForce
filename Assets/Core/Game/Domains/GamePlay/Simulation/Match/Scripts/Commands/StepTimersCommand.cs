@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -79,7 +80,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         continue;
                     }
 
-                    playerTalent.CooldownEndTick = 0;
+                    playerTalent.ResetCooldownEndTick();
                     playerState.Spaceship.TalentsState.Talents[i] = playerTalent;
                 }
             }

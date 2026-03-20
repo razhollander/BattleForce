@@ -4,6 +4,8 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
 using UnityEngine;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
@@ -13,16 +15,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         private readonly ushort _playerId;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private readonly IMatchPlayerTimersService _matchPlayerTimersService;
+        private readonly NetworkConfig _networkConfig;
         private MatchPlayerUIView _view;
 
-        public MatchPlayerUIController(IMatchDataService matchDataService, ushort playerId, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig, IMatchPlayerTimersService matchPlayerTimersService)
+        public MatchPlayerUIController(IMatchDataService matchDataService, ushort playerId, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig)
         {
             _matchDataService = matchDataService;
             _playerId = playerId;
             _gamePlayConfig = gamePlayConfig;
             _sharedGamePlayConfig = sharedGamePlayConfig;
-            _matchPlayerTimersService = matchPlayerTimersService;
+            _networkConfig = networkConfig;
         }
 
         public void CreateView(MatchPlayerUIView viewPrefab, Transform parent)
@@ -61,9 +63,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             for (int i = 0; i < talents.Count; i++)
             {
-                var cooldownLeft = _matchPlayerTimersService.GetPlayerTalentTimerSecondsLeft(_playerId, i, currentServerTick);
-                var isOnCooldown = cooldownLeft > 0;
                 var maxCooldown = talents[i].MaxCooldown;
+                var isOnCooldown = talents[i].IsOnCooldown();
+                var cooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talents[i].CooldownEndTick, _networkConfig.DeltaTime) : maxCooldown;
                 _view.UpdateTalentCooldown(i, maxCooldown, cooldownLeft, isOnCooldown);
             }
         }
@@ -82,10 +84,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 var talentVisualData = new TalentVisualData();
                 var talentState = talents[i];
                 talentVisualData.Icon = _gamePlayConfig.TalentCards.TalentSprites[talentState.TalentType];
-
-                talentVisualData.CooldownLeft = _matchPlayerTimersService.GetPlayerTalentTimerSecondsLeft(_playerId, i, currentServerTick);
-                talentVisualData.MaxCooldown = talentState.MaxCooldown;
-                talentVisualData.IsOnCooldown = talentVisualData.CooldownLeft > 0;
+                 var isOnCooldown = talentState.IsOnCooldown();
+                talentVisualData.IsOnCooldown = isOnCooldown;
+                var maxCooldown = talentState.MaxCooldown;
+                talentVisualData.CooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.CooldownEndTick, _networkConfig.DeltaTime) : maxCooldown;
+                talentVisualData.MaxCooldown = maxCooldown;
                 talentsVisualData[i] = talentVisualData;
             }
 

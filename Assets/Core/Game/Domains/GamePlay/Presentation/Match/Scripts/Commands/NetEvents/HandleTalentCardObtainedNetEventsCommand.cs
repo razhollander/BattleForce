@@ -17,7 +17,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchPlayerControllers _playerControllers;
         private IMatchPlayerUIControllers _matchPlayerUIControllers;
         private IMatchDataService _matchDataService;
+        private int _currentServerTick;
 
+        public HandleTalentCardObtainedNetEventsCommand SetCurrentServerTick(int currentServerTick)
+        {
+            _currentServerTick = currentServerTick;
+            return this;
+        }
+        
         public override void ResolveDependencies()
         {
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
@@ -43,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var playerPosition = _playerControllers.GetPlayerPosition(obtainedByPlayerId);
                 _talentCardObtainedEffectController.PlayEffect(talentCardPosition, playerPosition);
                 _talentCardControllers.DestroyTalentCard(talentCardObtainedNetEvent.TalentCardId);
-                _matchPlayerUIControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.PlayerTalents);
+                _matchPlayerUIControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.PlayerTalents, _currentServerTick);
                 
                 var isFirstTalentObtained = talentCardObtainedNetEvent.PlayerTalents.Count == 1;
                 if (isFirstTalentObtained || talentCardObtainedNetEvent.DidReplaceTalent)

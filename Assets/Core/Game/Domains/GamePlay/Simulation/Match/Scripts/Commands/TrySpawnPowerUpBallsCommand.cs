@@ -68,7 +68,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var powerUpBall = _matchDataService.AddPowerUpBall(position, velocity, powerUpType);
             _physicsSimulator.AddPowerUpBall(powerUpBall.Id, position, velocity, _gamePlayConfig.PowerUps.Radius);
             _netEventsDataService.AddPowerUpSpawnedNetEvent(_processedTick, powerUpBall.Id, position);
-            LogService.LogError($"Server: SpawnPowerUp: power up id: {powerUpBall.Id}");
         }
 
         private bool TryGenerateRandomPowerUpBall(out Vector2 position, out Vector2 velocity, out PowerUpType powerUpType)
