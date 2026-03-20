@@ -3,7 +3,6 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
 using UnityEngine;
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Timer;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Scripts.Network;
 
