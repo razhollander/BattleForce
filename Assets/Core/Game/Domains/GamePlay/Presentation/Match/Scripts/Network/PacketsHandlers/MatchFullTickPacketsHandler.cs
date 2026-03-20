@@ -573,16 +573,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 playerModel.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
                 playerModel.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
                 playerModel.Spaceship.TalentsState.AimDirection = playerState.Spaceship.TalentsState.AimDirection;
-
-               // var sourceTalents = playerState.Spaceship.TalentsState.Talents;
-                //var destinationTalents = playerModel.Spaceship.TalentsState.Talents;
-                // var talentsAmount = destinationTalents.Count;
-                //
-                // if (sourceTalents.Count != destinationTalents.Count)
-                // {
-                //     LogService.LogError($"For some reason there's a different amount of talents for player {playerModel.PlayerId} in state {sourceTalents.Count} and in presentation {destinationTalents.Count}");
-                //     talentsAmount =  System.Math.Min(sourceTalents.Count, destinationTalents.Count);
-                // }
             }
         }
 

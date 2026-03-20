@@ -130,6 +130,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 var casterPlayer = _matchDataService.GetPlayer(playerSwapEvent.CasterPlayerId);
                 casterPlayer.Spaceship.Transform.Position = playerSwapEvent.CasterPosition;
                 casterPlayer.Spaceship.Transform.Direction = playerSwapEvent.CasterDirection;
+                
                 var otherPlayer = _matchDataService.GetPlayer(playerSwapEvent.OtherPlayerId);
                 otherPlayer.Spaceship.Transform.Position = playerSwapEvent.OtherPosition;
                 otherPlayer.Spaceship.Transform.Direction = playerSwapEvent.OtherDirection;
@@ -141,7 +142,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     if (talent.TalentType == TalentType.Swap)
                     {
                         talent.CooldownEndTick = playerSwapEvent.TalentCooldownEndTick;
-                        // _matchPlayerTimersService.StartPlayerTalentTimer(playerSwapEvent.CasterPlayerId, i, playerSwapEvent.TalentCooldownEndTick);
                         break;
                     }
                 }
