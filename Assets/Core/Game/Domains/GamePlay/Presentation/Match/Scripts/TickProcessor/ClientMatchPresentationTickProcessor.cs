@@ -38,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand;
         private readonly UpdateObjectTransformInsideRotatingWheelsCommand _updateObjectTransformInsideRotatingWheelsCommand;
         private readonly HandlePreparationPhaseEndedNetEventsCommand _handlePreparationPhaseEndedNetEventsCommand;
+        private readonly Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents.HandleSwapFieldNetEventsCommand _handleSwapFieldNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -65,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand>();
             _updateObjectTransformInsideRotatingWheelsCommand = commandFactory.CreateCommandVoid<UpdateObjectTransformInsideRotatingWheelsCommand>();
             _handlePreparationPhaseEndedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePreparationPhaseEndedNetEventsCommand>();
+            _handleSwapFieldNetEventsCommand = commandFactory.CreateCommandVoid<Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents.HandleSwapFieldNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -96,6 +98,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleEnvironmentSpringPlayerCollisionNetEventsCommand.Execute();
             _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand.Execute();
             _handlePreparationPhaseEndedNetEventsCommand.Execute();
+            _handleSwapFieldNetEventsCommand.Execute();
             _matchPlayerUIControllers.UpdatePlayersTalentCooldowns(lastProcessedTickFromServer);
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();

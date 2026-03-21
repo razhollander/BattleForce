@@ -82,9 +82,39 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerEnvironmentSpringCollision(objectA, objectB);
                 HandlePlayerTeleportGateCollision(objectA, objectB);
+                HandleSwapFieldPlayerCollision(objectA, objectB);
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandleSwapFieldPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isPlayerToField = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.SwapField;
+            var isFieldToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.SwapField && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerToField && !isFieldToPlayer) return;
+
+            ushort playerId;
+            ushort fieldId; // Caster ID
+
+            if (isPlayerToField)
+            {
+                playerId = objectA.Id;
+                fieldId = objectB.Id;
+            }
+            else
+            {
+                playerId = objectB.Id;
+                fieldId = objectA.Id;
+            }
+
+            if (playerId == fieldId) return;
+
+            var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+            if (playerState.IsDestroyed) return;
+
+            _playersTalentsManager.CompleteSwapTalentWithEnemy(fieldId, playerState, _processedTick);
         }
 
         private void HandlePlayerTeleportGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)

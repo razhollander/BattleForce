@@ -312,5 +312,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.PreparationPhaseEndedNetEvents.Add(preparationPhaseEndedNetEvent);
             }
         }
+
+        public void ProcessCreateSwapFieldEvents(CapacityList<CreateSwapFieldNetEventS2C> createSwapFieldNetEvents)
+        {
+            if (createSwapFieldNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in createSwapFieldNetEvents)
+            {
+                _cachedPresentationEventsService.CreateSwapFieldNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDestroySwapFieldEvents(CapacityList<DestroySwapFieldNetEventS2C> destroySwapFieldNetEvents)
+        {
+            if (destroySwapFieldNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in destroySwapFieldNetEvents)
+            {
+                _cachedPresentationEventsService.DestroySwapFieldNetEvents.Add(netEvent);
+            }
+        }
     }
 }

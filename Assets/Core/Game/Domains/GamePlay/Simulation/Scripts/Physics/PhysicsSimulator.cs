@@ -723,6 +723,59 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _fixtureDefPool.Return(fixtureDef);
             _polygonShapePool.Return(shape);
         }
+
+        public void AddSwapField(ushort id, Vector2 position)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.SwapField);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var shape = GetCircleShape();
+            shape.Radius = 0;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+
+            fixtureDef.filter.categoryBits = PhysicsBodyType.SwapField.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.SwapField.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(shape);
+
+            // Using dictionary to hold reference so we can update/remove it easily
+            _dynamicBodies.Add(new PhysicsBodyData(id, PhysicsBodyType.SwapField), body);
+        }
+
+        public void UpdateSwapField(ushort id, Vector2 position, float newRadius)
+        {
+            var key = new PhysicsBodyData(id, PhysicsBodyType.SwapField);
+            if (_dynamicBodies.TryGetValue(key, out var body))
+            {
+                body.SetTransform(position, body.GetAngle());
+                var fixture = body.GetFixtureList();
+                var shape = (Box2D.NetStandard.Collision.Shapes.CircleShape)fixture.Shape;
+                shape.Radius = newRadius;
+            }
+        }
+
+        public void RemoveSwapField(ushort id)
+        {
+            var key = new PhysicsBodyData(id, PhysicsBodyType.SwapField);
+            if (_dynamicBodies.TryGetValue(key, out var body))
+            {
+                _world.DestroyBody(body);
+                _dynamicBodies.Remove(key);
+            }
+        }
         
         public void ClearAllData()
         {

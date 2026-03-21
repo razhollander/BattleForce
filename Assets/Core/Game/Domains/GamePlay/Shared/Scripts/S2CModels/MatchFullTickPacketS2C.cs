@@ -30,6 +30,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<GainBoltsNetEventS2C> GainBoltsNetEvents;
         public FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> PlayerToEnvironmentTeleportGateCollisionNetEvents;
         public FixedUnorderedList<PreparationPhaseEndedNetEventS2C> PreparationPhaseEndedNetEvents;
+        public FixedUnorderedList<CreateSwapFieldNetEventS2C> CreateSwapFieldNetEvents;
+        public FixedUnorderedList<DestroySwapFieldNetEventS2C> DestroySwapFieldNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -56,6 +58,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             GainBoltsNetEvents = new FixedUnorderedList<GainBoltsNetEventS2C>(maxCap.GainBoltsNetEvents);
             PlayerToEnvironmentTeleportGateCollisionNetEvents = new FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(maxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents);
             PreparationPhaseEndedNetEvents = new FixedUnorderedList<PreparationPhaseEndedNetEventS2C>(maxCap.PreparationPhaseEndedNetEvents);
+            CreateSwapFieldNetEvents = new FixedUnorderedList<CreateSwapFieldNetEventS2C>(maxCap.CreateSwapFieldNetEvents);
+            DestroySwapFieldNetEvents = new FixedUnorderedList<DestroySwapFieldNetEventS2C>(maxCap.DestroySwapFieldNetEvents);
         }
 
 
@@ -94,6 +98,26 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedGainBoltsEvents(writer);
             SerializedPlayerToEnvironmentTeleportGateCollisionEvents(writer);
             SerializedPreparationPhaseEndedEvents(writer);
+            SerializedCreateSwapFieldNetEvents(writer);
+            SerializedDestroySwapFieldNetEvents(writer);
+        }
+
+        private void SerializedCreateSwapFieldNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)CreateSwapFieldNetEvents.Count);
+            foreach (var evt in CreateSwapFieldNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void SerializedDestroySwapFieldNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DestroySwapFieldNetEvents.Count);
+            foreach (var evt in DestroySwapFieldNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
         }
 
         private void SerializedPreparationPhaseEndedEvents(NetDataWriter writer)
@@ -225,6 +249,30 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedGainBoltsEvents(reader);
             DeserializedPlayerToEnvironmentTeleportGateCollisionEvents(reader);
             DeserializedPreparationPhaseEndedEvents(reader);
+            DeserializedCreateSwapFieldNetEvents(reader);
+            DeserializedDestroySwapFieldNetEvents(reader);
+        }
+
+        private void DeserializedCreateSwapFieldNetEvents(NetDataReader reader)
+        {
+            CreateSwapFieldNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref CreateSwapFieldNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedDestroySwapFieldNetEvents(NetDataReader reader)
+        {
+            DestroySwapFieldNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref DestroySwapFieldNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
         }
 
         private void DeserializedPreparationPhaseEndedEvents(NetDataReader reader)

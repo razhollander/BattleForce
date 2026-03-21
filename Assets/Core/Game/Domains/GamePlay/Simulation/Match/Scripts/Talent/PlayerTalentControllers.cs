@@ -14,9 +14,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         
         private ushort _casterPlayerId;
 
-        public PlayerTalentControllers(INetEventsDataService iNetEventsDataService, IMatchDataService matchDataService)
+        public PlayerTalentControllers(INetEventsDataService iNetEventsDataService, IMatchDataService matchDataService, Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig gamePlayConfig, Core.Game.Domains.GamePlay.Simulation.Scripts.Physics.IPhysicsSimulator physicsSimulator)
         {
-            SwapTalentController = new SwapTalentController(iNetEventsDataService, matchDataService);
+            SwapTalentController = new SwapTalentController(iNetEventsDataService, matchDataService, gamePlayConfig, physicsSimulator);
             //HammerTalentController = new HammerTalentController(matchNetEventsDataService, matchDataService);
         }
 
@@ -55,14 +55,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             GetTalentByType(talentType).ProcessTalentInput(isTalentInputPressed, tick, deltaTime);
         }
         
-        public void OnTick(TalentType talentType, int tick)
+        public void OnTickAllActive(int tick)
         {
-            GetTalentByType(talentType).OnTick(tick);
+            // Call OnTick on all talents.
+            // The controllers themselves check if they are active before processing.
+            SwapTalentController?.OnTick(tick);
+            HammerTalentController?.OnTick(tick);
+            BombTalentController?.OnTick(tick);
+            SentryGunTalentController?.OnTick(tick);
         }
 
         public void StopTalent(TalentType talentType)
         {
             GetTalentByType(talentType).Stop();
+        }
+
+        public void CompleteSwapTalentWithEnemy(PlayerStateS2C enemyPlayer, int tick)
+        {
+            SwapTalentController.CompleteTalentWithEnemy(enemyPlayer, tick);
         }
     }
 }

@@ -16,13 +16,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly Dictionary<int, PlayerTalentControllers> _talentControllersPerPlayer;
         private readonly ConcurrentPool<PlayerTalentControllers> _talentControllersPool;
 
-        public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig, INetEventsDataService iNetEventsDataService, SimulationGamePlayConfig gamePlayConfig)
+        public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig, INetEventsDataService iNetEventsDataService, SimulationGamePlayConfig gamePlayConfig, Core.Game.Domains.GamePlay.Simulation.Scripts.Physics.IPhysicsSimulator physicsSimulator)
         {
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _gamePlayConfig = gamePlayConfig;
             _talentControllersPerPlayer = new Dictionary<int, PlayerTalentControllers>(networkConfig.MaxCap.ConcurrentPlayers);
-            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(iNetEventsDataService, matchDataService),networkConfig.MaxCap.ConcurrentPlayers);
+            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(iNetEventsDataService, matchDataService, gamePlayConfig, physicsSimulator),networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)
@@ -97,6 +97,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         public void ProcessPlayerTalentInput(ushort playerId, TalentType talentType, int tick, bool isTalentInputPressed, float deltaTime)
         {
             _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, isTalentInputPressed, tick, deltaTime);
+        }
+
+        public void OnTickAllActive(ushort playerId, int tick)
+        {
+            _talentControllersPerPlayer[playerId].OnTickAllActive(tick);
+        }
+
+        public void CompleteSwapTalentWithEnemy(ushort casterId, PlayerStateS2C enemyPlayer, int tick)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.CompleteSwapTalentWithEnemy(enemyPlayer, tick);
+            }
         }
 
         private TalentStateS2C AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)

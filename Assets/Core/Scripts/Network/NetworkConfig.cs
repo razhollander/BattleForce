@@ -75,6 +75,8 @@ namespace Core.Scripts.Network
         public int GainBoltsNetEvents = 128;
         public int PlayerToEnvironmentTeleportGateCollisionNetEvents = 64;
         public int PreparationPhaseEndedNetEvents = 32;
+        public int CreateSwapFieldNetEvents = 32;
+        public int DestroySwapFieldNetEvents = 32;
 
         [Serializable]
         public class EnvironmentRotatingWheel
