@@ -7,6 +7,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
     [CreateAssetMenu(fileName = "EnvironmentConfig", menuName = "BF/Shared/Environment Config")]
     public class EnvironmentConfig : ScriptableObject
     {
+        private const int MAX_ID = 255;
+        
         [SerializeField]
         SerializableDictionary<int, EnvironmentLayoutConfig> _environmentLayoutConfigs = new SerializableDictionary<int, EnvironmentLayoutConfig>();
 
@@ -106,9 +108,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                 if (this == null) return;
 
                 System.Text.StringBuilder errorBuilder = new System.Text.StringBuilder();
-
-                // Because _environmentLayoutConfigs uses JSON strings for inner collections (walls, lava, etc),
-                // we should deserialize those properties to check their IDs using reflection or direct casts.
+                
                 foreach (var kvp in _environmentLayoutConfigs)
                 {
                     int index = kvp.Key;
@@ -127,7 +127,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                         foreach (var w in wheels)
                         {
                             if (w == null) continue;
-                            if (w.Id > 255) errorBuilder.AppendLine($"Layout {index} RotatingWheel ID {w.Id} > 255");
+                            if (w.Id > MAX_ID) errorBuilder.AppendLine($"Layout {index} RotatingWheel ID {w.Id} > {MAX_ID}");
 
                             CheckConfigArray(w.Walls, $"Layout {index} RotatingWheel {w.Id} Wall", errorBuilder);
                             CheckConfigArray(w.LavaWalls, $"Layout {index} RotatingWheel {w.Id} LavaWall", errorBuilder);
@@ -163,7 +163,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                         try
                         {
                             int numericId = System.Convert.ToInt32(idVal);
-                            if (numericId > 255)
+                            if (numericId > MAX_ID)
                             {
                                 errorBuilder.AppendLine($"{prefix} ID {numericId} > 255");
                             }
@@ -181,7 +181,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                         try
                         {
                             int numericId = System.Convert.ToInt32(idVal);
-                            if (numericId > 255)
+                            if (numericId > MAX_ID)
                             {
                                 errorBuilder.AppendLine($"{prefix} ID {numericId} > 255");
                             }
