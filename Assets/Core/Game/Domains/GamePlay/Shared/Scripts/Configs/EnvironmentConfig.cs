@@ -7,6 +7,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
     [CreateAssetMenu(fileName = "EnvironmentConfig", menuName = "BF/Shared/Environment Config")]
     public class EnvironmentConfig : ScriptableObject
     {
+        private const int MAX_ID = 255;
+        
         [SerializeField]
         SerializableDictionary<int, EnvironmentLayoutConfig> _environmentLayoutConfigs = new SerializableDictionary<int, EnvironmentLayoutConfig>();
 
@@ -97,5 +99,98 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
 #endif
         }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            UnityEditor.EditorApplication.delayCall += () =>
+            {
+                if (this == null) return;
+
+                System.Text.StringBuilder errorBuilder = new System.Text.StringBuilder();
+                
+                foreach (var kvp in _environmentLayoutConfigs)
+                {
+                    int index = kvp.Key;
+                    var layout = kvp.Value;
+                    if (layout == null) continue;
+
+                    CheckConfigArray(layout.GetWalls(), $"Layout {index} Wall", errorBuilder);
+                    CheckConfigArray(layout.GetLavaWalls(), $"Layout {index} LavaWall", errorBuilder);
+                    CheckConfigArray(layout.GetTalentCards(), $"Layout {index} TalentCard", errorBuilder);
+                    CheckConfigArray(layout.GetEnvironmentSprings(), $"Layout {index} EnvironmentSpring", errorBuilder);
+                    CheckConfigArray(layout.GetTeleportGates(), $"Layout {index} TeleportGate", errorBuilder);
+
+                    var wheels = layout.GetRotatingWheels();
+                    if (wheels != null)
+                    {
+                        foreach (var w in wheels)
+                        {
+                            if (w == null) continue;
+                            if (w.Id > MAX_ID) errorBuilder.AppendLine($"Layout {index} RotatingWheel ID {w.Id} > {MAX_ID}");
+
+                            CheckConfigArray(w.Walls, $"Layout {index} RotatingWheel {w.Id} Wall", errorBuilder);
+                            CheckConfigArray(w.LavaWalls, $"Layout {index} RotatingWheel {w.Id} LavaWall", errorBuilder);
+                            CheckConfigArray(w.Springs, $"Layout {index} RotatingWheel {w.Id} Spring", errorBuilder);
+                            CheckConfigArray(w.TeleportGatePairs, $"Layout {index} RotatingWheel {w.Id} TeleportGatePair", errorBuilder);
+                        }
+                    }
+                }
+
+                if (errorBuilder.Length > 0)
+                {
+                    string errorMsg = "The following IDs exceed 255:\n" + errorBuilder.ToString();
+                    Debug.LogError(errorMsg);
+                    UnityEditor.EditorUtility.DisplayDialog("Environment Config ID Error", errorMsg, "OK");
+                }
+            };
+        }
+
+        private void CheckConfigArray(System.Collections.IEnumerable array, string prefix, System.Text.StringBuilder errorBuilder)
+        {
+            if (array == null) return;
+
+            foreach (var item in array)
+            {
+                if (item == null) continue;
+
+                var idField = item.GetType().GetField("Id", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                if (idField != null)
+                {
+                    object idVal = idField.GetValue(item);
+                    if (idVal != null)
+                    {
+                        try
+                        {
+                            int numericId = System.Convert.ToInt32(idVal);
+                            if (numericId > MAX_ID)
+                            {
+                                errorBuilder.AppendLine($"{prefix} ID {numericId} > 255");
+                            }
+                        }
+                        catch (System.Exception) { }
+                    }
+                }
+
+                var idProp = item.GetType().GetProperty("Id", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                if (idProp != null)
+                {
+                    object idVal = idProp.GetValue(item);
+                    if (idVal != null)
+                    {
+                        try
+                        {
+                            int numericId = System.Convert.ToInt32(idVal);
+                            if (numericId > MAX_ID)
+                            {
+                                errorBuilder.AppendLine($"{prefix} ID {numericId} > 255");
+                            }
+                        }
+                        catch (System.Exception) { }
+                    }
+                }
+            }
+        }
+#endif
     }
 }
