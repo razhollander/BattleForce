@@ -1,4 +1,5 @@
 using System;
+using CoreDomain.Scripts.Utils;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
@@ -10,6 +11,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public ushort PlayerCasterId;
         public int CreatedOnTick;
         public int EndTick;
+
+        public float CalculateCurrentRadiusForTick(int tick, float maxRadius)
+        {
+            return MathUtils.Remap(CreatedOnTick, EndTick, 0, maxRadius, tick);
+        }
         
         public TalentSwapFieldS2C(ushort id, ushort playerCasterId, int createdOnTick, int endTick)
         {

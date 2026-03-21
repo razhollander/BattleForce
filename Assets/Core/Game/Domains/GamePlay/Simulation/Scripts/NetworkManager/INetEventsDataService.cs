@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<ushort, FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>> PlayerToEnvironmentTeleportGateCollisionNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<PreparationPhaseEndedNetEventS2C>> PreparationPhaseEndedNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<CreateSwapFieldNetEventS2C>> CreateSwapFieldNetEventsPerPlayer { get; }
-        CapacityDict<ushort, FixedUnorderedList<DestroySwapFieldNetEventS2C>> DeactivateSwapTalentNetEventsPerPlayer { get; }
+        CapacityDict<ushort, FixedUnorderedList<DeactivateSwapTalentNetEventS2C>> DeactivateSwapTalentNetEventsPerPlayer { get; }
 
         void StartSavingPlayerEvents(ushort playerId);
         void StopSavingPlayerEvents(ushort playerId);
@@ -63,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddGainBoltsNetEvent(int onTick, ushort playerId, int gainedAmount, int totalTeamBolts);
         void AddPlayerToEnvironmentTeleportGateCollisionNetEvent(int onTick, ushort teleportPairId, Vector2 enterPoint, Vector2 exitPoint, ushort playerId);
         void AddPreparationPhaseEndedNetEvent(int onTick);
-        void AddCreateSwapFieldNetEvent(int onTick, ushort swapFieldId, ushort casterPlayerId, int fieldEndTick);
+        void AddCreateSwapFieldNetEvent(int onTick, ushort swapFieldId, ushort casterPlayerId, int fieldEndTick, float maxRadius);
         void AddDeactivateSwapTalentNetEvent(int onTick, ushort casterPlayerId, ushort swapFieldId, int talentCooldownEndTick);
     }
 }

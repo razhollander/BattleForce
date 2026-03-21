@@ -10,6 +10,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scri
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
@@ -46,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IPlayerTeleportEffectController _playerTeleportEffectController;
         private IEnvironmentTeleportGateControllers _environmentTeleportGateControllers;
         private IEnvironmentFieldBarrierControllers _environmentFieldBarrierControllers;
+        private ISwapFieldControllers _swapFieldControllers;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -74,6 +76,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _playerTeleportEffectController = _diContainer.Resolve<IPlayerTeleportEffectController>();
             _environmentTeleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
             _environmentFieldBarrierControllers = _diContainer.Resolve<IEnvironmentFieldBarrierControllers>();
+            _swapFieldControllers = _diContainer.Resolve<ISwapFieldControllers>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -85,6 +88,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentFieldBarrierControllers.InitEntryPoint();
             _talentCardObtainedEffectController.InitEntryPoint();
             _powerUpBallControllers.InitEntryPoint();
+            _swapFieldControllers.InitEntryPoint();
             _powerUpBallObtainedEffectController.InitEntryPoint();
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();

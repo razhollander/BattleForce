@@ -124,14 +124,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 ref var powerUp = ref PowerUpBalls.AddAndGet();
                 powerUp.Deserialize(reader);
             }
-
-            var swapFieldsCount = reader.GetByte();
-            SwapFields.Clear();
-            for (var i = 0; i < swapFieldsCount; i++)
-            {
-                ref var swapField = ref SwapFields.AddAndGet();
-                swapField.Deserialize(reader);
-            }
             
             GemsPerTeamId.Clear();
             var jemsCount = reader.GetUShort();
@@ -151,6 +143,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 BoltsPerTeam.Add(teamId, bolts);
             }
 
+            var swapFieldsCount = reader.GetByte();
+            SwapFields.Clear();
+            for (var i = 0; i < swapFieldsCount; i++)
+            {
+                ref var swapField = ref SwapFields.AddAndGet();
+                swapField.Deserialize(reader);
+            }
+            
             EnvironmentLayoutIndex = reader.GetByte();
             StageType = (StageType)reader.GetByte();
             StartPhaseInitialTick = reader.GetInt();

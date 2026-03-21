@@ -3,14 +3,14 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public struct DestroySwapFieldNetEventS2C : INetSerializable, IComparable<DestroySwapFieldNetEventS2C>
+    public struct DeactivateSwapTalentNetEventS2C : INetSerializable, IComparable<DeactivateSwapTalentNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort CasterPlayerId;
         public ushort SwapFieldId;
         public int TalentCooldownEndTick;
 
-        public DestroySwapFieldNetEventS2C(int occuredOnTick, ushort casterPlayerId, ushort swapFieldId, int talentCooldownEndTick)
+        public DeactivateSwapTalentNetEventS2C(int occuredOnTick, ushort casterPlayerId, ushort swapFieldId, int talentCooldownEndTick)
         {
             OccuredOnTick = occuredOnTick;
             CasterPlayerId = casterPlayerId;
@@ -34,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             TalentCooldownEndTick = reader.GetInt();
         }
 
-        public int CompareTo(DestroySwapFieldNetEventS2C other)
+        public int CompareTo(DeactivateSwapTalentNetEventS2C other)
         {
             return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }

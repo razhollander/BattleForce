@@ -45,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<EnvironmentSpringPlayerCollisionNetEventS2C> _cachedUnprocessedEnvironmentSpringPlayerCollisionEvents;
         private readonly CapacityList<PreparationPhaseEndedNetEventS2C> _cachedUnprocessedPreparationPhaseEndedEvents;
         private readonly CapacityList<CreateSwapFieldNetEventS2C> _cachedUnprocessedCreateSwapFieldEvents;
-        private readonly CapacityList<DestroySwapFieldNetEventS2C> _cachedUnprocessedDestroySwapFieldEvents;
+        private readonly CapacityList<DeactivateSwapTalentNetEventS2C> _cachedUnprocessedDeactivateSwapTalentEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
@@ -76,7 +76,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPlayerToEnvironmentTeleportCollisionEvents = new CapacityList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(networkConfig.MaxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents);
             _cachedUnprocessedPreparationPhaseEndedEvents = new CapacityList<PreparationPhaseEndedNetEventS2C>(networkConfig.MaxCap.PreparationPhaseEndedNetEvents);
             _cachedUnprocessedCreateSwapFieldEvents = new CapacityList<CreateSwapFieldNetEventS2C>(networkConfig.MaxCap.CreateSwapFieldNetEvents);
-            _cachedUnprocessedDestroySwapFieldEvents = new CapacityList<DestroySwapFieldNetEventS2C>(networkConfig.MaxCap.DestroySwapFieldNetEvents);
+            _cachedUnprocessedDeactivateSwapTalentEvents = new CapacityList<DeactivateSwapTalentNetEventS2C>(networkConfig.MaxCap.DestroySwapFieldNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -120,7 +120,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessEnvironmentTeleportPlayerCollisionEvents(latestFullTickPacket.PlayerToEnvironmentTeleportGateCollisionNetEvents);
             ProcessPreparationPhaseEndedEvents(latestFullTickPacket.PreparationPhaseEndedNetEvents);
             ProcessCreateSwapFieldEvents(latestFullTickPacket.CreateSwapFieldNetEvents);
-            ProcessDestroySwapFieldEvents(latestFullTickPacket.DestroySwapFieldNetEvents);
+            ProcessDeactivateSwapTalentEvents(latestFullTickPacket.DestroySwapFieldNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
@@ -210,22 +210,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void ProcessDestroySwapFieldEvents(FixedUnorderedList<DestroySwapFieldNetEventS2C> destroySwapFieldNetEvents)
+        private void ProcessDeactivateSwapTalentEvents(FixedUnorderedList<DeactivateSwapTalentNetEventS2C> deactivateSwapTalentNetEvents)
         {
-            _cachedUnprocessedDestroySwapFieldEvents.Clear();
+            _cachedUnprocessedDeactivateSwapTalentEvents.Clear();
 
-            foreach (var netEvent in destroySwapFieldNetEvents.AsSpan())
+            foreach (var netEvent in deactivateSwapTalentNetEvents.AsSpan())
             {
                 if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
                 {
-                    _cachedUnprocessedDestroySwapFieldEvents.Add(netEvent);
+                    _cachedUnprocessedDeactivateSwapTalentEvents.Add(netEvent);
                 }
             }
 
-            if (!_cachedUnprocessedDestroySwapFieldEvents.IsNullOrEmpty())
+            if (!_cachedUnprocessedDeactivateSwapTalentEvents.IsNullOrEmpty())
             {
-                _cachedUnprocessedDestroySwapFieldEvents.Sort();
-                _presentationNetEventsHandler.ProcessDestroySwapFieldEvents(_cachedUnprocessedDestroySwapFieldEvents);
+                _cachedUnprocessedDeactivateSwapTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateSwapTalentEvents(_cachedUnprocessedDeactivateSwapTalentEvents);
             }
         }
 

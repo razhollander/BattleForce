@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> PlayerToEnvironmentTeleportGateCollisionNetEvents;
         public FixedUnorderedList<PreparationPhaseEndedNetEventS2C> PreparationPhaseEndedNetEvents;
         public FixedUnorderedList<CreateSwapFieldNetEventS2C> CreateSwapFieldNetEvents;
-        public FixedUnorderedList<DestroySwapFieldNetEventS2C> DestroySwapFieldNetEvents;
+        public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PlayerToEnvironmentTeleportGateCollisionNetEvents = new FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(maxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents);
             PreparationPhaseEndedNetEvents = new FixedUnorderedList<PreparationPhaseEndedNetEventS2C>(maxCap.PreparationPhaseEndedNetEvents);
             CreateSwapFieldNetEvents = new FixedUnorderedList<CreateSwapFieldNetEventS2C>(maxCap.CreateSwapFieldNetEvents);
-            DestroySwapFieldNetEvents = new FixedUnorderedList<DestroySwapFieldNetEventS2C>(maxCap.DestroySwapFieldNetEvents);
+            DestroySwapFieldNetEvents = new FixedUnorderedList<DeactivateSwapTalentNetEventS2C>(maxCap.DestroySwapFieldNetEvents);
         }
 
 

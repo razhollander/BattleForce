@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>> PlayerToEnvironmentTeleportGateCollisionNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PreparationPhaseEndedNetEventS2C>> PreparationPhaseEndedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<CreateSwapFieldNetEventS2C>> CreateSwapFieldNetEventsPerPlayer { get; }
-        public CapacityDict<ushort, FixedUnorderedList<DestroySwapFieldNetEventS2C>> DeactivateSwapTalentNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<DeactivateSwapTalentNetEventS2C>> DeactivateSwapTalentNetEventsPerPlayer { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -64,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>> _playerToEnvironmentTeleportGateCollisionListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PreparationPhaseEndedNetEventS2C>> _preparationPhaseEndedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<CreateSwapFieldNetEventS2C>> _createSwapFieldNetEventsListPool;
-        private readonly ConcurrentPool<FixedUnorderedList<DestroySwapFieldNetEventS2C>> _destroySwapFieldNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateSwapTalentNetEventS2C>> _deactivateSwapTalentNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -92,7 +92,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerToEnvironmentTeleportGateCollisionNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>>(maxConcurrentPlayers);
             PreparationPhaseEndedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PreparationPhaseEndedNetEventS2C>>(maxConcurrentPlayers);
             CreateSwapFieldNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<CreateSwapFieldNetEventS2C>>(maxConcurrentPlayers);
-            DeactivateSwapTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DestroySwapFieldNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateSwapTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateSwapTalentNetEventS2C>>(maxConcurrentPlayers);
 
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
@@ -134,7 +134,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _playerToEnvironmentTeleportGateCollisionListPool = new ConcurrentPool<FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>>(() => new FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(networkConfig.MaxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents), maxConcurrentPlayers);
             _preparationPhaseEndedListPool = new ConcurrentPool<FixedUnorderedList<PreparationPhaseEndedNetEventS2C>>(() => new FixedUnorderedList<PreparationPhaseEndedNetEventS2C>(networkConfig.MaxCap.PreparationPhaseEndedNetEvents), maxConcurrentPlayers);
             _createSwapFieldNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateSwapFieldNetEventS2C>>(() => new FixedUnorderedList<CreateSwapFieldNetEventS2C>(networkConfig.MaxCap.CreateSwapFieldNetEvents), maxConcurrentPlayers);
-            _destroySwapFieldNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DestroySwapFieldNetEventS2C>>(() => new FixedUnorderedList<DestroySwapFieldNetEventS2C>(networkConfig.MaxCap.DestroySwapFieldNetEvents), maxConcurrentPlayers);
+            _deactivateSwapTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateSwapTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateSwapTalentNetEventS2C>(networkConfig.MaxCap.DestroySwapFieldNetEvents), maxConcurrentPlayers);
         }
 
 
@@ -344,7 +344,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
             if (!DeactivateSwapTalentNetEventsPerPlayer.ContainsKey(playerId))
             {
-                DeactivateSwapTalentNetEventsPerPlayer.Add(playerId, _destroySwapFieldNetEventsListPool.Get());
+                DeactivateSwapTalentNetEventsPerPlayer.Add(playerId, _deactivateSwapTalentNetEventsListPool.Get());
             }
         }
         
@@ -419,9 +419,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var createSwapFieldNetEventsList = CreateSwapFieldNetEventsPerPlayer[playerId];
             createSwapFieldNetEventsList.Clear();
             _createSwapFieldNetEventsListPool.Return(createSwapFieldNetEventsList);
-            var destroySwapFieldNetEventsList = DeactivateSwapTalentNetEventsPerPlayer[playerId];
-            destroySwapFieldNetEventsList.Clear();
-            _destroySwapFieldNetEventsListPool.Return(destroySwapFieldNetEventsList);
+            var deactivateSwapTalentNetEventsList = DeactivateSwapTalentNetEventsPerPlayer[playerId];
+            deactivateSwapTalentNetEventsList.Clear();
+            _deactivateSwapTalentNetEventsListPool.Return(deactivateSwapTalentNetEventsList);
 
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
@@ -848,13 +848,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
-            if (DeactivateSwapTalentNetEventsPerPlayer.TryGetValue(playerId, out var destroySwapFieldNetEvents))
+            if (DeactivateSwapTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivateSwapTalentNetEvents))
             {
-                for (int i = destroySwapFieldNetEvents.Count - 1; i >= 0; i--)
+                for (int i = deactivateSwapTalentNetEvents.Count - 1; i >= 0; i--)
                 {
-                    if (destroySwapFieldNetEvents[i].OccuredOnTick < tick)
+                    if (deactivateSwapTalentNetEvents[i].OccuredOnTick < tick)
                     {
-                        destroySwapFieldNetEvents.RemoveAt(i);
+                        deactivateSwapTalentNetEvents.RemoveAt(i);
                     }
                 }
             }
@@ -978,7 +978,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddCreateSwapFieldNetEvent(int onTick, ushort swapFieldId, ushort casterPlayerId, int fieldEndTick)
+        public void AddCreateSwapFieldNetEvent(int onTick, ushort swapFieldId, ushort casterPlayerId, int fieldEndTick, float maxRadius)
         {
             foreach (var kvp in CreateSwapFieldNetEventsPerPlayer)
             {
@@ -987,6 +987,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 packet.SwapFieldId = swapFieldId;
                 packet.CasterPlayerId = casterPlayerId;
                 packet.EndOnTick = fieldEndTick;
+                packet.MaxRadius = maxRadius;
             }
         }
 

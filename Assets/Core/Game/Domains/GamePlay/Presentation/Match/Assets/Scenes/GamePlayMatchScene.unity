@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &265990250
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -983,6 +983,7 @@ MonoBehaviour:
   gainBoltEffectViewPrefab: {fileID: 5904124016507781903, guid: 3a610ff1711a84992ac57463dd23197a, type: 3}
   playerTeleportEffectViewPrefab: {fileID: 5393333576666438519, guid: 9ed99fee5b48d4f88bc8062e974117a7, type: 3}
   _environmentFieldBarrierViewPrefab: {fileID: 6186951682495552436, guid: fff11549e688e4b7f98a5e86ba815ef9, type: 3}
+  _swapFieldViewPrefab: {fileID: -776366679696118115, guid: 1a171fa788e0b4da4aafcfdb960cc150, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

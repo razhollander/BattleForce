@@ -127,17 +127,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 otherPlayer.Spaceship.Transform.Position = playerSwapEvent.OtherPosition;
                 otherPlayer.Spaceship.Transform.Direction = playerSwapEvent.OtherDirection;
 
-                var talents = casterPlayer.Spaceship.TalentsState.Talents;
-                for (int i = 0; i < talents.Count; i++)
-                {
-                    ref var talent = ref talents.Get(i);
-                    if (talent.TalentType == TalentType.Swap)
-                    {
-                        talent.CooldownEndTick = playerSwapEvent.TalentCooldownEndTick;
-                        break;
-                    }
-                }
-
                 _cachedPresentationEventsService.PlayerSwapNetEvents.Add(playerSwapEvent);
             }
         }
@@ -320,22 +309,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 return;
             }
 
-            foreach (var netEvent in createSwapFieldNetEvents)
+            foreach (var swapFieldCreatedEvent in createSwapFieldNetEvents)
             {
-                _cachedPresentationEventsService.CreateSwapFieldNetEvents.Add(netEvent);
+                _matchDataService.AddSwapField(swapFieldCreatedEvent.SwapFieldId,swapFieldCreatedEvent.CasterPlayerId, swapFieldCreatedEvent.OccuredOnTick, swapFieldCreatedEvent.EndOnTick, swapFieldCreatedEvent.MaxRadius);
+                _cachedPresentationEventsService.CreateSwapFieldNetEvents.Add(swapFieldCreatedEvent);
             }
         }
 
-        public void ProcessDestroySwapFieldEvents(CapacityList<DestroySwapFieldNetEventS2C> destroySwapFieldNetEvents)
+        public void ProcessDeactivateSwapTalentEvents(CapacityList<DeactivateSwapTalentNetEventS2C> deactivateSwapTalentNetEvents)
         {
-            if (destroySwapFieldNetEvents.IsNullOrEmpty())
+            if (deactivateSwapTalentNetEvents.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var netEvent in destroySwapFieldNetEvents)
+            foreach (var netEvent in deactivateSwapTalentNetEvents)
             {
-                _cachedPresentationEventsService.DestroySwapFieldNetEvents.Add(netEvent);
+                var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
+                var talents = casterPlayer.Spaceship.TalentsState.Talents;
+                for (int i = 0; i < talents.Count; i++)
+                {
+                    ref var talent = ref talents.Get(i);
+                    if (talent.TalentType == TalentType.Swap)
+                    {
+                        talent.CooldownEndTick = netEvent.TalentCooldownEndTick;
+                        break;
+                    }
+                }
+                _matchDataService.RemoveSwapField(netEvent.SwapFieldId);
+                _cachedPresentationEventsService.DeactivateSwapTalentNetEvents.Add(netEvent);
             }
         }
     }

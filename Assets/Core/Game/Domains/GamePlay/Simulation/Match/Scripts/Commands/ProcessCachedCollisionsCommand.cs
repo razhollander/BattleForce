@@ -109,7 +109,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 fieldId = objectA.Id;
             }
 
-            if (playerId == fieldId)
+            var swapField = _matchDataService.SimulationState.GetSwapFieldById(fieldId);
+            var didSwapFieldHitItsCaster = playerId == swapField.PlayerCasterId;
+            if (didSwapFieldHitItsCaster)
             {
                 return;
             }

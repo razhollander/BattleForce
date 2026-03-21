@@ -1,5 +1,4 @@
 using System;
-using System.Security.Cryptography;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
@@ -9,9 +8,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
-using Unity.Mathematics;
-using UnityEngine;
-using Zenject;
+using CoreDomain.Scripts.Utils;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
@@ -59,11 +56,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             IsCurrentlyActive = true;
-            var fieldEndTick = TickUtils.GetTickPassedAfterDuration(tick,_gamePlayConfig.Talents.SwapTalentConfig.GrowDurationSeconds, _networkConfig.DeltaTime);
+            var talentsSwapTalentConfig = _gamePlayConfig.Talents.SwapTalentConfig;
+            var fieldEndTick = TickUtils.GetTickPassedAfterDuration(tick,talentsSwapTalentConfig.GrowDurationSeconds, _networkConfig.DeltaTime);
             var swapFieldModel = _matchDataService.AddSwapField(_casterPlayerId, tick, fieldEndTick);
             _currentActiveSwapFieldId = swapFieldModel.Id;
             _physicsSimulator.AddSwapField(swapFieldModel.Id, casterPlayerState.Spaceship.Transform.Position);
-            _netEventsDataService.AddCreateSwapFieldNetEvent(tick, swapFieldModel.Id, _casterPlayerId, fieldEndTick);
+            _netEventsDataService.AddCreateSwapFieldNetEvent(tick, swapFieldModel.Id, _casterPlayerId, fieldEndTick, talentsSwapTalentConfig.MaxRadius);
         }
 
         public void Stop(int tick)
@@ -84,22 +82,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var swapFieldModel = _matchDataService.SimulationState.GetSwapFieldById(_currentActiveSwapFieldId);
-            var fieldEndTick = swapFieldModel.EndTick;
+            var didEnd = tick >= swapFieldModel.EndTick;
 
-            if (tick >= fieldEndTick)
+            if (didEnd)
             {
                 DeactivateTalent(tick);
             }
             else
             {
-                UpdateSwapFieldSize(tick, swapFieldModel, fieldEndTick);
+                UpdateSwapFieldSize(tick, swapFieldModel);
             }
         }
 
-        private void UpdateSwapFieldSize(int tick, TalentSwapFieldS2C swapFieldModel, int fieldEndTick)
+        private void UpdateSwapFieldSize(int tick, TalentSwapFieldS2C swapFieldModel)
         {
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            var currentRadius = math.remap(swapFieldModel.CreatedOnTick, fieldEndTick, 0, _gamePlayConfig.Talents.SwapTalentConfig.MaxRadius, tick);
+            var currentRadius = swapFieldModel.CalculateCurrentRadiusForTick(tick, _gamePlayConfig.Talents.SwapTalentConfig.MaxRadius);
             _physicsSimulator.UpdateSwapField(_casterPlayerId, casterPlayerState.Spaceship.Transform.Position, currentRadius);
         }
 
