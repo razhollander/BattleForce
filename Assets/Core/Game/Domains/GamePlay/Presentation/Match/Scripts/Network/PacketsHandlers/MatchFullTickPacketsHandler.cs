@@ -206,7 +206,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             if (!_cachedUnprocessedCreateSwapFieldEvents.IsNullOrEmpty())
             {
                 _cachedUnprocessedCreateSwapFieldEvents.Sort();
-                _presentationMatchNetEventsHandler.ProcessCreateSwapFieldEvents(_cachedUnprocessedCreateSwapFieldEvents);
+                _presentationNetEventsHandler.ProcessCreateSwapFieldEvents(_cachedUnprocessedCreateSwapFieldEvents);
             }
         }
 
@@ -225,7 +225,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             if (!_cachedUnprocessedDestroySwapFieldEvents.IsNullOrEmpty())
             {
                 _cachedUnprocessedDestroySwapFieldEvents.Sort();
-                _presentationMatchNetEventsHandler.ProcessDestroySwapFieldEvents(_cachedUnprocessedDestroySwapFieldEvents);
+                _presentationNetEventsHandler.ProcessDestroySwapFieldEvents(_cachedUnprocessedDestroySwapFieldEvents);
             }
         }
 

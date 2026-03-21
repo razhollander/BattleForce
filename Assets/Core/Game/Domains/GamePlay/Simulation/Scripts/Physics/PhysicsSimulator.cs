@@ -750,31 +750,41 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             _fixtureDefPool.Return(fixtureDef);
             _circleShapePool.Return(shape);
-
-            // Using dictionary to hold reference so we can update/remove it easily
-            _dynamicBodies.Add(new PhysicsBodyData(id, PhysicsBodyType.SwapField), body);
         }
 
         public void UpdateSwapField(ushort id, Vector2 position, float newRadius)
         {
-            var key = new PhysicsBodyData(id, PhysicsBodyType.SwapField);
-            if (_dynamicBodies.TryGetValue(key, out var body))
+            var swapFieldBody = GetBody(PhysicsBodyType.SwapField, id);
+            swapFieldBody.SetTransform(position, swapFieldBody.GetAngle());
+            var fixture = swapFieldBody.GetFixtureList();
+            var shape = (CircleShape) fixture.Shape;
+            shape.Radius = newRadius;
+        }
+
+        public Body GetBody(PhysicsBodyType bodyType, ushort bodyId)
+        {
+            var currentBody = _world.GetBodyList();
+
+            while (currentBody != null)
             {
-                body.SetTransform(position, body.GetAngle());
-                var fixture = body.GetFixtureList();
-                var shape = (Box2D.NetStandard.Collision.Shapes.CircleShape)fixture.Shape;
-                shape.Radius = newRadius;
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                if (bodyData.PhysicsBodyType == bodyType && bodyData.Id == bodyId)
+                {
+                    return currentBody;
+                }
+
+                currentBody = currentBody.GetNext();
             }
+            
+            LogService.LogError($"Couldn't find bodyType {bodyType}, bodyId {bodyId}");
+            return default;
         }
 
         public void RemoveSwapField(ushort id)
         {
-            var key = new PhysicsBodyData(id, PhysicsBodyType.SwapField);
-            if (_dynamicBodies.TryGetValue(key, out var body))
-            {
-                _world.DestroyBody(body);
-                _dynamicBodies.Remove(key);
-            }
+            var body = GetBody(PhysicsBodyType.SwapField, id);
+            _world.DestroyBody(body);
         }
         
         public void ClearAllData()

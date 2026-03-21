@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Controllers;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using CoreDomain.Scripts.Services.CommandFactory;
-using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using UnityEngine;
 using DG.Tweening;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -40,13 +39,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 if (_activeFields.ContainsKey(evt.CasterPlayerId))
                     continue;
 
-                if (!_matchPlayerControllers.TryGetController(evt.CasterPlayerId, out var playerController))
-                    continue;
+                var playerTransform = _matchPlayerControllers.GetPlayerTransform(evt.CasterPlayerId);
+                    
 
                 // Create visual representation
                 var fieldGO = new GameObject($"SwapField_{evt.CasterPlayerId}");
-                fieldGO.transform.position = playerController.Transform.position;
-                fieldGO.transform.SetParent(playerController.Transform); // Attach to player
+                fieldGO.transform.position = playerTransform.position;
+                fieldGO.transform.SetParent(playerTransform); // Attach to player
 
                 // Use a primitive sphere for visualization since we don't have a sprite config yet
                 var primitive = GameObject.CreatePrimitive(PrimitiveType.Sphere);

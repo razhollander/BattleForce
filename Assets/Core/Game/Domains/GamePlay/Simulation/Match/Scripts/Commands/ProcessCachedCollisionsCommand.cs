@@ -112,8 +112,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             if (playerId == fieldId) return;
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            if (playerState.IsDestroyed) return;
-
             _playersTalentsManager.CompleteSwapTalentWithEnemy(fieldId, playerState, _processedTick);
         }
 
