@@ -58,6 +58,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _startTick = tick;
             _currentRadius = 0f;
 
+           // _matchDataService.AddSwapField(_casterPlayerId, casterPlayerState.Spaceship.Transform.Position, 0);
             _physicsSimulator.AddSwapField(_casterPlayerId, casterPlayerState.Spaceship.Transform.Position);
             _netEventsDataService.AddCreateSwapFieldNetEvent(tick, _casterPlayerId);
         }

@@ -109,7 +109,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 fieldId = objectA.Id;
             }
 
-            if (playerId == fieldId) return;
+            if (playerId == fieldId)
+            {
+                return;
+            }
+            LogService.LogError("Hit swap field!");
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             _playersTalentsManager.CompleteSwapTalentWithEnemy(fieldId, playerState, _processedTick);

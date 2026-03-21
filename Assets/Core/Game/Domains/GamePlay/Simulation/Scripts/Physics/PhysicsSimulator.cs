@@ -758,6 +758,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             swapFieldBody.SetTransform(position, swapFieldBody.GetAngle());
             var fixture = swapFieldBody.GetFixtureList();
             var shape = (CircleShape) fixture.Shape;
+            LogService.LogError($"radius:{shape.Radius}");
             shape.Radius = newRadius;
         }
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.LayerOrders;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -56,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var mr = fieldGO.AddComponent<MeshRenderer>();
                 mr.material = new Material(Shader.Find("Sprites/Default"));
                 mr.material.color = new Color(0.5f, 0.5f, 1f, 0.5f);
-                mr.sortingOrder = -1; // Behind player
+                mr.sortingOrder = LayerOrder.SwapField; // Behind player
 
                 // Initial scale
                 fieldGO.transform.localScale = Vector3.zero;
