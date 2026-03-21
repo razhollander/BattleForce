@@ -65,6 +65,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 // Animation using Simulation config
                 // Since this runs on Presentation, you should ideally have a shared config or presentation config for it
                 // Using hardcoded fallback values if we don't have access to simulation config here easily.
+                var config = _sharedGamePlayConfig..SwapTalentConfig;
                 float maxRadius = 10f; // This should match Simulation config
                 float growDurationSeconds = 1f; // This should match Simulation config
                 Ease growEase = Ease.Linear;

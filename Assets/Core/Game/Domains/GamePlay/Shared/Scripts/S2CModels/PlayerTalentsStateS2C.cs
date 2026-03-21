@@ -22,6 +22,28 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return ref Talents.Get(SelectedTalentIndex);
         }
 
+        public bool TryGetTalentByType(TalentType talentType, ref TalentStateS2C talentState)
+        {
+            if (Talents.Count == 0)
+            {
+                talentState = default;
+                return false;
+            }
+            
+            for (int i = 0; i < Talents.Count; i++)
+            {
+                var talent = Talents[i];
+                if (talent.TalentType == talentType)
+                {
+                    talentState = ref Talents.Get(i);
+                    return true;
+                }
+            }
+
+            talentState = default;
+            return false;
+        }
+        
         public bool TryGetCurrentSelectedTalent(out TalentStateS2C selectedTalent)
         {
             if (Talents.Count == 0)

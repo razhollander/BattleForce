@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public MatchSimulationStateS2C SimulationState => _simulationState;
         private ushort _lastBulletCreatedId = 0;
         private ushort _lastPowerUpBallCreatedId = 0;
+        private ushort _lastSwapFieldCreatedId = 0;
         public MatchEnvironmentDataService EnvironmentData { get; private set; }
         public HashSet<ushort> TeamIds { get; private set; }
 
@@ -86,6 +87,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             powerUpBall.Position = position;
             powerUpBall.Velocity = velocity;
             return powerUpBall;
+        }
+
+        public TalentSwapFieldS2C AddSwapField(ushort casterPlayerId, int tick, int fieldEndTick)
+        {
+            ref var swapField = ref _simulationState.SwapFields.AddAndGet();
+            var swapFieldId =(ushort) (++_lastSwapFieldCreatedId % ushort.MaxValue);
+            swapField.Id = swapFieldId;
+            swapField.PlayerCasterId = casterPlayerId;
+            swapField.CreatedOnTick = tick;
+            swapField.EndTick = fieldEndTick;
+            return swapField;
         }
     }
 }

@@ -2,6 +2,8 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 {
@@ -14,9 +16,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         
         private ushort _casterPlayerId;
 
-        public PlayerTalentControllers(INetEventsDataService iNetEventsDataService, IMatchDataService matchDataService, Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig gamePlayConfig, Core.Game.Domains.GamePlay.Simulation.Scripts.Physics.IPhysicsSimulator physicsSimulator)
+        public PlayerTalentControllers(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig)
         {
-            SwapTalentController = new SwapTalentController(iNetEventsDataService, matchDataService, gamePlayConfig, physicsSimulator);
+            SwapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
             //HammerTalentController = new HammerTalentController(matchNetEventsDataService, matchDataService);
         }
 
@@ -55,24 +57,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             GetTalentByType(talentType).ProcessTalentInput(isTalentInputPressed, tick, deltaTime);
         }
         
-        public void OnTickAllActive(int tick)
+        public void OnTick(int tick)
         {
-            // Call OnTick on all talents.
-            // The controllers themselves check if they are active before processing.
             SwapTalentController?.OnTick(tick);
             HammerTalentController?.OnTick(tick);
             BombTalentController?.OnTick(tick);
             SentryGunTalentController?.OnTick(tick);
         }
 
-        public void StopTalent(TalentType talentType)
+        public void StopTalent(TalentType talentType, int tick)
         {
-            GetTalentByType(talentType).Stop();
+            GetTalentByType(talentType).Stop(tick);
         }
 
         public void CompleteSwapTalentWithEnemy(PlayerStateS2C enemyPlayer, int tick)
         {
-            SwapTalentController.CompleteTalentWithEnemy(enemyPlayer, tick);
+            SwapTalentController.PerformTalentWithEnemy(enemyPlayer, tick);
         }
     }
 }

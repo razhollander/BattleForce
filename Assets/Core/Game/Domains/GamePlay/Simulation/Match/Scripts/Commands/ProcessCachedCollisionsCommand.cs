@@ -345,7 +345,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 var hitByPlayerId = bulletModel.BelongToPlayerId;
 
-                if (_playersTalentsManager.TryAddTalentToPlayer(talentCard.TalentType, hitByPlayerId, out _, out bool didReplaceExistingTalent))
+                if (_playersTalentsManager.TryAddTalentToPlayer(talentCard.TalentType, hitByPlayerId, _processedTick, out _, out bool didReplaceExistingTalent))
                 {
                     var playerTalents = _matchDataService.SimulationState.GetPlayerById(hitByPlayerId).Spaceship.TalentsState.Talents;
                     _netEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, hitByPlayerId, playerTalents, didReplaceExistingTalent);

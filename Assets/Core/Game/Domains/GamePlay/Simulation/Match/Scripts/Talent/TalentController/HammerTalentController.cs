@@ -77,7 +77,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             
         }
 
-        public void Stop()
+        public void Stop(int tick)
         {
 
         }

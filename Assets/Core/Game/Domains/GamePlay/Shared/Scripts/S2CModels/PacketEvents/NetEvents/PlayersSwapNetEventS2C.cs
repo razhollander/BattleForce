@@ -14,10 +14,9 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         public Vector2 OtherPosition;
         public Vector2 CasterDirection;
         public Vector2 OtherDirection;
-        public int TalentCooldownEndTick;
 
         public PlayersSwapNetEventS2C(int occuredOnTick, ushort casterPlayerId, ushort otherPlayerId, Vector2 casterPosition, Vector2 otherPosition, Vector2 casterDirection,
-            Vector2 otherDirection, int talentCooldownEndTick)
+            Vector2 otherDirection)
         {
             OccuredOnTick = occuredOnTick;
             CasterPlayerId = casterPlayerId;
@@ -26,7 +25,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             OtherPosition = otherPosition;
             CasterDirection = casterDirection;
             OtherDirection = otherDirection;
-            TalentCooldownEndTick = talentCooldownEndTick;
         }
 
         public void Serialize(NetDataWriter writer)
@@ -38,7 +36,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             writer.PutVector2Quantized(OtherPosition);
             writer.PutVector2AsAngle16(CasterDirection);
             writer.PutVector2AsAngle16(OtherDirection);
-            writer.Put(TalentCooldownEndTick);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -50,7 +47,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             OtherPosition = reader.GetVector2Quantized();
             CasterDirection = reader.GetVector2FromAngle16();
             OtherDirection = reader.GetVector2FromAngle16();
-            TalentCooldownEndTick = reader.GetInt();
         }
 
         public int CompareTo(PlayersSwapNetEventS2C other)

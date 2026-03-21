@@ -7,23 +7,31 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
     {
         public int OccuredOnTick;
         public ushort CasterPlayerId;
+        public ushort SwapFieldId;
+        public int TalentCooldownEndTick;
 
-        public DestroySwapFieldNetEventS2C(int occuredOnTick, ushort casterPlayerId)
+        public DestroySwapFieldNetEventS2C(int occuredOnTick, ushort casterPlayerId, ushort swapFieldId, int talentCooldownEndTick)
         {
             OccuredOnTick = occuredOnTick;
             CasterPlayerId = casterPlayerId;
+            SwapFieldId = swapFieldId;
+            TalentCooldownEndTick = talentCooldownEndTick;
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put(CasterPlayerId);
+            writer.Put((byte)CasterPlayerId);
+            writer.Put(SwapFieldId);
+            writer.Put(TalentCooldownEndTick);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            CasterPlayerId = reader.GetUShort();
+            CasterPlayerId = reader.GetByte();
+            SwapFieldId = reader.GetUShort();
+            TalentCooldownEndTick = reader.GetInt();
         }
 
         public int CompareTo(DestroySwapFieldNetEventS2C other)
