@@ -11,5 +11,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         void ProcessPlayerTalentInput(ushort playerId, TalentType talentType, int tick, bool isTalentInputPressed, float deltaTime);
         void OnTickAllActive(ushort playerId, int tick);
         void CompleteSwapTalentWithEnemy(ushort casterId, PlayerStateS2C enemyPlayer, int tick);
+        void ResetAllTalentsData();
     }
 }

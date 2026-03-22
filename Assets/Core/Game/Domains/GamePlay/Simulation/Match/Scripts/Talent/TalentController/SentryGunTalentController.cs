@@ -11,12 +11,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             
         }
 
-        public void Stop(int tick)
+        public void StopIfActive(int tick)
         {
 
         }
 
         public void OnTick(int tick)
+        {
+            
+        }
+
+        public void ResetData()
         {
             
         }

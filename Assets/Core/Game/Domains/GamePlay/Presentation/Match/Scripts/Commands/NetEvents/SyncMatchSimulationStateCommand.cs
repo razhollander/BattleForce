@@ -8,6 +8,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Telepor
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
@@ -45,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private NetworkConfig _networkConfig;
         private IEnvironmentFieldBarrierControllers _environmentFieldBarrierControllers;
+        private ISwapFieldControllers _swapFieldControllers;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -73,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _environmentFieldBarrierControllers = _diContainer.Resolve<IEnvironmentFieldBarrierControllers>();
+            _swapFieldControllers = _diContainer.Resolve<ISwapFieldControllers>();
         }
 
         public void Execute()
@@ -98,6 +101,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _teamsBoardUIController.DestroyAll();
             _teleportGateControllers.DestroyAll();
             _environmentFieldBarrierControllers.DestroyAll();
+            _swapFieldControllers.DestroyAll();
         }
 
         private void CreateAll()

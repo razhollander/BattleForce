@@ -6,14 +6,12 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
-using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
-using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -29,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private NetworkConfig _networkConfig;
         private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
+        private IPlayersTalentsManager _playersTalentsManager;
 
         public override void ResolveDependencies()
         {
@@ -42,19 +41,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
+            _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
         }
 
         public void Execute()
         {
-            _physicsSimulator.ClearAllData();
-            _playersInLavaTrackerService.ClearAllData();
-            _teleportGateService.ClearData();
-            ClearStageObjectsInSimulationState();
+            ClearStageData();
+            
+            CreateEnvironmentLayout();
+            SetupPlayers();
+        }
+
+        private void CreateEnvironmentLayout()
+        {
             var environmentLayoutIndex = _gamePlayConfig.ChosenEnvironmentIndex;
-            _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutIndex);
             _matchDataService.SimulationState.EnvironmentLayoutIndex = environmentLayoutIndex;
-            _matchDataService.SimulationState.IsInPreparationPhase = true;
-            _matchDataService.SimulationState.StartPhaseInitialTick = 0;
+            _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutIndex);
             
             CreateWalls();
             CreateLavaWalls();
@@ -63,10 +65,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateTeleportGates();
             CreateRotatingWheels();
             CreateFieldBarriers();
-            ResetPlayers();
+        }
 
-            _stageDataService.IsStageEnded = false;
-            _stageDataService.StageRestartTimer = -1;
+        private void ClearStageData()
+        {
+            _physicsSimulator.ClearAllData();
+            _playersInLavaTrackerService.ClearAllData();
+            _teleportGateService.ClearData();
+            ClearStageObjectsInSimulationState();
+            _matchDataService.SimulationState.IsInPreparationPhase = true;
+            _matchDataService.SimulationState.StartPhaseInitialTick = 0;
+            _playersTalentsManager.ResetAllTalentsData();
             _preparationPhaseTimerService.RestartTimer();
             _stageDataService.ClearData();
         }
@@ -76,10 +85,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.Bullets.Clear();
             _matchDataService.SimulationState.PowerUpBalls.Clear();
             _matchDataService.SimulationState.TalentCards.Clear();
+            _matchDataService.SimulationState.SwapFields.Clear();
             _matchDataService.EnvironmentData.ClearData();
         }
 
-        private void ResetPlayers()
+        private void SetupPlayers()
         {
             var halfSize = _matchEnvironmentConfigDataService.EnvironmentHalfSize;
             var players = _matchDataService.SimulationState.Players;
@@ -91,11 +101,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
                 var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
                 var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
-
-                player.Spaceship.Health.CurrentHealth = health;
-                player.Spaceship.Health.MaxHealth = health;
-                player.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
-                player.Spaceship.Shoot.MaxCooldown = shootCooldown;
 
                 var teamId = player.TeamId;
                 Vector2 position;
@@ -113,12 +118,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var direction = RNG.NextFloat(0, 360).AngleToVector();
                 var velocity = direction * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
 
+                player.Spaceship.Health.CurrentHealth = health;
+                player.Spaceship.Health.MaxHealth = health;
+                player.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
+                player.Spaceship.Shoot.MaxCooldown = shootCooldown;
                 player.Spaceship.Transform.Position = position;
                 player.Spaceship.Transform.Direction = direction;
                 player.Spaceship.Transform.Velocity = velocity;
                 player.Spaceship.Transform.Radius = radius;
                 player.Spaceship.IsEngineOn = true;
                 player.Spaceship.IsAlive = true;
+
+                var talentsCount = player.Spaceship.TalentsState.Talents.Count;
+                for (var k = 0; k < talentsCount; k++)
+                {
+                    ref var talentState = ref player.Spaceship.TalentsState.Talents.Get(k);
+                    talentState.ResetCooldownEndTick();
+                }
                 
                 _physicsSimulator.AddPlayer(player.Id, player.TeamId, position, velocity, radius);
             }

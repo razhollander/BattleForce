@@ -750,6 +750,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             _fixtureDefPool.Return(fixtureDef);
             _circleShapePool.Return(shape);
+            LogService.LogError($"Physics AddSwapField {id}");
         }
 
         public void UpdateSwapField(ushort id, Vector2 position, float newRadius)
@@ -786,6 +787,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var body = GetBody(PhysicsBodyType.SwapField, id);
             _world.DestroyBody(body);
+            LogService.LogError($"Physics RemoveSwapField {id}");
         }
         
         public void ClearAllData()

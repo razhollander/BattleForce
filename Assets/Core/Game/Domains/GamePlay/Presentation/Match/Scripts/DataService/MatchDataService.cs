@@ -221,6 +221,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             GemsPerTeam.Clear();
             EnvironmentTeleportPairs.Clear();
             FieldBarriers.Clear();
+            SwapFields.Clear();
         }
 
         public void SetTeamBolts(ushort teamId, int totalTeamBolts)

@@ -30,11 +30,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scri
 
         public void SetSwapFieldTransform(ushort swapFieldId, Vector2 position, float radius)
         {
-            foreach (var swapFieldController in _swapFieldControllers)
-            {
-                swapFieldController.SetPosition(position);
-                swapFieldController.SetRadius(radius);
-            }
+            var swapFieldController = GetSwapField(swapFieldId);
+            swapFieldController.SetPosition(position);
+            swapFieldController.SetRadius(radius);
         }
 
         public void DestroySwapField(ushort swapFieldId)

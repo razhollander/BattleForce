@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 {
@@ -111,6 +112,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             {
                 controllers.CompleteSwapTalentWithEnemy(enemyPlayer, tick);
             }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
+            }
+        }
+
+        public void ResetAllTalentsData()
+        {
+            foreach (var kvp in _talentControllersPerPlayer)
+            {
+                kvp.Value.ResetData();
+            }
         }
 
         private TalentStateS2C AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)
@@ -124,7 +137,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private TalentStateS2C ReplaceTalentWithCurrentSelectedTalent(TalentType talentType, PlayerStateS2C playerState, int tick)
         {
             ref var currentSelectedTalent = ref playerState.Spaceship.TalentsState.Talents.Get(playerState.Spaceship.TalentsState.SelectedTalentIndex);
-            _talentControllersPerPlayer[playerState.Id].StopTalent(currentSelectedTalent.TalentType, tick);
+            _talentControllersPerPlayer[playerState.Id].StopTalentIfActive(currentSelectedTalent.TalentType, tick);
             var maxCooldown = _gamePlayConfig.Talents.CooldownPerTalentType[talentType];
             currentSelectedTalent.Setup(talentType, maxCooldown);
             return currentSelectedTalent;

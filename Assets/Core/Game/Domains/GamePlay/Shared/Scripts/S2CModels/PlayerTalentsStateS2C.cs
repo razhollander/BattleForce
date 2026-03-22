@@ -22,7 +22,29 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return ref Talents.Get(SelectedTalentIndex);
         }
 
-        public bool TryGetTalentByType(TalentType talentType, ref TalentStateS2C talentState)
+        public bool TryGetTalentIndexByType(TalentType talentType, out int talentIndex)
+        {
+            if (Talents.Count == 0)
+            {
+                talentIndex = default;
+                return false;
+            }
+            
+            for (int i = 0; i < Talents.Count; i++)
+            {
+                var talent = Talents[i];
+                if (talent.TalentType == talentType)
+                {
+                    talentIndex = i;
+                    return true;
+                }
+            }
+
+            talentIndex = default;
+            return false;
+        }
+        
+        public bool TryGetTalentByType(TalentType talentType, out TalentStateS2C talentState)
         {
             if (Talents.Count == 0)
             {
@@ -35,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 var talent = Talents[i];
                 if (talent.TalentType == talentType)
                 {
-                    talentState = ref Talents.Get(i);
+                    talentState = Talents.Get(i);
                     return true;
                 }
             }

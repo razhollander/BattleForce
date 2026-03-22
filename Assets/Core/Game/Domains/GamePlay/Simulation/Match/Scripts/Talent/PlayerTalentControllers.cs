@@ -65,14 +65,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             SentryGunTalentController?.OnTick(tick);
         }
 
-        public void StopTalent(TalentType talentType, int tick)
+        public void StopTalentIfActive(TalentType talentType, int tick)
         {
-            GetTalentByType(talentType).Stop(tick);
+            GetTalentByType(talentType).StopIfActive(tick);
         }
 
         public void CompleteSwapTalentWithEnemy(PlayerStateS2C enemyPlayer, int tick)
         {
             SwapTalentController.PerformTalentWithEnemy(enemyPlayer, tick);
+        }
+
+        public void ResetData()
+        {
+            SwapTalentController.ResetData();
+            // HammerTalentController.ResetData();
+            // BombTalentController.ResetData();
+            // SentryGunTalentController.ResetData();
         }
     }
 }

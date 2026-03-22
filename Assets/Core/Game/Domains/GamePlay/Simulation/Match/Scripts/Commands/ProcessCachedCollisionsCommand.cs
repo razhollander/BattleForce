@@ -118,7 +118,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             LogService.LogError("Hit swap field!");
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            _playersTalentsManager.CompleteSwapTalentWithEnemy(fieldId, playerState, _processedTick);
+            _playersTalentsManager.CompleteSwapTalentWithEnemy(swapField.PlayerCasterId, playerState, _processedTick);
         }
 
         private void HandlePlayerTeleportGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)

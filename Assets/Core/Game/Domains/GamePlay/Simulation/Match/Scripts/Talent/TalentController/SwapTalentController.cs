@@ -64,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _netEventsDataService.AddCreateSwapFieldNetEvent(tick, swapFieldModel.Id, _casterPlayerId, fieldEndTick, talentsSwapTalentConfig.MaxRadius);
         }
 
-        public void Stop(int tick)
+        public void StopIfActive(int tick)
         {
             if (!IsCurrentlyActive)
             {
@@ -94,11 +94,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
         }
 
+        public void ResetData()
+        {
+            IsCurrentlyActive = false;
+            _currentActiveSwapFieldId = 0;
+        }
+
         private void UpdateSwapFieldSize(int tick, TalentSwapFieldS2C swapFieldModel)
         {
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             var currentRadius = swapFieldModel.CalculateCurrentRadiusForTick(tick, _gamePlayConfig.Talents.SwapTalentConfig.MaxRadius);
-            _physicsSimulator.UpdateSwapField(_casterPlayerId, casterPlayerState.Spaceship.Transform.Position, currentRadius);
+            _physicsSimulator.UpdateSwapField(_currentActiveSwapFieldId, casterPlayerState.Spaceship.Transform.Position, currentRadius);
         }
 
         public void PerformTalentWithEnemy(PlayerStateS2C enemyPlayer, int tick)
@@ -123,29 +129,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             IsCurrentlyActive = false;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            TalentStateS2C swapTalentModel = default;
 
-            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentByType(TalentType.Swap, ref swapTalentModel))
+            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.Swap, out int talentIndex))
             {
                 LogService.LogError($"No swap talent found for player id {_casterPlayerId}");
                 return;
             }
+            ref var swapTalentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
 
             var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, swapTalentModel.MaxCooldown, _networkConfig.DeltaTime);
             swapTalentModel.CooldownEndTick = cooldownEndTick;
+
             _physicsSimulator.RemoveSwapField(_currentActiveSwapFieldId);
             _matchDataService.SimulationState.RemoveSwapFieldById(_currentActiveSwapFieldId);
             _netEventsDataService.AddDeactivateSwapTalentNetEvent(tick, _casterPlayerId, _currentActiveSwapFieldId, cooldownEndTick);
-            
-            
-            
-            casterPlayerState.Spaceship.TalentsState.TryGetTalentByType(TalentType.Swap, ref swapTalentModel); //test
-            if (swapTalentModel.CooldownEndTick != cooldownEndTick)
-            {
-                LogService.LogError($"Didnt work to update the talent!");
-            }
         }
-
 
         private void SwapPlayersTransform(PlayerStateS2C casterPlayerState, PlayerStateS2C closetPlayerToCaster)
         {
@@ -160,40 +158,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             
             (casterPlayerState.Spaceship.Transform.AngularVelocity, closetPlayerToCaster.Spaceship.Transform.AngularVelocity) =
                 (closetPlayerToCaster.Spaceship.Transform.AngularVelocity, casterPlayerState.Spaceship.Transform.AngularVelocity);
-        }
-
-        private PlayerStateS2C FindClosestPlayerToCaster(PlayerStateS2C casterPlayerState, MatchSimulationStateS2C simulationStateS2C)
-        {
-            var players = simulationStateS2C.Players;
-            var span = players.AsSpan();
-
-            var casterPos = casterPlayerState.Spaceship.Transform.Position;
-
-            float smallestDistanceSqrd = float.MaxValue;
-            int closePlayerIndex = -1;
-
-            for (int i = 0; i < span.Length; i++)
-            {
-                var playerState = span[i];
-                bool isCaster = playerState.Id == _casterPlayerId;
-
-                if (isCaster)
-                    continue;
-
-                var otherPlayerPos = playerState.Spaceship.Transform.Position;
-                var distSq = Vector2.DistanceSquared(otherPlayerPos, casterPos);
-
-                if (distSq < smallestDistanceSqrd)
-                {
-                    smallestDistanceSqrd = distSq;
-                    closePlayerIndex = i;
-                }
-            }
-
-            if (closePlayerIndex == -1)
-                throw new InvalidOperationException("No other players found (only caster exists).");
-
-            return players.GetByIndex(closePlayerIndex);
         }
     }
 }

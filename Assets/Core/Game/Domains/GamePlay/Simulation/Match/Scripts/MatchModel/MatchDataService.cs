@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.Logger.Base;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
@@ -97,6 +98,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             swapField.PlayerCasterId = casterPlayerId;
             swapField.CreatedOnTick = tick;
             swapField.EndTick = fieldEndTick;
+            LogService.LogError($"Match data AddSwapField {swapFieldId}");
             return swapField;
         }
     }
