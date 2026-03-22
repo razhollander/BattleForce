@@ -168,8 +168,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 return;
             }
             
-            // Tick all active talents, even if they aren't the currently selected one
-            _playersTalentsManager.OnTickAllActive(playerState.Id, processedTick);
+            _playersTalentsManager.ProcessAllActiveTick(playerState.Id, processedTick);
 
             if (currentSelectedTalent.IsOnCooldown())
             {

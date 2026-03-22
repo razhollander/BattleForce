@@ -10,10 +10,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scri
     {
         private static readonly int SHADER_RADIUS_PROPERTY = Shader.PropertyToID("_Radius");
         private const float SHADER_MAX_RADIUS = 0.5f;
-        [SerializeField] private SpriteRenderer _spriteRenderer;
 
+        [SerializeField] private SpriteRenderer _spriteRenderer;
         private float _spriteRadius;
         private Material _material;
+
+        public Action Despawn { get; set; }
 
         public void OnCreated()
         {
@@ -31,8 +33,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scri
             var shaderRadius = MathUtils.Remap(0, _spriteRadius, 0,SHADER_MAX_RADIUS, radius);
             _material.SetFloat(SHADER_RADIUS_PROPERTY, shaderRadius);
         }
-
-        public Action Despawn { get; set; }
 
         public void OnSpawned()
         {

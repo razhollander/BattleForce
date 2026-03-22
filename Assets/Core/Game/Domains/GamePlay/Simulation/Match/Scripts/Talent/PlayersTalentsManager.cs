@@ -101,7 +101,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, isTalentInputPressed, tick, deltaTime);
         }
 
-        public void OnTickAllActive(ushort playerId, int tick)
+        public void ProcessAllActiveTick(ushort playerId, int tick)
         {
             _talentControllersPerPlayer[playerId].OnTick(tick);
         }
