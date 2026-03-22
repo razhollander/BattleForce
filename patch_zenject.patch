@@ -1,0 +1,36 @@
+--- Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/ZenjectInstallers/GamePlayMatchInstaller.cs
++++ Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/ZenjectInstallers/GamePlayMatchInstaller.cs
+@@ -10,6 +10,8 @@
+ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Team.Scripts.Mvc;
+ using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts;
+ using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
++using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts;
++using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
+ using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
+ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers;
+@@ -48,6 +50,7 @@
+         [SerializeField] private EnvironmentTeleportGateView _environmentTeleportGateViewPrefab;
+         [SerializeField] private EnvironmentFieldBarrierView _environmentFieldBarrierViewPrefab;
+         [SerializeField] private SwapFieldView _swapFieldViewPrefab;
++        [SerializeField] private KOProjectileView _koProjectileViewPrefab;
+
+         public override void InstallBindings()
+         {
+@@ -62,6 +65,7 @@
+             Container.Bind<IMatchTalentCardControllers>().To<MatchTalentCardControllers>().AsSingle().NonLazy();
+             Container.Bind<IMatchPowerUpBallsControllers>().To<MatchPowerUpBallsControllers>().AsSingle().NonLazy();
+             Container.Bind<ISwapFieldControllers>().To<SwapFieldControllers>().AsSingle().NonLazy();
++            Container.Bind<IKOProjectilesControllers>().To<KOProjectilesControllers>().AsSingle().NonLazy();
+             Container.Bind<IMatchPlayerUIControllers>().To<MatchPlayerUIControllers>().AsSingle().NonLazy();
+             Container.Bind<IMatchScoreUIControllers>().To<MatchScoreUIControllers>().AsSingle().NonLazy();
+             Container.Bind<IMatchAnnouncementUIController>().To<MatchAnnouncementUIController>().AsSingle().NonLazy();
+@@ -83,6 +87,8 @@
+             Container.Bind<EnvironmentFieldBarrierPool>().AsSingle().WithArguments(_environmentFieldBarrierViewPrefab, _fieldBarriersParent).NonLazy();
+
+             Container.Bind<SwapFieldPool>().AsSingle().WithArguments(_swapFieldViewPrefab, _bulletsParent).NonLazy();
++
++            Container.Bind<KOProjectilePool>().AsSingle().WithArguments(_koProjectileViewPrefab, _bulletsParent).NonLazy();
+         }
+     }
+ }

@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; private set; }
         public List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; private set; }
         public List<MatchSwapFieldModel> SwapFields { get; private set; }
+        public List<MatchKOProjectileModel> KOProjectiles { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
 
@@ -49,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentTeleportPairs = new List<MatchEnvironmentTeleportPairModel>(networkConfig.MaxCap.ConcurrentEvironmentTeleportPairs);
             FieldBarriers = new List<MatchEnvironmentFieldBarrierModel>(networkConfig.MaxCap.ConcurrentFieldBarriers);
             SwapFields = new List<MatchSwapFieldModel>(networkConfig.MaxCap.ConcurrentPlayers);
+            KOProjectiles = new List<MatchKOProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -222,6 +224,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentTeleportPairs.Clear();
             FieldBarriers.Clear();
             SwapFields.Clear();
+            KOProjectiles.Clear();
         }
 
         public void SetTeamBolts(ushort teamId, int totalTeamBolts)
@@ -285,6 +288,36 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             }
             
             return fieldBarrier;
+        }
+
+        public MatchKOProjectileModel AddKOProjectile(ushort id, ushort casterPlayerId, int startTick, float size)
+        {
+            var model = new MatchKOProjectileModel(id, casterPlayerId, startTick, size);
+            KOProjectiles.Add(model);
+            return model;
+        }
+
+        public MatchKOProjectileModel GetKOProjectile(ushort id)
+        {
+            var model = KOProjectiles.Find(x => x.Id == id);
+            if (model == null)
+            {
+                LogService.LogError($"Couldn't find ko projectile with id {id}");
+            }
+            return model;
+        }
+
+        public void RemoveKOProjectile(ushort id)
+        {
+            var model = GetKOProjectile(id);
+
+            if (model == null)
+            {
+                LogService.LogError($"No ko projectile to remove with id {id}!");
+                return;
+            }
+
+            KOProjectiles.Remove(model);
         }
     }
 }

@@ -1,0 +1,12 @@
+--- Assets/Core/Scripts/Network/NetworkConfig.cs
++++ Assets/Core/Scripts/Network/NetworkConfig.cs
+@@ -74,6 +74,9 @@
+         public int PreparationPhaseEndedNetEvents = 32;
+         public int CreateSwapFieldNetEvents = 128;
+         public int DestroySwapFieldNetEvents = 128;
++        public int KOProjectHitPlayerNetEvents = 128;
++        public int CreateKOProjectileNetEvents = 128;
++        public int DeactivateKOTalentNetEvents = 128;
+
+         [Serializable]
+         public class EnvironmentRotatingWheel

@@ -26,8 +26,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<PreparationPhaseEndedNetEventS2C> PreparationPhaseEndedNetEvents { get; set; } = new();
         public List<CreateSwapFieldNetEventS2C> CreateSwapFieldNetEvents { get; set; } = new();
         public List<DeactivateSwapTalentNetEventS2C> DeactivateSwapTalentNetEvents { get; set; } = new();
-        public List<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents { get; set; } = new();
-        public List<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents { get; set; } = new();
-        public List<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents { get; set; } = new();
+        public List<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents { get; set; }
+        public List<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents { get; set; }
+        public List<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents { get; set; }
     }
 }

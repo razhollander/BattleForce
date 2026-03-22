@@ -1,0 +1,61 @@
+--- Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/DataService/MatchDataService.cs
++++ Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/DataService/MatchDataService.cs
+@@ -49,6 +49,7 @@
+         public List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; private set; }
+         public List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; private set; }
+         public List<MatchSwapFieldModel> SwapFields { get; private set; }
++        public List<MatchKOProjectileModel> KOProjectiles { get; private set; }
+         public HashSet<ushort> TeamIds { get; private set; }
+         public int StartPhaseInitialTick { get; set; }
+         public bool IsInPreparationPhase { get; set; }
+@@ -82,6 +83,7 @@
+             EnvironmentTeleportPairs = new List<MatchEnvironmentTeleportPairModel>(networkConfig.MaxCap.ConcurrentEvironmentTeleportPairs);
+             FieldBarriers = new List<MatchEnvironmentFieldBarrierModel>(networkConfig.MaxCap.ConcurrentFieldBarriers);
+             SwapFields = new List<MatchSwapFieldModel>(networkConfig.MaxCap.ConcurrentPlayers);
++            KOProjectiles = new List<MatchKOProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
+             TeamIds = new HashSet<ushort>();
+             _playersById = new Dictionary<ushort, MatchPlayerModel>();
+             _bulletsById = new Dictionary<ushort, MatchPlayerBulletModel>();
+@@ -93,6 +95,7 @@
+             _fieldBarriersById = new Dictionary<ushort, MatchEnvironmentFieldBarrierModel>();
+             _swapFieldsById = new Dictionary<ushort, MatchSwapFieldModel>();
++            _koProjectilesById = new Dictionary<ushort, MatchKOProjectileModel>();
+             IsInPreparationPhase = true;
+         }
+
+@@ -370,5 +373,34 @@
+         {
+             return _swapFieldsById[id];
+         }
++
++        public void RemoveKOProjectile(ushort id)
++        {
++            var koProjectile = _koProjectilesById[id];
++            KOProjectiles.Remove(koProjectile);
++            _koProjectilesById.Remove(id);
++        }
++
++        public MatchKOProjectileModel AddKOProjectile(ushort id, ushort casterPlayerId, int startTick, float size)
++        {
++            var matchKOProjectileModel = new MatchKOProjectileModel
++            {
++                Id = id,
++                CasterPlayerId = casterPlayerId,
++                StartTick = startTick,
++                Size = size
++            };
++
++            KOProjectiles.Add(matchKOProjectileModel);
++            _koProjectilesById.Add(id, matchKOProjectileModel);
++
++            return matchKOProjectileModel;
++        }
++
++        public MatchKOProjectileModel GetKOProjectile(ushort id)
++        {
++            return _koProjectilesById[id];
++        }
++
++        private readonly Dictionary<ushort, MatchKOProjectileModel> _koProjectilesById;
+     }
+ }

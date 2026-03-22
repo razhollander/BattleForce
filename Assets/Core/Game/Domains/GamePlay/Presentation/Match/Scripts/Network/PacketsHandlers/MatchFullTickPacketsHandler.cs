@@ -46,6 +46,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PreparationPhaseEndedNetEventS2C> _cachedUnprocessedPreparationPhaseEndedEvents;
         private readonly CapacityList<CreateSwapFieldNetEventS2C> _cachedUnprocessedCreateSwapFieldEvents;
         private readonly CapacityList<DeactivateSwapTalentNetEventS2C> _cachedUnprocessedDeactivateSwapTalentEvents;
+        private readonly CapacityList<KOProjectHitPlayerNetEventS2C> _cachedUnprocessedKOProjectHitPlayerEvents;
+        private readonly CapacityList<CreateKOProjectileNetEventS2C> _cachedUnprocessedCreateKOProjectileEvents;
+        private readonly CapacityList<DeactivateKOTalentNetEventS2C> _cachedUnprocessedDeactivateKOTalentEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
@@ -77,6 +80,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPreparationPhaseEndedEvents = new CapacityList<PreparationPhaseEndedNetEventS2C>(networkConfig.MaxCap.PreparationPhaseEndedNetEvents);
             _cachedUnprocessedCreateSwapFieldEvents = new CapacityList<CreateSwapFieldNetEventS2C>(networkConfig.MaxCap.CreateSwapFieldNetEvents);
             _cachedUnprocessedDeactivateSwapTalentEvents = new CapacityList<DeactivateSwapTalentNetEventS2C>(networkConfig.MaxCap.DestroySwapFieldNetEvents);
+            _cachedUnprocessedKOProjectHitPlayerEvents = new CapacityList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents);
+            _cachedUnprocessedCreateKOProjectileEvents = new CapacityList<CreateKOProjectileNetEventS2C>(networkConfig.MaxCap.CreateKOProjectileNetEvents);
+            _cachedUnprocessedDeactivateKOTalentEvents = new CapacityList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -121,11 +127,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPreparationPhaseEndedEvents(latestFullTickPacket.PreparationPhaseEndedNetEvents);
             ProcessCreateSwapFieldEvents(latestFullTickPacket.CreateSwapFieldNetEvents);
             ProcessDeactivateSwapTalentEvents(latestFullTickPacket.DestroySwapFieldNetEvents);
+            ProcessKOProjectHitPlayerEvents(latestFullTickPacket.KOProjectHitPlayerNetEvents);
+            ProcessCreateKOProjectileEvents(latestFullTickPacket.CreateKOProjectileNetEvents);
+            ProcessDeactivateKOTalentEvents(latestFullTickPacket.DeactivateKOTalentNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
             UpdatePowerUpBallsTransform(simulationState);
             UpdateRotatingWheels(latestTickReceivedFromServer);
+            UpdateKOProjectilesTransform(simulationState);
 
             LastProcessedTickFromServer = latestTickReceivedFromServer;
 
@@ -226,6 +236,63 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedDeactivateSwapTalentEvents.Sort();
                 _presentationNetEventsHandler.ProcessDeactivateSwapTalentEvents(_cachedUnprocessedDeactivateSwapTalentEvents);
+            }
+        }
+
+        private void ProcessKOProjectHitPlayerEvents(FixedUnorderedList<KOProjectHitPlayerNetEventS2C> koProjectHitPlayerNetEvents)
+        {
+            _cachedUnprocessedKOProjectHitPlayerEvents.Clear();
+
+            foreach (var netEvent in koProjectHitPlayerNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedKOProjectHitPlayerEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedKOProjectHitPlayerEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedKOProjectHitPlayerEvents.Sort();
+                _presentationNetEventsHandler.ProcessKOProjectHitPlayerEvents(_cachedUnprocessedKOProjectHitPlayerEvents);
+            }
+        }
+
+        private void ProcessCreateKOProjectileEvents(FixedUnorderedList<CreateKOProjectileNetEventS2C> createKOProjectileNetEvents)
+        {
+            _cachedUnprocessedCreateKOProjectileEvents.Clear();
+
+            foreach (var netEvent in createKOProjectileNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedCreateKOProjectileEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedCreateKOProjectileEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedCreateKOProjectileEvents.Sort();
+                _presentationNetEventsHandler.ProcessCreateKOProjectileEvents(_cachedUnprocessedCreateKOProjectileEvents);
+            }
+        }
+
+        private void ProcessDeactivateKOTalentEvents(FixedUnorderedList<DeactivateKOTalentNetEventS2C> deactivateKOTalentNetEvents)
+        {
+            _cachedUnprocessedDeactivateKOTalentEvents.Clear();
+
+            foreach (var netEvent in deactivateKOTalentNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedDeactivateKOTalentEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedDeactivateKOTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDeactivateKOTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateKOTalentEvents(_cachedUnprocessedDeactivateKOTalentEvents);
             }
         }
 
@@ -622,6 +689,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 var bulletState = simulationState.GetBulletById(bullet.Id);
                 bullet.Position = bulletState.Position;
+            }
+        }
+
+        private void UpdateKOProjectilesTransform(MatchSimulationStateS2C simulationState)
+        {
+            foreach (var koProjectile in _matchDataService.KOProjectiles)
+            {
+                var koProjectileState = simulationState.GetKOProjectileById(koProjectile.Id);
+                koProjectile.Position = koProjectileState.Position.ToUnityVector2();
+                koProjectile.Rotation = koProjectileState.Rotation.ToUnityVector2();
             }
         }
         
