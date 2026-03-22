@@ -16,7 +16,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)SpringId);
-            writer.Put(PlayerId);
+            writer.Put((byte)PlayerId);
             writer.PutVector2Quantized(NewPlayerDirection);
         }
 
@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         {
             OccuredOnTick = reader.GetInt();
             SpringId = reader.GetByte();
-            PlayerId = reader.GetUShort();
+            PlayerId = reader.GetByte();
             NewPlayerDirection = reader.GetVector2Quantized();
         }
 
