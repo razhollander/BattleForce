@@ -46,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
+            LogService.LogError("init stage on server side");
             ClearStageData();
             
             CreateEnvironmentLayout();

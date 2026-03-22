@@ -115,7 +115,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 return;
             }
-            LogService.LogError("Hit swap field!");
+            LogService.LogError($"Hit swap field! swapField id: {swapField.Id}, hit player id: {playerId}, caster id: {swapField.PlayerCasterId}");
 
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             _playersTalentsManager.CompleteSwapTalentWithEnemy(swapField.PlayerCasterId, playerState, _processedTick);
