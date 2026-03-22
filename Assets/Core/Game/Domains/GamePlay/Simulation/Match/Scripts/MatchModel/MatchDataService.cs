@@ -98,7 +98,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             swapField.PlayerCasterId = casterPlayerId;
             swapField.CreatedOnTick = tick;
             swapField.EndTick = fieldEndTick;
-            LogService.LogError($"Match data AddSwapField {swapFieldId}");
             return swapField;
         }
     }

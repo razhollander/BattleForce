@@ -29,8 +29,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scri
         public void SetRadius(float radius)
         {
             var shaderRadius = MathUtils.Remap(0, _spriteRadius, 0,SHADER_MAX_RADIUS, radius);
-            
-            LogService.LogError($"Client Setting radius to {radius}, shaderRadius :{shaderRadius}");
             _material.SetFloat(SHADER_RADIUS_PROPERTY, shaderRadius);
         }
 
