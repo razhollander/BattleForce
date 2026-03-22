@@ -31,6 +31,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             //     closetPlayerToCaster.Spaceship.Transform.Position, casterPlayerState.Spaceship.Transform.Direction, closetPlayerToCaster.Spaceship.Transform.Direction);
         }
 
+        public void ResetData()
+        {
+            
+        }
+
         private void SwapPlayersMatchData(PlayerStateS2C casterPlayerState, ref PlayerStateS2C closetPlayerToCaster)
         {
             (casterPlayerState.Spaceship.Transform.Position, closetPlayerToCaster.Spaceship.Transform.Position) = (closetPlayerToCaster.Spaceship.Transform.Position, casterPlayerState.Spaceship.Transform.Position);
@@ -77,7 +82,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             
         }
 
-        public void Stop()
+        public void StopIfActive(int tick)
         {
 
         }

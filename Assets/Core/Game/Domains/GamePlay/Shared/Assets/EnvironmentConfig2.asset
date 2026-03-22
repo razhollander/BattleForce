@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnvironmentConfig2
   m_EditorClassIdentifier: 
   _environmentLayoutConfigs:
-    m_keys: 02000000630000000100000000000000030000000400000005000000
+    m_keys: 0200000063000000010000000000000003000000040000000500000006000000
     m_values:
     - _environmentName: Default
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -751,3 +751,27 @@ MonoBehaviour:
         {\n    \"Position\": {\n      \"x\": -10.08,\n      \"y\": -10.08\n    },\n   
         \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\":
         \"Circle\"\n  }\n]"
+    - _environmentName: Testing
+      _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
+      _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
+        "Y": -28.16       },       {         "X": -43.804464,         "Y": -28.16      
+        },       {         "X": -43.804464,         "Y": 28.16       },       {        
+        "X": -47.324464,         "Y": 28.16       }     ]   },   {     "Id": 7,    
+        "Points": [       {         "X": 43.804464,         "Y": -28.16       },      
+        {         "X": 47.324464,         "Y": -28.16       },       {         "X":
+        47.324464,         "Y": 28.16       },       {         "X": 43.804464,        
+        "Y": 28.16       }     ]   },   {     "Id": 8,     "Points": [       {        
+        "X": -47.324464,         "Y": 24.64       },       {         "X": 47.324464,        
+        "Y": 24.64       },       {         "X": 47.324464,         "Y": 28.16      
+        },       {         "X": -47.324464,         "Y": 28.16       }     ]   },  
+        {     "Id": 9,     "Points": [       {         "X": -47.324464,         "Y":
+        -28.16       },       {         "X": 47.324464,         "Y": -28.16      
+        },       {         "X": 47.324464,         "Y": -24.64       },       {        
+        "X": -47.324464,         "Y": -24.64       }     ]   }]'
+      _lavaWallsJson: 
+      _talentCardsJson: '[   { "Id": 1, "Position": { "X": -0.0, "Y": 0.0 }, "TalentType":
+        "Swap" } ] '
+      _environmentSpringsJson: 
+      _teleportGatesJson: 
+      _rotatingWheelsJson: 
+      _fieldBarriersJson: 

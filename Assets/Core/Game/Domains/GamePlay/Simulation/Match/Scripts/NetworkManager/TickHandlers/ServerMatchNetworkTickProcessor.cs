@@ -244,6 +244,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.GainBoltsNetEvents = _netEventsDataService.GainBoltsNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerToEnvironmentTeleportGateCollisionNetEvents = _netEventsDataService.PlayerToEnvironmentTeleportGateCollisionNetEventsPerPlayer[playerId];
                 _fullTickPacket.PreparationPhaseEndedNetEvents = _netEventsDataService.PreparationPhaseEndedNetEventsPerPlayer[playerId];
+                _fullTickPacket.CreateSwapFieldNetEvents = _netEventsDataService.CreateSwapFieldNetEventsPerPlayer[playerId];
+                _fullTickPacket.DestroySwapFieldNetEvents = _netEventsDataService.DeactivateSwapTalentNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

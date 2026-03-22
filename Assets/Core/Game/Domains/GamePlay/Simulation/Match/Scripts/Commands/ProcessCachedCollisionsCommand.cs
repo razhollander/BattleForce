@@ -82,9 +82,43 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerEnvironmentSpringCollision(objectA, objectB);
                 HandlePlayerTeleportGateCollision(objectA, objectB);
+                HandleSwapFieldPlayerCollision(objectA, objectB);
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandleSwapFieldPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isPlayerToField = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.SwapField;
+            var isFieldToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.SwapField && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerToField && !isFieldToPlayer) return;
+
+            ushort playerId;
+            ushort fieldId; // Caster ID
+
+            if (isPlayerToField)
+            {
+                playerId = objectA.Id;
+                fieldId = objectB.Id;
+            }
+            else
+            {
+                playerId = objectB.Id;
+                fieldId = objectA.Id;
+            }
+
+            var swapField = _matchDataService.SimulationState.GetSwapFieldById(fieldId);
+            var didSwapFieldHitItsCaster = playerId == swapField.PlayerCasterId;
+            if (didSwapFieldHitItsCaster)
+            {
+                return;
+            }
+            LogService.LogError($"Hit swap field! swapField id: {swapField.Id}, hit player id: {playerId}, caster id: {swapField.PlayerCasterId}");
+
+            var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+            _playersTalentsManager.CompleteSwapTalentWithEnemy(swapField.PlayerCasterId, playerState, _processedTick);
         }
 
         private void HandlePlayerTeleportGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -313,7 +347,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 var hitByPlayerId = bulletModel.BelongToPlayerId;
 
-                if (_playersTalentsManager.TryAddTalentToPlayer(talentCard.TalentType, hitByPlayerId, out _, out bool didReplaceExistingTalent))
+                if (_playersTalentsManager.TryAddTalentToPlayer(talentCard.TalentType, hitByPlayerId, _processedTick, out _, out bool didReplaceExistingTalent))
                 {
                     var playerTalents = _matchDataService.SimulationState.GetPlayerById(hitByPlayerId).Spaceship.TalentsState.Talents;
                     _netEventsDataService.AddTalentCardObtainedNetEvent(_processedTick, talentCard.Id, hitByPlayerId, playerTalents, didReplaceExistingTalent);

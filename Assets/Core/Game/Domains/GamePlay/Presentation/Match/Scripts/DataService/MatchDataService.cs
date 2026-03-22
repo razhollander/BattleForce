@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; private set; }
         public List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; private set; }
         public List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; private set; }
+        public List<MatchSwapFieldModel> SwapFields { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
 
@@ -47,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             GemsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             EnvironmentTeleportPairs = new List<MatchEnvironmentTeleportPairModel>(networkConfig.MaxCap.ConcurrentEvironmentTeleportPairs);
             FieldBarriers = new List<MatchEnvironmentFieldBarrierModel>(networkConfig.MaxCap.ConcurrentFieldBarriers);
+            SwapFields = new List<MatchSwapFieldModel>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -219,6 +221,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             GemsPerTeam.Clear();
             EnvironmentTeleportPairs.Clear();
             FieldBarriers.Clear();
+            SwapFields.Clear();
         }
 
         public void SetTeamBolts(ushort teamId, int totalTeamBolts)
@@ -240,6 +243,37 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchEnvironmentTeleportPairModel GetTeleportPair(ushort teleportPairId)
         {
             return EnvironmentTeleportPairs.Find(x => x.Id == teleportPairId);
+        }
+
+        public MatchSwapFieldModel AddSwapField(ushort id, ushort casterPlayerId, int startTick, int endTick, float maxRadius)
+        {
+            var swapFieldModel = new MatchSwapFieldModel(id, casterPlayerId, startTick, endTick, maxRadius);
+            SwapFields.Add(swapFieldModel);
+            return swapFieldModel;
+        }
+
+        public MatchSwapFieldModel GetSwapField(ushort id)
+        {
+            var swapField = SwapFields.Find(x => x.Id == id);
+            if (swapField == null)
+            {
+                LogService.LogError($"Couldn't find swap field with id {id}");
+            }
+            
+            return swapField;
+        }
+
+        public void RemoveSwapField(ushort id)
+        {
+            var swapFieldModel = GetSwapField(id);
+
+            if (swapFieldModel == null)
+            {
+                LogService.LogError($"No swap field to remove with id {id}!");
+                return;
+            }
+            
+            SwapFields.Remove(swapFieldModel);
         }
 
         public MatchEnvironmentFieldBarrierModel GetFieldBarrier(ushort id)

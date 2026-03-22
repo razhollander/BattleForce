@@ -26,6 +26,9 @@ MonoBehaviour:
     HammerSpeed: 10
     HammerSize: 1
     HammerMass: 10
+  SwapTalentConfig:
+    MaxRadius: 100
+    GrowDurationSeconds: 5
   PulseDashConfig:
     DashVelocity: 10
     PulsePower: 10

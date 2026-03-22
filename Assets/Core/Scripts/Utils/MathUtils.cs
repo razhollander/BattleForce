@@ -1,3 +1,4 @@
+using System;
 using Core.Scripts.Extensions;
 using UnityEngine;
 
@@ -5,6 +6,27 @@ namespace CoreDomain.Scripts.Utils
 {
     public static class MathUtils
     {
+        /// <summary>
+        /// Remaps a value from one range to another.
+        /// </summary>
+        public static float Remap(float inMin, float inMax, float outMin, float outMax, float value)
+        {
+            if (Mathf.Approximately(inMin, inMax)) return outMin;
+
+            return outMin + (value - inMin) * (outMax - outMin) / (inMax - inMin);
+        }
+
+        /// <summary>
+        /// Remaps a value from one range to another, ensuring the result stays within the output range.
+        /// </summary>
+        public static float RemapClamped(float inMin, float inMax, float outMin, float outMax, float value)
+        {
+            if (Mathf.Approximately(inMin, inMax)) return outMin;
+            var t = (value - inMin) / (inMax - inMin);
+            t = Math.Max(0f, Math.Min(1f, t)); 
+            return outMin + t * (outMax - outMin);
+        }
+        
         public static bool DidCrossTargetAngle(float previousAngle, float currentAngle, float targetAngle, float tolerance)
         {
             bool wasPreviousAbove = previousAngle < targetAngle + tolerance && previousAngle > targetAngle;

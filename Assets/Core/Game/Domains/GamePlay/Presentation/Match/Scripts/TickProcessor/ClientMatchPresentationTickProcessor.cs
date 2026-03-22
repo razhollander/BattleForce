@@ -4,7 +4,6 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mv
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -38,6 +37,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand;
         private readonly UpdateObjectTransformInsideRotatingWheelsCommand _updateObjectTransformInsideRotatingWheelsCommand;
         private readonly HandlePreparationPhaseEndedNetEventsCommand _handlePreparationPhaseEndedNetEventsCommand;
+        private readonly HandleDeactivateSwapTalentNetEventsCommand _handleDeactivateSwapTalentNetEventsCommand;
+        private readonly UpdateSwapFieldsTransformCommand _updateSwapFieldsTransformCommand;
+        private readonly HandleSwapFieldCreatedNetEventsCommand _handleSwapFieldCreatedNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -65,6 +67,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand>();
             _updateObjectTransformInsideRotatingWheelsCommand = commandFactory.CreateCommandVoid<UpdateObjectTransformInsideRotatingWheelsCommand>();
             _handlePreparationPhaseEndedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePreparationPhaseEndedNetEventsCommand>();
+            _handleDeactivateSwapTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSwapTalentNetEventsCommand>();
+            _updateSwapFieldsTransformCommand = commandFactory.CreateCommandVoid<UpdateSwapFieldsTransformCommand>();
+            _handleSwapFieldCreatedNetEventsCommand = commandFactory.CreateCommandVoid<HandleSwapFieldCreatedNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -98,11 +103,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePreparationPhaseEndedNetEventsCommand.Execute();
             _matchPlayerUIControllers.UpdatePlayersTalentCooldowns(lastProcessedTickFromServer);
             _playerControllers.UpdatePlayersTransform();
+            _handleSwapFieldCreatedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
+            _handleDeactivateSwapTalentNetEventsCommand.Execute();
+            _updateSwapFieldsTransformCommand.SetTick(lastProcessedTickFromServer).Execute();// must be after _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
             _updateObjectTransformInsideRotatingWheelsCommand.Execute();
-            
+
             _handleTalentCardObtainedNetEventsCommand.SetCurrentServerTick(lastProcessedTickFromServer).Execute();
         }
     }

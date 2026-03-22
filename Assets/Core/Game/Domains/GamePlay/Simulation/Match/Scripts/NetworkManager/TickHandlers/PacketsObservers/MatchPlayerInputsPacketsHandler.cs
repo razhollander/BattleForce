@@ -168,6 +168,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 return;
             }
             
+            _playersTalentsManager.ProcessAllActiveTick(playerState.Id, processedTick);
+
             if (currentSelectedTalent.IsOnCooldown())
             {
                 return;

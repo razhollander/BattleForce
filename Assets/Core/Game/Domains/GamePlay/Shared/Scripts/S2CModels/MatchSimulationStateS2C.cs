@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<PlayerBulletS2C> Bullets;
         public FixedUnorderedList<TalentCardS2C> TalentCards;
         public FixedUnorderedList<PowerUpBallS2C> PowerUpBalls;
+        public FixedUnorderedList<TalentSwapFieldS2C> SwapFields;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
         public int EnvironmentLayoutIndex;
@@ -28,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
             TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
             PowerUpBalls = new FixedUnorderedList<PowerUpBallS2C>(maxPowerUpBalls);
+            SwapFields = new FixedUnorderedList<TalentSwapFieldS2C>(maxPlayers);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
         }
@@ -75,6 +77,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 writer.Put(kvp.Key);
                 writer.Put(kvp.Value);
             }
+            
+            var swapFieldsCount = SwapFields.Count;
+            writer.Put((byte)swapFieldsCount);
+            foreach (var swapField in SwapFields.AsSpan())
+            {
+                swapField.Serialize(writer);
+            }
 
             writer.Put((byte)EnvironmentLayoutIndex);
             writer.Put((byte)StageType);
@@ -115,7 +124,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 ref var powerUp = ref PowerUpBalls.AddAndGet();
                 powerUp.Deserialize(reader);
             }
-
+            
             GemsPerTeamId.Clear();
             var jemsCount = reader.GetUShort();
             for (int i = 0; i < jemsCount; i++)
@@ -134,6 +143,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 BoltsPerTeam.Add(teamId, bolts);
             }
 
+            var swapFieldsCount = reader.GetByte();
+            SwapFields.Clear();
+            for (var i = 0; i < swapFieldsCount; i++)
+            {
+                ref var swapField = ref SwapFields.AddAndGet();
+                swapField.Deserialize(reader);
+            }
+            
             EnvironmentLayoutIndex = reader.GetByte();
             StageType = (StageType)reader.GetByte();
             StartPhaseInitialTick = reader.GetInt();
@@ -260,6 +277,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             throw new System.Exception($"No talent card for id {cardId}!");
         }
         
+        public ref TalentSwapFieldS2C GetSwapFieldById(ushort swapFieldId)
+        {
+            for (int i = 0; i < SwapFields.Count; i++)
+            {
+                if (SwapFields[i].Id == swapFieldId)
+                {
+                    return ref SwapFields.GetByIndex(i);
+                }
+            }
+
+            throw new System.Exception($"No swap field for id {swapFieldId}!");
+        }
+        
         public bool TryGetTalentCardById(ushort cardId, out TalentCardS2C talentCard)
         {
             for (int i = 0; i < TalentCards.Count; i++)
@@ -381,6 +411,20 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
 
             throw new System.Exception($"No power up for id {powerUpBallId}!");
+        }
+        
+        public void RemoveSwapFieldById(ushort swapFieldId)
+        {
+            for (int i = 0; i < SwapFields.Count; i++)
+            {
+                if (SwapFields[i].Id == swapFieldId)
+                {
+                    SwapFields.RemoveAt(i);
+                    return;
+                }
+            }
+
+            throw new System.Exception($"No power up for id {swapFieldId}!");
         }
 
         public  bool TryGetPlayerByName(string playerName, out PlayerStateS2C playerState)

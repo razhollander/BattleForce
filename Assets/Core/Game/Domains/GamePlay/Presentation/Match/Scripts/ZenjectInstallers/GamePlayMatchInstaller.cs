@@ -13,6 +13,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scri
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
@@ -46,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private GainBoltEffectView gainBoltEffectViewPrefab;
         [SerializeField] private PlayerTeleportEffectView playerTeleportEffectViewPrefab;
         [SerializeField] private EnvironmentFieldBarrierView _environmentFieldBarrierViewPrefab;
+        [SerializeField] private SwapFieldView _swapFieldViewPrefab;
 
         public override void InstallBindings()
         {
@@ -70,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<TalentCardControllers>().AsSingle().WithArguments(_talentCardViewPrefab).NonLazy();
             Container.BindInterfacesTo<TalentCardObtainedEffectController>().AsSingle().WithArguments(_talentCardObtainedEffectView).NonLazy();
             Container.BindInterfacesTo<PowerUpBallControllers>().AsSingle().WithArguments(_powerUpBallViewPrefab).NonLazy();
+            Container.BindInterfacesTo<SwapFieldControllers>().AsSingle().WithArguments(_swapFieldViewPrefab).NonLazy();
             Container.BindInterfacesTo<PowerUpBallObtainedEffectController>().AsSingle().WithArguments(_powerUpBallObtainedEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchPlayerUIControllers>().AsSingle().WithArguments(_matchPlayerUIControllersView).NonLazy();
             Container.BindInterfacesTo<MatchBulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();

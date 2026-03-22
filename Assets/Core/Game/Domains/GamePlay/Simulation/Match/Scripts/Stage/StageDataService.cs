@@ -38,7 +38,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         {
             WinnerTeamId = 0;
             LosingTeamIds.Clear();
-
+            IsStageEnded = false;
+            StageRestartTimer = -1;
+            
             foreach (var teamId in _matchDataService.TeamIds)
             {
                 GemsCollectedPerTeam[teamId] = 0;

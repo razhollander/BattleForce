@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Vector2 = System.Numerics.Vector2;
@@ -10,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
     {
         MatchSimulationStateS2C SimulationState { get; }
         MatchEnvironmentDataService EnvironmentData { get; }
+        HashSet<ushort> TeamIds { get; }
         //SimulationStateS2C PreviousSimulationState { get; }
         PlayerStateS2C AddPlayer(ushort playerId, ushort teamId, string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,
             float shootCooldown, bool isPlayerConnected);
@@ -17,6 +17,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         //void CopySimulationStateIntoPrevious();
         TalentCardS2C AddTalentCard(ushort talentCardId, Vector2 position, TalentType talentType, ushort health);
         PowerUpBallS2C AddPowerUpBall(Vector2 position, Vector2 velocity, PowerUpType powerUpType);
-        HashSet<ushort> TeamIds { get; }
+        TalentSwapFieldS2C AddSwapField(ushort casterPlayerId, int tick, int fieldEndTick);
     }
 }

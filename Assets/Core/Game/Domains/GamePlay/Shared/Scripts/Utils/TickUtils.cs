@@ -4,9 +4,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Utils
 {
     public static class TickUtils
     {
-        public static int GetTickInTime(int currentTick, float timeInSeconds, float deltaTime)
+        public static int GetTickPassedAfterDuration(int currentTick, float durationInSeconds, float deltaTime)
         {
-            return Mathf.RoundToInt(currentTick + timeInSeconds / deltaTime);
+            return Mathf.RoundToInt(currentTick + durationInSeconds / deltaTime);
         }
         
         public static float GetSecondsLeftUntilTick(int currentTick, int goalTick, float deltaTime)

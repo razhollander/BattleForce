@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; }
         List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; }
         List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; }
+        List<MatchSwapFieldModel> SwapFields { get; }
         HashSet<ushort> TeamIds {get; }
         int StartPhaseInitialTick { get; set; }
         bool IsInPreparationPhase { get; set; }
@@ -49,5 +50,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition,
             float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation, Vector2 size);
         MatchEnvironmentTeleportPairModel GetTeleportPair(ushort teleportPairId);
+        MatchSwapFieldModel AddSwapField(ushort id, ushort casterPlayerId, int startTick, int endTick, float maxRadius);
+        MatchSwapFieldModel GetSwapField(ushort id);
+        void RemoveSwapField(ushort id);
     }
 }

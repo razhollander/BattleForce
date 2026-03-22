@@ -35,6 +35,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void AddStartMatchWall(ushort id, Vector2 position, float radius);
         void AddEnvironmentSpring(ushort id, Vector2 position, float rotationDegrees, Vector2 size);
         void AddTeleportGate(ushort id, Vector2 position, float rotation, Vector2 size);
+        void AddSwapField(ushort id, Vector2 position);
+        void UpdateSwapField(ushort id, Vector2 position, float newRadius);
+        void RemoveSwapField(ushort id);
         void ClearAllData();
     }
 }

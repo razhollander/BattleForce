@@ -15,7 +15,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsBodyType.TeamFloor)
                                     | GetCollisionMask(PhysicsBodyType.StartMatchWall)
                                     | GetCollisionMask(PhysicsBodyType.EnvironmentSpring)
-                                    | GetCollisionMask(PhysicsBodyType.EnvironmentTeleportGate);
+                                    | GetCollisionMask(PhysicsBodyType.EnvironmentTeleportGate)
+                                    | GetCollisionMask(PhysicsBodyType.SwapField);
                     break;
                 case PhysicsBodyType.PlayerBullet:
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
@@ -50,6 +51,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.EnvironmentTeleportGate:
+                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    break;
+                case PhysicsBodyType.SwapField:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
                     break;
                 default:

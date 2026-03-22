@@ -3,8 +3,10 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 {
@@ -16,13 +18,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly Dictionary<int, PlayerTalentControllers> _talentControllersPerPlayer;
         private readonly ConcurrentPool<PlayerTalentControllers> _talentControllersPool;
 
-        public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig, INetEventsDataService iNetEventsDataService, SimulationGamePlayConfig gamePlayConfig)
+        public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig, INetEventsDataService iNetEventsDataService, SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator)
         {
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _gamePlayConfig = gamePlayConfig;
             _talentControllersPerPlayer = new Dictionary<int, PlayerTalentControllers>(networkConfig.MaxCap.ConcurrentPlayers);
-            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(iNetEventsDataService, matchDataService),networkConfig.MaxCap.ConcurrentPlayers);
+            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(iNetEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig),networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)
@@ -38,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _talentControllersPerPlayer.Remove(playerId);
         }
 
-        public bool TryAddTalentToPlayer(TalentType talentType, ushort playerId, out TalentStateS2C newTalent, out bool didReplaceExistingTalent)
+        public bool TryAddTalentToPlayer(TalentType talentType, ushort playerId, int tick, out TalentStateS2C newTalent, out bool didReplaceExistingTalent)
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             didReplaceExistingTalent = false;
@@ -52,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             var didPlayerReachMaxTalents = playerState.Spaceship.TalentsState.Talents.Count == _sharedGamePlayConfig.MaxConcurrentTalentsForPlayer;
             if (didPlayerReachMaxTalents)
             {
-                newTalent = ReplaceTalentWithCurrentSelectedTalent(talentType, playerState);
+                newTalent = ReplaceTalentWithCurrentSelectedTalent(talentType, playerState, tick);
                 didReplaceExistingTalent = true;
             }
             else
@@ -99,6 +101,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, isTalentInputPressed, tick, deltaTime);
         }
 
+        public void ProcessAllActiveTick(ushort playerId, int tick)
+        {
+            _talentControllersPerPlayer[playerId].OnTick(tick);
+        }
+
+        public void CompleteSwapTalentWithEnemy(ushort casterId, PlayerStateS2C enemyPlayer, int tick)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.CompleteSwapTalentWithEnemy(enemyPlayer, tick);
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
+            }
+        }
+
+        public void ResetAllTalentsData()
+        {
+            foreach (var kvp in _talentControllersPerPlayer)
+            {
+                kvp.Value.ResetData();
+            }
+        }
+
         private TalentStateS2C AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)
         {
             ref var newTalent = ref playerState.Spaceship.TalentsState.Talents.AddAndGet();
@@ -107,10 +134,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             return newTalent;
         }
 
-        private TalentStateS2C ReplaceTalentWithCurrentSelectedTalent(TalentType talentType, PlayerStateS2C playerState)
+        private TalentStateS2C ReplaceTalentWithCurrentSelectedTalent(TalentType talentType, PlayerStateS2C playerState, int tick)
         {
             ref var currentSelectedTalent = ref playerState.Spaceship.TalentsState.Talents.Get(playerState.Spaceship.TalentsState.SelectedTalentIndex);
-            _talentControllersPerPlayer[playerState.Id].StopTalent(currentSelectedTalent.TalentType);
+            _talentControllersPerPlayer[playerState.Id].StopTalentIfActive(currentSelectedTalent.TalentType, tick);
             var maxCooldown = _gamePlayConfig.Talents.CooldownPerTalentType[talentType];
             currentSelectedTalent.Setup(talentType, maxCooldown);
             return currentSelectedTalent;
