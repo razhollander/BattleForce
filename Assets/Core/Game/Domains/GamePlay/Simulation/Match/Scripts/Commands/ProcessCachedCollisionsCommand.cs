@@ -83,11 +83,56 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerEnvironmentSpringCollision(objectA, objectB);
                 HandlePlayerTeleportGateCollision(objectA, objectB);
                 HandleSwapFieldPlayerCollision(objectA, objectB);
+                HandleKOProjectilePlayerCollision(objectA, objectB);
+                HandleKOProjectileWallCollision(objectA, objectB);
             }
 
             _physicsSimulator.ClearCachedCollisions();
         }
 
+        private void HandleKOProjectileWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isWallToProjectile = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.KOProjectile;
+            var isProjectileToWall = objectA.PhysicsBodyType == PhysicsBodyType.KOProjectile && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
+
+            if (!isWallToProjectile && !isProjectileToWall) return;
+
+            ushort projectileId = isProjectileToWall ? objectA.Id : objectB.Id;
+
+            var projectile = _matchDataService.SimulationState.GetKOProjectileById(projectileId);
+            var casterId = projectile.PlayerCasterId;
+            _matchPlayerControllers.GetController(casterId).Talents.CompleteKOTalentWithWall(_tick);
+        }
+
+        private void HandleKOProjectilePlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isPlayerToProjectile = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.KOProjectile;
+            var isProjectileToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.KOProjectile && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerToProjectile && !isProjectileToPlayer) return;
+
+            ushort playerId;
+            ushort projectileId;
+
+            if (isPlayerToProjectile)
+            {
+                playerId = objectA.Id;
+                projectileId = objectB.Id;
+            }
+            else
+            {
+                projectileId = objectA.Id;
+                playerId = objectB.Id;
+            }
+
+            var projectile = _matchDataService.SimulationState.GetKOProjectileById(projectileId);
+            var casterId = projectile.PlayerCasterId;
+
+            if (casterId == playerId) return;
+
+            var enemyPlayer = _matchDataService.SimulationState.GetPlayerById(playerId);
+            _matchPlayerControllers.GetController(casterId).Talents.CompleteKOTalentWithEnemy(enemyPlayer, _tick);
+        }
         private void HandleSwapFieldPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
             var isPlayerToField = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.SwapField;

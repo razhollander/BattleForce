@@ -38,6 +38,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void AddSwapField(ushort id, Vector2 position);
         void UpdateSwapField(ushort id, Vector2 position, float newRadius);
         void RemoveSwapField(ushort id);
+        void AddKOProjectile(ushort id, Vector2 position, float radius);
+        void UpdateKOProjectile(ushort id, Vector2 position);
+        void RemoveKOProjectile(ushort id);
         void ClearAllData();
     }
 }

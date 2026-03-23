@@ -724,6 +724,45 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(shape);
         }
 
+        public void AddKOProjectile(ushort id, Vector2 position, float radius)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.KOProjectile);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var shape = GetCircleShape();
+            shape.Radius = radius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+
+            fixtureDef.filter.categoryBits = PhysicsBodyType.KOProjectile.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.KOProjectile.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(shape);
+        }
+
+        public void UpdateKOProjectile(ushort id, Vector2 position)
+        {
+            var body = GetBody(PhysicsBodyType.KOProjectile, id);
+            body.SetTransform(position, 0);
+        }
+
+        public void RemoveKOProjectile(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.KOProjectile, id);
+            RemoveBody(body);
+        }
+
         public void AddSwapField(ushort id, Vector2 position)
         {
             var bodyDef = GetBodyDef();

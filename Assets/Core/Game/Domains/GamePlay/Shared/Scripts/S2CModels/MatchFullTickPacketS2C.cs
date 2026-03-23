@@ -31,6 +31,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> PlayerToEnvironmentTeleportGateCollisionNetEvents;
         public FixedUnorderedList<PreparationPhaseEndedNetEventS2C> PreparationPhaseEndedNetEvents;
         public FixedUnorderedList<CreateSwapFieldNetEventS2C> CreateSwapFieldNetEvents;
+        public FixedUnorderedList<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents;
+        public FixedUnorderedList<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents;
+        public FixedUnorderedList<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
 
         public MatchFullTickPacketS2C()
@@ -59,6 +62,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PlayerToEnvironmentTeleportGateCollisionNetEvents = new FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(maxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents);
             PreparationPhaseEndedNetEvents = new FixedUnorderedList<PreparationPhaseEndedNetEventS2C>(maxCap.PreparationPhaseEndedNetEvents);
             CreateSwapFieldNetEvents = new FixedUnorderedList<CreateSwapFieldNetEventS2C>(maxCap.CreateSwapFieldNetEvents);
+            CreateKOProjectileNetEvents = new FixedUnorderedList<CreateKOProjectileNetEventS2C>(maxCap.CreateSwapFieldNetEvents);
+            KOProjectHitPlayerNetEvents = new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(maxCap.CreateSwapFieldNetEvents);
+            DeactivateKOTalentNetEvents = new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(maxCap.CreateSwapFieldNetEvents);
             DestroySwapFieldNetEvents = new FixedUnorderedList<DeactivateSwapTalentNetEventS2C>(maxCap.DestroySwapFieldNetEvents);
         }
 
@@ -99,9 +105,41 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedPlayerToEnvironmentTeleportGateCollisionEvents(writer);
             SerializedPreparationPhaseEndedEvents(writer);
             SerializedCreateSwapFieldNetEvents(writer);
+            SerializedCreateKOProjectileNetEvents(writer);
+            SerializedKOProjectHitPlayerNetEvents(writer);
+            SerializedDeactivateKOTalentNetEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
         }
 
+        private void SerializedCreateKOProjectileNetEvents(NetDataWriter writer)
+        {
+            var count = CreateKOProjectileNetEvents.Count;
+            writer.Put((byte)count);
+            foreach (var evt in CreateKOProjectileNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
+        {
+            var count = KOProjectHitPlayerNetEvents.Count;
+            writer.Put((byte)count);
+            foreach (var evt in KOProjectHitPlayerNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void SerializedDeactivateKOTalentNetEvents(NetDataWriter writer)
+        {
+            var count = DeactivateKOTalentNetEvents.Count;
+            writer.Put((byte)count);
+            foreach (var evt in DeactivateKOTalentNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
         private void SerializedCreateSwapFieldNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)CreateSwapFieldNetEvents.Count);
@@ -250,9 +288,44 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedPlayerToEnvironmentTeleportGateCollisionEvents(reader);
             DeserializedPreparationPhaseEndedEvents(reader);
             DeserializedCreateSwapFieldNetEvents(reader);
+            DeserializedCreateKOProjectileNetEvents(reader);
+            DeserializedKOProjectHitPlayerNetEvents(reader);
+            DeserializedDeactivateKOTalentNetEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
         }
 
+        private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
+        {
+            CreateKOProjectileNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref CreateKOProjectileNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedKOProjectHitPlayerNetEvents(NetDataReader reader)
+        {
+            KOProjectHitPlayerNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref KOProjectHitPlayerNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedDeactivateKOTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateKOTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref DeactivateKOTalentNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
         private void DeserializedCreateSwapFieldNetEvents(NetDataReader reader)
         {
             CreateSwapFieldNetEvents.Clear();
