@@ -8,12 +8,14 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public int OccuredOnTick;
         public ushort KoProjectileId;
         public ushort CasterPlayerId;
+        public int TalentCooldownEndTick;
 
-        public DeactivateKOTalentNetEventS2C(int occuredOnTick, ushort koProjectileId, ushort casterPlayerId)
+        public DeactivateKOTalentNetEventS2C(int occuredOnTick, ushort koProjectileId, ushort casterPlayerId, int talentCooldownEndTick)
         {
             OccuredOnTick = occuredOnTick;
             KoProjectileId = koProjectileId;
             CasterPlayerId = casterPlayerId;
+            TalentCooldownEndTick = talentCooldownEndTick;
         }
 
         public void Serialize(NetDataWriter writer)
@@ -21,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             writer.Put(OccuredOnTick);
             writer.Put(KoProjectileId);
             writer.Put((byte)CasterPlayerId);
+            writer.Put(TalentCooldownEndTick);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -28,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             OccuredOnTick = reader.GetInt();
             KoProjectileId = reader.GetUShort();
             CasterPlayerId = reader.GetByte();
+            TalentCooldownEndTick = reader.GetInt();
         }
 
         public int CompareTo(DeactivateKOTalentNetEventS2C other)

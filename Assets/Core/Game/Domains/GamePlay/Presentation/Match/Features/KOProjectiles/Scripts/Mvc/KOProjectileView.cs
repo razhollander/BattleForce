@@ -7,7 +7,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.S
     public class KOProjectileView : MonoBehaviour , IPoolable
     {
         [SerializeField] private KOProjectileCoilSpringView _coilSpringView;
-        public Transform Transform;
+        public Transform Transform { get; private set; }
 
         public void Setup(Vector2 position, Quaternion rotation, Vector2 coilSpringStartPosition, float size)
         {

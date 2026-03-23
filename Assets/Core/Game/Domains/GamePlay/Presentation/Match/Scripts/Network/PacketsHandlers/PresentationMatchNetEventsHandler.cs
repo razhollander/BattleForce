@@ -363,7 +363,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in createKOProjectileNetEvents)
             {
-                _matchDataService.AddKOProjectile(netEvent.KoProjectileId, netEvent.CasterPlayerId, netEvent.OccuredOnTick, netEvent.Size);
+                _matchDataService.AddKOProjectile(netEvent.KoProjectile.Id, netEvent.KoProjectile.PlayerCasterId, netEvent.OccuredOnTick, netEvent.KoProjectile.Size);
                 _cachedPresentationEventsService.CreateKOProjectileNetEvents.Add(netEvent);
             }
         }

@@ -7,27 +7,23 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     {
         public int OccuredOnTick;
         public TalentKOProjectileS2C KoProjectile;
-        public ushort CasterPlayerId;
 
-        public CreateKOProjectileNetEventS2C(int occuredOnTick, TalentKOProjectileS2C koProjectile, ushort casterPlayerId)
+        public CreateKOProjectileNetEventS2C(int occuredOnTick, TalentKOProjectileS2C koProjectile)
         {
             OccuredOnTick = occuredOnTick;
             KoProjectile = koProjectile;
-            CasterPlayerId = casterPlayerId;
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
             writer.Put(KoProjectile);
-            writer.Put((byte)CasterPlayerId);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
             KoProjectile.Deserialize(reader);
-            CasterPlayerId = reader.GetByte();
         }
 
         public int CompareTo(CreateKOProjectileNetEventS2C other)

@@ -9,7 +9,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
     [Serializable]
     public struct TalentKOProjectileS2C : INetSerializable, IEquatable<ushort>
     {
-        public int OccuredOnTick;
         public ushort Id;
         public ushort PlayerCasterId;
         public Vector2 Position;
@@ -19,7 +18,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(OccuredOnTick);
             writer.Put(Id);
             writer.Put(PlayerCasterId);
             writer.PutVector2Quantized(Position);
@@ -29,7 +27,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         public void Deserialize(NetDataReader reader)
         {
-            OccuredOnTick = reader.GetInt();
             Id = reader.GetUShort();
             PlayerCasterId = reader.GetUShort();
             Position = reader.GetVector2Quantized();

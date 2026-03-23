@@ -114,10 +114,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleSwapFieldCreatedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleDeactivateSwapTalentNetEventsCommand.Execute();
             _updateSwapFieldsTransformCommand.SetTick(lastProcessedTickFromServer).Execute();// must be after _playerControllers.UpdatePlayersTransform();
-            _handleKOProjectileCreatedNetEventsCommand.Execute();
-            _handleDeactivateKOTalentNetEventsCommand.Execute();
+            _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTransform();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();
-            _updateKOProjectilesTransformCommand.Execute();
+            _handleDeactivateKOTalentNetEventsCommand.Execute();
+            _updateKOProjectilesTransformCommand.Execute(); // must be after _handleDeactivateKOTalentNetEventsCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
