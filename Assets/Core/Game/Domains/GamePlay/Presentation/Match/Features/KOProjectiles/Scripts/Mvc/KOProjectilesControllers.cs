@@ -1,89 +1,79 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
-using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts;
-using CoreDomain.Scripts.Services.UpdateService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Scripts.Extensions;
+using UnityEngine;
+using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc
 {
-    public class KOProjectilesControllers : IKOProjectilesControllers, IUpdatable
+    public class KOProjectilesControllers : IKOProjectilesControllers
     {
+        private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly IMatchDataService _matchDataService;
         private readonly KOProjectilePool _koProjectilePool;
-        private readonly ICachedPresentationEventsService _cachedPresentationEventsService;
-        private readonly IUpdateSubscriptionService _updateSubscriptionService;
-        private readonly Dictionary<ushort, KOProjectileController> _controllers;
+        private readonly Dictionary<ushort, KOProjectileController> _controllers = new();
+        private Transform _koProjectilesParent;
 
-        public KOProjectilesControllers(IMatchDataService matchDataService, KOProjectilePool koProjectilePool,
-            ICachedPresentationEventsService cachedPresentationEventsService,
-            IUpdateSubscriptionService updateSubscriptionService)
+        public KOProjectilesControllers(KOProjectileView koProjectileViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
         {
-            _matchDataService = matchDataService;
-            _koProjectilePool = koProjectilePool;
-            _cachedPresentationEventsService = cachedPresentationEventsService;
-            _updateSubscriptionService = updateSubscriptionService;
-            _controllers = new Dictionary<ushort, KOProjectileController>();
+            _gamePlayConfig = gamePlayConfig;
+            _koProjectilePool = new KOProjectilePool(koProjectileViewPrefab, diContainer);
         }
 
         public void InitEntryPoint()
         {
-            _updateSubscriptionService.RegisterUpdatable(this);
+            _koProjectilesParent = (new GameObject("KOProjectilesParent")).transform;
+            _koProjectilePool.InitPool();
         }
 
-        public void InitExitPoint()
+        public void CreateKOProjectile(ushort koProjectileId, Vector2 position, Vector2 rotation, Vector2 coilStartPoint, float size)
         {
-            _updateSubscriptionService.UnregisterUpdatable(this);
+            var koProjectileController = new KOProjectileController(koProjectileId, _koProjectilePool, _koProjectilesParent);
+            koProjectileController.CreateKOPorjectileView(position, rotation.ToQuaternion(), coilStartPoint, size);
+            _controllers.Add(koProjectileId, koProjectileController);
+        }
 
-            foreach (var kvp in _controllers)
+        // public void HandleDeactivateEvents(List<DeactivateKOTalentNetEventS2C> events)
+        // {
+        //     for (int i = 0; i < events.Count; i++)
+        //     {
+        //         var netEvent = events[i];
+        //         var koProjectileId = netEvent.KoProjectileId;
+        //         if (_controllers.TryGetValue(koProjectileId, out var controller))
+        //         {
+        //             _koProjectilePool.Return(controller.View);
+        //             _controllers.Remove(koProjectileId);
+        //         }
+        //     }
+        // }
+
+        public void InterpulateKOProjectileTransform(ushort koProjectileId, Vector2 position, Quaternion rotation, Vector2 coilSpringStartPosition)
+        {
+            var koProjectileController = GetKOProjectile(koProjectileId);
+            koProjectileController.InterpolateTransform(position, rotation, coilSpringStartPosition, _gamePlayConfig.ExponentialDecay);
+        }
+        
+        public void DestroyKOProjectile(ushort koProjectileId)
+        {
+            var koProjectileController = GetKOProjectile(koProjectileId);
+            koProjectileController.Destroy();
+            _controllers.Remove(koProjectileId);
+        }
+
+        private KOProjectileController GetKOProjectile(ushort koProjectileId)
+        {
+            return _controllers[koProjectileId];
+        }
+        
+        public void DestroyAll()
+        {
+            foreach (var controller in _controllers.Values)
             {
-                _koProjectilePool.Return(kvp.Value.View);
+                controller.Destroy();
             }
+            
             _controllers.Clear();
-        }
-
-        public void ManagedUpdate()
-        {
-        }
-
-        public void HandleCreateEvents(List<CreateKOProjectileNetEventS2C> events)
-        {
-            for (int i = 0; i < events.Count; i++)
-            {
-                var netEvent = events[i];
-                var koProjectileId = netEvent.KoProjectileId;
-                if (!_controllers.ContainsKey(koProjectileId))
-                {
-                    var view = _koProjectilePool.Get();
-                    var model = _matchDataService.GetKOProjectile(koProjectileId);
-                    var casterModel = _matchDataService.GetPlayer(model.CasterPlayerId);
-                    var controller = new KOProjectileController(view, model, casterModel);
-                    _controllers.Add(koProjectileId, controller);
-                }
-            }
-        }
-
-        public void HandleDeactivateEvents(List<DeactivateKOTalentNetEventS2C> events)
-        {
-            for (int i = 0; i < events.Count; i++)
-            {
-                var netEvent = events[i];
-                var koProjectileId = netEvent.KoProjectileId;
-                if (_controllers.TryGetValue(koProjectileId, out var controller))
-                {
-                    _koProjectilePool.Return(controller.View);
-                    _controllers.Remove(koProjectileId);
-                }
-            }
-        }
-
-        public void UpdateKOProjectilesTransform()
-        {
-            foreach (var kvp in _controllers)
-            {
-                kvp.Value.UpdateTransform();
-            }
         }
     }
 }

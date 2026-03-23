@@ -87,10 +87,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<EnvironmentTeleportGateControllers>().AsSingle().WithArguments(_environmentTeleportGateViewPrefab).NonLazy();
             Container.BindInterfacesTo<PlayerTeleportEffectController>().AsSingle().WithArguments(playerTeleportEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentFieldBarrierControllers>().AsSingle().WithArguments(_environmentFieldBarrierViewPrefab).NonLazy();
-
-            var bulletsParent = new GameObject("KOProjectilesParent").transform;
-            Container.Bind<KOProjectilePool>().AsSingle().WithArguments(_koProjectileViewPrefab, bulletsParent).NonLazy();
-            Container.BindInterfacesTo<KOProjectilesControllers>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<KOProjectilesControllers>().AsSingle().WithArguments(_koProjectileViewPrefab).NonLazy();
         }
     }
 }

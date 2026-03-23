@@ -1,44 +1,40 @@
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using UnityEngine;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
-using Core.Game.Domains.GamePlay.Shared.Extensions;
+using CoreDomain.Scripts.Utils;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc
 {
     public class KOProjectileController
     {
-        private readonly KOProjectileView _view;
-        private readonly MatchKOProjectileModel _model;
-        private readonly MatchPlayerModel _casterModel;
-
-        public KOProjectileView View => _view;
-
-        public KOProjectileController(KOProjectileView view, MatchKOProjectileModel model, MatchPlayerModel casterModel)
+        private readonly ushort _koProjectileId;
+        private readonly KOProjectilePool _koProjectilePool;
+        private readonly Transform _parent;
+        private KOProjectileView _view;
+        
+        public KOProjectileController(ushort koProjectileId, KOProjectilePool koProjectilePool, Transform parent)
         {
-            _view = view;
-            _model = model;
-            _casterModel = casterModel;
-            _view.Transform.localScale = new Vector3(model.Size, model.Size, 1);
+            _koProjectileId = koProjectileId;
+            _koProjectilePool = koProjectilePool;
+            _parent = parent;
         }
 
-        public void UpdateTransform()
+        public void CreateKOPorjectileView(Vector2 position, Quaternion rotation, Vector2 coilSpringStartPosition, float size)
         {
-            _view.Transform.localPosition = new Vector3(_model.Position.x, _model.Position.y, 0);
-
-            var projAngle = Mathf.Atan2(_model.Rotation.y, _model.Rotation.x) * Mathf.Rad2Deg;
-            _view.Transform.localRotation = Quaternion.Euler(0, 0, projAngle);
-
-            // coil calculation
-            var casterPos = new Vector3(_casterModel.Spaceship.Transform.Position.x, _casterModel.Spaceship.Transform.Position.y, 0);
-            var distance = Vector3.Distance(casterPos, _view.Transform.localPosition);
-
-            _view.CoilTransform.position = (_view.Transform.localPosition + casterPos) / 2f;
-
-            var dir = _view.Transform.localPosition - casterPos;
-            var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            _view.CoilTransform.rotation = Quaternion.Euler(0, 0, angle);
-
-            _view.CoilSpriteRenderer.size = new Vector2(distance, _view.CoilSpriteRenderer.size.y);
+            _view = _koProjectilePool.Spawn();
+            _view.name = "KOProjectile_" + _koProjectileId;
+            _view.transform.SetParent(_parent);
+            _view.Setup(position, rotation, coilSpringStartPosition, size);
+        }
+        
+        public void InterpolateTransform(Vector2 position, Quaternion rotation, Vector2 coilSpringStartPosition, float decay)
+        {
+            var lerpedPosition = MathUtils.ExpDecay(_view.Transform.position, position, decay, Time.deltaTime);
+            var lerpedRotation = MathUtils.ExpDecay(_view.Transform.rotation, rotation, decay, Time.deltaTime);
+            _view.SetTransform(lerpedPosition, lerpedRotation, coilSpringStartPosition);
+        }
+        
+        public void Destroy()
+        {
+            _view.Despawn();
         }
     }
 }

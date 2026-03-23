@@ -1,20 +1,17 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
-using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
-    public class HandleDeactivateKOTalentNetEventsCommand : ICommand
+    public class HandleDeactivateKOTalentNetEventsCommand : BaseCommand, ICommandVoid
     {
-        private DiContainer _diContainer;
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IKOProjectilesControllers _koProjectilesControllers;
 
-        [Inject]
-        public void Construct(DiContainer diContainer)
+        public override void ResolveDependencies()
         {
-            _diContainer = diContainer;
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _koProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
         }
@@ -22,9 +19,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         public void Execute()
         {
             var events = _cachedPresentationEventsService.DeactivateKOTalentNetEvents;
-            if (events.Count == 0) return;
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
 
-            _koProjectilesControllers.HandleDeactivateEvents(events);
+            foreach (var netEvent in events)
+            {
+                var koProjectileId = netEvent.KoProjectileId;
+                _koProjectilesControllers.DestroyKOProjectile(koProjectileId);
+            }
+
             _cachedPresentationEventsService.DeactivateKOTalentNetEvents.Clear();
         }
     }
