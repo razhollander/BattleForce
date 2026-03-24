@@ -8,6 +8,8 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
+using Core.Scripts.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
@@ -27,9 +29,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         // State tracking
         private bool _isReturning;
-        private int _startTick;
 
-        public KOTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig)
+        public KOTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
@@ -58,7 +60,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             IsCurrentlyActive = true;
             _isReturning = false;
-            _startTick = tick;
 
             var koConfig = _gamePlayConfig.Talents.KOTalentConfig;
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
@@ -66,8 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var koProjectile = _matchDataService.AddKOProjectile(tick, _casterPlayerId, casterPlayerState.Spaceship.Transform.Position, direction, velocity, koConfig.ProjectileSize);
             _projectileId = koProjectile.Id;
-
-            _physicsSimulator.AddKOProjectile(_projectileId, koProjectile.Position, koConfig.ProjectileSize);
+            _physicsSimulator.AddKOProjectile(_projectileId, casterPlayerState.TeamId, koProjectile.Position, koConfig.ProjectileSize);
             _netEventsDataService.AddCreateKOProjectileNetEvent(tick, _projectileId, _casterPlayerId, koProjectile.Position, velocity, koConfig.ProjectileSize);
         }
 
@@ -90,32 +90,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             ref var projectile = ref _matchDataService.SimulationState.GetKOProjectileById(_projectileId);
-
             var koConfig = _gamePlayConfig.Talents.KOTalentConfig;
 
-            if (!_isReturning)
-            {
-                var elapsedSeconds = (tick - _startTick) * _networkConfig.DeltaTime;
-                if (elapsedSeconds >= koConfig.MaxDuration)
-                {
-                    StartReturnPhase(tick);
-                }
-                else
-                {
-                    projectile.Position += projectile.Velocity * _networkConfig.DeltaTime;
-                    _physicsSimulator.UpdateKOProjectile(_projectileId, projectile.Position);
-                }
-            }
-            else
+            if (_isReturning)
             {
                 var directionToCaster = Vector2.Normalize(casterPlayerState.Spaceship.Transform.Position - projectile.Position);
                 projectile.Velocity = directionToCaster * koConfig.ProjectileSpeed * koConfig.ReturnSpeedMultiplier;
                 projectile.Position += projectile.Velocity * _networkConfig.DeltaTime;
+                projectile.Rotation = directionToCaster * -1;
 
-                var distanceSqr = Vector2.DistanceSquared(projectile.Position, casterPlayerState.Spaceship.Transform.Position);
-                if (distanceSqr <= (koConfig.ProjectileSize + casterPlayerState.Spaceship.Transform.Radius) * (koConfig.ProjectileSize + casterPlayerState.Spaceship.Transform.Radius))
+                var distanceProjectileCenterToPlayerCenter = Vector2.DistanceSquared(projectile.Position, casterPlayerState.Spaceship.Transform.Position);
+                var neededReachDistance = koConfig.ProjectileSize + casterPlayerState.Spaceship.Transform.Radius;
+                var didReachPlayerCaster = distanceProjectileCenterToPlayerCenter <= neededReachDistance * neededReachDistance;
+                if (didReachPlayerCaster)
                 {
                     DeactivateTalent(tick);
+                }
+            }
+            else
+            {
+                var elapsedSeconds = (tick - projectile.CreatedOnTick) * _networkConfig.DeltaTime;
+                if (elapsedSeconds >= koConfig.MaxFirstPhaseDuration)
+                {
+                    StartReturnPhase();
+                }
+                else
+                {
+                    projectile.Position += projectile.Velocity * _networkConfig.DeltaTime;
                 }
             }
         }
@@ -127,7 +128,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _isReturning = false;
         }
 
-        public void PerformTalentWithEnemy(PlayerStateS2C enemyPlayer, int tick)
+        public void HitEnemyPlayer(ushort enemyPlayerId, int tick)
         {
             if (!IsCurrentlyActive || _isReturning)
             {
@@ -136,39 +137,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var koConfig = _gamePlayConfig.Talents.KOTalentConfig;
             ref var projectile = ref _matchDataService.SimulationState.GetKOProjectileById(_projectileId);
-
-            var pushDirection = Vector2.Normalize(enemyPlayer.Spaceship.Transform.Position - projectile.Position);
-            enemyPlayer.Spaceship.Transform.Velocity += pushDirection * koConfig.PushForce;
-            enemyPlayer.Spaceship.Transform.AngularVelocity += koConfig.SpinForce;
-            enemyPlayer.Spaceship.EngineOffSecondsLeft = koConfig.DurationEngineOffSeconds;
-
-            _netEventsDataService.AddKOProjectHitPlayerNetEvent(tick, _projectileId, enemyPlayer.Id, projectile.Position);
-
-            StartReturnPhase(tick);
+            var enemyPlayerState = _matchDataService.SimulationState.GetPlayerById(enemyPlayerId);
+            var pushDirection = projectile.Velocity.Normalize();
+            var pushForce = pushDirection * koConfig.PushForce;
+            var randomSpin = RNG.NextFloat(koConfig.MinSpin, koConfig.MaxSpin);
+            enemyPlayerState.Spaceship.PushAndSpin(pushForce, randomSpin);
+            _netEventsDataService.AddKOProjectHitPlayerNetEvent(tick, _projectileId, enemyPlayerState.Id, projectile.Position);
+            StartReturnPhase();
         }
 
-        public void HitWall(int tick)
+        public void HitWall()
         {
             if (!IsCurrentlyActive || _isReturning)
             {
                 return;
             }
 
-            StartReturnPhase(tick);
+            StartReturnPhase();
         }
 
-        private void StartReturnPhase(int tick)
+        private void StartReturnPhase()
         {
-            if (!_isReturning)
+            if (_isReturning)
             {
-                _isReturning = true;
-                _physicsSimulator.RemoveKOProjectile(_projectileId); // Disable collider
+                return;
             }
+
+            _isReturning = true;
+            _physicsSimulator.DisableBodyCollider(PhysicsBodyType.KOProjectile, _projectileId);
         }
 
         private void DeactivateTalent(int tick)
         {
             IsCurrentlyActive = false;
+            _isReturning = false;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
             if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.KO, out int talentIndex))
@@ -181,11 +183,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, koTalentModel.MaxCooldown, _networkConfig.DeltaTime);
             koTalentModel.CooldownEndTick = cooldownEndTick;
 
-            if (!_isReturning) // If not returning, we haven't removed it from physics yet
-            {
-                _physicsSimulator.RemoveKOProjectile(_projectileId);
-            }
-
+            _physicsSimulator.RemoveKOProjectile(_projectileId);
             _matchDataService.SimulationState.RemoveKOProjectileById(_projectileId);
             _netEventsDataService.AddDeactivateKOTalentNetEvent(tick, _casterPlayerId, _projectileId, cooldownEndTick);
         }

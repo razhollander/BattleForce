@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var fieldEndTick = TickUtils.GetTickPassedAfterDuration(tick,talentsSwapTalentConfig.GrowDurationSeconds, _networkConfig.DeltaTime);
             var swapFieldModel = _matchDataService.AddSwapField(_casterPlayerId, tick, fieldEndTick);
             _currentActiveSwapFieldId = swapFieldModel.Id;
-            _physicsSimulator.AddSwapField(swapFieldModel.Id, casterPlayerState.Spaceship.Transform.Position);
+            _physicsSimulator.AddSwapField(swapFieldModel.Id, casterPlayerState.TeamId, casterPlayerState.Spaceship.Transform.Position);
             _netEventsDataService.AddCreateSwapFieldNetEvent(tick, swapFieldModel.Id, _casterPlayerId, fieldEndTick, talentsSwapTalentConfig.MaxRadius);
         }
 
@@ -104,7 +104,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator.UpdateSwapField(_currentActiveSwapFieldId, casterPlayerState.Spaceship.Transform.Position, currentRadius);
         }
 
-        public void PerformTalentWithEnemy(PlayerStateS2C enemyPlayer, int tick)
+        public void PerformTalentWithEnemy(ushort enemyPlayerId, int tick)
         {
             if (!IsCurrentlyActive)
             {
@@ -113,11 +113,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-
-            SwapPlayersTransform(casterPlayerState, enemyPlayer);
-            _netEventsDataService.AddPlayersSwapEvent(tick, _casterPlayerId, enemyPlayer.Id,
-                casterPlayerState.Spaceship.Transform.Position, enemyPlayer.Spaceship.Transform.Position,
-                casterPlayerState.Spaceship.Transform.Direction, enemyPlayer.Spaceship.Transform.Direction);
+            var enemyPlayerState = _matchDataService.SimulationState.GetPlayerById(enemyPlayerId);
+            SwapPlayersTransform(casterPlayerState, enemyPlayerState);
+            _netEventsDataService.AddPlayersSwapEvent(tick, _casterPlayerId, enemyPlayerId,
+                casterPlayerState.Spaceship.Transform.Position, enemyPlayerState.Spaceship.Transform.Position,
+                casterPlayerState.Spaceship.Transform.Direction, enemyPlayerState.Spaceship.Transform.Direction);
             
             DeactivateTalent(tick);
         }

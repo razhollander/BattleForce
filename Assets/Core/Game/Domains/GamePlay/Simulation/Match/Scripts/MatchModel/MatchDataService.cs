@@ -106,7 +106,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         {
             ref var koProjectile = ref _simulationState.KOProjectiles.AddAndGet();
             var koProjectileId = (ushort)(++_lastKOProjectileCreatedId % ushort.MaxValue);
-            koProjectile.OccuredOnTick = tick;
+            koProjectile.CreatedOnTick = tick;
             koProjectile.Id = koProjectileId;
             koProjectile.PlayerCasterId = casterPlayerId;
             koProjectile.Position = position;

@@ -106,11 +106,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _talentControllersPerPlayer[playerId].OnTick(tick);
         }
 
-        public void CompleteSwapTalentWithEnemy(ushort casterId, PlayerStateS2C enemyPlayer, int tick)
+        public void CompleteSwapTalentWithEnemy(ushort casterId, ushort enemyPlayerId, int tick)
         {
             if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
             {
-                controllers.CompleteSwapTalentWithEnemy(enemyPlayer, tick);
+                controllers.CompleteSwapTalentWithEnemy(enemyPlayerId, tick);
             }
             else
             {
@@ -123,6 +123,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             foreach (var kvp in _talentControllersPerPlayer)
             {
                 kvp.Value.ResetData();
+            }
+        }
+
+        public void HitKOTalentWithEnemy(ushort casterId, ushort enemyPlayerId, int tick)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.HitKOTalentWithEnemy(enemyPlayerId, tick);
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
+            }
+        }
+
+        public void HitKOTalentWithWall(ushort casterId)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.HitKOTalentWithWall();
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
             }
         }
 

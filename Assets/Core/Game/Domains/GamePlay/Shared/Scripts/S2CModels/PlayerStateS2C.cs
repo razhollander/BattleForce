@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
@@ -15,7 +16,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             Spaceship = new PlayerSpaceshipStateS2C(maxTalents);
         }
-
+        
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)Id);

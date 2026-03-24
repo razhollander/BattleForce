@@ -101,7 +101,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             var projectile = _matchDataService.SimulationState.GetKOProjectileById(projectileId);
             var casterId = projectile.PlayerCasterId;
-            _matchPlayerControllers.GetController(casterId).Talents.CompleteKOTalentWithWall(_tick);
+            _playersTalentsManager.HitKOTalentWithWall(casterId);
         }
 
         private void HandleKOProjectilePlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -126,13 +126,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var projectile = _matchDataService.SimulationState.GetKOProjectileById(projectileId);
-            var casterId = projectile.PlayerCasterId;
-
-            if (casterId == playerId) return;
-
             var enemyPlayer = _matchDataService.SimulationState.GetPlayerById(playerId);
-            _matchPlayerControllers.GetController(casterId).Talents.CompleteKOTalentWithEnemy(enemyPlayer, _tick);
+            LogService.LogError($"Hit ko projectile field! ko projectile id: {projectileId}, hit player id: {playerId}, caster id: {projectile.PlayerCasterId}");
+
+            _playersTalentsManager.HitKOTalentWithEnemy(projectile.PlayerCasterId, enemyPlayer.Id, _processedTick);
         }
+        
         private void HandleSwapFieldPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
             var isPlayerToField = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.SwapField;
@@ -141,7 +140,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             if (!isPlayerToField && !isFieldToPlayer) return;
 
             ushort playerId;
-            ushort fieldId; // Caster ID
+            ushort fieldId;
 
             if (isPlayerToField)
             {
@@ -155,15 +154,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var swapField = _matchDataService.SimulationState.GetSwapFieldById(fieldId);
-            var didSwapFieldHitItsCaster = playerId == swapField.PlayerCasterId;
-            if (didSwapFieldHitItsCaster)
-            {
-                return;
-            }
+            
             LogService.LogError($"Hit swap field! swapField id: {swapField.Id}, hit player id: {playerId}, caster id: {swapField.PlayerCasterId}");
 
-            var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            _playersTalentsManager.CompleteSwapTalentWithEnemy(swapField.PlayerCasterId, playerState, _processedTick);
+            var playerStateHit = _matchDataService.SimulationState.GetPlayerById(playerId);
+            _playersTalentsManager.CompleteSwapTalentWithEnemy(swapField.PlayerCasterId, playerStateHit.Id, _processedTick);
         }
 
         private void HandlePlayerTeleportGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -246,11 +241,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var pushDirection = springAngle.FromAngleRadians();
             var forceMagnitude = _gamePlayConfig.EnvironmentSprings.Force;
             var force = pushDirection * forceMagnitude;
-            playerState.Spaceship.Transform.Velocity += force;
             var randomSpin = RNG.NextFloat(_gamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfig.EnvironmentSprings.MaxSpin);
-            playerState.Spaceship.Transform.AngularVelocity += randomSpin;
-            playerState.Spaceship.Transform.Direction = pushDirection;
-            playerState.Spaceship.IsEngineOn = false;
+            playerState.Spaceship.PushAndSpin(force, randomSpin);
 
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
         }

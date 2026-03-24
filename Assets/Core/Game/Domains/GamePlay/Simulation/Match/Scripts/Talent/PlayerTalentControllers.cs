@@ -77,19 +77,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             GetTalentByType(talentType).StopIfActive(tick);
         }
 
-        public void CompleteSwapTalentWithEnemy(PlayerStateS2C enemyPlayer, int tick)
+        public void CompleteSwapTalentWithEnemy(ushort enemyPlayerId, int tick)
         {
-            _swapTalentController.PerformTalentWithEnemy(enemyPlayer, tick);
+            _swapTalentController.PerformTalentWithEnemy(enemyPlayerId, tick);
         }
 
-        public void CompleteKOTalentWithEnemy(PlayerStateS2C enemyPlayer, int tick)
+        public void HitKOTalentWithEnemy(ushort enemyPlayerId, int tick)
         {
-            _koTalentController.PerformTalentWithEnemy(enemyPlayer, tick);
+            _koTalentController.HitEnemyPlayer(enemyPlayerId, tick);
         }
 
-        public void CompleteKOTalentWithWall(int tick)
+        public void HitKOTalentWithWall()
         {
-            _koTalentController.HitWall(tick);
+            _koTalentController.HitWall();
         }
 
         public void ResetData()

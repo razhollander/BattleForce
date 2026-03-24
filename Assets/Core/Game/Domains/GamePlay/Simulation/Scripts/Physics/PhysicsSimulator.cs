@@ -480,7 +480,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var hasCollisionWithAnyBodyType = false;
             var lowerBound = squarePosition - new Vector2(squareHalfWidth, squareHalfWidth);
             var upperBound = squarePosition + new Vector2(squareHalfWidth, squareHalfWidth);
-            var aabb = new Box2D.NetStandard.Collision.AABB(lowerBound, upperBound);
+            var aabb = new AABB(lowerBound, upperBound);
 
             _world.QueryAABB(ShouldProceedCheckHit, aabb);
 
@@ -724,7 +724,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(shape);
         }
 
-        public void AddKOProjectile(ushort id, Vector2 position, float radius)
+        public void AddKOProjectile(ushort id, ushort teamId, Vector2 position, float radius)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Dynamic;
@@ -742,6 +742,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.density = 0;
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
+            fixtureDef.filter.groupIndex = (short)-teamId;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.KOProjectile.GetCollisionsCategory();
             fixtureDef.filter.maskBits = PhysicsBodyType.KOProjectile.GetCollisionMask();
@@ -763,7 +764,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             RemoveBody(body);
         }
 
-        public void AddSwapField(ushort id, Vector2 position)
+        public void AddSwapField(ushort id, ushort teamId, Vector2 position)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Dynamic;
@@ -781,6 +782,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.density = 0;
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
+            fixtureDef.filter.groupIndex = (short)-teamId;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.SwapField.GetCollisionsCategory();
             fixtureDef.filter.maskBits = PhysicsBodyType.SwapField.GetCollisionMask();
@@ -831,6 +833,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             _world = CreateWorld();
             ClearCachedCollisions();
+        }
+
+        public void DisableBodyCollider(PhysicsBodyType koProjectile, ushort projectileId)
+        {
+            var body = GetBody(koProjectile, projectileId);
+            var fixture = body.GetFixtureList();
+            var filter = fixture.FilterData;
+            filter.maskBits = 0x0000; 
+            fixture.FilterData = filter; // not sure needed
+            body.SetAwake(true); // not sure needed
         }
     }
 }

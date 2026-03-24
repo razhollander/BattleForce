@@ -1,4 +1,5 @@
 using System;
+using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
@@ -26,9 +27,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             writer.Put(OccuredOnTick);
             writer.Put(ProjectileId);
-            Core.Game.Domains.GamePlay.Shared.Extensions.NetDataWriterExtensions.PutVector2Quantized(writer, Position);
-            Core.Game.Domains.GamePlay.Shared.Extensions.NetDataWriterExtensions.PutVector2Quantized(writer, Velocity);
-            Core.Game.Domains.GamePlay.Shared.Extensions.NetDataWriterExtensions.PutFloat16(writer, Size);
+            writer.PutVector2Quantized(Position);
+            writer.PutVector2Quantized(Velocity);
+            writer.PutFloat16(Size);
             writer.Put((byte)CasterPlayerId);
         }
 
@@ -36,9 +37,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             OccuredOnTick = reader.GetInt();
             ProjectileId = reader.GetUShort();
-            Position = Core.Game.Domains.GamePlay.Shared.Extensions.NetDataReaderExtensions.GetVector2Quantized(reader);
-            Velocity = Core.Game.Domains.GamePlay.Shared.Extensions.NetDataReaderExtensions.GetVector2Quantized(reader);
-            Size = Core.Game.Domains.GamePlay.Shared.Extensions.NetDataReaderExtensions.GetFloat16(reader);
+            Position = reader.GetVector2Quantized();
+            Velocity = reader.GetVector2Quantized();
+            Size = reader.GetFloat16();
             CasterPlayerId = reader.GetByte();
         }
 

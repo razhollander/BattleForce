@@ -8,9 +8,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
         public float ProjectileSpeed = 20f;
         public float ProjectileSize = 1f;
         public float ReturnSpeedMultiplier = 2f;
-        public float MaxDuration = 2f;
+        public float MaxFirstPhaseDuration = 2f;
         public float PushForce = 50f;
-        public float SpinForce = 500f;
-        public float DurationEngineOffSeconds = 2f;
+        public float MaxSpin = 55f;
+        public float MinSpin = 50f;
     }
 }
