@@ -84,10 +84,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     case PhysicsBodyType.Lava: CopyLavaStateToBody(currentBody, bodyData.Id, environmentLavaWalls); break;
                     case PhysicsBodyType.EnvironmentSpring: CopySpringStateToBody(currentBody, bodyData.Id, environmentSprings); break;
                     case PhysicsBodyType.EnvironmentTeleportGate: CopyTeleportGateStateToBody(currentBody, bodyData.Id, environmentTeleportGates); break;
+                    case PhysicsBodyType.SwapField: CopySwapFieldToBody(currentBody, bodyData.Id, simulationState); break;
                 }
 
                 currentBody = currentBody.GetNext();
             }
+        }
+
+        private void CopySwapFieldToBody(Body swapFieldBody, ushort swapFieldId, MatchSimulationStateS2C simulationState)
+        {
+            // var swapField = simulationState.Players.FindWithId(swapFieldId);
+            // swapFieldBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
+            // swapFieldBody.set(playerState.Spaceship.Transform.Velocity);
         }
 
         private void CopyPowerUpStateToBody(Body powerUpBody, ushort powerUpId, MatchSimulationStateS2C simulationState)

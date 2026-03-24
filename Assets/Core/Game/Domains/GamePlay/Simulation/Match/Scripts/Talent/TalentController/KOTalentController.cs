@@ -102,6 +102,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 var distanceProjectileCenterToPlayerCenter = Vector2.DistanceSquared(projectile.Position, casterPlayerState.Spaceship.Transform.Position);
                 var neededReachDistance = koConfig.ProjectileSize + casterPlayerState.Spaceship.Transform.Radius;
                 var didReachPlayerCaster = distanceProjectileCenterToPlayerCenter <= neededReachDistance * neededReachDistance;
+
                 if (didReachPlayerCaster)
                 {
                     DeactivateTalent(tick);
@@ -117,6 +118,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 else
                 {
                     projectile.Position += projectile.Velocity * _networkConfig.DeltaTime;
+                    _physicsSimulator.UpdateKOProjectile(_projectileId, projectile.Position);
                 }
             }
         }
