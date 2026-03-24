@@ -98,6 +98,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             if (!isWallToProjectile && !isProjectileToWall) return;
 
             ushort projectileId = isProjectileToWall ? objectA.Id : objectB.Id;
+            LogService.LogError($"Hit ko wall");
 
             var projectile = _matchDataService.SimulationState.GetKOProjectileById(projectileId);
             var casterId = projectile.PlayerCasterId;

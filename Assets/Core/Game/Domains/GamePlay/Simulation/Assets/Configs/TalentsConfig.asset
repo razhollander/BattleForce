@@ -34,5 +34,13 @@ MonoBehaviour:
     PulsePower: 10
     _pulseRectWidth: 5
     _pulseRectHeight: 10
+  KOTalentConfig:
+    ProjectileSpeed: 50
+    ProjectileSize: 1
+    ReturnSpeedMultiplier: 2
+    MaxFirstPhaseDuration: 2
+    PushForce: 50
+    MaxSpin: 55
+    MinSpin: 50
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844

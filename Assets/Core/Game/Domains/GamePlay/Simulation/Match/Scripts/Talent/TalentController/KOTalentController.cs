@@ -160,13 +160,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private void StartReturnPhase()
         {
-            if (_isReturning)
-            {
-                return;
-            }
-
             _isReturning = true;
-            _physicsSimulator.DisableBodyCollider(PhysicsBodyType.KOProjectile, _projectileId);
+            LogService.LogError("returning");
+            //_physicsSimulator.DisableBodyCollider(PhysicsBodyType.KOProjectile, _projectileId);
         }
 
         private void DeactivateTalent(int tick)

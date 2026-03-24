@@ -29,7 +29,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 case PhysicsBodyType.Wall:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsBodyType.PlayerBullet)
-                                    | GetCollisionMask(PhysicsBodyType.PowerUpBall);
+                                    | GetCollisionMask(PhysicsBodyType.PowerUpBall)
+                                    | GetCollisionMask(PhysicsBodyType.KOProjectile);
                     break;
                 case PhysicsBodyType.TalentCard:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerBullet);

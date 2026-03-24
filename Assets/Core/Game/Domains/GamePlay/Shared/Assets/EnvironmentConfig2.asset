@@ -769,8 +769,10 @@ MonoBehaviour:
         },       {         "X": 47.324464,         "Y": -24.64       },       {        
         "X": -47.324464,         "Y": -24.64       }     ]   }]'
       _lavaWallsJson: 
-      _talentCardsJson: '[   { "Id": 1, "Position": { "X": -0.0, "Y": 0.0 }, "TalentType":
-        "KO" } ] '
+      _talentCardsJson: "[\n  {\n    \"Id\": 1,\n    \"Position\": {\n      \"X\":
+        0,\n      \"Y\": 0\n    },\n    \"TalentType\": \"KO\"\n  },\n  {\n    \"Id\":
+        2,\n    \"Position\": {\n      \"X\": 2,\n      \"Y\": 0\n    },\n    \"TalentType\":
+        \"Swap\"\n  }\n]"
       _environmentSpringsJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: 

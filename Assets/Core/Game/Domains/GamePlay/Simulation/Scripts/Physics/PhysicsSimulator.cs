@@ -738,20 +738,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.type = BodyType.Dynamic;
             bodyDef.position = position;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.KOProjectile);
+            bodyDef.bullet = true;
 
             var body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
-
+            
             var shape = GetCircleShape();
             shape.Radius = radius;
 
             var fixtureDef = GetFixtureDef();
             fixtureDef.shape = shape;
-            fixtureDef.density = 0;
+            fixtureDef.density = 0.3f;
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
             fixtureDef.filter.groupIndex = (short)-teamId;
-
             fixtureDef.filter.categoryBits = PhysicsBodyType.KOProjectile.GetCollisionsCategory();
             fixtureDef.filter.maskBits = PhysicsBodyType.KOProjectile.GetCollisionMask();
 
@@ -765,6 +765,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var body = GetBody(PhysicsBodyType.KOProjectile, id);
             body.SetTransform(position, 0);
         }
+
 
         public void RemoveKOProjectile(ushort id)
         {
