@@ -85,10 +85,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     case PhysicsBodyType.EnvironmentSpring: CopySpringStateToBody(currentBody, bodyData.Id, environmentSprings); break;
                     case PhysicsBodyType.EnvironmentTeleportGate: CopyTeleportGateStateToBody(currentBody, bodyData.Id, environmentTeleportGates); break;
                     case PhysicsBodyType.SwapField: CopySwapFieldToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.KOProjectile: CopyKOProjectileToBody(currentBody, bodyData.Id, simulationState); break;
                 }
 
                 currentBody = currentBody.GetNext();
             }
+        }
+
+        private void CopyKOProjectileToBody(Body koProjectileBody, ushort koProjectileId, MatchSimulationStateS2C simulationState)
+        {
+            var koProjectileState = simulationState.KOProjectiles.FindWithId(koProjectileId);
+            koProjectileBody.SetTransform(koProjectileState.Position, koProjectileState.Rotation.ToAngleRadians());
+            koProjectileBody.SetLinearVelocity(koProjectileState.Velocity);
         }
 
         private void CopySwapFieldToBody(Body swapFieldBody, ushort swapFieldId, MatchSimulationStateS2C simulationState)
@@ -440,42 +448,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         public Body GetBullet(ushort bulletId)
         {
-            var currentBody = _world.GetBodyList();
-
-            while (currentBody != null)
-            {
-                var bodyData = (PhysicsBodyData) currentBody.UserData;
-
-                if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerBullet && bodyData.Id == bulletId)
-                {
-                    return currentBody;
-                }
-
-                currentBody = currentBody.GetNext();
-            }
-            
-            LogService.LogError($"Couldn't find bullet {bulletId}");
-            return default;
+            return GetBody(PhysicsBodyType.PlayerBullet, bulletId);
         }
 
         public Body GetPowerUpBall(ushort powerUpBallId)
         {
-            var currentBody = _world.GetBodyList();
-
-            while (currentBody != null)
-            {
-                var bodyData = (PhysicsBodyData) currentBody.UserData;
-
-                if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUpBallId)
-                {
-                    return currentBody;
-                }
-
-                currentBody = currentBody.GetNext();
-            }
-
-            LogService.LogError($"Couldn't find powerUp {powerUpBallId}");
-            return default;
+            return GetBody(PhysicsBodyType.PowerUpBall, powerUpBallId);
         }
 
         public void RemoveBody(Body body)
@@ -732,14 +710,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(shape);
         }
 
-        public void AddKOProjectile(ushort id, ushort teamId, Vector2 position, float radius)
+        public void AddKOProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Dynamic;
             bodyDef.position = position;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.KOProjectile);
             bodyDef.bullet = true;
-
+            bodyDef.linearVelocity = velocity;
+            
             var body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
             
@@ -765,7 +744,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var body = GetBody(PhysicsBodyType.KOProjectile, id);
             body.SetTransform(position, 0);
         }
-
 
         public void RemoveKOProjectile(ushort id)
         {
@@ -852,6 +830,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             filter.maskBits = 0x0000; 
             fixture.FilterData = filter; // not sure needed
             body.SetAwake(true); // not sure needed
+        }
+
+        public Body GetKOProjectile(ushort koProjectileId)
+        {
+            return GetBody(PhysicsBodyType.KOProjectile, koProjectileId);
         }
     }
 }

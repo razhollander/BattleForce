@@ -101,6 +101,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 ref var powerUpBallState = ref _matchDataService.SimulationState.PowerUpBalls.GetByIndex(i);
                 powerUpBallState.Position = _physicsSimulator.GetPowerUpBall(powerUpBallState.Id).Position;
             }
+            
+            for (int i = 0; i < _matchDataService.SimulationState.KOProjectiles.Count; i++)
+            {
+                ref var koProjectileState = ref _matchDataService.SimulationState.KOProjectiles.GetByIndex(i);
+                koProjectileState.Position = _physicsSimulator.GetKOProjectile(koProjectileState.Id).Position;
+            }
         }
     }
 }

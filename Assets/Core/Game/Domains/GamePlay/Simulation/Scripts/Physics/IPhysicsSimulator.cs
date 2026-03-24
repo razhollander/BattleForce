@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void CopyDataToSimulation(MatchSimulationStateS2C simulationState, FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls, FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls, FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings, FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> environmentTeleportGates);
         void CopyDataToSimulation(MatchMakingSimulationStateS2C simulationState);
         Body GetPlayer(ushort playerId);
+        Body GetKOProjectile(ushort koProjectileId);
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
         void AddTalentCard(ushort id, Vector2 position, float length, float height);
         void AddPowerUpBall(ushort id, Vector2 position, Vector2 velocity, float radius);
@@ -38,8 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void AddSwapField(ushort id, ushort teamId, Vector2 position);
         void UpdateSwapField(ushort id, Vector2 position, float newRadius);
         void RemoveSwapField(ushort id);
-        void AddKOProjectile(ushort id, ushort teamId, Vector2 position, float radius);
-        void UpdateKOProjectile(ushort id, Vector2 position);
+        void AddKOProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
         void RemoveKOProjectile(ushort id);
         void ClearAllData();
         void DisableBodyCollider(PhysicsBodyType koProjectile, ushort projectileId);

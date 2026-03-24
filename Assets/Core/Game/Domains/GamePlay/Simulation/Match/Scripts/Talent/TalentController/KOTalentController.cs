@@ -67,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var koProjectile = _matchDataService.AddKOProjectile(tick, _casterPlayerId, casterPlayerState.Spaceship.Transform.Position, direction, velocity, koConfig.ProjectileSize);
             _projectileId = koProjectile.Id;
-            _physicsSimulator.AddKOProjectile(_projectileId, casterPlayerState.TeamId, koProjectile.Position, koConfig.ProjectileSize);
+            _physicsSimulator.AddKOProjectile(_projectileId, casterPlayerState.TeamId, koProjectile.Position, koConfig.ProjectileSize, velocity);
             _netEventsDataService.AddCreateKOProjectileNetEvent(tick, _projectileId, _casterPlayerId, koProjectile.Position, velocity, koConfig.ProjectileSize);
         }
 
@@ -94,11 +94,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             if (_isReturning)
             {
-                var directionToCaster = Vector2.Normalize(casterPlayerState.Spaceship.Transform.Position - projectile.Position);
-                projectile.Velocity = directionToCaster * koConfig.ProjectileSpeed * koConfig.ReturnSpeedMultiplier;
-                projectile.Position += projectile.Velocity * _networkConfig.DeltaTime;
-                projectile.Rotation = directionToCaster * -1;
-
                 var distanceProjectileCenterToPlayerCenter = Vector2.DistanceSquared(projectile.Position, casterPlayerState.Spaceship.Transform.Position);
                 var neededReachDistance = koConfig.ProjectileSize + casterPlayerState.Spaceship.Transform.Radius;
                 var didReachPlayerCaster = distanceProjectileCenterToPlayerCenter <= neededReachDistance * neededReachDistance;
@@ -107,6 +102,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 {
                     DeactivateTalent(tick);
                 }
+                else
+                {
+                    var directionToCaster = Vector2.Normalize(casterPlayerState.Spaceship.Transform.Position - projectile.Position);
+                    projectile.Velocity = directionToCaster * koConfig.ProjectileSpeed * koConfig.ReturnSpeedMultiplier;
+                    projectile.Rotation = directionToCaster * -1;
+                }
             }
             else
             {
@@ -114,11 +115,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 if (elapsedSeconds >= koConfig.MaxFirstPhaseDuration)
                 {
                     StartReturnPhase();
-                }
-                else
-                {
-                    projectile.Position += projectile.Velocity * _networkConfig.DeltaTime;
-                    _physicsSimulator.UpdateKOProjectile(_projectileId, projectile.Position);
                 }
             }
         }
