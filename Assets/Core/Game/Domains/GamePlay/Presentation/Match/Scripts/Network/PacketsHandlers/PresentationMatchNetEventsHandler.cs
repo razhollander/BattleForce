@@ -340,5 +340,57 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.DeactivateSwapTalentNetEvents.Add(netEvent);
             }
         }
+
+        public void ProcessKOProjectHitPlayerEvents(CapacityList<KOProjectHitPlayerNetEventS2C> koProjectHitPlayerNetEvents)
+        {
+            if (koProjectHitPlayerNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in koProjectHitPlayerNetEvents)
+            {
+                _cachedPresentationEventsService.KOProjectHitPlayerNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessCreateKOProjectileEvents(CapacityList<CreateKOProjectileNetEventS2C> createKOProjectileNetEvents)
+        {
+            if (createKOProjectileNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in createKOProjectileNetEvents)
+            {
+                _matchDataService.AddKOProjectile(netEvent.KoProjectile.Id, netEvent.KoProjectile.PlayerCasterId, netEvent.OccuredOnTick, netEvent.KoProjectile.Size);
+                _cachedPresentationEventsService.CreateKOProjectileNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateKOTalentEvents(CapacityList<DeactivateKOTalentNetEventS2C> deactivateKOTalentNetEvents)
+        {
+            if (deactivateKOTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in deactivateKOTalentNetEvents)
+            {
+                var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
+                var talents = casterPlayer.Spaceship.TalentsState.Talents;
+                for (int i = 0; i < talents.Count; i++)
+                {
+                    ref var talent = ref talents.Get(i);
+                    if (talent.TalentType == TalentType.KO)
+                    {
+                        talent.CooldownEndTick = netEvent.TalentCooldownEndTick;
+                        break;
+                    }
+                }
+                _matchDataService.RemoveKOProjectile(netEvent.KoProjectileId);
+                _cachedPresentationEventsService.DeactivateKOTalentNetEvents.Add(netEvent);
+            }
+        }
     }
 }

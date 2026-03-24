@@ -770,7 +770,7 @@ MonoBehaviour:
         "X": -47.324464,         "Y": -24.64       }     ]   }]'
       _lavaWallsJson: 
       _talentCardsJson: '[   { "Id": 1, "Position": { "X": -0.0, "Y": 0.0 }, "TalentType":
-        "Swap" } ] '
+        "KO" } ] '
       _environmentSpringsJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: 

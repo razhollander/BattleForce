@@ -6,32 +6,32 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     public struct DeactivateKOTalentNetEventS2C : INetSerializable, IComparable<DeactivateKOTalentNetEventS2C>
     {
         public int OccuredOnTick;
-        public ushort ProjectileId;
+        public ushort KoProjectileId;
         public ushort CasterPlayerId;
-        public int CooldownEndTick;
+        public int TalentCooldownEndTick;
 
-        public DeactivateKOTalentNetEventS2C(int occuredOnTick, ushort koProjectileId, ushort casterPlayerId, int cooldownEndTick)
+        public DeactivateKOTalentNetEventS2C(int occuredOnTick, ushort koProjectileId, ushort casterPlayerId, int talentCooldownEndTick)
         {
             OccuredOnTick = occuredOnTick;
-            ProjectileId = koProjectileId;
+            KoProjectileId = koProjectileId;
             CasterPlayerId = casterPlayerId;
-            CooldownEndTick = cooldownEndTick;
+            TalentCooldownEndTick = talentCooldownEndTick;
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put(ProjectileId);
+            writer.Put(KoProjectileId);
             writer.Put((byte)CasterPlayerId);
-            writer.Put(CooldownEndTick);
+            writer.Put(TalentCooldownEndTick);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            ProjectileId = reader.GetUShort();
+            KoProjectileId = reader.GetUShort();
             CasterPlayerId = reader.GetByte();
-            CooldownEndTick = reader.GetInt();
+            TalentCooldownEndTick = reader.GetInt();
         }
 
         public int CompareTo(DeactivateKOTalentNetEventS2C other)

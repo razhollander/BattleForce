@@ -77,6 +77,9 @@ namespace Core.Scripts.Network
         public int PreparationPhaseEndedNetEvents = 32;
         public int CreateSwapFieldNetEvents = 128;
         public int DestroySwapFieldNetEvents = 128;
+        public int KOProjectHitPlayerNetEvents = 128;
+        public int CreateKOProjectileNetEvents = 128;
+        public int DeactivateKOTalentNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel

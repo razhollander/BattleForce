@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator
         public async Awaitable StartEntryPoint(IInitiatorEnterData enterDataObject, CancellationTokenSource cancellationTokenSource)
         {
             var enterData = (GamePlayMatchInitiatorEnterData)enterDataObject;
-            await _commandFactory.CreateCommandAsync<StartGamePlayMatchCommand>().SetEnterData(enterData).Execute(cancellationTokenSource);
+            _commandFactory.CreateCommandVoid<StartGamePlayMatchCommand>().SetEnterData(enterData).Execute();
         }
 
         public Awaitable InitExitPoint(CancellationTokenSource cancellationTokenSource)

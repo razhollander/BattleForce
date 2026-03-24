@@ -1072,21 +1072,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddCreateKOProjectileNetEvent(int onTick, ushort projectileId, ushort casterPlayerId, System.Numerics.Vector2 position, System.Numerics.Vector2 velocity, float size)
+        public void AddCreateKOProjectileNetEvent(int onTick, ushort projectileId, ushort playerCasterId, Vector2 position, Vector2 velocity, float size)
         {
             foreach (var kvp in CreateKOProjectileNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
-                packet.ProjectileId = projectileId;
-                packet.CasterPlayerId = casterPlayerId;
-                packet.Position = position;
-                packet.Velocity = velocity;
-                packet.Size = size;
+                packet.KoProjectile.Id = projectileId;
+                packet.KoProjectile.PlayerCasterId = playerCasterId;
+                packet.KoProjectile.Position = position;
+                packet.KoProjectile.Velocity = velocity;
+                packet.KoProjectile.Size = size;
             }
         }
 
-        public void AddKOProjectHitPlayerNetEvent(int onTick, ushort projectileId, ushort hitPlayerId, System.Numerics.Vector2 hitPosition)
+        public void AddKOProjectHitPlayerNetEvent(int onTick, ushort projectileId, ushort hitPlayerId, Vector2 hitPosition)
         {
             foreach (var kvp in KOProjectHitPlayerNetEventsPerPlayer)
             {
@@ -1098,15 +1098,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddDeactivateKOTalentNetEvent(int onTick, ushort casterPlayerId, ushort projectileId, int cooldownEndTick)
+        public void AddDeactivateKOTalentNetEvent(int onTick, ushort casterPlayerId, ushort projectileId, int talentCooldownEndTick)
         {
             foreach (var kvp in DeactivateKOTalentNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.CasterPlayerId = casterPlayerId;
-                packet.ProjectileId = projectileId;
-                packet.CooldownEndTick = cooldownEndTick;
+                packet.KoProjectileId = projectileId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
             }
         }
     }

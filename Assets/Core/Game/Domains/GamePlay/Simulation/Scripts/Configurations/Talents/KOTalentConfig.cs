@@ -1,9 +1,9 @@
-using UnityEngine;
+using System;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
 {
-    [CreateAssetMenu(fileName = "KOTalentConfig", menuName = "BF/Network/Talents/KO Talent Config")]
-    public class KOTalentConfig : ScriptableObject
+    [Serializable]
+    public class KOTalentConfig
     {
         public float ProjectileSpeed = 20f;
         public float ProjectileSize = 1f;

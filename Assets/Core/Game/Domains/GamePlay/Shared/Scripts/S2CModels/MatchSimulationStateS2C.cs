@@ -306,6 +306,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No swap field for id {swapFieldId}!");
         }
+
+        public ref TalentKOProjectileS2C GetKOProjectileById(ushort koProjectileId)
+        {
+            for (int i = 0; i < KOProjectiles.Count; i++)
+            {
+                if (KOProjectiles[i].Id == koProjectileId)
+                {
+                    return ref KOProjectiles.GetByIndex(i);
+                }
+            }
+
+            throw new System.Exception($"No ko projectile for id {koProjectileId}!");
+        }
         
         public bool TryGetTalentCardById(ushort cardId, out TalentCardS2C talentCard)
         {
@@ -359,6 +372,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 powerUp.SerializeTransforms(writer);
             }
+
+            var koProjectilesCount = KOProjectiles.Count;
+            writer.Put((byte)koProjectilesCount);
+            foreach (var koProjectile in KOProjectiles.AsSpan())
+            {
+                koProjectile.SerializeDelta(writer);
+            }
         }
 
         public void DeserializeTransforms(NetDataReader reader)
@@ -385,6 +405,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var powerUp = ref PowerUpBalls.AddAndGet();
                 powerUp.DeserializeTransforms(reader);
+            }
+
+            var koProjectilesCount = reader.GetByte();
+            KOProjectiles.Clear();
+            for (int i = 0; i < koProjectilesCount; i++)
+            {
+                ref var koProjectile = ref KOProjectiles.AddAndGet();
+                koProjectile.DeserializeDelta(reader);
             }
         }
         
@@ -441,20 +469,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 }
             }
 
-            throw new System.Exception($"No power up for id {swapFieldId}!");
-        }
-
-        public ref TalentKOProjectileS2C GetKOProjectileById(ushort koProjectileId)
-        {
-            for (int i = 0; i < KOProjectiles.Count; i++)
-            {
-                if (KOProjectiles[i].Id == koProjectileId)
-                {
-                    return ref KOProjectiles.GetByIndex(i);
-                }
-            }
-
-            throw new System.Exception($"No ko projectile for id {koProjectileId}!");
+            throw new System.Exception($"No swap field for id {swapFieldId}!");
         }
 
         public void RemoveKOProjectileById(ushort koProjectileId)

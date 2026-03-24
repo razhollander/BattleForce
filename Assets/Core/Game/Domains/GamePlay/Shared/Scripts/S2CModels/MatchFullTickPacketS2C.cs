@@ -62,10 +62,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PlayerToEnvironmentTeleportGateCollisionNetEvents = new FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(maxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents);
             PreparationPhaseEndedNetEvents = new FixedUnorderedList<PreparationPhaseEndedNetEventS2C>(maxCap.PreparationPhaseEndedNetEvents);
             CreateSwapFieldNetEvents = new FixedUnorderedList<CreateSwapFieldNetEventS2C>(maxCap.CreateSwapFieldNetEvents);
-            CreateKOProjectileNetEvents = new FixedUnorderedList<CreateKOProjectileNetEventS2C>(maxCap.CreateSwapFieldNetEvents);
-            KOProjectHitPlayerNetEvents = new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(maxCap.CreateSwapFieldNetEvents);
-            DeactivateKOTalentNetEvents = new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(maxCap.CreateSwapFieldNetEvents);
             DestroySwapFieldNetEvents = new FixedUnorderedList<DeactivateSwapTalentNetEventS2C>(maxCap.DestroySwapFieldNetEvents);
+            KOProjectHitPlayerNetEvents = new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(maxCap.KOProjectHitPlayerNetEvents);
+            CreateKOProjectileNetEvents = new FixedUnorderedList<CreateKOProjectileNetEventS2C>(maxCap.CreateKOProjectileNetEvents);
+            DeactivateKOTalentNetEvents = new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
         }
 
 
@@ -111,21 +111,19 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedDestroySwapFieldNetEvents(writer);
         }
 
-        private void SerializedCreateKOProjectileNetEvents(NetDataWriter writer)
+        private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
         {
-            var count = CreateKOProjectileNetEvents.Count;
-            writer.Put((byte)count);
-            foreach (var evt in CreateKOProjectileNetEvents.AsSpan())
+            writer.Put((byte)KOProjectHitPlayerNetEvents.Count);
+            foreach (var evt in KOProjectHitPlayerNetEvents.AsSpan())
             {
                 evt.Serialize(writer);
             }
         }
 
-        private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
+        private void SerializedCreateKOProjectileNetEvents(NetDataWriter writer)
         {
-            var count = KOProjectHitPlayerNetEvents.Count;
-            writer.Put((byte)count);
-            foreach (var evt in KOProjectHitPlayerNetEvents.AsSpan())
+            writer.Put((byte)CreateKOProjectileNetEvents.Count);
+            foreach (var evt in CreateKOProjectileNetEvents.AsSpan())
             {
                 evt.Serialize(writer);
             }
@@ -133,13 +131,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         private void SerializedDeactivateKOTalentNetEvents(NetDataWriter writer)
         {
-            var count = DeactivateKOTalentNetEvents.Count;
-            writer.Put((byte)count);
+            writer.Put((byte)DeactivateKOTalentNetEvents.Count);
             foreach (var evt in DeactivateKOTalentNetEvents.AsSpan())
             {
                 evt.Serialize(writer);
             }
         }
+        
         private void SerializedCreateSwapFieldNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)CreateSwapFieldNetEvents.Count);

@@ -31,11 +31,24 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             Id = reader.GetUShort();
             PlayerCasterId = reader.GetUShort();
             Position = reader.GetVector2Quantized();
-            Position = reader.GetVector2Quantized();
             Rotation = reader.GetVector2FromAngle16();
             Size = reader.GetFloat16();
         }
 
+        public void SerializeDelta(NetDataWriter writer)
+        {
+            writer.Put(Id);
+            writer.PutVector2Quantized(Position);
+            writer.PutVector2AsAngle16(Rotation);
+        }
+
+        public void DeserializeDelta(NetDataReader reader)
+        {
+            Id = reader.GetUShort();
+            Position = reader.GetVector2Quantized();
+            Rotation = reader.GetVector2FromAngle16();
+        }
+        
         public bool Equals(ushort otherId)
         {
             return Id == otherId;
