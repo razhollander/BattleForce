@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
     public class MatchFullTickPacketsHandler : IFullTickPacketsHandler
     {
         private readonly NetworkConfig _networkConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationMatchNetEventsHandler _presentationNetEventsHandler;
@@ -49,6 +50,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<KOProjectHitPlayerNetEventS2C> _cachedUnprocessedKOProjectHitPlayerEvents;
         private readonly CapacityList<CreateKOProjectileNetEventS2C> _cachedUnprocessedCreateKOProjectileEvents;
         private readonly CapacityList<DeactivateKOTalentNetEventS2C> _cachedUnprocessedDeactivateKOTalentEvents;
+        private readonly CapacityList<PerformDashPulseNetEventS2C> _cachedUnprocessedPerformDashPulseEvents;
+        private readonly CapacityList<DeactivateDashPulseTalentNetEventS2C> _cachedUnprocessedDeactivateDashPulseTalentEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
@@ -57,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             IMatchDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory)
         {
             _networkConfig = networkConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory);
@@ -83,6 +87,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedKOProjectHitPlayerEvents = new CapacityList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents);
             _cachedUnprocessedCreateKOProjectileEvents = new CapacityList<CreateKOProjectileNetEventS2C>(networkConfig.MaxCap.CreateKOProjectileNetEvents);
             _cachedUnprocessedDeactivateKOTalentEvents = new CapacityList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents);
+            _cachedUnprocessedPerformDashPulseEvents = new CapacityList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents);
+            _cachedUnprocessedDeactivateDashPulseTalentEvents = new CapacityList<DeactivateDashPulseTalentNetEventS2C>(networkConfig.MaxCap.DeactivateDashPulseTalentNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -130,8 +136,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessKOProjectHitPlayerEvents(latestFullTickPacket.KOProjectHitPlayerNetEvents);
             ProcessCreateKOProjectileEvents(latestFullTickPacket.CreateKOProjectileNetEvents);
             ProcessDeactivateKOTalentEvents(latestFullTickPacket.DeactivateKOTalentNetEvents);
+            ProcessPerformDashPulseEvents(latestFullTickPacket.PerformDashPulseNetEvents);
+            ProcessDeactivateDashPulseTalentEvents(latestFullTickPacket.DeactivateDashPulseTalentNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
-            UpdatePlayersDeltas(simulationState);
+            UpdatePlayersDeltas(simulationState, latestTickReceivedFromServer);
             UpdateBulletsTransform(simulationState);
             UpdatePowerUpBallsTransform(simulationState);
             UpdateRotatingWheels(latestTickReceivedFromServer);
@@ -293,6 +301,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedDeactivateKOTalentEvents.Sort();
                 _presentationNetEventsHandler.ProcessDeactivateKOTalentEvents(_cachedUnprocessedDeactivateKOTalentEvents);
+            }
+        }
+
+        private void ProcessPerformDashPulseEvents(FixedUnorderedList<PerformDashPulseNetEventS2C> events)
+        {
+            _cachedUnprocessedPerformDashPulseEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPerformDashPulseEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPerformDashPulseEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPerformDashPulseEvents.Sort();
+                _presentationNetEventsHandler.ProcessPerformDashPulseEvents(_cachedUnprocessedPerformDashPulseEvents);
+            }
+        }
+
+        private void ProcessDeactivateDashPulseTalentEvents(FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C> events)
+        {
+            _cachedUnprocessedDeactivateDashPulseTalentEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedDeactivateDashPulseTalentEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedDeactivateDashPulseTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDeactivateDashPulseTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateDashPulseTalentEvents(_cachedUnprocessedDeactivateDashPulseTalentEvents);
             }
         }
 
@@ -671,7 +717,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void UpdatePlayersDeltas(MatchSimulationStateS2C simulationState)
+        private void UpdatePlayersDeltas(MatchSimulationStateS2C simulationState, int currentTick)
         {
             foreach (var playerModel in _matchDataService.Players)
             {
@@ -680,6 +726,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 playerModel.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
                 playerModel.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
                 playerModel.Spaceship.TalentsState.AimDirection = playerState.Spaceship.TalentsState.AimDirection;
+
+                for (int i = 0; i < playerModel.Spaceship.TalentsState.Talents.Count; i++)
+                {
+                    var playerTalent = playerModel.Spaceship.TalentsState.Talents[i];
+                    if (!playerTalent.IsStockable || playerTalent.ReceiveStockOnTick == 0)
+                    {
+                        continue;
+                    }
+
+                    if (playerTalent.ReceiveStockOnTick <= currentTick)
+                    {
+                        if (playerTalent.CurrentStocksAmount < playerTalent.MaxStocksAmount)
+                        {
+                            playerTalent.CurrentStocksAmount++;
+                        }
+
+                        if (playerTalent.CurrentStocksAmount < playerTalent.MaxStocksAmount)
+                        {
+                            var cooldownPerStock = _sharedGamePlayConfig.SimulationGamePlayConfig.Talents.PulseDashConfig.CooldownPerStock;
+                            playerTalent.ReceiveStockOnTick = Core.Game.Domains.GamePlay.Shared.Scripts.Utils.TickUtils.GetTickPassedAfterDuration(currentTick, cooldownPerStock, _networkConfig.DeltaTime);
+                        }
+                        else
+                        {
+                            playerTalent.ReceiveStockOnTick = 0;
+                        }
+
+                        playerModel.Spaceship.TalentsState.Talents[i] = playerTalent;
+                    }
+                }
             }
         }
 
