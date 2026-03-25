@@ -101,9 +101,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         private void CopySwapFieldToBody(Body swapFieldBody, ushort swapFieldId, MatchSimulationStateS2C simulationState)
         {
-            // var swapField = simulationState.Players.FindWithId(swapFieldId);
-            // swapFieldBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
-            // swapFieldBody.set(playerState.Spaceship.Transform.Velocity);
+            var swapField = simulationState.SwapFields.FindWithId(swapFieldId);
+            var swapFieldPosition = simulationState.Players.FindWithId(swapField.PlayerCasterId).Spaceship.Transform.Position;
+            swapFieldBody.SetTransform(swapFieldPosition, swapFieldBody.GetAngle());
+            var fixture = swapFieldBody.GetFixtureList();
+            var shape = (CircleShape) fixture.Shape;
+            shape.Radius = swapField.Radius;
         }
 
         private void CopyPowerUpStateToBody(Body powerUpBody, ushort powerUpId, MatchSimulationStateS2C simulationState)
@@ -778,15 +781,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             _fixtureDefPool.Return(fixtureDef);
             _circleShapePool.Return(shape);
-        }
-
-        public void UpdateSwapField(ushort id, Vector2 position, float newRadius)
-        {
-            var swapFieldBody = GetBody(PhysicsBodyType.SwapField, id);
-            swapFieldBody.SetTransform(position, swapFieldBody.GetAngle());
-            var fixture = swapFieldBody.GetFixtureList();
-            var shape = (CircleShape) fixture.Shape;
-            shape.Radius = newRadius;
         }
 
         public Body GetBody(PhysicsBodyType bodyType, ushort bodyId)

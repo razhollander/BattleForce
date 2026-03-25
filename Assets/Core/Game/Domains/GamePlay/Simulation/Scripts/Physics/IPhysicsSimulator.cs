@@ -37,7 +37,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void AddEnvironmentSpring(ushort id, Vector2 position, float rotationDegrees, Vector2 size);
         void AddTeleportGate(ushort id, Vector2 position, float rotation, Vector2 size);
         void AddSwapField(ushort id, ushort teamId, Vector2 position);
-        void UpdateSwapField(ushort id, Vector2 position, float newRadius);
         void RemoveSwapField(ushort id);
         void AddKOProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
         void RemoveKOProjectile(ushort id);
