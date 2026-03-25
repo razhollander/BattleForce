@@ -40,8 +40,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<ushort, FixedUnorderedList<CreateKOProjectileNetEventS2C>> CreateKOProjectileNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> KOProjectHitPlayerNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<DeactivateKOTalentNetEventS2C>> DeactivateKOTalentNetEventsPerPlayer { get; }
-
-        void StartSavingPlayerEvents(ushort playerId);
+        CapacityDict<ushort, FixedUnorderedList<PerformDashPulseNetEventS2C>> PerformDashPulseNetEventsPerPlayer { get; }
+        CapacityDict<ushort, FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C>> DeactivateDashPulseTalentNetEventsPerPlayer { get; }
+void StartSavingPlayerEvents(ushort playerId);
         void StopSavingPlayerEvents(ushort playerId);
         void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius);
         void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive);
@@ -70,6 +71,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddDeactivateSwapTalentNetEvent(int onTick, ushort casterPlayerId, ushort swapFieldId, int talentCooldownEndTick);
         void AddCreateKOProjectileNetEvent(int onTick, ushort projectileId, ushort playerCasterId, Vector2 position, Vector2 velocity, float size);
         void AddKOProjectHitPlayerNetEvent(int onTick, ushort projectileId, ushort hitPlayerId, Vector2 hitPosition);
+        void AddPerformDashPulseNetEvent(int onTick, ushort casterPlayerId);
+        void AddDeactivateDashPulseTalentNetEvent(int onTick, ushort casterPlayerId, int cooldownEndTick);
         void AddDeactivateKOTalentNetEvent(int onTick, ushort casterPlayerId, ushort projectileId, int talentCooldownEndTick);
     }
 }

@@ -34,6 +34,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents;
         public FixedUnorderedList<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents;
         public FixedUnorderedList<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents;
+        public FixedUnorderedList<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents;
+        public FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C> DeactivateDashPulseTalentNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
 
         public MatchFullTickPacketS2C()
@@ -66,6 +68,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             KOProjectHitPlayerNetEvents = new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(maxCap.KOProjectHitPlayerNetEvents);
             CreateKOProjectileNetEvents = new FixedUnorderedList<CreateKOProjectileNetEventS2C>(maxCap.CreateKOProjectileNetEvents);
             DeactivateKOTalentNetEvents = new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
+            PerformDashPulseNetEvents = new FixedUnorderedList<PerformDashPulseNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
+            DeactivateDashPulseTalentNetEvents = new FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
         }
 
 
@@ -108,6 +112,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedCreateKOProjectileNetEvents(writer);
             SerializedKOProjectHitPlayerNetEvents(writer);
             SerializedDeactivateKOTalentNetEvents(writer);
+            SerializedPerformDashPulseNetEvents(writer);
+            SerializedDeactivateDashPulseTalentNetEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
         }
 
@@ -289,6 +295,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedCreateKOProjectileNetEvents(reader);
             DeserializedKOProjectHitPlayerNetEvents(reader);
             DeserializedDeactivateKOTalentNetEvents(reader);
+            DeserializedPerformDashPulseNetEvents(reader);
+            DeserializedDeactivateDashPulseTalentNetEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
         }
 
@@ -576,6 +584,46 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             {
                 ref var bulletSpawnEvent = ref BulletSpawnNetEvents.AddAndGet();
                 bulletSpawnEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPerformDashPulseNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PerformDashPulseNetEvents.Count);
+            foreach (var evt in PerformDashPulseNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void DeserializedPerformDashPulseNetEvents(NetDataReader reader)
+        {
+            var count = reader.GetByte();
+            PerformDashPulseNetEvents.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                ref var evt = ref PerformDashPulseNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateDashPulseTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateDashPulseTalentNetEvents.Count);
+            foreach (var evt in DeactivateDashPulseTalentNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void DeserializedDeactivateDashPulseTalentNetEvents(NetDataReader reader)
+        {
+            var count = reader.GetByte();
+            DeactivateDashPulseTalentNetEvents.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                ref var evt = ref DeactivateDashPulseTalentNetEvents.AddAndGet();
+                evt.Deserialize(reader);
             }
         }
     }

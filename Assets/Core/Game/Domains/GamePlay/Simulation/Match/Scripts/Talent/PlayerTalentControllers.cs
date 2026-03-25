@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
     {
         private readonly SwapTalentController _swapTalentController;
         private readonly KOTalentController _koTalentController;
+        private readonly DashPulseTalentController _dashPulseTalentController;
         private HammerTalentController HammerTalentController;
         private BombTalentController BombTalentController;
         private SentryGunTalentController SentryGunTalentController;
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         {
             _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
             _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
+            _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, matchDataService, gamePlayConfig);
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -30,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _casterPlayerId = casterPlayerId;
             _swapTalentController.SetCasterId(casterPlayerId);
             _koTalentController.SetCasterId(casterPlayerId);
+            _dashPulseTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)
@@ -41,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.Hammer: return HammerTalentController;
                 case TalentType.Bomb: return BombTalentController;
                 case TalentType.SentryGun: return SentryGunTalentController;
+                case TalentType.DashPulse: return _dashPulseTalentController;
                 default: return default;
             }
         }
@@ -54,6 +58,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.Hammer: return HammerTalentController.IsCurrentlyActive;
                 case TalentType.Bomb: return BombTalentController.IsCurrentlyActive;
                 case TalentType.SentryGun: return SentryGunTalentController.IsCurrentlyActive;
+                case TalentType.DashPulse: return _dashPulseTalentController.IsCurrentlyActive;
                 default: return false;
             }
         }
@@ -70,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             HammerTalentController?.OnTick(tick);
             BombTalentController?.OnTick(tick);
             SentryGunTalentController?.OnTick(tick);
+            _dashPulseTalentController?.OnTick(tick);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)
@@ -96,6 +102,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         {
             _swapTalentController.ResetData();
             _koTalentController.ResetData();
+            _dashPulseTalentController.ResetData();
             // HammerTalentController.ResetData();
             // BombTalentController.ResetData();
             // SentryGunTalentController.ResetData();

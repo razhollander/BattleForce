@@ -121,6 +121,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public TalentType TalentType;
         public int CooldownEndTick;
         public float MaxCooldown;
+        public bool IsStockable;
+        public int CurrentStocksAmount;
+        public int MaxStocksAmount;
+        public int ReceiveStockOnTick;
         public bool IsOnCooldown() => CooldownEndTick > NO_COOLDOWN_TICK;
         public void ResetCooldownEndTick() => CooldownEndTick = NO_COOLDOWN_TICK;
         public TalentStateS2C(TalentType talentType, float maxCooldown)
@@ -128,12 +132,21 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentType = talentType;
             MaxCooldown = maxCooldown;
             CooldownEndTick = 0;
+            IsStockable = talentType == TalentType.DashPulse;
+            MaxStocksAmount = IsStockable ? 3 : 0;
+            CurrentStocksAmount = MaxStocksAmount;
+            ReceiveStockOnTick = 0;
         }
 
         public void Setup(TalentType talentType, float maxCooldown)
         {
             TalentType = talentType;
             MaxCooldown = maxCooldown;
+            IsStockable = talentType == TalentType.DashPulse;
+            MaxStocksAmount = IsStockable ? 3 : 0;
+            CurrentStocksAmount = MaxStocksAmount;
+            ReceiveStockOnTick = 0;
+            CooldownEndTick = 0;
         }
 
         public void Serialize(NetDataWriter writer)
@@ -141,6 +154,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((byte)TalentType);
             writer.Put(CooldownEndTick);
             writer.PutFloat16(MaxCooldown);
+            writer.Put(IsStockable);
+            writer.Put((byte)CurrentStocksAmount);
+            writer.Put((byte)MaxStocksAmount);
+            writer.Put(ReceiveStockOnTick);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -148,6 +165,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentType = (TalentType)reader.GetByte();
             CooldownEndTick = reader.GetInt();
             MaxCooldown = reader.GetFloat16();
+            IsStockable = reader.GetBool();
+            CurrentStocksAmount = reader.GetByte();
+            MaxStocksAmount = reader.GetByte();
+            ReceiveStockOnTick = reader.GetInt();
         }
 
 

@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -69,19 +70,49 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 for (int i = 0; i < playerState.Spaceship.TalentsState.Talents.Count; i++)
                 {
                     var playerTalent = playerState.Spaceship.TalentsState.Talents[i];
-                    if (!playerTalent.IsOnCooldown())
-                    {
-                        continue;
-                    }
 
-                    var didCooldownEnd = playerTalent.CooldownEndTick <= _tick;
-                    if (!didCooldownEnd)
+                    if (playerTalent.IsStockable)
                     {
-                        continue;
-                    }
+                        if (playerTalent.CurrentStocksAmount < playerTalent.MaxStocksAmount)
+                        {
+                            if (playerTalent.ReceiveStockOnTick > 0 && playerTalent.ReceiveStockOnTick <= _tick)
+                            {
+                                playerTalent.CurrentStocksAmount++;
 
-                    playerTalent.ResetCooldownEndTick();
-                    playerState.Spaceship.TalentsState.Talents[i] = playerTalent;
+                                if (playerTalent.CurrentStocksAmount == playerTalent.MaxStocksAmount)
+                                {
+                                    playerTalent.ReceiveStockOnTick = 0;
+                                }
+                                else
+                                {
+                                    playerTalent.ReceiveStockOnTick = TickUtils.GetTickPassedAfterDuration(_tick, playerTalent.MaxCooldown, _deltaTime);
+                                }
+
+                                if (playerTalent.CurrentStocksAmount > 0)
+                                {
+                                    playerTalent.ResetCooldownEndTick();
+                                }
+
+                                playerState.Spaceship.TalentsState.Talents[i] = playerTalent;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!playerTalent.IsOnCooldown())
+                        {
+                            continue;
+                        }
+
+                        var didCooldownEnd = playerTalent.CooldownEndTick <= _tick;
+                        if (!didCooldownEnd)
+                        {
+                            continue;
+                        }
+
+                        playerTalent.ResetCooldownEndTick();
+                        playerState.Spaceship.TalentsState.Talents[i] = playerTalent;
+                    }
                 }
             }
         }
