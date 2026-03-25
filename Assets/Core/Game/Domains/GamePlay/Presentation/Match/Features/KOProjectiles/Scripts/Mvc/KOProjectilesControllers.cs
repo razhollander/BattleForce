@@ -34,20 +34,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.S
             _controllers.Add(koProjectileId, koProjectileController);
         }
 
-        // public void HandleDeactivateEvents(List<DeactivateKOTalentNetEventS2C> events)
-        // {
-        //     for (int i = 0; i < events.Count; i++)
-        //     {
-        //         var netEvent = events[i];
-        //         var koProjectileId = netEvent.KoProjectileId;
-        //         if (_controllers.TryGetValue(koProjectileId, out var controller))
-        //         {
-        //             _koProjectilePool.Return(controller.View);
-        //             _controllers.Remove(koProjectileId);
-        //         }
-        //     }
-        // }
-
         public void InterpulateKOProjectileTransform(ushort koProjectileId, Vector2 position, Quaternion rotation, Vector2 coilSpringStartPosition)
         {
             var koProjectileController = GetKOProjectile(koProjectileId);

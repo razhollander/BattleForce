@@ -26,9 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public TalentType TalentType => TalentType.KO;
         public bool IsCurrentlyActive { get; private set; }
-
-        // State tracking
-        private bool _isReturning;
+        private bool _isInReturnPhase;
 
         public KOTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
             IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig)
@@ -59,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             IsCurrentlyActive = true;
-            _isReturning = false;
+            _isInReturnPhase = false;
 
             var koConfig = _gamePlayConfig.Talents.KOTalentConfig;
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
@@ -92,7 +90,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             ref var projectile = ref _matchDataService.SimulationState.GetKOProjectileById(_projectileId);
             var koConfig = _gamePlayConfig.Talents.KOTalentConfig;
 
-            if (_isReturning)
+            if (_isInReturnPhase)
             {
                 var distanceProjectileCenterToPlayerCenter = Vector2.DistanceSquared(projectile.Position, casterPlayerState.Spaceship.Transform.Position);
                 var neededReachDistance = koConfig.ProjectileSize + casterPlayerState.Spaceship.Transform.Radius;
@@ -123,12 +121,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             IsCurrentlyActive = false;
             _projectileId = 0;
-            _isReturning = false;
+            _isInReturnPhase = false;
         }
 
         public void HitEnemyPlayer(ushort enemyPlayerId, int tick)
         {
-            if (!IsCurrentlyActive || _isReturning)
+            if (!IsCurrentlyActive || _isInReturnPhase)
             {
                 return;
             }
@@ -146,7 +144,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void HitWall()
         {
-            if (!IsCurrentlyActive || _isReturning)
+            if (!IsCurrentlyActive || _isInReturnPhase)
             {
                 return;
             }
@@ -156,15 +154,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private void StartReturnPhase()
         {
-            _isReturning = true;
-            LogService.LogError("returning");
-            //_physicsSimulator.DisableBodyCollider(PhysicsBodyType.KOProjectile, _projectileId);
+            _isInReturnPhase = true;
         }
 
         private void DeactivateTalent(int tick)
         {
             IsCurrentlyActive = false;
-            _isReturning = false;
+            _isInReturnPhase = false;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
             if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.KO, out int talentIndex))

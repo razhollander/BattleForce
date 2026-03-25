@@ -95,11 +95,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var isWallToProjectile = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.KOProjectile;
             var isProjectileToWall = objectA.PhysicsBodyType == PhysicsBodyType.KOProjectile && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
 
-            if (!isWallToProjectile && !isProjectileToWall) return;
+            if (!isWallToProjectile && !isProjectileToWall)
+            {
+                return;
+            }
 
-            ushort projectileId = isProjectileToWall ? objectA.Id : objectB.Id;
-            LogService.LogError($"Hit ko wall");
-
+            var projectileId = isProjectileToWall ? objectA.Id : objectB.Id;
             var projectile = _matchDataService.SimulationState.GetKOProjectileById(projectileId);
             var casterId = projectile.PlayerCasterId;
             _playersTalentsManager.HitKOTalentWithWall(casterId);
@@ -110,7 +111,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var isPlayerToProjectile = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.KOProjectile;
             var isProjectileToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.KOProjectile && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
 
-            if (!isPlayerToProjectile && !isProjectileToPlayer) return;
+            if (!isPlayerToProjectile && !isProjectileToPlayer)
+            {
+                return;
+            }
 
             ushort playerId;
             ushort projectileId;
@@ -128,8 +132,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             var projectile = _matchDataService.SimulationState.GetKOProjectileById(projectileId);
             var enemyPlayer = _matchDataService.SimulationState.GetPlayerById(playerId);
-            LogService.LogError($"Hit ko projectile field! ko projectile id: {projectileId}, hit player id: {playerId}, caster id: {projectile.PlayerCasterId}");
-
             _playersTalentsManager.HitKOTalentWithEnemy(projectile.PlayerCasterId, enemyPlayer.Id, _processedTick);
         }
         
@@ -138,7 +140,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var isPlayerToField = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.SwapField;
             var isFieldToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.SwapField && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
 
-            if (!isPlayerToField && !isFieldToPlayer) return;
+            if (!isPlayerToField && !isFieldToPlayer)
+            {
+                return;
+            }
 
             ushort playerId;
             ushort fieldId;
@@ -155,9 +160,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var swapField = _matchDataService.SimulationState.GetSwapFieldById(fieldId);
-            
-            LogService.LogError($"Hit swap field! swapField id: {swapField.Id}, hit player id: {playerId}, caster id: {swapField.PlayerCasterId}");
-
             var playerStateHit = _matchDataService.SimulationState.GetPlayerById(playerId);
             _playersTalentsManager.CompleteSwapTalentWithEnemy(swapField.PlayerCasterId, playerStateHit.Id, _processedTick);
         }
