@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scrip
                 transform.position = pos;
                 if (direction != Vector2.zero)
                 {
-                    transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
+                    transform.rotation = direction.ToQuaternion();
                 }
 
                 await Awaitable.WaitForSecondsAsync(duration, cancellationToken: cancellationTokenSource.Token);

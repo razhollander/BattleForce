@@ -1119,11 +1119,11 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
-                packet.ProjectileId = projectileId;
-                packet.CasterPlayerId = casterPlayerId;
-                packet.Position = position;
-                packet.Velocity = velocity;
-                packet.Size = size;
+                packet.KoProjectile.Id = projectileId;
+                packet.KoProjectile.PlayerCasterId = casterPlayerId;
+                packet.KoProjectile.Position = position;
+                packet.KoProjectile.Velocity = velocity;
+                packet.KoProjectile.Size = size;
             }
         }
 
@@ -1146,10 +1146,11 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.CasterPlayerId = casterPlayerId;
-                packet.ProjectileId = projectileId;
+                packet.KoProjectileId = projectileId;
                 packet.TalentCooldownEndTick = talentCooldownEndTick;
             }
         }
+        
         public void AddPerformDashPulseNetEvent(int onTick, ushort casterPlayerId)
         {
             foreach (var kvp in PerformDashPulseNetEventsPerPlayer)

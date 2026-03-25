@@ -985,6 +985,7 @@ MonoBehaviour:
   _environmentFieldBarrierViewPrefab: {fileID: 6186951682495552436, guid: fff11549e688e4b7f98a5e86ba815ef9, type: 3}
   _swapFieldViewPrefab: {fileID: -776366679696118115, guid: 1a171fa788e0b4da4aafcfdb960cc150, type: 3}
   _koProjectileViewPrefab: {fileID: 9213814470890300496, guid: a86c63ffab0304d369270a78cedc91d7, type: 3}
+  _dashPulseGustEffectViewPrefab: {fileID: 2651892565007212038, guid: 26b876fb431b54fffa58daf61e4d5811, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
