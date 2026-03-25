@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.S
     {
         [SerializeField] private KOProjectileCoilSpringView _coilSpringView;
         public Transform Transform { get; private set; }
+        public Action Despawn { get; set; }
 
         public void Setup(Vector2 position, Quaternion rotation, Vector2 coilSpringStartPosition, float size)
         {
@@ -26,7 +27,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.S
             Transform = transform;
         }
 
-        public Action Despawn { get; set; }
         public void OnSpawned()
         {
             gameObject.SetActive(true);
