@@ -16,12 +16,12 @@ MonoBehaviour:
   CooldownPerTalentType:
     m_keys: 010000000200000003000000040000000500000006000000
     m_values:
-    - 2
-    - 2
-    - 2
-    - 2
-    - 2
-    - 2
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
   HammerTalentConfig:
     HammerSpeed: 10
     HammerSize: 1
@@ -38,7 +38,7 @@ MonoBehaviour:
     ProjectileSpeed: 50
     ProjectileSize: 1
     ReturnSpeedMultiplier: 2
-    MaxFirstPhaseDuration: 2
+    MaxFirstPhaseDuration: 1
     PushForce: 50
     MaxSpin: 55
     MinSpin: 50
