@@ -82,7 +82,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             var talents = playerState.Spaceship.TalentsState;
-            if (talents.Talents.Count <=1)
+
+            if (!talents.TryGetCurrentSelectedTalent(out var selectedTalent))
+            {
+                return false;
+            }
+
+            var isTalentCurrentlyActive = _talentControllersPerPlayer[playerId].IsTalentCurrentlyActive(selectedTalent.TalentType);
+            if (isTalentCurrentlyActive)
             {
                 return false;
             }

@@ -142,7 +142,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState, deltaTime);
 
                 _simulationInputService.SetPlayerInput(playerId, PlayerInputType.SwitchTalent, playerInputPacket.IsSwitchTalentInputPressed);
-
+                
                 if (_simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.SwitchTalent))
                 {
                     if (_playersTalentsManager.TrySwitchToNextTalent(playerId))
