@@ -392,5 +392,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.DeactivateKOTalentNetEvents.Add(netEvent);
             }
         }
+
+        public void ProcessPerformDashPulseEvents(CapacityList<PerformDashPulseNetEventS2C> performDashPulseNetEvents)
+        {
+            if (performDashPulseNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in performDashPulseNetEvents)
+            {
+                _cachedPresentationEventsService.PerformDashPulseNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateDashPulseTalentEvents(CapacityList<DeactivateDashPulseTalentNetEventS2C> deactivateDashPulseTalentNetEvents)
+        {
+            if (deactivateDashPulseTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in deactivateDashPulseTalentNetEvents)
+            {
+                var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
+                var talents = casterPlayer.Spaceship.TalentsState.Talents;
+                for (int i = 0; i < talents.Count; i++)
+                {
+                    ref var talent = ref talents.Get(i);
+                    if (talent.TalentType == TalentType.DashPulse)
+                    {
+                        talent.CooldownEndTick = netEvent.TalentCooldownEndTick;
+                        break;
+                    }
+                }
+                _cachedPresentationEventsService.DeactivateDashPulseTalentNetEvents.Add(netEvent);
+            }
+        }
     }
 }
