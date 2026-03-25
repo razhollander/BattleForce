@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.UpdateService;
@@ -44,9 +45,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleDeactivateKOTalentNetEventsCommand _handleDeactivateKOTalentNetEventsCommand;
         private readonly HandleKOProjectHitPlayerNetEventsCommand _handleKOProjectHitPlayerNetEventsCommand;
         private readonly UpdateKOProjectilesTransformCommand _updateKOProjectilesTransformCommand;
+        private readonly HandlePerformDashPulseNetEventsCommand _handlePerformDashPulseNetEventsCommand;
+        private readonly HandleDeactivateDashPulseTalentNetEventsCommand _handleDeactivateDashPulseTalentNetEventsCommand;
+        private readonly IDashPulseGustEffectController _dashPulseGustEffectController;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
+            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler, IDashPulseGustEffectController dashPulseGustEffectController)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
@@ -54,6 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _powerUpBallControllers = powerUpBallControllers;
             _matchPlayerUIControllers = matchPlayerUIControllers;
             _fullTickPacketsHandler = fullTickPacketsHandler;
+            _dashPulseGustEffectController = dashPulseGustEffectController;
             _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
             _handlePlayerTakeDamangeNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
             _handlePlayerDiedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerDiedNetEventsCommand>();
@@ -78,10 +83,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateKOTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateKOTalentNetEventsCommand>();
             _handleKOProjectHitPlayerNetEventsCommand = commandFactory.CreateCommandVoid<HandleKOProjectHitPlayerNetEventsCommand>();
             _updateKOProjectilesTransformCommand = commandFactory.CreateCommandVoid<UpdateKOProjectilesTransformCommand>();
+            _handlePerformDashPulseNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformDashPulseNetEventsCommand>();
+            _handleDeactivateDashPulseTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateDashPulseTalentNetEventsCommand>();
         }
         
         public void InitEntryPoint()
         {
+            _dashPulseGustEffectController.InitEntryPoint();
             _updateSubscriptionService.RegisterUpdatable(this);
         }
         
@@ -117,6 +125,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTransform();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();
             _handleDeactivateKOTalentNetEventsCommand.Execute();
+            _handlePerformDashPulseNetEventsCommand.Execute();
+            _handleDeactivateDashPulseTalentNetEventsCommand.Execute();
             _updateKOProjectilesTransformCommand.Execute(); // must be after _handleDeactivateKOTalentNetEventsCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();

@@ -51,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private EnvironmentFieldBarrierView _environmentFieldBarrierViewPrefab;
         [SerializeField] private SwapFieldView _swapFieldViewPrefab;
         [SerializeField] private KOProjectileView _koProjectileViewPrefab;
+        [SerializeField] private Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect.DashPulseGustEffectView _dashPulseGustEffectViewPrefab;
 
         public override void InstallBindings()
         {
@@ -88,6 +89,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<PlayerTeleportEffectController>().AsSingle().WithArguments(playerTeleportEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentFieldBarrierControllers>().AsSingle().WithArguments(_environmentFieldBarrierViewPrefab).NonLazy();
             Container.BindInterfacesTo<KOProjectilesControllers>().AsSingle().WithArguments(_koProjectileViewPrefab).NonLazy();
+            Container.BindInterfacesTo<Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect.DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();
         }
     }
 }

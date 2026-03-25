@@ -49,6 +49,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<KOProjectHitPlayerNetEventS2C> _cachedUnprocessedKOProjectHitPlayerEvents;
         private readonly CapacityList<CreateKOProjectileNetEventS2C> _cachedUnprocessedCreateKOProjectileEvents;
         private readonly CapacityList<DeactivateKOTalentNetEventS2C> _cachedUnprocessedDeactivateKOTalentEvents;
+        private readonly CapacityList<PerformDashPulseNetEventS2C> _cachedUnprocessedPerformDashPulseEvents;
+        private readonly CapacityList<DeactivateDashPulseTalentNetEventS2C> _cachedUnprocessedDeactivateDashPulseTalentEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
@@ -83,6 +85,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedKOProjectHitPlayerEvents = new CapacityList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents);
             _cachedUnprocessedCreateKOProjectileEvents = new CapacityList<CreateKOProjectileNetEventS2C>(networkConfig.MaxCap.CreateKOProjectileNetEvents);
             _cachedUnprocessedDeactivateKOTalentEvents = new CapacityList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents);
+            _cachedUnprocessedPerformDashPulseEvents = new CapacityList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents);
+            _cachedUnprocessedDeactivateDashPulseTalentEvents = new CapacityList<DeactivateDashPulseTalentNetEventS2C>(networkConfig.MaxCap.DeactivateDashPulseTalentNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -130,6 +134,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessKOProjectHitPlayerEvents(latestFullTickPacket.KOProjectHitPlayerNetEvents);
             ProcessCreateKOProjectileEvents(latestFullTickPacket.CreateKOProjectileNetEvents);
             ProcessDeactivateKOTalentEvents(latestFullTickPacket.DeactivateKOTalentNetEvents);
+            ProcessPerformDashPulseEvents(latestFullTickPacket.PerformDashPulseNetEvents);
+            ProcessDeactivateDashPulseTalentEvents(latestFullTickPacket.DeactivateDashPulseTalentNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
@@ -293,6 +299,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedDeactivateKOTalentEvents.Sort();
                 _presentationNetEventsHandler.ProcessDeactivateKOTalentEvents(_cachedUnprocessedDeactivateKOTalentEvents);
+            }
+        }
+
+        private void ProcessPerformDashPulseEvents(FixedUnorderedList<PerformDashPulseNetEventS2C> performDashPulseNetEvents)
+        {
+            _cachedUnprocessedPerformDashPulseEvents.Clear();
+
+            foreach (var netEvent in performDashPulseNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPerformDashPulseEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPerformDashPulseEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPerformDashPulseEvents.Sort();
+                _presentationNetEventsHandler.ProcessPerformDashPulseEvents(_cachedUnprocessedPerformDashPulseEvents);
+            }
+        }
+
+        private void ProcessDeactivateDashPulseTalentEvents(FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C> deactivateDashPulseTalentNetEvents)
+        {
+            _cachedUnprocessedDeactivateDashPulseTalentEvents.Clear();
+
+            foreach (var netEvent in deactivateDashPulseTalentNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedDeactivateDashPulseTalentEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedDeactivateDashPulseTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDeactivateDashPulseTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateDashPulseTalentEvents(_cachedUnprocessedDeactivateDashPulseTalentEvents);
             }
         }
 
