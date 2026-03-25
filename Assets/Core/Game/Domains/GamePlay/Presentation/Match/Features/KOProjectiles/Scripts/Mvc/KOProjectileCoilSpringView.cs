@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.S
         {
             var totalPoints = _numberOfCoils * _pointsPerCoil;
             ApplyLineThicknessAndCount(totalPoints);
-            var perpendicularVector = MathUtils.CalculatePerpendicularDirection(startPoint, endPoint);
+            var perpendicularVector = MathUtils.GetPerpendicularDirection(startPoint, endPoint);
             SetSpringPoints(startPoint, endPoint, totalPoints, perpendicularVector);
         }
 
@@ -30,16 +30,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.S
         {
             for (int i = 0; i < totalPoints; i++)
             {
-                float t = (float)i / (totalPoints - 1);
-                var finalPosition = CalculatePointPositionAlongWave(startPoint, endPoint, t, perpendicular);
+                float interpolation = (float)i / (totalPoints - 1);
+                var finalPosition = CalculatePointPositionAlongWave(startPoint, endPoint, interpolation, perpendicular);
                 _lineRenderer.SetPosition(i, finalPosition);
             }
         }
 
-        private Vector3 CalculatePointPositionAlongWave(Vector2 startPoint, Vector2 endPoint, float t, Vector3 perpendicular)
+        private Vector3 CalculatePointPositionAlongWave(Vector2 startPoint, Vector2 endPoint, float interpolation, Vector3 perpendicular)
         {
-            var basePosition = Vector3.Lerp(startPoint, endPoint, t);
-            float currentAngle = t * _numberOfCoils * Mathf.PI * 2f;
+            var basePosition = Vector3.Lerp(startPoint, endPoint, interpolation);
+            float currentAngle = interpolation * _numberOfCoils * Mathf.PI * 2f;
             var sidewaysOffset = perpendicular * Mathf.Sin(currentAngle) * _coilWidth;
             return basePosition + sidewaysOffset;
         }
