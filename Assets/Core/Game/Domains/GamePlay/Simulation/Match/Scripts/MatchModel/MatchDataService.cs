@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastBulletCreatedId = 0;
         private ushort _lastPowerUpBallCreatedId = 0;
         private ushort _lastSwapFieldCreatedId = 0;
+        private ushort _lastKOProjectileCreatedId = 0;
         public MatchEnvironmentDataService EnvironmentData { get; private set; }
         public HashSet<ushort> TeamIds { get; private set; }
 
@@ -99,6 +100,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             swapField.CreatedOnTick = tick;
             swapField.EndTick = fieldEndTick;
             return swapField;
+        }
+
+        public TalentKOProjectileS2C AddKOProjectile(int tick, ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 velocity, float size)
+        {
+            ref var koProjectile = ref _simulationState.KOProjectiles.AddAndGet();
+            var koProjectileId = (ushort)(++_lastKOProjectileCreatedId % ushort.MaxValue);
+            koProjectile.CreatedOnTick = tick;
+            koProjectile.Id = koProjectileId;
+            koProjectile.PlayerCasterId = casterPlayerId;
+            koProjectile.Position = position;
+            koProjectile.Rotation = rotation;
+            koProjectile.Velocity = velocity;
+            koProjectile.Size = size;
+            return koProjectile;
         }
     }
 }

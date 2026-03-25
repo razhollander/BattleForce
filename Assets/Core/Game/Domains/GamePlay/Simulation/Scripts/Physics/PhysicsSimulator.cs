@@ -84,10 +84,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     case PhysicsBodyType.Lava: CopyLavaStateToBody(currentBody, bodyData.Id, environmentLavaWalls); break;
                     case PhysicsBodyType.EnvironmentSpring: CopySpringStateToBody(currentBody, bodyData.Id, environmentSprings); break;
                     case PhysicsBodyType.EnvironmentTeleportGate: CopyTeleportGateStateToBody(currentBody, bodyData.Id, environmentTeleportGates); break;
+                    case PhysicsBodyType.SwapField: CopySwapFieldToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.KOProjectile: CopyKOProjectileToBody(currentBody, bodyData.Id, simulationState); break;
                 }
 
                 currentBody = currentBody.GetNext();
             }
+        }
+
+        private void CopyKOProjectileToBody(Body koProjectileBody, ushort koProjectileId, MatchSimulationStateS2C simulationState)
+        {
+            var koProjectileState = simulationState.KOProjectiles.FindWithId(koProjectileId);
+            koProjectileBody.SetTransform(koProjectileState.Position, koProjectileState.Rotation.ToAngleRadians());
+            koProjectileBody.SetLinearVelocity(koProjectileState.Velocity);
+        }
+
+        private void CopySwapFieldToBody(Body swapFieldBody, ushort swapFieldId, MatchSimulationStateS2C simulationState)
+        {
+            var swapField = simulationState.SwapFields.FindWithId(swapFieldId);
+            var swapFieldPosition = simulationState.Players.FindWithId(swapField.PlayerCasterId).Spaceship.Transform.Position;
+            swapFieldBody.SetTransform(swapFieldPosition, swapFieldBody.GetAngle());
+            var fixture = swapFieldBody.GetFixtureList();
+            var shape = (CircleShape) fixture.Shape;
+            shape.Radius = swapField.Radius;
         }
 
         private void CopyPowerUpStateToBody(Body powerUpBody, ushort powerUpId, MatchSimulationStateS2C simulationState)
@@ -432,42 +451,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         public Body GetBullet(ushort bulletId)
         {
-            var currentBody = _world.GetBodyList();
-
-            while (currentBody != null)
-            {
-                var bodyData = (PhysicsBodyData) currentBody.UserData;
-
-                if (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerBullet && bodyData.Id == bulletId)
-                {
-                    return currentBody;
-                }
-
-                currentBody = currentBody.GetNext();
-            }
-            
-            LogService.LogError($"Couldn't find bullet {bulletId}");
-            return default;
+            return GetBody(PhysicsBodyType.PlayerBullet, bulletId);
         }
 
         public Body GetPowerUpBall(ushort powerUpBallId)
         {
-            var currentBody = _world.GetBodyList();
-
-            while (currentBody != null)
-            {
-                var bodyData = (PhysicsBodyData) currentBody.UserData;
-
-                if (bodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && bodyData.Id == powerUpBallId)
-                {
-                    return currentBody;
-                }
-
-                currentBody = currentBody.GetNext();
-            }
-
-            LogService.LogError($"Couldn't find powerUp {powerUpBallId}");
-            return default;
+            return GetBody(PhysicsBodyType.PowerUpBall, powerUpBallId);
         }
 
         public void RemoveBody(Body body)
@@ -480,7 +469,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var hasCollisionWithAnyBodyType = false;
             var lowerBound = squarePosition - new Vector2(squareHalfWidth, squareHalfWidth);
             var upperBound = squarePosition + new Vector2(squareHalfWidth, squareHalfWidth);
-            var aabb = new Box2D.NetStandard.Collision.AABB(lowerBound, upperBound);
+            var aabb = new AABB(lowerBound, upperBound);
 
             _world.QueryAABB(ShouldProceedCheckHit, aabb);
 
@@ -724,7 +713,48 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(shape);
         }
 
-        public void AddSwapField(ushort id, Vector2 position)
+        public void AddKOProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.KOProjectile);
+            bodyDef.bullet = true;
+            bodyDef.linearVelocity = velocity;
+            
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+            
+            var shape = GetCircleShape();
+            shape.Radius = radius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0.3f;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.groupIndex = (short)-teamId;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.KOProjectile.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.KOProjectile.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(shape);
+        }
+
+        public void UpdateKOProjectile(ushort id, Vector2 position)
+        {
+            var body = GetBody(PhysicsBodyType.KOProjectile, id);
+            body.SetTransform(position, 0);
+        }
+
+        public void RemoveKOProjectile(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.KOProjectile, id);
+            RemoveBody(body);
+        }
+
+        public void AddSwapField(ushort id, ushort teamId, Vector2 position)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Dynamic;
@@ -742,6 +772,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.density = 0;
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
+            fixtureDef.filter.groupIndex = (short)-teamId;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.SwapField.GetCollisionsCategory();
             fixtureDef.filter.maskBits = PhysicsBodyType.SwapField.GetCollisionMask();
@@ -750,15 +781,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             _fixtureDefPool.Return(fixtureDef);
             _circleShapePool.Return(shape);
-        }
-
-        public void UpdateSwapField(ushort id, Vector2 position, float newRadius)
-        {
-            var swapFieldBody = GetBody(PhysicsBodyType.SwapField, id);
-            swapFieldBody.SetTransform(position, swapFieldBody.GetAngle());
-            var fixture = swapFieldBody.GetFixtureList();
-            var shape = (CircleShape) fixture.Shape;
-            shape.Radius = newRadius;
         }
 
         public Body GetBody(PhysicsBodyType bodyType, ushort bodyId)
@@ -792,6 +814,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             _world = CreateWorld();
             ClearCachedCollisions();
+        }
+
+        public void DisableBodyCollider(PhysicsBodyType koProjectile, ushort projectileId)
+        {
+            var body = GetBody(koProjectile, projectileId);
+            var fixture = body.GetFixtureList();
+            var filter = fixture.FilterData;
+            filter.maskBits = 0x0000; 
+            fixture.FilterData = filter; // not sure needed
+            body.SetAwake(true); // not sure needed
+        }
+
+        public Body GetKOProjectile(ushort koProjectileId)
+        {
+            return GetBody(PhysicsBodyType.KOProjectile, koProjectileId);
         }
     }
 }

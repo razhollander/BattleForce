@@ -40,6 +40,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleDeactivateSwapTalentNetEventsCommand _handleDeactivateSwapTalentNetEventsCommand;
         private readonly UpdateSwapFieldsTransformCommand _updateSwapFieldsTransformCommand;
         private readonly HandleSwapFieldCreatedNetEventsCommand _handleSwapFieldCreatedNetEventsCommand;
+        private readonly HandleKOProjectileCreatedNetEventsCommand _handleKOProjectileCreatedNetEventsCommand;
+        private readonly HandleDeactivateKOTalentNetEventsCommand _handleDeactivateKOTalentNetEventsCommand;
+        private readonly HandleKOProjectHitPlayerNetEventsCommand _handleKOProjectHitPlayerNetEventsCommand;
+        private readonly UpdateKOProjectilesTransformCommand _updateKOProjectilesTransformCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -70,6 +74,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateSwapTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSwapTalentNetEventsCommand>();
             _updateSwapFieldsTransformCommand = commandFactory.CreateCommandVoid<UpdateSwapFieldsTransformCommand>();
             _handleSwapFieldCreatedNetEventsCommand = commandFactory.CreateCommandVoid<HandleSwapFieldCreatedNetEventsCommand>();
+            _handleKOProjectileCreatedNetEventsCommand = commandFactory.CreateCommandVoid<HandleKOProjectileCreatedNetEventsCommand>();
+            _handleDeactivateKOTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateKOTalentNetEventsCommand>();
+            _handleKOProjectHitPlayerNetEventsCommand = commandFactory.CreateCommandVoid<HandleKOProjectHitPlayerNetEventsCommand>();
+            _updateKOProjectilesTransformCommand = commandFactory.CreateCommandVoid<UpdateKOProjectilesTransformCommand>();
         }
         
         public void InitEntryPoint()
@@ -106,6 +114,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleSwapFieldCreatedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleDeactivateSwapTalentNetEventsCommand.Execute();
             _updateSwapFieldsTransformCommand.SetTick(lastProcessedTickFromServer).Execute();// must be after _playerControllers.UpdatePlayersTransform();
+            _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTransform();
+            _handleKOProjectHitPlayerNetEventsCommand.Execute();
+            _handleDeactivateKOTalentNetEventsCommand.Execute();
+            _updateKOProjectilesTransformCommand.Execute(); // must be after _handleDeactivateKOTalentNetEventsCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();

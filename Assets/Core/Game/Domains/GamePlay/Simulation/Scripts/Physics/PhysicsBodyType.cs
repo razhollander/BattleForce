@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         StartMatchWall = 8,
         EnvironmentSpring = 9,
         EnvironmentTeleportGate = 10,
-        SwapField = 11
+        SwapField = 11,
+        KOProjectile = 12
     }
 }

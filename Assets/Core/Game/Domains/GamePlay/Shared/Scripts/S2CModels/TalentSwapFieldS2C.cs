@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using CoreDomain.Scripts.Utils;
 using LiteNetLib.Utils;
 
@@ -11,18 +12,20 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public ushort PlayerCasterId;
         public int CreatedOnTick;
         public int EndTick;
-
-        public float CalculateCurrentRadiusForTick(int tick, float maxRadius)
+        public float Radius;
+        
+        public void UpdateRadiusForTick(int tick, float maxRadius)
         {
-            return MathUtils.Remap(CreatedOnTick, EndTick, 0, maxRadius, tick);
+            Radius = MathUtils.Remap(CreatedOnTick, EndTick, 0, maxRadius, tick);
         }
         
-        public TalentSwapFieldS2C(ushort id, ushort playerCasterId, int createdOnTick, int endTick)
+        public TalentSwapFieldS2C(ushort id, ushort playerCasterId, int createdOnTick, int endTick, float radius)
         {
             Id = id;
             PlayerCasterId = playerCasterId;
             CreatedOnTick = createdOnTick;
             EndTick = endTick;
+            Radius = radius;
         }
 
         public void Serialize(NetDataWriter writer)

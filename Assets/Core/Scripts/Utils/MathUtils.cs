@@ -6,6 +6,18 @@ namespace CoreDomain.Scripts.Utils
 {
     public static class MathUtils
     {
+        public static Vector3 GetPerpendicularDirection(Vector2 startPoint, Vector2 endPoint)
+        {
+            var direction = (endPoint - startPoint);
+            return GetPerpendicularDirection(direction);
+        }
+            
+        public static Vector3 GetPerpendicularDirection(Vector2 direction)
+        {
+            var normalizedDir = direction.normalized;
+            return new Vector3(-normalizedDir.y, normalizedDir.x, 0);
+        }
+        
         /// <summary>
         /// Remaps a value from one range to another.
         /// </summary>

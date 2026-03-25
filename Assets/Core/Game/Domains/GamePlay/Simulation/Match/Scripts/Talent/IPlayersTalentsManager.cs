@@ -10,7 +10,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         bool TrySwitchToNextTalent(ushort playerId);
         void ProcessPlayerTalentInput(ushort playerId, TalentType talentType, int tick, bool isTalentInputPressed, float deltaTime);
         void ProcessAllActiveTick(ushort playerId, int tick);
-        void CompleteSwapTalentWithEnemy(ushort casterId, PlayerStateS2C enemyPlayer, int tick);
+        void CompleteSwapTalentWithEnemy(ushort casterId, ushort enemyPlayerId, int tick);
         void ResetAllTalentsData();
+        void HitKOTalentWithEnemy(ushort casterId, ushort enemyPlayerId, int tick);
+        void HitKOTalentWithWall(ushort casterId);
     }
 }

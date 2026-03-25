@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Telepor
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.PlayerTeleportEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
@@ -25,7 +26,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPoint
 {
-    public class StartGamePlayMatchCommand: BaseCommand, ICommandAsync
+    public class StartGamePlayMatchCommand: BaseCommand, ICommandVoid
     {
         private GamePlayMatchInitiatorEnterData _enterData;
         private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
@@ -48,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IEnvironmentTeleportGateControllers _environmentTeleportGateControllers;
         private IEnvironmentFieldBarrierControllers _environmentFieldBarrierControllers;
         private ISwapFieldControllers _swapFieldControllers;
+        private IKOProjectilesControllers _koProjectilesControllers;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -77,9 +79,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentTeleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
             _environmentFieldBarrierControllers = _diContainer.Resolve<IEnvironmentFieldBarrierControllers>();
             _swapFieldControllers = _diContainer.Resolve<ISwapFieldControllers>();
+            _koProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
         }
 
-        public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
+        public void Execute()
         {
             _fullTickPacketsHandler.InitEntryPoint();
             _startStagePacketHandler.InitEntryPoint();
@@ -89,6 +92,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _talentCardObtainedEffectController.InitEntryPoint();
             _powerUpBallControllers.InitEntryPoint();
             _swapFieldControllers.InitEntryPoint();
+            _koProjectilesControllers.InitEntryPoint();
             _powerUpBallObtainedEffectController.InitEntryPoint();
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();

@@ -16,7 +16,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsBodyType.StartMatchWall)
                                     | GetCollisionMask(PhysicsBodyType.EnvironmentSpring)
                                     | GetCollisionMask(PhysicsBodyType.EnvironmentTeleportGate)
-                                    | GetCollisionMask(PhysicsBodyType.SwapField);
+                                    | GetCollisionMask(PhysicsBodyType.SwapField)
+                                    | GetCollisionMask(PhysicsBodyType.KOProjectile);
                     break;
                 case PhysicsBodyType.PlayerBullet:
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
@@ -28,7 +29,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 case PhysicsBodyType.Wall:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsBodyType.PlayerBullet)
-                                    | GetCollisionMask(PhysicsBodyType.PowerUpBall);
+                                    | GetCollisionMask(PhysicsBodyType.PowerUpBall)
+                                    | GetCollisionMask(PhysicsBodyType.KOProjectile);
                     break;
                 case PhysicsBodyType.TalentCard:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerBullet);
@@ -52,6 +54,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     break;
                 case PhysicsBodyType.EnvironmentTeleportGate:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    break;
+                case PhysicsBodyType.KOProjectile:
+                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsBodyType.Wall);
                     break;
                 case PhysicsBodyType.SwapField:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);

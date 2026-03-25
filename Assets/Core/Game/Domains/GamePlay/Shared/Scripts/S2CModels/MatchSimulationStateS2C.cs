@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentCardS2C> TalentCards;
         public FixedUnorderedList<PowerUpBallS2C> PowerUpBalls;
         public FixedUnorderedList<TalentSwapFieldS2C> SwapFields;
+        public FixedUnorderedList<TalentKOProjectileS2C> KOProjectiles;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
         public int EnvironmentLayoutIndex;
@@ -30,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
             PowerUpBalls = new FixedUnorderedList<PowerUpBallS2C>(maxPowerUpBalls);
             SwapFields = new FixedUnorderedList<TalentSwapFieldS2C>(maxPlayers);
+            KOProjectiles = new FixedUnorderedList<TalentKOProjectileS2C>(maxPlayers);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
         }
@@ -83,6 +85,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var swapField in SwapFields.AsSpan())
             {
                 swapField.Serialize(writer);
+            }
+
+            var koProjectilesCount = KOProjectiles.Count;
+            writer.Put((byte)koProjectilesCount);
+            foreach (var koProjectile in KOProjectiles.AsSpan())
+            {
+                koProjectile.Serialize(writer);
             }
 
             writer.Put((byte)EnvironmentLayoutIndex);
@@ -151,6 +160,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 swapField.Deserialize(reader);
             }
             
+            var koProjectilesCount = reader.GetByte();
+            KOProjectiles.Clear();
+            for (var i = 0; i < koProjectilesCount; i++)
+            {
+                ref var koProjectile = ref KOProjectiles.AddAndGet();
+                koProjectile.Deserialize(reader);
+            }
+
             EnvironmentLayoutIndex = reader.GetByte();
             StageType = (StageType)reader.GetByte();
             StartPhaseInitialTick = reader.GetInt();
@@ -289,6 +306,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No swap field for id {swapFieldId}!");
         }
+
+        public ref TalentKOProjectileS2C GetKOProjectileById(ushort koProjectileId)
+        {
+            for (int i = 0; i < KOProjectiles.Count; i++)
+            {
+                if (KOProjectiles[i].Id == koProjectileId)
+                {
+                    return ref KOProjectiles.GetByIndex(i);
+                }
+            }
+
+            throw new System.Exception($"No ko projectile for id {koProjectileId}!");
+        }
         
         public bool TryGetTalentCardById(ushort cardId, out TalentCardS2C talentCard)
         {
@@ -342,6 +372,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 powerUp.SerializeTransforms(writer);
             }
+
+            var koProjectilesCount = KOProjectiles.Count;
+            writer.Put((byte)koProjectilesCount);
+            foreach (var koProjectile in KOProjectiles.AsSpan())
+            {
+                koProjectile.SerializeDelta(writer);
+            }
         }
 
         public void DeserializeTransforms(NetDataReader reader)
@@ -368,6 +405,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var powerUp = ref PowerUpBalls.AddAndGet();
                 powerUp.DeserializeTransforms(reader);
+            }
+
+            var koProjectilesCount = reader.GetByte();
+            KOProjectiles.Clear();
+            for (int i = 0; i < koProjectilesCount; i++)
+            {
+                ref var koProjectile = ref KOProjectiles.AddAndGet();
+                koProjectile.DeserializeDelta(reader);
             }
         }
         
@@ -424,7 +469,21 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 }
             }
 
-            throw new System.Exception($"No power up for id {swapFieldId}!");
+            throw new System.Exception($"No swap field for id {swapFieldId}!");
+        }
+
+        public void RemoveKOProjectileById(ushort koProjectileId)
+        {
+            for (int i = 0; i < KOProjectiles.Count; i++)
+            {
+                if (KOProjectiles[i].Id == koProjectileId)
+                {
+                    KOProjectiles.RemoveAt(i);
+                    return;
+                }
+            }
+
+            throw new System.Exception($"No ko projectile for id {koProjectileId}!");
         }
 
         public  bool TryGetPlayerByName(string playerName, out PlayerStateS2C playerState)
