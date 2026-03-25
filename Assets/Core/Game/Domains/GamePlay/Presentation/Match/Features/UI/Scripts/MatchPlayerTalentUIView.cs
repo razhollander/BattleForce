@@ -1,5 +1,3 @@
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using CoreDomain.Scripts.Services.Logger.Base;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,12 +16,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private Vector3 _selectedScale = new Vector3(1.2f, 1.2f, 1.2f);
         [SerializeField] private Sprite _noneTalentSprite;
         [SerializeField] private CanvasGroup _canvasGroup;
+        [SerializeField] private MatchPlayerTalentStockUIView _stockView;
 
         public void SetNoneTalent()
         {
             _talentImage.sprite = _noneTalentSprite;
             _canvasGroup.alpha = 0.5f;
             _cooldownText.gameObject.SetActive(false);
+        }
+
+        public void SetAreEnabledStocks(bool areEnabled)
+        {
+            _stockView.gameObject.SetActive(areEnabled);
+        }
+
+        public void SetStocksAmount(int amount)
+        {
+            _stockView.SetStockAmount(amount);
         }
         
         public void SetIsSelected(bool isSelected)
@@ -38,6 +47,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _canvasGroup.alpha = 1f;
 
             UpdateCooldown(talentVisualData.MaxCooldown, talentVisualData.CooldownLeft, talentVisualData.IsOnCooldown);
+            var isStockable = talentVisualData.IsStockable;
+            SetAreEnabledStocks(isStockable);
+
+            if (isStockable)
+            {
+                SetStocksAmount(talentVisualData.StocksAmount);
+            }
         }
         
         public void UpdateCooldown(float maxCooldown, float cooldownLeft, bool isOnCooldown)

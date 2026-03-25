@@ -93,5 +93,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 talentView.SetIsSelected(selectedTalentIndex == i);
             }
         }
+
+        public void UpdateTalentStocks(int talentIndex, int stockAmount)
+        {
+            _talentViews[talentIndex].SetStocksAmount(stockAmount);
+        }
     }
 }

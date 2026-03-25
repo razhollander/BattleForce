@@ -62,10 +62,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             for (int i = 0; i < talents.Count; i++)
             {
-                var maxCooldown = talents[i].MaxCooldown;
-                var isOnCooldown = talents[i].IsOnCooldown();
-                var cooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talents[i].CooldownEndTick, _networkConfig.DeltaTime) : maxCooldown;
+                var talentState = talents[i];
+                var maxCooldown = talentState.MaxCooldown;
+                var isOnCooldown = talentState.IsOnCooldown();
+                var cooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.CooldownEndTick, _networkConfig.DeltaTime) : maxCooldown;
                 _view.UpdateTalentCooldown(i, maxCooldown, cooldownLeft, isOnCooldown);
+
+                if (talentState.IsStockable)
+                {
+                    _view.UpdateTalentStocks(i, talentState.CurrentStocksAmount);
+                }
             }
         }
         
@@ -88,6 +94,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 var maxCooldown = talentState.MaxCooldown;
                 talentVisualData.CooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.CooldownEndTick, _networkConfig.DeltaTime) : maxCooldown;
                 talentVisualData.MaxCooldown = maxCooldown;
+                talentVisualData.IsStockable = talentState.IsStockable;
+                talentVisualData.StocksAmount = talentState.CurrentStocksAmount;
                 talentsVisualData[i] = talentVisualData;
             }
 
@@ -101,5 +109,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         public float MaxCooldown;
         public float CooldownLeft;
         public bool IsOnCooldown;
+        public int StocksAmount;
+        public bool IsStockable;
     }
 }

@@ -1151,13 +1151,14 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
             }
         }
         
-        public void AddPerformDashPulseNetEvent(int onTick, ushort casterPlayerId)
+        public void AddPerformDashPulseNetEvent(int onTick, ushort casterPlayerId, int remainingDashPulseStocksAmount)
         {
             foreach (var kvp in PerformDashPulseNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.CasterPlayerId = casterPlayerId;
+                packet.RemainingDashPulseStocksAmount = remainingDashPulseStocksAmount;
             }
         }
 

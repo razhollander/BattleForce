@@ -54,13 +54,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             bool wasAtMaxStocks = dashPulseTalentModel.CurrentStocksAmount == dashPulseTalentModel.MaxStocksAmount;
 
-            dashPulseTalentModel.CurrentStocksAmount--;
+            var remainingStocksAmount = --dashPulseTalentModel.CurrentStocksAmount;
 
             var direction = casterPlayerState.Spaceship.Transform.Direction;
             var pushForce = direction * _gamePlayConfig.Talents.PulseDashConfig.DashVelocity;
             casterPlayerState.Spaceship.Transform.Velocity += pushForce;
 
-            _netEventsDataService.AddPerformDashPulseNetEvent(tick, _casterPlayerId);
+            _netEventsDataService.AddPerformDashPulseNetEvent(tick, _casterPlayerId, remainingStocksAmount);
 
             if (wasAtMaxStocks)
             {

@@ -402,6 +402,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in performDashPulseNetEvents)
             {
+                var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
+                var talents = casterPlayer.Spaceship.TalentsState.Talents;
+                for (int i = 0; i < talents.Count; i++)
+                {
+                    ref var talent = ref talents.Get(i);
+                    if (talent.TalentType == TalentType.DashPulse)
+                    {
+                        talent.CurrentStocksAmount = netEvent.RemainingDashPulseStocksAmount;
+                        break;
+                    }
+                }
+                
                 _cachedPresentationEventsService.PerformDashPulseNetEvents.Add(netEvent);
             }
         }
