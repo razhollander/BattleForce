@@ -27,22 +27,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _cooldownText.gameObject.SetActive(false);
         }
 
-        public void SetAreEnabledStocks(bool areEnabled)
-        {
-            _stockView.gameObject.SetActive(areEnabled);
-        }
-
         public void SetStocksAmount(int amount)
         {
             _stockView.SetStockAmount(amount);
         }
-        
+
         public void SetIsSelected(bool isSelected)
         {
             _background.sprite = isSelected ? _selectedBackground : _normalBackground;
             _talentImage.transform.localScale = isSelected ? _selectedScale : _normalScale;
         }
-        
+
         public void SetTalent(TalentVisualData talentVisualData)
         {
             _talentImage.sprite = talentVisualData.Icon;
@@ -57,7 +52,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 SetStocksAmount(talentVisualData.StocksAmount);
             }
         }
-        
+
+        private void SetAreEnabledStocks(bool areEnabled)
+        {
+            _stockView.gameObject.SetActive(areEnabled);
+        }
+
         public void UpdateCooldown(float maxCooldown, float cooldownLeft, bool isOnCooldown)
         {
             if (cooldownLeft > 0)

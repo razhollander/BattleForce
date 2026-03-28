@@ -22,16 +22,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
         
-        public void InitEnvironmentLayout(int environmentLayoutIndex)
+        public void InitEnvironmentLayout(int environmentLayoutId)
         {
-            WallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetWalls();
-            LavaWallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetLavaWalls();
-            TalentCards = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetTalentCards();
-            EnvironmentSprings = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentSprings();
-            TeleportGates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetTeleportGates();
-            RotatingWheels = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetRotatingWheels();
-            EnvironmentHalfSize = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetEnvironmentHalfSize();
-            FieldBarrierConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutIndex).GetFieldBarriers();
+            WallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetWalls();
+            LavaWallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetLavaWalls();
+            TalentCards = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetTalentCards();
+            EnvironmentSprings = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetEnvironmentSprings();
+            TeleportGates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetTeleportGates();
+            RotatingWheels = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetRotatingWheels();
+            EnvironmentHalfSize = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetEnvironmentHalfSize();
+            FieldBarrierConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetFieldBarriers();
         }
     }
 }

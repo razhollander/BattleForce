@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using Core.Scripts.Extensions;
-using Core.Scripts.Utils;
 using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 

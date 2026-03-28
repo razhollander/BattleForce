@@ -47,10 +47,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly UpdateKOProjectilesTransformCommand _updateKOProjectilesTransformCommand;
         private readonly HandlePerformDashPulseNetEventsCommand _handlePerformDashPulseNetEventsCommand;
         private readonly HandleUpdatePlayerTalentStocksNetEventsCommand _handleUpdatePlayerTalentStocksNetEventsCommand;
-        private readonly IDashPulseGustEffectController _dashPulseGustEffectController;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler, IDashPulseGustEffectController dashPulseGustEffectController)
+            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
@@ -58,7 +57,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _powerUpBallControllers = powerUpBallControllers;
             _matchPlayerUIControllers = matchPlayerUIControllers;
             _fullTickPacketsHandler = fullTickPacketsHandler;
-            _dashPulseGustEffectController = dashPulseGustEffectController;
             _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
             _handlePlayerTakeDamangeNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerTakeDamangeNetEventsCommand>();
             _handlePlayerDiedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerDiedNetEventsCommand>();
@@ -89,7 +87,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         
         public void InitEntryPoint()
         {
-            _dashPulseGustEffectController.InitEntryPoint();
             _updateSubscriptionService.RegisterUpdatable(this);
         }
         

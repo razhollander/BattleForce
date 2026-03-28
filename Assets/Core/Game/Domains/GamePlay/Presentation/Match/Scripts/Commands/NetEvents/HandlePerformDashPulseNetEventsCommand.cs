@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
+using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Core.Scripts.Extensions;
 
@@ -22,21 +22,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            if (_cachedPresentationEventsService.PerformDashPulseNetEvents.Count == 0)
+            if (_cachedPresentationEventsService.PerformDashPulseNetEvents.IsNullOrEmpty())
             {
                 return;
             }
 
             foreach (var evt in _cachedPresentationEventsService.PerformDashPulseNetEvents)
             {
-                var casterPlayer = _matchDataService.GetPlayer(evt.CasterPlayerId);
-                var position = casterPlayer.Spaceship.Transform.Position.ToUnityVector2();
-                var direction = casterPlayer.Spaceship.Transform.Direction.ToUnityVector2();
-
-                _dashPulseGustEffectController.PlayEffect(position, direction);
+                PlayDashPulseEffectForPlayer(evt.CasterPlayerId);
             }
 
             _cachedPresentationEventsService.PerformDashPulseNetEvents.Clear();
+        }
+
+        private void PlayDashPulseEffectForPlayer(ushort playerId)
+        {
+            var casterPlayer = _matchDataService.GetPlayer(playerId);
+            var position = casterPlayer.Spaceship.Transform.Position.ToUnityVector2();
+            var direction = casterPlayer.Spaceship.Transform.Direction.ToUnityVector2();
+
+            _dashPulseGustEffectController.PlayEffect(position, direction);
         }
     }
 }

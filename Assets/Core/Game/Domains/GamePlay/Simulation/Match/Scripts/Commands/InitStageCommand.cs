@@ -55,9 +55,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void CreateEnvironmentLayout()
         {
-            var environmentLayoutIndex = _gamePlayConfig.ChosenEnvironmentIndex;
-            _matchDataService.SimulationState.EnvironmentLayoutIndex = environmentLayoutIndex;
-            _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutIndex);
+            var environmentLayoutId = GenerateNextStageEnvironmentLayoutId();
+            _matchDataService.SimulationState.EnvironmentLayoutId = environmentLayoutId;
+            _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutId);
             
             CreateWalls();
             CreateLavaWalls();
@@ -66,6 +66,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateTeleportGates();
             CreateRotatingWheels();
             CreateFieldBarriers();
+        }
+        
+        private int GenerateNextStageEnvironmentLayoutId()
+        {
+            var environmentLayoutId = _gamePlayConfig.DeafultEnvironmentIndex;
+            if (_gamePlayConfig.ShouldChooseRandomStage)
+            {
+                environmentLayoutId = GenerateRandomStageIndex();
+            }
+
+            return environmentLayoutId;
+        }
+
+        private int GenerateRandomStageIndex()
+        {
+            if (_matchDataService.UnsusedStageIndexes.IsNullOrEmpty())
+            {
+                foreach (int index in _sharedGamePlayConfig.Environment.AvailableLayoutIndexes)
+                {
+                    _matchDataService.UnsusedStageIndexes.Add(index);
+                }
+            }
+                
+            var randomIndex = RNG.NextInt(0, _matchDataService.UnsusedStageIndexes.Count);
+            var environmentLayoutId = _matchDataService.UnsusedStageIndexes[randomIndex];
+            _matchDataService.UnsusedStageIndexes.RemoveAt(randomIndex);
+
+            return environmentLayoutId;
         }
 
         private void ClearStageData()
