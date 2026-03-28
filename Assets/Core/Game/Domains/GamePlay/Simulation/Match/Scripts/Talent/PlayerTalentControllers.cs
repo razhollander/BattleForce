@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -20,11 +21,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private ushort _casterPlayerId;
 
         public PlayerTalentControllers(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, IOverrideableNetEventsService overrideableNetEventsService)
         {
             _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
             _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
-            _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, matchDataService, gamePlayConfig);
+            _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig);
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -68,14 +69,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             GetTalentByType(talentType).ProcessTalentInput(isTalentInputPressed, tick, deltaTime);
         }
         
-        public void OnTick(int tick)
+        public void OnTick(int tick, float deltaTime)
         {
-            _swapTalentController?.OnTick(tick);
-            _koTalentController?.OnTick(tick);
-            HammerTalentController?.OnTick(tick);
-            BombTalentController?.OnTick(tick);
-            SentryGunTalentController?.OnTick(tick);
-            _dashPulseTalentController?.OnTick(tick);
+            _swapTalentController?.OnTick(tick, deltaTime);
+            _koTalentController?.OnTick(tick, deltaTime);
+            HammerTalentController?.OnTick(tick, deltaTime);
+            BombTalentController?.OnTick(tick, deltaTime);
+            SentryGunTalentController?.OnTick(tick, deltaTime);
+            _dashPulseTalentController?.OnTick(tick, deltaTime);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)

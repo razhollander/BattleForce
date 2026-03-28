@@ -17,7 +17,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ICommandFactory _commandFactory;
         private StepAllWheelsRotationCommand _stepAllWheelsRotationCommand;
         private EnforceFieldBarriersCommand _enforceFieldBarriersCommand;
-        private IStageDataService _stageDataService;
 
         private float _deltaTime;
         private int _tick;
@@ -46,7 +45,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _stepAllWheelsRotationCommand = _commandFactory.CreateCommandVoid<StepAllWheelsRotationCommand>();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
             _enforceFieldBarriersCommand = _commandFactory.CreateCommandVoid<EnforceFieldBarriersCommand>();
-            _stageDataService = _diContainer.Resolve<IStageDataService>();
         }
 
         public void Execute()

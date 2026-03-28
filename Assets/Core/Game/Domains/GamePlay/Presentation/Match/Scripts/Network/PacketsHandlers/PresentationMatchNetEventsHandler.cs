@@ -332,7 +332,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     ref var talent = ref talents.Get(i);
                     if (talent.TalentType == TalentType.Swap)
                     {
-                        talent.CooldownEndTick = netEvent.TalentCooldownEndTick;
+                        talent.NormalCooldown.CooldownEndTick = netEvent.TalentCooldownEndTick;
                         break;
                     }
                 }
@@ -384,7 +384,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     ref var talent = ref talents.Get(i);
                     if (talent.TalentType == TalentType.KO)
                     {
-                        talent.CooldownEndTick = netEvent.TalentCooldownEndTick;
+                        talent.NormalCooldown.CooldownEndTick = netEvent.TalentCooldownEndTick;
                         break;
                     }
                 }
@@ -402,43 +402,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in performDashPulseNetEvents)
             {
-                var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
-                var talents = casterPlayer.Spaceship.TalentsState.Talents;
-                for (int i = 0; i < talents.Count; i++)
-                {
-                    ref var talent = ref talents.Get(i);
-                    if (talent.TalentType == TalentType.DashPulse)
-                    {
-                        talent.CurrentStocksAmount = netEvent.RemainingDashPulseStocksAmount;
-                        break;
-                    }
-                }
-                
                 _cachedPresentationEventsService.PerformDashPulseNetEvents.Add(netEvent);
             }
         }
 
-        public void ProcessDeactivateDashPulseTalentEvents(CapacityList<DeactivateDashPulseTalentNetEventS2C> deactivateDashPulseTalentNetEvents)
+        public void ProcessUpdatePlayerTalentStocksEvents(CapacityList<UpdatePlayerTalentStocksNetEventS2C> updatePlayerTalentStocksEvents)
         {
-            if (deactivateDashPulseTalentNetEvents.IsNullOrEmpty())
+            if (updatePlayerTalentStocksEvents.IsNullOrEmpty())
             {
                 return;
             }
-
-            foreach (var netEvent in deactivateDashPulseTalentNetEvents)
+            
+            var didFoundPlayerWithTalent = false;
+            foreach (var netEvent in updatePlayerTalentStocksEvents)
             {
                 var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
                 var talents = casterPlayer.Spaceship.TalentsState.Talents;
                 for (int i = 0; i < talents.Count; i++)
                 {
                     ref var talent = ref talents.Get(i);
-                    if (talent.TalentType == TalentType.DashPulse)
+                    if (talent.TalentType == netEvent.TalentType)
                     {
-                        talent.CooldownEndTick = netEvent.TalentCooldownEndTick;
+                        talent.StocksCooldown.CurrentStocksAmount = netEvent.CurrentStocksAmount;
+                        talent.StocksCooldown.RecieveNextStockOnTick = netEvent.RecieveNextStockOnTick;
+                        didFoundPlayerWithTalent = true;
                         break;
                     }
                 }
-                _cachedPresentationEventsService.DeactivateDashPulseTalentNetEvents.Add(netEvent);
+
+                if (didFoundPlayerWithTalent)
+                {
+                    _cachedPresentationEventsService.UpdatePlayerTalentStocksNetEvents.Add(netEvent);
+                }
+                else
+                {
+                    LogService.LogError($"Player with id {netEvent.CasterPlayerId} does not have talent {netEvent.TalentType}!");
+                }
             }
         }
     }

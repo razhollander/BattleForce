@@ -188,8 +188,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _text: {fileID: 1834258444832423009}
   _backgroundImage: {fileID: 769986991455381140}
-  _backgroundZeroStockColor: {r: 1, g: 0.5330188, b: 0.5330188, a: 1}
-  _backgroundDefaultColor: {r: 0.5424528, g: 1, b: 0.7430868, a: 1}
+  _backgroundZeroStockColor: {r: 0.6698113, g: 0, b: 0, a: 1}
+  _backgroundDefaultColor: {r: 0, g: 0.3490566, b: 0.15215285, a: 1}
 --- !u!1 &2587746393044768763
 GameObject:
   m_ObjectHideFlags: 0
@@ -607,7 +607,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldownOverlay: {fileID: 3560648826604916476}
   _cooldownText: {fileID: 533526369696567285}
-  _background: {fileID: 769986991455381140}
+  _background: {fileID: 8394410604637020736}
   _normalBackground: {fileID: 21300000, guid: 35fad018f993a4e0caed572bdfec3960, type: 3}
   _selectedBackground: {fileID: 21300000, guid: 6afdb934779e848b9971db4c3c58a5bf, type: 3}
   _talentImage: {fileID: 3772769616346268760}

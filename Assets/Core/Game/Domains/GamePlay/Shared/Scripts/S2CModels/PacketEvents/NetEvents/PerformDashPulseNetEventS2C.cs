@@ -7,27 +7,23 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
     {
         public int OccuredOnTick;
         public ushort CasterPlayerId;
-        public int RemainingDashPulseStocksAmount;
 
-        public PerformDashPulseNetEventS2C(int occuredOnTick, ushort casterPlayerId, int remainingDashPulseStocksAmount)
+        public PerformDashPulseNetEventS2C(int occuredOnTick, ushort casterPlayerId)
         {
             OccuredOnTick = occuredOnTick;
             CasterPlayerId = casterPlayerId;
-            RemainingDashPulseStocksAmount = remainingDashPulseStocksAmount;
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)CasterPlayerId);
-            writer.Put((byte)RemainingDashPulseStocksAmount);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
             CasterPlayerId = reader.GetByte();
-            RemainingDashPulseStocksAmount = reader.GetByte();
         }
 
         public int CompareTo(PerformDashPulseNetEventS2C other)

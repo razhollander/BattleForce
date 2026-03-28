@@ -13,15 +13,11 @@ MonoBehaviour:
   m_Name: TalentsConfig
   m_EditorClassIdentifier: 
   TalentCardHealth: 2
-  CooldownPerTalentType:
-    m_keys: 010000000200000003000000040000000500000006000000
-    m_values:
-    - 1
-    - 1
-    - 1
-    - 1
-    - 1
-    - 1
+  TalentsCooldownsConfigs:
+    TalentCooldownConfigs:
+    - rid: 8506109566889754721
+    - rid: 8506109566889754722
+    - rid: 8506109566889754723
   HammerTalentConfig:
     HammerSpeed: 10
     HammerSize: 1
@@ -44,3 +40,22 @@ MonoBehaviour:
     MinSpin: 50
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
+  references:
+    version: 2
+    RefIds:
+    - rid: 8506109566889754721
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 1
+        CooldownInSeconds: 5
+    - rid: 8506109566889754722
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 6
+        CooldownInSeconds: 5
+    - rid: 8506109566889754723
+      type: {class: TalentStocksCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 5
+        MaxStocks: 3
+        SingleStockCooldownInSeconds: 2

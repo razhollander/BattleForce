@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
-    [CreateAssetMenu(fileName = "LavaConfig", menuName = "BF/Network/Lava Config")]
+    [CreateAssetMenu(fileName = "LavaConfig", menuName = "BF/Simulation/Lava Config")]
     public class LavaConfig : ScriptableObject
     {
         public ushort DamageAmount = 1;

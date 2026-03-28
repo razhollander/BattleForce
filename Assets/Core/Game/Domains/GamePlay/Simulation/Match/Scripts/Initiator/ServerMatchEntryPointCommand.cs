@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
@@ -129,6 +130,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown, isPlayerConnected);
                 _playersTalentsManager.AddPlayer(playerId);
                 _simulationInputService.AddPlayer(playerId);
+                _playersTalentsManager.TryAddTalentToPlayer(TalentType.Swap, playerId, 0, out _, out _);
+                _playersTalentsManager.TryAddTalentToPlayer(TalentType.KO, playerId, 0, out _, out _);
+                _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
             }
         }
     }

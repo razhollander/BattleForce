@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -18,13 +19,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly Dictionary<int, PlayerTalentControllers> _talentControllersPerPlayer;
         private readonly ConcurrentPool<PlayerTalentControllers> _talentControllersPool;
 
-        public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig, INetEventsDataService iNetEventsDataService, SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator)
+        public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig, INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator, IOverrideableNetEventsService overrideableNetEventsService)
         {
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _gamePlayConfig = gamePlayConfig;
             _talentControllersPerPlayer = new Dictionary<int, PlayerTalentControllers>(networkConfig.MaxCap.ConcurrentPlayers);
-            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(iNetEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig),networkConfig.MaxCap.ConcurrentPlayers);
+            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, overrideableNetEventsService),networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)
@@ -108,9 +109,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, isTalentInputPressed, tick, deltaTime);
         }
 
-        public void ProcessAllActiveTick(ushort playerId, int tick)
+        public void ProcessAllTalentsTick(ushort playerId, int tick, float deltaTime)
         {
-            _talentControllersPerPlayer[playerId].OnTick(tick);
+            _talentControllersPerPlayer[playerId].OnTick(tick, deltaTime);
         }
 
         public void CompleteSwapTalentWithEnemy(ushort casterId, ushort enemyPlayerId, int tick)
@@ -160,8 +161,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private TalentStateS2C AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)
         {
             ref var newTalent = ref playerState.Spaceship.TalentsState.Talents.AddAndGet();
-            var maxCooldown = _gamePlayConfig.Talents.CooldownPerTalentType[talentType];
-            newTalent.Setup(talentType, maxCooldown);
+            var cooldownConfig = _gamePlayConfig.Talents.TalentsCooldownsConfigs.TalentCooldownConfigs.Find(x => x.TalentType == talentType);
+
+            switch (cooldownConfig.CooldownType)
+            {
+                case TalentCooldownType.Normal:
+                    var normalCooldownConfig = (TalentNormalCooldownConfig) cooldownConfig;
+                    newTalent.SetupWithNormalCooldown(talentType, normalCooldownConfig.CooldownInSeconds);
+                    break;
+                case TalentCooldownType.Stocks:
+                    var stocksCooldownConfig = (TalentStocksCooldownConfig) cooldownConfig;
+                    newTalent.SetupWithStocksCooldown(talentType, stocksCooldownConfig.MaxStocks, stocksCooldownConfig.SingleStockCooldownInSeconds);
+                    break;
+            }
+            
             return newTalent;
         }
 
@@ -169,8 +182,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         {
             ref var currentSelectedTalent = ref playerState.Spaceship.TalentsState.Talents.Get(playerState.Spaceship.TalentsState.SelectedTalentIndex);
             _talentControllersPerPlayer[playerState.Id].StopTalentIfActive(currentSelectedTalent.TalentType, tick);
-            var maxCooldown = _gamePlayConfig.Talents.CooldownPerTalentType[talentType];
-            currentSelectedTalent.Setup(talentType, maxCooldown);
+            var cooldownConfig = _gamePlayConfig.Talents.TalentsCooldownsConfigs.TalentCooldownConfigs.Find(x => x.TalentType == talentType);
+
+            switch (cooldownConfig.CooldownType) // todo check if can use the switch from the method above
+            {
+                case TalentCooldownType.Normal:
+                    var normalCooldownConfig = (TalentNormalCooldownConfig) cooldownConfig;
+                    currentSelectedTalent.SetupWithNormalCooldown(talentType, normalCooldownConfig.CooldownInSeconds);
+                    break;
+                case TalentCooldownType.Stocks:
+                    var stocksCooldownConfig = (TalentStocksCooldownConfig) cooldownConfig;
+                    currentSelectedTalent.SetupWithStocksCooldown(talentType, stocksCooldownConfig.MaxStocks, stocksCooldownConfig.SingleStockCooldownInSeconds);
+                    break;
+            }            
+            
             return currentSelectedTalent;
         }
     }

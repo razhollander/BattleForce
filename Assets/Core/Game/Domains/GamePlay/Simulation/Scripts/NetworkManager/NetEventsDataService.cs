@@ -44,8 +44,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> KOProjectHitPlayerNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<DeactivateKOTalentNetEventS2C>> DeactivateKOTalentNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PerformDashPulseNetEventS2C>> PerformDashPulseNetEventsPerPlayer { get; }
-        public CapacityDict<ushort, FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C>> DeactivateDashPulseTalentNetEventsPerPlayer { get; }
-private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
+        public CapacityDict<ushort, FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>> UpdatePlayerTalentStocksNetEventsPerPlayer { get; }
+
+        private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>> _matchMakingPlayerJoinAcceptListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerTakeDamageNetEventS2C>> _playerTakeDamageListPool;
@@ -73,7 +74,7 @@ private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bul
         private readonly ConcurrentPool<FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> _koProjectHitPlayerNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateKOTalentNetEventS2C>> _deactivateKOTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PerformDashPulseNetEventS2C>> _performDashPulseNetEventsListPool;
-        private readonly ConcurrentPool<FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C>> _deactivateDashPulseTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>> _updatePlayerTalentStocksNetEventsListPool;
 public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
@@ -105,7 +106,7 @@ public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sh
             KOProjectHitPlayerNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(maxConcurrentPlayers);
             DeactivateKOTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(maxConcurrentPlayers);
             PerformDashPulseNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PerformDashPulseNetEventS2C>>(maxConcurrentPlayers);
-            DeactivateDashPulseTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C>>(maxConcurrentPlayers);
+            UpdatePlayerTalentStocksNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>>(maxConcurrentPlayers);
 _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -148,12 +149,11 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             _createSwapFieldNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateSwapFieldNetEventS2C>>(() => new FixedUnorderedList<CreateSwapFieldNetEventS2C>(networkConfig.MaxCap.CreateSwapFieldNetEvents), maxConcurrentPlayers);
             _deactivateSwapTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateSwapTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateSwapTalentNetEventS2C>(networkConfig.MaxCap.DestroySwapFieldNetEvents), maxConcurrentPlayers);
             _createKOProjectileNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateKOProjectileNetEventS2C>>(() => new FixedUnorderedList<CreateKOProjectileNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
-            _koProjectHitPlayerNetEventsListPool = new ConcurrentPool<FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(() => new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
-            _deactivateKOTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
-            _performDashPulseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformDashPulseNetEventS2C>>(() => new FixedUnorderedList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
-            _deactivateDashPulseTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
-}
-
+            _koProjectHitPlayerNetEventsListPool = new ConcurrentPool<FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(() => new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents), maxConcurrentPlayers);
+            _deactivateKOTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents), maxConcurrentPlayers);
+            _performDashPulseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformDashPulseNetEventS2C>>(() => new FixedUnorderedList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents), maxConcurrentPlayers);
+            _updatePlayerTalentStocksNetEventsListPool = new ConcurrentPool<FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>>(() => new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(networkConfig.MaxCap.UpdatePlayerTalentStocksNetEvent), maxConcurrentPlayers);
+        }
 
         public void StartSavingPlayerEvents(ushort playerId)
         {
@@ -379,11 +379,11 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             {
                 PerformDashPulseNetEventsPerPlayer.Add(playerId, _performDashPulseNetEventsListPool.Get());
             }
-            if (!DeactivateDashPulseTalentNetEventsPerPlayer.ContainsKey(playerId))
+            if (!UpdatePlayerTalentStocksNetEventsPerPlayer.ContainsKey(playerId))
             {
-                DeactivateDashPulseTalentNetEventsPerPlayer.Add(playerId, _deactivateDashPulseTalentNetEventsListPool.Get());
+                UpdatePlayerTalentStocksNetEventsPerPlayer.Add(playerId, _updatePlayerTalentStocksNetEventsListPool.Get());
             }
-}
+        }
         
         public void StopSavingPlayerEvents(ushort playerId)
         {
@@ -469,16 +469,18 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             _koProjectHitPlayerNetEventsListPool.Return(koProjectHitPlayerNetEventsList);
 
             var deactivateKOTalentNetEventsList = DeactivateKOTalentNetEventsPerPlayer[playerId];
-
-deactivateKOTalentNetEventsList.Clear();
+            deactivateKOTalentNetEventsList.Clear();
             _deactivateKOTalentNetEventsListPool.Return(deactivateKOTalentNetEventsList);
+            
             var performDashPulseNetEventsList = PerformDashPulseNetEventsPerPlayer[playerId];
             performDashPulseNetEventsList.Clear();
             _performDashPulseNetEventsListPool.Return(performDashPulseNetEventsList);
-            var deactivateDashPulseTalentNetEventsList = DeactivateDashPulseTalentNetEventsPerPlayer[playerId];
-            deactivateDashPulseTalentNetEventsList.Clear();
-            _deactivateDashPulseTalentNetEventsListPool.Return(deactivateDashPulseTalentNetEventsList);
-BulletSpawnNetEventsPerPlayer.Remove(playerId);
+            
+            var updatePlayerTalentStocksNetEventsList = UpdatePlayerTalentStocksNetEventsPerPlayer[playerId];
+            updatePlayerTalentStocksNetEventsList.Clear();
+            _updatePlayerTalentStocksNetEventsListPool.Return(updatePlayerTalentStocksNetEventsList);
+            
+            BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
             MatchMakingPlayerJoinAcceptNetEventsPerPlayer.Remove(playerId);
             PlayerTakeDamageNetEventsPerPlayer.Remove(playerId);
@@ -506,8 +508,8 @@ BulletSpawnNetEventsPerPlayer.Remove(playerId);
             KOProjectHitPlayerNetEventsPerPlayer.Remove(playerId);
             DeactivateKOTalentNetEventsPerPlayer.Remove(playerId);
             PerformDashPulseNetEventsPerPlayer.Remove(playerId);
-            DeactivateDashPulseTalentNetEventsPerPlayer.Remove(playerId);
-}
+            UpdatePlayerTalentStocksNetEventsPerPlayer.Remove(playerId);
+        }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
         {
@@ -959,17 +961,17 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                     }
                 }
             }
-            if (DeactivateDashPulseTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivateDashPulseTalentNetEvents))
+            if (UpdatePlayerTalentStocksNetEventsPerPlayer.TryGetValue(playerId, out var updatePlayerTalentsStocksNetEvnets))
             {
-                for (int i = deactivateDashPulseTalentNetEvents.Count - 1; i >= 0; i--)
+                for (int i = updatePlayerTalentsStocksNetEvnets.Count - 1; i >= 0; i--)
                 {
-                    if (deactivateDashPulseTalentNetEvents[i].OccuredOnTick < tick)
+                    if (updatePlayerTalentsStocksNetEvnets[i].OccuredOnTick < tick)
                     {
-                        deactivateDashPulseTalentNetEvents.RemoveAt(i);
+                        updatePlayerTalentsStocksNetEvnets.RemoveAt(i);
                     }
                 }
             }
-}
+        }
 
         public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
         {
@@ -1151,25 +1153,26 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
             }
         }
         
-        public void AddPerformDashPulseNetEvent(int onTick, ushort casterPlayerId, int remainingDashPulseStocksAmount)
+        public void AddPerformDashPulseNetEvent(int onTick, ushort casterPlayerId)
         {
             foreach (var kvp in PerformDashPulseNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.CasterPlayerId = casterPlayerId;
-                packet.RemainingDashPulseStocksAmount = remainingDashPulseStocksAmount;
             }
         }
 
-        public void AddDeactivateDashPulseTalentNetEvent(int onTick, ushort casterPlayerId, int cooldownEndTick)
+        public void AddUpdatePlayerTalentStocksNetEventS2C(int onTick, ushort casterPlayerId, TalentType talentType, int currentStocksAmount, int recieveNextStockOnTick)
         {
-            foreach (var kvp in DeactivateDashPulseTalentNetEventsPerPlayer)
+            foreach (var kvp in UpdatePlayerTalentStocksNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.CasterPlayerId = casterPlayerId;
-                packet.TalentCooldownEndTick = cooldownEndTick;
+                packet.TalentType = talentType;
+                packet.CurrentStocksAmount = currentStocksAmount;
+                packet.RecieveNextStockOnTick = recieveNextStockOnTick;
             }
         }
     }

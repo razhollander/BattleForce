@@ -79,7 +79,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             DeactivateTalent(tick);
         }
 
-        public void OnTick(int tick)
+        public void OnTick(int tick, float deltaTime)
         {
             if (!IsCurrentlyActive)
             {
@@ -109,7 +109,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
             else
             {
-                var elapsedSeconds = (tick - projectile.CreatedOnTick) * _networkConfig.DeltaTime;
+                var elapsedSeconds = (tick - projectile.CreatedOnTick) * deltaTime;
                 if (elapsedSeconds >= koConfig.MaxFirstPhaseDuration)
                 {
                     StartReturnPhase();
@@ -170,8 +170,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
             ref var koTalentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
 
-            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, koTalentModel.MaxCooldown, _networkConfig.DeltaTime);
-            koTalentModel.CooldownEndTick = cooldownEndTick;
+            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, koTalentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+            koTalentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _physicsSimulator.RemoveKOProjectile(_projectileId);
             _matchDataService.SimulationState.RemoveKOProjectileById(_projectileId);

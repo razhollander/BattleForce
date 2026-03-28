@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents;
         public FixedUnorderedList<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents;
         public FixedUnorderedList<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents;
-        public FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C> DeactivateDashPulseTalentNetEvents;
+        public FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
 
         public MatchFullTickPacketS2C()
@@ -68,11 +68,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             KOProjectHitPlayerNetEvents = new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(maxCap.KOProjectHitPlayerNetEvents);
             CreateKOProjectileNetEvents = new FixedUnorderedList<CreateKOProjectileNetEventS2C>(maxCap.CreateKOProjectileNetEvents);
             DeactivateKOTalentNetEvents = new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
-            PerformDashPulseNetEvents = new FixedUnorderedList<PerformDashPulseNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
-            DeactivateDashPulseTalentNetEvents = new FixedUnorderedList<DeactivateDashPulseTalentNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
+            PerformDashPulseNetEvents = new FixedUnorderedList<PerformDashPulseNetEventS2C>(maxCap.PerformDashPulseNetEvents);
+            UpdatePlayerTalentStocksNetEvents = new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(maxCap.UpdatePlayerTalentStocksNetEvents);
         }
-
-
+        
         // public FullTickPacket(int tick, SimulationStateS2C previousSimulationState,
         //     SimulationStateS2C currentSimulationState, List<BulletSpawnNetEventS2C> bulletSpawnNetEvents,
         //     List<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, List<PlayerTakeDamageNetEventS2C> playerTakeDamageNetEvents,
@@ -113,7 +112,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedKOProjectHitPlayerNetEvents(writer);
             SerializedDeactivateKOTalentNetEvents(writer);
             SerializedPerformDashPulseNetEvents(writer);
-            SerializedDeactivateDashPulseTalentNetEvents(writer);
+            SerializedUpdatePlayerTalentStocksNetEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
         }
 
@@ -296,7 +295,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedKOProjectHitPlayerNetEvents(reader);
             DeserializedDeactivateKOTalentNetEvents(reader);
             DeserializedPerformDashPulseNetEvents(reader);
-            DeserializedDeactivateDashPulseTalentNetEvents(reader);
+            DeserializedUpdatePlayerTalentStocksNetEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
         }
 
@@ -607,22 +606,22 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
-        private void SerializedDeactivateDashPulseTalentNetEvents(NetDataWriter writer)
+        private void SerializedUpdatePlayerTalentStocksNetEvents(NetDataWriter writer)
         {
-            writer.Put((byte)DeactivateDashPulseTalentNetEvents.Count);
-            foreach (var evt in DeactivateDashPulseTalentNetEvents.AsSpan())
+            writer.Put((byte)UpdatePlayerTalentStocksNetEvents.Count);
+            foreach (var evt in UpdatePlayerTalentStocksNetEvents.AsSpan())
             {
                 evt.Serialize(writer);
             }
         }
 
-        private void DeserializedDeactivateDashPulseTalentNetEvents(NetDataReader reader)
+        private void DeserializedUpdatePlayerTalentStocksNetEvents(NetDataReader reader)
         {
             var count = reader.GetByte();
-            DeactivateDashPulseTalentNetEvents.Clear();
+            UpdatePlayerTalentStocksNetEvents.Clear();
             for (int i = 0; i < count; i++)
             {
-                ref var evt = ref DeactivateDashPulseTalentNetEvents.AddAndGet();
+                ref var evt = ref UpdatePlayerTalentStocksNetEvents.AddAndGet();
                 evt.Deserialize(reader);
             }
         }

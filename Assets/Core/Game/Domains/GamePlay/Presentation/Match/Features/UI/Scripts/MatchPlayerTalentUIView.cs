@@ -58,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         
         public void UpdateCooldown(float maxCooldown, float cooldownLeft, bool isOnCooldown)
         {
-            if (isOnCooldown)
+            if (cooldownLeft > 0)
             {
                 var progress = cooldownLeft / maxCooldown;
                 _cooldownOverlay.enabled = true;
@@ -73,6 +73,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 _cooldownOverlay.fillAmount = 0;
                 _cooldownText.gameObject.SetActive(false);
             }        
+            
+            _cooldownOverlay.color = isOnCooldown ? Color.black : Color.white;
         }
     }
 }

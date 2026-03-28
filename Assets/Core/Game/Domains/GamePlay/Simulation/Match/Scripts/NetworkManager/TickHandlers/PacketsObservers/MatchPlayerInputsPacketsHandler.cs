@@ -171,15 +171,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 return;
             }
-            
-            _playersTalentsManager.ProcessAllActiveTick(playerState.Id, processedTick);
+
+            var playerId = playerState.Id;
+            _playersTalentsManager.ProcessAllTalentsTick(playerId, processedTick, deltaTime);
 
             if (currentSelectedTalent.IsOnCooldown())
             {
                 return;
             }
 
-            _playersTalentsManager.ProcessPlayerTalentInput(playerState.Id, currentSelectedTalent.TalentType, processedTick, isTalentInputPressed, deltaTime);
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentInput, isTalentInputPressed);
+
+            var wasTalentInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.TalentInput);
+            LogService.LogError($"wasTalentInputDownThisTick {wasTalentInputDownThisTick}");
+            _playersTalentsManager.ProcessPlayerTalentInput(playerId, currentSelectedTalent.TalentType, processedTick, wasTalentInputDownThisTick, deltaTime);
         }
 
         private CapacityDict<ushort, int> GetHeighestProcessedTickFromServerPerPlayer()
@@ -248,7 +253,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, PlayerStateS2C playerModel)
         {
             var shootState = playerModel.Spaceship.Shoot;
-            var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
+            var playerId = playerModel.Id;
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, isShootInputPressed);
+            var wasTalentInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
+            var shouldShoot = wasTalentInputDownThisTick && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
             if (shouldShoot)
             {
                 shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;

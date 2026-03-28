@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using Core.Scripts.Utils.CustomCollections;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -33,12 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
                 return;
             }
 
-            switch (inputType)
-            {
-                case PlayerInputType.SwitchTalent:
-                    inputStates.SwitchTalent.Update(isPressed);
-                    break;
-            }
+            inputStates.InputStates[inputType].Update(isPressed);
         }
 
         public bool WasInputDownThisTick(ushort playerId, PlayerInputType inputType)
@@ -49,13 +44,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
                 return false;
             }
 
-            switch (inputType)
-            {
-                case PlayerInputType.SwitchTalent:
-                    return inputStates.SwitchTalent.WasDownThisTick;
-                default:
-                    return false;
-            }
+            return inputStates.InputStates[inputType].WasDownThisTick;
         }
 
         public bool WasInputReleasedThisTick(ushort playerId, PlayerInputType inputType)
@@ -66,13 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
                 return false;
             }
 
-            switch (inputType)
-            {
-                case PlayerInputType.SwitchTalent:
-                    return inputStates.SwitchTalent.WasReleasedThisTick;
-                default:
-                    return false;
-            }
+            return inputStates.InputStates[inputType].WasReleasedThisTick;
         }
 
         public bool IsInputPressed(ushort playerId, PlayerInputType inputType)
@@ -83,21 +66,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
                 return false;
             }
 
-            switch (inputType)
-            {
-                case PlayerInputType.SwitchTalent:
-                    return inputStates.SwitchTalent.IsPressed;
-                default:
-                    return false;
-            }
+            return inputStates.InputStates[inputType].IsPressed;
         }
 
         private class PlayerInputStates
         {
-            public TickInputState SwitchTalent = new TickInputState();
+            public Dictionary<PlayerInputType, TickInputState> InputStates = new Dictionary<PlayerInputType, TickInputState>
+            {
+                {PlayerInputType.SwitchTalent, new TickInputState()},
+                {PlayerInputType.TalentInput, new TickInputState()},
+                {PlayerInputType.Shoot, new TickInputState()}
+            };
         }
 
-        private struct TickInputState
+        private class TickInputState
         {
             public bool IsPressed;
             public bool WasDownThisTick;

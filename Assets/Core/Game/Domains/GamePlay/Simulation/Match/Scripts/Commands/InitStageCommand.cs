@@ -134,7 +134,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 for (var k = 0; k < talentsCount; k++)
                 {
                     ref var talentState = ref player.Spaceship.TalentsState.Talents.Get(k);
-                    talentState.ResetCooldownEndTick();
+                    talentState.ClearCooldown();
                 }
                 
                 _physicsSimulator.AddPlayer(player.Id, player.TeamId, position, velocity, radius);

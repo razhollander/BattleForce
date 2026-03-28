@@ -9,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         bool IsCurrentlyActive { get; }
         void ProcessTalentInput(bool isTalentInputPressed, int tick, float deltaTime);
         void StopIfActive(int tick);
-        void OnTick(int tick);
+        void OnTick(int tick,  float deltaTime);
         void ResetData();
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
-    [CreateAssetMenu(fileName = "SimulationGamePlayConfig", menuName = "BF/Network/GamePlay Config")]
+    [CreateAssetMenu(fileName = "SimulationGamePlayConfig", menuName = "BF/Simulation/GamePlay Config")]
     public class SimulationGamePlayConfig : ScriptableObject
     {
         [EditableRef] public PlayerSpaceshipConfig PlayerSpaceship;

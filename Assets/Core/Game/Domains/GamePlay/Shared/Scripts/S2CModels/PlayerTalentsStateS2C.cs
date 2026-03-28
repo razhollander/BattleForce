@@ -117,62 +117,125 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
     public struct TalentStateS2C
     {
-        private const int NO_COOLDOWN_TICK = 0;
         public TalentType TalentType;
-        public int CooldownEndTick;
-        public float MaxCooldown;
-        public bool IsStockable;
-        public int CurrentStocksAmount;
-        public int MaxStocksAmount;
-        public int ReceiveStockOnTick;
-        public bool IsOnCooldown() => CooldownEndTick > NO_COOLDOWN_TICK;
-        public void ResetCooldownEndTick() => CooldownEndTick = NO_COOLDOWN_TICK;
-        public TalentStateS2C(TalentType talentType, float maxCooldown)
-        {
-            TalentType = talentType;
-            MaxCooldown = maxCooldown;
-            CooldownEndTick = 0;
-            IsStockable = talentType == TalentType.DashPulse;
-            MaxStocksAmount = IsStockable ? 3 : 0;
-            CurrentStocksAmount = MaxStocksAmount;
-            ReceiveStockOnTick = 0;
-        }
+        public TalentCooldownType CooldownType;
+        public TalentNormalCooldownStateS2C NormalCooldown;
+        public TalentStocksCooldownStateS2C StocksCooldown;
 
-        public void Setup(TalentType talentType, float maxCooldown)
+        public bool IsOnCooldown() => 
+            CooldownType == TalentCooldownType.Normal
+                ? NormalCooldown.IsOnCooldown()
+                : StocksCooldown.IsOnCooldown();
+        // public void ResetCooldownEndTick() => CooldownEndTick = NO_COOLDOWN_TICK;
+
+        public void SetupWithNormalCooldown(TalentType talentType, float maxCooldown)
         {
             TalentType = talentType;
-            MaxCooldown = maxCooldown;
-            IsStockable = talentType == TalentType.DashPulse;
-            MaxStocksAmount = IsStockable ? 3 : 0;
-            CurrentStocksAmount = MaxStocksAmount;
-            ReceiveStockOnTick = 0;
-            CooldownEndTick = 0;
+            CooldownType = TalentCooldownType.Normal;
+            NormalCooldown.MaxCooldown = maxCooldown;
+            NormalCooldown.CooldownEndTick = 0;
+            StocksCooldown = default;
+        }
+        
+        public void SetupWithStocksCooldown(TalentType talentType, int maxStocksAmount, float singleStockCooldown)
+        {
+            TalentType = talentType;
+            CooldownType = TalentCooldownType.Stocks;
+            StocksCooldown.MaxStocksAmount = maxStocksAmount;
+            StocksCooldown.CurrentStocksAmount = maxStocksAmount;
+            StocksCooldown.MaxSingleStockCooldown = singleStockCooldown;
+            StocksCooldown.RecieveNextStockOnTick = 0;
+            NormalCooldown = default;
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)TalentType);
-            writer.Put(CooldownEndTick);
-            writer.PutFloat16(MaxCooldown);
-            writer.Put(IsStockable);
-            writer.Put((byte)CurrentStocksAmount);
-            writer.Put((byte)MaxStocksAmount);
-            writer.Put(ReceiveStockOnTick);
+            writer.Put((byte)CooldownType);
+
+            switch (CooldownType)
+            {
+                case TalentCooldownType.Stocks: StocksCooldown.Serialize(writer); break;
+                case TalentCooldownType.Normal: NormalCooldown.Serialize(writer); break;
+            }
         }
 
         public void Deserialize(NetDataReader reader)
         {
             TalentType = (TalentType)reader.GetByte();
-            CooldownEndTick = reader.GetInt();
-            MaxCooldown = reader.GetFloat16();
-            IsStockable = reader.GetBool();
-            CurrentStocksAmount = reader.GetByte();
-            MaxStocksAmount = reader.GetByte();
-            ReceiveStockOnTick = reader.GetInt();
+            CooldownType = (TalentCooldownType)reader.GetByte();
+            switch (CooldownType)
+            {
+                case TalentCooldownType.Stocks: StocksCooldown.Deserialize(reader); break;
+                case TalentCooldownType.Normal: NormalCooldown.Deserialize(reader); break;
+            }
         }
 
+        public void ClearCooldown()
+        {
+            switch (CooldownType)
+            {
+                case TalentCooldownType.Stocks: StocksCooldown.ClearCooldown(); break;
+                case TalentCooldownType.Normal: NormalCooldown.ClearCooldown(); break;
+            }
+        }
+    }
+    
+    public struct TalentNormalCooldownStateS2C : ITalentCooldownStrategy
+    {
+        private const int NO_COOLDOWN_TICK = 0;
 
+        public int CooldownEndTick; 
+        public float MaxCooldown;
 
+        public bool IsOnCooldown() => CooldownEndTick > NO_COOLDOWN_TICK;
+        
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.Put(CooldownEndTick);
+            writer.PutFloat16(MaxCooldown);
+        }
 
+        public void Deserialize(NetDataReader reader)
+        {
+            CooldownEndTick = reader.GetInt();
+            MaxCooldown = reader.GetFloat16();
+        }
+
+        public void ClearCooldown() => CooldownEndTick = NO_COOLDOWN_TICK;
+    }
+    
+    public struct TalentStocksCooldownStateS2C : ITalentCooldownStrategy
+    {
+        public int CurrentStocksAmount;
+        public int MaxStocksAmount;
+        public int RecieveNextStockOnTick;
+        public float MaxSingleStockCooldown;
+        public bool IsOnCooldown() => CurrentStocksAmount == 0;
+        public bool IsAtMaxStocks() => CurrentStocksAmount == MaxStocksAmount;
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.Put((byte)CurrentStocksAmount);
+            writer.Put((byte)MaxStocksAmount);
+            writer.Put(RecieveNextStockOnTick);
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            CurrentStocksAmount = reader.GetByte();
+            MaxStocksAmount = reader.GetByte();
+            RecieveNextStockOnTick = reader.GetInt();
+        }
+
+        public void ClearCooldown()
+        {
+            CurrentStocksAmount = MaxStocksAmount;
+            RecieveNextStockOnTick = 0;
+        }
+    }
+
+    public interface ITalentCooldownStrategy
+    {
+        bool IsOnCooldown();
     }
 }

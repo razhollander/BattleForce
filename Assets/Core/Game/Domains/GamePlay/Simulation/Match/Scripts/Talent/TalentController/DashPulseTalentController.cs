@@ -1,24 +1,24 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
-using Core.Scripts.Network;
-using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
     public class DashPulseTalentController : ITalentController
     {
         private ushort _casterPlayerId;
-
         private readonly INetEventsDataService _netEventsDataService;
+        private readonly IOverrideableNetEventsService _overrideableNetEventsService;
         private readonly IMatchDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
 
-        public DashPulseTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig)
+        public DashPulseTalentController(INetEventsDataService netEventsDataService, IOverrideableNetEventsService overrideableNetEventsService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig)
         {
             _netEventsDataService = netEventsDataService;
+            _overrideableNetEventsService = overrideableNetEventsService;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
         }
@@ -29,50 +29,45 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         }
 
         public TalentType TalentType => TalentType.DashPulse;
-        public bool IsCurrentlyActive { get; private set; }
+        public bool IsCurrentlyActive => false;
 
         public void ProcessTalentInput(bool isTalentInputPressed, int tick, float deltaTime)
         {
-            if (IsCurrentlyActive || !isTalentInputPressed)
+            if (!isTalentInputPressed)
             {
                 return;
             }
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
-            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.DashPulse, out int talentIndex))
+            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType, out int talentIndex))
             {
                 return;
             }
 
             ref var dashPulseTalentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
-
-            if (dashPulseTalentModel.CurrentStocksAmount == 0)
+            var doesHaveAvailableStock = dashPulseTalentModel.StocksCooldown.CurrentStocksAmount > 0;
+            if (!doesHaveAvailableStock)
             {
                 return;
             }
 
-            bool wasAtMaxStocks = dashPulseTalentModel.CurrentStocksAmount == dashPulseTalentModel.MaxStocksAmount;
+            bool wasAtMaxStocks = dashPulseTalentModel.StocksCooldown.CurrentStocksAmount == dashPulseTalentModel.StocksCooldown.MaxStocksAmount;
 
-            var remainingStocksAmount = --dashPulseTalentModel.CurrentStocksAmount;
+            var remainingStocksAmount = --dashPulseTalentModel.StocksCooldown.CurrentStocksAmount;
 
             var direction = casterPlayerState.Spaceship.Transform.Direction;
             var pushForce = direction * _gamePlayConfig.Talents.PulseDashConfig.DashVelocity;
             casterPlayerState.Spaceship.Transform.Velocity += pushForce;
 
-            _netEventsDataService.AddPerformDashPulseNetEvent(tick, _casterPlayerId, remainingStocksAmount);
-
+            _netEventsDataService.AddPerformDashPulseNetEvent(tick, _casterPlayerId);
+            
             if (wasAtMaxStocks)
             {
-                dashPulseTalentModel.ReceiveStockOnTick = TickUtils.GetTickPassedAfterDuration(tick, dashPulseTalentModel.MaxCooldown, deltaTime);
+                dashPulseTalentModel.StocksCooldown.RecieveNextStockOnTick = TickUtils.GetTickPassedAfterDuration(tick, dashPulseTalentModel.StocksCooldown.MaxSingleStockCooldown, deltaTime);
             }
-
-            if (dashPulseTalentModel.CurrentStocksAmount == 0)
-            {
-                var cooldownEndTick = dashPulseTalentModel.ReceiveStockOnTick;
-                dashPulseTalentModel.CooldownEndTick = cooldownEndTick;
-                _netEventsDataService.AddDeactivateDashPulseTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);
-            }
+            
+            _overrideableNetEventsService.OverrideUpdateTalentStockEvent(tick, _casterPlayerId, TalentType, remainingStocksAmount, dashPulseTalentModel.StocksCooldown.RecieveNextStockOnTick);
         }
 
         public void StopIfActive(int tick)
@@ -80,14 +75,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         }
 
-        public void OnTick(int tick)
+        public void OnTick(int tick, float deltaTime)
         {
-
+         
         }
 
         public void ResetData()
         {
-            IsCurrentlyActive = false;
+            
         }
     }
 }
