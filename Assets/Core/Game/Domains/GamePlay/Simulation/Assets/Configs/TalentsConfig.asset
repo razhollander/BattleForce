@@ -44,15 +44,15 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 1
-        CooldownInSeconds: 5
+        CooldownInSeconds: 8
     - rid: 8506109566889754722
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 6
-        CooldownInSeconds: 5
+        CooldownInSeconds: 7
     - rid: 8506109566889754723
       type: {class: TalentStocksCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 5
         MaxStocks: 3
-        SingleStockCooldownInSeconds: 2
+        SingleStockCooldownInSeconds: 5
