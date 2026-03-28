@@ -1,5 +1,4 @@
-using System;
-using CoreDomain.Scripts.Services.Logger.Base;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
 using Zenject;
@@ -8,8 +7,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scrip
 {
     public class DashPulseGustEffectController : IDashPulseGustEffectController
     {
-        private const float EFFECT_DURATION = 0.5f; // Adjust as needed
-
         private readonly IStateMachineService _stateMachineService;
         private readonly DashPulseGustEffectPool _effectsPool;
 
@@ -26,24 +23,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scrip
 
         public void PlayEffect(Vector2 position, Vector2 direction)
         {
-            _ = PlayEffectAsync(position, direction);
+            PlayEffectAsync(position, direction).Forget();
         }
 
         private async Awaitable PlayEffectAsync(Vector2 position, Vector2 direction)
         {
             var view = _effectsPool.Spawn();
-
-            try
-            {
-                await view.PlayAndDespawn(position, direction, EFFECT_DURATION, _stateMachineService.CurrentState().CancellationTokenSource);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception ex)
-            {
-                LogService.LogError(ex.Message);
-            }
+            await view.PlayGustAnimation(position, direction, _stateMachineService.CurrentState().CancellationTokenSource);
+            view.Despawn();
         }
     }
 }

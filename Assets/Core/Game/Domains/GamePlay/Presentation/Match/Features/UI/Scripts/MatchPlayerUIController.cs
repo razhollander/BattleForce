@@ -54,9 +54,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             Object.Destroy(_view.gameObject);
         }
 
-        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
+        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents, int selectedTalentIndex, int currentServerTick)
         {
             _view.UpdateTalents(ConvertTalentsToVisualData(talents, currentServerTick));
+            _view.SetSelectedTalent(selectedTalentIndex);
         }
         
         public void UpdateTalentsCooldown(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)

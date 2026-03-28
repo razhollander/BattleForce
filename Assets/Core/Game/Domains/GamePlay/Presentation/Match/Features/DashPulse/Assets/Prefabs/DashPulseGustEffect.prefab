@@ -133,6 +133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16ed2090fbf4b4d71a2ca27a3416336f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _animation: {fileID: 8082266639382950631}
 --- !u!111 &8082266639382950631
 Animation:
   m_ObjectHideFlags: 0
@@ -146,7 +147,7 @@ Animation:
   m_Animations:
   - {fileID: 7400000, guid: 0a54366ed07f343a69b3e3d040eb6be0, type: 2}
   m_WrapMode: 0
-  m_PlayAutomatically: 1
+  m_PlayAutomatically: 0
   m_AnimatePhysics: 0
   m_UpdateMode: 0
   m_CullingType: 0

@@ -21,7 +21,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
             
-            LogService.LogError("Projectile hit player (on client)");
             _cachedPresentationEventsService.KOProjectHitPlayerNetEvents.Clear();
         }
     }

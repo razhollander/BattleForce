@@ -118,13 +118,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var didCooldownEnd = playerTalent.NormalCooldown.CooldownEndTick <= _tick;
-            LogService.LogError($"didCooldownEnd {didCooldownEnd}, CooldownEndTick: {playerTalent.NormalCooldown.CooldownEndTick}, Tick: {_tick}");
             if (!didCooldownEnd)
             {
                 return;
             }
-
-            LogService.LogError($"ClearCooldown!!");
+            
             playerTalent.ClearCooldown();
             playerState.Spaceship.TalentsState.Talents[talentIndex] = playerTalent;
         }

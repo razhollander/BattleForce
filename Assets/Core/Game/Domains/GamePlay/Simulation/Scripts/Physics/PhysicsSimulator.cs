@@ -807,7 +807,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var body = GetBody(PhysicsBodyType.SwapField, id);
             _world.DestroyBody(body);
-            LogService.LogError($"Physics RemoveSwapField {id}");
         }
         
         public void ClearAllData()
