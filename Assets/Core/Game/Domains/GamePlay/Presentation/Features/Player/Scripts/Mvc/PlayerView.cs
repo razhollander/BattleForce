@@ -47,6 +47,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             playerLoadingRingView.SetRingScale(cooldownLeft/maxCooldown, decay);
         }
+
+        public void InterpolateTalentLoading(float cooldownLeft, float maxCooldown, float decay)
+        {
+            playerLoadingRingView.SetTalentRingArc(cooldownLeft, maxCooldown);
+        }
         
         public void SetPositionAndRotation(Vector2 position, Quaternion rotation)
         {

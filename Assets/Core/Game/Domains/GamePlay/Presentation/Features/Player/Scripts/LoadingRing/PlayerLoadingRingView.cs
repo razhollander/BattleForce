@@ -7,31 +7,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
     public class PlayerLoadingRingView : MonoBehaviour
     {
         //private float MAX_SCALE = 1f;
-        // private const int ArcEmptyValue = 180;
-        // private const int ArcFullValue = 0;
+        private const int ArcEmptyValue = 180;
+        private const int ArcFullValue = 0;
         // private readonly Color PowerUpFullColor = Color.yellow;
         // private readonly Color PowerUpEmptyColor = Color.white;
-        // private static readonly int Arc1 = Shader.PropertyToID("_Arc1");
-        // private static readonly int Arc2 = Shader.PropertyToID("_Arc2");
-    
+        private static readonly int Arc1 = Shader.PropertyToID("_Arc1");
+        private static readonly int Arc2 = Shader.PropertyToID("_Arc2");
+
         [SerializeField] private SpriteRenderer _spriteRenderer;
        // [SerializeField] public float BulletLoadingTime;
        // [SerializeField] public float PowerUpLoadingTime = 10f;
-    
+
      //   public bool IsBulletLoadingReady { get; private set; } = true;
      //   public bool IsPowerUpLoadingReady { get; private set; } = true;
 
-        //private Material _material;
+        private Material _material;
         //private int _currentArcValue = ArcFullValue;
         private float _currentScale = 1;
 
         public void InitEntryPoint()
         {
-           // _material = _spriteRenderer.material;
+            _material = _spriteRenderer.material;
             //ResetPowerUpLoading();
         }
 
-        
+        public void SetTalentRingArc(float cooldownLeft, float maxCooldown)
+        {
+            if (_material == null) return;
+
+            float ratio = Mathf.Clamp01(cooldownLeft / maxCooldown);
+            int arcValue = Mathf.RoundToInt(Mathf.Lerp(ArcFullValue, ArcEmptyValue, ratio));
+
+            _material.SetFloat(Arc1, arcValue);
+            _material.SetFloat(Arc2, arcValue);
+        }
+
+
         public void SetRingScale(float scale, float decay)
         {
             if (Mathf.Approximately(_currentScale,scale))
@@ -40,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
             }
 
             var shouldLerp = scale < _currentScale;
-            if (shouldLerp)// todo: bad, this isn't the view responsibility 
+            if (shouldLerp)// todo: bad, this isn't the view responsibility
             {
                 _currentScale = MathUtils.ExpDecay(_currentScale,scale, decay, Time.deltaTime);
             }
@@ -49,7 +60,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
                 _currentScale = scale;
             }
 
-            
+
             transform.localScale = Vector3.one * _currentScale;
             // if (Mathf.Approximately(scale, MAX_SCALE))
             // {
@@ -60,7 +71,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
             //     _spriteRenderer.color = PowerUpEmptyColor;
             // }
         }
-        
+
         // public void DoBulletLoading(TweenCallback onComplete)
         // {
         //     IsBulletLoadingReady = false;
@@ -72,7 +83,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
         //         ResetBulletLoading();
         //     }
         // }
-    
+
         // public void DoPowerUpLoading()
         // {
         //     IsPowerUpLoadingReady = false;

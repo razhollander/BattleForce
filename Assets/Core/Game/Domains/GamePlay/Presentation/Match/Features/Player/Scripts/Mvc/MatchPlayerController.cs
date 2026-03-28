@@ -2,7 +2,11 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
+using Core.Scripts.Network;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
@@ -12,16 +16,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
     {
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly NetworkConfig _networkConfig;
         private readonly Transform _parent;
         public readonly ushort PlayerId;
         private PlayerView _playerView;
         private readonly PlayerViewPool _playerPool;
 
-        public MatchPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, Transform parent)
+        public MatchPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, Transform parent)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
+            _networkConfig = networkConfig;
             _parent = parent;
             PlayerId = playerId;
         }
@@ -77,6 +83,38 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             {
                 RestoreBulletEffect();
             }
+        }
+
+        public void UpdateTalentCooldown(int currentServerTick)
+        {
+            var playerModel = _matchDataService.GetPlayer(PlayerId);
+            var talentsState = playerModel.Spaceship.TalentsState;
+            if (talentsState.Talents.Count == 0) return;
+            var talentState = talentsState.GetCurrentSelectedTalent();
+
+            float maxCooldown = 0;
+            float cooldownLeft = 0;
+
+            switch (talentState.CooldownType)
+            {
+                case TalentCooldownType.Normal:
+                    maxCooldown = talentState.NormalCooldown.MaxCooldown;
+                    cooldownLeft = talentState.NormalCooldown.IsOnCooldown() ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
+                    break;
+                case TalentCooldownType.Stocks:
+                    maxCooldown = talentState.StocksCooldown.MaxSingleStockCooldown;
+                    cooldownLeft = talentState.StocksCooldown.IsAtMaxStocks() ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
+                    break;
+                default:
+                    LogService.LogError("Not implemented cooldown type: " + talentState.CooldownType);
+                    break;
+            }
+
+            // Fallback for division by zero if maxCooldown is somehow 0
+            if (maxCooldown <= 0.001f) maxCooldown = 1f;
+
+            var exponentialDecay = _gamePlayConfig.ExponentialDecay;
+            _playerView.InterpolateTalentLoading(cooldownLeft, maxCooldown, exponentialDecay);
         }
 
         public void RestoreBulletEffect()
