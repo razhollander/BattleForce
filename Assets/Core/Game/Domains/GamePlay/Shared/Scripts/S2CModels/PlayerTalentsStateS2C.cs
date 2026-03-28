@@ -218,6 +218,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((byte)CurrentStocksAmount);
             writer.Put((byte)MaxStocksAmount);
             writer.Put(RecieveNextStockOnTick);
+            writer.Put(MaxSingleStockCooldown);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -225,6 +226,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             CurrentStocksAmount = reader.GetByte();
             MaxStocksAmount = reader.GetByte();
             RecieveNextStockOnTick = reader.GetInt();
+            MaxSingleStockCooldown = reader.GetFloat();
         }
 
         public void ClearCooldown()

@@ -17,6 +17,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private Sprite _noneTalentSprite;
         [SerializeField] private CanvasGroup _canvasGroup;
         [SerializeField] private MatchPlayerTalentStockUIView _stockView;
+        [SerializeField] private Color _cooldownOverlayColor = Color.white;
+        [SerializeField] private Color _cooldownOverlayColorWhenOnCooldown = Color.black;
 
         public void SetNoneTalent()
         {
@@ -74,7 +76,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 _cooldownText.gameObject.SetActive(false);
             }        
             
-            _cooldownOverlay.color = isOnCooldown ? Color.black : Color.white;
+            _cooldownOverlay.color = isOnCooldown ? _cooldownOverlayColorWhenOnCooldown: _cooldownOverlayColor;
         }
     }
 }

@@ -616,6 +616,8 @@ MonoBehaviour:
   _noneTalentSprite: {fileID: 21300000, guid: bc47e4f2b85614740aac22078e60e81a, type: 3}
   _canvasGroup: {fileID: 7209318775248424656}
   _stockView: {fileID: 7564092179518207992}
+  _cooldownOverlayColor: {r: 1, g: 1, b: 1, a: 0.6509804}
+  _cooldownOverlayColorWhenOnCooldown: {r: 0, g: 0, b: 0, a: 0.6509804}
 --- !u!225 &7209318775248424656
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -660,10 +662,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6720305295345633735}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4404582725815017494
 CanvasRenderer:
@@ -693,7 +695,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 35fad018f993a4e0caed572bdfec3960, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 03fb8a5183e9d9e498383ab862e9e612, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
