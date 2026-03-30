@@ -9,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
     {
         MatchSimulationStateS2C SimulationState { get; }
         MatchEnvironmentDataService EnvironmentData { get; }
-        List<int> UnsusedStageIndexes { get;  }
+        List<int> DidntPlayYetStageIndexes { get;  }
         HashSet<ushort> TeamIds { get; }
         //SimulationStateS2C PreviousSimulationState { get; }
         PlayerStateS2C AddPlayer(ushort playerId, ushort teamId, string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,

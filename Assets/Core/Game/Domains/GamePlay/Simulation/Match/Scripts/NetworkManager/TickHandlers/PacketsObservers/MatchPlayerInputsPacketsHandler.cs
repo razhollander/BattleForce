@@ -173,7 +173,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
 
             var playerId = playerState.Id;
-            _playersTalentsManager.ProcessAllTalentsTick(playerId, processedTick, deltaTime);
+            _playersTalentsManager.ProcessAllTalentsTickOfPlayer(playerId, processedTick, deltaTime);
 
             if (currentSelectedTalent.IsOnCooldown())
             {

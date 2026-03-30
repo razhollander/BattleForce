@@ -70,28 +70,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         
         private int GenerateNextStageEnvironmentLayoutId()
         {
-            var environmentLayoutId = _gamePlayConfig.DeafultEnvironmentIndex;
+            var environmentLayoutId = _gamePlayConfig.DeafultEnvironmentId;
             if (_gamePlayConfig.ShouldChooseRandomStage)
             {
-                environmentLayoutId = GenerateRandomStageIndex();
+                environmentLayoutId = GenerateRandomStageId();
             }
 
             return environmentLayoutId;
         }
 
-        private int GenerateRandomStageIndex()
+        private int GenerateRandomStageId()
         {
-            if (_matchDataService.UnsusedStageIndexes.IsNullOrEmpty())
+            var didntPlayYetStageIndexes = _matchDataService.DidntPlayYetStageIndexes;
+
+            if (didntPlayYetStageIndexes.IsNullOrEmpty())
             {
                 foreach (int index in _sharedGamePlayConfig.Environment.AvailableLayoutIndexes)
                 {
-                    _matchDataService.UnsusedStageIndexes.Add(index);
+                    didntPlayYetStageIndexes.Add(index);
                 }
             }
                 
-            var randomIndex = RNG.NextInt(0, _matchDataService.UnsusedStageIndexes.Count);
-            var environmentLayoutId = _matchDataService.UnsusedStageIndexes[randomIndex];
-            _matchDataService.UnsusedStageIndexes.RemoveAt(randomIndex);
+            var randomIndex = RNG.NextInt(0, didntPlayYetStageIndexes.Count);
+            var environmentLayoutId = didntPlayYetStageIndexes[randomIndex];
+            didntPlayYetStageIndexes.RemoveAt(randomIndex);
 
             return environmentLayoutId;
         }

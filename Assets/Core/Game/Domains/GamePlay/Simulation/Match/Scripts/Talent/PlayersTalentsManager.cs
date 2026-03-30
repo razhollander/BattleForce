@@ -109,7 +109,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, isTalentInputPressed, tick, deltaTime);
         }
 
-        public void ProcessAllTalentsTick(ushort playerId, int tick, float deltaTime)
+        public void ProcessAllTalentsTickOfPlayer(ushort playerId, int tick, float deltaTime)
         {
             _talentControllersPerPlayer[playerId].OnTick(tick, deltaTime);
         }
@@ -161,41 +161,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private TalentStateS2C AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)
         {
             ref var newTalent = ref playerState.Spaceship.TalentsState.Talents.AddAndGet();
+            newTalent.Setup(talentType);
+            SetupTalentCooldown(ref newTalent);
+            return newTalent;
+        }
+
+        private void SetupTalentCooldown(ref TalentStateS2C newTalent)
+        {
+            var talentType = newTalent.TalentType;
             var cooldownConfig = _gamePlayConfig.Talents.TalentsCooldownsConfigs.TalentCooldownConfigs.Find(x => x.TalentType == talentType);
 
             switch (cooldownConfig.CooldownType)
             {
                 case TalentCooldownType.Normal:
                     var normalCooldownConfig = (TalentNormalCooldownConfig) cooldownConfig;
-                    newTalent.SetupWithNormalCooldown(talentType, normalCooldownConfig.CooldownInSeconds);
+                    newTalent.SetupWithNormalCooldown(normalCooldownConfig.CooldownInSeconds);
                     break;
                 case TalentCooldownType.Stocks:
                     var stocksCooldownConfig = (TalentStocksCooldownConfig) cooldownConfig;
-                    newTalent.SetupWithStocksCooldown(talentType, stocksCooldownConfig.MaxStocks, stocksCooldownConfig.SingleStockCooldownInSeconds);
+                    newTalent.SetupWithStocksCooldown(stocksCooldownConfig.MaxStocks, stocksCooldownConfig.SingleStockCooldownInSeconds);
                     break;
             }
-            
-            return newTalent;
         }
 
         private TalentStateS2C ReplaceTalentWithCurrentSelectedTalent(TalentType talentType, PlayerStateS2C playerState, int tick)
         {
             ref var currentSelectedTalent = ref playerState.Spaceship.TalentsState.Talents.Get(playerState.Spaceship.TalentsState.SelectedTalentIndex);
             _talentControllersPerPlayer[playerState.Id].StopTalentIfActive(currentSelectedTalent.TalentType, tick);
-            var cooldownConfig = _gamePlayConfig.Talents.TalentsCooldownsConfigs.TalentCooldownConfigs.Find(x => x.TalentType == talentType);
-
-            switch (cooldownConfig.CooldownType) // todo check if can use the switch from the method above
-            {
-                case TalentCooldownType.Normal:
-                    var normalCooldownConfig = (TalentNormalCooldownConfig) cooldownConfig;
-                    currentSelectedTalent.SetupWithNormalCooldown(talentType, normalCooldownConfig.CooldownInSeconds);
-                    break;
-                case TalentCooldownType.Stocks:
-                    var stocksCooldownConfig = (TalentStocksCooldownConfig) cooldownConfig;
-                    currentSelectedTalent.SetupWithStocksCooldown(talentType, stocksCooldownConfig.MaxStocks, stocksCooldownConfig.SingleStockCooldownInSeconds);
-                    break;
-            }            
-            
+            currentSelectedTalent.Setup(talentType);
+            SetupTalentCooldown(ref currentSelectedTalent);
             return currentSelectedTalent;
         }
     }
