@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
-    [CreateAssetMenu(fileName = "SimulationGamePlayConfig", menuName = "BF/Network/GamePlay Config")]
+    [CreateAssetMenu(fileName = "SimulationGamePlayConfig", menuName = "BF/Simulation/GamePlay Config")]
     public class SimulationGamePlayConfig : ScriptableObject
     {
         [EditableRef] public PlayerSpaceshipConfig PlayerSpaceship;
@@ -14,7 +14,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         [EditableRef] public PowerUpsConfig PowerUps;
         [EditableRef] public EnvironmentSpringsConfig EnvironmentSprings;
         [EditableRef] public PhysicsConfig Physics;
-        public int ChosenEnvironmentIndex = 0;
+        public int DeafultEnvironmentId = 0;
+        public bool ShouldChooseRandomStage = true;
         public ushort StartMatchCountdownDuration = 5;
         public float ShootCooldownMultiplierWhenDead = 2;
         public float StageRestartDelaySeconds = 3f;

@@ -8,27 +8,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
 {
     public interface ICachedPresentationEventsService
     {
-        List<BulletSpawnNetEventS2C> BulletSpawnNetEvents { get; set; }
-        List<PlayerTakeDamageNetEventS2C> PlayerTakeDamageNetEvents { get; set; }
-        List<PlayerDiedNetEventS2C> PlayerDiedNetEvents { get; set; }
-        List<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents { get; set; }
-        List<PlayersSwapNetEventS2C> PlayerSwapNetEvents { get; set; }
-        List<TalentCardObtainedNetEventS2C> TalentCardObtainedNetEvents { get; set; }
-        List<TalentCardHitNetEventS2C> TalentCardHitNetEvents { get; set; }
-        List<PowerUpBallSpawnedNetEventS2C> PowerUpBallSpawnedNetEvents { get; set; }
-        List<PowerUpBallObtainedNetEventS2C> PowerUpBallObtainedNetEvents { get; set; }
-        List<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents { get; set; }
-        List<StageEndNetEventS2C> StageEndNetEvents { get; set; }
-        List<TeamLostNetEventS2C> TeamLostNetEvents { get; set; }
-        List<TalentSwitchNetEventS2C> TalentSwitchNetEvents { get; set; }
-        List<GainBoltsNetEventS2C> GainBoltsNetEvents { get; set; }
-        List<EnvironmentSpringPlayerCollisionNetEventS2C> EnvironmentSpringPlayerCollisionNetEvents { get; set; }
-        List<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> PlayerToEnvironmentTeleportGateCollisionNetEvents { get; set; }
-        List<PreparationPhaseEndedNetEventS2C> PreparationPhaseEndedNetEvents { get; set; }
-        List<CreateSwapFieldNetEventS2C> CreateSwapFieldNetEvents { get; set; }
-        List<DeactivateSwapTalentNetEventS2C> DeactivateSwapTalentNetEvents { get; set; }
-        List<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents { get; set; }
-        List<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents { get; set; }
-        List<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents { get; set; }
+        List<BulletSpawnNetEventS2C> BulletSpawnNetEvents { get; }
+        List<PlayerTakeDamageNetEventS2C> PlayerTakeDamageNetEvents { get; }
+        List<PlayerDiedNetEventS2C> PlayerDiedNetEvents { get;}
+        List<BulletDestroyedNetEventS2C> BulletDestroyedNetEvents { get; }
+        List<PlayersSwapNetEventS2C> PlayerSwapNetEvents { get; }
+        List<TalentCardObtainedNetEventS2C> TalentCardObtainedNetEvents { get; }
+        List<TalentCardHitNetEventS2C> TalentCardHitNetEvents { get; }
+        List<PowerUpBallSpawnedNetEventS2C> PowerUpBallSpawnedNetEvents { get; }
+        List<PowerUpBallObtainedNetEventS2C> PowerUpBallObtainedNetEvents { get; }
+        List<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents { get; }
+        List<StageEndNetEventS2C> StageEndNetEvents { get; }
+        List<TeamLostNetEventS2C> TeamLostNetEvents { get; }
+        List<TalentSwitchNetEventS2C> TalentSwitchNetEvents { get; }
+        List<GainBoltsNetEventS2C> GainBoltsNetEvents { get; }
+        List<EnvironmentSpringPlayerCollisionNetEventS2C> EnvironmentSpringPlayerCollisionNetEvents { get; }
+        List<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> PlayerToEnvironmentTeleportGateCollisionNetEvents { get; }
+        List<PreparationPhaseEndedNetEventS2C> PreparationPhaseEndedNetEvents { get; }
+        List<CreateSwapFieldNetEventS2C> CreateSwapFieldNetEvents { get; }
+        List<DeactivateSwapTalentNetEventS2C> DeactivateSwapTalentNetEvents { get; }
+        List<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents { get; }
+        List<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents { get; }
+        List<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents { get; }
+        List<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents { get; }
+        List<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents { get; }
     }
 }

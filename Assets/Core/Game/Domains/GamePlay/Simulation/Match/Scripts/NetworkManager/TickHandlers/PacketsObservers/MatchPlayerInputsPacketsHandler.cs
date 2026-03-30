@@ -139,17 +139,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 playerState.Spaceship.TalentsState.AimDirection = playerInputPacket.AimDirection;
                 UpdatePlayerDirection(playerInputPacket, playerState);
                 UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
-                UpdatePlayerTalent(processedTick, playerInputPacket.IsTalentInputPressed, playerState, deltaTime);
-
-                _simulationInputService.SetPlayerInput(playerId, PlayerInputType.SwitchTalent, playerInputPacket.IsSwitchTalentInputPressed);
-                
-                if (_simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.SwitchTalent))
-                {
-                    if (_playersTalentsManager.TrySwitchToNextTalent(playerId))
-                    {
-                        _netEventsDataService.AddTalentSwitchNetEvent(processedTick, playerId, playerState.Spaceship.TalentsState.SelectedTalentIndex);
-                    }
-                }
+                ProcessPlayerTalentInput(processedTick, playerInputPacket.IsTalentInputPressed, playerState, deltaTime);
+                ProcessPlayerSwitchTalentInput(processedTick, playerId, playerInputPacket, playerState);
 
                 if (_lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastPlayerInput))
                 {
@@ -161,21 +152,38 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             return earliestInputPerPlayers;
         }
 
-        private void UpdatePlayerTalent(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState, float deltaTime)
+        private void ProcessPlayerSwitchTalentInput(int processedTick, ushort playerId, MatchPlayerInputPacketC2S playerInputPacket, PlayerStateS2C playerState)
+        {
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.SwitchTalent, playerInputPacket.IsSwitchTalentInputPressed);
+
+            if (_simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.SwitchTalent))
+            {
+                if (_playersTalentsManager.TrySwitchToNextTalent(playerId))
+                {
+                    _netEventsDataService.AddTalentSwitchNetEvent(processedTick, playerId, playerState.Spaceship.TalentsState.SelectedTalentIndex);
+                }
+            }
+        }
+
+        private void ProcessPlayerTalentInput(int processedTick, bool isTalentInputPressed, PlayerStateS2C playerState, float deltaTime)
         {
             if (!playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalent))
             {
                 return;
             }
-            
-            _playersTalentsManager.ProcessAllActiveTick(playerState.Id, processedTick);
+
+            var playerId = playerState.Id;
+            _playersTalentsManager.ProcessAllTalentsTickOfPlayer(playerId, processedTick, deltaTime);
 
             if (currentSelectedTalent.IsOnCooldown())
             {
                 return;
             }
 
-            _playersTalentsManager.ProcessPlayerTalentInput(playerState.Id, currentSelectedTalent.TalentType, processedTick, isTalentInputPressed, deltaTime);
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentInput, isTalentInputPressed);
+
+            var wasTalentInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.TalentInput);
+            _playersTalentsManager.ProcessPlayerTalentInput(playerId, currentSelectedTalent.TalentType, processedTick, wasTalentInputDownThisTick, deltaTime);
         }
 
         private CapacityDict<ushort, int> GetHeighestProcessedTickFromServerPerPlayer()
@@ -244,7 +252,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, PlayerStateS2C playerModel)
         {
             var shootState = playerModel.Spaceship.Shoot;
-            var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
+            var playerId = playerModel.Id;
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, isShootInputPressed);
+            var wasTalentInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
+            var shouldShoot = wasTalentInputDownThisTick && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
             if (shouldShoot)
             {
                 shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;

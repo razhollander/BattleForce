@@ -71,7 +71,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             DeactivateTalent(tick);
         }
 
-        public void OnTick(int tick)
+        public void OnTick(int tick, float deltaTime)
         {
             if (!IsCurrentlyActive)
             {
@@ -97,7 +97,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _currentActiveSwapFieldId = 0;
         }
 
-        private void UpdateSwapFieldSize(int tick, ref TalentSwapFieldS2C swapFieldModel)
+        private void UpdateSwapFieldSize(int tick, ref TalentSwapFieldS2C swapFieldModel) // add delta time!
         {
             swapFieldModel.UpdateRadiusForTick(tick, _gamePlayConfig.Talents.SwapTalentConfig.MaxRadius);
         }
@@ -132,8 +132,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
             ref var swapTalentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
 
-            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, swapTalentModel.MaxCooldown, _networkConfig.DeltaTime);
-            swapTalentModel.CooldownEndTick = cooldownEndTick;
+            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, swapTalentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+            swapTalentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _physicsSimulator.RemoveSwapField(_currentActiveSwapFieldId);
             _matchDataService.SimulationState.RemoveSwapFieldById(_currentActiveSwapFieldId);

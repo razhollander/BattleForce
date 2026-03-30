@@ -19,7 +19,7 @@ namespace Core.Scripts.Extensions
             var clip = animation.GetClip(clipName);
             if (clip == null)
             {
-                LogService.LogError($"clip {clipName} is null");
+                LogService.LogError($"clip {clipName} is null (is it set to Legacy?)");
                 return;
             }
             

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Core.Scripts.Extensions;
+using Core.Scripts.Extensions.Linq;
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
 using UnityEngine;
 
@@ -12,6 +14,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [SerializeField]
         SerializableDictionary<int, EnvironmentLayoutConfig> _environmentLayoutConfigs = new SerializableDictionary<int, EnvironmentLayoutConfig>();
 
+        public List<int> AvailableLayoutIndexes;
+        
         public EnvironmentLayoutConfig GetEnvironmentLayout(int index)
         {
             return _environmentLayoutConfigs[index];

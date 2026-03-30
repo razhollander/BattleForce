@@ -17,10 +17,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastPowerUpBallCreatedId = 0;
         private ushort _lastSwapFieldCreatedId = 0;
         private ushort _lastKOProjectileCreatedId = 0;
+        public List<int> DidntPlayYetStageIndexes { get; } = new List<int>();
         public MatchEnvironmentDataService EnvironmentData { get; private set; }
         public HashSet<ushort> TeamIds { get; private set; }
 
-        public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
+        public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             EnvironmentData = new MatchEnvironmentDataService(networkConfig);
             _simulationState = new MatchSimulationStateS2C(
@@ -35,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.StageType = StageType.DeathMatch;
         }
-
+        
         public PlayerStateS2C AddPlayer(ushort playerId, ushort teamId, string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,
             float shootCooldown, bool isPlayerConnected)
         {

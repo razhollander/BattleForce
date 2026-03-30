@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _matchDataService = matchDataService;
         }
 
-        public void OnTick(int tick)
+        public void OnTick(int tick, float deltaTime)
         {
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             var closetPlayerToCaster = FindClosestPlayerToCaster(casterPlayerState, _matchDataService.SimulationState);

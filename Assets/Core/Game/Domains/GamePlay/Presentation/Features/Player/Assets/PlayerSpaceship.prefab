@@ -144,8 +144,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1.66, y: 0.39}
-  m_SizeDelta: {x: 77.9656, y: 77.9656}
+  m_AnchoredPosition: {x: 1.706, y: 0.344}
+  m_SizeDelta: {x: 87.1725, y: 87.1725}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3613967119639632681
 MonoBehaviour:
@@ -169,6 +169,9 @@ MonoBehaviour:
   _selectedScale: {x: 1.2, y: 1.2, z: 1.2}
   _noneTalentSprite: {fileID: 21300000, guid: bc47e4f2b85614740aac22078e60e81a, type: 3}
   _canvasGroup: {fileID: 4813016501805290155}
+  _stockView: {fileID: 0}
+  _cooldownOverlayColor: {r: 1, g: 1, b: 1, a: 1}
+  _cooldownOverlayColorWhenOnCooldown: {r: 0, g: 0, b: 0, a: 1}
 --- !u!225 &4813016501805290155
 CanvasGroup:
   m_ObjectHideFlags: 0

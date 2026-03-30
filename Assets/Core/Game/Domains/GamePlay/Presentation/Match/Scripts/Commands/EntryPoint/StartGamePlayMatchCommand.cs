@@ -1,5 +1,6 @@
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
@@ -50,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IEnvironmentFieldBarrierControllers _environmentFieldBarrierControllers;
         private ISwapFieldControllers _swapFieldControllers;
         private IKOProjectilesControllers _koProjectilesControllers;
+        private IDashPulseGustEffectController _dashPulseGustEffectController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -80,6 +82,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentFieldBarrierControllers = _diContainer.Resolve<IEnvironmentFieldBarrierControllers>();
             _swapFieldControllers = _diContainer.Resolve<ISwapFieldControllers>();
             _koProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
+            _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
         }
 
         public void Execute()
@@ -105,6 +108,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
                  .Execute();
              _matchDataService.SetLocalPlayer(_enterData.LocalPlayerId);
             _gainBoltEffectController.InitEntryPoint();
+            _dashPulseGustEffectController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }

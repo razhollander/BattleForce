@@ -55,9 +55,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void CreateEnvironmentLayout()
         {
-            var environmentLayoutIndex = _gamePlayConfig.ChosenEnvironmentIndex;
-            _matchDataService.SimulationState.EnvironmentLayoutIndex = environmentLayoutIndex;
-            _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutIndex);
+            var environmentLayoutId = GenerateNextStageEnvironmentLayoutId();
+            _matchDataService.SimulationState.EnvironmentLayoutId = environmentLayoutId;
+            _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutId);
             
             CreateWalls();
             CreateLavaWalls();
@@ -66,6 +66,36 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateTeleportGates();
             CreateRotatingWheels();
             CreateFieldBarriers();
+        }
+        
+        private int GenerateNextStageEnvironmentLayoutId()
+        {
+            var environmentLayoutId = _gamePlayConfig.DeafultEnvironmentId;
+            if (_gamePlayConfig.ShouldChooseRandomStage)
+            {
+                environmentLayoutId = GenerateRandomStageId();
+            }
+
+            return environmentLayoutId;
+        }
+
+        private int GenerateRandomStageId()
+        {
+            var didntPlayYetStageIndexes = _matchDataService.DidntPlayYetStageIndexes;
+
+            if (didntPlayYetStageIndexes.IsNullOrEmpty())
+            {
+                foreach (int index in _sharedGamePlayConfig.Environment.AvailableLayoutIndexes)
+                {
+                    didntPlayYetStageIndexes.Add(index);
+                }
+            }
+                
+            var randomIndex = RNG.NextInt(0, didntPlayYetStageIndexes.Count);
+            var environmentLayoutId = didntPlayYetStageIndexes[randomIndex];
+            didntPlayYetStageIndexes.RemoveAt(randomIndex);
+
+            return environmentLayoutId;
         }
 
         private void ClearStageData()
@@ -134,7 +164,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 for (var k = 0; k < talentsCount; k++)
                 {
                     ref var talentState = ref player.Spaceship.TalentsState.Talents.Get(k);
-                    talentState.ResetCooldownEndTick();
+                    talentState.ClearCooldown();
                 }
                 
                 _physicsSimulator.AddPlayer(player.Id, player.TeamId, position, velocity, radius);

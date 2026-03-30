@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
-    [CreateAssetMenu(fileName = "PowerUpsNetworkConfig", menuName = "BF/Network/Power Ups Config")]
+    [CreateAssetMenu(fileName = "PowerUpsNetworkConfig", menuName = "BF/Simulation/Power Ups Config")]
     public class PowerUpsConfig : ScriptableObject
     {
         public float SpawnMinSecondsInterval = 5f;

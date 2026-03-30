@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
-    [CreateAssetMenu(fileName = "PlayerSpaceshipConfig", menuName = "BF/Network/Player Spaceship Config")]
+    [CreateAssetMenu(fileName = "PlayerSpaceshipConfig", menuName = "BF/Simulation/Player Spaceship Config")]
     public class PlayerSpaceshipConfig : ScriptableObject
     {
         public ushort StartHealth = 5;

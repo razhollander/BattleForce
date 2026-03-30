@@ -49,6 +49,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<KOProjectHitPlayerNetEventS2C> _cachedUnprocessedKOProjectHitPlayerEvents;
         private readonly CapacityList<CreateKOProjectileNetEventS2C> _cachedUnprocessedCreateKOProjectileEvents;
         private readonly CapacityList<DeactivateKOTalentNetEventS2C> _cachedUnprocessedDeactivateKOTalentEvents;
+        private readonly CapacityList<PerformDashPulseNetEventS2C> _cachedUnprocessedPerformDashPulseEvents;
+        private readonly CapacityList<UpdatePlayerTalentStocksNetEventS2C> _cachedUnprocessedUpdatePlayerTalentStocksEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
@@ -83,6 +85,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedKOProjectHitPlayerEvents = new CapacityList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents);
             _cachedUnprocessedCreateKOProjectileEvents = new CapacityList<CreateKOProjectileNetEventS2C>(networkConfig.MaxCap.CreateKOProjectileNetEvents);
             _cachedUnprocessedDeactivateKOTalentEvents = new CapacityList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents);
+            _cachedUnprocessedPerformDashPulseEvents = new CapacityList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents);
+            _cachedUnprocessedUpdatePlayerTalentStocksEvents = new CapacityList<UpdatePlayerTalentStocksNetEventS2C>(networkConfig.MaxCap.UpdatePlayerTalentStocksNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -108,7 +112,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
             
             ProcessPlayerRejoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents, latestTickReceivedFromServer);
-            ResetPlayersTalentsCooldownsTimersIfEnded(latestTickReceivedFromServer);
+            ClearPlayersTalentsNormalCooldownsTimersIfEnded(latestTickReceivedFromServer);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
             ProcessPlayerTakeDamageEvents(latestFullTickPacket.PlayerTakeDamageNetEvents);
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
@@ -130,6 +134,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessKOProjectHitPlayerEvents(latestFullTickPacket.KOProjectHitPlayerNetEvents);
             ProcessCreateKOProjectileEvents(latestFullTickPacket.CreateKOProjectileNetEvents);
             ProcessDeactivateKOTalentEvents(latestFullTickPacket.DeactivateKOTalentNetEvents);
+            ProcessPerformDashPulseEvents(latestFullTickPacket.PerformDashPulseNetEvents);
+            ProcessUpdatePlayerTalentStockEvents(latestFullTickPacket.UpdatePlayerTalentStocksNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
@@ -147,17 +153,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _fullTickPackets.Clear();
         }
 
-        private void ResetPlayersTalentsCooldownsTimersIfEnded(int latestTickReceivedFromServer)
+        /// <summary>
+        /// the server doesn't send this to the client because we prefer to save this redundent bandwidth,
+        /// so the client need to clear the cooldowns on its own.
+        /// </summary>
+        /// <param name="latestTickReceivedFromServer"></param>
+        private void ClearPlayersTalentsNormalCooldownsTimersIfEnded(int latestTickReceivedFromServer)
         {
             foreach (var playerModel in _matchDataService.Players)
             {
                 for (int i = 0; i < playerModel.Spaceship.TalentsState.Talents.Count; i++)
                 {
                     ref var talentsState = ref playerModel.Spaceship.TalentsState.Talents.Get(i);
-                    var didCooldownEnd = talentsState.CooldownEndTick <= latestTickReceivedFromServer;
+                    var isNormalCooldownType = talentsState.CooldownType == TalentCooldownType.Normal;
+                    if (!isNormalCooldownType)
+                    {
+                        continue;
+                    }
+
+                    var didCooldownEnd = talentsState.NormalCooldown.CooldownEndTick <= latestTickReceivedFromServer;
                     if (didCooldownEnd)
                     {
-                        talentsState.ResetCooldownEndTick();
+                        talentsState.ClearCooldown();
                     }
                 }
             }
@@ -293,6 +310,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedDeactivateKOTalentEvents.Sort();
                 _presentationNetEventsHandler.ProcessDeactivateKOTalentEvents(_cachedUnprocessedDeactivateKOTalentEvents);
+            }
+        }
+
+        private void ProcessPerformDashPulseEvents(FixedUnorderedList<PerformDashPulseNetEventS2C> performDashPulseNetEvents)
+        {
+            _cachedUnprocessedPerformDashPulseEvents.Clear();
+
+            foreach (var netEvent in performDashPulseNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPerformDashPulseEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPerformDashPulseEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPerformDashPulseEvents.Sort();
+                _presentationNetEventsHandler.ProcessPerformDashPulseEvents(_cachedUnprocessedPerformDashPulseEvents);
+            }
+        }
+
+        private void ProcessUpdatePlayerTalentStockEvents(FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> updatePlayerTalentStocksNetEvents)
+        {
+            _cachedUnprocessedUpdatePlayerTalentStocksEvents.Clear();
+
+            foreach (var netEvent in updatePlayerTalentStocksNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedUpdatePlayerTalentStocksEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedUpdatePlayerTalentStocksEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedUpdatePlayerTalentStocksEvents.Sort();
+                _presentationNetEventsHandler.ProcessUpdatePlayerTalentStocksEvents(_cachedUnprocessedUpdatePlayerTalentStocksEvents);
             }
         }
 

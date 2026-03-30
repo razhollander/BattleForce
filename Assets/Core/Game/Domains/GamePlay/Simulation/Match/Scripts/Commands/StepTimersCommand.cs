@@ -1,10 +1,8 @@
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -14,18 +12,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPowerUpsSpawnerService _powerUpsSpawnerService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IHeadLessQuitterController _headLessQuitterController;
-        private IStageDataService _stageDataService;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         
         private float _deltaTime;
-        private int _tick;
-
-        public StepTimersCommand SetStepTick(int tick)
-        {
-            _tick = tick;
-            return this;
-        }
-        
+   
         public StepTimersCommand SetStepDeltaTime(float deltaTime)
         {
             _deltaTime = deltaTime;
@@ -39,53 +29,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
-            _stageDataService = _diContainer.Resolve<IStageDataService>();
         }
 
         public void Execute()
         {
             StepPlayersShootCooldown(_deltaTime);
-            ResetPlayersTalentsCooldownsIfEnded();
             _powerUpsSpawnerService.StepTimer(_deltaTime);
             _playersInLavaTrackerService.StepTimePassedSinceLastDamageTaken(_deltaTime);
             _headLessQuitterController.StepTimer(_deltaTime);
-            StepPreperationPhaseTimer();
+            StepPreperationPhaseTimer(_deltaTime);
         }
 
-        private void StepPreperationPhaseTimer()
+        private void StepPreperationPhaseTimer(float deltaTime)
         {
             if (!_matchDataService.SimulationState.IsInPreparationPhase)
             {
                 return;
             }
             
-            _preparationPhaseTimerService.StepPreperationPhaseTimer(_deltaTime);
+            _preparationPhaseTimerService.StepPreperationPhaseTimer(deltaTime);
         }
-
-        private void ResetPlayersTalentsCooldownsIfEnded()
-        {
-            foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
-            {
-                for (int i = 0; i < playerState.Spaceship.TalentsState.Talents.Count; i++)
-                {
-                    var playerTalent = playerState.Spaceship.TalentsState.Talents[i];
-                    if (!playerTalent.IsOnCooldown())
-                    {
-                        continue;
-                    }
-
-                    var didCooldownEnd = playerTalent.CooldownEndTick <= _tick;
-                    if (!didCooldownEnd)
-                    {
-                        continue;
-                    }
-
-                    playerTalent.ResetCooldownEndTick();
-                    playerState.Spaceship.TalentsState.Talents[i] = playerTalent;
-                }
-            }
-        }
-
+        
         private void StepPlayersShootCooldown(float deltaTime)
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())

@@ -34,6 +34,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents;
         public FixedUnorderedList<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents;
         public FixedUnorderedList<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents;
+        public FixedUnorderedList<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents;
+        public FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
 
         public MatchFullTickPacketS2C()
@@ -66,9 +68,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             KOProjectHitPlayerNetEvents = new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(maxCap.KOProjectHitPlayerNetEvents);
             CreateKOProjectileNetEvents = new FixedUnorderedList<CreateKOProjectileNetEventS2C>(maxCap.CreateKOProjectileNetEvents);
             DeactivateKOTalentNetEvents = new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
+            PerformDashPulseNetEvents = new FixedUnorderedList<PerformDashPulseNetEventS2C>(maxCap.PerformDashPulseNetEvents);
+            UpdatePlayerTalentStocksNetEvents = new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(maxCap.UpdatePlayerTalentStocksNetEvents);
         }
-
-
+        
         // public FullTickPacket(int tick, SimulationStateS2C previousSimulationState,
         //     SimulationStateS2C currentSimulationState, List<BulletSpawnNetEventS2C> bulletSpawnNetEvents,
         //     List<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, List<PlayerTakeDamageNetEventS2C> playerTakeDamageNetEvents,
@@ -108,6 +111,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedCreateKOProjectileNetEvents(writer);
             SerializedKOProjectHitPlayerNetEvents(writer);
             SerializedDeactivateKOTalentNetEvents(writer);
+            SerializedPerformDashPulseNetEvents(writer);
+            SerializedUpdatePlayerTalentStocksNetEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
         }
 
@@ -289,6 +294,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedCreateKOProjectileNetEvents(reader);
             DeserializedKOProjectHitPlayerNetEvents(reader);
             DeserializedDeactivateKOTalentNetEvents(reader);
+            DeserializedPerformDashPulseNetEvents(reader);
+            DeserializedUpdatePlayerTalentStocksNetEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
         }
 
@@ -576,6 +583,46 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             {
                 ref var bulletSpawnEvent = ref BulletSpawnNetEvents.AddAndGet();
                 bulletSpawnEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPerformDashPulseNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PerformDashPulseNetEvents.Count);
+            foreach (var evt in PerformDashPulseNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void DeserializedPerformDashPulseNetEvents(NetDataReader reader)
+        {
+            var count = reader.GetByte();
+            PerformDashPulseNetEvents.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                ref var evt = ref PerformDashPulseNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void SerializedUpdatePlayerTalentStocksNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)UpdatePlayerTalentStocksNetEvents.Count);
+            foreach (var evt in UpdatePlayerTalentStocksNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void DeserializedUpdatePlayerTalentStocksNetEvents(NetDataReader reader)
+        {
+            var count = reader.GetByte();
+            UpdatePlayerTalentStocksNetEvents.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                ref var evt = ref UpdatePlayerTalentStocksNetEvents.AddAndGet();
+                evt.Deserialize(reader);
             }
         }
     }

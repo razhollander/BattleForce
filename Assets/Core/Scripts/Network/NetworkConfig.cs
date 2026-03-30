@@ -80,6 +80,10 @@ namespace Core.Scripts.Network
         public int KOProjectHitPlayerNetEvents = 128;
         public int CreateKOProjectileNetEvents = 128;
         public int DeactivateKOTalentNetEvents = 128;
+        public int PerformDashPulseNetEvents = 128;
+        public int UpdatePlayerTalentStocksNetEvents = 128;
+        public int DeactivateDashPulseTalentNetEvents = 128;
+        public int UpdatePlayerTalentStocksNetEvent = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel
@@ -89,5 +93,6 @@ namespace Core.Scripts.Network
             public int MaxSprings = 8;
             public int MaxTeleportGatePairs = 4;
         }
+
     }
 }
