@@ -24,6 +24,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoa
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
@@ -64,6 +65,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         {
             Container.Bind<IGamePlayMatchInitiator>().To<GamePlayMatchInitiator>().AsSingle().NonLazy();
             Container.Bind<IMatchDataService>().To<MatchDataService>().AsSingle().NonLazy();
+            Container.Bind<IStageCancellationTokenProvider>().To<StageCancellationTokenProvider>().AsSingle().NonLazy();
             Container.Rebind<ITickProcessor>().To<ClientMatchNetworkTickProcessor>().AsSingle().NonLazy();
             Container.Bind<IFullTickPacketsHandler>().To<MatchFullTickPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IClientMatchPresentationTickProcessor>().To<ClientMatchPresentationTickProcessor>().AsSingle().NonLazy();

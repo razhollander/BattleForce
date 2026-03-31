@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
@@ -11,17 +12,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
     {
         private readonly IMatchDataService _matchDataService;
         private readonly EnvironmentTeleportGateView _prefab;
-        private readonly IStateMachineService _stateMachineService;
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly DiContainer _container;
         private Transform _parent;
         private readonly List<EnvironmentTeleportGatePairController> _controllers = new List<EnvironmentTeleportGatePairController>();
 
-        public EnvironmentTeleportGateControllers(IMatchDataService matchDataService, EnvironmentTeleportGateView teleportGateViewPrefab, IStateMachineService stateMachineService, PresentationGamePlayConfig gamePlayConfig)
+        public EnvironmentTeleportGateControllers(IMatchDataService matchDataService, EnvironmentTeleportGateView teleportGateViewPrefab, IStageCancellationTokenProvider stageCancellationTokenProvider,
+            PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
             _prefab = teleportGateViewPrefab;
-            _stateMachineService = stateMachineService;
+            _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _gamePlayConfig = gamePlayConfig;
         }
 
@@ -54,7 +56,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
 
         public void PlayTeleportAnimation(ushort pairId)
         {
-            GetGate(pairId).PlayTeleportAnimation(_stateMachineService.CurrentState().CancellationTokenSource);
+            GetGate(pairId).PlayTeleportAnimation(_stageCancellationTokenProvider.CancellationTokenSource);
         }
 
         public void UpdateTeleportGateTransform(ushort pairId)

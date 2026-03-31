@@ -14,8 +14,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
         {
             _lineRenderer.SetPosition(0, from);
             _lineRenderer.SetPosition(1, to);
-            await Awaitable.WaitForSecondsAsync(duration, cancellationToken: cancellationTokenSource.Token);
-            Despawn();        
+
+            try
+            {
+                await Awaitable.WaitForSecondsAsync(duration, cancellationToken: cancellationTokenSource.Token);
+            }
+            finally
+            {
+                Despawn();        
+            }
         }
 
         public void OnCreated()

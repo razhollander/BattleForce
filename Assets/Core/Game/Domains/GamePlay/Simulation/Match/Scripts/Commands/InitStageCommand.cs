@@ -117,6 +117,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.PowerUpBalls.Clear();
             _matchDataService.SimulationState.TalentCards.Clear();
             _matchDataService.SimulationState.SwapFields.Clear();
+            _matchDataService.SimulationState.KOProjectiles.Clear();
             _matchDataService.EnvironmentData.ClearData();
         }
 

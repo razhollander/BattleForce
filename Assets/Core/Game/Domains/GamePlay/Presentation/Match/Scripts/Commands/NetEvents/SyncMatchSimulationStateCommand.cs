@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
@@ -13,6 +15,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
@@ -21,6 +24,7 @@ using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -47,6 +51,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private NetworkConfig _networkConfig;
         private IEnvironmentFieldBarrierControllers _environmentFieldBarrierControllers;
         private ISwapFieldControllers _swapFieldControllers;
+        private IKOProjectilesControllers _kOProjectilesControllers;
+        private IStageCancellationTokenProvider _stageCancellationTokenProvider;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -76,12 +82,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _environmentFieldBarrierControllers = _diContainer.Resolve<IEnvironmentFieldBarrierControllers>();
             _swapFieldControllers = _diContainer.Resolve<ISwapFieldControllers>();
+            _kOProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
+            _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
         }
 
         public void Execute()
         {
             _matchDataService.StartPhaseInitialTick = _simulationState.StartPhaseInitialTick;
             _matchDataService.IsInPreparationPhase = _simulationState.IsInPreparationPhase;
+            _stageCancellationTokenProvider.CancelAndRegenarateStageToken();
             DestroyAll();
             CreateAll();
         }
@@ -102,6 +111,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _teleportGateControllers.DestroyAll();
             _environmentFieldBarrierControllers.DestroyAll();
             _swapFieldControllers.DestroyAll();
+            _kOProjectilesControllers.DestroyAll();
         }
 
         private void CreateAll()

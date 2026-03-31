@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 4681685721148872250}
   - component: {fileID: 5447874160441701297}
   m_Layer: 5
-  m_Name: MonyText
+  m_Name: MoneyText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
