@@ -165,7 +165,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 for (int i = 0; i < playerModel.Spaceship.TalentsState.Talents.Count; i++)
                 {
                     ref var talentsState = ref playerModel.Spaceship.TalentsState.Talents.Get(i);
-                    if (talentsState.CooldownType != TalentCooldownType.Normal)
+                    var isNormalCooldownType = talentsState.CooldownType == TalentCooldownType.Normal;
+                    if (!isNormalCooldownType)
                     {
                         continue;
                     }

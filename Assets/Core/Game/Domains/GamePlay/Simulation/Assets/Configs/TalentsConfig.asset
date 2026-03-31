@@ -31,7 +31,7 @@ MonoBehaviour:
     ProjectileSpeed: 50
     ProjectileSize: 1
     ReturnSpeedMultiplier: 2
-    MaxFirstPhaseDuration: 1
+    MaxFirstPhaseDuration: 0.3
     PushForce: 50
     MaxSpin: 55
     MinSpin: 50

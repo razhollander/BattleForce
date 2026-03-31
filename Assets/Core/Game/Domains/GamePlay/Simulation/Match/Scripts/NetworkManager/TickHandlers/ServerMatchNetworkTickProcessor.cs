@@ -49,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private StartMatchPacketS2C _cachedStartMatchPacket;
         private StartStagePacketS2C _startStagePacket;
         private TryEndStagePreparationPhaseCommand _tryEndStagePreparationPhaseCommand;
+        private StepAllPlayersTalentsCooldownsCommand _stepAllPlayersTalentsCooldownsCommand;
         //private TimerFixedThreaded2 _pollEventsFixedTimer;
         private Stopwatch _sw;
         private long _last;
@@ -83,6 +84,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
             _tryEndStagePreparationPhaseCommand = _commandFactory.CreateCommandVoid<TryEndStagePreparationPhaseCommand>();
+            _stepAllPlayersTalentsCooldownsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCooldownsCommand>();
             _tickService.RegisterObserver(this);
         }
 
@@ -115,7 +117,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 var stepDeltaTime = _networkConfig.DeltaTime;
 
                 TryHandleStageEnded(currentTick, stepDeltaTime);
-                _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).SetStepTick(currentTick).Execute();
+                _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
+                _stepAllPlayersTalentsCooldownsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick, stepDeltaTime);
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();

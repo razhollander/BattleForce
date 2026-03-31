@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -10,12 +11,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.
 {
     public class GainBoltEffectController : IGainBoltEffectController
     {
-        private readonly IStateMachineService _stateMachineService;
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly GainBoltEffectPool _effectsPool;
         
-        public GainBoltEffectController(GainBoltEffectView prefab, DiContainer diContainer, IStateMachineService stateMachineService)
+        public GainBoltEffectController(GainBoltEffectView prefab, DiContainer diContainer, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
-            _stateMachineService = stateMachineService;
+            _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _effectsPool = new GainBoltEffectPool(prefab, diContainer);
         }
 
@@ -26,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.
         
         public void PlayEffect(int boltsAmount, Vector2 position, Transform parent)
         {
-            PlayEffectAsync(boltsAmount, position, parent, _stateMachineService.CurrentState().CancellationTokenSource).Forget();
+            PlayEffectAsync(boltsAmount, position, parent, _stageCancellationTokenProvider.CancellationTokenSource).Forget();
         }
 
         private async Awaitable PlayEffectAsync(int boltsAmount, Vector2 position, Transform parent, CancellationTokenSource cancellationTokenSource)

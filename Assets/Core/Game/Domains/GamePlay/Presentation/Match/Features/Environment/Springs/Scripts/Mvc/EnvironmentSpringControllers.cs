@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -12,16 +13,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
     {
         private readonly IMatchDataService _matchDataService;
         private readonly EnvironmentSpringView _environmentSpringViewPrefab;
-        private readonly IStateMachineService _stateMachineService;
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly Dictionary<ushort, MatchEnvironmentSpringController> _springControllers = new Dictionary<ushort, MatchEnvironmentSpringController>();
         private GameObject _springsParent;
 
-        public EnvironmentSpringControllers(IMatchDataService matchDataService, EnvironmentSpringView environmentSpringViewPrefab, IStateMachineService stateMachineService, PresentationGamePlayConfig gamePlayConfig)
+        public EnvironmentSpringControllers(IMatchDataService matchDataService, EnvironmentSpringView environmentSpringViewPrefab, IStageCancellationTokenProvider stageCancellationTokenProvider, PresentationGamePlayConfig gamePlayConfig)
         {
             _matchDataService = matchDataService;
             _environmentSpringViewPrefab = environmentSpringViewPrefab;
-            _stateMachineService = stateMachineService;
+            _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _gamePlayConfig = gamePlayConfig;
         }
 
@@ -55,7 +56,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
 
         public void PlaySpringBounceAnimation(ushort springId)
         {
-            _springControllers[springId].PlayBounceAnimation(_stateMachineService.CurrentState().CancellationTokenSource);
+            _springControllers[springId].PlayBounceAnimation(_stageCancellationTokenProvider.CancellationTokenSource);
         }
     }
 }

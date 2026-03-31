@@ -10,10 +10,4 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         DashPulse = 5,
         KO = 6,
     }
-    
-    public enum TalentCooldownType
-    {
-        Normal = 0,
-        Stocks = 1,
-    }
 }
