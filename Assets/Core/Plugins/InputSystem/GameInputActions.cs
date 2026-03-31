@@ -226,6 +226,17 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""61860cec-2245-481c-90bd-7ca2622c8e1d"",
+                    ""path"": ""<DualShockGamepad>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""8cf7ce48-ccf3-4828-8432-93f4f6b1e116"",
                     ""path"": ""<DualShockGamepad>/leftStick/right"",
                     ""interactions"": """",
@@ -237,8 +248,19 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""3b16907d-a971-4655-90ba-4a92c58fca2d"",
+                    ""path"": ""<DualShockGamepad>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""d765a5aa-a722-420a-bcee-da7e4df73d38"",
-                    ""path"": ""<DualShockGamepad>/rightTrigger"",
+                    ""path"": ""<DualShockGamepad>/leftTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Joystick;Gamepad"",
@@ -249,7 +271,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""6e848ecb-3969-43f2-989e-f4b38ed904e4"",
-                    ""path"": ""<DualShockGamepad>/buttonEast"",
+                    ""path"": ""<DualShockGamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Joystick;Gamepad"",
@@ -260,7 +282,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""ddb5432c-68a7-4065-a5ac-b80cb15a0729"",
-                    ""path"": ""<DualShockGamepad>/buttonNorth"",
+                    ""path"": ""<DualShockGamepad>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Joystick;Gamepad"",
