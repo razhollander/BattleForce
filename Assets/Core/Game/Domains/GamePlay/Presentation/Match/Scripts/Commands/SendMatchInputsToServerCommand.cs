@@ -26,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         private IMatchPlayerControllers _matchPlayerControllers;
         private IMatchDataService _matchDataService;
         private IWorldCameraController _worldCameraController;
+        private IInputBeingUsedService _inputBeingUsedService;
 
         public override void ResolveDependencies()
         {
@@ -37,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
              _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
              _matchDataService = _diContainer.Resolve<IMatchDataService>();
              _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
+             _inputBeingUsedService = _diContainer.Resolve<IInputBeingUsedService>();
         }
 
         public void Execute()
@@ -71,7 +73,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             var playerPos = _matchPlayerControllers.GetPlayerPosition(localPlayerId);
             var mousePos = Input.mousePosition;
             var mouseWorldPos = _worldCameraController.ScreenToWorldPoint(mousePos).ToVector2XY();
-            return (mouseWorldPos - playerPos).normalized.ToNumericsVector2();
+            var mouseDirection = (mouseWorldPos - playerPos).normalized;
+            var gamePadAimDirection = _gameInputActionsController.GetAimDirection();
+            var aimDirection = _inputBeingUsedService.AimInputType == AimInputType.RightGamePad ? gamePadAimDirection.ToNumericsVector2() : mouseDirection.ToNumericsVector2();
+            return aimDirection;
         }
     }
 }

@@ -41,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
             Container.Bind<ITickCounterService>().To<TickCounterService>().AsSingle().NonLazy();
             Container.Bind<IPlaybackIOService>().To<PlaybackIOService>().AsSingle().NonLazy();
             Container.Bind<IJoinResponsePacketHandler>().To<JoinResponsePacketHandler>().AsSingle().NonLazy();
+            Container.Bind<IInputBeingUsedService>().To<InputBeingUsedService>().AsSingle().NonLazy();
         }
 
         private void BindControllers()

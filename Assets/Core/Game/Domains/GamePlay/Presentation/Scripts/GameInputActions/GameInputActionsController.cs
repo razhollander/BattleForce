@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
     {
         private readonly global::GameInputActions _gameInputActions;
         private readonly ICommandFactory _commandFactory;
+        private Vector2 _lastAimDirection;
 
         public GameInputActionsController(
             global::GameInputActions gameInputActions,
@@ -71,7 +72,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         {
             return _gameInputActions.GamePlay.MoveForward.IsPressed();
         }
-        
+
+        public Vector2 GetAimDirection()
+        {
+            var currentAim =  _gameInputActions.GamePlay.Aim.ReadValue<Vector2>();
+
+            if (currentAim.sqrMagnitude > 0.25f)
+            {
+                _lastAimDirection = currentAim;
+            }
+
+            return _lastAimDirection;
+        }
+
         public bool IsShootInputPressed()
         {
             return _gameInputActions.GamePlay.Shoot.IsPressed();

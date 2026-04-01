@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private IChooseNetworkRoleUIController _chooseNetworkRoleUIController;
         private IDataPersistence _dataPersistence;
         private IJoinResponsePacketHandler _joinResponsePacketHandler;
+        private IInputBeingUsedService _inputBeingUsedService;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -32,11 +33,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _chooseNetworkRoleUIController = _diContainer.Resolve<IChooseNetworkRoleUIController>();
             _joinResponsePacketHandler = _diContainer.Resolve<IJoinResponsePacketHandler>();
             _dataPersistence = _diContainer.Resolve<IDataPersistence>();
+            _inputBeingUsedService = _diContainer.Resolve<IInputBeingUsedService>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
             _gameInputActionsController.EnableInputs();
+            _inputBeingUsedService.InitEntryPoint();
             _chooseNetworkRoleUIController.InitEntryPoint();
             _joinResponsePacketHandler.InitEntryPoint();
         }
