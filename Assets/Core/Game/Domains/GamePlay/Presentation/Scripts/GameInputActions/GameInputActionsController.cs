@@ -15,6 +15,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 {
     public class GameInputActionsController : IGameInputActionsController
     {
+        private const float MIN_AIM_THRESHOLD = 0.1f;
+        private const float MIN_MOVE_THRESHOLD = 0.1f;
         private readonly global::GameInputActions _gameInputActions;
         private readonly ICommandFactory _commandFactory;
         private Vector2 _lastAimDirection;
@@ -76,13 +78,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         public Vector2 GetAimDirection()
         {
             var currentAim =  _gameInputActions.GamePlay.Aim.ReadValue<Vector2>();
-
-            if (currentAim.sqrMagnitude > 0.25f)
+            var isAimNotZero = currentAim.sqrMagnitude > MIN_AIM_THRESHOLD;
+            if (isAimNotZero)
             {
                 _lastAimDirection = currentAim;
             }
 
             return _lastAimDirection;
+        }
+
+        public Vector2 GetMoveDirection()
+        {
+            return _gameInputActions.GamePlay.MoveDirection.ReadValue<Vector2>();
         }
 
         public bool IsShootInputPressed()

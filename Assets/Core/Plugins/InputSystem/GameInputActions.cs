@@ -153,6 +153,15 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""MoveDirection"",
+                    ""type"": ""Value"",
+                    ""id"": ""d49c52bb-8879-4e86-b026-20d5cff0b9d1"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -307,6 +316,17 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Aim"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""13cfce55-da79-47eb-b25a-4e5b6a1635c6"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDirection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -901,6 +921,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         m_GamePlay_SwitchTalent = m_GamePlay.FindAction("SwitchTalent", throwIfNotFound: true);
         m_GamePlay_MoveForward = m_GamePlay.FindAction("MoveForward", throwIfNotFound: true);
         m_GamePlay_Aim = m_GamePlay.FindAction("Aim", throwIfNotFound: true);
+        m_GamePlay_MoveDirection = m_GamePlay.FindAction("MoveDirection", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1001,6 +1022,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_GamePlay_SwitchTalent;
     private readonly InputAction m_GamePlay_MoveForward;
     private readonly InputAction m_GamePlay_Aim;
+    private readonly InputAction m_GamePlay_MoveDirection;
     /// <summary>
     /// Provides access to input actions defined in input action map "GamePlay".
     /// </summary>
@@ -1040,6 +1062,10 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "GamePlay/Aim".
         /// </summary>
         public InputAction @Aim => m_Wrapper.m_GamePlay_Aim;
+        /// <summary>
+        /// Provides access to the underlying input action "GamePlay/MoveDirection".
+        /// </summary>
+        public InputAction @MoveDirection => m_Wrapper.m_GamePlay_MoveDirection;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1087,6 +1113,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @Aim.started += instance.OnAim;
             @Aim.performed += instance.OnAim;
             @Aim.canceled += instance.OnAim;
+            @MoveDirection.started += instance.OnMoveDirection;
+            @MoveDirection.performed += instance.OnMoveDirection;
+            @MoveDirection.canceled += instance.OnMoveDirection;
         }
 
         /// <summary>
@@ -1119,6 +1148,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @Aim.started -= instance.OnAim;
             @Aim.performed -= instance.OnAim;
             @Aim.canceled -= instance.OnAim;
+            @MoveDirection.started -= instance.OnMoveDirection;
+            @MoveDirection.performed -= instance.OnMoveDirection;
+            @MoveDirection.canceled -= instance.OnMoveDirection;
         }
 
         /// <summary>
@@ -1468,6 +1500,13 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAim(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MoveDirection" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMoveDirection(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

@@ -1,3 +1,4 @@
+using System;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
@@ -43,15 +44,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 
         public void Execute()
         {
-            var isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
-            var isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
             var isShootInputPressed = _gameInputActionsController.IsShootInputPressed();
             var isTalentInputPressed = _gameInputActionsController.IsTalentInputPressed();
             var isSwitchTalentInputPressed = _gameInputActionsController.IsSwitchTalentInputPressed();
+     
+
+            CalculateRightAndLeftInputs(_matchDataService.LocalPlayer.Spaceship.Transform.Direction, out var isMoveRightInputPressed, out var isMoveLeftInputPressed);
             LogService.LogTopic(
                 $"Sending: isMoveRightInputPressed:{isMoveRightInputPressed},isMoveLeftInputPressed:{isMoveLeftInputPressed},isShootInputPressed:{isShootInputPressed}",
                 LogTopicType.ClientNetwork);
-
             var playerInputPacket = new MatchPlayerInputPacketC2S
             {
                 Tick = _tickCounterService.CurrentClientTick,
@@ -65,6 +66,54 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             };
             
             _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchPlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
+        }
+
+        private void CalculateRightAndLeftInputs(Vector2 playerDirection, out bool isMoveRightInputPressed, out bool isMoveLeftInputPressed)
+        {
+            if (_inputBeingUsedService.AimInputType == AimInputType.Mouse)
+            {
+                isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
+                isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
+            }
+            else
+            {
+                var gamePadMoveDirection = _gameInputActionsController.GetMoveDirection().ToNumericsVector2();
+                (isMoveRightInputPressed, isMoveLeftInputPressed) = GetDirectionChangeInputs(playerDirection, gamePadMoveDirection);
+            }
+        }
+        
+        // Threshold in radians (e.g., 45 degrees is ~0.785 radians)
+        private const float TurnThresholdRad = 0.05f;
+
+        private (bool shouldChangeDirectionLocalRight, bool shouldChangeDirectionLocalLeft) GetDirectionChangeInputs(
+            Vector2 currentMovement, 
+            Vector2 joystickDirection)
+        {
+            // 1. Check for zero/near-zero vectors to avoid NaN results
+            if (currentMovement.LengthSquared() < 0.01f || joystickDirection.LengthSquared() < 0.01f)
+            {
+                return (false, false);
+            }
+
+            // 2. Normalize vectors for consistent angular calculation
+            Vector2 v1 = Vector2.Normalize(currentMovement);
+            Vector2 v2 = Vector2.Normalize(joystickDirection);
+
+            // 3. Calculate the signed angle in Radians
+            // Dot product gives us the Cosine of the angle
+            float dot = Vector2.Dot(v1, v2);
+            // Determinant (2D Cross Product) gives us the Sine/Direction
+            float det = v1.X * v2.Y - v1.Y * v2.X;
+        
+            float angle = (float)Math.Atan2(det, dot);
+
+            // 4. Determine direction
+            // Positive angle = Counter-Clockwise (Left)
+            // Negative angle = Clockwise (Right)
+            bool shouldChangeLeft = angle > TurnThresholdRad;
+            bool shouldChangeRight = angle < -TurnThresholdRad;
+
+            return (shouldChangeRight, shouldChangeLeft);
         }
 
         private Vector2 CalculateAimDirection()

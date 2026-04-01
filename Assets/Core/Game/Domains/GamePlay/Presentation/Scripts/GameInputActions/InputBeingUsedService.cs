@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         private readonly IGameInputActionsController _gameInputActionsController;
         private Vector2 _lastMousePosition;
         private Vector2 _lastGamePadAimDirection;
+        private Vector2 _lastGamePadMoveDirection;
         private bool _lastLeftClickState;
         private bool _lastRightClickState;
 
@@ -74,14 +75,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         private bool IfRightGamePadUsed()
         {
             var currentAimDirection = _gameInputActionsController.GetAimDirection();
-            var isZero = currentAimDirection.sqrMagnitude < 0.01f;
-            if (isZero)
-            {
-                return false;
-            }
+            var currentMoveDirection = _gameInputActionsController.GetMoveDirection();
+            var didChange = _lastGamePadAimDirection != currentAimDirection || _lastGamePadMoveDirection != currentMoveDirection;
             
-            var didChange = _lastGamePadAimDirection != currentAimDirection;
             _lastGamePadAimDirection = currentAimDirection;
+            _lastGamePadMoveDirection = currentMoveDirection;
             return didChange;
         }
 
