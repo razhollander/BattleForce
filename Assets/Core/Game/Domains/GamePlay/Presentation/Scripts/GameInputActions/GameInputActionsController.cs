@@ -16,7 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
     public class GameInputActionsController : IGameInputActionsController
     {
         private const float MIN_AIM_THRESHOLD = 0.1f;
-        private const float MIN_MOVE_THRESHOLD = 0.1f;
+        
         private readonly global::GameInputActions _gameInputActions;
         private readonly ICommandFactory _commandFactory;
         private Vector2 _lastAimDirection;

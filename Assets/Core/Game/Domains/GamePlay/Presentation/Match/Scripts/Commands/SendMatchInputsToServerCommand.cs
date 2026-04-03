@@ -21,7 +21,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
     {
         private IClientNetworkManager _clientNetworkManager;
         private IGameInputActionsController _gameInputActionsController;
-        private ITickProcessor _tickProcessor;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private ITickCounterService _tickCounterService;
         private IMatchPlayerControllers _matchPlayerControllers;
@@ -33,7 +32,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         {
              _clientNetworkManager = _diContainer.Resolve<IClientNetworkManager>();
              _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
-             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
              _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
              _tickCounterService = _diContainer.Resolve<ITickCounterService>();
              _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
@@ -77,45 +75,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             // else
             // {
             //     var gamePadMoveDirection = _gameInputActionsController.GetMoveDirection().ToNumericsVector2();
-            //     (isMoveRightInputPressed, isMoveLeftInputPressed) = GetDirectionChangeInputs(playerDirection, gamePadMoveDirection);
+            //     (isMoveRightInputPressed, isMoveLeftInputPressed) = MathUtils.GetDirectionChangeInputs(playerDirection, gamePadMoveDirection);
             // }
         }
         
-        // Threshold in radians (e.g., 45 degrees is ~0.785 radians)
-        private const float TurnThresholdRad = 0.1f;
-
-        private (bool shouldChangeDirectionLocalRight, bool shouldChangeDirectionLocalLeft) GetDirectionChangeInputs(
-            Vector2 currentMovement, 
-            Vector2 joystickDirection)
-        {
-            // 1. Deadzone check: avoid jitter or NaN errors when stick is barely touched
-            if (currentMovement.LengthSquared() < 0.01f || joystickDirection.LengthSquared() < 0.01f)
-            {
-                return (false, false);
-            }
-
-            // 2. Normalize to treat these as pure directions
-            Vector2 v1 = Vector2.Normalize(currentMovement);
-            Vector2 v2 = Vector2.Normalize(joystickDirection);
-
-            // 3. The Math:
-            // Dot product = cos(theta)
-            // Determinant (Perp-Dot) = sin(theta)
-            float dot = Vector2.Dot(v1, v2);
-            float det = v1.X * v2.Y - v1.Y * v2.X;
-
-            // Atan2 returns the signed angle in radians (-PI to PI).
-            // This is inherently the shortest arc between the two vectors.
-            float shortestAngle = (float)Math.Atan2(det, dot);
-
-            // 4. Threshold Comparison
-            // Positive result means the target is to the "Left" (Counter-Clockwise)
-            // Negative result means the target is to the "Right" (Clockwise)
-            bool shouldChangeLeft = shortestAngle > TurnThresholdRad;
-            bool shouldChangeRight = shortestAngle < -TurnThresholdRad;
-
-            return (shouldChangeRight, shouldChangeLeft);
-        }
         private Vector2 CalculateAimDirection()
         {
             var localPlayerId = _matchDataService.LocalPlayer.PlayerId;

@@ -1,13 +1,11 @@
-using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 {
-    public class InputBeingUsedService: IUpdatable, IInputBeingUsedService
+    public class InputBeingUsedService : IUpdatable, IInputBeingUsedService
     {
-        public AimInputType AimInputType { get; private set; }
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly IGameInputActionsController _gameInputActionsController;
         private Vector2 _lastMousePosition;
@@ -15,6 +13,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         private Vector2 _lastGamePadMoveDirection;
         private bool _lastLeftClickState;
         private bool _lastRightClickState;
+
+        public AimInputType AimInputType { get; private set; }
 
         public InputBeingUsedService(IUpdateSubscriptionService updateSubscriptionService, IGameInputActionsController gameInputActionsController)
         {
@@ -29,10 +29,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 
         public void ManagedUpdate()
         {
+            UpdateCurrentAimInputType();
+        }
+
+        private void UpdateCurrentAimInputType()
+        {
             if (AimInputType == AimInputType.RightGamePad && IfMouseUsed())
             {
                 AimInputType = AimInputType.Mouse;
             }
+
             if (AimInputType == AimInputType.Mouse && IfRightGamePadUsed())
             {
                 AimInputType = AimInputType.RightGamePad;
@@ -46,29 +52,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         private bool IfMouseUsed()
         {
             var mouse = Mouse.current;
-            if (mouse == null) return false;
+            if (mouse == null)
+            {
+                return false;
+            }
 
-            // 1. Get current states
-            Vector2 currentPosition = mouse.position.ReadValue();
-            bool currentLeftClick = mouse.leftButton.isPressed;
-            bool currentRightClick = mouse.rightButton.isPressed;
+            var currentPosition = mouse.position.ReadValue();
+            var currentLeftClick = mouse.leftButton.isPressed;
+            var currentRightClick = mouse.rightButton.isPressed;
 
-            // 2. Compare against cached states
-            bool hasMoved = currentPosition != _lastMousePosition;
-            bool clickChanged = (currentLeftClick != _lastLeftClickState) || 
+            var hasMouseMoved = currentPosition != _lastMousePosition;
+            var hasClickChanged = (currentLeftClick != _lastLeftClickState) || 
                                 (currentRightClick != _lastRightClickState);
 
-            // 3. Update the cache for the next check
             _lastMousePosition = currentPosition;
             _lastLeftClickState = currentLeftClick;
             _lastRightClickState = currentRightClick;
-            var didChange= hasMoved || clickChanged;
-
-            if (didChange)
-            {
-                LogService.LogError($"Mouse used: hasMoved: {hasMoved}, clickChanged:{clickChanged}");
-            }
-
+            var didChange = hasMouseMoved || hasClickChanged;
             return didChange;
         }
 
