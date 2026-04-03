@@ -49,6 +49,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<KOProjectHitPlayerNetEventS2C> _cachedUnprocessedKOProjectHitPlayerEvents;
         private readonly CapacityList<CreateKOProjectileNetEventS2C> _cachedUnprocessedCreateKOProjectileEvents;
         private readonly CapacityList<DeactivateKOTalentNetEventS2C> _cachedUnprocessedDeactivateKOTalentEvents;
+        private readonly CapacityList<ActivateSentryGunTalentNetEventS2C> _cachedUnprocessedActivateSentryGunTalentEvents;
+        private readonly CapacityList<DeactivateSentryGunTalentNetEventS2C> _cachedUnprocessedDeactivateSentryGunTalentEvents;
         private readonly CapacityList<PerformDashPulseNetEventS2C> _cachedUnprocessedPerformDashPulseEvents;
         private readonly CapacityList<UpdatePlayerTalentStocksNetEventS2C> _cachedUnprocessedUpdatePlayerTalentStocksEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
@@ -85,6 +87,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedKOProjectHitPlayerEvents = new CapacityList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents);
             _cachedUnprocessedCreateKOProjectileEvents = new CapacityList<CreateKOProjectileNetEventS2C>(networkConfig.MaxCap.CreateKOProjectileNetEvents);
             _cachedUnprocessedDeactivateKOTalentEvents = new CapacityList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents);
+            _cachedUnprocessedActivateSentryGunTalentEvents = new CapacityList<ActivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateSentryGunTalentNetEvents);
+            _cachedUnprocessedDeactivateSentryGunTalentEvents = new CapacityList<DeactivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSentryGunTalentNetEvents);
             _cachedUnprocessedPerformDashPulseEvents = new CapacityList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents);
             _cachedUnprocessedUpdatePlayerTalentStocksEvents = new CapacityList<UpdatePlayerTalentStocksNetEventS2C>(networkConfig.MaxCap.UpdatePlayerTalentStocksNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
@@ -134,6 +138,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessKOProjectHitPlayerEvents(latestFullTickPacket.KOProjectHitPlayerNetEvents);
             ProcessCreateKOProjectileEvents(latestFullTickPacket.CreateKOProjectileNetEvents);
             ProcessDeactivateKOTalentEvents(latestFullTickPacket.DeactivateKOTalentNetEvents);
+            ProcessActivateSentryGunTalentEvents(latestFullTickPacket.ActivateSentryGunTalentNetEvents);
+            ProcessDeactivateSentryGunTalentEvents(latestFullTickPacket.DeactivateSentryGunTalentNetEvents);
             ProcessPerformDashPulseEvents(latestFullTickPacket.PerformDashPulseNetEvents);
             ProcessUpdatePlayerTalentStockEvents(latestFullTickPacket.UpdatePlayerTalentStocksNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
@@ -780,5 +786,41 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         {
             _networkManager.UnregisterPacketsObserver(this);
         }
-    }
+
+        private void ProcessActivateSentryGunTalentEvents(FixedUnorderedList<ActivateSentryGunTalentNetEventS2C> activateSentryGunTalentNetEvents)
+        {
+            _cachedUnprocessedActivateSentryGunTalentEvents.Clear();
+            foreach (var netEvent in activateSentryGunTalentNetEvents.AsSpan())
+            {
+                if (IsTickValidToProcess(netEvent.OccuredOnTick))
+                {
+                    _cachedUnprocessedActivateSentryGunTalentEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedActivateSentryGunTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedActivateSentryGunTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessActivateSentryGunTalentEvents(_cachedUnprocessedActivateSentryGunTalentEvents);
+            }
+        }
+
+        private void ProcessDeactivateSentryGunTalentEvents(FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C> deactivateSentryGunTalentNetEvents)
+        {
+            _cachedUnprocessedDeactivateSentryGunTalentEvents.Clear();
+            foreach (var netEvent in deactivateSentryGunTalentNetEvents.AsSpan())
+            {
+                if (IsTickValidToProcess(netEvent.OccuredOnTick))
+                {
+                    _cachedUnprocessedDeactivateSentryGunTalentEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedDeactivateSentryGunTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDeactivateSentryGunTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateSentryGunTalentEvents(_cachedUnprocessedDeactivateSentryGunTalentEvents);
+            }
+        }
+}
 }

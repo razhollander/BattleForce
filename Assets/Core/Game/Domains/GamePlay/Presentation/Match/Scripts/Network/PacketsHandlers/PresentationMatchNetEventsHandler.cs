@@ -440,5 +440,41 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 }
             }
         }
-    }
+
+        public void ProcessActivateSentryGunTalentEvents(CapacityList<ActivateSentryGunTalentNetEventS2C> activateSentryGunTalentNetEvents)
+        {
+            if (activateSentryGunTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in activateSentryGunTalentNetEvents)
+            {
+                if (IsTickProcessed(netEvent.OccuredOnTick))
+                {
+                    continue;
+                }
+
+                _cachedPresentationEventsService.ActivateSentryGunTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateSentryGunTalentEvents(CapacityList<DeactivateSentryGunTalentNetEventS2C> deactivateSentryGunTalentNetEvents)
+        {
+            if (deactivateSentryGunTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in deactivateSentryGunTalentNetEvents)
+            {
+                if (IsTickProcessed(netEvent.OccuredOnTick))
+                {
+                    continue;
+                }
+
+                _cachedPresentationEventsService.DeactivateSentryGunTalentNetEvents.Add(netEvent);
+            }
+        }
+}
 }

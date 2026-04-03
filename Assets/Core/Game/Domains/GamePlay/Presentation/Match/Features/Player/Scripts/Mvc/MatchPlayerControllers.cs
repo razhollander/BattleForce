@@ -64,6 +64,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return _playerControllers.Find(x => x.PlayerId == playerId);
         }
 
+        public void SetPlayerSentryGunState(ushort playerId, bool isSentryGun)
+        {
+            GetPlayer(playerId).SetSentryGunState(isSentryGun);
+        }
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)
         {
             GetPlayer(playerId).SetHealth(currentHealth, maxHealth);

@@ -27,6 +27,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public Action Despawn { get; set; }
 
+        public void SetSentryGunState(bool isSentryGun)
+        {
+            if (isSentryGun)
+            {
+                _spaceShipTransform.localScale = new UnityEngine.Vector3(1.5f, 1.5f, 1.5f); // Simple scaling effect to show the state
+            }
+            else
+            {
+                _spaceShipTransform.localScale = UnityEngine.Vector3.one;
+            }
+        }
         public void SetTalentSprite(Sprite sprite)
         {
             _selectedTalentImage.sprite = sprite;
