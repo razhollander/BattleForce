@@ -17,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private SpriteRenderer _availableBulletSpriteRenderer;
         [SerializeField] private SimpleHealthBar _healthBar; // todo move to the match domain
         [SerializeField] private GameObject _healthBarGameObject; // todo move to the match domain
-        [SerializeField] private PlayerLoadingRingView playerLoadingRingView;
+        [SerializeField] private PlayerLoadingRingView _loadingRingView;
         [SerializeField] private Transform _spaceShipTransform;
         [SerializeField] private Transform _aimArrowTransform; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
@@ -45,12 +45,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void InterpolateBulletLoading(float cooldownLeft, float maxCooldown, float decay)
         {
-            playerLoadingRingView.SetRingScale(cooldownLeft/maxCooldown, decay);
+            _loadingRingView.SetRingScale(cooldownLeft/maxCooldown, decay);
         }
 
         public void InterpolateTalentLoading(float cooldownLeft, float maxCooldown, float decay)
         {
-            playerLoadingRingView.SetTalentRingArc(cooldownLeft, maxCooldown);
+            _loadingRingView.SetTalentRingArc(cooldownLeft, maxCooldown);
         }
         
         public void SetPositionAndRotation(Vector2 position, Quaternion rotation)
@@ -84,6 +84,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnCreated()
         {
             _transform = transform;
+            _loadingRingView.InitEntryPoint();
         }
         
         public void OnSpawned()

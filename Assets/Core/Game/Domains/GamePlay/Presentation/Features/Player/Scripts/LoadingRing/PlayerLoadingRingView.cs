@@ -6,13 +6,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
 {
     public class PlayerLoadingRingView : MonoBehaviour
     {
-        //private float MAX_SCALE = 1f;
+        private const float MAX_RATIO = 1f;
         private const int ArcEmptyValue = 180;
         private const int ArcFullValue = 0;
-        // private readonly Color PowerUpFullColor = Color.yellow;
-        // private readonly Color PowerUpEmptyColor = Color.white;
-        private static readonly int Arc1 = Shader.PropertyToID("_Arc1");
-        private static readonly int Arc2 = Shader.PropertyToID("_Arc2");
+        [SerializeField] private Color _talentFullColor = Color.yellow;
+        [SerializeField] private Color _talentEmptyColor = Color.white;
+        [SerializeField] private float _talentFullThickness = 0.09f;
+        [SerializeField] private float _talentEmptyThickness = 0.062f;
+        private static readonly int Arc = Shader.PropertyToID("_HalfArc");
+        private static readonly int ColorShader = Shader.PropertyToID("_Color");
+        private static readonly int Thickness = Shader.PropertyToID("_Thickness");
+        //private static readonly int Arc2 = Shader.PropertyToID("_Arc2");
 
         [SerializeField] private SpriteRenderer _spriteRenderer;
        // [SerializeField] public float BulletLoadingTime;
@@ -38,8 +42,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
             float ratio = Mathf.Clamp01(cooldownLeft / maxCooldown);
             int arcValue = Mathf.RoundToInt(Mathf.Lerp(ArcFullValue, ArcEmptyValue, ratio));
 
-            _material.SetFloat(Arc1, arcValue);
-            _material.SetFloat(Arc2, arcValue);
+            _material.SetFloat(Arc, arcValue);
+            //LogService.LogError($"scale: {scale}");
+            LogService.LogError($"cooldownLeft: {cooldownLeft}");
+            if (Mathf.Approximately(cooldownLeft, 0))
+            {
+                
+               // _spriteRenderer.color = _talentFullColor;
+                _material.SetFloat(Thickness, _talentFullThickness);
+                _material.SetColor(ColorShader, _talentFullColor);
+            }
+            else
+            {
+                //_spriteRenderer.color = _talentEmptyColor;
+                _material.SetFloat(Thickness, _talentEmptyThickness);
+                _material.SetColor(ColorShader, _talentEmptyColor);
+
+            }
         }
 
 
@@ -60,16 +79,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
                 _currentScale = scale;
             }
 
-
             transform.localScale = Vector3.one * _currentScale;
-            // if (Mathf.Approximately(scale, MAX_SCALE))
-            // {
-            //     _spriteRenderer.color = PowerUpFullColor;
-            // }
-            // else
-            // {
-            //     _spriteRenderer.color = PowerUpEmptyColor;
-            // }
         }
 
         // public void DoBulletLoading(TweenCallback onComplete)
