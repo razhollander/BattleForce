@@ -47,8 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             var isShootInputPressed = _gameInputActionsController.IsShootInputPressed();
             var isTalentInputPressed = _gameInputActionsController.IsTalentInputPressed();
             var isSwitchTalentInputPressed = _gameInputActionsController.IsSwitchTalentInputPressed();
-     
-
+            
             CalculateRightAndLeftInputs(_matchDataService.LocalPlayer.Spaceship.Transform.Direction, out var isMoveRightInputPressed, out var isMoveLeftInputPressed);
             LogService.LogTopic(
                 $"Sending: isMoveRightInputPressed:{isMoveRightInputPressed},isMoveLeftInputPressed:{isMoveLeftInputPressed},isShootInputPressed:{isShootInputPressed}",
@@ -70,52 +69,53 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 
         private void CalculateRightAndLeftInputs(Vector2 playerDirection, out bool isMoveRightInputPressed, out bool isMoveLeftInputPressed)
         {
-            if (_inputBeingUsedService.AimInputType == AimInputType.Mouse)
-            {
+            //if (_inputBeingUsedService.AimInputType == AimInputType.Mouse)
+            //{
                 isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
                 isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
-            }
-            else
-            {
-                var gamePadMoveDirection = _gameInputActionsController.GetMoveDirection().ToNumericsVector2();
-                (isMoveRightInputPressed, isMoveLeftInputPressed) = GetDirectionChangeInputs(playerDirection, gamePadMoveDirection);
-            }
+            //}
+            // else
+            // {
+            //     var gamePadMoveDirection = _gameInputActionsController.GetMoveDirection().ToNumericsVector2();
+            //     (isMoveRightInputPressed, isMoveLeftInputPressed) = GetDirectionChangeInputs(playerDirection, gamePadMoveDirection);
+            // }
         }
         
         // Threshold in radians (e.g., 45 degrees is ~0.785 radians)
-        private const float TurnThresholdRad = 0.05f;
+        private const float TurnThresholdRad = 0.1f;
 
         private (bool shouldChangeDirectionLocalRight, bool shouldChangeDirectionLocalLeft) GetDirectionChangeInputs(
             Vector2 currentMovement, 
             Vector2 joystickDirection)
         {
-            // 1. Check for zero/near-zero vectors to avoid NaN results
+            // 1. Deadzone check: avoid jitter or NaN errors when stick is barely touched
             if (currentMovement.LengthSquared() < 0.01f || joystickDirection.LengthSquared() < 0.01f)
             {
                 return (false, false);
             }
 
-            // 2. Normalize vectors for consistent angular calculation
+            // 2. Normalize to treat these as pure directions
             Vector2 v1 = Vector2.Normalize(currentMovement);
             Vector2 v2 = Vector2.Normalize(joystickDirection);
 
-            // 3. Calculate the signed angle in Radians
-            // Dot product gives us the Cosine of the angle
+            // 3. The Math:
+            // Dot product = cos(theta)
+            // Determinant (Perp-Dot) = sin(theta)
             float dot = Vector2.Dot(v1, v2);
-            // Determinant (2D Cross Product) gives us the Sine/Direction
             float det = v1.X * v2.Y - v1.Y * v2.X;
-        
-            float angle = (float)Math.Atan2(det, dot);
 
-            // 4. Determine direction
-            // Positive angle = Counter-Clockwise (Left)
-            // Negative angle = Clockwise (Right)
-            bool shouldChangeLeft = angle > TurnThresholdRad;
-            bool shouldChangeRight = angle < -TurnThresholdRad;
+            // Atan2 returns the signed angle in radians (-PI to PI).
+            // This is inherently the shortest arc between the two vectors.
+            float shortestAngle = (float)Math.Atan2(det, dot);
+
+            // 4. Threshold Comparison
+            // Positive result means the target is to the "Left" (Counter-Clockwise)
+            // Negative result means the target is to the "Right" (Clockwise)
+            bool shouldChangeLeft = shortestAngle > TurnThresholdRad;
+            bool shouldChangeRight = shortestAngle < -TurnThresholdRad;
 
             return (shouldChangeRight, shouldChangeLeft);
         }
-
         private Vector2 CalculateAimDirection()
         {
             var localPlayerId = _matchDataService.LocalPlayer.PlayerId;

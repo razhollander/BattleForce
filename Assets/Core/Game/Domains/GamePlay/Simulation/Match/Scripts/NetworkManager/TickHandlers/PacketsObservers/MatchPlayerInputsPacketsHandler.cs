@@ -254,8 +254,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var shootState = playerModel.Spaceship.Shoot;
             var playerId = playerModel.Id;
             _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, isShootInputPressed);
-            var wasTalentInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
-            var shouldShoot = wasTalentInputDownThisTick && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
+            var wasShootInputDownThisTick = true;//_simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
+            var shouldShoot = wasShootInputDownThisTick && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
             if (shouldShoot)
             {
                 shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
