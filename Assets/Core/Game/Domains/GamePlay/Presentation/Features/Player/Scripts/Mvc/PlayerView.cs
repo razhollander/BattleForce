@@ -22,6 +22,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _aimArrowTransform; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
+        [SerializeField] private Transform _leftEye;
+        [SerializeField] private Transform _rightEye;
+        [SerializeField] private float _eyeMovementRadius = 0.1f;
+
+        private Vector2 _leftEyeInitialLocalPos;
+        private Vector2 _rightEyeInitialLocalPos;
         
         private Transform _transform;
 
@@ -79,6 +85,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnCreated()
         {
             _transform = transform;
+
+            if (_leftEye != null)
+            {
+                _leftEyeInitialLocalPos = _leftEye.localPosition;
+            }
+
+            if (_rightEye != null)
+            {
+                _rightEyeInitialLocalPos = _rightEye.localPosition;
+            }
         }
         
         public void OnSpawned()
@@ -122,6 +138,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
                 decay,
                 Time.deltaTime
             );
+
+            var eyeOffset = new Vector2(direction.X, direction.Y) * _eyeMovementRadius;
+
+            if (_leftEye != null)
+            {
+                var targetLeftEyePos = _leftEyeInitialLocalPos + eyeOffset;
+                _leftEye.localPosition = MathUtils.ExpDecay((Vector2)_leftEye.localPosition, targetLeftEyePos, decay, Time.deltaTime);
+            }
+
+            if (_rightEye != null)
+            {
+                var targetRightEyePos = _rightEyeInitialLocalPos + eyeOffset;
+                _rightEye.localPosition = MathUtils.ExpDecay((Vector2)_rightEye.localPosition, targetRightEyePos, decay, Time.deltaTime);
+            }
         }
     }
 }
