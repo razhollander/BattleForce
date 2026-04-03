@@ -69,24 +69,34 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 switch (talentState.CooldownType)
                 {
                     case TalentCooldownType.Normal: 
-                        var maxCooldown = talentState.NormalCooldown.MaxCooldown;
-                        var isOnCooldown = talentState.NormalCooldown.IsOnCooldown();
-                        var cooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
-                        _view.UpdateTalentCooldown(i, maxCooldown, cooldownLeft, isOnCooldown);
+                        UpdateTalentViewNormalCooldown(talentState, i, currentServerTick);
                         break;
                     case TalentCooldownType.Stocks: 
-                        var maxCooldown2 = talentState.StocksCooldown.MaxSingleStockCooldown;
-                        var isOnCooldown2 = talentState.StocksCooldown.IsOnCooldown();
-                        var cooldownLeft2 = talentState.StocksCooldown.IsAtMaxStocks() ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
-                        _view.UpdateTalentCooldown(i, maxCooldown2, cooldownLeft2, isOnCooldown2);
-                        _view.UpdateTalentStocks(i, talentState.StocksCooldown.CurrentStocksAmount);
+                        UpdateTalentViewStocksCooldown(talentState, i, currentServerTick);
                         break;
                     default: LogService.LogError("Not implemented cooldown type: " + talentState.CooldownType);
                         break;
                 }
             }
         }
-        
+
+        private void UpdateTalentViewStocksCooldown(TalentStateS2C talentState, int talentViewIndex, int currentServerTick)
+        {
+            var maxCooldown = talentState.StocksCooldown.MaxSingleStockCooldown;
+            var isOnCooldown = talentState.StocksCooldown.IsOnCooldown();
+            var cooldownLeft = talentState.StocksCooldown.IsAtMaxStocks() ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
+            _view.UpdateTalentCooldown(talentViewIndex, maxCooldown, cooldownLeft, isOnCooldown);
+            _view.UpdateTalentStocks(talentViewIndex, talentState.StocksCooldown.CurrentStocksAmount);
+        }
+
+        private void UpdateTalentViewNormalCooldown(TalentStateS2C talentState, int talentViewIndex, int currentServerTick)
+        {
+            var maxCooldown = talentState.NormalCooldown.MaxCooldown;
+            var isOnCooldown = talentState.NormalCooldown.IsOnCooldown();
+            var cooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
+            _view.UpdateTalentCooldown(talentViewIndex, maxCooldown, cooldownLeft, isOnCooldown);
+        }
+
         public void SetSelectedTalent(int talentIndex)
         {
             _view.SetSelectedTalent(talentIndex);

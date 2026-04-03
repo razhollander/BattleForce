@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -11,13 +12,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
     {
         private readonly TeamsBoardContainerView _view;
         private readonly PresentationGamePlayConfig _presentationGamePlayConfig;
-        private readonly IStateMachineService _stateMachineService;
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
 
-        public TeamsBoardUIController(TeamsBoardContainerView view, PresentationGamePlayConfig presentationGamePlayConfig, IStateMachineService stateMachineService)
+        public TeamsBoardUIController(TeamsBoardContainerView view, PresentationGamePlayConfig presentationGamePlayConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _view = view;
             _presentationGamePlayConfig = presentationGamePlayConfig;
-            _stateMachineService = stateMachineService;
+            _stageCancellationTokenProvider = stageCancellationTokenProvider;
         }
 
         public void UpdateTeamGems(ushort teamId, int gems)
@@ -27,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
 
         public void UpdateTeamBolts(ushort teamId, int teamBolts)
         {
-            _view.UpdateTeamBolts(teamId, teamBolts, _stateMachineService.CurrentState().CancellationTokenSource);
+            _view.UpdateTeamBolts(teamId, teamBolts, _stageCancellationTokenProvider.CancellationTokenSource);
         }
 
         public void CreateTeamBoard(ushort teamId, int teamGems, int teamBolts)

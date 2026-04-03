@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentKOProjectileS2C> KOProjectiles;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
-        public int EnvironmentLayoutIndex;
+        public int EnvironmentLayoutId;
         public StageType StageType;
         public int StartPhaseInitialTick;
         public bool IsInPreparationPhase;
@@ -94,7 +94,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 koProjectile.Serialize(writer);
             }
 
-            writer.Put((byte)EnvironmentLayoutIndex);
+            writer.Put((byte)EnvironmentLayoutId);
             writer.Put((byte)StageType);
             writer.Put(StartPhaseInitialTick);
             writer.Put(IsInPreparationPhase);
@@ -168,7 +168,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 koProjectile.Deserialize(reader);
             }
 
-            EnvironmentLayoutIndex = reader.GetByte();
+            EnvironmentLayoutId = reader.GetByte();
             StageType = (StageType)reader.GetByte();
             StartPhaseInitialTick = reader.GetInt();
             IsInPreparationPhase = reader.GetBool();

@@ -137,7 +137,7 @@ MonoBehaviour:
       _teleportGatesJson: 
       _rotatingWheelsJson: 
       _fieldBarriersJson: 
-    - _environmentName: 
+    - _environmentName: A
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: "[\n  {\n    \"Id\": 1,\n    \"Points\": [\n      { \"X\": 20.0,
         \"Y\": -19.0 },\n      { \"X\": 20.0, \"Y\": -20.0 },\n      { \"X\": 23.47,
@@ -778,3 +778,4 @@ MonoBehaviour:
       _teleportGatesJson: 
       _rotatingWheelsJson: 
       _fieldBarriersJson: 
+  AvailableLayoutIndexes: 00000000030000000400000005000000

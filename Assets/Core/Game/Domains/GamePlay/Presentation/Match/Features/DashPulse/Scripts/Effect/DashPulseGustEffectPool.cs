@@ -5,10 +5,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scrip
 {
     public class DashPulseGustEffectPool : PrefabsPool<DashPulseGustEffectView>
     {
-        protected override string ParentGameObjectName => "DashPulseGustEffect";
+        protected override string ParentGameObjectName => "DashPulseGustEffectPool";
 
         public DashPulseGustEffectPool(DashPulseGustEffectView view, DiContainer diContainer) : base(
-            new PoolData(3, 1), diContainer, view)
+            new PoolData(6, 1), diContainer, view)
         {
         }
     }

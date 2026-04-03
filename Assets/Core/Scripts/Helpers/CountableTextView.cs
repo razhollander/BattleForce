@@ -25,6 +25,8 @@ namespace CoreDomain.Scripts.Helpers
         private string _zeroDigits = "";
         private readonly StringBuilder _stringBuilder = new StringBuilder();
         private int _goalNumber;
+        
+        private CancellationTokenSource _currentCountingCancellationTokenSource;
 
         public void SetNumber(int number)
         {
@@ -41,47 +43,68 @@ namespace CoreDomain.Scripts.Helpers
 
         public void CountToNumber(int newNumber, CancellationTokenSource cancellationTokenSource, bool isImmediate = false)
         {
+            CountToNumberAsync(newNumber, cancellationTokenSource, isImmediate).Forget();
+        }
+        
+        private async Awaitable CountToNumberAsync(int newNumber, CancellationTokenSource cancellationTokenSource, bool isImmediate = false)
+        {
+            _currentCountingCancellationTokenSource?.Cancel();
+            _currentCountingCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
+            
             if (isImmediate)
             {
-                UpdateText(newNumber - _savedTotalNumber);
+                UpdateText(newNumber);
             }
             else
             {
-                CountAddedNumber(newNumber - _savedTotalNumber, cancellationTokenSource).Forget();
+                try
+                {
+                    await CountToNumberInternal(newNumber, _currentCountingCancellationTokenSource);
+                }
+                finally
+                {
+                    if (cancellationTokenSource.IsCancellationRequested)
+                    {
+                        UpdateText(newNumber);
+                    }
+                }
             }
 
             _savedTotalNumber = newNumber;
         }
 
-        private void UpdateText(int addedNumber)
+        private void UpdateText(int newNumber)
         {
-            _viewTotalNumber += addedNumber;
+            _viewTotalNumber = newNumber;
             RefreshText();
         }
         
-        private async Awaitable CountAddedNumber(int numberAdded, CancellationTokenSource cancellationTokenSource)
+        private async Awaitable CountToNumberInternal(int targetNumber, CancellationTokenSource cancellationTokenSource)
         {
-            var numberLeftToAdd = numberAdded;
-            var isPositive = numberAdded >= 0;
+            var totalDistance = Mathf.Abs(targetNumber - _viewTotalNumber);
+            var distanceTravelled = 0;
 
-            while (numberLeftToAdd > 0)
+            while (distanceTravelled < totalDistance)
             {
-                var numberToAddThisFrame = Mathf.CeilToInt(Time.deltaTime * numberAdded * _textAnimtaionSpeed);
+                var rawDelta = targetNumber - _viewTotalNumber;
+                var step = rawDelta * Time.deltaTime * _textAnimtaionSpeed;
+                var moveAmount = (rawDelta > 0) ? Mathf.Max(1, Mathf.RoundToInt(step)) 
+                    : Mathf.Min(-1, Mathf.RoundToInt(step));
 
-                if ((isPositive && numberToAddThisFrame < numberLeftToAdd) ||
-                    (!isPositive && numberToAddThisFrame > numberLeftToAdd))
+                var willOverStepTargetThisFrame = Mathf.Abs(moveAmount) >= Mathf.Abs(targetNumber - _viewTotalNumber);
+                if (willOverStepTargetThisFrame)
                 {
-                    UpdateText(numberToAddThisFrame);
-                    numberLeftToAdd -= numberToAddThisFrame;
-                }
-                else
-                {
-                    UpdateText(numberLeftToAdd);
-                    numberLeftToAdd -= numberLeftToAdd;
+                    break; 
                 }
 
-                await Awaitable.NextFrameAsync(cancellationToken: cancellationTokenSource.Token);
+                _viewTotalNumber += moveAmount;
+                RefreshText();
+                distanceTravelled += Mathf.Abs(moveAmount);
+                await Awaitable.NextFrameAsync(cancellationTokenSource.Token);
             }
+
+            _viewTotalNumber = targetNumber;
+            RefreshText();
         }
 
         private void RefreshText()

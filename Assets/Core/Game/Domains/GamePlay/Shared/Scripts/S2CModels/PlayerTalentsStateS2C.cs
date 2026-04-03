@@ -126,20 +126,22 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             CooldownType == TalentCooldownType.Normal
                 ? NormalCooldown.IsOnCooldown()
                 : StocksCooldown.IsOnCooldown();
-        // public void ResetCooldownEndTick() => CooldownEndTick = NO_COOLDOWN_TICK;
 
-        public void SetupWithNormalCooldown(TalentType talentType, float maxCooldown)
+        public void Setup(TalentType talentType)
         {
             TalentType = talentType;
+        }
+
+        public void SetupWithNormalCooldown(float maxCooldown)
+        {
             CooldownType = TalentCooldownType.Normal;
             NormalCooldown.MaxCooldown = maxCooldown;
             NormalCooldown.CooldownEndTick = 0;
             StocksCooldown = default;
         }
         
-        public void SetupWithStocksCooldown(TalentType talentType, int maxStocksAmount, float singleStockCooldown)
+        public void SetupWithStocksCooldown(int maxStocksAmount, float singleStockCooldown)
         {
-            TalentType = talentType;
             CooldownType = TalentCooldownType.Stocks;
             StocksCooldown.MaxStocksAmount = maxStocksAmount;
             StocksCooldown.CurrentStocksAmount = maxStocksAmount;
@@ -181,7 +183,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         }
     }
     
-    public struct TalentNormalCooldownStateS2C : ITalentCooldownStrategy
+    public struct TalentNormalCooldownStateS2C
     {
         private const int NO_COOLDOWN_TICK = 0;
 
@@ -205,7 +207,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public void ClearCooldown() => CooldownEndTick = NO_COOLDOWN_TICK;
     }
     
-    public struct TalentStocksCooldownStateS2C : ITalentCooldownStrategy
+    public struct TalentStocksCooldownStateS2C
     {
         public int CurrentStocksAmount;
         public int MaxStocksAmount;
@@ -234,10 +236,5 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             CurrentStocksAmount = MaxStocksAmount;
             RecieveNextStockOnTick = 0;
         }
-    }
-
-    public interface ITalentCooldownStrategy
-    {
-        bool IsOnCooldown();
     }
 }

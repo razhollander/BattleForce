@@ -1,4 +1,6 @@
+using System;
 using System.Threading;
+using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts
@@ -17,8 +19,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
             _bounceAnimationCancellationTokenSource?.Cancel();
             _bounceAnimationCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
             _renderer.sprite = _strechedSprite;
-            await Awaitable.WaitForSecondsAsync(_animationDuration, _bounceAnimationCancellationTokenSource.Token);
-            _renderer.sprite = _pressedSprite;
+            _animationDuration = 10;
+            try
+            {
+                await Awaitable.WaitForSecondsAsync(_animationDuration, _bounceAnimationCancellationTokenSource.Token);
+            }
+            finally
+            {
+                _renderer.sprite = _pressedSprite;
+            }
         }
     }
 }

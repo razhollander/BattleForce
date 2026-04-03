@@ -1,3 +1,4 @@
+using System;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
@@ -20,36 +21,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
     {
         private IClientNetworkManager _clientNetworkManager;
         private IGameInputActionsController _gameInputActionsController;
-        private ITickProcessor _tickProcessor;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private ITickCounterService _tickCounterService;
         private IMatchPlayerControllers _matchPlayerControllers;
         private IMatchDataService _matchDataService;
         private IWorldCameraController _worldCameraController;
+        private IInputBeingUsedService _inputBeingUsedService;
 
         public override void ResolveDependencies()
         {
              _clientNetworkManager = _diContainer.Resolve<IClientNetworkManager>();
              _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
-             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
              _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
              _tickCounterService = _diContainer.Resolve<ITickCounterService>();
              _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
              _matchDataService = _diContainer.Resolve<IMatchDataService>();
              _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
+             _inputBeingUsedService = _diContainer.Resolve<IInputBeingUsedService>();
         }
 
         public void Execute()
         {
-            var isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
-            var isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
             var isShootInputPressed = _gameInputActionsController.IsShootInputPressed();
             var isTalentInputPressed = _gameInputActionsController.IsTalentInputPressed();
             var isSwitchTalentInputPressed = _gameInputActionsController.IsSwitchTalentInputPressed();
+            
+            CalculateRightAndLeftInputs(_matchDataService.LocalPlayer.Spaceship.Transform.Direction, out var isMoveRightInputPressed, out var isMoveLeftInputPressed);
             LogService.LogTopic(
                 $"Sending: isMoveRightInputPressed:{isMoveRightInputPressed},isMoveLeftInputPressed:{isMoveLeftInputPressed},isShootInputPressed:{isShootInputPressed}",
                 LogTopicType.ClientNetwork);
-
             var playerInputPacket = new MatchPlayerInputPacketC2S
             {
                 Tick = _tickCounterService.CurrentClientTick,
@@ -65,13 +65,30 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchPlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
         }
 
+        private void CalculateRightAndLeftInputs(Vector2 playerDirection, out bool isMoveRightInputPressed, out bool isMoveLeftInputPressed)
+        {
+            //if (_inputBeingUsedService.AimInputType == AimInputType.Mouse)
+            //{
+                isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
+                isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
+            //}
+            // else
+            // {
+            //     var gamePadMoveDirection = _gameInputActionsController.GetMoveDirection().ToNumericsVector2();
+            //     (isMoveRightInputPressed, isMoveLeftInputPressed) = MathUtils.GetDirectionChangeInputs(playerDirection, gamePadMoveDirection);
+            // }
+        }
+        
         private Vector2 CalculateAimDirection()
         {
             var localPlayerId = _matchDataService.LocalPlayer.PlayerId;
             var playerPos = _matchPlayerControllers.GetPlayerPosition(localPlayerId);
             var mousePos = Input.mousePosition;
             var mouseWorldPos = _worldCameraController.ScreenToWorldPoint(mousePos).ToVector2XY();
-            return (mouseWorldPos - playerPos).normalized.ToNumericsVector2();
+            var mouseDirection = (mouseWorldPos - playerPos).normalized;
+            var gamePadAimDirection = _gameInputActionsController.GetAimDirection();
+            var aimDirection = _inputBeingUsedService.AimInputType == AimInputType.RightGamePad ? gamePadAimDirection.ToNumericsVector2() : mouseDirection.ToNumericsVector2();
+            return aimDirection;
         }
     }
 }

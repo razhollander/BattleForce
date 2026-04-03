@@ -8,12 +8,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     public class HandleUpdatePlayerTalentStocksNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
-        private IMatchPlayerUIControllers _playerUIControllers;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
-            _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
         }
 
         public void Execute()
@@ -22,12 +20,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 return;
             }
-
-            // for (int i = 0; i < _cachedPresentationEventsService.UpdatePlayerTalentStocksNetEvents.Count; i++)
-            // {
-            //     var eventData = _cachedPresentationEventsService.UpdatePlayerTalentStocksNetEvents[i];
-            //     _playerUIControllers.UpdatePlayerTalentStocks(eventData.CasterPlayerId, eventData.TalentType, eventData.CurrentStocksAmount, eventData.RecieveNextStockOnTick);
-            // }
+            
+            // left empty, maybe good for future use.
+            
             _cachedPresentationEventsService.UpdatePlayerTalentStocksNetEvents.Clear();
         }
     }

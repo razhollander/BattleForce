@@ -1,4 +1,6 @@
 using System;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
@@ -10,12 +12,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scr
     {
         private const float EFFECT_DURATION = 0.2f;
         
-        private readonly IStateMachineService _stateMachineService;
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly TalentCardObtainedEffectPool _effectsPool;
         
-        public TalentCardObtainedEffectController(TalentCardObtainedEffectView talentCardObtainedEffectViewPrefab, DiContainer diContainer, IStateMachineService stateMachineService)
+        public TalentCardObtainedEffectController(TalentCardObtainedEffectView talentCardObtainedEffectViewPrefab, DiContainer diContainer, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
-            _stateMachineService = stateMachineService;
+            _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _effectsPool = new TalentCardObtainedEffectPool(talentCardObtainedEffectViewPrefab, diContainer);
         }
 
@@ -26,24 +28,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scr
 
         public void PlayEffect(Vector2 from, Vector2 to)
         {
-            _ = PlayEffectAsync(from, to);
+            PlayEffectAsync(from, to).Forget();
         }
 
         private async Awaitable PlayEffectAsync(Vector2 from, Vector2 to)
         {
             var view = _effectsPool.Spawn();
-
-            try
-            {
-                await view.PlayAndDespawn(from, to, EFFECT_DURATION, _stateMachineService.CurrentState().CancellationTokenSource);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception ex)
-            {
-                LogService.LogError(ex.Message);
-            }
+            await view.PlayAndDespawn(from, to, EFFECT_DURATION, _stageCancellationTokenProvider.CancellationTokenSource);
         }
     }
 }

@@ -112,7 +112,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
             
             ProcessPlayerRejoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents, latestTickReceivedFromServer);
-            ClearPlayersTalentsCooldownsTimersIfEnded(latestTickReceivedFromServer);
+            ClearPlayersTalentsNormalCooldownsTimersIfEnded(latestTickReceivedFromServer);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents);
             ProcessPlayerTakeDamageEvents(latestFullTickPacket.PlayerTakeDamageNetEvents);
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
@@ -153,21 +153,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _fullTickPackets.Clear();
         }
 
-        private void ClearPlayersTalentsCooldownsTimersIfEnded(int latestTickReceivedFromServer)
+        /// <summary>
+        /// the server doesn't send this to the client because we prefer to save this redundent bandwidth,
+        /// so the client need to clear the cooldowns on its own.
+        /// </summary>
+        /// <param name="latestTickReceivedFromServer"></param>
+        private void ClearPlayersTalentsNormalCooldownsTimersIfEnded(int latestTickReceivedFromServer)
         {
             foreach (var playerModel in _matchDataService.Players)
             {
                 for (int i = 0; i < playerModel.Spaceship.TalentsState.Talents.Count; i++)
                 {
                     ref var talentsState = ref playerModel.Spaceship.TalentsState.Talents.Get(i);
-
-                    if (talentsState.CooldownType == TalentCooldownType.Normal)
+                    var isNormalCooldownType = talentsState.CooldownType == TalentCooldownType.Normal;
+                    if (!isNormalCooldownType)
                     {
-                        var didCooldownEnd = talentsState.NormalCooldown.CooldownEndTick <= latestTickReceivedFromServer;
-                        if (didCooldownEnd)
-                        {
-                            talentsState.ClearCooldown();
-                        }    
+                        continue;
+                    }
+
+                    var didCooldownEnd = talentsState.NormalCooldown.CooldownEndTick <= latestTickReceivedFromServer;
+                    if (didCooldownEnd)
+                    {
+                        talentsState.ClearCooldown();
                     }
                 }
             }

@@ -52,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            bool wasAtMaxStocks = dashPulseTalentModel.StocksCooldown.CurrentStocksAmount == dashPulseTalentModel.StocksCooldown.MaxStocksAmount;
+            var wasAtMaxStocks = dashPulseTalentModel.StocksCooldown.CurrentStocksAmount == dashPulseTalentModel.StocksCooldown.MaxStocksAmount;
 
             var remainingStocksAmount = --dashPulseTalentModel.StocksCooldown.CurrentStocksAmount;
 

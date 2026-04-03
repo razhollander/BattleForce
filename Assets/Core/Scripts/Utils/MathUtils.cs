@@ -6,6 +6,9 @@ namespace CoreDomain.Scripts.Utils
 {
     public static class MathUtils
     {
+        // Threshold in radians (e.g., 45 degrees is ~0.785 radians)
+        private const float TurnThresholdRad = 0.1f;
+        
         public static Vector3 GetPerpendicularDirection(Vector2 startPoint, Vector2 endPoint)
         {
             var direction = (endPoint - startPoint);
@@ -125,6 +128,39 @@ namespace CoreDomain.Scripts.Utils
 
                 // 4. Use your Rotate method to transform the velocity by that difference
                 return currentVelocity.Rotate(deltaDegrees);
+            }
+
+            public static (bool shouldChangeDirectionLocalRight, bool shouldChangeDirectionLocalLeft) GetDirectionChangeInputs(
+                System.Numerics.Vector2 currentMovementDirection, 
+                System.Numerics.Vector2 desiredMovementDiretion)
+            {
+                // 1. Deadzone check: avoid jitter or NaN errors when stick is barely touched
+                if (currentMovementDirection.LengthSquared() < 0.01f || desiredMovementDiretion.LengthSquared() < 0.01f)
+                {
+                    return (false, false);
+                }
+
+                // 2. Normalize to treat these as pure directions
+                var v1 = System.Numerics.Vector2.Normalize(currentMovementDirection);
+                var v2 = System.Numerics.Vector2.Normalize(desiredMovementDiretion);
+
+                // 3. The Math:
+                // Dot product = cos(theta)
+                // Determinant (Perp-Dot) = sin(theta)
+                float dot = System.Numerics.Vector2.Dot(v1, v2);
+                float det = v1.X * v2.Y - v1.Y * v2.X;
+
+                // Atan2 returns the signed angle in radians (-PI to PI).
+                // This is inherently the shortest arc between the two vectors.
+                float shortestAngle = (float)Math.Atan2(det, dot);
+
+                // 4. Threshold Comparison
+                // Positive result means the target is to the "Left" (Counter-Clockwise)
+                // Negative result means the target is to the "Right" (Clockwise)
+                bool shouldChangeLeft = shortestAngle > TurnThresholdRad;
+                bool shouldChangeRight = shortestAngle < -TurnThresholdRad;
+
+                return (shouldChangeRight, shouldChangeLeft);
             }
         }
     }

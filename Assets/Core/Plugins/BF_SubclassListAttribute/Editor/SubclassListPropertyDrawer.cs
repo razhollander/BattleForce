@@ -23,7 +23,6 @@ namespace BF_SubclassList
             EditorGUI.BeginProperty(position, label, property);
             if (!initialized)
             {
-                Debug.Log("init" + property.propertyPath);
                 name = property.displayName;
                 heights.AddRange(new float[10]);
                 subclassAttribute = attribute as SubclassListAttribute;
