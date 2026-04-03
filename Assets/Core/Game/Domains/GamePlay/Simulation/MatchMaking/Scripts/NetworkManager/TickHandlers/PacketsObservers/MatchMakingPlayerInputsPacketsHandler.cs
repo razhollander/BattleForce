@@ -176,40 +176,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             return max;
         }
 
-        
-
-        //         public Dictionary<ushort, PlayerInputPacketC2S> ProcessInputs(int processedTick)
-//         {
-//             var earliestInputPerPlayers = PopExceptLastInputsOfEachPlayer();//PopEarliestInputsOfEachPlayer();            
-//             for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
-//             {
-//                 var player = _matchDataService.SimulationState.Players[i];
-//                 var playerId = player.Id;
-//                 if (!earliestInputPerPlayers.ContainsKey(playerId))
-//                 {
-// #if Logs
-//                     LogService.LogTopic($"Didn't find any last cached inputs for player {playerId}!", LogTopicType.ServerNetwork);
-// #endif
-//                     continue;
-//                 }
-//
-//                 var inputs = earliestInputPerPlayers[playerId];
-//                 foreach (var playerInputPacket in inputs)
-//                 {
-//                     //var playerInputPacket = earliestInputPerPlayers[playerId];
-//                     var playerModel = _matchDataService.GetPlayer(playerId);
-//                     UpdatePlayerDirection(playerInputPacket, ref playerModel);
-//                     UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, ref playerModel);
-//                     _matchDataService.SetPlayer(playerId, playerModel);
-//                     _cachedLastProcessedInput[playerId] = playerInputPacket;
-//                     
-//                 }
-//             }
-//             
-//             //return earliestInputPerPlayers;
-//             return null;
-//         }
-
         private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, MatchMakingPlayerStateS2C playerModel)
         {
             var shootState = playerModel.Spaceship.Shoot;

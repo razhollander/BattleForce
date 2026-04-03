@@ -130,6 +130,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 var playerState = _matchDataService.SimulationState.GetPlayerByIndex(i);
                 var playerId = playerState.Id;
+                UpdatePlayerShoot(processedTick, /*playerInputPacket.IsShootInputPressed*/true, playerState);
+
                 if (!earliestInputPerPlayers.TryGetValue(playerId, out var playerInputPacket))
                 {
                     LogService.LogTopic($"Didn't find any last cached inputs for player {playerId}!", LogTopicType.ServerNetwork);
@@ -138,7 +140,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
                 playerState.Spaceship.TalentsState.AimDirection = playerInputPacket.AimDirection;
                 UpdatePlayerDirection(playerInputPacket, playerState);
-                UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
                 ProcessPlayerTalentInput(processedTick, playerInputPacket.IsTalentInputPressed, playerState, deltaTime);
                 ProcessPlayerSwitchTalentInput(processedTick, playerId, playerInputPacket, playerState);
 
@@ -217,60 +218,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             return indexOfMin;
         }
 
-        //         public Dictionary<ushort, PlayerInputPacketC2S> ProcessInputs(int processedTick)
-//         {
-//             var earliestInputPerPlayers = PopExceptLastInputsOfEachPlayer();//PopEarliestInputsOfEachPlayer();            
-//             for (var i = 0; i < _matchDataService.SimulationState.PlayersCount; i++)
-//             {
-//                 var player = _matchDataService.SimulationState.Players[i];
-//                 var playerId = player.Id;
-//                 if (!earliestInputPerPlayers.ContainsKey(playerId))
-//                 {
-// #if Logs
-//                     LogService.LogTopic($"Didn't find any last cached inputs for player {playerId}!", LogTopicType.ServerNetwork);
-// #endif
-//                     continue;
-//                 }
-//
-//                 var inputs = earliestInputPerPlayers[playerId];
-//                 foreach (var playerInputPacket in inputs)
-//                 {
-//                     //var playerInputPacket = earliestInputPerPlayers[playerId];
-//                     var playerModel = _matchDataService.GetPlayer(playerId);
-//                     UpdatePlayerDirection(playerInputPacket, ref playerModel);
-//                     UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, ref playerModel);
-//                     _matchDataService.SetPlayer(playerId, playerModel);
-//                     _cachedLastProcessedInput[playerId] = playerInputPacket;
-//                     
-//                 }
-//             }
-//             
-//             //return earliestInputPerPlayers;
-//             return null;
-//         }
-
         private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, PlayerStateS2C playerModel)
         {
             var shootState = playerModel.Spaceship.Shoot;
             var playerId = playerModel.Id;
             _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, isShootInputPressed);
-            var wasTalentInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
-            var shouldShoot = wasTalentInputDownThisTick && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
-            if (shouldShoot)
+            var wasShootInputDownThisTick = true;//_simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
+            var shouldShoot = wasShootInputDownThisTick && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
+            if (!shouldShoot)
             {
-                shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
-                playerModel.Spaceship.Shoot = shootState;
-                CreateBulletForPlayer(processedTick, playerModel);
-                var rectSize = new System.Numerics.Vector2(10, 5);
-                var rectDistanceFromPlayer = playerModel.Spaceship.Transform.Radius + rectSize.X / 2;
-                var center = playerModel.Spaceship.Transform.Position+rectDistanceFromPlayer*playerModel.Spaceship.TalentsState.AimDirection;
+                return;
+            }
 
-                float angleRadians = playerModel.Spaceship.TalentsState.AimDirection.ToAngleRadians();
-                if (_physicsSimulator.RectangleCast(center, rectSize, angleRadians,
-                        PhysicsBodyType.Wall))
-                {
-                    LogService.LogError("Hit!");
-                }
+            shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
+            playerModel.Spaceship.Shoot = shootState;
+            CreateBulletForPlayer(processedTick, playerModel);
+            var rectSize = new System.Numerics.Vector2(10, 5);
+            var rectDistanceFromPlayer = playerModel.Spaceship.Transform.Radius + rectSize.X / 2;
+            var center = playerModel.Spaceship.Transform.Position+rectDistanceFromPlayer*playerModel.Spaceship.TalentsState.AimDirection;
+
+            float angleRadians = playerModel.Spaceship.TalentsState.AimDirection.ToAngleRadians();
+            if (_physicsSimulator.RectangleCast(center, rectSize, angleRadians,
+                    PhysicsBodyType.Wall))
+            {
+                LogService.LogError("Hit!");
             }
         }
         
@@ -292,90 +263,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var rotatedVector = playerState.Spaceship.Transform.Direction.Rotate(rotationAngle);
             playerState.Spaceship.Transform.Direction = rotatedVector;
         }
-
-        // private Dictionary<ushort, PlayerInputPacketC2S> PopLastInputsOfEachPlayer()
-        // {
-        //     var earliestInputsPerPlayer = new Dictionary<ushort, PlayerInputPacketC2S>();
-        //
-        //     for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
-        //     {
-        //         var playerState = _matchDataService.SimulationState.Players[i];
-        //         var playerId = playerState.Id;
-        //         PlayerInputPacketC2S earliestPlayerInput;
-        //         if (_inputsPerPlayer.TryGetValue(playerId, out var playerInputs))
-        //         {
-        //             playerInputs.Sort();
-        //             earliestPlayerInput = playerInputs.Last();
-        //
-        //             foreach (var playerInput in playerInputs)
-        //             {
-        //                 _playerInputPacketsPool.Return(playerInput);
-        //             }
-        //             playerInputs.Clear();
-        //             if (playerInputs.Count == 0)
-        //             {
-        //                 _inputsPerPlayer.Remove(playerId);
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if (!TryGetCachedInputForPlayer(playerId, out earliestPlayerInput))
-        //             {
-        //                 continue;
-        //             }
-        //         }
-        //         
-        //         earliestInputsPerPlayer.Add(playerId, earliestPlayerInput);
-        //     }
-        //
-        //     return earliestInputsPerPlayer;
-        // }
-        
-        // private Dictionary<ushort, List<PlayerInputPacketC2S>> PopExceptLastInputsOfEachPlayer()
-        // {
-        //     var exceptLastInputsPerPlayer = new Dictionary<ushort, List<PlayerInputPacketC2S>>();
-        //
-        //     for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
-        //     {
-        //         var playerState = _matchDataService.SimulationState.Players[i];
-        //         var playerId = playerState.Id;
-        //         List<PlayerInputPacketC2S> exceptLastPlayerInputs =new List<PlayerInputPacketC2S>();
-        //         if (_inputsPerPlayer.TryGetValue(playerId, out var playerInputs))
-        //         {
-        //             playerInputs.Sort();
-        //             exceptLastPlayerInputs = new List<PlayerInputPacketC2S>();
-        //             var count = playerInputs.Count;
-        //             for (int j = 0; j < count; j++)
-        //             {
-        //                 exceptLastPlayerInputs.Add(playerInputs[0]);
-        //                 playerInputs.RemoveAt(0);
-        //             }
-        //             
-        //             if (count == 0)
-        //             {
-        //                 _inputsPerPlayer.Remove(playerId);
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if (!TryGetCachedInputForPlayer(playerId, out var lastCachedPlayerInput))
-        //             {
-        //                 continue;
-        //             }
-        //             exceptLastPlayerInputs.Add(lastCachedPlayerInput);
-        //         }
-        //
-        //         exceptLastInputsPerPlayer.Add(playerId, exceptLastPlayerInputs);
-        //     }
-        //
-        //     return exceptLastInputsPerPlayer;
-        // }
         
         private CapacityDict<ushort, MatchPlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()
         {
-            //_cachedProcessPlayersInputsResult.HeighestProcessedTickPerPlayer.Clear();
-            //_cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Clear();
-
             for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
                 var playerState = _matchDataService.SimulationState.Players[i];
