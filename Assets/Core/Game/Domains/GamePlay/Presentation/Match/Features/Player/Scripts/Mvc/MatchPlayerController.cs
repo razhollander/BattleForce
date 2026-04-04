@@ -77,8 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerShootState = playerModel.Spaceship.Shoot;
             var maxShootCooldown = playerShootState.MaxCooldown;
             var cooldownSecondsLeft = playerShootState.CooldownSecondsLeft;
-            var exponentialDecay = _gamePlayConfig.ExponentialDecay;
-            _playerView.InterpolateBulletLoading(cooldownSecondsLeft, maxShootCooldown, exponentialDecay);
+            _playerView.SetBulletLoading(cooldownSecondsLeft, maxShootCooldown);
             if (Mathf.Approximately(cooldownSecondsLeft, maxShootCooldown))
             {
                 RestoreBulletEffect();
@@ -89,32 +88,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             var talentsState = playerModel.Spaceship.TalentsState;
-            if (talentsState.Talents.Count == 0) return;
-            var talentState = talentsState.GetCurrentSelectedTalent();
+            if (!talentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
+            {
+                return;
+            }
+            
 
             float maxCooldown = 0;
             float cooldownLeft = 0;
 
-            switch (talentState.CooldownType)
+            switch (currentSelectedTalentState.CooldownType)
             {
                 case TalentCooldownType.Normal:
-                    maxCooldown = talentState.NormalCooldown.MaxCooldown;
-                    cooldownLeft = talentState.NormalCooldown.IsOnCooldown() ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
+                    maxCooldown = currentSelectedTalentState.NormalCooldown.MaxCooldown;
+                    cooldownLeft = currentSelectedTalentState.NormalCooldown.IsOnCooldown() ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, currentSelectedTalentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
                     break;
                 case TalentCooldownType.Stocks:
-                    maxCooldown = talentState.StocksCooldown.MaxSingleStockCooldown;
-                    cooldownLeft = talentState.StocksCooldown.IsAtMaxStocks() ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
+                    maxCooldown = currentSelectedTalentState.StocksCooldown.MaxSingleStockCooldown;
+                    cooldownLeft = currentSelectedTalentState.StocksCooldown.CurrentStocksAmount > 0 ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, currentSelectedTalentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
                     break;
                 default:
-                    LogService.LogError("Not implemented cooldown type: " + talentState.CooldownType);
+                    LogService.LogError("Not implemented cooldown type: " + currentSelectedTalentState.CooldownType);
                     break;
             }
-
-            // Fallback for division by zero if maxCooldown is somehow 0
-            if (maxCooldown <= 0.001f) maxCooldown = 1f;
-
-            var exponentialDecay = _gamePlayConfig.ExponentialDecay;
-            _playerView.InterpolateTalentLoading(cooldownLeft, maxCooldown, exponentialDecay);
+            
+            _playerView.SetTalentLoading(cooldownLeft, maxCooldown);
         }
 
         public void RestoreBulletEffect()

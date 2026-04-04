@@ -43,14 +43,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _availableBulletSpriteRenderer.color = color;
         }
 
-        public void InterpolateBulletLoading(float cooldownLeft, float maxCooldown, float decay)
+        public void SetBulletLoading(float cooldownLeft, float maxCooldown)
         {
-            _loadingRingView.SetRingScale(cooldownLeft/maxCooldown, decay);
+            _loadingRingView.SetRingScale(cooldownLeft/maxCooldown);
         }
 
-        public void InterpolateTalentLoading(float cooldownLeft, float maxCooldown, float decay)
+        public void SetTalentLoading(float cooldownLeft, float maxCooldown)
         {
-            _loadingRingView.SetTalentRingArc(cooldownLeft, maxCooldown);
+            _loadingRingView.SetRingArc(cooldownLeft, maxCooldown);
         }
         
         public void SetPositionAndRotation(Vector2 position, Quaternion rotation)
