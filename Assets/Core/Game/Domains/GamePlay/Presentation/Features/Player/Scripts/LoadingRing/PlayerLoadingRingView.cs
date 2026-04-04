@@ -1,110 +1,53 @@
-using CoreDomain.Scripts.Services.Logger.Base;
-using CoreDomain.Scripts.Utils;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing
 {
     public class PlayerLoadingRingView : MonoBehaviour
     {
-        //private float MAX_SCALE = 1f;
-        // private const int ArcEmptyValue = 180;
-        // private const int ArcFullValue = 0;
-        // private readonly Color PowerUpFullColor = Color.yellow;
-        // private readonly Color PowerUpEmptyColor = Color.white;
-        // private static readonly int Arc1 = Shader.PropertyToID("_Arc1");
-        // private static readonly int Arc2 = Shader.PropertyToID("_Arc2");
-    
+        private const int ArcEmptyValue = 180;
+        private const int ArcFullValue = 0;
+        private static readonly int ARC_SHADER_PROPERTY = Shader.PropertyToID("_HalfArc");
+        private static readonly int COLOR_SHADER_PROPERTY = Shader.PropertyToID("_Color");
+        private static readonly int THICKNESS_SHADER_PROPERTY = Shader.PropertyToID("_Thickness");
+        
+        [SerializeField] private Color _talentFullColor = Color.yellow;
+        [SerializeField] private Color _talentEmptyColor = Color.white;
+        [SerializeField] private float _talentFullThickness = 0.09f;
+        [SerializeField] private float _talentEmptyThickness = 0.062f;
         [SerializeField] private SpriteRenderer _spriteRenderer;
-       // [SerializeField] public float BulletLoadingTime;
-       // [SerializeField] public float PowerUpLoadingTime = 10f;
-    
-     //   public bool IsBulletLoadingReady { get; private set; } = true;
-     //   public bool IsPowerUpLoadingReady { get; private set; } = true;
-
-        //private Material _material;
-        //private int _currentArcValue = ArcFullValue;
-        private float _currentScale = 1;
+       
+        private Material _material;
 
         public void InitEntryPoint()
         {
-           // _material = _spriteRenderer.material;
-            //ResetPowerUpLoading();
+            _material = _spriteRenderer.material;
         }
 
-        
-        public void SetRingScale(float scale, float decay)
+        public void SetRingArc(float cooldownLeft, float maxCooldown)
         {
-            if (Mathf.Approximately(_currentScale,scale))
-            {
-                return;
-            }
+            var ratio = Mathf.Clamp01(cooldownLeft / maxCooldown);
+            var arcValue = Mathf.RoundToInt(Mathf.Lerp(ArcFullValue, ArcEmptyValue, ratio));
 
-            var shouldLerp = scale < _currentScale;
-            if (shouldLerp)// todo: bad, this isn't the view responsibility 
+            _material.SetFloat(ARC_SHADER_PROPERTY, arcValue);
+
+            var isNoCooldown = Mathf.Approximately(cooldownLeft, 0);
+
+            if (isNoCooldown)
             {
-                _currentScale = MathUtils.ExpDecay(_currentScale,scale, decay, Time.deltaTime);
+                _material.SetFloat(THICKNESS_SHADER_PROPERTY, _talentFullThickness);
+                _material.SetColor(COLOR_SHADER_PROPERTY, _talentFullColor);
             }
             else
             {
-                _currentScale = scale;
+                _material.SetFloat(THICKNESS_SHADER_PROPERTY, _talentEmptyThickness);
+                _material.SetColor(COLOR_SHADER_PROPERTY, _talentEmptyColor);
             }
-
-            
-            transform.localScale = Vector3.one * _currentScale;
-            // if (Mathf.Approximately(scale, MAX_SCALE))
-            // {
-            //     _spriteRenderer.color = PowerUpFullColor;
-            // }
-            // else
-            // {
-            //     _spriteRenderer.color = PowerUpEmptyColor;
-            // }
         }
-        
-        // public void DoBulletLoading(TweenCallback onComplete)
-        // {
-        //     IsBulletLoadingReady = false;
-        //     transform.DOScale(Vector3.zero, BulletLoadingTime).OnComplete(OnComplete);
-        //
-        //     void OnComplete()
-        //     {
-        //         onComplete();
-        //         ResetBulletLoading();
-        //     }
-        // }
-    
-        // public void DoPowerUpLoading()
-        // {
-        //     IsPowerUpLoadingReady = false;
-        //     _currentArcValue = ArcEmptyValue;
-        //     _spriteRenderer.color = PowerUpEmptyColor;
-        //
-        //     DOTween.To(() => _currentArcValue, SetArcValue, ArcFullValue, PowerUpLoadingTime).OnComplete(OnComplete);
-        //
-        //     void OnComplete()
-        //     {
-        //         ResetPowerUpLoading();
-        //     }
-        // }
-        //
-        // private void ResetPowerUpLoading()
-        // {
-        //     IsPowerUpLoadingReady = true;
-        //     SetArcValue(ArcFullValue);
-        //     _spriteRenderer.color = PowerUpFullColor;
-        // }
-        //
-        // private void SetArcValue(int value)
-        // {
-        //     _currentArcValue = value;
-        //     _material.SetFloat(Arc1, value);
-        //     _material.SetFloat(Arc2, value);
-        // }
-        //
-        // private void ResetBulletLoading()
-        // {
-        //     transform.localScale = Vector3.one;
-        //     IsBulletLoadingReady = true;
-        // }
+
+
+        public void SetRingScale(float scale)
+        {
+            transform.localScale = Vector3.one * scale;
+        }
     }
 }
