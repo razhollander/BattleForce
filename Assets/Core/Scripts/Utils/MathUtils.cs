@@ -152,13 +152,13 @@ namespace CoreDomain.Scripts.Utils
 
                 // Atan2 returns the signed angle in radians (-PI to PI).
                 // This is inherently the shortest arc between the two vectors.
-                float shortestAngle = (float)Math.Atan2(det, dot);
+                float shortestAngleInRadians = (float)Math.Atan2(det, dot);
 
                 // 4. Threshold Comparison
                 // Positive result means the target is to the "Left" (Counter-Clockwise)
                 // Negative result means the target is to the "Right" (Clockwise)
-                bool shouldChangeLeft = shortestAngle > TurnThresholdRad;
-                bool shouldChangeRight = shortestAngle < -TurnThresholdRad;
+                bool shouldChangeLeft = shortestAngleInRadians > TurnThresholdRad;
+                bool shouldChangeRight = shortestAngleInRadians < -TurnThresholdRad;
 
                 return (shouldChangeRight, shouldChangeLeft);
             }

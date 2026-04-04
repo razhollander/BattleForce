@@ -1,8 +1,9 @@
+using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed
 {
     public class InputBeingUsedService : IUpdatable, IInputBeingUsedService
     {
@@ -14,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         private bool _lastLeftClickState;
         private bool _lastRightClickState;
 
-        public AimInputType AimInputType { get; private set; }
+        public SupportedInputType InputTypeBeingUsed { get; private set; }
 
         public InputBeingUsedService(IUpdateSubscriptionService updateSubscriptionService, IGameInputActionsController gameInputActionsController)
         {
@@ -34,22 +35,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 
         private void UpdateCurrentAimInputType()
         {
-            if (AimInputType == AimInputType.RightGamePad && IfMouseUsed())
+            var shouldChangeToMouseInput = InputTypeBeingUsed == SupportedInputType.GamePad && IsMouseCurrentlyUsed();
+            if (shouldChangeToMouseInput)
             {
-                AimInputType = AimInputType.Mouse;
+                InputTypeBeingUsed = SupportedInputType.Mouse;
             }
 
-            if (AimInputType == AimInputType.Mouse && IfRightGamePadUsed())
+            var shouldChangeToGamePadInput = InputTypeBeingUsed == SupportedInputType.Mouse && IsGamePadCurrentlyUsed();
+            if (shouldChangeToGamePadInput)
             {
-                AimInputType = AimInputType.RightGamePad;
+                InputTypeBeingUsed = SupportedInputType.GamePad;
             }
         }
-
-        /// <summary>
-        /// Checks if the mouse position or click state has changed since the last call.
-        /// </summary>
-        /// <returns>True if the mouse is currently being used/moved.</returns>
-        private bool IfMouseUsed()
+        
+        private bool IsMouseCurrentlyUsed()
         {
             var mouse = Mouse.current;
             if (mouse == null)
@@ -68,11 +67,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             _lastMousePosition = currentPosition;
             _lastLeftClickState = currentLeftClick;
             _lastRightClickState = currentRightClick;
-            var didChange = hasMouseMoved || hasClickChanged;
-            return didChange;
+            var didAnyMouseInputChange = hasMouseMoved || hasClickChanged;
+            return didAnyMouseInputChange;
         }
 
-        private bool IfRightGamePadUsed()
+        private bool IsGamePadCurrentlyUsed()
         {
             var currentAimDirection = _gameInputActionsController.GetAimDirection();
             var currentMoveDirection = _gameInputActionsController.GetMoveDirection();
@@ -83,15 +82,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             return didChange;
         }
 
-        public void ExitEntryPoint()
+        public void InitExitPoint()
         {
             _updateSubscriptionService.UnregisterUpdatable(this);
         }
-    }
-
-    public enum AimInputType
-    {
-        Mouse,
-        RightGamePad
     }
 }
