@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: PlayerCooldownRing
-  m_Shader: {fileID: -6465566751694194690, guid: e25c446afb22246a6be0855374ffd0bb, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 0d29a75bbf6354fc48524ee4f03539b1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -67,11 +67,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Angle: 0
     - _EnableExternalAlpha: 0
+    - _HalfArc: 0
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Radius: 0.5
-    - _Thickness: 0.098
+    - _Thickness: 0.062
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
