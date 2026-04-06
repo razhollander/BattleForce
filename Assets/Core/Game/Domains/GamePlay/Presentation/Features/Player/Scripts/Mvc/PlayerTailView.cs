@@ -31,7 +31,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void OnCreated()
         {
-            _isTailWaving = true;
             _tailMaterial = _spriteRenderer.material;
             _previousRotationZ = transform.eulerAngles.z;
             _maxWaveAmplitude = _tailMaterial.GetFloat(WAVE_AMPLITUDE_SHADER_PROPERTY);
