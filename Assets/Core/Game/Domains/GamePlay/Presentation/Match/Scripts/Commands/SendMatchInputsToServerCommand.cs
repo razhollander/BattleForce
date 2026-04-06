@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -87,7 +88,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             var mouseWorldPos = _worldCameraController.ScreenToWorldPoint(mousePos).ToVector2XY();
             var mouseDirection = (mouseWorldPos - playerPos).normalized;
             var gamePadAimDirection = _gameInputActionsController.GetAimDirection();
-            var aimDirection = _inputBeingUsedService.AimInputType == AimInputType.RightGamePad ? gamePadAimDirection.ToNumericsVector2() : mouseDirection.ToNumericsVector2();
+            var aimDirection = _inputBeingUsedService.InputTypeBeingUsed == SupportedInputType.GamePad ? gamePadAimDirection.ToNumericsVector2() : mouseDirection.ToNumericsVector2();
             return aimDirection;
         }
     }

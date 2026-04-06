@@ -17,17 +17,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private SpriteRenderer _availableBulletSpriteRenderer;
         [SerializeField] private SimpleHealthBar _healthBar; // todo move to the match domain
         [SerializeField] private GameObject _healthBarGameObject; // todo move to the match domain
-        [SerializeField] private PlayerLoadingRingView playerLoadingRingView;
+        [SerializeField] private PlayerLoadingRingView _loadingRingView;
         [SerializeField] private Transform _spaceShipTransform;
         [SerializeField] private Transform _aimArrowTransform; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
+        [SerializeField] private Transform _leftEyeBall;
         [SerializeField] private Transform _leftEye;
+        [SerializeField] private Transform _rightEyeBall;
         [SerializeField] private Transform _rightEye;
         [SerializeField] private float _eyeMovementRadius = 0.1f;
-
-        private Vector2 _leftEyeInitialLocalPos;
-        private Vector2 _rightEyeInitialLocalPos;
         
         private Transform _transform;
 
@@ -49,9 +48,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _availableBulletSpriteRenderer.color = color;
         }
 
-        public void InterpolateBulletLoading(float cooldownLeft, float maxCooldown, float decay)
+        public void SetBulletLoading(float cooldownLeft, float maxCooldown)
         {
-            playerLoadingRingView.SetRingScale(cooldownLeft/maxCooldown, decay);
+            _loadingRingView.SetRingScale(cooldownLeft/maxCooldown);
+        }
+
+        public void SetTalentLoading(float cooldownLeft, float maxCooldown)
+        {
+            _loadingRingView.SetRingArc(cooldownLeft, maxCooldown);
         }
         
         public void SetPositionAndRotation(Vector2 position, Quaternion rotation)
@@ -85,18 +89,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnCreated()
         {
             _transform = transform;
-
-            if (_leftEye != null)
-            {
-                _leftEyeInitialLocalPos = _leftEye.localPosition;
-            }
-
-            if (_rightEye != null)
-            {
-                _rightEyeInitialLocalPos = _rightEye.localPosition;
-            }
+            _loadingRingView.InitEntryPoint();
         }
-        
+
         public void OnSpawned()
         {
             gameObject.SetActive(true);
@@ -139,19 +134,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
                 Time.deltaTime
             );
 
-            var eyeOffset = new Vector2(direction.X, direction.Y) * _eyeMovementRadius;
+            var eyeOffset = new Vector2(direction.X, direction.Y).normalized * _eyeMovementRadius;
+                var targetLeftEyePos = eyeOffset;
+                var leftPosition = _leftEye.position.ToVector2XY()+ eyeOffset;
+                var rightPosition = _rightEye.position.ToVector2XY() + eyeOffset;
+                _leftEyeBall.position = new Vector3(leftPosition.x,leftPosition.y,_leftEyeBall.position.z); //MathUtils.ExpDecay((Vector2)_leftEye.localPosition, targetLeftEyePos, decay, Time.deltaTime);
+                _rightEyeBall.position = new Vector3(rightPosition.x,rightPosition.y,_rightEyeBall.position.z);
 
-            if (_leftEye != null)
-            {
-                var targetLeftEyePos = _leftEyeInitialLocalPos + eyeOffset;
-                _leftEye.localPosition = MathUtils.ExpDecay((Vector2)_leftEye.localPosition, targetLeftEyePos, decay, Time.deltaTime);
-            }
-
-            if (_rightEye != null)
-            {
-                var targetRightEyePos = _rightEyeInitialLocalPos + eyeOffset;
-                _rightEye.localPosition = MathUtils.ExpDecay((Vector2)_rightEye.localPosition, targetRightEyePos, decay, Time.deltaTime);
-            }
+            
+            
+               // var targetRightEyePos = _rightEyeInitialLocalPos + eyeOffset;
+                //_rightEye.position = _leftEye.localToWorldMatrix * MathUtils.ExpDecay((Vector2)_rightEye.localPosition, targetRightEyePos, decay, Time.deltaTime);
         }
     }
 }
