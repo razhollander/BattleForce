@@ -1296,10 +1296,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1b95e229f896424a989e055d7493bf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 9212962959922570277}
-  bendSensitivity: 0.012
-  maxBend: 2
-  tailFlexibility: 10
+  _spriteRenderer: {fileID: 9212962959922570277}
+  _bendSensitivity: 0.012
+  _maxBend: 2
+  _tailFlexibility: 10
+  _reachMaxWaveSpeed: 4
 --- !u!1 &8218143705077051413
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,77 +1,81 @@
-using Core.Scripts.Extensions;
-using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 
-public class PlayerTailView : MonoBehaviour
+namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 {
-    private static readonly int spiralPropertyID = Shader.PropertyToID("_SpiralAmount"); 
-    private static readonly int TAIL_IS_MOVING_SHADER_PROPERTY = Shader.PropertyToID("_IsMoving");
-
-    [Header("References")]
-    public SpriteRenderer spriteRenderer;
-
-    [Header("Tail Physics")]
-    [Tooltip("How strongly the tail reacts to rotation. Higher = more bend.")]
-    public float bendSensitivity = 0.005f;
-    
-    [Tooltip("Maximum allowed bend to prevent the spiral from breaking or clipping.")]
-    public float maxBend = 1.5f;
-    
-    [Tooltip("How fast the tail physically snaps to the new bend or returns to straight.")]
-    public float tailFlexibility = 10f;
-    
-    private float previousRotationZ;
-    private float currentBend = 0f;
-
-    private Material _tailMaterial;
-
-    public void InitEntryPoint()
+    public class PlayerTailView : MonoBehaviour
     {
-        _tailMaterial = spriteRenderer.material;
-        previousRotationZ = transform.eulerAngles.z;
-    }
+        private static readonly int SPIRAL_SHADER_PROPERTY = Shader.PropertyToID("_SpiralAmount"); 
+        private static readonly int WAVE_AMPLITUDE_SHADER_PROPERTY = Shader.PropertyToID("_WaveAmplitude"); 
+    
+        [SerializeField] private SpriteRenderer _spriteRenderer;
 
-    void Update()
-    {
-        // 1. Get the current rotation on the Z axis
-        float currentRotationZ = transform.eulerAngles.z;
+        [Header("Tail Physics")]
+        [Tooltip("How strongly the tail reacts to rotation. Higher = more bend.")]
+        [SerializeField] private  float _bendSensitivity = 0.012f;
+    
+        [Tooltip("Maximum allowed bend to prevent the spiral from breaking or clipping.")]
+        [SerializeField] private  float _maxBend = 2f;
+    
+        [Tooltip("How fast the tail physically snaps to the new bend or returns to straight.")]
+        [SerializeField] private  float _tailFlexibility = 10f;
+        
+        [SerializeField] private float _reachMaxWaveSpeed = 2;
 
-        // 2. Calculate the difference (delta) in rotation since last frame.
-        // We use Mathf.DeltaAngle because it safely handles the jump between 360 and 0 degrees.
-        float deltaRotation = Mathf.DeltaAngle(previousRotationZ, currentRotationZ);
+        private float _previousRotationZ;
+        private float _currentBend = 0f;
+        private Material _tailMaterial;
+        private bool _isTailWaving;
+        private bool _targetTail;
+        private float _maxWaveAmplitude;
+        private float _currentWaveAmplitude;
 
-        // 3. Calculate rotational speed (degrees per second). 
-        // Dividing by deltaTime ensures the bend is consistent regardless of frame rate.
-        float angularVelocity = deltaRotation / Time.deltaTime;
-
-        // 4. Determine the target bend based on how fast we are turning.
-        // We multiply by negative sensitivity so the tail lags *behind* the rotation.
-        float targetBend = angularVelocity * -bendSensitivity; 
-
-        // 5. Clamp the target so the tail doesn't curl into a tight, broken circle.
-        targetBend = Mathf.Clamp(targetBend, -maxBend, maxBend);
-
-        // 6. Smoothly transition the current bend towards the target bend.
-        // If targetBend is 0 (player stopped), this smoothly pulls currentBend back to 0.
-        currentBend = Mathf.Lerp(currentBend, targetBend, Time.deltaTime * tailFlexibility);
-        LogService.LogError(currentBend.ToString());
-        // 7. Send the final calculated bend to the shader.
-        if (spriteRenderer != null && spriteRenderer.material != null)
+        public void OnCreated()
         {
-            spriteRenderer.material.SetFloat(spiralPropertyID, -currentBend);
+            _isTailWaving = true;
+            _tailMaterial = _spriteRenderer.material;
+            _previousRotationZ = transform.eulerAngles.z;
+            _maxWaveAmplitude = _tailMaterial.GetFloat(WAVE_AMPLITUDE_SHADER_PROPERTY);
+            _currentWaveAmplitude = _maxWaveAmplitude;
+        }
+    
+        public void UpdateTail()
+        {
+            UpdateTailBend();
+            UpdateTailWaveAmplitude();
         }
 
-        // 8. Store the current rotation to compare against in the next frame.
-        previousRotationZ = currentRotationZ;
-    }
+        private void UpdateTailWaveAmplitude()
+        {
+            var targetWaveAmplitude = _isTailWaving ? _maxWaveAmplitude : 0;
+            if (Mathf.Approximately(targetWaveAmplitude, _currentWaveAmplitude))
+            {
+                return;
+            }
+            
+            _currentWaveAmplitude = Mathf.Lerp(_currentWaveAmplitude, targetWaveAmplitude, Time.deltaTime * _reachMaxWaveSpeed);
+            _tailMaterial.SetFloat(WAVE_AMPLITUDE_SHADER_PROPERTY, _currentWaveAmplitude);
+        }
 
-    public void SetColor(Color color)
-    {
-        spriteRenderer.color = color;
-    }
+        private void UpdateTailBend()
+        {
+            var currentRotationZ = transform.eulerAngles.z;
+            var deltaRotationSinceLastFrame = Mathf.DeltaAngle(_previousRotationZ, currentRotationZ);
+            var angularVelocity = deltaRotationSinceLastFrame / Time.deltaTime;
+            var targetBend = angularVelocity * -_bendSensitivity; // We multiply by negative sensitivity so the tail lags *behind* the rotation.
+            targetBend = Mathf.Clamp(targetBend, -_maxBend, _maxBend);
+            _currentBend = Mathf.Lerp(_currentBend, targetBend, Time.deltaTime * _tailFlexibility);
+            _tailMaterial.SetFloat(SPIRAL_SHADER_PROPERTY, -_currentBend);
+            _previousRotationZ = currentRotationZ;
+        }
 
-    public void SetIsTailMoving(bool isMoving)
-    {
-        _tailMaterial.SetInt(TAIL_IS_MOVING_SHADER_PROPERTY, isMoving.ToInt());
+        public void SetColor(Color color)
+        {
+            _spriteRenderer.color = color;
+        }
+
+        public void SetIsTailWaving(bool isWaving)
+        {
+            _isTailWaving = isWaving;
+        }
     }
 }

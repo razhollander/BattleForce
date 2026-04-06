@@ -32,10 +32,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         private Transform _transform;
 
         public Action Despawn { get; set; }
-
-        public void InitEntryPoint()
+        
+        public void UpdateTailBend()
         {
-            _tailView.InitEntryPoint();
+            _tailView.UpdateTail();
         }
         
         public void SetTalentSprite(Sprite sprite)
@@ -96,7 +96,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnCreated()
         {
             _transform = transform;
-            _loadingRingView.InitEntryPoint();
+            _loadingRingView.OnCreated();
+            _tailView.OnCreated();
         }
 
         public void OnSpawned()
@@ -155,9 +156,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _rightEyeBall.position = new Vector3(rightPosition.x, rightPosition.y, _rightEyeBall.position.z);
         }
 
-        public void SetIsTailMoving(bool isMoving)
+        public void SetIsTailWaving(bool isWaving)
         {
-            _tailView.SetIsTailMoving(isMoving);
+            _tailView.SetIsTailWaving(isWaving);
         }
     }
 }

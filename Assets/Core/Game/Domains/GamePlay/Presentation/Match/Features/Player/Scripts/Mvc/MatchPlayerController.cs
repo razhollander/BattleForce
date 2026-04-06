@@ -39,8 +39,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView = _playerPool.Spawn();
             _playerView.transform.SetParent(_parent);
             _playerView.name = "Player_" + PlayerId + "_" + playerName;
-            _playerView.InitEntryPoint();
             _playerView.SetPlayerName(playerName);
+            _playerView.SetIsTailWaving(true);
             var playerTransform = playerModel.Spaceship.Transform;
             _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
@@ -70,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var decay = _gamePlayConfig.ExponentialDecay;
             _playerView.InterpolateTransform(playerPosition, playerRotation, decay);
             _playerView.InterpolateAimRotation(playerModel.Spaceship.TalentsState.AimDirection, decay);
+            _playerView.UpdateTailBend();
         }
 
         public void UpdateBulletCooldown()
@@ -161,9 +162,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return _playerView.GetTransform();
         }
 
-        public void SetIsTailMoving(bool isMoving)
+        public void SetIsTailWaving(bool isMoving)
         {
-            _playerView.SetIsTailMoving(isMoving);
+            _playerView.SetIsTailWaving(isMoving);
         }
     }
 }

@@ -119,9 +119,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetSelectedTalent(talentIndex);
         }
 
-        public void SetIsTailMoving(ushort playerId, bool isMoving)
+        public void SetIsTailWaving(ushort playerId, bool isWaving)
         {
-            GetPlayer(playerId).SetIsTailMoving(isMoving);
+            GetPlayer(playerId).SetIsTailWaving(isWaving);
         }
     }
 }

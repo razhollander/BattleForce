@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Loadin
        
         private Material _material;
 
-        public void InitEntryPoint()
+        public void OnCreated()
         {
             _material = _spriteRenderer.material;
         }
