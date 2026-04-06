@@ -1,9 +1,12 @@
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 
 public class PlayerTailView : MonoBehaviour
 {
     private static readonly int spiralPropertyID = Shader.PropertyToID("_SpiralAmount"); 
+    private static readonly int TAIL_IS_MOVING_SHADER_PROPERTY = Shader.PropertyToID("_IsMoving");
+
     [Header("References")]
     public SpriteRenderer spriteRenderer;
 
@@ -19,6 +22,14 @@ public class PlayerTailView : MonoBehaviour
     
     private float previousRotationZ;
     private float currentBend = 0f;
+
+    private Material _tailMaterial;
+
+    public void InitEntryPoint()
+    {
+        _tailMaterial = spriteRenderer.material;
+        previousRotationZ = transform.eulerAngles.z;
+    }
 
     void Update()
     {
@@ -54,17 +65,13 @@ public class PlayerTailView : MonoBehaviour
         previousRotationZ = currentRotationZ;
     }
 
-    public void InitEntryPoint()
-    {
-        // Cache the shader property ID for performance
-      
-        
-        // Record our starting rotation
-        previousRotationZ = transform.eulerAngles.z;
-    }
-
     public void SetColor(Color color)
     {
         spriteRenderer.color = color;
+    }
+
+    public void SetIsTailMoving(bool isMoving)
+    {
+        _tailMaterial.SetInt(TAIL_IS_MOVING_SHADER_PROPERTY, isMoving.ToInt());
     }
 }

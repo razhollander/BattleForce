@@ -9,6 +9,7 @@ Shader "Custom/SineWaveSpiralURP"
         _WaveSpeed ("Wave Speed", Float) = 3.0
         _WaveFrequency ("Wave Frequency", Float) = 10.0
         _WaveAmplitude ("Wave Amplitude", Float) = 0.1 
+        _IsMoving ("Is Moving", Float) = 1.0
         
         [Header(Spiral Settings)]
         // This is the property you will control from your script
@@ -62,6 +63,7 @@ Shader "Custom/SineWaveSpiralURP"
                 float _WaveSpeed;
                 float _WaveFrequency;
                 float _WaveAmplitude;
+                float _IsMoving;
                 float _SpiralAmount; // Replaced Bend with Spiral
             CBUFFER_END
 
@@ -104,7 +106,7 @@ Shader "Custom/SineWaveSpiralURP"
                 // We apply the wave AFTER the spiral, so the ripples 
                 // naturally follow the curve of the curled tail.
                 float wave = sin(uv.y * _WaveFrequency + _Time.y * _WaveSpeed);
-                float waveOffset = wave * _WaveAmplitude * uv.y;
+                float waveOffset = wave * _WaveAmplitude * uv.y * _IsMoving;
                 uv.x += waveOffset;
 
                 // Sample the texture with our heavily distorted UVs

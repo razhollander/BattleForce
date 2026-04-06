@@ -160,5 +160,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             return _playerView.GetTransform();
         }
+
+        public void SetIsTailMoving(bool isMoving)
+        {
+            _playerView.SetIsTailMoving(isMoving);
+        }
     }
 }

@@ -13,8 +13,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 {
     public class PlayerView : MonoBehaviour, IPoolable
     {
-        private static readonly int TAIL_BEND_SHADER_PROPERTY = Shader.PropertyToID("_Bend");
-
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private SpriteRenderer _availableBulletSpriteRenderer;
         [SerializeField] private SimpleHealthBar _healthBar; // todo move to the match domain
@@ -32,7 +30,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private PlayerTailView _tailView;
         
         private Transform _transform;
-        private Material _tailMaterial;
 
         public Action Despawn { get; set; }
 
@@ -156,6 +153,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             var rightPosition = _rightEye.position.ToVector2XY() + eyeOffset;
             _leftEyeBall.position = new Vector3(leftPosition.x, leftPosition.y, _leftEyeBall.position.z);
             _rightEyeBall.position = new Vector3(rightPosition.x, rightPosition.y, _rightEyeBall.position.z);
+        }
+
+        public void SetIsTailMoving(bool isMoving)
+        {
+            _tailView.SetIsTailMoving(isMoving);
         }
     }
 }

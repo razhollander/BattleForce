@@ -843,8 +843,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3, y: 1.3, z: 1}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 1.6, y: 1.6, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3206563709897034926}
   - {fileID: 2743151170629309137}
@@ -1359,7 +1359,7 @@ MonoBehaviour:
   _leftEye: {fileID: 9138266757602045038}
   _rightEyeBall: {fileID: 3831587375936345955}
   _rightEye: {fileID: 421401659335743815}
-  _eyeMovementRadius: 0.09
+  _eyeMovementRadius: 0.12
   _tailView: {fileID: 2261358914737223833}
 --- !u!1 &8268790909231806898
 GameObject:

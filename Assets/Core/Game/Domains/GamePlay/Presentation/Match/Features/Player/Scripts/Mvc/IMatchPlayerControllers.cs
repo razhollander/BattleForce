@@ -19,5 +19,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void HidePlayerHealthBar(ushort playerId);
         void DestroyAll();
         void SetPlayerTalentSelected(ushort playerId, int talentIndex);
+        void SetIsTailMoving(ushort playerId, bool isMoving);
     }
 }
