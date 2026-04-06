@@ -118,5 +118,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             GetPlayer(playerId).SetSelectedTalent(talentIndex);
         }
+
+        public void SetIsTailWaving(ushort playerId, bool isWaving)
+        {
+            GetPlayer(playerId).SetIsTailWaving(isWaving);
+        }
     }
 }

@@ -27,11 +27,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _rightEyeBall;
         [SerializeField] private Transform _rightEye;
         [SerializeField] private float _eyeMovementRadius = 0.1f;
+        [SerializeField] private PlayerTailView _tailView;
         
         private Transform _transform;
 
         public Action Despawn { get; set; }
-
+        
+        public void UpdateTailBend()
+        {
+            _tailView.UpdateTail();
+        }
+        
         public void SetTalentSprite(Sprite sprite)
         {
             _selectedTalentImage.sprite = sprite;
@@ -45,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetColor(Color color)
         {
             _spriteRenderer.color = color;
+            _tailView.SetColor(color);
             _availableBulletSpriteRenderer.color = color;
         }
 
@@ -89,7 +96,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnCreated()
         {
             _transform = transform;
-            _loadingRingView.InitEntryPoint();
+            _loadingRingView.OnCreated();
+            _tailView.OnCreated();
         }
 
         public void OnSpawned()
@@ -146,6 +154,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             var rightPosition = _rightEye.position.ToVector2XY() + eyeOffset;
             _leftEyeBall.position = new Vector3(leftPosition.x, leftPosition.y, _leftEyeBall.position.z);
             _rightEyeBall.position = new Vector3(rightPosition.x, rightPosition.y, _rightEyeBall.position.z);
+        }
+
+        public void SetIsTailWaving(bool isWaving)
+        {
+            _tailView.SetIsTailWaving(isWaving);
         }
     }
 }
