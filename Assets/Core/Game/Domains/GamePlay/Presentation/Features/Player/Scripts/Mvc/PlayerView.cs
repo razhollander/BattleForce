@@ -27,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _rightEyeBall;
         [SerializeField] private Transform _rightEye;
         [SerializeField] private float _eyeMovementRadius = 0.1f;
+        [SerializeField] private SpriteRenderer _tailSpriteRenderer;
         
         private Transform _transform;
 
@@ -45,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetColor(Color color)
         {
             _spriteRenderer.color = color;
+            _tailSpriteRenderer.color = color;
             _availableBulletSpriteRenderer.color = color;
         }
 
