@@ -97,7 +97,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _currentActiveSwapFieldId = 0;
         }
 
-        private void UpdateSwapFieldSize(int tick, ref TalentSwapFieldS2C swapFieldModel) // add delta time!
+        private void UpdateSwapFieldSize(int tick, ref TalentSwapFieldS2C swapFieldModel)
         {
             swapFieldModel.UpdateRadiusForTick(tick, _gamePlayConfig.Talents.SwapTalentConfig.MaxRadius);
         }

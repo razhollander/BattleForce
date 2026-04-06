@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var swapFieldCreatedEvent in _cachedPresentationEventsService.CreateSwapFieldNetEvents)
             {
                 var playerPosition = _matchPlayerControllers.GetPlayerPosition(swapFieldCreatedEvent.CasterPlayerId);
-                var currentRadius = MathUtils.Remap(swapFieldCreatedEvent.OccuredOnTick,
+                var currentRadius = MathUtils.RemapClamped(swapFieldCreatedEvent.OccuredOnTick,
                     swapFieldCreatedEvent.EndOnTick, 0, swapFieldCreatedEvent.MaxRadius, _tick); // we intentioanly don't use the model in the match data service, because we may not have it in an edge case that the field was created and destroyed at the same tick.
                 _swapFieldControllers.CreateSwapField(swapFieldCreatedEvent.SwapFieldId, currentRadius, playerPosition);
             }

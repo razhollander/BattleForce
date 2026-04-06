@@ -119,6 +119,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand.Execute();
             _handlePreparationPhaseEndedNetEventsCommand.Execute();
             _matchPlayerUIControllers.UpdatePlayersTalentCooldowns(lastProcessedTickFromServer);
+            _playerControllers.UpdatePlayersTalentCooldowns(lastProcessedTickFromServer);
             _playerControllers.UpdatePlayersTransform();
             _handleSwapFieldCreatedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleDeactivateSwapTalentNetEventsCommand.Execute();

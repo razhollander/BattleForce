@@ -16,7 +16,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         
         public void UpdateRadiusForTick(int tick, float maxRadius)
         {
-            Radius = MathUtils.Remap(CreatedOnTick, EndTick, 0, maxRadius, tick);
+            Radius = MathUtils.RemapClamped(CreatedOnTick, EndTick, 0, maxRadius, tick);
         }
         
         public TalentSwapFieldS2C(ushort id, ushort playerCasterId, int createdOnTick, int endTick, float radius)

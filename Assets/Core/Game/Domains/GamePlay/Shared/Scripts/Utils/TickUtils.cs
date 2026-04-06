@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Utils
         
         public static float GetSecondsLeftUntilTick(int currentTick, int goalTick, float deltaTime)
         {
-            return (goalTick - currentTick) * deltaTime;
+            return Mathf.Max(0, goalTick - currentTick) * deltaTime;
         }
     }
 }
