@@ -2,7 +2,11 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
+using Core.Scripts.Network;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
@@ -12,16 +16,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
     {
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly NetworkConfig _networkConfig;
         private readonly Transform _parent;
         public readonly ushort PlayerId;
         private PlayerView _playerView;
         private readonly PlayerViewPool _playerPool;
 
-        public MatchPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, Transform parent)
+        public MatchPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, Transform parent)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
+            _networkConfig = networkConfig;
             _parent = parent;
             PlayerId = playerId;
         }
@@ -34,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.transform.SetParent(_parent);
             _playerView.name = "Player_" + PlayerId + "_" + playerName;
             _playerView.SetPlayerName(playerName);
+            _playerView.SetIsTailWaving(true);
             var playerTransform = playerModel.Spaceship.Transform;
             _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
@@ -63,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var decay = _gamePlayConfig.ExponentialDecay;
             _playerView.InterpolateTransform(playerPosition, playerRotation, decay);
             _playerView.InterpolateAimRotation(playerModel.Spaceship.TalentsState.AimDirection, decay);
+            _playerView.UpdateTailBend();
         }
 
         public void UpdateBulletCooldown()
@@ -71,12 +79,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerShootState = playerModel.Spaceship.Shoot;
             var maxShootCooldown = playerShootState.MaxCooldown;
             var cooldownSecondsLeft = playerShootState.CooldownSecondsLeft;
-            var exponentialDecay = _gamePlayConfig.ExponentialDecay;
-            _playerView.InterpolateBulletLoading(cooldownSecondsLeft, maxShootCooldown, exponentialDecay);
+            _playerView.SetBulletLoading(cooldownSecondsLeft, maxShootCooldown);
             if (Mathf.Approximately(cooldownSecondsLeft, maxShootCooldown))
             {
                 RestoreBulletEffect();
             }
+        }
+
+        public void UpdateTalentCooldown(int currentServerTick)
+        {
+            var playerModel = _matchDataService.GetPlayer(PlayerId);
+            var talentsState = playerModel.Spaceship.TalentsState;
+            if (!talentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
+            {
+                return;
+            }
+            
+
+            float maxCooldown = 0;
+            float cooldownLeft = 0;
+
+            switch (currentSelectedTalentState.CooldownType)
+            {
+                case TalentCooldownType.Normal:
+                    maxCooldown = currentSelectedTalentState.NormalCooldown.MaxCooldown;
+                    cooldownLeft = currentSelectedTalentState.NormalCooldown.IsOnCooldown() ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, currentSelectedTalentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
+                    break;
+                case TalentCooldownType.Stocks:
+                    maxCooldown = currentSelectedTalentState.StocksCooldown.MaxSingleStockCooldown;
+                    cooldownLeft = currentSelectedTalentState.StocksCooldown.CurrentStocksAmount > 0 ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, currentSelectedTalentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
+                    break;
+                default:
+                    LogService.LogError("Not implemented cooldown type: " + currentSelectedTalentState.CooldownType);
+                    break;
+            }
+            
+            _playerView.SetTalentLoading(cooldownLeft, maxCooldown);
         }
 
         public void RestoreBulletEffect()
@@ -122,6 +160,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public Transform GetTransform()
         {
             return _playerView.GetTransform();
+        }
+
+        public void SetIsTailWaving(bool isMoving)
+        {
+            _playerView.SetIsTailWaving(isMoving);
         }
     }
 }

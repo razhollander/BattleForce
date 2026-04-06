@@ -130,7 +130,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 var playerState = _matchDataService.SimulationState.GetPlayerByIndex(i);
                 var playerId = playerState.Id;
-                UpdatePlayerShoot(processedTick, /*playerInputPacket.IsShootInputPressed*/true, playerState);
+                // UpdatePlayerShoot(processedTick, true, playerState);
 
                 if (!earliestInputPerPlayers.TryGetValue(playerId, out var playerInputPacket))
                 {
@@ -139,6 +139,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 }
 
                 playerState.Spaceship.TalentsState.AimDirection = playerInputPacket.AimDirection;
+                UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
                 UpdatePlayerDirection(playerInputPacket, playerState);
                 ProcessPlayerTalentInput(processedTick, playerInputPacket.IsTalentInputPressed, playerState, deltaTime);
                 ProcessPlayerSwitchTalentInput(processedTick, playerId, playerInputPacket, playerState);
@@ -223,7 +224,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var shootState = playerModel.Spaceship.Shoot;
             var playerId = playerModel.Id;
             _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, isShootInputPressed);
-            var wasShootInputDownThisTick = true;//_simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
+            var wasShootInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
+            // var wasShootInputDownThisTick = true;
             var shouldShoot = wasShootInputDownThisTick && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
             if (!shouldShoot)
             {
@@ -233,6 +235,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
             playerModel.Spaceship.Shoot = shootState;
             CreateBulletForPlayer(processedTick, playerModel);
+            
+            
             var rectSize = new System.Numerics.Vector2(10, 5);
             var rectDistanceFromPlayer = playerModel.Spaceship.Transform.Radius + rectSize.X / 2;
             var center = playerModel.Spaceship.Transform.Position+rectDistanceFromPlayer*playerModel.Spaceship.TalentsState.AimDirection;

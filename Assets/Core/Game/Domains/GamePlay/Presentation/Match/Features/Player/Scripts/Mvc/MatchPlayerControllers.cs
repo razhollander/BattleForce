@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Zenject;
@@ -15,14 +16,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly IMatchDataService _matchDataService;
         private readonly PlayerViewPool _playerPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly NetworkConfig _networkConfig;
         private readonly List<MatchPlayerController> _playerControllers = new ();
         private Transform _playersParent;
 
-        public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
+        public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
         {
             _matchDataService = matchDataService;
             _playerPool = new PlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
+            _networkConfig = networkConfig;
         }
 
         public void InitEntryPoint()
@@ -33,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void AddPlayer(ushort playerId)
         {
-            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _playersParent.transform);
+            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform);
             playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
         }
@@ -51,6 +54,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             foreach (var playerController in _playerControllers)
             {
                 playerController.UpdateBulletCooldown();
+            }
+        }
+
+        public void UpdatePlayersTalentCooldowns(int currentServerTick)
+        {
+            foreach (var playerController in _playerControllers)
+            {
+                playerController.UpdateTalentCooldown(currentServerTick);
             }
         }
 
@@ -106,6 +117,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetPlayerTalentSelected(ushort playerId, int talentIndex)
         {
             GetPlayer(playerId).SetSelectedTalent(talentIndex);
+        }
+
+        public void SetIsTailWaving(ushort playerId, bool isWaving)
+        {
+            GetPlayer(playerId).SetIsTailWaving(isWaving);
         }
     }
 }

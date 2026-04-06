@@ -9,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void AddPlayer(ushort playerId);
         void UpdatePlayersTransform();
         void UpdatePlayersBulletCooldowns();
+        void UpdatePlayersTalentCooldowns(int currentServerTick);
         void ShootBulletEffectForPlayer(ushort playerId);
         void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth);
         void SetPlayerTransform(ushort playerId, Vector2 position, Vector2 direction);
@@ -18,5 +19,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void HidePlayerHealthBar(ushort playerId);
         void DestroyAll();
         void SetPlayerTalentSelected(ushort playerId, int talentIndex);
+        void SetIsTailWaving(ushort playerId, bool isWaving);
     }
 }
