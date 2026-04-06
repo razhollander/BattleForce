@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
     public class PlayerView : MonoBehaviour, IPoolable
     {
         [SerializeField] private SpriteRenderer _spriteRenderer;
+        [SerializeField] private SpriteRenderer _sentryGunSpriteRenderer;
         [SerializeField] private SpriteRenderer _availableBulletSpriteRenderer;
         [SerializeField] private SimpleHealthBar _healthBar; // todo move to the match domain
         [SerializeField] private GameObject _healthBarGameObject; // todo move to the match domain
@@ -27,17 +28,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public Action Despawn { get; set; }
 
-        public void SetSentryGunState(bool isSentryGun)
+        public void SetSentryGunState(bool isOn)
         {
-            if (isSentryGun)
-            {
-                _spaceShipTransform.localScale = new UnityEngine.Vector3(1.5f, 1.5f, 1.5f); // Simple scaling effect to show the state
-            }
-            else
-            {
-                _spaceShipTransform.localScale = UnityEngine.Vector3.one;
-            }
+            _sentryGunSpriteRenderer.enabled = isOn;
         }
+        
         public void SetTalentSprite(Sprite sprite)
         {
             _selectedTalentImage.sprite = sprite;

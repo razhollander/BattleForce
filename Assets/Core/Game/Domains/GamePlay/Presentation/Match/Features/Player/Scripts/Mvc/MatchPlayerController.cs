@@ -50,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _playerView.SetSentryGunState(isSentryGun);
         }
+        
         public void SetSelectedTalent(int talentIndex)
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
