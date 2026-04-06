@@ -35,9 +35,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents;
         public FixedUnorderedList<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents;
         public FixedUnorderedList<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents;
-        public FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents;
         public FixedUnorderedList<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents;
         public FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents;
+        public FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
 
         public MatchFullTickPacketS2C()
@@ -71,6 +71,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             CreateKOProjectileNetEvents = new FixedUnorderedList<CreateKOProjectileNetEventS2C>(maxCap.CreateKOProjectileNetEvents);
             DeactivateKOTalentNetEvents = new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
             PerformDashPulseNetEvents = new FixedUnorderedList<PerformDashPulseNetEventS2C>(maxCap.PerformDashPulseNetEvents);
+            ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
+            DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
             UpdatePlayerTalentStocksNetEvents = new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(maxCap.UpdatePlayerTalentStocksNetEvents);
             ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
             DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
@@ -116,9 +118,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedKOProjectHitPlayerNetEvents(writer);
             SerializedDeactivateKOTalentNetEvents(writer);
             SerializedPerformDashPulseNetEvents(writer);
-            SerializedUpdatePlayerTalentStocksNetEvents(writer);
             SerializedActivateSentryGunTalentNetEvents(writer);
             SerializedDeactivateSentryGunTalentNetEvents(writer);
+            SerializedUpdatePlayerTalentStocksNetEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
         }
 
@@ -135,24 +137,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         {
             writer.Put((byte)CreateKOProjectileNetEvents.Count);
             foreach (var evt in CreateKOProjectileNetEvents.AsSpan())
-            {
-                evt.Serialize(writer);
-            }
-        }
-
-        private void SerializedActivateSentryGunTalentNetEvents(NetDataWriter writer)
-        {
-            writer.Put((byte)ActivateSentryGunTalentNetEvents.Count);
-            foreach (var evt in ActivateSentryGunTalentNetEvents.AsSpan())
-            {
-                evt.Serialize(writer);
-            }
-        }
-
-        private void SerializedDeactivateSentryGunTalentNetEvents(NetDataWriter writer)
-        {
-            writer.Put((byte)DeactivateSentryGunTalentNetEvents.Count);
-            foreach (var evt in DeactivateSentryGunTalentNetEvents.AsSpan())
             {
                 evt.Serialize(writer);
             }
@@ -319,9 +303,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedKOProjectHitPlayerNetEvents(reader);
             DeserializedDeactivateKOTalentNetEvents(reader);
             DeserializedPerformDashPulseNetEvents(reader);
-            DeserializedUpdatePlayerTalentStocksNetEvents(reader);
             DeserializedActivateSentryGunTalentNetEvents(reader);
             DeserializedDeactivateSentryGunTalentNetEvents(reader);
+            DeserializedUpdatePlayerTalentStocksNetEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
         }
 
@@ -343,17 +327,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (var i = 0; i < count; i++)
             {
                 ref var evt = ref KOProjectHitPlayerNetEvents.AddAndGet();
-                evt.Deserialize(reader);
-            }
-        }
-
-        private void DeserializedActivateSentryGunTalentNetEvents(NetDataReader reader)
-        {
-            ActivateSentryGunTalentNetEvents.Clear();
-            var count = reader.GetByte();
-            for (var i = 0; i < count; i++)
-            {
-                ref var evt = ref ActivateSentryGunTalentNetEvents.AddAndGet();
                 evt.Deserialize(reader);
             }
         }
@@ -650,6 +623,35 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var evt = ref PerformDashPulseNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateSentryGunTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateSentryGunTalentNetEvents.Count);
+            foreach (var evt in ActivateSentryGunTalentNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void SerializedDeactivateSentryGunTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateSentryGunTalentNetEvents.Count);
+            foreach (var evt in DeactivateSentryGunTalentNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+        
+        private void DeserializedActivateSentryGunTalentNetEvents(NetDataReader reader)
+        {
+            var count = reader.GetByte();
+            ActivateSentryGunTalentNetEvents.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                ref var evt = ref ActivateSentryGunTalentNetEvents.AddAndGet();
                 evt.Deserialize(reader);
             }
         }
