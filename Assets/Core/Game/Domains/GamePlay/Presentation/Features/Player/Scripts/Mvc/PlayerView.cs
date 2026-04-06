@@ -22,6 +22,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _aimArrowTransform; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
+        [SerializeField] private Transform _leftEyeBall;
+        [SerializeField] private Transform _leftEye;
+        [SerializeField] private Transform _rightEyeBall;
+        [SerializeField] private Transform _rightEye;
+        [SerializeField] private float _eyeMovementRadius = 0.1f;
         
         private Transform _transform;
 
@@ -86,7 +91,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _transform = transform;
             _loadingRingView.InitEntryPoint();
         }
-        
+
         public void OnSpawned()
         {
             gameObject.SetActive(true);
@@ -112,22 +117,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             _healthBarGameObject.SetActive(isShown);
         }
-        
+
         public void InterpolateAimRotation(System.Numerics.Vector2 direction, float decay)
         {
             if (direction.LengthSquared() < 0.0001f)
             {
                 LogService.LogError("Direction is too small (0) to interpolate");
+
                 return;
             }
 
             var targetRotation = direction.ToQuaternion();
+
             _aimArrowTransform.rotation = MathUtils.ExpDecay(
-                _aimArrowTransform.rotation, 
-                targetRotation, 
+                _aimArrowTransform.rotation,
+                targetRotation,
                 decay,
                 Time.deltaTime
             );
+
+            UpdateEyesToLookAtAimArrow(direction);
+        }
+
+        private void UpdateEyesToLookAtAimArrow(System.Numerics.Vector2 aimArrowDirection)
+        {
+            var eyeOffset = new Vector2(aimArrowDirection.X, aimArrowDirection.Y).normalized * _eyeMovementRadius;
+            var leftPosition = _leftEye.position.ToVector2XY() + eyeOffset;
+            var rightPosition = _rightEye.position.ToVector2XY() + eyeOffset;
+            _leftEyeBall.position = new Vector3(leftPosition.x, leftPosition.y, _leftEyeBall.position.z);
+            _rightEyeBall.position = new Vector3(rightPosition.x, rightPosition.y, _rightEyeBall.position.z);
         }
     }
 }
