@@ -1,4 +1,5 @@
 using System;
+using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
@@ -8,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public int OccuredOnTick;
         public ushort CasterPlayerId;
         public int TalentCooldownEndTick;
-
+        
         public DeactivateSentryGunTalentNetEventS2C(int occuredOnTick, ushort casterPlayerId, int talentCooldownEndTick)
         {
             OccuredOnTick = occuredOnTick;

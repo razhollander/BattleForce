@@ -1,4 +1,5 @@
 using System;
+using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
@@ -8,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public int OccuredOnTick;
         public ushort CasterPlayerId;
         public float Duration;
-
+        
         public ActivateSentryGunTalentNetEventS2C(int occuredOnTick, ushort casterPlayerId, float duration)
         {
             OccuredOnTick = occuredOnTick;
@@ -20,14 +21,14 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)CasterPlayerId);
-            writer.Put(Duration);
+            writer.PutFloat16(Duration);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
             CasterPlayerId = reader.GetByte();
-            Duration = reader.GetFloat();
+            Duration = reader.GetFloat16();
         }
 
         public int CompareTo(ActivateSentryGunTalentNetEventS2C other)

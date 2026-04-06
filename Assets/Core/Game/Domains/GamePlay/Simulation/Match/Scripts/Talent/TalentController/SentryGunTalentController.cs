@@ -1,11 +1,13 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
-using System.Numerics;
+using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
@@ -43,12 +45,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            
-            if (!casterPlayerState.IsAlive)
-            {
-                return;
-            }
-
             if (casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown())
             {
                 return;
@@ -62,8 +58,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             casterPlayerState.Spaceship.IsEngineOn = false;
             casterPlayerState.Spaceship.Transform.Velocity = Vector2.Zero;
             casterPlayerState.Spaceship.Shoot.MaxCooldown *= sentryConfig.ShootCooldownMultiplier;
-
-            _netEventsDataService.AddActivateSentryGunTalentNetEvent(tick, _casterPlayerId, sentryConfig.Duration);
+            casterPlayerState.Spaceship.Shoot.CooldownSecondsLeft = Mathf.Min(casterPlayerState.Spaceship.Shoot.MaxCooldown, casterPlayerState.Spaceship.Shoot.CooldownSecondsLeft);
+            _netEventsDataService.AddActivateSentryGunTalentNetEvent(tick, _casterPlayerId, sentryConfig.DurationInSeconds);
         }
 
         public void StopIfActive(int tick)
@@ -89,7 +85,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             casterPlayerState.Spaceship.IsEngineOn = false;
             casterPlayerState.Spaceship.Transform.Velocity = Vector2.Zero;
 
-            bool isDead = !casterPlayerState.IsAlive;
+            bool isDead = !casterPlayerState.Spaceship.IsAlive;
             bool switchedTalents = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().TalentType != TalentType.SentryGun;
             bool isSpinned = casterPlayerState.Spaceship.Transform.AngularVelocity != 0;
 
@@ -100,7 +96,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var elapsedSeconds = (tick - _startTick) * deltaTime;
-            if (elapsedSeconds >= sentryConfig.Duration)
+            if (elapsedSeconds >= sentryConfig.DurationInSeconds)
             {
                 DeactivateTalent(tick);
             }
@@ -112,7 +108,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             var sentryConfig = _gamePlayConfig.Talents.SentryGunTalentConfig;
 
-            if (casterPlayerState.IsAlive)
+            if (casterPlayerState.Spaceship.IsAlive)
             {
                 casterPlayerState.Spaceship.IsEngineOn = true;
                 casterPlayerState.Spaceship.Shoot.MaxCooldown /= sentryConfig.ShootCooldownMultiplier;
