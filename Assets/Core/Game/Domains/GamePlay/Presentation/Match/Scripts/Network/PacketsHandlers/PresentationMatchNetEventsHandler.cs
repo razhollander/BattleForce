@@ -172,6 +172,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessPlayerSpinnedEvents(CapacityList<PlayerSpinnedNetEventS2C> playerSpinnedNetEvents)
+        {
+            if (playerSpinnedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerSpinnedNetEvent in playerSpinnedNetEvents)
+            {
+                _cachedPresentationEventsService.PlayerSpinnedNetEvents.Add(playerSpinnedNetEvent);
+            }
+        }
+
         public void ProcessPowerUpSpawnedEvents(CapacityList<PowerUpBallSpawnedNetEventS2C> powerUpBallSpawnedNetEvents)
         {
             if (powerUpBallSpawnedNetEvents.IsNullOrEmpty())

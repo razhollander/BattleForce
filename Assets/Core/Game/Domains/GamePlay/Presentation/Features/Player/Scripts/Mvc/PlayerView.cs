@@ -28,8 +28,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _rightEye;
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         [SerializeField] private PlayerTailView _tailView;
+        [SerializeField] private Sprite _spinnedEyesSprite;
         
         private Transform _transform;
+        private SpriteRenderer _leftEyeRenderer;
+        private SpriteRenderer _rightEyeRenderer;
+        private Sprite _defaultLeftEyeSprite;
+        private Sprite _defaultRightEyeSprite;
 
         public Action Despawn { get; set; }
         
@@ -98,6 +103,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _transform = transform;
             _loadingRingView.OnCreated();
             _tailView.OnCreated();
+            _leftEyeRenderer = _leftEye.GetComponent<SpriteRenderer>();
+            _rightEyeRenderer = _rightEye.GetComponent<SpriteRenderer>();
+            if (_leftEyeRenderer != null) _defaultLeftEyeSprite = _leftEyeRenderer.sprite;
+            if (_rightEyeRenderer != null) _defaultRightEyeSprite = _rightEyeRenderer.sprite;
+        }
+
+        public void SetIsSpinned(bool isSpinned)
+        {
+            if (_leftEyeRenderer != null)
+            {
+                _leftEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultLeftEyeSprite;
+            }
+            if (_rightEyeRenderer != null)
+            {
+                _rightEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultRightEyeSprite;
+            }
         }
 
         public void OnSpawned()

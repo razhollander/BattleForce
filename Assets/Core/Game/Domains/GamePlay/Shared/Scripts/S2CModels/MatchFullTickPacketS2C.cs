@@ -21,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<PlayersSwapNetEventS2C> PlayerSwapNetEvents;
         public FixedClassUnorderedList<TalentCardObtainedNetEventS2C> TalentCardObtainedNetEvents; // todo: remove events related to card when bullet id destroyed
         public FixedUnorderedList<TalentCardHitNetEventS2C> TalentCardHitNetEvents;
+        public FixedUnorderedList<PlayerSpinnedNetEventS2C> PlayerSpinnedNetEvents;
         public FixedUnorderedList<PowerUpBallSpawnedNetEventS2C> PowerUpSpawnedNetEvents; // todo: remove events related to power up when bullet id destroyed
         public FixedUnorderedList<PowerUpBallObtainedNetEventS2C> PowerUpObtainedNetEvents;
         public FixedClassUnorderedList<StageEndNetEventS2C> StageEndNetEvents;
@@ -54,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PlayerSwapNetEvents = new FixedUnorderedList<PlayersSwapNetEventS2C>(maxCap.PlayerSwapNetEvents);
             TalentCardObtainedNetEvents = new FixedClassUnorderedList<TalentCardObtainedNetEventS2C>(maxCap.TalentCardObtainedNetEvent, () => new TalentCardObtainedNetEventS2C(sharedGamePlayConfig.MaxConcurrentTalentsForPlayer));
             TalentCardHitNetEvents = new FixedUnorderedList<TalentCardHitNetEventS2C>(maxCap.TalentCardHitNetEvents);
+            PlayerSpinnedNetEvents = new FixedUnorderedList<PlayerSpinnedNetEventS2C>(maxCap.PlayerSpinnedNetEvents);
             PowerUpSpawnedNetEvents = new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(maxCap.PowerUpSpawnedNetEvents);
             PowerUpObtainedNetEvents = new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(maxCap.PowerUpObtainedNetEvents);
             StageEndNetEvents = new FixedClassUnorderedList<StageEndNetEventS2C>(maxCap.StageEndNetEvents, () => new StageEndNetEventS2C(sharedGamePlayConfig.MaxTeamsAmount));
@@ -113,6 +115,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedDeactivateKOTalentNetEvents(writer);
             SerializedPerformDashPulseNetEvents(writer);
             SerializedUpdatePlayerTalentStocksNetEvents(writer);
+            SerializedPlayerSpinnedEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
         }
 
@@ -296,6 +299,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedDeactivateKOTalentNetEvents(reader);
             DeserializedPerformDashPulseNetEvents(reader);
             DeserializedUpdatePlayerTalentStocksNetEvents(reader);
+            DeserializedPlayerSpinnedEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
         }
 
@@ -602,6 +606,26 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var evt = ref PerformDashPulseNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerSpinnedEvents(NetDataWriter writer)
+        {
+            writer.Put((byte) PlayerSpinnedNetEvents.Count);
+            foreach (var evt in PlayerSpinnedNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void DeserializedPlayerSpinnedEvents(NetDataReader reader)
+        {
+            PlayerSpinnedNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref PlayerSpinnedNetEvents.AddAndGet();
                 evt.Deserialize(reader);
             }
         }

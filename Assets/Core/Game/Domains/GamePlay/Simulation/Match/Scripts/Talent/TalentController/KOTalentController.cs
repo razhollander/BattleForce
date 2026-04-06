@@ -138,6 +138,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var pushForce = pushDirection * koConfig.PushForce;
             var randomSpin = RNG.NextFloat(koConfig.MinSpin, koConfig.MaxSpin);
             enemyPlayerState.Spaceship.PushAndSpin(pushForce, randomSpin);
+            var spinEndOnTick = tick + (int)(koConfig.SpinDuration * _networkConfig.TicksPerSeconds);
+            _netEventsDataService.AddPlayerSpinnedNetEvent(tick, enemyPlayerId, spinEndOnTick);
             _netEventsDataService.AddKOProjectHitPlayerNetEvent(tick, _projectileId, enemyPlayerState.Id, projectile.Position);
             StartReturnPhase();
         }

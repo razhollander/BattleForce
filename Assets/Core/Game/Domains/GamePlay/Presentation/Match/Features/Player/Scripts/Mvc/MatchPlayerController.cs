@@ -86,6 +86,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
         }
 
+        public void UpdateSpinnedState(int currentServerTick)
+        {
+            var playerModel = _matchDataService.GetPlayer(PlayerId);
+            var isSpinned = currentServerTick <= playerModel.SpinEndOnTick;
+            _playerView.SetIsSpinned(isSpinned);
+        }
+
         public void UpdateTalentCooldown(int currentServerTick)
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);

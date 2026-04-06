@@ -28,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandlePlayerSwapNetEventsCommand _handlePlayerSwapNetEventsCommand;
         private readonly HandleTalentCardObtainedNetEventsCommand _handleTalentCardObtainedNetEventsCommand;
         private readonly HandleTalentCardHitNetEventsCommand _handleTalentCardHitNetEventsCommand;
+        private readonly HandlePlayerSpinnedNetEventsCommand _handlePlayerSpinnedNetEventsCommand;
         private readonly HandlePowerUpBallSpawnedNetEventsCommand _handlePowerUpBallSpawneddNetEventsCommand;
         private readonly HandlePowerUpBallObtainedNetEventsCommand _handlePowerUpBallObtainedNetEventsCommand;
         private readonly HandleStageEndNetEventsCommand _handleStageEndNetEventsCommand;
@@ -64,6 +65,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePlayerSwapNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerSwapNetEventsCommand>();
             _handleTalentCardObtainedNetEventsCommand = commandFactory.CreateCommandVoid<HandleTalentCardObtainedNetEventsCommand>();
             _handleTalentCardHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleTalentCardHitNetEventsCommand>();
+            _handlePlayerSpinnedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerSpinnedNetEventsCommand>();
             _handlePowerUpBallSpawneddNetEventsCommand = commandFactory.CreateCommandVoid<HandlePowerUpBallSpawnedNetEventsCommand>();
             _handlePowerUpBallObtainedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePowerUpBallObtainedNetEventsCommand>();
             _handleStageEndNetEventsCommand = commandFactory.CreateCommandVoid<HandleStageEndNetEventsCommand>();
@@ -105,6 +107,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePlayerDiedNetEventsCommand.Execute();
             _handlePlayerSwapNetEventsCommand.Execute();
             _handleTalentCardHitNetEventsCommand.Execute();
+            _handlePlayerSpinnedNetEventsCommand.Execute();
             _handlePowerUpBallSpawneddNetEventsCommand.Execute();
             _handlePowerUpBallObtainedNetEventsCommand.Execute();
             _handleStageEndNetEventsCommand.Execute();
@@ -116,6 +119,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePreparationPhaseEndedNetEventsCommand.Execute();
             _matchPlayerUIControllers.UpdatePlayersTalentCooldowns(lastProcessedTickFromServer);
             _playerControllers.UpdatePlayersTalentCooldowns(lastProcessedTickFromServer);
+            _playerControllers.UpdatePlayersSpinnedState(lastProcessedTickFromServer);
             _playerControllers.UpdatePlayersTransform();
             _handleSwapFieldCreatedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleDeactivateSwapTalentNetEventsCommand.Execute();

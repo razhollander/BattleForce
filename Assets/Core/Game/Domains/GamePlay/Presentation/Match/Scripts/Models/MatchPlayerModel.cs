@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
         public string PlayerName;
         public ushort TeamId;
         public PlayerSpaceshipStateS2C Spaceship;
+        public int SpinEndOnTick;
         
         public MatchPlayerModel(ushort playerId, string playerName, ushort teamId, PlayerSpaceshipStateS2C spaceship)
         {

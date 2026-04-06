@@ -35,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PlayersSwapNetEventS2C> _cachedUnprocessedPlayerSwapEvents;
         private readonly CapacityList<TalentCardObtainedNetEventS2C> _cachedUnprocessedTalentCardObtainedEvents;
         private readonly CapacityList<TalentCardHitNetEventS2C> _cachedUnprocessedTalentCardHitEvents;
+        private readonly CapacityList<PlayerSpinnedNetEventS2C> _cachedUnprocessedPlayerSpinnedEvents;
         private readonly CapacityList<PowerUpBallSpawnedNetEventS2C> _cachedUnprocessedPowerUpBallSpawnedEvents;
         private readonly CapacityList<PowerUpBallObtainedNetEventS2C> _cachedUnprocessedPowerUpBallObtainedEvents;
         private readonly CapacityList<StageEndNetEventS2C> _cachedUnprocessedStageEndEvents;
@@ -71,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPlayerSwapEvents = new CapacityList<PlayersSwapNetEventS2C>(networkConfig.MaxCap.PlayerSwapNetEvents);
             _cachedUnprocessedTalentCardObtainedEvents = new CapacityList<TalentCardObtainedNetEventS2C>(networkConfig.MaxCap.TalentCardObtainedNetEvent);
             _cachedUnprocessedTalentCardHitEvents = new CapacityList<TalentCardHitNetEventS2C>(networkConfig.MaxCap.TalentCardHitNetEvents);
+            _cachedUnprocessedPlayerSpinnedEvents = new CapacityList<PlayerSpinnedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedNetEvents);
             _cachedUnprocessedPowerUpBallSpawnedEvents = new CapacityList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents);
             _cachedUnprocessedPowerUpBallObtainedEvents = new CapacityList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents);
             _cachedUnprocessedStageEndEvents = new CapacityList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents);
@@ -118,6 +120,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents);
             ProcessPlayerSwapEvents(latestFullTickPacket.PlayerSwapNetEvents);
             ProcessTalentCardHitEvents(latestFullTickPacket.TalentCardHitNetEvents);
+            ProcessPlayerSpinnedEvents(latestFullTickPacket.PlayerSpinnedNetEvents);
             ProcessTalentCardObtainedEvents(latestFullTickPacket.TalentCardObtainedNetEvents);
             ProcessPowerUpBallSpawnedEvents(latestFullTickPacket.PowerUpSpawnedNetEvents);
             ProcessPowerUpBallObtainedEvents(latestFullTickPacket.PowerUpObtainedNetEvents);
@@ -456,6 +459,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedTalentCardHitEvents.Sort();
                 _presentationNetEventsHandler.ProcessTalentCardHitEvents(_cachedUnprocessedTalentCardHitEvents);
+            }
+        }
+
+        private void ProcessPlayerSpinnedEvents(FixedUnorderedList<PlayerSpinnedNetEventS2C> playerSpinnedNetEvents)
+        {
+            _cachedUnprocessedPlayerSpinnedEvents.Clear();
+
+            foreach (var netEvent in playerSpinnedNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPlayerSpinnedEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPlayerSpinnedEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerSpinnedEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerSpinnedEvents(_cachedUnprocessedPlayerSpinnedEvents);
             }
         }
 

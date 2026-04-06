@@ -25,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>> PlayerSwapNetEventsPerPlayer { get; private set;} // todo: remove events related to player hit when player is destroyed
         public CapacityDict<ushort, FixedClassUnorderedList<TalentCardObtainedNetEventS2C>> TalentCardObtainedNetEventsPerPlayer { get; private set; } // todo: remove events related to player hit when player is destroyed
         public CapacityDict<ushort, FixedUnorderedList<TalentCardHitNetEventS2C>> TalentCardHitNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<PlayerSpinnedNetEventS2C>> PlayerSpinnedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> PowerUpBallSpawnedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> PowerUpBallObtainedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> PlayerSwitchTeamNetEventsPerPlayer { get; }
@@ -55,6 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<PlayersSwapNetEventS2C>> _playerSwapListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<TalentCardObtainedNetEventS2C>> _talentCardObtainedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TalentCardHitNetEventS2C>> _talentCardHitListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerSpinnedNetEventS2C>> _playerSpinnedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> _powerUpBallsSpawnedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> _powerUpBallsObtainedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> _playerSwitchTeamListPool;
@@ -87,6 +89,7 @@ public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sh
             PlayerSwapNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>>(maxConcurrentPlayers);
             TalentCardObtainedNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<TalentCardObtainedNetEventS2C>>(maxConcurrentPlayers);
             TalentCardHitNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<TalentCardHitNetEventS2C>>(maxConcurrentPlayers);
+            PlayerSpinnedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerSpinnedNetEventS2C>>(maxConcurrentPlayers);
             PowerUpBallSpawnedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>>(maxConcurrentPlayers);
             PowerUpBallObtainedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>>(maxConcurrentPlayers);
             PlayerSwitchTeamNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(maxConcurrentPlayers);
@@ -128,6 +131,7 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             _playerSwapListPool= new ConcurrentPool<FixedUnorderedList<PlayersSwapNetEventS2C>>(() => new FixedUnorderedList<PlayersSwapNetEventS2C>(networkConfig.MaxCap.PlayerSwapNetEvents), maxConcurrentPlayers);
             _talentCardObtainedListPool = new ConcurrentPool<FixedClassUnorderedList<TalentCardObtainedNetEventS2C>>(() => new FixedClassUnorderedList<TalentCardObtainedNetEventS2C>(networkConfig.MaxCap.TalentCardObtainedNetEvent, ()=>new TalentCardObtainedNetEventS2C()), maxConcurrentPlayers);
             _talentCardHitListPool = new ConcurrentPool<FixedUnorderedList<TalentCardHitNetEventS2C>>(() => new FixedUnorderedList<TalentCardHitNetEventS2C>(networkConfig.MaxCap.TalentCardHitNetEvents), maxConcurrentPlayers);
+            _playerSpinnedListPool = new ConcurrentPool<FixedUnorderedList<PlayerSpinnedNetEventS2C>>(() => new FixedUnorderedList<PlayerSpinnedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedNetEvents), maxConcurrentPlayers);
             _powerUpBallsSpawnedListPool = new ConcurrentPool<FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>>(() => new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents), maxConcurrentPlayers);
             _powerUpBallsObtainedListPool = new ConcurrentPool<FixedUnorderedList<PowerUpBallObtainedNetEventS2C>>(() => new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents), maxConcurrentPlayers);
             _playerSwitchTeamListPool = new ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(() => new FixedUnorderedList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents), maxConcurrentPlayers);
@@ -232,6 +236,11 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             if (!TalentCardHitNetEventsPerPlayer.ContainsKey(playerId))
             {
                 TalentCardHitNetEventsPerPlayer.Add(playerId, _talentCardHitListPool.Get());
+            }
+
+            if (!PlayerSpinnedNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                PlayerSpinnedNetEventsPerPlayer.Add(playerId, _playerSpinnedListPool.Get());
             }
             else
             {
@@ -414,6 +423,10 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             var talentCardHitList = TalentCardHitNetEventsPerPlayer[playerId];
             talentCardHitList.Clear();
             _talentCardHitListPool.Return(talentCardHitList);
+
+            var playerSpinnedList = PlayerSpinnedNetEventsPerPlayer[playerId];
+            playerSpinnedList.Clear();
+            _playerSpinnedListPool.Return(playerSpinnedList);
             var powerUpBallsSpawnedList = PowerUpBallSpawnedNetEventsPerPlayer[playerId];
             powerUpBallsSpawnedList.Clear();
             _powerUpBallsSpawnedListPool.Return(powerUpBallsSpawnedList);
@@ -489,6 +502,7 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             PlayerSwapNetEventsPerPlayer.Remove(playerId);
             TalentCardObtainedNetEventsPerPlayer.Remove(playerId);
             TalentCardHitNetEventsPerPlayer.Remove(playerId);
+            PlayerSpinnedNetEventsPerPlayer.Remove(playerId);
             PowerUpBallSpawnedNetEventsPerPlayer.Remove(playerId);
             PowerUpBallObtainedNetEventsPerPlayer.Remove(playerId);
             PlayerSwitchTeamNetEventsPerPlayer.Remove(playerId);
@@ -666,6 +680,17 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
                     if(bulletSpawnNetEvents[i].OccuredOnTick<tick)
                     {
                         bulletSpawnNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PlayerSpinnedNetEventsPerPlayer.TryGetValue(playerId, out var playerSpinnedNetEvents))
+            {
+                for (var i = playerSpinnedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerSpinnedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerSpinnedNetEvents.RemoveAt(i);
                     }
                 }
             }
@@ -1042,6 +1067,17 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                 packet.OccuredOnTick = onTick;
                 packet.PlayerId = playerId;
                 packet.NewTalentIndex = newTalentIndex;
+            }
+        }
+
+        public void AddPlayerSpinnedNetEvent(int onTick, ushort playerId, int spinEndOnTick)
+        {
+            foreach (var kvp in PlayerSpinnedNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
+                packet.SpinEndOnTick = spinEndOnTick;
             }
         }
 

@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>> PlayerSwapNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedClassUnorderedList<TalentCardObtainedNetEventS2C>> TalentCardObtainedNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<TalentCardHitNetEventS2C>> TalentCardHitNetEventsPerPlayer { get; }
+        CapacityDict<ushort, FixedUnorderedList<PlayerSpinnedNetEventS2C>> PlayerSpinnedNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> PowerUpBallSpawnedNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> PowerUpBallObtainedNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> PlayerSwitchTeamNetEventsPerPlayer { get; }
@@ -54,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddTalentCardObtainedNetEvent(int onTick, ushort cardId, ushort obtainedByPlayerId, FixedOrderedList<TalentStateS2C> playerTalents, bool didReplaceTalent);
         void RemoveAllEventsOlderThanTick(ushort playerId, int tick);
         void AddTalentCardHitNetEvent(int processedTick, ushort talentCardId, ushort cardHealth);
+        void AddPlayerSpinnedNetEvent(int onTick, ushort playerId, int spinEndOnTick);
         void AddPowerUpSpawnedNetEvent(int onTick, ushort powerUpBallId, Vector2 position);
         void AddPowerUpObtainedNetEvent(int onTick, ushort powerUpBallId, ushort byPlayerId);
         void AddPlayerSwitchTeamNetEvent(int onTick, ushort playerId, ushort teamId);

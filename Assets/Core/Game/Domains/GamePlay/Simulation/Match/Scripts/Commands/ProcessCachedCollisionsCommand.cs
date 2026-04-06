@@ -247,6 +247,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var randomSpin = RNG.NextFloat(_gamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfig.EnvironmentSprings.MaxSpin);
             playerState.Spaceship.PushAndSpin(force, randomSpin);
 
+            var spinEndOnTick = _processedTick + (int)(_gamePlayConfig.EnvironmentSprings.SpinDuration * _networkConfig.TicksPerSeconds);
+            _netEventsDataService.AddPlayerSpinnedNetEvent(_processedTick, playerId, spinEndOnTick);
+
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
         }
 
