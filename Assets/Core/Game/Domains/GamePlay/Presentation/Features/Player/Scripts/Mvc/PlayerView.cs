@@ -117,34 +117,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             _healthBarGameObject.SetActive(isShown);
         }
-        
+
         public void InterpolateAimRotation(System.Numerics.Vector2 direction, float decay)
         {
             if (direction.LengthSquared() < 0.0001f)
             {
                 LogService.LogError("Direction is too small (0) to interpolate");
+
                 return;
             }
 
             var targetRotation = direction.ToQuaternion();
+
             _aimArrowTransform.rotation = MathUtils.ExpDecay(
-                _aimArrowTransform.rotation, 
-                targetRotation, 
+                _aimArrowTransform.rotation,
+                targetRotation,
                 decay,
                 Time.deltaTime
             );
 
-            var eyeOffset = new Vector2(direction.X, direction.Y).normalized * _eyeMovementRadius;
-                var targetLeftEyePos = eyeOffset;
-                var leftPosition = _leftEye.position.ToVector2XY()+ eyeOffset;
-                var rightPosition = _rightEye.position.ToVector2XY() + eyeOffset;
-                _leftEyeBall.position = new Vector3(leftPosition.x,leftPosition.y,_leftEyeBall.position.z); //MathUtils.ExpDecay((Vector2)_leftEye.localPosition, targetLeftEyePos, decay, Time.deltaTime);
-                _rightEyeBall.position = new Vector3(rightPosition.x,rightPosition.y,_rightEyeBall.position.z);
+            UpdateEyesToLookAtAimArrow(direction);
+        }
 
-            
-            
-               // var targetRightEyePos = _rightEyeInitialLocalPos + eyeOffset;
-                //_rightEye.position = _leftEye.localToWorldMatrix * MathUtils.ExpDecay((Vector2)_rightEye.localPosition, targetRightEyePos, decay, Time.deltaTime);
+        private void UpdateEyesToLookAtAimArrow(System.Numerics.Vector2 aimArrowDirection)
+        {
+            var eyeOffset = new Vector2(aimArrowDirection.X, aimArrowDirection.Y).normalized * _eyeMovementRadius;
+            var leftPosition = _leftEye.position.ToVector2XY() + eyeOffset;
+            var rightPosition = _rightEye.position.ToVector2XY() + eyeOffset;
+            _leftEyeBall.position = new Vector3(leftPosition.x, leftPosition.y, _leftEyeBall.position.z);
+            _rightEyeBall.position = new Vector3(rightPosition.x, rightPosition.y, _rightEyeBall.position.z);
         }
     }
 }
