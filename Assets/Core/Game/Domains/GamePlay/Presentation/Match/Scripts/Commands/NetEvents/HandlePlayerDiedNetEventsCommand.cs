@@ -34,7 +34,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var playerId = playerDiedEvent.PlayerId;
                 var playerSpaceshipState = _matchDataService.GetPlayer(playerId).Spaceship;
-                playerSpaceshipState.Shoot.MaxCooldown = playerDiedEvent.PlayerMaxShootCooldown; 
                 playerSpaceshipState.Shoot.CooldownSecondsLeft = playerDiedEvent.PlayerShootCooldownSecondsLeft; 
                 _matchPlayerControllers.HidePlayerHealthBar(playerDiedEvent.PlayerId);
                 _matchPlayerControllers.SetIsTailWaving(playerDiedEvent.PlayerId, false);

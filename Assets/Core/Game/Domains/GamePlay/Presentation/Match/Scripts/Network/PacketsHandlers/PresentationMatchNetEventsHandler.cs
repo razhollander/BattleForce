@@ -406,6 +406,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessPlayerMaxShootCooldownChangedEvents(CapacityList<PlayerMaxShootCooldownChangedNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var evt in events)
+            {
+                var player = _matchDataService.GetPlayer(evt.PlayerId);
+                var shoot = player.Spaceship.Shoot;
+                shoot.MaxCooldown = evt.MaxShootCooldown;
+                player.Spaceship.Shoot = shoot;
+            }
+        }
+
         public void ProcessUpdatePlayerTalentStocksEvents(CapacityList<UpdatePlayerTalentStocksNetEventS2C> updatePlayerTalentStocksEvents)
         {
             if (updatePlayerTalentStocksEvents.IsNullOrEmpty())

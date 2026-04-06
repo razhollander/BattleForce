@@ -37,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents;
         public FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
+        public FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C> PlayerMaxShootCooldownChangedNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -70,6 +71,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateKOTalentNetEvents = new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
             PerformDashPulseNetEvents = new FixedUnorderedList<PerformDashPulseNetEventS2C>(maxCap.PerformDashPulseNetEvents);
             UpdatePlayerTalentStocksNetEvents = new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(maxCap.UpdatePlayerTalentStocksNetEvents);
+            PlayerMaxShootCooldownChangedNetEvents = new FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>(maxCap.PlayerMaxShootCooldownChangedNetEvents);
         }
         
         // public FullTickPacket(int tick, SimulationStateS2C previousSimulationState,
@@ -114,6 +116,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedPerformDashPulseNetEvents(writer);
             SerializedUpdatePlayerTalentStocksNetEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
+            SerializedPlayerMaxShootCooldownChangedNetEvents(writer);
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -297,6 +300,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedPerformDashPulseNetEvents(reader);
             DeserializedUpdatePlayerTalentStocksNetEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
+            DeserializedPlayerMaxShootCooldownChangedNetEvents(reader);
         }
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
@@ -615,6 +619,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
+        private void SerializedPlayerMaxShootCooldownChangedNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerMaxShootCooldownChangedNetEvents.Count);
+            foreach (var evt in PlayerMaxShootCooldownChangedNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
         private void DeserializedUpdatePlayerTalentStocksNetEvents(NetDataReader reader)
         {
             var count = reader.GetByte();
@@ -622,6 +635,17 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var evt = ref UpdatePlayerTalentStocksNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedPlayerMaxShootCooldownChangedNetEvents(NetDataReader reader)
+        {
+            var count = reader.GetByte();
+            PlayerMaxShootCooldownChangedNetEvents.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                ref var evt = ref PlayerMaxShootCooldownChangedNetEvents.AddAndGet();
                 evt.Deserialize(reader);
             }
         }

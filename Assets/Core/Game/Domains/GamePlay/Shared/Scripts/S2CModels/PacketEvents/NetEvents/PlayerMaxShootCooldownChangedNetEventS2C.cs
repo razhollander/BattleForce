@@ -1,30 +1,30 @@
 using System;
-using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
+using Core.Game.Domains.GamePlay.Shared.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public struct PlayerDiedNetEventS2C : INetSerializable, IComparable<PlayerDiedNetEventS2C>
+    public struct PlayerMaxShootCooldownChangedNetEventS2C : INetSerializable, IComparable<PlayerMaxShootCooldownChangedNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort PlayerId;
-        public float PlayerShootCooldownSecondsLeft;
+        public float MaxShootCooldown;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)PlayerId);
-            writer.PutFloat16(PlayerShootCooldownSecondsLeft);
+            writer.PutFloat16(MaxShootCooldown);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
             PlayerId = reader.GetByte();
-            PlayerShootCooldownSecondsLeft = reader.GetFloat16();
+            MaxShootCooldown = reader.GetFloat16();
         }
 
-        public int CompareTo(PlayerDiedNetEventS2C other)
+        public int CompareTo(PlayerMaxShootCooldownChangedNetEventS2C other)
         {
             return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }

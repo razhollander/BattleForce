@@ -26,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
             _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
             _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig);
+            SentryGunTalentController = new SentryGunTalentController(overrideableNetEventsService, matchDataService);
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -34,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _swapTalentController.SetCasterId(casterPlayerId);
             _koTalentController.SetCasterId(casterPlayerId);
             _dashPulseTalentController.SetCasterId(casterPlayerId);
+            SentryGunTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)

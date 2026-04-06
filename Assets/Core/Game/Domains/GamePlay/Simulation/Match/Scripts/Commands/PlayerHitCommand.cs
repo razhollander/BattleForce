@@ -9,6 +9,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -32,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private PlayerGainedBoltsCommand _playerGainedBoltsCommand;
         private ushort _byPlayerId;
         private bool _wasHitByAnotherPlayer;
+        private IOverrideableNetEventsService _overrideableNetEventsService;
 
         public PlayerHitCommand SetHitDamage(ushort hitDamage)
         {
@@ -62,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService =_diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
+            _overrideableNetEventsService = _diContainer.Resolve<IOverrideableNetEventsService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
@@ -133,7 +136,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             playerState.Spaceship.Shoot = shootState;
             playerState.Spaceship.IsEngineOn = false;
             playerState.Spaceship.Transform.Velocity = Vector2.Zero;
-            _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerIdGotHit, shootState.MaxCooldown, shootState.CooldownSecondsLeft);
+            _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerIdGotHit, shootState.CooldownSecondsLeft);
+            _overrideableNetEventsService.OverridePlayerMaxShootCooldownChangedEvent(_processedTick, _playerIdGotHit, shootState.MaxCooldown);
 
             if (!_stageDataService.IsStageEnded)
             {
