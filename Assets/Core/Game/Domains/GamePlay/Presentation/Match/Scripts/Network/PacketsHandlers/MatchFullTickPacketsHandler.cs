@@ -792,7 +792,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedActivateSentryGunTalentEvents.Clear();
             foreach (var netEvent in activateSentryGunTalentNetEvents.AsSpan())
             {
-                if (IsTickValidToProcess(netEvent.OccuredOnTick))
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
                 {
                     _cachedUnprocessedActivateSentryGunTalentEvents.Add(netEvent);
                 }
@@ -810,7 +810,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedDeactivateSentryGunTalentEvents.Clear();
             foreach (var netEvent in deactivateSentryGunTalentNetEvents.AsSpan())
             {
-                if (IsTickValidToProcess(netEvent.OccuredOnTick))
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
                 {
                     _cachedUnprocessedDeactivateSentryGunTalentEvents.Add(netEvent);
                 }

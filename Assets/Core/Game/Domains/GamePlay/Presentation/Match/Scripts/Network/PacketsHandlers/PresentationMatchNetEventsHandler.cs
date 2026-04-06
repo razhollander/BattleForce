@@ -450,11 +450,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in activateSentryGunTalentNetEvents)
             {
-                if (IsTickProcessed(netEvent.OccuredOnTick))
-                {
-                    continue;
-                }
-
                 _cachedPresentationEventsService.ActivateSentryGunTalentNetEvents.Add(netEvent);
             }
         }
@@ -468,13 +463,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in deactivateSentryGunTalentNetEvents)
             {
-                if (IsTickProcessed(netEvent.OccuredOnTick))
+                var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
+                var talents = casterPlayer.Spaceship.TalentsState.Talents;
+                for (int i = 0; i < talents.Count; i++)
                 {
-                    continue;
+                    ref var talent = ref talents.Get(i);
+                    if (talent.TalentType == TalentType.SentryGun)
+                    {
+                        talent.NormalCooldown.CooldownEndTick = netEvent.TalentCooldownEndTick;
+                        break;
+                    }
                 }
-
                 _cachedPresentationEventsService.DeactivateSentryGunTalentNetEvents.Add(netEvent);
             }
         }
-}
+    }
 }
