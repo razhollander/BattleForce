@@ -20,5 +20,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void DestroyAll();
         void SetPlayerTalentSelected(ushort playerId, int talentIndex);
         void SetIsTailWaving(ushort playerId, bool isWaving);
+        void SetPlayerSentryGunState(ushort playerId, bool isOn);
     }
 }

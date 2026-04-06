@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
             _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
             _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig);
-            _sentryGunTalentController = new SentryGunTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig);
+            _sentryGunTalentController = new SentryGunTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig, networkConfig);
         }
 
         public void SetCasterId(ushort casterPlayerId)

@@ -5,7 +5,6 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Network;
-using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
@@ -22,7 +21,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly List<MatchPlayerController> _playerControllers = new ();
         private Transform _playersParent;
 
-        public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
+        public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
+            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _matchDataService = matchDataService;
             _playerPool = new PlayerViewPool(playerViewPrefab, diContainer);

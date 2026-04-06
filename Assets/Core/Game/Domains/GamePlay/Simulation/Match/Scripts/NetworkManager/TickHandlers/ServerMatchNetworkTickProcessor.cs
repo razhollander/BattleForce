@@ -1,9 +1,6 @@
 using System;
 using System.Diagnostics;
-using System.Threading;
-using Core.Game.Domains.GamePlay.Shared;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
@@ -13,7 +10,6 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
@@ -256,9 +252,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.ActivateSentryGunTalentNetEvents = _netEventsDataService.ActivateSentryGunTalentNetEventsPerPlayer[playerId];
                 _fullTickPacket.DeactivateSentryGunTalentNetEvents = _netEventsDataService.DeactivateSentryGunTalentNetEventsPerPlayer[playerId];
                 _fullTickPacket.PerformDashPulseNetEvents = _netEventsDataService.PerformDashPulseNetEventsPerPlayer[playerId];
-                _fullTickPacket.ActivateSentryGunTalentNetEvents = _netEventsDataService.ActivateSentryGunTalentNetEventsPerPlayer[playerId];
-                _fullTickPacket.DeactivateSentryGunTalentNetEvents = _netEventsDataService.DeactivateSentryGunTalentNetEventsPerPlayer[playerId];
                 _fullTickPacket.UpdatePlayerTalentStocksNetEvents = _netEventsDataService.UpdatePlayerTalentStocksNetEventsPerPlayer[playerId];
+                _fullTickPacket.PlayerMaxShootCooldownChangedNetEvents = _netEventsDataService.PlayerMaxShootCooldownChangedNetEventsPerPlayer[playerId];
                 _fullTickPacket.DestroySwapFieldNetEvents = _netEventsDataService.DeactivateSwapTalentNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);

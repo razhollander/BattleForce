@@ -39,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents;
         public FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
+        public FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C> PlayerMaxShootCooldownChangedNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -74,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
             DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
             UpdatePlayerTalentStocksNetEvents = new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(maxCap.UpdatePlayerTalentStocksNetEvents);
+            PlayerMaxShootCooldownChangedNetEvents = new FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>(maxCap.PlayerMaxShootCooldownChangedNetEvents);
             ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
             DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
         }
@@ -122,6 +124,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedDeactivateSentryGunTalentNetEvents(writer);
             SerializedUpdatePlayerTalentStocksNetEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
+            SerializedPlayerMaxShootCooldownChangedNetEvents(writer);
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -307,6 +310,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedDeactivateSentryGunTalentNetEvents(reader);
             DeserializedUpdatePlayerTalentStocksNetEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
+            DeserializedPlayerMaxShootCooldownChangedNetEvents(reader);
         }
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
@@ -665,6 +669,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
+        private void SerializedPlayerMaxShootCooldownChangedNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerMaxShootCooldownChangedNetEvents.Count);
+            foreach (var evt in PlayerMaxShootCooldownChangedNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
         private void DeserializedUpdatePlayerTalentStocksNetEvents(NetDataReader reader)
         {
             var count = reader.GetByte();
@@ -672,6 +685,17 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var evt = ref UpdatePlayerTalentStocksNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedPlayerMaxShootCooldownChangedNetEvents(NetDataReader reader)
+        {
+            var count = reader.GetByte();
+            PlayerMaxShootCooldownChangedNetEvents.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                ref var evt = ref PlayerMaxShootCooldownChangedNetEvents.AddAndGet();
                 evt.Deserialize(reader);
             }
         }

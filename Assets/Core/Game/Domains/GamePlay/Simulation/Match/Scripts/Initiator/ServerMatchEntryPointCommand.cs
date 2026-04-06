@@ -131,7 +131,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 _playersTalentsManager.AddPlayer(playerId);
                 _simulationInputService.AddPlayer(playerId);
                 _playersTalentsManager.TryAddTalentToPlayer(TalentType.Swap, playerId, 0, out _, out _);
-                _playersTalentsManager.TryAddTalentToPlayer(TalentType.KO, playerId, 0, out _, out _);
+                _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
                 _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
             }
         }

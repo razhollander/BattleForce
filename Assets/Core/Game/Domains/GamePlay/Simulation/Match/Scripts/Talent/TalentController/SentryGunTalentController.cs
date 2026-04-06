@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private ushort _casterPlayerId;
         private int _startTick;
 
+        private readonly IOverrideableNetEventsService _overrideableNetEventsService;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IMatchDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
@@ -24,12 +25,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         public TalentType TalentType => TalentType.SentryGun;
         public bool IsCurrentlyActive { get; private set; }
 
-        public SentryGunTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
+        public SentryGunTalentController(INetEventsDataService netEventsDataService, IOverrideableNetEventsService overrideableNetEventsService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
+            _overrideableNetEventsService = overrideableNetEventsService;
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -60,6 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             casterPlayerState.Spaceship.Shoot.MaxCooldown *= sentryConfig.ShootCooldownMultiplier;
             casterPlayerState.Spaceship.Shoot.CooldownSecondsLeft = Mathf.Min(casterPlayerState.Spaceship.Shoot.MaxCooldown, casterPlayerState.Spaceship.Shoot.CooldownSecondsLeft);
             _netEventsDataService.AddActivateSentryGunTalentNetEvent(tick, _casterPlayerId);
+            _overrideableNetEventsService.OverridePlayerMaxShootCooldownChangedEvent(tick, _casterPlayerId, casterPlayerState.Spaceship.Shoot.MaxCooldown, casterPlayerState.Spaceship.Shoot.CooldownSecondsLeft);
         }
 
         public void StopIfActive(int tick)
@@ -125,6 +128,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             sentryTalentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _netEventsDataService.AddDeactivateSentryGunTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);
+            var player = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
+            var shoot = player.Spaceship.Shoot;
+            shoot.MaxCooldown /= _gamePlayConfig.Talents.SentryGunTalentConfig.ShootCooldownMultiplier;
+            player.Spaceship.Shoot = shoot;
+            _overrideableNetEventsService.OverridePlayerMaxShootCooldownChangedEvent(tick, _casterPlayerId, shoot.MaxCooldown, shoot.CooldownSecondsLeft);
         }
 
         public void ResetData()

@@ -8,12 +8,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     public class HandleDeactivateSentryGunTalentNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
-        private MatchPlayerControllers _matchPlayerControllers;
+        private IMatchPlayerControllers _matchPlayerControllers;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
-            _matchPlayerControllers = _diContainer.Resolve<MatchPlayerControllers>();
+            _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
         }
 
         public void Execute()

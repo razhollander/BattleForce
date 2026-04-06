@@ -18,6 +18,7 @@ MonoBehaviour:
     - rid: 8506109566889754721
     - rid: 8506109566889754722
     - rid: 8506109566889754723
+    - rid: 8476404660102234386
   HammerTalentConfig:
     HammerSpeed: 10
     HammerSize: 1
@@ -35,11 +36,19 @@ MonoBehaviour:
     PushForce: 50
     MaxSpin: 55
     MinSpin: 50
+  SentryGunTalentConfig:
+    DurationInSeconds: 5
+    ShootCooldownMultiplier: 0.5
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:
     version: 2
     RefIds:
+    - rid: 8476404660102234386
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 4
+        CooldownInSeconds: 3
     - rid: 8506109566889754721
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
