@@ -347,7 +347,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.linearVelocity = velocity;
             bodyDef.type = BodyType.Dynamic;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PlayerSpaceship);
-
+            bodyDef.allowSleep = false;
             var body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
 

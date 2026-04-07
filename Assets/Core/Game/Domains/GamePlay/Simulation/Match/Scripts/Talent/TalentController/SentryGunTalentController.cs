@@ -59,11 +59,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             if (IsCurrentlyActive || !isTalentInputPressed)
             {
+                if (isTalentInputPressed)
+                {
+                    DeactivateTalent(tick);
+                }
                 return;
             }
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            if (casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown())
+            var isOnCooldown = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown();
+
+            if (isOnCooldown)
             {
                 return;
             }
@@ -112,6 +118,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             if (isDead || /*switchedTalents ||*/ isSpinned)
             {
+                LogService.LogError("Stop because spinned!");
                 DeactivateTalent(tick);
                 return;
             }
