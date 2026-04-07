@@ -116,7 +116,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             // bool switchedTalents = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().TalentType != TalentType.SentryGun;
             bool isSpinned = casterPlayerState.Spaceship.IsSpinned;
 
-            if (isDead || /*switchedTalents ||*/ isSpinned)
+            if (isSpinned)
             {
                 LogService.LogError("Stop because spinned!");
                 DeactivateTalent(tick);
