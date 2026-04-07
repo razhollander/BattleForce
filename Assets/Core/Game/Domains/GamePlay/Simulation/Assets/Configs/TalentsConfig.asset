@@ -37,8 +37,8 @@ MonoBehaviour:
     MaxSpin: 55
     MinSpin: 50
   SentryGunTalentConfig:
-    DurationInSeconds: 5
-    ShootCooldownMultiplier: 0.5
+    DurationInSeconds: 3
+    ShootCooldownMultiplier: 0.25
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:

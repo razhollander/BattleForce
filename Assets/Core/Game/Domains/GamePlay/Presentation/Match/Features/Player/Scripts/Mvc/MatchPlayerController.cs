@@ -59,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             if (!playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
             {
+                _playerView.SetIsAimArrowShown(false);
                 return;
             }
 
@@ -79,8 +80,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             var talentState = playerModel.Spaceship.TalentsState.Talents[talentIndex];
-            var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentState.TalentType];
+            var talentType = talentState.TalentType;
+            var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentType];
             _playerView.SetTalentSprite(talentSprite);
+            _playerView.SetIsAimArrowShown(_gamePlayConfig.TalentsConfig.Talents[talentType].IsAimArrowActiveWhileSelected);
         }
 
         public void UpdateTransform()
