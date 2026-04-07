@@ -39,18 +39,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void SetSentryGunState(bool isOn, CancellationTokenSource cancellationTokenSource)
         {
-            _sentryGunAnimator.gameObject.TrySetActive(isOn);
             
             if (isOn)
             {
+                _sentryGunAnimator.gameObject.TrySetActive(true);
                 _sentryGunAnimator.PlayAnimation(cancellationTokenSource).Forget();
             }
             else
             {
-                _sentryGunAnimator.StopAnimation();
+                DisableSentryGunState();
             }
         }
-        
+
+        private void DisableSentryGunState()
+        {
+            _sentryGunAnimator.StopAnimation();
+            _sentryGunAnimator.gameObject.TrySetActive(false);
+        }
+
         public void UpdateTailBend()
         {
             _tailView.UpdateTail();
@@ -126,6 +132,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void OnDespawned()
         {
+            DisableSentryGunState();
             gameObject.SetActive(false);
         }
         

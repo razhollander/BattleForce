@@ -49,7 +49,8 @@ namespace Core.Scripts.Helpers
 
         public void StopAnimation()
         {
-            if (_animationCts == null)
+            var isAnimationRunning = _animationCts != null;
+            if (!isAnimationRunning)
             {
                 return;
             }
