@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -44,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         private readonly IPlayersTalentsManager _playersTalentsManager;
         private readonly IPlaybackRecorderService _playerbackRecorderService;
+        private readonly TryPerformShootForPlayerIfNotOnCooldownCommand _tryPerformShootForPlayerIfNotOnCooldownCommand;
 
         public bool DidReceiveAnyInputFromPlayer(ushort playerId)
         {
@@ -72,6 +74,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _inputsListsPool = new ConcurrentPool<FixedUnorderedList<MatchPlayerInputPacketC2S>>(() => new FixedUnorderedList<MatchPlayerInputPacketC2S>(inputPacketsSavedPerPlayer), networkConfig.MaxCap.ConcurrentPlayers);
             _playerInputPacketsPool = new ConcurrentPool<MatchPlayerInputPacketC2S>(() => new MatchPlayerInputPacketC2S(), networkConfig.MaxCap.ConcurrentInputsProcessed);
             _heighestProcessedTickPerPlayer = new CapacityDict<ushort, int>(networkConfig.MaxCap.ConcurrentPlayers);
+            _tryPerformShootForPlayerIfNotOnCooldownCommand = _commandFactory.CreateCommandVoid<TryPerformShootForPlayerIfNotOnCooldownCommand>();
         }
 
         public void InitEntryPoint()
@@ -221,41 +224,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, PlayerStateS2C playerModel)
         {
-            var shootState = playerModel.Spaceship.Shoot;
             var playerId = playerModel.Id;
             _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, isShootInputPressed);
             var wasShootInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
             // var wasShootInputDownThisTick = true;
-            var shouldShoot = wasShootInputDownThisTick && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
-            if (!shouldShoot)
+            if (wasShootInputDownThisTick)
             {
-                return;
+                _tryPerformShootForPlayerIfNotOnCooldownCommand.SetPlayerId(playerId).SetTick(processedTick).Execute();
+                
+                //
+                // var rectSize = new System.Numerics.Vector2(10, 5);
+                // var rectDistanceFromPlayer = playerModel.Spaceship.Transform.Radius + rectSize.X / 2;
+                // var center = playerModel.Spaceship.Transform.Position+rectDistanceFromPlayer*playerModel.Spaceship.TalentsState.AimDirection;
+                //
+                // float angleRadians = playerModel.Spaceship.TalentsState.AimDirection.ToAngleRadians();
+                // if (_physicsSimulator.RectangleCast(center, rectSize, angleRadians,
+                //         PhysicsBodyType.Wall))
+                // {
+                //     LogService.LogError("Hit!");
+                // }
             }
-
-            shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
-            playerModel.Spaceship.Shoot = shootState;
-            CreateBulletForPlayer(processedTick, playerModel);
-            
-            
-            var rectSize = new System.Numerics.Vector2(10, 5);
-            var rectDistanceFromPlayer = playerModel.Spaceship.Transform.Radius + rectSize.X / 2;
-            var center = playerModel.Spaceship.Transform.Position+rectDistanceFromPlayer*playerModel.Spaceship.TalentsState.AimDirection;
-
-            float angleRadians = playerModel.Spaceship.TalentsState.AimDirection.ToAngleRadians();
-            if (_physicsSimulator.RectangleCast(center, rectSize, angleRadians,
-                    PhysicsBodyType.Wall))
-            {
-                LogService.LogError("Hit!");
-            }
-        }
-        
-        private void CreateBulletForPlayer(int processedTick, PlayerStateS2C playerModel)
-        {
-            var bullet = _matchDataService.AddBullet(playerModel.Id, playerModel.Spaceship.Transform.GetHeadPosition(),
-                playerModel.Spaceship.Transform.Direction, _gamePlayConfig.PlayerBullet.MoveSpeed, _gamePlayConfig.PlayerBullet.Radius);
-            _netEventsDataService.AddBulletSpawnNetEvent(processedTick, bullet.Id, bullet.BelongToPlayerId, bullet.Position, bullet.Radius);
-            _physicsSimulator.AddPlayerBullet(bullet.Id, playerModel.TeamId, bullet.Position, bullet.Velocity, bullet.Radius);
-            LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);
         }
 
         private void UpdatePlayerDirection(MatchPlayerInputPacketC2S playerInputPacket, PlayerStateS2C playerState)

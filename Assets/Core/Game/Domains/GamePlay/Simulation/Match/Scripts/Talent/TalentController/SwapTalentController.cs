@@ -21,8 +21,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
 
         public TalentType TalentType => TalentType.Swap;
-        public bool IsCurrentlyActive { get; private set; }
-        
+
+        private bool IsCurrentlyActive
+        {
+            get
+            {
+                return _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_casterPlayerId, TalentType);
+            }
+            set
+            {
+                _matchDataService.SimulationState.SetIsTalentCurrentlyActiveForPlayer(_casterPlayerId, TalentType, value);
+            }
+        }
+
         private ushort _currentActiveSwapFieldId;
 
         public SwapTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig)

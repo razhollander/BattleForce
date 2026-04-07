@@ -1,10 +1,12 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
@@ -21,16 +23,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IMatchDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
+        private readonly ICommandFactory _commandFactory;
+        private readonly TryPerformShootForPlayerIfNotOnCooldownCommand _tryPerformShootForPlayerIfNotOnCooldownCommand;
 
         public TalentType TalentType => TalentType.SentryGun;
-        public bool IsCurrentlyActive { get; private set; }
-
-        public SentryGunTalentController(INetEventsDataService netEventsDataService, IOverrideableNetEventsService overrideableNetEventsService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
+        private bool IsCurrentlyActive
+        {
+            get
+            {
+                return _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_casterPlayerId, TalentType);
+            }
+            set
+            {
+                _matchDataService.SimulationState.SetIsTalentCurrentlyActiveForPlayer(_casterPlayerId, TalentType, value);
+            }
+        }
+        
+        public SentryGunTalentController(INetEventsDataService netEventsDataService, IOverrideableNetEventsService overrideableNetEventsService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
+            _commandFactory = commandFactory;
+            _tryPerformShootForPlayerIfNotOnCooldownCommand = commandFactory.CreateCommandVoid<TryPerformShootForPlayerIfNotOnCooldownCommand>();
             _overrideableNetEventsService = overrideableNetEventsService;
         }
 
@@ -59,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             casterPlayerState.Spaceship.IsEngineOn = false;
             casterPlayerState.Spaceship.Transform.Velocity = Vector2.Zero;
+            casterPlayerState.Spaceship.Transform.AngularVelocity = 0;
             casterPlayerState.Spaceship.Shoot.MaxCooldown *= sentryConfig.ShootCooldownMultiplier;
             casterPlayerState.Spaceship.Shoot.CooldownSecondsLeft = Mathf.Min(casterPlayerState.Spaceship.Shoot.MaxCooldown, casterPlayerState.Spaceship.Shoot.CooldownSecondsLeft);
             _netEventsDataService.AddActivateSentryGunTalentNetEvent(tick, _casterPlayerId);
@@ -81,18 +98,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             {
                 return;
             }
-
+            
+            _tryPerformShootForPlayerIfNotOnCooldownCommand.SetPlayerId(_casterPlayerId).SetTick(tick).Execute();
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             var sentryConfig = _gamePlayConfig.Talents.SentryGunTalentConfig;
 
-            casterPlayerState.Spaceship.IsEngineOn = false;
-            casterPlayerState.Spaceship.Transform.Velocity = Vector2.Zero;
+            // casterPlayerState.Spaceship.IsEngineOn = false;
+            // casterPlayerState.Spaceship.Transform.Velocity = Vector2.Zero;
 
             bool isDead = !casterPlayerState.Spaceship.IsAlive;
-            bool switchedTalents = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().TalentType != TalentType.SentryGun;
-            bool isSpinned = casterPlayerState.Spaceship.Transform.AngularVelocity != 0;
+            // bool switchedTalents = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().TalentType != TalentType.SentryGun;
+            bool isSpinned = casterPlayerState.Spaceship.IsSpinned;
 
-            if (isDead || switchedTalents || isSpinned)
+            if (isDead || /*switchedTalents ||*/ isSpinned)
             {
                 DeactivateTalent(tick);
                 return;
@@ -114,8 +132,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             if (casterPlayerState.Spaceship.IsAlive)
             {
                 casterPlayerState.Spaceship.IsEngineOn = true;
-                casterPlayerState.Spaceship.Shoot.MaxCooldown /= sentryConfig.ShootCooldownMultiplier;
             }
+            
+            casterPlayerState.Spaceship.Shoot.MaxCooldown /= sentryConfig.ShootCooldownMultiplier;
 
             if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.SentryGun, out int talentIndex))
             {
@@ -130,7 +149,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _netEventsDataService.AddDeactivateSentryGunTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);
             var player = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             var shoot = player.Spaceship.Shoot;
-            shoot.MaxCooldown /= _gamePlayConfig.Talents.SentryGunTalentConfig.ShootCooldownMultiplier;
             player.Spaceship.Shoot = shoot;
             _overrideableNetEventsService.OverridePlayerMaxShootCooldownChangedEvent(tick, _casterPlayerId, shoot.MaxCooldown, shoot.CooldownSecondsLeft);
         }

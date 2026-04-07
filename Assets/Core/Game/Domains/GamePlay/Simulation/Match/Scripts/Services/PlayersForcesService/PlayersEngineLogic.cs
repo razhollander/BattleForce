@@ -1,15 +1,10 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService
 {
-    public interface IPlayersEngineLogic
-    {
-        void TurnOnEngineIfPlayerIdle(PlayerSpaceshipStateS2C playerSpaceshipState);
-        void TryAddEngineForceToPlayer(PlayerSpaceshipStateS2C playerSpaceshipState, float deltaTIme);
-    }
-
     public class PlayersEngineLogic : IPlayersEngineLogic
     {
         private readonly SimulationGamePlayConfig _simulationGamePlayConfig;
@@ -24,6 +19,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesSe
             if (playerSpaceshipState.IsEngineOn || !playerSpaceshipState.IsAlive)
             {
                 return;
+            }
+
+            if (playerSpaceshipState.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent))
+            {
+                if (selectedTalent is {TalentType: TalentType.SentryGun, IsActive: true})
+                {
+                    return;
+                }
             }
 
             var isPlayerIdle = playerSpaceshipState.Transform.Velocity.Length() < _simulationGamePlayConfig.PlayerSpaceship.TurnEngineOnWhenReachVelocity;

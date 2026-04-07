@@ -219,6 +219,21 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             throw new System.Exception($"No bullet for id {bulletId}!");
         }
 
+        public bool GetIsTalentCurrentlyActiveForPlayer(ushort playerId, TalentType talentType)
+        {
+            if (GetPlayerById(playerId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent))
+            {
+                return selectedTalent.TalentType == talentType && selectedTalent.IsActive;
+            }
+
+            return false;
+        }
+
+        public void SetIsTalentCurrentlyActiveForPlayer(ushort playerId, TalentType talentType, bool isActive)
+        {
+            GetPlayerById(playerId).Spaceship.TalentsState.TrySetIsTalentActive(talentType, isActive);
+        }
+        
         public ref PlayerBulletS2C GetBulletById(ushort bulletId)
         {
             for (int i = 0; i < Bullets.Count; i++)

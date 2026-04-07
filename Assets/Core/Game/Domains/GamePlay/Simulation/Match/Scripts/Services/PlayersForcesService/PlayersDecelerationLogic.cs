@@ -2,10 +2,8 @@ using System;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Extensions;
-using UnityEngine;
-using Vector2 = System.Numerics.Vector2;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService
 {
     public class PlayersDecelerationLogic : IPlayersDecelerationLogic
     {
