@@ -179,7 +179,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, MatchMakingPlayerStateS2C playerModel)
         {
             var shootState = playerModel.Spaceship.Shoot;
-            var shouldShoot = /*isShootInputPressed*/true && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
+            var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
             if (shouldShoot)
             {
                 shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
