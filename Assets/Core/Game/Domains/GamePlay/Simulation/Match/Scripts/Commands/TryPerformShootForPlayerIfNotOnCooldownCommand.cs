@@ -1,7 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
@@ -18,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
         private SimulationGamePlayConfig _gamePlayConfig;
+        
         private ushort _playerId;
         private int _processedTick;
 

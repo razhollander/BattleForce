@@ -35,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private NetworkConfig _networkConfig;
         private IStageDataService _stageDataService;
         private ISimulationInputService _simulationInputService;
+        private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -59,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _simulationInputService = _diContainer.Resolve<ISimulationInputService>();
+            _setRandomTalentsForPlayerCommand =  _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
         }
 
         public void Execute()
@@ -134,17 +136,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 // _playersTalentsManager.TryAddTalentToPlayer(TalentType.KO, playerId, 0, out _, out _);
                 // _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
                 
-                var rndIndex = RNG.NextInt(0, 4);
-                TalentType talentType = TalentType.None;
-
-                switch (rndIndex)
+                if (_gamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                 {
-                    case 0: talentType = TalentType.Swap; break;
-                    case 1: talentType = TalentType.KO;break;
-                    case 2: talentType = TalentType.DashPulse;break;
-                    case 3: talentType = TalentType.SentryGun;break;
+                    _setRandomTalentsForPlayerCommand.SetPlayerId(playerId).SetTalentsAmount(_gamePlayConfig.RandomTalentsForPlayersAmount).Execute();
                 }
-                _playersTalentsManager.TryAddTalentToPlayer(talentType, player.Id, 0, out _, out _);
             }
         }
     }

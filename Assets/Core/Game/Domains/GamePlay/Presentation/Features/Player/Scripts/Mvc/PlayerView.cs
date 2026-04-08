@@ -39,7 +39,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void SetSentryGunState(bool isOn, CancellationTokenSource cancellationTokenSource)
         {
-            
             if (isOn)
             {
                 _sentryGunAnimator.gameObject.TrySetActive(true);
@@ -186,9 +185,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _tailView.SetIsTailWaving(isWaving);
         }
 
-        public void SetIsAimArrowShown(bool isAimArrowActiveWhileSelected)
+        public void SetIsAimArrowShown(bool isShown)
         {
-            _aimArrowTransform.gameObject.TrySetActive(isAimArrowActiveWhileSelected);
+            _aimArrowTransform.gameObject.TrySetActive(isShown);
         }
     }
 }

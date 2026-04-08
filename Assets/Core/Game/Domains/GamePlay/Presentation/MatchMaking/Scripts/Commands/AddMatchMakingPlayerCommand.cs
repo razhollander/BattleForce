@@ -28,7 +28,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         public void Execute()
         {
             var playerId = _playerState.Id;
-            LogService.LogError($"Add player: {_playerState.ToJson()}");
             _matchMakingDataService.AddPlayer(_playerState);
             _playerControllers.AddPlayer(playerId);
         }

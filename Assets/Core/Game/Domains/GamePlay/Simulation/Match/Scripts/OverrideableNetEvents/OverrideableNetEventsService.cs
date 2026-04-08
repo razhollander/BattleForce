@@ -6,6 +6,9 @@ using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents
 {
+    /// <summary>
+    /// Net Events that we want to be sent only once per tick are registered here
+    /// </summary>
     public class OverrideableNetEventsService : IOverrideableNetEventsService
     {
         private readonly INetEventsDataService _netEventsDataService;
@@ -60,7 +63,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEve
 
                 ref var netEvent = ref _updatePlayerTalentStocksNetEvents.GetByIndex(i);
                 netEvent.OccuredOnTick = onTick;
-                netEvent.CasterPlayerId = casterPlayerId;
                 netEvent.TalentType = talentType;
                 netEvent.CurrentStocksAmount = currentStocksAmount;
                 netEvent.RecieveNextStockOnTick = recieveNextStockOnTick;
@@ -80,18 +82,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEve
             for (int i = 0; i < _playerMaxShootCooldownChangedNetEvents.Count; i++)
             {
                 var evt = _playerMaxShootCooldownChangedNetEvents[i];
-                if (evt.PlayerId == playerId)
+                if (evt.PlayerId != playerId)
                 {
-                    ref var netEvent = ref _playerMaxShootCooldownChangedNetEvents.GetByIndex(i);
-                    netEvent.OccuredOnTick = onTick;
-                    netEvent.MaxShootCooldown = maxShootCooldown;
-                    return;
+                    continue;
                 }
+
+                ref var netEvent = ref _playerMaxShootCooldownChangedNetEvents.GetByIndex(i);
+                netEvent.OccuredOnTick = onTick;
+                netEvent.MaxShootCooldown = maxShootCooldown;
+                netEvent.ShootCooldownSecondsLeft = cooldownSecondsLeft;
+                return;
             }
 
             ref var packet = ref _playerMaxShootCooldownChangedNetEvents.AddAndGet();
-            packet.OccuredOnTick = onTick;
             packet.PlayerId = playerId;
+            packet.OccuredOnTick = onTick;
             packet.MaxShootCooldown = maxShootCooldown;
             packet.ShootCooldownSecondsLeft = cooldownSecondsLeft;
         }

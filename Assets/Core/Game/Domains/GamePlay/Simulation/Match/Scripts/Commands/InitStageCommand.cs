@@ -29,6 +29,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         private IPlayersTalentsManager _playersTalentsManager;
+        private ICommandFactory _commandFactory;
+        private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
 
         public override void ResolveDependencies()
         {
@@ -43,6 +45,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
         }
 
         public void Execute()
@@ -164,7 +168,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
                 if (_gamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                 {
-                    SetRandomTalentForPlayer(player, _gamePlayConfig.RandomTalentsForPlayersAmount);
+                    _setRandomTalentsForPlayerCommand.SetPlayerId(player.Id).SetTalentsAmount(_gamePlayConfig.RandomTalentsForPlayersAmount).Execute();
                 }
 
                 var talentsCount = player.Spaceship.TalentsState.Talents.Count;
@@ -175,21 +179,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
                 
                 _physicsSimulator.AddPlayer(player.Id, player.TeamId, position, velocity, radius);
-            }
-        }
-
-        private void SetRandomTalentForPlayer(PlayerStateS2C player, int amountOfTalents)
-        {
-            player.Spaceship.TalentsState.Talents.Clear();
-            var talentValues = ((TalentType[])System.Enum.GetValues(typeof(TalentType))).ToList();
-            talentValues.Remove(TalentType.None);
-
-            for (int i = 0; i < amountOfTalents; i++)
-            {
-                var rndIndex = RNG.NextInt(0, talentValues.Count);
-                var randomlyChosenTalentType = talentValues[rndIndex];
-                _playersTalentsManager.TryAddTalentToPlayer(randomlyChosenTalentType, player.Id, 0, out _, out _);
-                talentValues.Remove(randomlyChosenTalentType);
             }
         }
 
