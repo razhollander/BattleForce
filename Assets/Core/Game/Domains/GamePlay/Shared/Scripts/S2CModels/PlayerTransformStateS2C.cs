@@ -15,7 +15,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             set
             {
                 _Velocity = value;
-                LogService.LogError($"set velocity to {value}");
                 Acceleration = Vector2.Zero;
             }
         }

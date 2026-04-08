@@ -321,6 +321,21 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No swap field for id {swapFieldId}!");
         }
+        
+        public bool TryGetSwapFieldById(ushort swapFieldId, out TalentSwapFieldS2C swapField)
+        {
+            for (int i = 0; i < SwapFields.Count; i++)
+            {
+                if (SwapFields[i].Id == swapFieldId)
+                {
+                    swapField= SwapFields.GetByIndex(i);
+                    return true;
+                }
+            }
+
+            swapField = default;
+            return false;
+        }
 
         public ref TalentKOProjectileS2C GetKOProjectileById(ushort koProjectileId)
         {

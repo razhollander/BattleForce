@@ -158,8 +158,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 playerId = objectB.Id;
                 fieldId = objectA.Id;
             }
+            
+            if (!_matchDataService.SimulationState.TryGetSwapFieldById(fieldId, out var swapField))
+            {
+                LogService.LogError("Swap field already collided with another player this tick therefore was destroyed OR reached here because of a bug!");
+                return;   
+            }
 
-            var swapField = _matchDataService.SimulationState.GetSwapFieldById(fieldId);
             var playerStateHit = _matchDataService.SimulationState.GetPlayerById(playerId);
             _playersTalentsManager.CompleteSwapTalentWithEnemy(swapField.PlayerCasterId, playerStateHit.Id, _processedTick);
         }
