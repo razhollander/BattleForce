@@ -406,19 +406,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        public void ProcessPlayerMaxShootCooldownChangedEvents(CapacityList<PlayerMaxShootCooldownChangedNetEventS2C> events)
+        public void ProcessPlayerMaxShootCooldownChangedEvents(CapacityList<PlayerMaxShootCooldownChangedNetEventS2C> netEvents)
         {
-            if (events.IsNullOrEmpty())
+            if (netEvents.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var evt in events)
+            foreach (var netEvent in netEvents)
             {
-                var player = _matchDataService.GetPlayer(evt.PlayerId);
+                var player = _matchDataService.GetPlayer(netEvent.PlayerId);
                 var shoot = player.Spaceship.Shoot;
-                shoot.MaxCooldown = evt.MaxShootCooldown;
-                shoot.CooldownSecondsLeft = evt.ShootCooldownSecondsLeft;
+                shoot.MaxCooldown = netEvent.MaxShootCooldown;
+                shoot.CooldownSecondsLeft = netEvent.ShootCooldownSecondsLeft;
                 player.Spaceship.Shoot = shoot;
             }
         }
