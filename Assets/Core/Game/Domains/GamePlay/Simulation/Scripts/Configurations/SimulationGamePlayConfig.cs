@@ -1,4 +1,5 @@
 using ASoliman.Utils.EditableRefs;
+using ConditionalField;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using UnityEngine;
 
@@ -16,8 +17,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         [EditableRef] public PhysicsConfig Physics;
         public int DeafultEnvironmentId = 0;
         public bool ShouldChooseRandomStage = true;
-        [ConditionalField]
         public bool ShouldChooseRandomTalentsForPlayer = true;
+        [ConditionalField(nameof(ShouldChooseRandomTalentsForPlayer), true)]
         public int RandomTalentsForPlayersAmount = 1;
         public ushort StartMatchCountdownDuration = 5;
         public float ShootCooldownMultiplierWhenDead = 2;

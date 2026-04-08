@@ -24,7 +24,7 @@ MonoBehaviour:
     StartMatchWallRadius: 2
   PowerUps: {fileID: 11400000, guid: 0121acb33a8104de2926cc3c0bb6c95a, type: 2}
   EnvironmentTeleport: {fileID: 11400000, guid: f5de02aa5fbf34854b8feed180b1eefe, type: 2}
-  MaxSavedPlaybacks: 10
+  MaxSavedPlaybacks: 40
   NoTeamId: 5
   TeamIds: 0100020003000400
   MinEntityId: 1
