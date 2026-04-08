@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Network;
-using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
@@ -17,15 +17,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly PlayerViewPool _playerPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly List<MatchPlayerController> _playerControllers = new ();
         private Transform _playersParent;
 
-        public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
+        public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
+            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _matchDataService = matchDataService;
             _playerPool = new PlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
+            _stageCancellationTokenProvider = stageCancellationTokenProvider;
         }
 
         public void InitEntryPoint()
@@ -36,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void AddPlayer(ushort playerId)
         {
-            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform);
+            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform, _stageCancellationTokenProvider);
             playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
         }
@@ -75,6 +78,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return _playerControllers.Find(x => x.PlayerId == playerId);
         }
 
+        public void SetPlayerSentryGunState(ushort playerId, bool isSentryGun)
+        {
+            GetPlayer(playerId).SetSentryGunState(isSentryGun, _stageCancellationTokenProvider.CancellationTokenSource);
+        }
+        
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)
         {
             GetPlayer(playerId).SetHealth(currentHealth, maxHealth);

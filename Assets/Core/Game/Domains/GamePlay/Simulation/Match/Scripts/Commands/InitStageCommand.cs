@@ -11,6 +11,7 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
@@ -28,6 +29,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         private IPlayersTalentsManager _playersTalentsManager;
+        private ICommandFactory _commandFactory;
+        private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
 
         public override void ResolveDependencies()
         {
@@ -42,6 +45,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
         }
 
         public void Execute()
@@ -160,6 +165,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.Transform.Radius = radius;
                 player.Spaceship.IsEngineOn = true;
                 player.Spaceship.IsAlive = true;
+
+                if (_gamePlayConfig.ShouldChooseRandomTalentsForPlayer)
+                {
+                    _setRandomTalentsForPlayerCommand.SetPlayerId(player.Id).SetTalentsAmount(_gamePlayConfig.RandomTalentsForPlayersAmount).Execute();
+                }
 
                 var talentsCount = player.Spaceship.TalentsState.Talents.Count;
                 for (var k = 0; k < talentsCount; k++)

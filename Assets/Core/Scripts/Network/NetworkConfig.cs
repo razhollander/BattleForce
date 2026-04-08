@@ -82,8 +82,10 @@ namespace Core.Scripts.Network
         public int DeactivateKOTalentNetEvents = 128;
         public int PerformDashPulseNetEvents = 128;
         public int UpdatePlayerTalentStocksNetEvents = 128;
-        public int DeactivateDashPulseTalentNetEvents = 128;
+        public int ActivateSentryGunTalentNetEvents = 128;
+        public int DeactivateSentryGunTalentNetEvents = 128;
         public int UpdatePlayerTalentStocksNetEvent = 128;
+        public int PlayerMaxShootCooldownChangedNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel

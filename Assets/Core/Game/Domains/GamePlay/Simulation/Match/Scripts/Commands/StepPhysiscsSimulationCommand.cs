@@ -1,7 +1,7 @@
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -58,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 _playersDecelerationLogic.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
                 _playersDecelerationLogic.DeceleratePlayerSpin(playerState.Spaceship, stepDeltaTime);
-                _playersEngineLogic.TurnOnEngineIfPlayerIdle(playerState.Spaceship);
+                _playersEngineLogic.TurnOnEngineForPlayerIfPossible(playerState.Spaceship);
                 _playersEngineLogic.TryAddEngineForceToPlayer(playerState.Spaceship, stepDeltaTime);
             }
 

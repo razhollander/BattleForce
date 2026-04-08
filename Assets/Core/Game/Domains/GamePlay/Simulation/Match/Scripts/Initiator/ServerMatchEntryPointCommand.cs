@@ -35,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private NetworkConfig _networkConfig;
         private IStageDataService _stageDataService;
         private ISimulationInputService _simulationInputService;
+        private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -59,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _simulationInputService = _diContainer.Resolve<ISimulationInputService>();
+            _setRandomTalentsForPlayerCommand =  _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
         }
 
         public void Execute()
@@ -130,9 +132,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown, isPlayerConnected);
                 _playersTalentsManager.AddPlayer(playerId);
                 _simulationInputService.AddPlayer(playerId);
-                _playersTalentsManager.TryAddTalentToPlayer(TalentType.Swap, playerId, 0, out _, out _);
-                _playersTalentsManager.TryAddTalentToPlayer(TalentType.KO, playerId, 0, out _, out _);
-                _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
+                // _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
+                // _playersTalentsManager.TryAddTalentToPlayer(TalentType.KO, playerId, 0, out _, out _);
+                // _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
+                
+                if (_gamePlayConfig.ShouldChooseRandomTalentsForPlayer)
+                {
+                    _setRandomTalentsForPlayerCommand.SetPlayerId(playerId).SetTalentsAmount(_gamePlayConfig.RandomTalentsForPlayersAmount).Execute();
+                }
             }
         }
     }

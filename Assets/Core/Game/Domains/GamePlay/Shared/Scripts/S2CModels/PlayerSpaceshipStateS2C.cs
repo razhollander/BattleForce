@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public PlayerTalentsStateS2C TalentsState;
         public bool IsEngineOn = true;
         public bool IsAlive = true;
+        public bool IsSpinned => Transform.AngularVelocity != 0;
 
         public PlayerSpaceshipStateS2C(int maxTalents)
         {
@@ -28,6 +29,21 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 IsEngineOn = false;
             }
+        }
+        
+        public PlayerSpaceshipStateS2C GetClone()
+        {
+            var clone = new PlayerSpaceshipStateS2C(TalentsState.Talents.Capacity)
+            {
+                IsEngineOn = this.IsEngineOn,
+                IsAlive = this.IsAlive,
+                Shoot = this.Shoot,
+                Transform = this.Transform,
+                Health = this.Health,
+            };
+
+            clone.TalentsState.CopyFrom(this.TalentsState);
+            return clone;
         }
         
         public void Serialize(NetDataWriter writer)

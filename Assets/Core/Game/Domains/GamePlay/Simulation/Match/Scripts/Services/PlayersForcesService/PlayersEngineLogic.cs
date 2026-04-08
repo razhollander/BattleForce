@@ -1,15 +1,10 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService
 {
-    public interface IPlayersEngineLogic
-    {
-        void TurnOnEngineIfPlayerIdle(PlayerSpaceshipStateS2C playerSpaceshipState);
-        void TryAddEngineForceToPlayer(PlayerSpaceshipStateS2C playerSpaceshipState, float deltaTIme);
-    }
-
     public class PlayersEngineLogic : IPlayersEngineLogic
     {
         private readonly SimulationGamePlayConfig _simulationGamePlayConfig;
@@ -19,9 +14,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesSe
             _simulationGamePlayConfig = simulationGamePlayConfig;
         }
 
-        public void TurnOnEngineIfPlayerIdle(PlayerSpaceshipStateS2C playerSpaceshipState)
+        public void TurnOnEngineForPlayerIfPossible(PlayerSpaceshipStateS2C playerSpaceshipState)
         {
             if (playerSpaceshipState.IsEngineOn || !playerSpaceshipState.IsAlive)
+            {
+                return;
+            }
+
+            var isPlayerInSentryGun = playerSpaceshipState.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) 
+                                               && selectedTalent is {TalentType: TalentType.SentryGun, IsActive: true};
+
+            if (isPlayerInSentryGun)
             {
                 return;
             }

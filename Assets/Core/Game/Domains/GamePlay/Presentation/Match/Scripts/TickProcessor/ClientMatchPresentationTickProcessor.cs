@@ -43,6 +43,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleSwapFieldCreatedNetEventsCommand _handleSwapFieldCreatedNetEventsCommand;
         private readonly HandleKOProjectileCreatedNetEventsCommand _handleKOProjectileCreatedNetEventsCommand;
         private readonly HandleDeactivateKOTalentNetEventsCommand _handleDeactivateKOTalentNetEventsCommand;
+        private readonly HandleActivateSentryGunTalentNetEventsCommand _handleActivateSentryGunTalentNetEventsCommand;
+        private readonly HandleDeactivateSentryGunTalentNetEventsCommand _handleDeactivateSentryGunTalentNetEventsCommand;
         private readonly HandleKOProjectHitPlayerNetEventsCommand _handleKOProjectHitPlayerNetEventsCommand;
         private readonly UpdateKOProjectilesTransformCommand _updateKOProjectilesTransformCommand;
         private readonly HandlePerformDashPulseNetEventsCommand _handlePerformDashPulseNetEventsCommand;
@@ -79,6 +81,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleSwapFieldCreatedNetEventsCommand = commandFactory.CreateCommandVoid<HandleSwapFieldCreatedNetEventsCommand>();
             _handleKOProjectileCreatedNetEventsCommand = commandFactory.CreateCommandVoid<HandleKOProjectileCreatedNetEventsCommand>();
             _handleDeactivateKOTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateKOTalentNetEventsCommand>();
+            _handleActivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateSentryGunTalentNetEventsCommand>();
+            _handleDeactivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSentryGunTalentNetEventsCommand>();
             _handleKOProjectHitPlayerNetEventsCommand = commandFactory.CreateCommandVoid<HandleKOProjectHitPlayerNetEventsCommand>();
             _updateKOProjectilesTransformCommand = commandFactory.CreateCommandVoid<UpdateKOProjectilesTransformCommand>();
             _handlePerformDashPulseNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformDashPulseNetEventsCommand>();
@@ -123,6 +127,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTransform();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();
             _handleDeactivateKOTalentNetEventsCommand.Execute();
+            _handleActivateSentryGunTalentNetEventsCommand.Execute();
+            _handleDeactivateSentryGunTalentNetEventsCommand.Execute();
             _handlePerformDashPulseNetEventsCommand.Execute();
             _handleUpdatePlayerTalentStocksNetEventsCommand.Execute();
             _updateKOProjectilesTransformCommand.Execute(); // must be after _handleDeactivateKOTalentNetEventsCommand.Execute();

@@ -92,6 +92,17 @@
                 },
                 {
                     "name": "",
+                    "id": "c7547370-5b71-47a3-a3bf-8851ddc06613",
+                    "path": "<DualShockGamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "c6142d62-426e-4341-bf67-036be37f8286",
                     "path": "<Keyboard>/a",
                     "interactions": "",

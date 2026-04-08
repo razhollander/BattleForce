@@ -406,6 +406,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessPlayerMaxShootCooldownChangedEvents(CapacityList<PlayerMaxShootCooldownChangedNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                var player = _matchDataService.GetPlayer(netEvent.PlayerId);
+                var shoot = player.Spaceship.Shoot;
+                shoot.MaxCooldown = netEvent.MaxShootCooldown;
+                shoot.CooldownSecondsLeft = netEvent.ShootCooldownSecondsLeft;
+                player.Spaceship.Shoot = shoot;
+            }
+        }
+
         public void ProcessUpdatePlayerTalentStocksEvents(CapacityList<UpdatePlayerTalentStocksNetEventS2C> updatePlayerTalentStocksEvents)
         {
             if (updatePlayerTalentStocksEvents.IsNullOrEmpty())
@@ -438,6 +455,43 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 {
                     LogService.LogError($"Player with id {netEvent.CasterPlayerId} does not have talent {netEvent.TalentType}!");
                 }
+            }
+        }
+
+        public void ProcessActivateSentryGunTalentEvents(CapacityList<ActivateSentryGunTalentNetEventS2C> activateSentryGunTalentNetEvents)
+        {
+            if (activateSentryGunTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in activateSentryGunTalentNetEvents)
+            {
+                _cachedPresentationEventsService.ActivateSentryGunTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateSentryGunTalentEvents(CapacityList<DeactivateSentryGunTalentNetEventS2C> deactivateSentryGunTalentNetEvents)
+        {
+            if (deactivateSentryGunTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in deactivateSentryGunTalentNetEvents)
+            {
+                var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
+                var talents = casterPlayer.Spaceship.TalentsState.Talents;
+                for (int i = 0; i < talents.Count; i++)
+                {
+                    ref var talent = ref talents.Get(i);
+                    if (talent.TalentType == TalentType.SentryGun)
+                    {
+                        talent.NormalCooldown.CooldownEndTick = netEvent.TalentCooldownEndTick;
+                        break;
+                    }
+                }
+                _cachedPresentationEventsService.DeactivateSentryGunTalentNetEvents.Add(netEvent);
             }
         }
     }

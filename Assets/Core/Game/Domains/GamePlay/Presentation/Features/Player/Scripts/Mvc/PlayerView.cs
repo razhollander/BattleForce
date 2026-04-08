@@ -1,8 +1,11 @@
 using System;
+using System.Threading;
 using TMPro;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Scripts.Extensions;
+using Core.Scripts.Helpers;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Helpers.Pools;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Utils;
@@ -28,11 +31,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _rightEye;
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         [SerializeField] private PlayerTailView _tailView;
+        [SerializeField] private SpriteAnimator _sentryGunAnimator;
         
         private Transform _transform;
 
         public Action Despawn { get; set; }
-        
+
+        public void SetSentryGunState(bool isOn, CancellationTokenSource cancellationTokenSource)
+        {
+            if (isOn)
+            {
+                _sentryGunAnimator.gameObject.TrySetActive(true);
+                _sentryGunAnimator.PlayAnimation(cancellationTokenSource).Forget();
+            }
+            else
+            {
+                DisableSentryGunState();
+            }
+        }
+
+        private void DisableSentryGunState()
+        {
+            _sentryGunAnimator.StopAnimation();
+            _sentryGunAnimator.gameObject.TrySetActive(false);
+        }
+
         public void UpdateTailBend()
         {
             _tailView.UpdateTail();
@@ -108,6 +131,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void OnDespawned()
         {
+            DisableSentryGunState();
             gameObject.SetActive(false);
         }
         
@@ -159,6 +183,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetIsTailWaving(bool isWaving)
         {
             _tailView.SetIsTailWaving(isWaving);
+        }
+
+        public void SetIsAimArrowShown(bool isShown)
+        {
+            _aimArrowTransform.gameObject.TrySetActive(isShown);
         }
     }
 }

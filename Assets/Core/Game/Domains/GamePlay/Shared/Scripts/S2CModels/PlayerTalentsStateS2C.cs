@@ -66,6 +66,27 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return false;
         }
         
+        public bool TrySetIsTalentActive(TalentType talentType, bool isActive)
+        {
+            if (Talents.Count == 0)
+            {
+                return false;
+            }
+            
+            for (int i = 0; i < Talents.Count; i++)
+            {
+                var talent = Talents[i];
+                if (talent.TalentType == talentType)
+                {
+                    ref var talentState = ref Talents.Get(i);
+                    talentState.IsActive = isActive;
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
         public bool TryGetCurrentSelectedTalent(out TalentStateS2C selectedTalent)
         {
             if (Talents.Count == 0)
@@ -113,6 +134,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             AimDirection = reader.GetVector2FromAngle16();
         }
+
+        public void CopyFrom(PlayerTalentsStateS2C other)
+        {
+            this.SelectedTalentIndex = other.SelectedTalentIndex;
+            this.AimDirection = other.AimDirection;
+            this.Talents.Clear();
+            
+            for (int i = 0; i < other.Talents.Count; i++)
+            {
+                ref var talentState = ref this.Talents.AddAndGet();
+                talentState = other.Talents[i];
+            }
+        }
     }
 
     public struct TalentStateS2C
@@ -121,7 +155,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public TalentCooldownType CooldownType;
         public TalentNormalCooldownStateS2C NormalCooldown;
         public TalentStocksCooldownStateS2C StocksCooldown;
-
+        public bool IsActive;
+        
         public bool IsOnCooldown() => 
             CooldownType == TalentCooldownType.Normal
                 ? NormalCooldown.IsOnCooldown()
