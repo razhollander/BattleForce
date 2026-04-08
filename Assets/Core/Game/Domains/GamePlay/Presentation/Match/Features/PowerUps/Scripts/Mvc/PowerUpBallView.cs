@@ -1,14 +1,15 @@
 using System;
 using CoreDomain.Scripts.Helpers.Pools;
+using CoreDomain.Scripts.Utils;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc
 {
     public class PowerUpBallView : MonoBehaviour, IPoolable
     {
-        public void InterpolatePosition(Vector2 position, float lerpFactor)
+        public void InterpolatePosition(Vector2 position, float decay)
         {
-            var lerpedPosition = Vector2.Lerp(transform.position, position, lerpFactor);
+            var lerpedPosition = MathUtils.ExpDecay(transform.position, position, decay, Time.deltaTime);
             SetPosition(lerpedPosition);
         }
 
