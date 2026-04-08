@@ -43,10 +43,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
+        private const string PrefsPlayerNameKey = "NetworkRole_PlayerName";
+        private const string PrefsIpAddressKey = "NetworkRole_IpAddress";
+        private const string PrefsIsLocalHostKey = "NetworkRole_IsLocalHost";
+
         public void InitEntryPoint()
         {
-            var playerName = "Player_" + UnityEngine.Random.Range(1000, 9999);
-            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, _networkConfig.OnlyLocal, _networkConfig.IpAddress, _networkConfig.DefaultHostPort, playerName);
+            var defaultPlayerName = "Player_" + UnityEngine.Random.Range(1000, 9999);
+            var playerName = PlayerPrefs.GetString(PrefsPlayerNameKey, defaultPlayerName);
+            var ipAddress = PlayerPrefs.GetString(PrefsIpAddressKey, _networkConfig.IpAddress);
+            var isLocalHostInt = PlayerPrefs.GetInt(PrefsIsLocalHostKey, _networkConfig.OnlyLocal ? 1 : 0);
+            var isLocalHost = isLocalHostInt == 1;
+
+            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, isLocalHost, ipAddress, _networkConfig.DefaultHostPort, playerName);
             PopulatePlaybacksDropdown();
 #if UNITY_SERVER
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
@@ -113,6 +122,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private async Awaitable OnHostClickedAsync()
         {
+            SavePrefs();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
 
             try
@@ -173,8 +183,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             return playerName;
         }
 
+        private void SavePrefs()
+        {
+            PlayerPrefs.SetString(PrefsPlayerNameKey, _uiView.PlayerName);
+            PlayerPrefs.SetString(PrefsIpAddressKey, _uiView.IpAddress);
+            PlayerPrefs.SetInt(PrefsIsLocalHostKey, _uiView.IsLocalHost ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
         private void OnClientClicked()
         {
+            SavePrefs();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;
             StartClient(ip, false, cancellationTokenSource, false);
