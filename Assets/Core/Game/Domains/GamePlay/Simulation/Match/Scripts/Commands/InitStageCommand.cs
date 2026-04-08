@@ -11,6 +11,7 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
@@ -160,6 +161,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.Transform.Radius = radius;
                 player.Spaceship.IsEngineOn = true;
                 player.Spaceship.IsAlive = true;
+                
+                SetRandomTalentForPlayer(player);
 
                 var talentsCount = player.Spaceship.TalentsState.Talents.Count;
                 for (var k = 0; k < talentsCount; k++)
@@ -170,6 +173,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 
                 _physicsSimulator.AddPlayer(player.Id, player.TeamId, position, velocity, radius);
             }
+        }
+
+        private void SetRandomTalentForPlayer(PlayerStateS2C player)
+        {
+            player.Spaceship.TalentsState.Talents.Clear();
+            var talentValues = ((TalentType[])System.Enum.GetValues(typeof(TalentType))).ToList();
+            talentValues.Remove(TalentType.None);
+            var rndIndex = RNG.NextInt(0, talentValues.Count);
+            var randomlyChosenTalentType = talentValues[rndIndex];
+            _playersTalentsManager.TryAddTalentToPlayer(randomlyChosenTalentType, player.Id, 0, out _, out _);
         }
 
         private Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel.MatchEnvironmentFieldBarrierModel GetBarrierForTeam(ushort teamId)

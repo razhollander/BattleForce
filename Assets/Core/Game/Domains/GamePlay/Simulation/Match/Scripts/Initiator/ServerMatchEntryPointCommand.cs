@@ -130,9 +130,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown, isPlayerConnected);
                 _playersTalentsManager.AddPlayer(playerId);
                 _simulationInputService.AddPlayer(playerId);
-                _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
-                _playersTalentsManager.TryAddTalentToPlayer(TalentType.KO, playerId, 0, out _, out _);
-                _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
+                // _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
+                // _playersTalentsManager.TryAddTalentToPlayer(TalentType.KO, playerId, 0, out _, out _);
+                // _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
+                
+                var rndIndex = RNG.NextInt(0, 4);
+                TalentType talentType = TalentType.None;
+
+                switch (rndIndex)
+                {
+                    case 0: talentType = TalentType.Swap; break;
+                    case 1: talentType = TalentType.KO;break;
+                    case 2: talentType = TalentType.DashPulse;break;
+                    case 3: talentType = TalentType.SentryGun;break;
+                }
+                _playersTalentsManager.TryAddTalentToPlayer(talentType, player.Id, 0, out _, out _);
             }
         }
     }
