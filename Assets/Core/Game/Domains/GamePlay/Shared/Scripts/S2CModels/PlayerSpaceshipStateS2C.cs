@@ -31,6 +31,21 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
         }
         
+        public PlayerSpaceshipStateS2C GetClone()
+        {
+            var clone = new PlayerSpaceshipStateS2C(TalentsState.Talents.Capacity)
+            {
+                IsEngineOn = this.IsEngineOn,
+                IsAlive = this.IsAlive,
+                Shoot = this.Shoot,
+                Transform = this.Transform,
+                Health = this.Health,
+            };
+
+            clone.TalentsState.CopyFrom(this.TalentsState);
+            return clone;
+        }
+        
         public void Serialize(NetDataWriter writer)
         {
             Transform.Serialize(writer);

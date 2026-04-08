@@ -25,7 +25,7 @@ MonoBehaviour:
     HammerMass: 10
   SwapTalentConfig:
     MaxRadius: 30
-    GrowDurationSeconds: 1.5
+    GrowDurationSeconds: 3
   PulseDashConfig:
     DashVelocity: 30
   KOTalentConfig:

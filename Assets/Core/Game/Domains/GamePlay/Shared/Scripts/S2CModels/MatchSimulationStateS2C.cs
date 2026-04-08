@@ -337,6 +337,21 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return false;
         }
 
+        public bool TryGetKOProjectileById(ushort koProjectileId, out TalentKOProjectileS2C koProjectile)
+        {
+            for (int i = 0; i < KOProjectiles.Count; i++)
+            {
+                if (KOProjectiles[i].Id == koProjectileId)
+                {
+                    koProjectile = KOProjectiles.GetByIndex(i);
+                    return true;
+                }
+            }
+
+            koProjectile = default;
+            return false;
+        }
+        
         public ref TalentKOProjectileS2C GetKOProjectileById(ushort koProjectileId)
         {
             for (int i = 0; i < KOProjectiles.Count; i++)

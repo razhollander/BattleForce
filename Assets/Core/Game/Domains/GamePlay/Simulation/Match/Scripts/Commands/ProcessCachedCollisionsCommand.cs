@@ -101,8 +101,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var projectileId = isProjectileToWall ? objectA.Id : objectB.Id;
-            var projectile = _matchDataService.SimulationState.GetKOProjectileById(projectileId);
-            var casterId = projectile.PlayerCasterId;
+            if (!_matchDataService.SimulationState.TryGetKOProjectileById(projectileId, out var koProjectile))
+            {
+                LogService.LogTopic("Ko Projectile was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+            
+            var casterId = koProjectile.PlayerCasterId;
             _playersTalentsManager.HitKOTalentWithWall(casterId);
         }
 
@@ -130,9 +135,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 playerId = objectB.Id;
             }
 
-            var projectile = _matchDataService.SimulationState.GetKOProjectileById(projectileId);
+            if (!_matchDataService.SimulationState.TryGetKOProjectileById(projectileId, out var koProjectile))
+            {
+                LogService.LogTopic("Ko Projectile was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+            
             var enemyPlayer = _matchDataService.SimulationState.GetPlayerById(playerId);
-            _playersTalentsManager.HitKOTalentWithEnemy(projectile.PlayerCasterId, enemyPlayer.Id, _processedTick);
+            _playersTalentsManager.HitKOTalentWithEnemy(koProjectile.PlayerCasterId, enemyPlayer.Id, _processedTick);
         }
         
         private void HandleSwapFieldPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -161,7 +171,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             if (!_matchDataService.SimulationState.TryGetSwapFieldById(fieldId, out var swapField))
             {
-                LogService.LogError("Swap field already collided with another player this tick therefore was destroyed OR reached here because of a bug!");
+                LogService.Log("Swap field already collided with another player this tick therefore was destroyed!");
                 return;   
             }
 

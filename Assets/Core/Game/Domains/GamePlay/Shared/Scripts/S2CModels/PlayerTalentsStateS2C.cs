@@ -134,6 +134,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             AimDirection = reader.GetVector2FromAngle16();
         }
+
+        public void CopyFrom(PlayerTalentsStateS2C other)
+        {
+            this.SelectedTalentIndex = other.SelectedTalentIndex;
+            this.AimDirection = other.AimDirection;
+            this.Talents.Clear();
+            
+            for (int i = 0; i < other.Talents.Count; i++)
+            {
+                ref var talentState = ref this.Talents.AddAndGet();
+                talentState = other.Talents[i];
+            }
+        }
     }
 
     public struct TalentStateS2C

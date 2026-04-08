@@ -14,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
             PlayerId = playerId;
             PlayerName = playerName;
             TeamId = teamId;
-            Spaceship = spaceship;
+            Spaceship = spaceship.GetClone();
         }
     }
 }

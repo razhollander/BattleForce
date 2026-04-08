@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -27,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         public void Execute()
         {
             var playerId = _playerState.Id;
+            LogService.LogError($"Add player: {_playerState.ToJson()}");
             _matchMakingDataService.AddPlayer(_playerState);
             _playerControllers.AddPlayer(playerId);
         }
