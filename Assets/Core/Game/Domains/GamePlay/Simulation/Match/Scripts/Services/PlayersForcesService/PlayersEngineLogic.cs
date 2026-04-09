@@ -14,19 +14,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
             _simulationGamePlayConfig = simulationGamePlayConfig;
         }
 
-        public void TurnOnEngineIfPlayerIdle(PlayerSpaceshipStateS2C playerSpaceshipState)
+        public void TurnOnEngineForPlayerIfPossible(PlayerSpaceshipStateS2C playerSpaceshipState)
         {
             if (playerSpaceshipState.IsEngineOn || !playerSpaceshipState.IsAlive)
             {
                 return;
             }
 
-            if (playerSpaceshipState.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent))
+            var isPlayerInSentryGun = playerSpaceshipState.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) 
+                                               && selectedTalent is {TalentType: TalentType.SentryGun, IsActive: true};
+
+            if (isPlayerInSentryGun)
             {
-                if (selectedTalent is {TalentType: TalentType.SentryGun, IsActive: true})
-                {
-                    return;
-                }
+                return;
             }
 
             var isPlayerIdle = playerSpaceshipState.Transform.Velocity.Length() < _simulationGamePlayConfig.PlayerSpaceship.TurnEngineOnWhenReachVelocity;

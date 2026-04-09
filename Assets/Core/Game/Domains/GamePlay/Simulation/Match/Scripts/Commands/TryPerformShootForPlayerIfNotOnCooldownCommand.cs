@@ -1,7 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
@@ -18,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
         private SimulationGamePlayConfig _gamePlayConfig;
+        
         private ushort _playerId;
         private int _processedTick;
 
@@ -59,7 +59,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         
         private void CreateBulletForPlayer(int processedTick, PlayerStateS2C playerModel)
         {
-            var bullet = _matchDataService.AddBullet(playerModel.Id, playerModel.Spaceship.Transform.GetHeadPosition(),
+            var spawnPosition = playerModel.Spaceship.Transform.GetHeadPosition();
+            var isSentryGunActive = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerModel.Id, TalentType.SentryGun);
+
+            if (isSentryGunActive)
+            {
+                var sentryOffset = _gamePlayConfig.Talents.SentryGunTalentConfig.BulletsSpawnOffsetFromPlayerHead;
+                spawnPosition += playerModel.Spaceship.Transform.Direction * sentryOffset;
+            }
+
+            var bullet = _matchDataService.AddBullet(playerModel.Id, spawnPosition,
                 playerModel.Spaceship.Transform.Direction, _gamePlayConfig.PlayerBullet.MoveSpeed, _gamePlayConfig.PlayerBullet.Radius);
             _netEventsDataService.AddBulletSpawnNetEvent(processedTick, bullet.Id, bullet.BelongToPlayerId, bullet.Position, bullet.Radius);
             _physicsSimulator.AddPlayerBullet(bullet.Id, playerModel.TeamId, bullet.Position, bullet.Velocity, bullet.Radius);
