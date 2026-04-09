@@ -95,6 +95,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.InterpolateTransform(playerPosition, playerRotation, decay);
             _playerView.InterpolateAimRotation(playerModel.Spaceship.TalentsState.AimDirection, decay);
             _playerView.UpdateTailBend();
+
+            var headPosition = playerTransformState.GetHeadPosition().ToUnityVector2();
+            var direction = playerTransformState.Direction.ToUnityVector2();
+            var angularVelocity = playerTransformState.AngularVelocity;
+            var velocityLength = (float)playerTransformState.Velocity.Length();
+            var assistLineLength = _gamePlayConfig.AssistLineLength;
+
+            _playerView.UpdateAssistLine(headPosition, direction, angularVelocity, velocityLength, assistLineLength);
         }
 
         public void UpdateBulletCooldown()

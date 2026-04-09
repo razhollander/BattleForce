@@ -249,11 +249,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private void UpdatePlayerDirection(MatchPlayerInputPacketC2S playerInputPacket, PlayerStateS2C playerState)
         {
             var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
-            var rotationAngle =
-                (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
-                 playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
+            var rotationDirection = (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
+                 playerInputPacket.IsMoveRightInputPressed.ToInt());
+            var rotationAngle = rotationDirection * rotationDelta;
             var rotatedVector = playerState.Spaceship.Transform.Direction.Rotate(rotationAngle);
             playerState.Spaceship.Transform.Direction = rotatedVector;
+            playerState.Spaceship.Transform.AngularVelocity = rotationDirection * _gamePlayConfig.PlayerSpaceship.RotationSpeed;
         }
         
         private CapacityDict<ushort, MatchPlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()

@@ -32,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private SpriteAnimator _sentryGunAnimator;
+        [SerializeField] private PlayerAssistLineView _assistLineView;
         
         private Transform _transform;
 
@@ -76,6 +77,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _spriteRenderer.color = color;
             _tailView.SetColor(color);
             _availableBulletSpriteRenderer.color = color;
+            if (_assistLineView != null)
+            {
+                _assistLineView.SetColor(color);
+            }
         }
 
         public void SetBulletLoading(float cooldownLeft, float maxCooldown)
@@ -121,6 +126,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _transform = transform;
             _loadingRingView.OnCreated();
             _tailView.OnCreated();
+            if (_assistLineView != null)
+            {
+                _assistLineView.OnCreated();
+            }
         }
 
         public void OnSpawned()
@@ -188,6 +197,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetIsAimArrowShown(bool isShown)
         {
             _aimArrowTransform.gameObject.TrySetActive(isShown);
+        }
+
+        public void UpdateAssistLine(Vector2 headPos, Vector2 direction, float angularVelocity, float velocityLength, float length)
+        {
+            if (_assistLineView != null)
+            {
+                _assistLineView.UpdateLine(headPos, direction, angularVelocity, velocityLength, length);
+            }
         }
     }
 }

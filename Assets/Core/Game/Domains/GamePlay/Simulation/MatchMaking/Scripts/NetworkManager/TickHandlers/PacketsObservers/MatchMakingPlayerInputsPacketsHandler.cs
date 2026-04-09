@@ -200,11 +200,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private void UpdatePlayerDirection(MatchMakingPlayerInputPacketC2S playerInputPacket, MatchMakingPlayerStateS2C playerModel)
         {
             var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
-            var rotationAngle =
-                (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
-                 playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
+            var rotationDirection = (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
+                 playerInputPacket.IsMoveRightInputPressed.ToInt());
+            var rotationAngle = rotationDirection * rotationDelta;
             var rotatedVector = playerModel.Spaceship.Transform.Direction.Rotate(rotationAngle);
             playerModel.Spaceship.Transform.Direction = rotatedVector;
+            playerModel.Spaceship.Transform.AngularVelocity = rotationDirection * _gamePlayConfig.PlayerSpaceship.RotationSpeed;
             if (playerInputPacket.IsMoveForwardInputPressed)
             {
                 playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;

@@ -237,6 +237,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 var playerState = simulationState.GetPlayerById(player.PlayerId);
                 player.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
                 player.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
+                player.Spaceship.Transform.Velocity = playerState.Spaceship.Transform.Velocity;
+                player.Spaceship.Transform.AngularVelocity = playerState.Spaceship.Transform.AngularVelocity;
                 player.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
             }
         }

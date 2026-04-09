@@ -47,6 +47,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             var playerRotation = playerTransformState.Direction.ToUnityVector2().ToQuaternion();
             var exponentialDecay = _gamePlayConfig.ExponentialDecay;
             _playerView.InterpolateTransform(playerPosition, playerRotation, exponentialDecay);
+
+            var headPosition = playerTransformState.GetHeadPosition().ToUnityVector2();
+            var direction = playerTransformState.Direction.ToUnityVector2();
+            var angularVelocity = playerTransformState.AngularVelocity;
+            var velocityLength = (float)playerTransformState.Velocity.Length();
+            var assistLineLength = _gamePlayConfig.AssistLineLength;
+
+            _playerView.UpdateAssistLine(headPosition, direction, angularVelocity, velocityLength, assistLineLength);
         }
 
         public void UpdateBulletCooldown()

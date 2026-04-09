@@ -39,6 +39,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.PutVector2Quantized(Position);
             writer.PutVector2AsAngle16(Direction);
             writer.PutFloat16(Radius);
+            writer.PutVector2Quantized(_Velocity);
+            writer.PutFloat16(AngularVelocity);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -46,18 +48,24 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Position = reader.GetVector2Quantized();
             Direction = reader.GetVector2FromAngle16();
             Radius = reader.GetFloat16();
+            _Velocity = reader.GetVector2Quantized();
+            AngularVelocity = reader.GetFloat16();
         }
 
         public void SerializeDeltas(NetDataWriter writer)
         {
             writer.PutVector2Quantized(Position);
             writer.PutVector2AsAngle16(Direction);
+            writer.PutVector2Quantized(_Velocity);
+            writer.PutFloat16(AngularVelocity);
         }
 
         public void DeserializeDeltas(NetDataReader reader)
         {
             Position = reader.GetVector2Quantized();
             Direction = reader.GetVector2FromAngle16();
+            _Velocity = reader.GetVector2Quantized();
+            AngularVelocity = reader.GetFloat16();
         }
     }
 }
