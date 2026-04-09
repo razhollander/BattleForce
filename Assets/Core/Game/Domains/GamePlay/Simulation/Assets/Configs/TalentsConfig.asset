@@ -39,6 +39,7 @@ MonoBehaviour:
   SentryGunTalentConfig:
     DurationInSeconds: 3
     ShootCooldownMultiplier: 0.25
+    BulletsSpawnOffsetFromPlayerHead: 1.1
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:
