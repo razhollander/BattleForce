@@ -8,19 +8,27 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.DataPersistence;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.SceneService;
 using CoreDomain.Scripts.Services.StateMachineService;
 using LiteNetLib;
+using Sirenix.OdinInspector.Editor;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.Scripts
 {
     public class ChooseNetworkRoleUIController : IChooseNetworkRoleUIController
     {
+        private const string PREFS_PLAYER_NAME_KEY = "NetworkRole_PlayerName";
+        private const string PREFS_IP_ADDRESS_KEY = "NetworkRole_IpAddress";
+        private const string PREFS_IS_LOCAL_HOST_KEY = "NetworkRole_IsLocalHost";
+        private const string PREFS_PORT_HOST_KEY = "NetworkRole_Port";
+        
         private readonly ChooseNetworkRoleUIView _uiView;
         private readonly ISceneLoaderService _sceneLoaderService;
         private readonly IStateMachineService _stateMachineService;
@@ -29,9 +37,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly IPlaybackIOService _playbackIOService;
         private readonly ICommandFactory _commandFactory;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
+        private readonly IDataPersistence _dataPersistence;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, NetworkConfig networkConfig, IPlaybackIOService playbackIOService, ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig)
+            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, NetworkConfig networkConfig, IPlaybackIOService playbackIOService,
+            ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig, IDataPersistence dataPersistence)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
@@ -41,21 +51,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _playbackIOService = playbackIOService;
             _commandFactory = commandFactory;
             _sharedGamePlayConfig = sharedGamePlayConfig;
+            _dataPersistence = dataPersistence;
         }
-
-        private const string PrefsPlayerNameKey = "NetworkRole_PlayerName";
-        private const string PrefsIpAddressKey = "NetworkRole_IpAddress";
-        private const string PrefsIsLocalHostKey = "NetworkRole_IsLocalHost";
 
         public void InitEntryPoint()
         {
             var defaultPlayerName = "Player_" + UnityEngine.Random.Range(1000, 9999);
-            var playerName = PlayerPrefs.GetString(PrefsPlayerNameKey, defaultPlayerName);
-            var ipAddress = PlayerPrefs.GetString(PrefsIpAddressKey, _networkConfig.IpAddress);
-            var isLocalHostInt = PlayerPrefs.GetInt(PrefsIsLocalHostKey, _networkConfig.OnlyLocal ? 1 : 0);
-            var isLocalHost = isLocalHostInt == 1;
-
-            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, isLocalHost, ipAddress, _networkConfig.DefaultHostPort, playerName);
+            var playerName = _dataPersistence.Load(PREFS_PLAYER_NAME_KEY, defaultPlayerName);
+            var ipAddress = _dataPersistence.Load(PREFS_IP_ADDRESS_KEY, _networkConfig.IpAddress);
+            var isLocalHost = _dataPersistence.Load(PREFS_IS_LOCAL_HOST_KEY, _networkConfig.OnlyLocal);
+            var port = _dataPersistence.Load(PREFS_PORT_HOST_KEY, _networkConfig.DefaultHostPort);
+            
+            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, isLocalHost, ipAddress, port, playerName);
             PopulatePlaybacksDropdown();
 #if UNITY_SERVER
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
@@ -122,7 +129,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private async Awaitable OnHostClickedAsync()
         {
-            SavePrefs();
+            SaveLocallyChosenParameters();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
 
             try
@@ -143,6 +150,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private async Awaitable StartServer(CancellationTokenSource cancellationTokenSource, bool isPlaybackEnabled, string playbackFilePath = "")
         {
+            SaveLocallyChosenParameters();
             var port = _uiView.Port;
             var enterData = new ServerInitiatorEnterData(isPlaybackEnabled, playbackFilePath, port);
             LogService.LogTopic("Starting Server", LogTopicType.ClientNetwork);
@@ -183,17 +191,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             return playerName;
         }
 
-        private void SavePrefs()
+        private void SaveLocallyChosenParameters()
         {
-            PlayerPrefs.SetString(PrefsPlayerNameKey, _uiView.PlayerName);
-            PlayerPrefs.SetString(PrefsIpAddressKey, _uiView.IpAddress);
-            PlayerPrefs.SetInt(PrefsIsLocalHostKey, _uiView.IsLocalHost ? 1 : 0);
-            PlayerPrefs.Save();
+            _dataPersistence.Save(
+                PREFS_PLAYER_NAME_KEY, _uiView.PlayerName,
+                PREFS_IP_ADDRESS_KEY, _uiView.IpAddress, 
+                PREFS_IS_LOCAL_HOST_KEY, _uiView.IsLocalHost,
+                PREFS_PORT_HOST_KEY, _uiView.Port);
         }
 
         private void OnClientClicked()
         {
-            SavePrefs();
+            SaveLocallyChosenParameters();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;
             StartClient(ip, false, cancellationTokenSource, false);

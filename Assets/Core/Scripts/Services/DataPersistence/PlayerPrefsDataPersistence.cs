@@ -18,7 +18,7 @@ namespace Core.Scripts.Services.DataPersistence
             _serializer = serializer;
         }
 
-        public void Save<T>(string id, T data)
+        private void SaveInternal<T>(string id, T data)
         {
             try
             {
@@ -26,7 +26,6 @@ namespace Core.Scripts.Services.DataPersistence
                 var encrypted = EncryptionUtils.Encrypt(json);
 
                 PlayerPrefs.SetString(id, encrypted);
-                PlayerPrefs.Save();
 
                 // update cache
                 _cachedIdToJson[id] = json;
@@ -35,6 +34,46 @@ namespace Core.Scripts.Services.DataPersistence
             {
                 LogService.LogError($"Tried to save {id}, but exception was thrown: {e}");
             }
+        }
+        
+        public void Save<T>(string id, T data)
+        {
+            SaveInternal(id, data);
+            PlayerPrefs.Save();
+        }
+        
+        public void Save<T1, T2>(string id1, T1 data1, string id2, T2 data2)
+        {
+            SaveInternal(id1, data1);
+            SaveInternal(id2, data2);
+            PlayerPrefs.Save();
+        }
+        
+        public void Save<T1, T2, T3>(string id1, T1 data1, string id2, T2 data2, string id3, T3 data3)
+        {
+            SaveInternal(id1, data1);
+            SaveInternal(id2, data2);
+            SaveInternal(id3, data3);
+            PlayerPrefs.Save();
+        }
+        
+        public void Save<T1, T2, T3, T4>(string id1, T1 data1, string id2, T2 data2, string id3, T3 data3, string id4, T4 data4)
+        {
+            SaveInternal(id1, data1);
+            SaveInternal(id2, data2);
+            SaveInternal(id3, data3);
+            SaveInternal(id4, data4);
+            PlayerPrefs.Save();
+        }
+        
+        public void Save<T1, T2, T3, T4, T5>(string id1, T1 data1, string id2, T2 data2, string id3, T3 data3, string id4, T4 data4, string id5, T5 data5)
+        {
+            Save(id1, data1);
+            Save(id2, data2);
+            Save(id3, data3);
+            Save(id4, data4);
+            Save(id5, data5);
+            PlayerPrefs.Save();
         }
 
         public T Load<T>(string id, T defaultValue = default)
