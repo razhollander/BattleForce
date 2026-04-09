@@ -7,6 +7,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
     {
         public float DurationInSeconds = 5f;
         public float ShootCooldownMultiplier = 0.5f;
-        public float SpawnDistanceOffset = 1.5f;
+        public float BulletsSpawnOffsetFromPlayerHead = 1.5f;
     }
 }

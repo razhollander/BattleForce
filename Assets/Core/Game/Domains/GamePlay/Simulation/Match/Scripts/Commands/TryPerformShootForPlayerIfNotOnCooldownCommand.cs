@@ -64,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             if (isSentryGunActive)
             {
-                var sentryOffset = _gamePlayConfig.Talents.SentryGunTalentConfig.SpawnDistanceOffset;
+                var sentryOffset = _gamePlayConfig.Talents.SentryGunTalentConfig.BulletsSpawnOffsetFromPlayerHead;
                 spawnPosition += playerModel.Spaceship.Transform.Direction * sentryOffset;
             }
 
