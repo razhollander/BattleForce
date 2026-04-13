@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             _playerView.transform.SetParent(_parent);
             _playerView.name = "Player_" + PlayerId;
             _playerView.SetPlayerName(playerModel.PlayerName);
+            _playerView.SetIsTailWaving(true);
             var playerTransform = playerModel.Spaceship.Transform;
             _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
@@ -47,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             var playerRotation = playerTransformState.Direction.ToUnityVector2().ToQuaternion();
             var exponentialDecay = _gamePlayConfig.ExponentialDecay;
             _playerView.InterpolateTransform(playerPosition, playerRotation, exponentialDecay);
+            _playerView.UpdateTailBend();
         }
 
         public void UpdateBulletCooldown()
