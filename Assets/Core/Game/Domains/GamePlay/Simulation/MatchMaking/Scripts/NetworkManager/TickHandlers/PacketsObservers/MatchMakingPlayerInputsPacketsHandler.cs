@@ -205,7 +205,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             var rotationAngle = rotationDirection * rotationDelta;
             var rotatedVector = playerModel.Spaceship.Transform.Direction.Rotate(rotationAngle);
             playerModel.Spaceship.Transform.Direction = rotatedVector;
-            playerModel.Spaceship.Transform.AngularVelocity = rotationDirection * _gamePlayConfig.PlayerSpaceship.RotationSpeed;
+            playerModel.Spaceship.Transform.InputAngularVelocity = rotationDirection * _gamePlayConfig.PlayerSpaceship.RotationSpeed;
             if (playerInputPacket.IsMoveForwardInputPressed)
             {
                 playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;

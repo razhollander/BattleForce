@@ -7,10 +7,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
     {
         [SerializeField] private LineRenderer _lineRenderer;
         [SerializeField] private int _pointsCount = 30;
+        [SerializeField] private float _lerpSpeed = 15f; // Adjust for smoothness
+
+        private Vector3[] _targetPositions;
 
         public void OnCreated()
         {
+            _lineRenderer.useWorldSpace = true;
             _lineRenderer.positionCount = _pointsCount;
+            _targetPositions = new Vector3[_pointsCount];
         }
 
         public void UpdateLine(Vector2 headPos, Vector2 direction, float angularVelocity, float velocityLength, float lineLength)
@@ -21,29 +26,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
                 return;
             }
 
-            _lineRenderer.positionCount = _pointsCount;
+            if (_lineRenderer.positionCount != _pointsCount)
+                _lineRenderer.positionCount = _pointsCount;
 
             float distanceStep = lineLength / (_pointsCount - 1);
-
-            float speed = Mathf.Max(velocityLength, 5f); // Use a minimum speed to always show a line
+            float speed = Mathf.Max(velocityLength, 5f);
             float timeStep = distanceStep / speed;
 
             Vector2 currentPos = headPos;
             Vector2 currentDir = direction;
 
+            // 1. Calculate and store the "Target" world positions
             for (int i = 0; i < _pointsCount; i++)
             {
-                _lineRenderer.SetPosition(i, new Vector3(currentPos.x, currentPos.y, 0f));
+                _targetPositions[i] = new Vector3(currentPos.x, currentPos.y, 0f);
 
-                // Move forward
                 currentPos += currentDir * distanceStep;
 
-                // Rotate direction based on angular velocity (degrees per second)
                 if (Mathf.Abs(angularVelocity) > 0.01f)
                 {
                     float rotationAngle = angularVelocity * timeStep;
                     currentDir = currentDir.Rotate(rotationAngle);
                 }
+            }
+        }
+
+        private void Update()
+        {
+            // 2. Every frame, Lerp the LineRenderer's current positions toward the targets
+            if (_lineRenderer.positionCount == 0 || _targetPositions == null) return;
+
+            for (int i = 0; i < _pointsCount; i++)
+            {
+                Vector3 currentPointPos = _lineRenderer.GetPosition(i);
+                
+                // Smoothly interpolate between current and target
+                Vector3 lerpedPos = Vector3.Lerp(currentPointPos, _targetPositions[i], Time.deltaTime * _lerpSpeed);
+                
+                _lineRenderer.SetPosition(i, lerpedPos);
             }
         }
 

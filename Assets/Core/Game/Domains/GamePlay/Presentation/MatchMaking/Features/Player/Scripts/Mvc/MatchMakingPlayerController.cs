@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
 
             var headPosition = playerTransformState.GetHeadPosition().ToUnityVector2();
             var direction = playerTransformState.Direction.ToUnityVector2();
-            var angularVelocity = playerTransformState.AngularVelocity;
+            var angularVelocity = playerTransformState.InputAngularVelocity;
             var velocityLength = (float)playerTransformState.Velocity.Length();
             var assistLineLength = _gamePlayConfig.AssistLineLength;
 

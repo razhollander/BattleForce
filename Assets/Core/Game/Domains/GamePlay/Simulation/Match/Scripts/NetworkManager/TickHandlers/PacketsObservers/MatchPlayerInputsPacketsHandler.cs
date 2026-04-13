@@ -254,7 +254,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var rotationAngle = rotationDirection * rotationDelta;
             var rotatedVector = playerState.Spaceship.Transform.Direction.Rotate(rotationAngle);
             playerState.Spaceship.Transform.Direction = rotatedVector;
-            playerState.Spaceship.Transform.AngularVelocity = rotationDirection * _gamePlayConfig.PlayerSpaceship.RotationSpeed;
+            playerState.Spaceship.Transform.InputAngularVelocity = rotationDirection * _gamePlayConfig.PlayerSpaceship.RotationSpeed;
         }
         
         private CapacityDict<ushort, MatchPlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()
