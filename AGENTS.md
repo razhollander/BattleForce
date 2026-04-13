@@ -20,7 +20,9 @@ For Awake/Start/OnEnable use InitEntryPoint.
 For OnDisable/OnDestroy use InitExitPoint.
 For Update on the client side use the ClientPresentationTickProcessor.ManagedUpdate()
 For Update on the server side use the ServerNetworkTickProcessor.OnTick()
-- Use `var` whenever possible
+- Use `var` whenever possible, even in for loops
+- Always use brackets when writing 'if' statements
+- Use CAPS_LOCK for consts
 - No comments unless complex algorithm
 - No Tuples - use Result classes
 - Always wrap condition in {} brackets
