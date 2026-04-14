@@ -55,6 +55,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
                 controller.Destroy();
                 _controllers.Remove(hookId);
             }
+            else
+            {
+                Debug.LogError($"GrapplingHookProjectileController with id {hookId} not found");
+            }
         }
 
         public void DestroyAll()

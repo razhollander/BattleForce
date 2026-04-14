@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -18,7 +19,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         public void Execute()
         {
             var events = _cachedPresentationEventsService.PlayerGrapplingHookHitNetEvents;
-            if (events.Count == 0) return;
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
 
             foreach (var netEvent in events)
             {

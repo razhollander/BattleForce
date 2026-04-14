@@ -27,15 +27,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         public void Execute()
         {
             var netEvents = _cachedPresentationEventsService.PlayerGrapplingHookShotNetEvents;
-            if (netEvents.Count == 0) return;
+            if (netEvents.Count == 0)
+            {
+                return;
+            }
 
             foreach (var netEvent in netEvents)
             {
                 var hookModel = netEvent.HookProjectile;
                 var casterPosition = _playerControllers.GetPlayerPosition(hookModel.PlayerCasterId);
-                var rotation = Vector2.zero; // Rotation will be handled dynamically in transform command based on opposites of caster position
+                var rotation = hookModel.Position - casterPosition.ToNumericsVector2();
 
-                _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, hookModel.PlayerCasterId, hookModel.Position.ToUnityVector2(), rotation, casterPosition);
+                _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, hookModel.PlayerCasterId, hookModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition);
                 _matchDataService.AddGrapplingHookProjectile(hookModel.Id, hookModel.PlayerCasterId, hookModel.Position);
 
                 // // Hide the aim arrow

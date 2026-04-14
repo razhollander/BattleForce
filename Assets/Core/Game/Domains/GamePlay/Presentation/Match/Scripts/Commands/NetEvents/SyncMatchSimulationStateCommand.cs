@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWal
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
@@ -53,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ISwapFieldControllers _swapFieldControllers;
         private IKOProjectilesControllers _kOProjectilesControllers;
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
+        private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -84,6 +86,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _swapFieldControllers = _diContainer.Resolve<ISwapFieldControllers>();
             _kOProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
+            _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
         }
 
         public void Execute()
@@ -112,6 +115,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _environmentFieldBarrierControllers.DestroyAll();
             _swapFieldControllers.DestroyAll();
             _kOProjectilesControllers.DestroyAll();
+            _grapplingHookProjectilesControllers.DestroyAll();
         }
 
         private void CreateAll()

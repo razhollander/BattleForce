@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
 
@@ -24,16 +25,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             foreach (var hookModel in _matchDataService.GrapplingHookProjectiles)
             {
                 var casterPosition = _playerControllers.GetPlayerPosition(hookModel.CasterPlayerId);
-                var rotation = Quaternion.identity; // Can compute proper rotation to face player if necessary, or let view handle it
-
-                // Rotate towards opposite direction of player
-                Vector2 directionFromCaster = (hookModel.Position - casterPosition).normalized;
-                if (directionFromCaster != Vector2.zero)
-                {
-                    float angle = Mathf.Atan2(directionFromCaster.y, directionFromCaster.x) * Mathf.Rad2Deg;
-                    rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-                }
-
+                var directionFromCaster = hookModel.Position - casterPosition;
+                var rotation = directionFromCaster.ToQuaternion();
                 _hookControllers.InterpolateGrapplingHookTransform(hookModel.Id, hookModel.Position, rotation, casterPosition);
             }
         }

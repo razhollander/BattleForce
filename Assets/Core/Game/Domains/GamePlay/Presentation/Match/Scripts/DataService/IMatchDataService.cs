@@ -20,10 +20,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         HashSet<ushort> TeamIds {get; }
         int StartPhaseInitialTick { get; set; }
         bool IsInPreparationPhase { get; set; }
-        MatchPlayerModel GetPlayer(ushort playerId);
-        ushort GetPlayerTeamId(ushort playerId);
+        List<MatchKOProjectileModel> KOProjectiles { get; }
+        List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
         MatchPlayerModel LocalPlayer { get; }
         bool IsPlayerJoined { get; }
+        
+        MatchPlayerModel GetPlayer(ushort playerId);
+        ushort GetPlayerTeamId(ushort playerId);
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
         MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
         MatchEnvironmentLavaWallModel AddLavalWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
@@ -53,13 +56,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchSwapFieldModel AddSwapField(ushort id, ushort casterPlayerId, int startTick, int endTick, float maxRadius);
         MatchSwapFieldModel GetSwapField(ushort id);
         void RemoveSwapField(ushort id);
-        List<MatchKOProjectileModel> KOProjectiles { get; }
-        List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
         MatchKOProjectileModel AddKOProjectile(ushort id, ushort casterPlayerId, int startTick, float size);
         MatchGrapplingHookProjectileModel AddGrapplingHookProjectile(ushort id, ushort casterPlayerId, Vector2 position);
         MatchGrapplingHookProjectileModel GetGrapplingHookProjectile(ushort id);
         void RemoveGrapplingHookProjectile(ushort id);
-
         MatchKOProjectileModel GetKOProjectile(ushort id);
         void RemoveKOProjectile(ushort id);
     }

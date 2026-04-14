@@ -1,11 +1,9 @@
-using System;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.LayerOrders;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts
 {
@@ -37,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Fie
                 FieldBarrierShape.Rectangle => MeshUtils.CreateRectangleMesh(fieldBarrierModel.Size, layerOrder),
                 FieldBarrierShape.Circle => MeshUtils.CreateCircleMesh(fieldBarrierModel.CircleRadius, _gamePlayConfig.FieldBarriers.Thickness,
                     _gamePlayConfig.FieldBarriers.CircleBarrierSegmentsAmount, layerOrder),
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new System.ArgumentOutOfRangeException()
             };
             
             _view.SetMesh(mesh);
