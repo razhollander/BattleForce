@@ -49,6 +49,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<KOProjectHitPlayerNetEventS2C> _cachedUnprocessedKOProjectHitPlayerEvents;
         private readonly CapacityList<CreateKOProjectileNetEventS2C> _cachedUnprocessedCreateKOProjectileEvents;
         private readonly CapacityList<DeactivateKOTalentNetEventS2C> _cachedUnprocessedDeactivateKOTalentEvents;
+        private readonly CapacityList<PlayerGrapplingHookShotNetEventS2C> _cachedUnprocessedPlayerGrapplingHookShotEvents;
+        private readonly CapacityList<PlayerGrapplingHookHitNetEventS2C> _cachedUnprocessedPlayerGrapplingHookHitEvents;
+        private readonly CapacityList<PlayerGrapplingHookDeactivatedNetEventS2C> _cachedUnprocessedPlayerGrapplingHookDeactivatedEvents;
         private readonly CapacityList<ActivateSentryGunTalentNetEventS2C> _cachedUnprocessedActivateSentryGunTalentEvents;
         private readonly CapacityList<DeactivateSentryGunTalentNetEventS2C> _cachedUnprocessedDeactivateSentryGunTalentEvents;
         private readonly CapacityList<PerformDashPulseNetEventS2C> _cachedUnprocessedPerformDashPulseEvents;
@@ -88,6 +91,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedKOProjectHitPlayerEvents = new CapacityList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents);
             _cachedUnprocessedCreateKOProjectileEvents = new CapacityList<CreateKOProjectileNetEventS2C>(networkConfig.MaxCap.CreateKOProjectileNetEvents);
             _cachedUnprocessedDeactivateKOTalentEvents = new CapacityList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents);
+            _cachedUnprocessedPlayerGrapplingHookShotEvents = new CapacityList<PlayerGrapplingHookShotNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookShotNetEvents);
+            _cachedUnprocessedPlayerGrapplingHookHitEvents = new CapacityList<PlayerGrapplingHookHitNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookHitNetEvents);
+            _cachedUnprocessedPlayerGrapplingHookDeactivatedEvents = new CapacityList<PlayerGrapplingHookDeactivatedNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookDeactivatedNetEvents);
             _cachedUnprocessedActivateSentryGunTalentEvents = new CapacityList<ActivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateSentryGunTalentNetEvents);
             _cachedUnprocessedDeactivateSentryGunTalentEvents = new CapacityList<DeactivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSentryGunTalentNetEvents);
             _cachedUnprocessedPerformDashPulseEvents = new CapacityList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents);
@@ -140,6 +146,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessKOProjectHitPlayerEvents(latestFullTickPacket.KOProjectHitPlayerNetEvents);
             ProcessCreateKOProjectileEvents(latestFullTickPacket.CreateKOProjectileNetEvents);
             ProcessDeactivateKOTalentEvents(latestFullTickPacket.DeactivateKOTalentNetEvents);
+            ProcessPlayerGrapplingHookShotEvents(latestFullTickPacket.PlayerGrapplingHookShotNetEvents);
+            ProcessPlayerGrapplingHookHitEvents(latestFullTickPacket.PlayerGrapplingHookHitNetEvents);
+            ProcessPlayerGrapplingHookDeactivatedEvents(latestFullTickPacket.PlayerGrapplingHookDeactivatedNetEvents);
             ProcessActivateSentryGunTalentEvents(latestFullTickPacket.ActivateSentryGunTalentNetEvents);
             ProcessDeactivateSentryGunTalentEvents(latestFullTickPacket.DeactivateSentryGunTalentNetEvents);
             ProcessPerformDashPulseEvents(latestFullTickPacket.PerformDashPulseNetEvents);
@@ -151,6 +160,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdatePowerUpBallsTransform(simulationState);
             UpdateRotatingWheels(latestTickReceivedFromServer);
             UpdateKOProjectilesTransform(simulationState);
+            UpdateGrapplingHookProjectilesTransform(simulationState);
 
             LastProcessedTickFromServer = latestTickReceivedFromServer;
 
@@ -300,6 +310,60 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedCreateKOProjectileEvents.Sort();
                 _presentationNetEventsHandler.ProcessCreateKOProjectileEvents(_cachedUnprocessedCreateKOProjectileEvents);
+            }
+        }
+
+        private void ProcessPlayerGrapplingHookShotEvents(FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C> events)
+        {
+            _cachedUnprocessedPlayerGrapplingHookShotEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPlayerGrapplingHookShotEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedPlayerGrapplingHookShotEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerGrapplingHookShotEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerGrapplingHookShotEvents(_cachedUnprocessedPlayerGrapplingHookShotEvents);
+            }
+        }
+
+        private void ProcessPlayerGrapplingHookHitEvents(FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C> events)
+        {
+            _cachedUnprocessedPlayerGrapplingHookHitEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPlayerGrapplingHookHitEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedPlayerGrapplingHookHitEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerGrapplingHookHitEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerGrapplingHookHitEvents(_cachedUnprocessedPlayerGrapplingHookHitEvents);
+            }
+        }
+
+        private void ProcessPlayerGrapplingHookDeactivatedEvents(FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C> events)
+        {
+            _cachedUnprocessedPlayerGrapplingHookDeactivatedEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedPlayerGrapplingHookDeactivatedEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedPlayerGrapplingHookDeactivatedEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerGrapplingHookDeactivatedEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerGrapplingHookDeactivatedEvents(_cachedUnprocessedPlayerGrapplingHookDeactivatedEvents);
             }
         }
 
@@ -772,6 +836,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 var bulletState = simulationState.GetBulletById(bullet.Id);
                 bullet.Position = bulletState.Position;
+            }
+        }
+
+        private void UpdateGrapplingHookProjectilesTransform(MatchSimulationStateS2C simulationState)
+        {
+            foreach (var hook in _matchDataService.GrapplingHookProjectiles)
+            {
+                if (simulationState.TryGetGrapplingHookProjectileById(hook.Id, out var state))
+                {
+                    hook.Position = state.Position.ToUnityVector2();
+                }
             }
         }
 

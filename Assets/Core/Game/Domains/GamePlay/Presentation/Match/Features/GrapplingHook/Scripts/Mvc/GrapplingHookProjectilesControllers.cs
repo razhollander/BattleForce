@@ -1,0 +1,69 @@
+using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using UnityEngine;
+using Zenject;
+using Core.Scripts.Extensions;
+
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc
+{
+    public class GrapplingHookProjectilesControllers : IGrapplingHookProjectilesControllers
+    {
+        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly GrapplingHookProjectilePool _pool;
+        private readonly Dictionary<ushort, GrapplingHookProjectileController> _controllers = new();
+        private Transform _parentTransform;
+
+        public GrapplingHookProjectilesControllers(GrapplingHookProjectileView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
+        {
+            _gamePlayConfig = gamePlayConfig;
+            _pool = new GrapplingHookProjectilePool(prefab, diContainer);
+        }
+
+        public void InitEntryPoint()
+        {
+            _parentTransform = (new GameObject("GrapplingHookProjectilesParent")).transform;
+            _pool.InitPool();
+        }
+
+        public void CreateGrapplingHookProjectile(ushort hookId, ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 casterPosition)
+        {
+            var controller = new GrapplingHookProjectileController(hookId, casterPlayerId, _pool, _parentTransform);
+            controller.CreateView(position, rotation.ToQuaternion(), casterPosition);
+            _controllers.Add(hookId, controller);
+        }
+
+        public void InterpolateGrapplingHookTransform(ushort hookId, Vector2 position, Quaternion rotation, Vector2 casterPosition)
+        {
+            if (_controllers.TryGetValue(hookId, out var controller))
+            {
+                controller.InterpolateTransform(position, rotation, casterPosition, _gamePlayConfig.ExponentialDecay);
+            }
+        }
+
+        public void UpdateOnHit(ushort hookId)
+        {
+            if (_controllers.TryGetValue(hookId, out var controller))
+            {
+                controller.UpdateOnHit();
+            }
+        }
+
+        public void DestroyGrapplingHookProjectile(ushort hookId)
+        {
+            if (_controllers.TryGetValue(hookId, out var controller))
+            {
+                controller.Destroy();
+                _controllers.Remove(hookId);
+            }
+        }
+
+        public void DestroyAll()
+        {
+            foreach (var controller in _controllers.Values)
+            {
+                controller.Destroy();
+            }
+            _controllers.Clear();
+        }
+    }
+}

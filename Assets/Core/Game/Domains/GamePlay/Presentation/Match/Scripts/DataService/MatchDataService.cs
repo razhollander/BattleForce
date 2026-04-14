@@ -24,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; private set; }
         public List<MatchSwapFieldModel> SwapFields { get; private set; }
         public List<MatchKOProjectileModel> KOProjectiles { get; private set; }
+        public List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
 
@@ -51,6 +52,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             FieldBarriers = new List<MatchEnvironmentFieldBarrierModel>(networkConfig.MaxCap.ConcurrentFieldBarriers);
             SwapFields = new List<MatchSwapFieldModel>(networkConfig.MaxCap.ConcurrentPlayers);
             KOProjectiles = new List<MatchKOProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
+            GrapplingHookProjectiles = new List<MatchGrapplingHookProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -225,6 +227,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             FieldBarriers.Clear();
             SwapFields.Clear();
             KOProjectiles.Clear();
+            GrapplingHookProjectiles.Clear();
         }
 
         public void SetTeamBolts(ushort teamId, int totalTeamBolts)
@@ -295,6 +298,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             var model = new MatchKOProjectileModel(id, casterPlayerId, startTick, size);
             KOProjectiles.Add(model);
             return model;
+        }
+
+        public MatchGrapplingHookProjectileModel AddGrapplingHookProjectile(ushort id, ushort casterPlayerId, Vector2 position)
+        {
+            var model = new MatchGrapplingHookProjectileModel(id, casterPlayerId, position);
+            GrapplingHookProjectiles.Add(model);
+            return model;
+        }
+
+        public MatchGrapplingHookProjectileModel GetGrapplingHookProjectile(ushort id)
+        {
+            var model = GrapplingHookProjectiles.Find(x => x.Id == id);
+            if (model == null)
+            {
+                LogService.LogError($"Couldn't find grappling hook projectile with id {id}");
+            }
+            return model;
+        }
+
+        public void RemoveGrapplingHookProjectile(ushort id)
+        {
+            for (int i = 0; i < GrapplingHookProjectiles.Count; i++)
+            {
+                if (GrapplingHookProjectiles[i].Id == id)
+                {
+                    GrapplingHookProjectiles.RemoveAt(i);
+                    return;
+                }
+            }
         }
 
         public MatchKOProjectileModel GetKOProjectile(ushort id)

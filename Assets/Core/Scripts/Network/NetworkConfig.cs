@@ -84,6 +84,9 @@ namespace Core.Scripts.Network
         public int UpdatePlayerTalentStocksNetEvents = 128;
         public int ActivateSentryGunTalentNetEvents = 128;
         public int DeactivateSentryGunTalentNetEvents = 128;
+        public int PlayerGrapplingHookShotNetEvents = 128;
+        public int PlayerGrapplingHookHitNetEvents = 128;
+        public int PlayerGrapplingHookDeactivatedNetEvents = 128;
         public int UpdatePlayerTalentStocksNetEvent = 128;
         public int PlayerMaxShootCooldownChangedNetEvents = 128;
 

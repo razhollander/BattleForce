@@ -368,6 +368,33 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessPlayerGrapplingHookShotEvents(CapacityList<PlayerGrapplingHookShotNetEventS2C> events)
+        {
+            var eventsSpan = events.AsSpan();
+            foreach (var netEvent in eventsSpan)
+            {
+                _cachedPresentationEventsService.PlayerGrapplingHookShotNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessPlayerGrapplingHookHitEvents(CapacityList<PlayerGrapplingHookHitNetEventS2C> events)
+        {
+            var eventsSpan = events.AsSpan();
+            foreach (var netEvent in eventsSpan)
+            {
+                _cachedPresentationEventsService.PlayerGrapplingHookHitNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessPlayerGrapplingHookDeactivatedEvents(CapacityList<PlayerGrapplingHookDeactivatedNetEventS2C> events)
+        {
+            var eventsSpan = events.AsSpan();
+            foreach (var netEvent in eventsSpan)
+            {
+                _cachedPresentationEventsService.PlayerGrapplingHookDeactivatedNetEvents.Add(netEvent);
+            }
+        }
+
         public void ProcessDeactivateKOTalentEvents(CapacityList<DeactivateKOTalentNetEventS2C> deactivateKOTalentNetEvents)
         {
             if (deactivateKOTalentNetEvents.IsNullOrEmpty())

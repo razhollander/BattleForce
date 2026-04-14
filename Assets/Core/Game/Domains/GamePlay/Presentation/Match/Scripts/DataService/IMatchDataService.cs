@@ -54,7 +54,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchSwapFieldModel GetSwapField(ushort id);
         void RemoveSwapField(ushort id);
         List<MatchKOProjectileModel> KOProjectiles { get; }
+        List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
         MatchKOProjectileModel AddKOProjectile(ushort id, ushort casterPlayerId, int startTick, float size);
+        MatchGrapplingHookProjectileModel AddGrapplingHookProjectile(ushort id, ushort casterPlayerId, Vector2 position);
+        MatchGrapplingHookProjectileModel GetGrapplingHookProjectile(ushort id);
+        void RemoveGrapplingHookProjectile(ushort id);
+
         MatchKOProjectileModel GetKOProjectile(ushort id);
         void RemoveKOProjectile(ushort id);
     }

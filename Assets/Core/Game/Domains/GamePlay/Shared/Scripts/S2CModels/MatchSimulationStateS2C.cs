@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<PowerUpBallS2C> PowerUpBalls;
         public FixedUnorderedList<TalentSwapFieldS2C> SwapFields;
         public FixedUnorderedList<TalentKOProjectileS2C> KOProjectiles;
+        public FixedUnorderedList<TalentGrapplingHookProjectileS2C> GrapplingHookProjectiles;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
         public int EnvironmentLayoutId;
@@ -32,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             PowerUpBalls = new FixedUnorderedList<PowerUpBallS2C>(maxPowerUpBalls);
             SwapFields = new FixedUnorderedList<TalentSwapFieldS2C>(maxPlayers);
             KOProjectiles = new FixedUnorderedList<TalentKOProjectileS2C>(maxPlayers);
+            GrapplingHookProjectiles = new FixedUnorderedList<TalentGrapplingHookProjectileS2C>(maxPlayers);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
         }
@@ -92,6 +94,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var koProjectile in KOProjectiles.AsSpan())
             {
                 koProjectile.Serialize(writer);
+            }
+
+            var hooksCount = GrapplingHookProjectiles.Count;
+            writer.Put((byte)hooksCount);
+            foreach (var hook in GrapplingHookProjectiles.AsSpan())
+            {
+                hook.Serialize(writer);
             }
 
             writer.Put((byte)EnvironmentLayoutId);
@@ -166,6 +175,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var koProjectile = ref KOProjectiles.AddAndGet();
                 koProjectile.Deserialize(reader);
+            }
+
+            var hooksCount = reader.GetByte();
+            GrapplingHookProjectiles.Clear();
+            for (var i = 0; i < hooksCount; i++)
+            {
+                ref var hook = ref GrapplingHookProjectiles.AddAndGet();
+                hook.Deserialize(reader);
             }
 
             EnvironmentLayoutId = reader.GetByte();
@@ -352,6 +369,34 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return false;
         }
         
+        public bool TryGetGrapplingHookProjectileById(ushort id, out TalentGrapplingHookProjectileS2C hook)
+        {
+            for (int i = 0; i < GrapplingHookProjectiles.Count; i++)
+            {
+                if (GrapplingHookProjectiles[i].Id == id)
+                {
+                    hook = GrapplingHookProjectiles.GetByIndex(i);
+                    return true;
+                }
+            }
+
+            hook = default;
+            return false;
+        }
+
+        public ref TalentGrapplingHookProjectileS2C GetGrapplingHookProjectileById(ushort id)
+        {
+            for (int i = 0; i < GrapplingHookProjectiles.Count; i++)
+            {
+                if (GrapplingHookProjectiles[i].Id == id)
+                {
+                    return ref GrapplingHookProjectiles.GetByIndex(i);
+                }
+            }
+
+            throw new System.Exception($"No grappling hook projectile for id {id}!");
+        }
+
         public ref TalentKOProjectileS2C GetKOProjectileById(ushort koProjectileId)
         {
             for (int i = 0; i < KOProjectiles.Count; i++)
@@ -424,6 +469,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 koProjectile.SerializeDelta(writer);
             }
+
+            var hooksCountDelta = GrapplingHookProjectiles.Count;
+            writer.Put((byte)hooksCountDelta);
+            foreach (var hook in GrapplingHookProjectiles.AsSpan())
+            {
+                hook.SerializeDelta(writer);
+            }
         }
 
         public void DeserializeTransforms(NetDataReader reader)
@@ -458,6 +510,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var koProjectile = ref KOProjectiles.AddAndGet();
                 koProjectile.DeserializeDelta(reader);
+            }
+
+            var hooksCountDelta = reader.GetByte();
+            GrapplingHookProjectiles.Clear();
+            for (int i = 0; i < hooksCountDelta; i++)
+            {
+                ref var hook = ref GrapplingHookProjectiles.AddAndGet();
+                hook.DeserializeDelta(reader);
             }
         }
         
@@ -515,6 +575,20 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
 
             throw new System.Exception($"No swap field for id {swapFieldId}!");
+        }
+
+        public void RemoveGrapplingHookProjectileById(ushort id)
+        {
+            for (int i = 0; i < GrapplingHookProjectiles.Count; i++)
+            {
+                if (GrapplingHookProjectiles[i].Id == id)
+                {
+                    GrapplingHookProjectiles.RemoveAt(i);
+                    return;
+                }
+            }
+
+            throw new System.Exception($"No grappling hook projectile for id {id}!");
         }
 
         public void RemoveKOProjectileById(ushort koProjectileId)

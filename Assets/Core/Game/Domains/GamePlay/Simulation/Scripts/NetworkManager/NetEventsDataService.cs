@@ -43,6 +43,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<CreateKOProjectileNetEventS2C>> CreateKOProjectileNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> KOProjectHitPlayerNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<DeactivateKOTalentNetEventS2C>> DeactivateKOTalentNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C>> PlayerGrapplingHookShotNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C>> PlayerGrapplingHookHitNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C>> PlayerGrapplingHookDeactivatedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PerformDashPulseNetEventS2C>> PerformDashPulseNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>> ActivateSentryGunTalentNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>> DeactivateSentryGunTalentNetEventsPerPlayer { get; }
@@ -76,6 +79,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<CreateKOProjectileNetEventS2C>> _createKOProjectileNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> _koProjectHitPlayerNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateKOTalentNetEventS2C>> _deactivateKOTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C>> _playerGrapplingHookShotNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C>> _playerGrapplingHookHitNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C>> _playerGrapplingHookDeactivatedNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PerformDashPulseNetEventS2C>> _performDashPulseNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>> _activateSentryGunTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>> _deactivateSentryGunTalentNetEventsListPool;
@@ -112,6 +118,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             CreateKOProjectileNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<CreateKOProjectileNetEventS2C>>(maxConcurrentPlayers);
             KOProjectHitPlayerNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(maxConcurrentPlayers);
             DeactivateKOTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(maxConcurrentPlayers);
+            PlayerGrapplingHookShotNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C>>(maxConcurrentPlayers);
+            PlayerGrapplingHookHitNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C>>(maxConcurrentPlayers);
+            PlayerGrapplingHookDeactivatedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C>>(maxConcurrentPlayers);
             ActivateSentryGunTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateSentryGunTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>>(maxConcurrentPlayers);
             PerformDashPulseNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PerformDashPulseNetEventS2C>>(maxConcurrentPlayers);
@@ -161,6 +170,9 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             _createKOProjectileNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateKOProjectileNetEventS2C>>(() => new FixedUnorderedList<CreateKOProjectileNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
             _koProjectHitPlayerNetEventsListPool = new ConcurrentPool<FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(() => new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents), maxConcurrentPlayers);
             _deactivateKOTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents), maxConcurrentPlayers);
+            _playerGrapplingHookShotNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C>>(() => new FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookShotNetEvents), maxConcurrentPlayers);
+            _playerGrapplingHookHitNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C>>(() => new FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookHitNetEvents), maxConcurrentPlayers);
+            _playerGrapplingHookDeactivatedNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C>>(() => new FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookDeactivatedNetEvents), maxConcurrentPlayers);
             _performDashPulseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformDashPulseNetEventS2C>>(() => new FixedUnorderedList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents), maxConcurrentPlayers);
             _activateSentryGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateSentryGunTalentNetEvents), maxConcurrentPlayers);
             _deactivateSentryGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSentryGunTalentNetEvents), maxConcurrentPlayers);
@@ -384,6 +396,18 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             {
                 KOProjectHitPlayerNetEventsPerPlayer.Add(playerId, _koProjectHitPlayerNetEventsListPool.Get());
             }
+            if (!PlayerGrapplingHookShotNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                PlayerGrapplingHookShotNetEventsPerPlayer.Add(playerId, _playerGrapplingHookShotNetEventsListPool.Get());
+            }
+            if (!PlayerGrapplingHookHitNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                PlayerGrapplingHookHitNetEventsPerPlayer.Add(playerId, _playerGrapplingHookHitNetEventsListPool.Get());
+            }
+            if (!PlayerGrapplingHookDeactivatedNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                PlayerGrapplingHookDeactivatedNetEventsPerPlayer.Add(playerId, _playerGrapplingHookDeactivatedNetEventsListPool.Get());
+            }
             if (!DeactivateKOTalentNetEventsPerPlayer.ContainsKey(playerId))
             {
                 DeactivateKOTalentNetEventsPerPlayer.Add(playerId, _deactivateKOTalentNetEventsListPool.Get());
@@ -494,8 +518,17 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             _koProjectHitPlayerNetEventsListPool.Return(koProjectHitPlayerNetEventsList);
 
             var deactivateKOTalentNetEventsList = DeactivateKOTalentNetEventsPerPlayer[playerId];
+            var playerGrapplingHookShotNetEventsList = PlayerGrapplingHookShotNetEventsPerPlayer[playerId];
+            var playerGrapplingHookHitNetEventsList = PlayerGrapplingHookHitNetEventsPerPlayer[playerId];
+            var playerGrapplingHookDeactivatedNetEventsList = PlayerGrapplingHookDeactivatedNetEventsPerPlayer[playerId];
             deactivateKOTalentNetEventsList.Clear();
+            playerGrapplingHookShotNetEventsList.Clear();
+            playerGrapplingHookHitNetEventsList.Clear();
+            playerGrapplingHookDeactivatedNetEventsList.Clear();
             _deactivateKOTalentNetEventsListPool.Return(deactivateKOTalentNetEventsList);
+            _playerGrapplingHookShotNetEventsListPool.Return(playerGrapplingHookShotNetEventsList);
+            _playerGrapplingHookHitNetEventsListPool.Return(playerGrapplingHookHitNetEventsList);
+            _playerGrapplingHookDeactivatedNetEventsListPool.Return(playerGrapplingHookDeactivatedNetEventsList);
             
             var performDashPulseNetEventsList = PerformDashPulseNetEventsPerPlayer[playerId];
             performDashPulseNetEventsList.Clear();
@@ -544,6 +577,9 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             CreateKOProjectileNetEventsPerPlayer.Remove(playerId);
             KOProjectHitPlayerNetEventsPerPlayer.Remove(playerId);
             DeactivateKOTalentNetEventsPerPlayer.Remove(playerId);
+            PlayerGrapplingHookShotNetEventsPerPlayer.Remove(playerId);
+            PlayerGrapplingHookHitNetEventsPerPlayer.Remove(playerId);
+            PlayerGrapplingHookDeactivatedNetEventsPerPlayer.Remove(playerId);
             PerformDashPulseNetEventsPerPlayer.Remove(playerId);
             ActivateSentryGunTalentNetEventsPerPlayer.Remove(playerId);
             DeactivateSentryGunTalentNetEventsPerPlayer.Remove(playerId);
