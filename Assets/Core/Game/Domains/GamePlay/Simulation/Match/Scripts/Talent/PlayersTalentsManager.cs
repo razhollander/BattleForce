@@ -160,11 +160,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             }
         }
 
-        public void HitGrapplingHookWithWall(ushort casterId, ushort projectileId, ushort wallId)
+        public void HitGrapplingHookWithWall(ushort casterId, ushort projectileId, ushort wallId, int tick)
         {
             if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
             {
-                controllers.HitGrapplingHookWithWall(wallId, _processedTick);
+                controllers.HitGrapplingHookWithWall(wallId, tick);
             }
             else
             {

@@ -103,11 +103,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             ref var projectile = ref _matchDataService.SimulationState.GetGrapplingHookProjectileById(_projectileId);
             var config = _gamePlayConfig.Talents.GrapplingHookTalentConfig;
+            var arriveDistance = config.ArriveDistance;
 
             if (_isInReturnPhase)
             {
                 var distanceProjectileCenterToPlayerCenter = Vector2.DistanceSquared(projectile.Position, casterPlayerState.Spaceship.Transform.Position);
-                var neededReachDistance = config.ArriveDistance;
+                var neededReachDistance = arriveDistance;
                 var didReachPlayerCaster = distanceProjectileCenterToPlayerCenter <= neededReachDistance * neededReachDistance;
 
                 if (didReachPlayerCaster)
@@ -125,13 +126,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             {
                 if (projectile.IsAttached)
                 {
-                    // Update attached position based on wall's current position and rotation
                     if (_matchDataService.EnvironmentData.TryGetEnvironmentWall(projectile.AttachedWallId, out var wall))
                     {
                         // Calculate world position from local offset
-                        float radians = wall.Transform.WorldRotationDegrees * (System.MathF.PI / 180f);
-                        float cos = System.MathF.Cos(radians);
-                        float sin = System.MathF.Sin(radians);
+                        var radians = wall.Transform.WorldRotationDegrees * (System.MathF.PI / 180f);
+                        var cos = System.MathF.Cos(radians);
+                        var sin = System.MathF.Sin(radians);
 
                         Vector2 localPos = projectile.AttachedLocalPosition;
                         Vector2 worldPos = new Vector2(
@@ -140,34 +140,38 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                         ) + wall.Transform.WorldPosition;
 
                         projectile.Position = worldPos;
-                        _physicsSimulator.UpdateGrapplingHookProjectile(_projectileId, projectile.Position, Vector2.Zero);
+                        //_physicsSimulator.UpdateGrapplingHookProjectile(_projectileId, projectile.Position, Vector2.Zero);
                     }
 
-                    var distanceSquared = Vector2.DistanceSquared(casterPlayerState.Spaceship.Transform.Position, projectile.Position);
-                    if (distanceSquared <= config.ArriveDistance * config.ArriveDistance)
+                    var playerToHookDistanceSquared = Vector2.DistanceSquared(casterPlayerState.Spaceship.Transform.Position, projectile.Position);
+                    bool didPlayerReachHook = playerToHookDistanceSquared <= arriveDistance * arriveDistance;
+
+                    if (didPlayerReachHook)
                     {
                         DeactivateTalent(tick);
                     }
                     else
                     {
-                        var directionToHook = Vector2.Normalize(projectile.Position - casterPlayerState.Spaceship.Transform.Position);
+                        var didPassGraceTicks = tick > _attachedOnTick + config.GraceTicksUntilCheckIfVelocityIsBelowThreshold;
+                        var isPlayerVelocityZero = casterPlayerState.Spaceship.Transform.Velocity.LengthSquared() < config.PlayerVelocitySquaredThresholdToDeactivateHook;
 
-                        // Check if player is stuck (velocity almost 0 from previous tick physics)
-                        // We check this with a grace period of 5 ticks to avoid instant deactivation when standing still
-                        if (tick > _attachedOnTick + 5 && casterPlayerState.Spaceship.Transform.Velocity.LengthSquared() < 0.1f)
+                        if (didPassGraceTicks && isPlayerVelocityZero)
                         {
                             DeactivateTalent(tick);
                         }
                         else
                         {
-                            casterPlayerState.Spaceship.Transform.Velocity += directionToHook * config.PullForce;
+                            var directionToHook = Vector2.Normalize(projectile.Position - casterPlayerState.Spaceship.Transform.Position);
+                            casterPlayerState.Spaceship.Transform.Velocity += directionToHook * config.PullForce * deltaTime;
                         }
                     }
                 }
                 else
                 {
                     var distanceTraveled = Vector2.Distance(projectile.StartPosition, projectile.Position);
-                    if (distanceTraveled >= config.MaxDistance)
+                    var didHookReachMaxDistance = distanceTraveled >= config.MaxDistance;
+
+                    if (didHookReachMaxDistance)
                     {
                         StartReturnPhase();
                     }
@@ -190,7 +194,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             ref var projectile = ref _matchDataService.SimulationState.GetGrapplingHookProjectileById(_projectileId);
-            if (projectile.IsAttached) return;
+            if (projectile.IsAttached)
+            {
+                return;
+            }
 
             _attachedOnTick = tick;
             projectile.IsAttached = true;
@@ -211,7 +218,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 );
             }
 
-            _physicsSimulator.UpdateGrapplingHookProjectile(_projectileId, projectile.Position, Vector2.Zero);
+            //_physicsSimulator.UpdateGrapplingHookProjectile(_projectileId, projectile.Position, Vector2.Zero);
             _netEventsDataService.AddGrapplingHookHitWallNetEvent(tick, _projectileId, wallId, projectile.Position);
         }
 

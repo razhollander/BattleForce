@@ -782,7 +782,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.density = 0.3f;
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
-            fixtureDef.filter.groupIndex = (short)-teamId;
+            // fixtureDef.filter.groupIndex = (short)-teamId;
             fixtureDef.filter.categoryBits = PhysicsBodyType.GrapplingHookProjectile.GetCollisionsCategory();
             fixtureDef.filter.maskBits = PhysicsBodyType.GrapplingHookProjectile.GetCollisionMask();
 

@@ -149,15 +149,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
                 }
             }
 
-            for (int i = 0; i < _lavaWalls.Count; i++)
-            {
-                if (_lavaWalls[i].Id == wallId)
-                {
-                    wall = _lavaWalls[i];
-                    return true;
-                }
-            }
-
             wall = null;
             return false;
         }
