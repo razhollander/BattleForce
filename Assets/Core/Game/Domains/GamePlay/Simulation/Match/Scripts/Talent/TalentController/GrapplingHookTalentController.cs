@@ -10,6 +10,7 @@ using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
 using Core.Scripts.Extensions;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
+using CoreDomain.Scripts.Utils;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
@@ -76,8 +77,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
             var velocity = direction * config.ProjectileSpeed;
             var size = _sharedConfig.GrapplingHookProjectileSize;
-
-            var projectile = _matchDataService.AddGrapplingHookProjectile(_casterPlayerId, casterPlayerState.Spaceship.Transform.Position, velocity);
+            var projectilePosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
+            var projectile = _matchDataService.AddGrapplingHookProjectile(_casterPlayerId, projectilePosition, velocity);
             _projectileId = projectile.Id;
             _physicsSimulator.AddGrapplingHookProjectile(_projectileId, casterPlayerState.TeamId, projectile.Position, size, velocity);
             _netEventsDataService.AddCreateGrapplingHookProjectileNetEvent(tick, _projectileId, _casterPlayerId, projectile.Position);
@@ -125,28 +126,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             {
                 if (projectile.IsAttached)
                 {
-                    if (_matchDataService.EnvironmentData.TryGetEnvironmentWall(projectile.AttachedWallId, out var wall))
-                    {
-                        // Calculate world position from local offset
-                        var radians = wall.Transform.WorldRotationDegrees * (System.MathF.PI / 180f);
-                        var cos = System.MathF.Cos(radians);
-                        var sin = System.MathF.Sin(radians);
-
-                        Vector2 localPos = projectile.AttachedLocalPosition;
-                        Vector2 worldPos = new Vector2(
-                            localPos.X * cos - localPos.Y * sin,
-                            localPos.X * sin + localPos.Y * cos
-                        ) + wall.Transform.WorldPosition;
-
-                        projectile.Position = worldPos;
-                        //_physicsSimulator.UpdateGrapplingHookProjectile(_projectileId, projectile.Position, Vector2.Zero);
-                    }
+                    projectile = UpdateHookPositionRelativeToAttachedWall(projectile);
 
                     var playerToHookDistanceSquared = Vector2.DistanceSquared(casterPlayerState.Spaceship.Transform.Position, projectile.Position);
-                    bool didPlayerReachHook = playerToHookDistanceSquared <= arriveDistance * arriveDistance;
+                    var didPlayerReachHook = playerToHookDistanceSquared <= arriveDistance * arriveDistance;
 
                     if (didPlayerReachHook)
                     {
+                        var playerCaster = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
+                        playerCaster.Spaceship.Transform.Velocity = Vector2.Zero;
                         DeactivateTalent(tick);
                     }
                     else
@@ -161,7 +149,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                         else
                         {
                             var directionToHook = Vector2.Normalize(projectile.Position - casterPlayerState.Spaceship.Transform.Position);
-                            casterPlayerState.Spaceship.Transform.Velocity += directionToHook * config.PullForce * deltaTime;
+                            casterPlayerState.Spaceship.Transform.Velocity += directionToHook * config.PlayerPullForceWhileHooked * deltaTime;
+
+                            casterPlayerState.Spaceship.Transform.Direction = MathUtils.RotateTowards(casterPlayerState.Spaceship.Transform.Direction,
+                                casterPlayerState.Spaceship.Transform.Velocity, config.PlayerRotateSpeedWhileHooked * deltaTime);
+
                         }
                     }
                 }
@@ -176,6 +168,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                     }
                 }
             }
+        }
+
+        private TalentGrapplingHookProjectileStateS2C UpdateHookPositionRelativeToAttachedWall(TalentGrapplingHookProjectileStateS2C projectile)
+        {
+            if (_matchDataService.EnvironmentData.TryGetEnvironmentWall(projectile.AttachedWallId, out var wall))
+            {
+                var radians = wall.Transform.WorldRotationDegrees * (System.MathF.PI / 180f);
+                var cos = System.MathF.Cos(radians);
+                var sin = System.MathF.Sin(radians);
+
+                Vector2 localPos = projectile.AttachedLocalPosition;
+                Vector2 worldPos = new Vector2(
+                    localPos.X * cos - localPos.Y * sin,
+                    localPos.X * sin + localPos.Y * cos
+                ) + wall.Transform.WorldPosition;
+
+                projectile.Position = worldPos;
+            }
+
+            return projectile;
         }
 
         public void ResetData()
@@ -216,7 +228,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                     diff.X * sin + diff.Y * cos
                 );
             }
-
+            
             //_physicsSimulator.UpdateGrapplingHookProjectile(_projectileId, projectile.Position, Vector2.Zero);
             _netEventsDataService.AddGrapplingHookHitWallNetEvent(tick, _projectileId, wallId, projectile.Position);
         }
