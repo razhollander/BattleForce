@@ -85,9 +85,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandleSwapFieldPlayerCollision(objectA, objectB);
                 HandleKOProjectilePlayerCollision(objectA, objectB);
                 HandleKOProjectileWallCollision(objectA, objectB);
+                HandleGrapplingHookWallCollision(objectA, objectB);
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandleGrapplingHookWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isWallToProjectile = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.GrapplingHookProjectile;
+            var isProjectileToWall = objectA.PhysicsBodyType == PhysicsBodyType.GrapplingHookProjectile && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
+
+            if (!isWallToProjectile && !isProjectileToWall)
+            {
+                return;
+            }
+
+            var projectileId = isProjectileToWall ? objectA.Id : objectB.Id;
+            var wallId = isProjectileToWall ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetGrapplingHookProjectileById(projectileId, out var projectile))
+            {
+                return;
+            }
+
+            _playersTalentsManager.HitGrapplingHookWithWall(projectile.PlayerCasterId, projectileId, wallId);
         }
 
         private void HandleKOProjectileWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)

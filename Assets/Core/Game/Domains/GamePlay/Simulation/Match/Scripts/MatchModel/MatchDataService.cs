@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastPowerUpBallCreatedId = 0;
         private ushort _lastSwapFieldCreatedId = 0;
         private ushort _lastKOProjectileCreatedId = 0;
+        private ushort _lastGrapplingHookProjectileCreatedId = 0;
         public List<int> DidntPlayYetStageIndexes { get; } = new List<int>();
         public MatchEnvironmentDataService EnvironmentData { get; private set; }
         public HashSet<ushort> TeamIds { get; private set; }
@@ -115,6 +116,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             koProjectile.Velocity = velocity;
             koProjectile.Size = size;
             return koProjectile;
+        }
+
+        public TalentGrapplingHookProjectileS2C AddGrapplingHookProjectile(int tick, ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 velocity, float size)
+        {
+            ref var grapplingHookProjectile = ref _simulationState.GrapplingHookProjectiles.AddAndGet();
+            var projectileId = (ushort)(++_lastGrapplingHookProjectileCreatedId % ushort.MaxValue);
+            grapplingHookProjectile.CreatedOnTick = tick;
+            grapplingHookProjectile.Id = projectileId;
+            grapplingHookProjectile.PlayerCasterId = casterPlayerId;
+            grapplingHookProjectile.StartPosition = position;
+            grapplingHookProjectile.Position = position;
+            grapplingHookProjectile.Rotation = rotation;
+            grapplingHookProjectile.Velocity = velocity;
+            grapplingHookProjectile.Size = size;
+            grapplingHookProjectile.IsAttached = false;
+            return grapplingHookProjectile;
         }
     }
 }

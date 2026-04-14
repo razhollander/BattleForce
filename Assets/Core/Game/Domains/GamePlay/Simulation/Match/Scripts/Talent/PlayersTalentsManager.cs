@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _gamePlayConfig = gamePlayConfig;
             _talentControllersPerPlayer = new Dictionary<int, PlayerTalentControllers>(networkConfig.MaxCap.ConcurrentPlayers);
-            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, overrideableNetEventsService, commandFactory),networkConfig.MaxCap.ConcurrentPlayers);
+            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, overrideableNetEventsService, commandFactory, sharedGamePlayConfig),networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)
@@ -153,6 +153,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
             {
                 controllers.HitKOTalentWithWall();
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
+            }
+        }
+
+        public void HitGrapplingHookWithWall(ushort casterId, ushort projectileId, ushort wallId)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.HitGrapplingHookWithWall(wallId, _processedTick);
             }
             else
             {

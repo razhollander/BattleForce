@@ -14,5 +14,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         void ResetAllTalentsData();
         void HitKOTalentWithEnemy(ushort casterId, ushort enemyPlayerId, int tick);
         void HitKOTalentWithWall(ushort casterId);
+        void HitGrapplingHookWithWall(ushort casterId, ushort projectileId, ushort wallId);
     }
 }

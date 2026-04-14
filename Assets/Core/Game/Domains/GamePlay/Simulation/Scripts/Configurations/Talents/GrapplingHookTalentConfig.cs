@@ -1,0 +1,13 @@
+using System;
+
+namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
+{
+    [Serializable]
+    public class GrapplingHookTalentConfig
+    {
+        public float ProjectileSpeed = 25f;
+        public float MaxDistance = 30f;
+        public float ArriveDistance = 2f;
+        public float PullForce = 5f;
+    }
+}
