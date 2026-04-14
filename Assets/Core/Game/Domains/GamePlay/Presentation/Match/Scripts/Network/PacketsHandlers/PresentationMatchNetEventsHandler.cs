@@ -370,8 +370,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         public void ProcessPlayerGrapplingHookShotEvents(CapacityList<PlayerGrapplingHookShotNetEventS2C> events)
         {
-            var eventsSpan = events.AsSpan();
-            foreach (var netEvent in eventsSpan)
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+            
+            foreach (var netEvent in events)
             {
                 _cachedPresentationEventsService.PlayerGrapplingHookShotNetEvents.Add(netEvent);
             }
@@ -379,8 +383,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         public void ProcessPlayerGrapplingHookHitEvents(CapacityList<PlayerGrapplingHookHitNetEventS2C> events)
         {
-            var eventsSpan = events.AsSpan();
-            foreach (var netEvent in eventsSpan)
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+            
+            foreach (var netEvent in events)
             {
                 _cachedPresentationEventsService.PlayerGrapplingHookHitNetEvents.Add(netEvent);
             }
@@ -388,8 +396,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         public void ProcessPlayerGrapplingHookDeactivatedEvents(CapacityList<PlayerGrapplingHookDeactivatedNetEventS2C> events)
         {
-            var eventsSpan = events.AsSpan();
-            foreach (var netEvent in eventsSpan)
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+            
+            foreach (var netEvent in events)
             {
                 _cachedPresentationEventsService.PlayerGrapplingHookDeactivatedNetEvents.Add(netEvent);
             }

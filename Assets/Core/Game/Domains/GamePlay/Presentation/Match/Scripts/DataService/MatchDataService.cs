@@ -302,7 +302,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 
         public MatchGrapplingHookProjectileModel AddGrapplingHookProjectile(ushort id, ushort casterPlayerId, Vector2 position)
         {
-            var model = new MatchGrapplingHookProjectileModel(id, casterPlayerId, position);
+            var model = new MatchGrapplingHookProjectileModel(id, casterPlayerId, position.ToUnityVector2());
             GrapplingHookProjectiles.Add(model);
             return model;
         }

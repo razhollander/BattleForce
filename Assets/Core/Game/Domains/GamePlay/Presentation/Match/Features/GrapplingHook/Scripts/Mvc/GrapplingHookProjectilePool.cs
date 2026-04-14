@@ -3,27 +3,12 @@ using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc
 {
-    public class GrapplingHookProjectilePool
+    public class GrapplingHookProjectilePool : PrefabsPool<GrapplingHookProjectileView>
     {
-        private readonly GrapplingHookProjectileView _prefab;
-        private readonly DiContainer _diContainer;
-        private IPrefabsPool<GrapplingHookProjectileView> _pool;
+        protected override string ParentGameObjectName => "Grappling Hook Projectiles Pool";
 
-        public GrapplingHookProjectilePool(GrapplingHookProjectileView prefab, DiContainer diContainer)
+        public GrapplingHookProjectilePool(GrapplingHookProjectileView prefab, DiContainer diContainer) : base(new PoolData(3, 1), diContainer, prefab)
         {
-            _prefab = prefab;
-            _diContainer = diContainer;
-        }
-
-        public void InitPool()
-        {
-            _pool = new PrefabsPool<GrapplingHookProjectileView>(_prefab, _diContainer);
-            _pool.Init(5);
-        }
-
-        public GrapplingHookProjectileView Spawn()
-        {
-            return _pool.Spawn();
         }
     }
 }

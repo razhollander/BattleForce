@@ -249,9 +249,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.CreateKOProjectileNetEvents = _netEventsDataService.CreateKOProjectileNetEventsPerPlayer[playerId];
                 _fullTickPacket.KOProjectHitPlayerNetEvents = _netEventsDataService.KOProjectHitPlayerNetEventsPerPlayer[playerId];
                 _fullTickPacket.DeactivateKOTalentNetEvents = _netEventsDataService.DeactivateKOTalentNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerGrapplingHookShotNetEvents = _netEventsDataService.PlayerGrapplingHookShotNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerGrapplingHookHitNetEvents = _netEventsDataService.PlayerGrapplingHookHitNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerGrapplingHookDeactivatedNetEvents = _netEventsDataService.PlayerGrapplingHookDeactivatedNetEventsPerPlayer[playerId];
                 _fullTickPacket.ActivateSentryGunTalentNetEvents = _netEventsDataService.ActivateSentryGunTalentNetEventsPerPlayer[playerId];
                 _fullTickPacket.DeactivateSentryGunTalentNetEvents = _netEventsDataService.DeactivateSentryGunTalentNetEventsPerPlayer[playerId];
                 _fullTickPacket.PerformDashPulseNetEvents = _netEventsDataService.PerformDashPulseNetEventsPerPlayer[playerId];

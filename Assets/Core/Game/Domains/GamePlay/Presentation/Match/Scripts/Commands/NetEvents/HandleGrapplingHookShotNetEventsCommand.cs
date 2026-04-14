@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
@@ -35,14 +36,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var rotation = Vector2.zero; // Rotation will be handled dynamically in transform command based on opposites of caster position
 
                 _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, hookModel.PlayerCasterId, hookModel.Position.ToUnityVector2(), rotation, casterPosition);
-                _matchDataService.AddGrapplingHookProjectile(hookModel.Id, hookModel.PlayerCasterId, hookModel.Position.ToUnityVector2());
+                _matchDataService.AddGrapplingHookProjectile(hookModel.Id, hookModel.PlayerCasterId, hookModel.Position);
 
-                // Hide the aim arrow
-                var casterPlayerController = _playerControllers.GetPlayerController(hookModel.PlayerCasterId);
-                if (casterPlayerController != null)
-                {
-                    casterPlayerController.SetAimViewActive(false);
-                }
+                // // Hide the aim arrow
+                // var casterPlayerController = _playerControllers.GetPlayerController(hookModel.PlayerCasterId);
+                // if (casterPlayerController != null)
+                // {
+                //     casterPlayerController.SetAimViewActive(false);
+                // }
             }
 
             _cachedPresentationEventsService.PlayerGrapplingHookShotNetEvents.Clear();

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
