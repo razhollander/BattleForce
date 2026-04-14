@@ -84,7 +84,8 @@ namespace Core.Scripts.Network
         public int UpdatePlayerTalentStocksNetEvents = 128;
         public int DeactivateDashPulseTalentNetEvents = 128;
         public int UpdatePlayerTalentStocksNetEvent = 128;
-        public int PlayerSpinnedNetEvents = 64;
+        public int PlayerSpinnedStartedNetEvents = 64;
+        public int PlayerSpinnedEndedNetEvents = 64;
 
         [Serializable]
         public class EnvironmentRotatingWheel

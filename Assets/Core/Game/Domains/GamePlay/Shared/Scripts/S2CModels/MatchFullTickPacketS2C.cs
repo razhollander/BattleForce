@@ -21,7 +21,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<PlayersSwapNetEventS2C> PlayerSwapNetEvents;
         public FixedClassUnorderedList<TalentCardObtainedNetEventS2C> TalentCardObtainedNetEvents; // todo: remove events related to card when bullet id destroyed
         public FixedUnorderedList<TalentCardHitNetEventS2C> TalentCardHitNetEvents;
-        public FixedUnorderedList<PlayerSpinnedNetEventS2C> PlayerSpinnedNetEvents;
+        public FixedUnorderedList<PlayerSpinnedStartedNetEventS2C> PlayerSpinnedStartedNetEvents;
+        public FixedUnorderedList<PlayerSpinnedEndedNetEventS2C> PlayerSpinnedEndedNetEvents;
         public FixedUnorderedList<PowerUpBallSpawnedNetEventS2C> PowerUpSpawnedNetEvents; // todo: remove events related to power up when bullet id destroyed
         public FixedUnorderedList<PowerUpBallObtainedNetEventS2C> PowerUpObtainedNetEvents;
         public FixedClassUnorderedList<StageEndNetEventS2C> StageEndNetEvents;
@@ -55,7 +56,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PlayerSwapNetEvents = new FixedUnorderedList<PlayersSwapNetEventS2C>(maxCap.PlayerSwapNetEvents);
             TalentCardObtainedNetEvents = new FixedClassUnorderedList<TalentCardObtainedNetEventS2C>(maxCap.TalentCardObtainedNetEvent, () => new TalentCardObtainedNetEventS2C(sharedGamePlayConfig.MaxConcurrentTalentsForPlayer));
             TalentCardHitNetEvents = new FixedUnorderedList<TalentCardHitNetEventS2C>(maxCap.TalentCardHitNetEvents);
-            PlayerSpinnedNetEvents = new FixedUnorderedList<PlayerSpinnedNetEventS2C>(maxCap.PlayerSpinnedNetEvents);
+            PlayerSpinnedStartedNetEvents = new FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>(maxCap.PlayerSpinnedStartedNetEvents);
+            PlayerSpinnedEndedNetEvents = new FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>(maxCap.PlayerSpinnedEndedNetEvents);
             PowerUpSpawnedNetEvents = new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(maxCap.PowerUpSpawnedNetEvents);
             PowerUpObtainedNetEvents = new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(maxCap.PowerUpObtainedNetEvents);
             StageEndNetEvents = new FixedClassUnorderedList<StageEndNetEventS2C>(maxCap.StageEndNetEvents, () => new StageEndNetEventS2C(sharedGamePlayConfig.MaxTeamsAmount));
@@ -115,7 +117,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedDeactivateKOTalentNetEvents(writer);
             SerializedPerformDashPulseNetEvents(writer);
             SerializedUpdatePlayerTalentStocksNetEvents(writer);
-            SerializedPlayerSpinnedEvents(writer);
+            SerializedPlayerSpinnedStartedEvents(writer);
+            SerializedPlayerSpinnedEndedEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
         }
 
@@ -299,7 +302,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedDeactivateKOTalentNetEvents(reader);
             DeserializedPerformDashPulseNetEvents(reader);
             DeserializedUpdatePlayerTalentStocksNetEvents(reader);
-            DeserializedPlayerSpinnedEvents(reader);
+            DeserializedPlayerSpinnedStartedEvents(reader);
+            DeserializedPlayerSpinnedEndedEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
         }
 
@@ -610,22 +614,42 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
-        private void SerializedPlayerSpinnedEvents(NetDataWriter writer)
+        private void SerializedPlayerSpinnedStartedEvents(NetDataWriter writer)
         {
-            writer.Put((byte) PlayerSpinnedNetEvents.Count);
-            foreach (var evt in PlayerSpinnedNetEvents.AsSpan())
+            writer.Put((byte) PlayerSpinnedStartedNetEvents.Count);
+            foreach (var evt in PlayerSpinnedStartedNetEvents.AsSpan())
             {
                 evt.Serialize(writer);
             }
         }
 
-        private void DeserializedPlayerSpinnedEvents(NetDataReader reader)
+        private void DeserializedPlayerSpinnedStartedEvents(NetDataReader reader)
         {
-            PlayerSpinnedNetEvents.Clear();
+            PlayerSpinnedStartedNetEvents.Clear();
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref PlayerSpinnedNetEvents.AddAndGet();
+                ref var evt = ref PlayerSpinnedStartedNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerSpinnedEndedEvents(NetDataWriter writer)
+        {
+            writer.Put((byte) PlayerSpinnedEndedNetEvents.Count);
+            foreach (var evt in PlayerSpinnedEndedNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void DeserializedPlayerSpinnedEndedEvents(NetDataReader reader)
+        {
+            PlayerSpinnedEndedNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref PlayerSpinnedEndedNetEvents.AddAndGet();
                 evt.Deserialize(reader);
             }
         }

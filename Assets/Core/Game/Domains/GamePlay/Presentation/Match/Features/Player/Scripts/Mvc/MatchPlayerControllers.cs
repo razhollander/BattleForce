@@ -65,11 +65,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
         }
 
-        public void UpdatePlayersSpinnedState(int currentServerTick)
+        public void UpdatePlayersSpinnedState()
         {
             foreach (var playerController in _playerControllers)
             {
-                playerController.UpdateSpinnedState(currentServerTick);
+                playerController.UpdateSpinnedState();
             }
         }
 

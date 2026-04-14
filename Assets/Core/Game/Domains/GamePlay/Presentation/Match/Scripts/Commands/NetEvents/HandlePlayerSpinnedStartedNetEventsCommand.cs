@@ -5,7 +5,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
-    public class HandlePlayerSpinnedNetEventsCommand : BaseCommand, ICommandVoid
+    public class HandlePlayerSpinnedStartedNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchDataService _matchDataService;
@@ -18,22 +18,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            var playerSpinnedEvents = _cachedPresentationEventsService.PlayerSpinnedNetEvents;
-            if (playerSpinnedEvents.IsNullOrEmpty())
+            var events = _cachedPresentationEventsService.PlayerSpinnedStartedNetEvents;
+            if (events.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var spinnedEvent in playerSpinnedEvents)
+            foreach (var netEvent in events)
             {
-                var player = _matchDataService.GetPlayer(spinnedEvent.PlayerId);
+                var player = _matchDataService.GetPlayer(netEvent.PlayerId);
                 if (player != null)
                 {
-                    player.SpinEndOnTick = spinnedEvent.SpinEndOnTick;
+                    player.IsSpinned = true;
                 }
             }
 
-            playerSpinnedEvents.Clear();
+            events.Clear();
         }
     }
 }

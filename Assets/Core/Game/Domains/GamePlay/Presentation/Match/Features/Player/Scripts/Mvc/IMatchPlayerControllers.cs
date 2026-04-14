@@ -10,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void UpdatePlayersTransform();
         void UpdatePlayersBulletCooldowns();
         void UpdatePlayersTalentCooldowns(int currentServerTick);
-        void UpdatePlayersSpinnedState(int currentServerTick);
+        void UpdatePlayersSpinnedState();
         void ShootBulletEffectForPlayer(ushort playerId);
         void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth);
         void SetPlayerTransform(ushort playerId, Vector2 position, Vector2 direction);

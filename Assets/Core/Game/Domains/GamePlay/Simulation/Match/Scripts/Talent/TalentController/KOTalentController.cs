@@ -137,9 +137,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var pushDirection = projectile.Velocity.Normalize();
             var pushForce = pushDirection * koConfig.PushForce;
             var randomSpin = RNG.NextFloat(koConfig.MinSpin, koConfig.MaxSpin);
-            enemyPlayerState.Spaceship.PushAndSpin(pushForce, randomSpin);
-            var spinEndOnTick = tick + (int)(koConfig.SpinDuration * _networkConfig.TicksPerSeconds);
-            _netEventsDataService.AddPlayerSpinnedNetEvent(tick, enemyPlayerId, spinEndOnTick);
+
+            enemyPlayerState.Spaceship.Transform.Velocity += pushForce;
+            enemyPlayerState.Spaceship.Transform.Direction = pushDirection;
+            enemyPlayerState.Spaceship.IsEngineOn = false;
+
+            _commandFactory.CreateCommandVoid<SpinPlayerCommand>()
+                .SetPlayer(enemyPlayerId, enemyPlayerState.Spaceship)
+                .SetSpinAmount(randomSpin)
+                .SetTick(tick)
+                .Execute();
+
             _netEventsDataService.AddKOProjectHitPlayerNetEvent(tick, _projectileId, enemyPlayerState.Id, projectile.Position);
             StartReturnPhase();
         }

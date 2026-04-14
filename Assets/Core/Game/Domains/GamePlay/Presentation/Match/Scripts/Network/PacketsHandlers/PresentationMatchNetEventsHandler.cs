@@ -172,16 +172,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        public void ProcessPlayerSpinnedEvents(CapacityList<PlayerSpinnedNetEventS2C> playerSpinnedNetEvents)
+        public void ProcessPlayerSpinnedStartedEvents(CapacityList<PlayerSpinnedStartedNetEventS2C> playerSpinnedStartedNetEvents)
         {
-            if (playerSpinnedNetEvents.IsNullOrEmpty())
+            if (playerSpinnedStartedNetEvents.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var playerSpinnedNetEvent in playerSpinnedNetEvents)
+            foreach (var playerSpinnedStartedNetEvent in playerSpinnedStartedNetEvents)
             {
-                _cachedPresentationEventsService.PlayerSpinnedNetEvents.Add(playerSpinnedNetEvent);
+                _cachedPresentationEventsService.PlayerSpinnedStartedNetEvents.Add(playerSpinnedStartedNetEvent);
+            }
+        }
+
+        public void ProcessPlayerSpinnedEndedEvents(CapacityList<PlayerSpinnedEndedNetEventS2C> playerSpinnedEndedNetEvents)
+        {
+            if (playerSpinnedEndedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerSpinnedEndedNetEvent in playerSpinnedEndedNetEvents)
+            {
+                _cachedPresentationEventsService.PlayerSpinnedEndedNetEvents.Add(playerSpinnedEndedNetEvent);
             }
         }
 

@@ -245,10 +245,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var forceMagnitude = _gamePlayConfig.EnvironmentSprings.Force;
             var force = pushDirection * forceMagnitude;
             var randomSpin = RNG.NextFloat(_gamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfig.EnvironmentSprings.MaxSpin);
-            playerState.Spaceship.PushAndSpin(force, randomSpin);
 
-            var spinEndOnTick = _processedTick + (int)(_gamePlayConfig.EnvironmentSprings.SpinDuration * _networkConfig.TicksPerSeconds);
-            _netEventsDataService.AddPlayerSpinnedNetEvent(_processedTick, playerId, spinEndOnTick);
+            playerState.Spaceship.Transform.Velocity += force;
+            playerState.Spaceship.Transform.Direction = force.Normalize();
+            playerState.Spaceship.IsEngineOn = false;
+
+            _commandFactory.CreateCommandVoid<SpinPlayerCommand>()
+                .SetPlayer(playerId, playerState.Spaceship)
+                .SetSpinAmount(randomSpin)
+                .SetTick(_processedTick)
+                .Execute();
 
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
         }
