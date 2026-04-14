@@ -34,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in netEvents)
             {
-                var hookModel = netEvent.HookProjectile;
+                var hookModel = netEvent.GrapplingHookProjectile;
                 var casterPosition = _playerControllers.GetPlayerPosition(hookModel.PlayerCasterId);
                 var rotation = hookModel.Position - casterPosition.ToNumericsVector2();
 

@@ -34,15 +34,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents;
         public FixedUnorderedList<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents;
         public FixedUnorderedList<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents;
-        public FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C> PlayerGrapplingHookShotNetEvents;
-        public FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C> PlayerGrapplingHookHitNetEvents;
-        public FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C> PlayerGrapplingHookDeactivatedNetEvents;
         public FixedUnorderedList<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents;
         public FixedUnorderedList<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents;
         public FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents;
         public FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
         public FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C> PlayerMaxShootCooldownChangedNetEvents;
+        public FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C> CreateGrapplingHookProjectileNetEvents;
+        public FixedUnorderedList<GrapplingHookHitWallNetEventS2C> GrapplingHookHitWallNetEvents;
+        public FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -74,9 +74,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             KOProjectHitPlayerNetEvents = new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(maxCap.KOProjectHitPlayerNetEvents);
             CreateKOProjectileNetEvents = new FixedUnorderedList<CreateKOProjectileNetEventS2C>(maxCap.CreateKOProjectileNetEvents);
             DeactivateKOTalentNetEvents = new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
-            PlayerGrapplingHookShotNetEvents = new FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C>(maxCap.PlayerGrapplingHookShotNetEvents);
-            PlayerGrapplingHookHitNetEvents = new FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C>(maxCap.PlayerGrapplingHookHitNetEvents);
-            PlayerGrapplingHookDeactivatedNetEvents = new FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C>(maxCap.PlayerGrapplingHookDeactivatedNetEvents);
             PerformDashPulseNetEvents = new FixedUnorderedList<PerformDashPulseNetEventS2C>(maxCap.PerformDashPulseNetEvents);
             ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
             DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
@@ -84,6 +81,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PlayerMaxShootCooldownChangedNetEvents = new FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>(maxCap.PlayerMaxShootCooldownChangedNetEvents);
             ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
             DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
+            CreateGrapplingHookProjectileNetEvents = new FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>(maxCap.CreateGrapplingHookProjectileNetEvents);
+            GrapplingHookHitWallNetEvents = new FixedUnorderedList<GrapplingHookHitWallNetEventS2C>(maxCap.GrapplingHookHitWallNetEvents);
+            DeactivateGrapplingHookTalentNetEvents = new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(maxCap.DeactivateGrapplingHookTalentNetEvents);
         }
         
         // public FullTickPacket(int tick, SimulationStateS2C previousSimulationState,
@@ -131,9 +131,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedUpdatePlayerTalentStocksNetEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
             SerializedPlayerMaxShootCooldownChangedNetEvents(writer);
-            SerializedPlayerGrapplingHookShotEvents(writer);
-            SerializedPlayerGrapplingHookHitEvents(writer);
-            SerializedPlayerGrapplingHookDeactivatedEvents(writer);
+            SerializedCreateGrapplingHookProjectileNetEvents(writer);
+            SerializedGrapplingHookHitWallNetEvents(writer);
+            SerializedDeactivateGrapplingHookTalentNetEvents(writer);
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -320,9 +320,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedUpdatePlayerTalentStocksNetEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
             DeserializedPlayerMaxShootCooldownChangedNetEvents(reader);
-            DeserializedPlayerGrapplingHookShotEvents(reader);
-            DeserializedPlayerGrapplingHookHitEvents(reader);
-            DeserializedPlayerGrapplingHookDeactivatedEvents(reader);
+            DeserializedCreateGrapplingHookProjectileNetEvents(reader);
+            DeserializedGrapplingHookHitWallNetEvents(reader);
+            DeserializedDeactivateGrapplingHookTalentNetEvents(reader);
         }
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
@@ -701,66 +701,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
-        private void SerializedPlayerGrapplingHookShotEvents(NetDataWriter writer)
-        {
-            writer.Put((byte)PlayerGrapplingHookShotNetEvents.Count);
-            foreach (var netEvent in PlayerGrapplingHookShotNetEvents.AsSpan())
-            {
-                netEvent.Serialize(writer);
-            }
-        }
-
-        private void SerializedPlayerGrapplingHookHitEvents(NetDataWriter writer)
-        {
-            writer.Put((byte)PlayerGrapplingHookHitNetEvents.Count);
-            foreach (var netEvent in PlayerGrapplingHookHitNetEvents.AsSpan())
-            {
-                netEvent.Serialize(writer);
-            }
-        }
-
-        private void SerializedPlayerGrapplingHookDeactivatedEvents(NetDataWriter writer)
-        {
-            writer.Put((byte)PlayerGrapplingHookDeactivatedNetEvents.Count);
-            foreach (var netEvent in PlayerGrapplingHookDeactivatedNetEvents.AsSpan())
-            {
-                netEvent.Serialize(writer);
-            }
-        }
-
-        private void DeserializedPlayerGrapplingHookShotEvents(NetDataReader reader)
-        {
-            var count = reader.GetByte();
-            PlayerGrapplingHookShotNetEvents.Clear();
-            for (int i = 0; i < count; i++)
-            {
-                ref var netEvent = ref PlayerGrapplingHookShotNetEvents.AddAndGet();
-                netEvent.Deserialize(reader);
-            }
-        }
-
-        private void DeserializedPlayerGrapplingHookHitEvents(NetDataReader reader)
-        {
-            var count = reader.GetByte();
-            PlayerGrapplingHookHitNetEvents.Clear();
-            for (int i = 0; i < count; i++)
-            {
-                ref var netEvent = ref PlayerGrapplingHookHitNetEvents.AddAndGet();
-                netEvent.Deserialize(reader);
-            }
-        }
-
-        private void DeserializedPlayerGrapplingHookDeactivatedEvents(NetDataReader reader)
-        {
-            var count = reader.GetByte();
-            PlayerGrapplingHookDeactivatedNetEvents.Clear();
-            for (int i = 0; i < count; i++)
-            {
-                ref var netEvent = ref PlayerGrapplingHookDeactivatedNetEvents.AddAndGet();
-                netEvent.Deserialize(reader);
-            }
-        }
-
         private void DeserializedPlayerMaxShootCooldownChangedNetEvents(NetDataReader reader)
         {
             var count = reader.GetByte();
@@ -768,6 +708,66 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref PlayerMaxShootCooldownChangedNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedCreateGrapplingHookProjectileNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)CreateGrapplingHookProjectileNetEvents.Count);
+            foreach (var netEvent in CreateGrapplingHookProjectileNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void SerializedGrapplingHookHitWallNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)GrapplingHookHitWallNetEvents.Count);
+            foreach (var netEvent in GrapplingHookHitWallNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void SerializedDeactivateGrapplingHookTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateGrapplingHookTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateGrapplingHookTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedCreateGrapplingHookProjectileNetEvents(NetDataReader reader)
+        {
+            CreateGrapplingHookProjectileNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref CreateGrapplingHookProjectileNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedGrapplingHookHitWallNetEvents(NetDataReader reader)
+        {
+            GrapplingHookHitWallNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref GrapplingHookHitWallNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedDeactivateGrapplingHookTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateGrapplingHookTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateGrapplingHookTalentNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

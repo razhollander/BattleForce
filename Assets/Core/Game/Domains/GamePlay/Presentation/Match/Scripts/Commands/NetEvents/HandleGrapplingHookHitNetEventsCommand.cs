@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in events)
             {
-                _hookProjectilesControllers.UpdateOnHit(netEvent.HookProjectileId);
+                _hookProjectilesControllers.UpdateOnHit(netEvent.ProjectileId);
             }
 
             _cachedPresentationEventsService.PlayerGrapplingHookHitNetEvents.Clear();

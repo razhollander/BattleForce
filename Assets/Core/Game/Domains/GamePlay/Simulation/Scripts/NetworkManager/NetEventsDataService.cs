@@ -43,14 +43,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<CreateKOProjectileNetEventS2C>> CreateKOProjectileNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> KOProjectHitPlayerNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<DeactivateKOTalentNetEventS2C>> DeactivateKOTalentNetEventsPerPlayer { get; }
-        public CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C>> PlayerGrapplingHookShotNetEventsPerPlayer { get; }
-        public CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C>> PlayerGrapplingHookHitNetEventsPerPlayer { get; }
-        public CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C>> PlayerGrapplingHookDeactivatedNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> PlayerGrapplingHookShotNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> PlayerGrapplingHookHitNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> PlayerGrapplingHookDeactivatedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PerformDashPulseNetEventS2C>> PerformDashPulseNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>> ActivateSentryGunTalentNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>> DeactivateSentryGunTalentNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>> UpdatePlayerTalentStocksNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>> PlayerMaxShootCooldownChangedNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> CreateGrapplingHookProjectileNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> GrapplingHookHitWallNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> DeactivateGrapplingHookTalentNetEventsPerPlayer { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -79,14 +82,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<CreateKOProjectileNetEventS2C>> _createKOProjectileNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> _koProjectHitPlayerNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateKOTalentNetEventS2C>> _deactivateKOTalentNetEventsListPool;
-        private readonly ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C>> _playerGrapplingHookShotNetEventsListPool;
-        private readonly ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C>> _playerGrapplingHookHitNetEventsListPool;
-        private readonly ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C>> _playerGrapplingHookDeactivatedNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> _playerGrapplingHookShotNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> _playerGrapplingHookHitNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> _playerGrapplingHookDeactivatedNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PerformDashPulseNetEventS2C>> _performDashPulseNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>> _activateSentryGunTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>> _deactivateSentryGunTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>> _updatePlayerTalentStocksNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>> _playerMaxShootCooldownChangedListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> _createGrapplingHookProjectileNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> _grapplingHookHitWallNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> _deactivateGrapplingHookTalentNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -118,15 +124,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             CreateKOProjectileNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<CreateKOProjectileNetEventS2C>>(maxConcurrentPlayers);
             KOProjectHitPlayerNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(maxConcurrentPlayers);
             DeactivateKOTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(maxConcurrentPlayers);
-            PlayerGrapplingHookShotNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C>>(maxConcurrentPlayers);
-            PlayerGrapplingHookHitNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C>>(maxConcurrentPlayers);
-            PlayerGrapplingHookDeactivatedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C>>(maxConcurrentPlayers);
+            PlayerGrapplingHookShotNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>>(maxConcurrentPlayers);
+            PlayerGrapplingHookHitNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>>(maxConcurrentPlayers);
+            PlayerGrapplingHookDeactivatedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(maxConcurrentPlayers);
             ActivateSentryGunTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateSentryGunTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>>(maxConcurrentPlayers);
             PerformDashPulseNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PerformDashPulseNetEventS2C>>(maxConcurrentPlayers);
             UpdatePlayerTalentStocksNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>>(maxConcurrentPlayers);
             PlayerMaxShootCooldownChangedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>>(maxConcurrentPlayers);
-_bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
+            CreateGrapplingHookProjectileNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>>(maxConcurrentPlayers);
+            GrapplingHookHitWallNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateGrapplingHookTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(maxConcurrentPlayers);
+            _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
                 var list =new FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents, ()=>new PlayerRejoinAcceptPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount));
@@ -170,14 +179,17 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             _createKOProjectileNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateKOProjectileNetEventS2C>>(() => new FixedUnorderedList<CreateKOProjectileNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
             _koProjectHitPlayerNetEventsListPool = new ConcurrentPool<FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(() => new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents), maxConcurrentPlayers);
             _deactivateKOTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents), maxConcurrentPlayers);
-            _playerGrapplingHookShotNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C>>(() => new FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookShotNetEvents), maxConcurrentPlayers);
-            _playerGrapplingHookHitNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C>>(() => new FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookHitNetEvents), maxConcurrentPlayers);
-            _playerGrapplingHookDeactivatedNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C>>(() => new FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookDeactivatedNetEvents), maxConcurrentPlayers);
+            _playerGrapplingHookShotNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>>(() => new FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookShotNetEvents), maxConcurrentPlayers);
+            _playerGrapplingHookHitNetEventsListPool = new ConcurrentPool<FixedUnorderedList<GrapplingHookHitWallNetEventS2C>>(() => new FixedUnorderedList<GrapplingHookHitWallNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookHitNetEvents), maxConcurrentPlayers);
+            _playerGrapplingHookDeactivatedNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookDeactivatedNetEvents), maxConcurrentPlayers);
             _performDashPulseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformDashPulseNetEventS2C>>(() => new FixedUnorderedList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents), maxConcurrentPlayers);
             _activateSentryGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateSentryGunTalentNetEvents), maxConcurrentPlayers);
             _deactivateSentryGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSentryGunTalentNetEvents), maxConcurrentPlayers);
             _updatePlayerTalentStocksNetEventsListPool = new ConcurrentPool<FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>>(() => new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(networkConfig.MaxCap.UpdatePlayerTalentStocksNetEvent), maxConcurrentPlayers);
             _playerMaxShootCooldownChangedListPool = new ConcurrentPool<FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>>(() => new FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>(networkConfig.MaxCap.PlayerMaxShootCooldownChangedNetEvents), maxConcurrentPlayers);
+            _createGrapplingHookProjectileNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>>(() => new FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>(networkConfig.MaxCap.CreateGrapplingHookProjectileNetEvents), maxConcurrentPlayers);
+            _grapplingHookHitWallNetEventsListPool = new ConcurrentPool<FixedUnorderedList<GrapplingHookHitWallNetEventS2C>>(() => new FixedUnorderedList<GrapplingHookHitWallNetEventS2C>(networkConfig.MaxCap.GrapplingHookHitWallNetEvents), maxConcurrentPlayers);
+            _deactivateGrapplingHookTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(networkConfig.MaxCap.DeactivateGrapplingHookTalentNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingPlayerEvents(ushort playerId)
@@ -432,6 +444,18 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             {
                 PlayerMaxShootCooldownChangedNetEventsPerPlayer.Add(playerId, _playerMaxShootCooldownChangedListPool.Get());
             }
+            if (!CreateGrapplingHookProjectileNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                CreateGrapplingHookProjectileNetEventsPerPlayer.Add(playerId, _createGrapplingHookProjectileNetEventsListPool.Get());
+            }
+            if (!GrapplingHookHitWallNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                GrapplingHookHitWallNetEventsPerPlayer.Add(playerId, _grapplingHookHitWallNetEventsListPool.Get());
+            }
+            if (!DeactivateGrapplingHookTalentNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                DeactivateGrapplingHookTalentNetEventsPerPlayer.Add(playerId, _deactivateGrapplingHookTalentNetEventsListPool.Get());
+            }
         }
         
         public void StopSavingPlayerEvents(ushort playerId)
@@ -549,6 +573,18 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             var playerMaxShootCooldownChangedList = PlayerMaxShootCooldownChangedNetEventsPerPlayer[playerId];
             playerMaxShootCooldownChangedList.Clear();
             _playerMaxShootCooldownChangedListPool.Return(playerMaxShootCooldownChangedList);
+
+            var createGrapplingHookProjectileNetEventsList = CreateGrapplingHookProjectileNetEventsPerPlayer[playerId];
+            createGrapplingHookProjectileNetEventsList.Clear();
+            _createGrapplingHookProjectileNetEventsListPool.Return(createGrapplingHookProjectileNetEventsList);
+
+            var grapplingHookHitWallNetEventsList = GrapplingHookHitWallNetEventsPerPlayer[playerId];
+            grapplingHookHitWallNetEventsList.Clear();
+            _grapplingHookHitWallNetEventsListPool.Return(grapplingHookHitWallNetEventsList);
+
+            var deactivateGrapplingHookTalentNetEventsList = DeactivateGrapplingHookTalentNetEventsPerPlayer[playerId];
+            deactivateGrapplingHookTalentNetEventsList.Clear();
+            _deactivateGrapplingHookTalentNetEventsListPool.Return(deactivateGrapplingHookTalentNetEventsList);
 
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
@@ -1087,6 +1123,39 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                     }
                 }
             }
+
+            if (CreateGrapplingHookProjectileNetEventsPerPlayer.TryGetValue(playerId, out var createGrapplingHookProjectileNetEvents))
+            {
+                for (int i = createGrapplingHookProjectileNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (createGrapplingHookProjectileNetEvents[i].OccuredOnTick < tick)
+                    {
+                        createGrapplingHookProjectileNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (GrapplingHookHitWallNetEventsPerPlayer.TryGetValue(playerId, out var grapplingHookHitWallNetEvents))
+            {
+                for (int i = grapplingHookHitWallNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (grapplingHookHitWallNetEvents[i].OccuredOnTick < tick)
+                    {
+                        grapplingHookHitWallNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateGrapplingHookTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivateGrapplingHookTalentNetEvents))
+            {
+                for (int i = deactivateGrapplingHookTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateGrapplingHookTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateGrapplingHookTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
@@ -1309,6 +1378,42 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.CasterPlayerId = casterPlayerId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+            }
+        }
+
+        public void AddCreateGrapplingHookProjectileNetEvent(int onTick, ushort projectileId, ushort playerCasterId, Vector2 position)
+        {
+            foreach (var kvp in CreateGrapplingHookProjectileNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.GrapplingHookProjectile.Id = projectileId;
+                packet.GrapplingHookProjectile.PlayerCasterId = playerCasterId;
+                packet.GrapplingHookProjectile.Position = position;
+            }
+        }
+
+        public void AddGrapplingHookHitWallNetEvent(int onTick, ushort projectileId, ushort hitWallId, System.Numerics.Vector2 hitPosition)
+        {
+            foreach (var kvp in GrapplingHookHitWallNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.ProjectileId = projectileId;
+                packet.HitWallId = hitWallId;
+                packet.HitPosition = hitPosition;
+            }
+        }
+
+        public void AddDeactivateGrapplingHookTalentNetEvent(int onTick, ushort casterPlayerId, ushort projectileId, int talentCooldownEndTick)
+        {
+            foreach (var kvp in DeactivateGrapplingHookTalentNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.ProjectileId = projectileId;
                 packet.TalentCooldownEndTick = talentCooldownEndTick;
             }
         }

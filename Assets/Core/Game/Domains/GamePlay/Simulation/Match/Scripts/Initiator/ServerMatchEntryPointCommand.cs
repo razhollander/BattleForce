@@ -134,7 +134,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 _simulationInputService.AddPlayer(playerId);
                 // _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
                 // _playersTalentsManager.TryAddTalentToPlayer(TalentType.KO, playerId, 0, out _, out _);
-                _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
+                _playersTalentsManager.TryAddTalentToPlayer(TalentType.GrapplingHook, playerId, 0, out _, out _);
                 
                 if (_gamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                 {

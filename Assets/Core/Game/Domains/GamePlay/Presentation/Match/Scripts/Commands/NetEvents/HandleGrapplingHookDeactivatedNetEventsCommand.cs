@@ -27,8 +27,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in events)
             {
-                _hookProjectilesControllers.DestroyGrapplingHookProjectile(netEvent.HookProjectileId);
-                _matchDataService.RemoveGrapplingHookProjectile(netEvent.HookProjectileId);
+                _hookProjectilesControllers.DestroyGrapplingHookProjectile(netEvent.ProjectileId);
+                _matchDataService.RemoveGrapplingHookProjectile(netEvent.ProjectileId);
             }
 
             _cachedPresentationEventsService.PlayerGrapplingHookDeactivatedNetEvents.Clear();

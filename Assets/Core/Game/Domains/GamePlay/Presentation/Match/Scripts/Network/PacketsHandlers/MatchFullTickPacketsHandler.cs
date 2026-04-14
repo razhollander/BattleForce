@@ -49,9 +49,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<KOProjectHitPlayerNetEventS2C> _cachedUnprocessedKOProjectHitPlayerEvents;
         private readonly CapacityList<CreateKOProjectileNetEventS2C> _cachedUnprocessedCreateKOProjectileEvents;
         private readonly CapacityList<DeactivateKOTalentNetEventS2C> _cachedUnprocessedDeactivateKOTalentEvents;
-        private readonly CapacityList<PlayerGrapplingHookShotNetEventS2C> _cachedUnprocessedPlayerGrapplingHookShotEvents;
-        private readonly CapacityList<PlayerGrapplingHookHitNetEventS2C> _cachedUnprocessedPlayerGrapplingHookHitEvents;
-        private readonly CapacityList<PlayerGrapplingHookDeactivatedNetEventS2C> _cachedUnprocessedPlayerGrapplingHookDeactivatedEvents;
+        private readonly CapacityList<CreateGrapplingHookProjectileNetEventS2C> _cachedUnprocessedPlayerGrapplingHookShotEvents;
+        private readonly CapacityList<GrapplingHookHitWallNetEventS2C> _cachedUnprocessedPlayerGrapplingHookHitEvents;
+        private readonly CapacityList<DeactivateGrapplingHookTalentNetEventS2C> _cachedUnprocessedPlayerGrapplingHookDeactivatedEvents;
         private readonly CapacityList<ActivateSentryGunTalentNetEventS2C> _cachedUnprocessedActivateSentryGunTalentEvents;
         private readonly CapacityList<DeactivateSentryGunTalentNetEventS2C> _cachedUnprocessedDeactivateSentryGunTalentEvents;
         private readonly CapacityList<PerformDashPulseNetEventS2C> _cachedUnprocessedPerformDashPulseEvents;
@@ -91,9 +91,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedKOProjectHitPlayerEvents = new CapacityList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents);
             _cachedUnprocessedCreateKOProjectileEvents = new CapacityList<CreateKOProjectileNetEventS2C>(networkConfig.MaxCap.CreateKOProjectileNetEvents);
             _cachedUnprocessedDeactivateKOTalentEvents = new CapacityList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents);
-            _cachedUnprocessedPlayerGrapplingHookShotEvents = new CapacityList<PlayerGrapplingHookShotNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookShotNetEvents);
-            _cachedUnprocessedPlayerGrapplingHookHitEvents = new CapacityList<PlayerGrapplingHookHitNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookHitNetEvents);
-            _cachedUnprocessedPlayerGrapplingHookDeactivatedEvents = new CapacityList<PlayerGrapplingHookDeactivatedNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookDeactivatedNetEvents);
+            _cachedUnprocessedPlayerGrapplingHookShotEvents = new CapacityList<CreateGrapplingHookProjectileNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookShotNetEvents);
+            _cachedUnprocessedPlayerGrapplingHookHitEvents = new CapacityList<GrapplingHookHitWallNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookHitNetEvents);
+            _cachedUnprocessedPlayerGrapplingHookDeactivatedEvents = new CapacityList<DeactivateGrapplingHookTalentNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookDeactivatedNetEvents);
             _cachedUnprocessedActivateSentryGunTalentEvents = new CapacityList<ActivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateSentryGunTalentNetEvents);
             _cachedUnprocessedDeactivateSentryGunTalentEvents = new CapacityList<DeactivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSentryGunTalentNetEvents);
             _cachedUnprocessedPerformDashPulseEvents = new CapacityList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents);
@@ -146,9 +146,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessKOProjectHitPlayerEvents(latestFullTickPacket.KOProjectHitPlayerNetEvents);
             ProcessCreateKOProjectileEvents(latestFullTickPacket.CreateKOProjectileNetEvents);
             ProcessDeactivateKOTalentEvents(latestFullTickPacket.DeactivateKOTalentNetEvents);
-            ProcessPlayerGrapplingHookShotEvents(latestFullTickPacket.PlayerGrapplingHookShotNetEvents);
-            ProcessPlayerGrapplingHookHitEvents(latestFullTickPacket.PlayerGrapplingHookHitNetEvents);
-            ProcessPlayerGrapplingHookDeactivatedEvents(latestFullTickPacket.PlayerGrapplingHookDeactivatedNetEvents);
+            ProcessPlayerGrapplingHookShotEvents(latestFullTickPacket.CreateGrapplingHookProjectileNetEvents);
+            ProcessPlayerGrapplingHookHitEvents(latestFullTickPacket.GrapplingHookHitWallNetEvents);
+            ProcessPlayerGrapplingHookDeactivatedEvents(latestFullTickPacket.DeactivateGrapplingHookTalentNetEvents);
             ProcessActivateSentryGunTalentEvents(latestFullTickPacket.ActivateSentryGunTalentNetEvents);
             ProcessDeactivateSentryGunTalentEvents(latestFullTickPacket.DeactivateSentryGunTalentNetEvents);
             ProcessPerformDashPulseEvents(latestFullTickPacket.PerformDashPulseNetEvents);
@@ -313,7 +313,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void ProcessPlayerGrapplingHookShotEvents(FixedUnorderedList<PlayerGrapplingHookShotNetEventS2C> events)
+        private void ProcessPlayerGrapplingHookShotEvents(FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C> events)
         {
             _cachedUnprocessedPlayerGrapplingHookShotEvents.Clear();
             var span = events.AsSpan();
@@ -331,7 +331,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void ProcessPlayerGrapplingHookHitEvents(FixedUnorderedList<PlayerGrapplingHookHitNetEventS2C> events)
+        private void ProcessPlayerGrapplingHookHitEvents(FixedUnorderedList<GrapplingHookHitWallNetEventS2C> events)
         {
             _cachedUnprocessedPlayerGrapplingHookHitEvents.Clear();
             var span = events.AsSpan();
@@ -349,7 +349,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void ProcessPlayerGrapplingHookDeactivatedEvents(FixedUnorderedList<PlayerGrapplingHookDeactivatedNetEventS2C> events)
+        private void ProcessPlayerGrapplingHookDeactivatedEvents(FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C> events)
         {
             _cachedUnprocessedPlayerGrapplingHookDeactivatedEvents.Clear();
             var span = events.AsSpan();

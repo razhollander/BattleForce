@@ -368,7 +368,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        public void ProcessPlayerGrapplingHookShotEvents(CapacityList<PlayerGrapplingHookShotNetEventS2C> events)
+        public void ProcessPlayerGrapplingHookShotEvents(CapacityList<CreateGrapplingHookProjectileNetEventS2C> events)
         {
             if (events.IsNullOrEmpty())
             {
@@ -381,7 +381,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        public void ProcessPlayerGrapplingHookHitEvents(CapacityList<PlayerGrapplingHookHitNetEventS2C> events)
+        public void ProcessPlayerGrapplingHookHitEvents(CapacityList<GrapplingHookHitWallNetEventS2C> events)
         {
             if (events.IsNullOrEmpty())
             {
@@ -394,7 +394,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        public void ProcessPlayerGrapplingHookDeactivatedEvents(CapacityList<PlayerGrapplingHookDeactivatedNetEventS2C> events)
+        public void ProcessPlayerGrapplingHookDeactivatedEvents(CapacityList<DeactivateGrapplingHookTalentNetEventS2C> events)
         {
             if (events.IsNullOrEmpty())
             {

@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public PulseDashConfig PulseDashConfig;
         public KOTalentConfig KOTalentConfig;
         public SentryGunTalentConfig SentryGunTalentConfig;
+        public GrapplingHookTalentConfig GrapplingHookTalentConfig;
         public float TalentCardWidth = 1.602175f;
         public float TalentCardHeight = 2.382844f;
     }

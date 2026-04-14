@@ -29,9 +29,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents { get; } = new();
         public List<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents { get; } = new();
         public List<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents { get; } = new();
-        public List<PlayerGrapplingHookShotNetEventS2C> PlayerGrapplingHookShotNetEvents { get; } = new();
-        public List<PlayerGrapplingHookHitNetEventS2C> PlayerGrapplingHookHitNetEvents { get; } = new();
-        public List<PlayerGrapplingHookDeactivatedNetEventS2C> PlayerGrapplingHookDeactivatedNetEvents { get; } = new();
+        public List<CreateGrapplingHookProjectileNetEventS2C> PlayerGrapplingHookShotNetEvents { get; } = new();
+        public List<GrapplingHookHitWallNetEventS2C> PlayerGrapplingHookHitNetEvents { get; } = new();
+        public List<DeactivateGrapplingHookTalentNetEventS2C> PlayerGrapplingHookDeactivatedNetEvents { get; } = new();
         public List<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents { get; } = new();
         public List<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents { get; } = new();
         public List<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents { get; } = new();

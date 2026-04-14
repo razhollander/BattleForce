@@ -3,17 +3,17 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
 {
-    public struct PlayerGrapplingHookDeactivatedNetEventS2C : INetSerializable, IComparable<PlayerGrapplingHookDeactivatedNetEventS2C>
+    public struct DeactivateGrapplingHookTalentNetEventS2C : INetSerializable, IComparable<DeactivateGrapplingHookTalentNetEventS2C>
     {
         public int OccuredOnTick;
-        public ushort HookProjectileId;
+        public ushort ProjectileId;
         public ushort CasterPlayerId;
         public int TalentCooldownEndTick;
 
-        public PlayerGrapplingHookDeactivatedNetEventS2C(int occuredOnTick, ushort hookProjectileId, ushort casterPlayerId, int talentCooldownEndTick)
+        public DeactivateGrapplingHookTalentNetEventS2C(int occuredOnTick, ushort projectileId, ushort casterPlayerId, int talentCooldownEndTick)
         {
             OccuredOnTick = occuredOnTick;
-            HookProjectileId = hookProjectileId;
+            ProjectileId = projectileId;
             CasterPlayerId = casterPlayerId;
             TalentCooldownEndTick = talentCooldownEndTick;
         }
@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put(HookProjectileId);
+            writer.Put(ProjectileId);
             writer.Put((byte)CasterPlayerId);
             writer.Put(TalentCooldownEndTick);
         }
@@ -29,12 +29,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            HookProjectileId = reader.GetUShort();
+            ProjectileId = reader.GetUShort();
             CasterPlayerId = reader.GetByte();
             TalentCooldownEndTick = reader.GetInt();
         }
 
-        public int CompareTo(PlayerGrapplingHookDeactivatedNetEventS2C other)
+        public int CompareTo(DeactivateGrapplingHookTalentNetEventS2C other)
         {
             return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
