@@ -42,12 +42,14 @@ MonoBehaviour:
     ShootCooldownMultiplier: 0.25
     BulletsSpawnOffsetFromPlayerHead: 1.1
   GrapplingHookTalentConfig:
-    ProjectileSpeed: 25
-    MaxDistance: 30
+    ProjectileSpeed: 40
+    ReturnProjectileSpeedMultiplier: 2
+    MaxDistance: 100
     ArriveDistance: 2
-    PullForce: 1
+    PlayerPullForceWhileHooked: 200
     PlayerVelocitySquaredThresholdToDeactivateHook: 0.1
     GraceTicksUntilCheckIfVelocityIsBelowThreshold: 5
+    PlayerRotateSpeedWhileHooked: 500
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:
