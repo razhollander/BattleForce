@@ -1,6 +1,8 @@
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
@@ -18,17 +20,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly Transform _parent;
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         public readonly ushort PlayerId;
         private PlayerView _playerView;
         private readonly PlayerViewPool _playerPool;
 
-        public MatchPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, Transform parent)
+        public MatchPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
+            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
             _parent = parent;
+            _stageCancellationTokenProvider = stageCancellationTokenProvider;
             PlayerId = playerId;
         }
 
@@ -46,19 +51,39 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
-            var doesPlayerHaveAnyTalent = playerModel.Spaceship.TalentsState.Talents.Count > 0;
-            if (doesPlayerHaveAnyTalent)
+            SetupPlayerAccordingToHisSelectedTalent(playerModel);
+            SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
+        }
+
+        private void SetupPlayerAccordingToHisSelectedTalent(MatchPlayerModel playerModel)
+        {
+            if (!playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
             {
-                SetSelectedTalent(playerModel.Spaceship.TalentsState.SelectedTalentIndex);
+                _playerView.SetIsAimArrowShown(false);
+                return;
+            }
+
+            SetSelectedTalent(playerModel.Spaceship.TalentsState.SelectedTalentIndex);
+
+            if (currentSelectedTalentState.TalentType == TalentType.SentryGun)
+            {
+                SetSentryGunState(currentSelectedTalentState.IsActive, _stageCancellationTokenProvider.CancellationTokenSource);
             }
         }
 
+        public void SetSentryGunState(bool isSentryGun, CancellationTokenSource cancellationTokenSource)
+        {
+            _playerView.SetSentryGunState(isSentryGun, cancellationTokenSource);
+        }
+        
         public void SetSelectedTalent(int talentIndex)
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             var talentState = playerModel.Spaceship.TalentsState.Talents[talentIndex];
-            var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentState.TalentType];
+            var talentType = talentState.TalentType;
+            var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentType];
             _playerView.SetTalentSprite(talentSprite);
+            _playerView.SetIsAimArrowShown(_gamePlayConfig.TalentsConfig.Talents[talentType].IsAimArrowActiveWhileSelected);
         }
 
         public void UpdateTransform()
@@ -84,12 +109,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             {
                 RestoreBulletEffect();
             }
-        }
-
-        public void UpdateSpinnedState()
-        {
-            var playerModel = _matchDataService.GetPlayer(PlayerId);
-            _playerView.SetIsSpinned(playerModel.IsSpinned);
         }
 
         public void UpdateTalentCooldown(int currentServerTick)
@@ -171,6 +190,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsTailWaving(bool isMoving)
         {
             _playerView.SetIsTailWaving(isMoving);
+        }
+
+        public void SetPlayersSpinnedState(bool isOn)
+        {
+            _playerView.SetIsSpinned(isOn, _stageCancellationTokenProvider.CancellationTokenSource);
         }
     }
 }

@@ -1,5 +1,19 @@
 {
   "dependencies": {
+    "com.jonagill.conditionalfield": {
+      "version": "https://github.com/jonagill/ConditionalField.git?path=Packages/com.jonagill.conditionalfield",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "0f611bed58433ed32b3f052fbf4681ea623e1a09"
+    },
+    "com.jonagill.unityinternalaccess": {
+      "version": "https://github.com/jonagill/UnityInternalAccess.git?path=Packages/com.jonagill.unityinternalaccess",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "190de2d978c1201e5e0880b85f2ff18cfa8c103d"
+    },
     "com.unity.2d.animation": {
       "version": "10.1.4",
       "depth": 1,

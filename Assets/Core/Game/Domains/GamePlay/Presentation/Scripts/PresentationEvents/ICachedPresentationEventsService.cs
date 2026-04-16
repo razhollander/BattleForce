@@ -32,6 +32,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents { get; }
         List<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents { get; }
         List<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents { get; }
+        List<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents { get; }
+        List<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents { get; }
         List<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents { get; }
         List<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents { get; }
     }

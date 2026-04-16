@@ -1,4 +1,4 @@
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
+/*using Core.Game.Domains.GamePlay.Shared.S2CModels;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
@@ -26,4 +26,4 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             
         }
     }
-}
+}*/

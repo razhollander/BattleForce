@@ -37,8 +37,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents;
         public FixedUnorderedList<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents;
         public FixedUnorderedList<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents;
+        public FixedUnorderedList<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents;
+        public FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents;
         public FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
+        public FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C> PlayerMaxShootCooldownChangedNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -73,7 +76,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             CreateKOProjectileNetEvents = new FixedUnorderedList<CreateKOProjectileNetEventS2C>(maxCap.CreateKOProjectileNetEvents);
             DeactivateKOTalentNetEvents = new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(maxCap.DeactivateKOTalentNetEvents);
             PerformDashPulseNetEvents = new FixedUnorderedList<PerformDashPulseNetEventS2C>(maxCap.PerformDashPulseNetEvents);
+            ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
+            DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
             UpdatePlayerTalentStocksNetEvents = new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(maxCap.UpdatePlayerTalentStocksNetEvents);
+            PlayerMaxShootCooldownChangedNetEvents = new FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>(maxCap.PlayerMaxShootCooldownChangedNetEvents);
+            ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
+            DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
         }
         
         // public FullTickPacket(int tick, SimulationStateS2C previousSimulationState,
@@ -116,135 +124,138 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedKOProjectHitPlayerNetEvents(writer);
             SerializedDeactivateKOTalentNetEvents(writer);
             SerializedPerformDashPulseNetEvents(writer);
+            SerializedActivateSentryGunTalentNetEvents(writer);
+            SerializedDeactivateSentryGunTalentNetEvents(writer);
             SerializedUpdatePlayerTalentStocksNetEvents(writer);
             SerializedPlayerSpinnedStartedEvents(writer);
             SerializedPlayerSpinnedEndedEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
+            SerializedPlayerMaxShootCooldownChangedNetEvents(writer);
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)KOProjectHitPlayerNetEvents.Count);
-            foreach (var evt in KOProjectHitPlayerNetEvents.AsSpan())
+            foreach (var netEvent in KOProjectHitPlayerNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedCreateKOProjectileNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)CreateKOProjectileNetEvents.Count);
-            foreach (var evt in CreateKOProjectileNetEvents.AsSpan())
+            foreach (var netEvent in CreateKOProjectileNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedDeactivateKOTalentNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)DeactivateKOTalentNetEvents.Count);
-            foreach (var evt in DeactivateKOTalentNetEvents.AsSpan())
+            foreach (var netEvent in DeactivateKOTalentNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
         
         private void SerializedCreateSwapFieldNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)CreateSwapFieldNetEvents.Count);
-            foreach (var evt in CreateSwapFieldNetEvents.AsSpan())
+            foreach (var netEvent in CreateSwapFieldNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedDestroySwapFieldNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)DestroySwapFieldNetEvents.Count);
-            foreach (var evt in DestroySwapFieldNetEvents.AsSpan())
+            foreach (var netEvent in DestroySwapFieldNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedPreparationPhaseEndedEvents(NetDataWriter writer)
         {
             writer.Put((byte)PreparationPhaseEndedNetEvents.Count);
-            foreach (var evt in PreparationPhaseEndedNetEvents.AsSpan())
+            foreach (var netEvent in PreparationPhaseEndedNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedGainBoltsEvents(NetDataWriter writer)
         {
             writer.Put((byte) GainBoltsNetEvents.Count);
-            foreach (var evt in GainBoltsNetEvents.AsSpan())
+            foreach (var netEvent in GainBoltsNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedPlayerToEnvironmentTeleportGateCollisionEvents(NetDataWriter writer)
         {
             writer.Put((byte)PlayerToEnvironmentTeleportGateCollisionNetEvents.Count);
-            foreach (var evt in PlayerToEnvironmentTeleportGateCollisionNetEvents.AsSpan())
+            foreach (var netEvent in PlayerToEnvironmentTeleportGateCollisionNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedTalentSwitchEvents(NetDataWriter writer)
         {
             writer.Put((byte) TalentSwitchNetEvents.Count);
-            foreach (var evt in TalentSwitchNetEvents.AsSpan())
+            foreach (var netEvent in TalentSwitchNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedEnvironmentSpringPlayerCollisionEvents(NetDataWriter writer)
         {
             writer.Put((byte)EnvironmentSpringPlayerCollisionNetEvents.Count);
-            foreach (var evt in EnvironmentSpringPlayerCollisionNetEvents.AsSpan())
+            foreach (var netEvent in EnvironmentSpringPlayerCollisionNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedTeamLostEvents(NetDataWriter writer)
         {
             writer.Put((byte) TeamLostNetEvents.Count);
-            foreach (var evt in TeamLostNetEvents.AsSpan())
+            foreach (var netEvent in TeamLostNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedStageEndEvents(NetDataWriter writer)
         {
             writer.Put((byte) StageEndNetEvents.Count);
-            foreach (var evt in StageEndNetEvents.AsSpan())
+            foreach (var netEvent in StageEndNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedPowerUpObtainedEvents(NetDataWriter writer)
         {
             writer.Put((byte) PowerUpObtainedNetEvents.Count);
-            foreach (var evt in PowerUpObtainedNetEvents.AsSpan())
+            foreach (var netEvent in PowerUpObtainedNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
         private void SerializedPowerUpSpawnedEvents(NetDataWriter writer)
         {
             writer.Put((byte) PowerUpSpawnedNetEvents.Count);
-            foreach (var evt in PowerUpSpawnedNetEvents.AsSpan())
+            foreach (var netEvent in PowerUpSpawnedNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
@@ -301,10 +312,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedKOProjectHitPlayerNetEvents(reader);
             DeserializedDeactivateKOTalentNetEvents(reader);
             DeserializedPerformDashPulseNetEvents(reader);
+            DeserializedActivateSentryGunTalentNetEvents(reader);
+            DeserializedDeactivateSentryGunTalentNetEvents(reader);
             DeserializedUpdatePlayerTalentStocksNetEvents(reader);
             DeserializedPlayerSpinnedStartedEvents(reader);
             DeserializedPlayerSpinnedEndedEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
+            DeserializedPlayerMaxShootCooldownChangedNetEvents(reader);
         }
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
@@ -313,8 +327,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref CreateKOProjectileNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref CreateKOProjectileNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -324,8 +338,19 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref KOProjectHitPlayerNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref KOProjectHitPlayerNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedDeactivateSentryGunTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateSentryGunTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateSentryGunTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -335,8 +360,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref DeactivateKOTalentNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref DeactivateKOTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
         private void DeserializedCreateSwapFieldNetEvents(NetDataReader reader)
@@ -345,8 +370,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref CreateSwapFieldNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref CreateSwapFieldNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -356,8 +381,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref DestroySwapFieldNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref DestroySwapFieldNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -367,8 +392,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref PreparationPhaseEndedNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref PreparationPhaseEndedNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -378,8 +403,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref GainBoltsNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref GainBoltsNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -389,8 +414,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref PlayerToEnvironmentTeleportGateCollisionNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref PlayerToEnvironmentTeleportGateCollisionNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -400,8 +425,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref TalentSwitchNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref TalentSwitchNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -411,8 +436,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref EnvironmentSpringPlayerCollisionNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref EnvironmentSpringPlayerCollisionNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -422,8 +447,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref TeamLostNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref TeamLostNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -433,8 +458,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                var evt = StageEndNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                var netEvent = StageEndNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -444,8 +469,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref PowerUpObtainedNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref PowerUpObtainedNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -455,8 +480,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var evt = ref PowerUpSpawnedNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref PowerUpSpawnedNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -597,9 +622,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         private void SerializedPerformDashPulseNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)PerformDashPulseNetEvents.Count);
-            foreach (var evt in PerformDashPulseNetEvents.AsSpan())
+            foreach (var netEvent in PerformDashPulseNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
             }
         }
 
@@ -609,8 +634,37 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PerformDashPulseNetEvents.Clear();
             for (int i = 0; i < count; i++)
             {
-                ref var evt = ref PerformDashPulseNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref PerformDashPulseNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateSentryGunTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateSentryGunTalentNetEvents.Count);
+            foreach (var netEvent in ActivateSentryGunTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void SerializedDeactivateSentryGunTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateSentryGunTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateSentryGunTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+        
+        private void DeserializedActivateSentryGunTalentNetEvents(NetDataReader reader)
+        {
+            var count = reader.GetByte();
+            ActivateSentryGunTalentNetEvents.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateSentryGunTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 
@@ -657,9 +711,18 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         private void SerializedUpdatePlayerTalentStocksNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)UpdatePlayerTalentStocksNetEvents.Count);
-            foreach (var evt in UpdatePlayerTalentStocksNetEvents.AsSpan())
+            foreach (var netEvent in UpdatePlayerTalentStocksNetEvents.AsSpan())
             {
-                evt.Serialize(writer);
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void SerializedPlayerMaxShootCooldownChangedNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerMaxShootCooldownChangedNetEvents.Count);
+            foreach (var netEvent in PlayerMaxShootCooldownChangedNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
             }
         }
 
@@ -669,8 +732,19 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             UpdatePlayerTalentStocksNetEvents.Clear();
             for (int i = 0; i < count; i++)
             {
-                ref var evt = ref UpdatePlayerTalentStocksNetEvents.AddAndGet();
-                evt.Deserialize(reader);
+                ref var netEvent = ref UpdatePlayerTalentStocksNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedPlayerMaxShootCooldownChangedNetEvents(NetDataReader reader)
+        {
+            var count = reader.GetByte();
+            PlayerMaxShootCooldownChangedNetEvents.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PlayerMaxShootCooldownChangedNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
     }

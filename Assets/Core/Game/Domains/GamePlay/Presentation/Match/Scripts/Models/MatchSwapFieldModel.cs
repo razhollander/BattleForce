@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
 
         public float CalculateCurrentRadiusForTick(int tick)
         {
-            return MathUtils.Remap(OccuredOnTick, EndTick, 0, MaxRadius, tick);
+            return MathUtils.RemapClamped(OccuredOnTick, EndTick, 0, MaxRadius, tick);
         }
     }
 }

@@ -46,7 +46,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> KOProjectHitPlayerNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<DeactivateKOTalentNetEventS2C>> DeactivateKOTalentNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PerformDashPulseNetEventS2C>> PerformDashPulseNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>> ActivateSentryGunTalentNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>> DeactivateSentryGunTalentNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>> UpdatePlayerTalentStocksNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>> PlayerMaxShootCooldownChangedNetEventsPerPlayer { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -78,8 +81,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> _koProjectHitPlayerNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateKOTalentNetEventS2C>> _deactivateKOTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PerformDashPulseNetEventS2C>> _performDashPulseNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>> _activateSentryGunTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>> _deactivateSentryGunTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>> _updatePlayerTalentStocksNetEventsListPool;
-public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>> _playerMaxShootCooldownChangedListPool;
+
+        public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             BulletSpawnNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>>(maxConcurrentPlayers);
@@ -111,8 +118,11 @@ public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sh
             CreateKOProjectileNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<CreateKOProjectileNetEventS2C>>(maxConcurrentPlayers);
             KOProjectHitPlayerNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(maxConcurrentPlayers);
             DeactivateKOTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(maxConcurrentPlayers);
+            ActivateSentryGunTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateSentryGunTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>>(maxConcurrentPlayers);
             PerformDashPulseNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PerformDashPulseNetEventS2C>>(maxConcurrentPlayers);
             UpdatePlayerTalentStocksNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>>(maxConcurrentPlayers);
+            PlayerMaxShootCooldownChangedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>>(maxConcurrentPlayers);
 _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -160,7 +170,10 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             _koProjectHitPlayerNetEventsListPool = new ConcurrentPool<FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(() => new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents), maxConcurrentPlayers);
             _deactivateKOTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents), maxConcurrentPlayers);
             _performDashPulseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformDashPulseNetEventS2C>>(() => new FixedUnorderedList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents), maxConcurrentPlayers);
+            _activateSentryGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateSentryGunTalentNetEvents), maxConcurrentPlayers);
+            _deactivateSentryGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSentryGunTalentNetEvents), maxConcurrentPlayers);
             _updatePlayerTalentStocksNetEventsListPool = new ConcurrentPool<FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>>(() => new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(networkConfig.MaxCap.UpdatePlayerTalentStocksNetEvent), maxConcurrentPlayers);
+            _playerMaxShootCooldownChangedListPool = new ConcurrentPool<FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>>(() => new FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>(networkConfig.MaxCap.PlayerMaxShootCooldownChangedNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingPlayerEvents(ushort playerId)
@@ -401,9 +414,21 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             {
                 PerformDashPulseNetEventsPerPlayer.Add(playerId, _performDashPulseNetEventsListPool.Get());
             }
+            if (!ActivateSentryGunTalentNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                ActivateSentryGunTalentNetEventsPerPlayer.Add(playerId, _activateSentryGunTalentNetEventsListPool.Get());
+            }
+            if (!DeactivateSentryGunTalentNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                DeactivateSentryGunTalentNetEventsPerPlayer.Add(playerId, _deactivateSentryGunTalentNetEventsListPool.Get());
+            }
             if (!UpdatePlayerTalentStocksNetEventsPerPlayer.ContainsKey(playerId))
             {
                 UpdatePlayerTalentStocksNetEventsPerPlayer.Add(playerId, _updatePlayerTalentStocksNetEventsListPool.Get());
+            }
+            if (!PlayerMaxShootCooldownChangedNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                PlayerMaxShootCooldownChangedNetEventsPerPlayer.Add(playerId, _playerMaxShootCooldownChangedListPool.Get());
             }
         }
         
@@ -504,11 +529,23 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             var performDashPulseNetEventsList = PerformDashPulseNetEventsPerPlayer[playerId];
             performDashPulseNetEventsList.Clear();
             _performDashPulseNetEventsListPool.Return(performDashPulseNetEventsList);
+
+            var activateSentryGunTalentNetEventsList = ActivateSentryGunTalentNetEventsPerPlayer[playerId];
+            activateSentryGunTalentNetEventsList.Clear();
+            _activateSentryGunTalentNetEventsListPool.Return(activateSentryGunTalentNetEventsList);
+
+            var deactivateSentryGunTalentNetEventsList = DeactivateSentryGunTalentNetEventsPerPlayer[playerId];
+            deactivateSentryGunTalentNetEventsList.Clear();
+            _deactivateSentryGunTalentNetEventsListPool.Return(deactivateSentryGunTalentNetEventsList);
             
             var updatePlayerTalentStocksNetEventsList = UpdatePlayerTalentStocksNetEventsPerPlayer[playerId];
             updatePlayerTalentStocksNetEventsList.Clear();
             _updatePlayerTalentStocksNetEventsListPool.Return(updatePlayerTalentStocksNetEventsList);
             
+            var playerMaxShootCooldownChangedList = PlayerMaxShootCooldownChangedNetEventsPerPlayer[playerId];
+            playerMaxShootCooldownChangedList.Clear();
+            _playerMaxShootCooldownChangedListPool.Return(playerMaxShootCooldownChangedList);
+
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
             MatchMakingPlayerJoinAcceptNetEventsPerPlayer.Remove(playerId);
@@ -539,7 +576,10 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             KOProjectHitPlayerNetEventsPerPlayer.Remove(playerId);
             DeactivateKOTalentNetEventsPerPlayer.Remove(playerId);
             PerformDashPulseNetEventsPerPlayer.Remove(playerId);
+            ActivateSentryGunTalentNetEventsPerPlayer.Remove(playerId);
+            DeactivateSentryGunTalentNetEventsPerPlayer.Remove(playerId);
             UpdatePlayerTalentStocksNetEventsPerPlayer.Remove(playerId);
+            PlayerMaxShootCooldownChangedNetEventsPerPlayer.Remove(playerId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -555,15 +595,25 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             }
         }
 
-        public void AddPlayerDiedNetEvent(int onTick, ushort playerId, float maxShootCooldown, float shootCooldownSecondsLeft)
+        public void AddPlayerDiedNetEvent(int onTick, ushort playerId)
         {
             foreach (var kvp in PlayerDiedNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.PlayerId = playerId;
-                packet.PlayerMaxShootCooldown = maxShootCooldown;
-                packet.PlayerShootCooldownSecondsLeft = shootCooldownSecondsLeft;
+            }
+        }
+
+        public void AddPlayerMaxShootCooldownChangedNetEvent(int onTick, ushort playerId, float maxShootCooldown, float shootCooldownSecondsLeft)
+        {
+            foreach (var kvp in PlayerMaxShootCooldownChangedNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
+                packet.MaxShootCooldown = maxShootCooldown;
+                packet.ShootCooldownSecondsLeft = shootCooldownSecondsLeft;
             }
         }
 
@@ -1013,6 +1063,26 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                     }
                 }
             }
+            if (ActivateSentryGunTalentNetEventsPerPlayer.TryGetValue(playerId, out var activateSentryGunTalentNetEvents))
+            {
+                for (int i = activateSentryGunTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateSentryGunTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateSentryGunTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+            if (DeactivateSentryGunTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivateSentryGunTalentNetEvents))
+            {
+                for (int i = deactivateSentryGunTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateSentryGunTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateSentryGunTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
             if (UpdatePlayerTalentStocksNetEventsPerPlayer.TryGetValue(playerId, out var updatePlayerTalentsStocksNetEvnets))
             {
                 for (int i = updatePlayerTalentsStocksNetEvnets.Count - 1; i >= 0; i--)
@@ -1020,6 +1090,16 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                     if (updatePlayerTalentsStocksNetEvnets[i].OccuredOnTick < tick)
                     {
                         updatePlayerTalentsStocksNetEvnets.RemoveAt(i);
+                    }
+                }
+            }
+            if (PlayerMaxShootCooldownChangedNetEventsPerPlayer.TryGetValue(playerId, out var playerMaxShootCooldownChangedNetEvents))
+            {
+                for (int i = playerMaxShootCooldownChangedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerMaxShootCooldownChangedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerMaxShootCooldownChangedNetEvents.RemoveAt(i);
                     }
                 }
             }
@@ -1245,6 +1325,27 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                 packet.TalentType = talentType;
                 packet.CurrentStocksAmount = currentStocksAmount;
                 packet.RecieveNextStockOnTick = recieveNextStockOnTick;
+            }
+        }
+
+        public void AddActivateSentryGunTalentNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in ActivateSentryGunTalentNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddDeactivateSentryGunTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick)
+        {
+            foreach (var kvp in DeactivateSentryGunTalentNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
             }
         }
     }

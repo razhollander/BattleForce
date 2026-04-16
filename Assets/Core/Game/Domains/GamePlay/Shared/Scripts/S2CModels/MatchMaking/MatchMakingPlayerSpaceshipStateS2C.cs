@@ -34,5 +34,14 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             Transform.DeserializeDeltas(reader);
             Shoot.DeserializeDeltas(reader);
         }
+
+        public MatchMakingPlayerSpaceshipStateS2C GetClone()
+        {
+            return new MatchMakingPlayerSpaceshipStateS2C()
+            {
+                Shoot = this.Shoot,
+                Transform = this.Transform
+            };
+        }
     }
 }

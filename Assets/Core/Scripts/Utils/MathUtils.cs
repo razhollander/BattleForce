@@ -15,10 +15,10 @@ namespace CoreDomain.Scripts.Utils
             return GetPerpendicularDirection(direction);
         }
             
-        public static Vector3 GetPerpendicularDirection(Vector2 direction)
+        public static Vector2 GetPerpendicularDirection(Vector2 direction)
         {
             var normalizedDir = direction.normalized;
-            return new Vector3(-normalizedDir.y, normalizedDir.x, 0);
+            return new Vector2(-normalizedDir.y, normalizedDir.x);
         }
         
         /// <summary>

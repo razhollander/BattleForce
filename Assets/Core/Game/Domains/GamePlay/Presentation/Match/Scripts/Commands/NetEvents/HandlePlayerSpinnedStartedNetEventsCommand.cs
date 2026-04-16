@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
@@ -8,12 +9,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     public class HandlePlayerSpinnedStartedNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
-        private IMatchDataService _matchDataService;
+        private IMatchPlayerControllers _playerControllers;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
-            _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
         }
 
         public void Execute()
@@ -26,11 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in events)
             {
-                var player = _matchDataService.GetPlayer(netEvent.PlayerId);
-                if (player != null)
-                {
-                    player.IsSpinned = true;
-                }
+                _playerControllers.SetPlayersSpinnedState(netEvent.PlayerId, true);
             }
 
             events.Clear();

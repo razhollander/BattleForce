@@ -1,6 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService
 {
     public interface IPlayersDecelerationLogic
     {

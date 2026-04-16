@@ -31,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
+        private SpinPlayerCommand _spinPlayerCommand;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
         {
@@ -45,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
+            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
@@ -101,8 +103,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var projectileId = isProjectileToWall ? objectA.Id : objectB.Id;
-            var projectile = _matchDataService.SimulationState.GetKOProjectileById(projectileId);
-            var casterId = projectile.PlayerCasterId;
+            if (!_matchDataService.SimulationState.TryGetKOProjectileById(projectileId, out var koProjectile))
+            {
+                LogService.LogTopic("Ko Projectile was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+            
+            var casterId = koProjectile.PlayerCasterId;
             _playersTalentsManager.HitKOTalentWithWall(casterId);
         }
 
@@ -130,9 +137,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 playerId = objectB.Id;
             }
 
-            var projectile = _matchDataService.SimulationState.GetKOProjectileById(projectileId);
+            if (!_matchDataService.SimulationState.TryGetKOProjectileById(projectileId, out var koProjectile))
+            {
+                LogService.LogTopic("Ko Projectile was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+            
             var enemyPlayer = _matchDataService.SimulationState.GetPlayerById(playerId);
-            _playersTalentsManager.HitKOTalentWithEnemy(projectile.PlayerCasterId, enemyPlayer.Id, _processedTick);
+            _playersTalentsManager.HitKOTalentWithEnemy(koProjectile.PlayerCasterId, enemyPlayer.Id, _processedTick);
         }
         
         private void HandleSwapFieldPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -158,8 +170,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 playerId = objectB.Id;
                 fieldId = objectA.Id;
             }
+            
+            if (!_matchDataService.SimulationState.TryGetSwapFieldById(fieldId, out var swapField))
+            {
+                LogService.Log("Swap field already collided with another player this tick therefore was destroyed!");
+                return;   
+            }
 
-            var swapField = _matchDataService.SimulationState.GetSwapFieldById(fieldId);
             var playerStateHit = _matchDataService.SimulationState.GetPlayerById(playerId);
             _playersTalentsManager.CompleteSwapTalentWithEnemy(swapField.PlayerCasterId, playerStateHit.Id, _processedTick);
         }
@@ -250,8 +267,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             playerState.Spaceship.Transform.Direction = force.Normalize();
             playerState.Spaceship.IsEngineOn = false;
 
-            _commandFactory.CreateCommandVoid<SpinPlayerCommand>()
-                .SetPlayer(playerId, playerState.Spaceship)
+            _spinPlayerCommand
+                .SetPlayer(playerId)
                 .SetSpinAmount(randomSpin)
                 .SetTick(_processedTick)
                 .Execute();

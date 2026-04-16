@@ -1,24 +1,21 @@
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
-using System.Numerics;
-using System;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
     public class SpinPlayerCommand : BaseCommand, ICommandVoid
     {
         private INetEventsDataService _netEventsDataService;
-
-        private PlayerSpaceshipStateS2C _spaceshipState;
+        private IMatchDataService _matchDataService;
+        
         private ushort _playerId;
         private float _spinAmount;
         private int _tick;
 
-        public SpinPlayerCommand SetPlayer(ushort playerId, PlayerSpaceshipStateS2C spaceshipState)
+        public SpinPlayerCommand SetPlayer(ushort playerId)
         {
             _playerId = playerId;
-            _spaceshipState = spaceshipState;
             return this;
         }
 
@@ -37,25 +34,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public override void ResolveDependencies()
         {
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
+            _matchDataService = _diContainer.Resolve<IMatchDataService>();
         }
 
         public void Execute()
         {
-            if (_spaceshipState == null)
+            var playerSpaceship = _matchDataService.SimulationState.GetPlayerById(_playerId).Spaceship;
+            playerSpaceship.Transform.AngularVelocity += _spinAmount;
+            var isSpinningNow = playerSpaceship.Transform.AngularVelocity != 0;
+
+            var isPlayerAlreadySpinned = playerSpaceship.IsSpinned;
+            var didPlayerStartSpinning = !isPlayerAlreadySpinned && isSpinningNow;
+            if (!didPlayerStartSpinning)
             {
                 return;
             }
 
-            var wasSpinning = _spaceshipState.Transform.AngularVelocity != 0;
-
-            _spaceshipState.Transform.AngularVelocity += _spinAmount;
-
-            var isSpinningNow = _spaceshipState.Transform.AngularVelocity != 0;
-
-            if (!wasSpinning && isSpinningNow)
-            {
-                _netEventsDataService.AddPlayerSpinnedStartedNetEvent(_tick, _playerId);
-            }
+            playerSpaceship.IsSpinned = true;
+            _netEventsDataService.AddPlayerSpinnedStartedNetEvent(_tick, _playerId);
         }
     }
 }

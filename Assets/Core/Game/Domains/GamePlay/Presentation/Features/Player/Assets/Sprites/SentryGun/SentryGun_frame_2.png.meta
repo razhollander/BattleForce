@@ -1,22 +1,13 @@
 fileFormatVersion: 2
-guid: fe2082846331745b3a0083cc0d3795b1
+guid: 97a10fcc6fe07414fb6316bd9daeb07f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2600398229611662288
-    second: SeeingStars_0
+      213: -8256543566841641590
+    second: SentryGun_frame_2_0
   - first:
-      213: -5286127004656438834
-    second: SeeingStars_1
-  - first:
-      213: 6146805000580188127
-    second: SeeingStars_2
-  - first:
-      213: -593941788705896047
-    second: SeeingStars_3
-  - first:
-      213: 21892358056856987
-    second: SeeingStars_4
+      213: 3050906158465105803
+    second: SentryGun_frame_2_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -36,7 +27,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 0
+  isReadable: 1
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -58,14 +49,14 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 1
+  spriteGenerateFallbackPhysicsShape: 0
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -84,7 +75,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 256
+    maxTextureSize: 512
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -125,13 +116,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SeeingStars_0
+      name: SentryGun_frame_2_0
       rect:
         serializedVersion: 2
-        x: 322
-        y: 429
-        width: 99
-        height: 96
+        x: 1
+        y: 93
+        width: 301
+        height: 365
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -140,20 +131,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0343171769789ebd0800000000000000
-      internalID: -2600398229611662288
+      spriteID: a850ed9fe5dda6d80800000000000000
+      internalID: -8256543566841641590
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SeeingStars_1
+      name: SentryGun_frame_2_1
       rect:
         serializedVersion: 2
-        x: 411
-        y: 316
-        width: 133
-        height: 142
+        x: 297
+        y: 258
+        width: 286
+        height: 217
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -162,74 +153,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ec17ad11f77e3a6b0800000000000000
-      internalID: -5286127004656438834
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SeeingStars_2
-      rect:
-        serializedVersion: 2
-        x: 23
-        y: 281
-        width: 91
-        height: 88
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: fd74d23b496dd4550800000000000000
-      internalID: 6146805000580188127
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SeeingStars_3
-      rect:
-        serializedVersion: 2
-        x: 124
-        y: 241
-        width: 120
-        height: 125
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 199ccea0715e1c7f0800000000000000
-      internalID: -593941788705896047
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: SeeingStars_4
-      rect:
-        serializedVersion: 2
-        x: 42
-        y: 265
-        width: 54
-        height: 12
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b9d4641dbf6cd4000800000000000000
-      internalID: 21892358056856987
+      spriteID: b8f3d5a9cfef65a20800000000000000
+      internalID: 3050906158465105803
       vertices: []
       indices: 
       edges: []
@@ -238,7 +163,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -248,11 +173,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      SeeingStars_0: -2600398229611662288
-      SeeingStars_1: -5286127004656438834
-      SeeingStars_2: 6146805000580188127
-      SeeingStars_3: -593941788705896047
-      SeeingStars_4: 21892358056856987
+      SentryGun_frame_2_0: -8256543566841641590
+      SentryGun_frame_2_1: 3050906158465105803
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

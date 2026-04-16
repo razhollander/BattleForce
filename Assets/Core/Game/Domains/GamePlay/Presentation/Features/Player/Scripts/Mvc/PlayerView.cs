@@ -1,8 +1,11 @@
 using System;
+using System.Threading;
 using TMPro;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Scripts.Extensions;
+using Core.Scripts.Helpers;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Helpers.Pools;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Utils;
@@ -28,7 +31,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _rightEye;
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         [SerializeField] private PlayerTailView _tailView;
+        [SerializeField] private SpriteAnimator _sentryGunAnimator;
         [SerializeField] private Sprite _spinnedEyesSprite;
+        [SerializeField] private Canvas _spinnedEyesCanvas;
+        [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         
         private Transform _transform;
         private SpriteRenderer _leftEyeRenderer;
@@ -37,7 +43,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         private Sprite _defaultRightEyeSprite;
 
         public Action Despawn { get; set; }
-        
+
+        public void SetSentryGunState(bool isOn, CancellationTokenSource cancellationTokenSource)
+        {
+            if (isOn)
+            {
+                _sentryGunAnimator.gameObject.TrySetActive(true);
+                _sentryGunAnimator.PlayAnimation(cancellationTokenSource).Forget();
+            }
+            else
+            {
+                DisableSentryGunState();
+            }
+        }
+
+        private void DisableSentryGunState()
+        {
+            _sentryGunAnimator.StopAnimation();
+            _sentryGunAnimator.gameObject.TrySetActive(false);
+        }
+
         public void UpdateTailBend()
         {
             _tailView.UpdateTail();
@@ -105,20 +130,30 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _tailView.OnCreated();
             _leftEyeRenderer = _leftEye.GetComponent<SpriteRenderer>();
             _rightEyeRenderer = _rightEye.GetComponent<SpriteRenderer>();
-            if (_leftEyeRenderer != null) _defaultLeftEyeSprite = _leftEyeRenderer.sprite;
-            if (_rightEyeRenderer != null) _defaultRightEyeSprite = _rightEyeRenderer.sprite;
+            _defaultLeftEyeSprite = _leftEyeRenderer.sprite;
+            _defaultRightEyeSprite = _rightEyeRenderer.sprite;
         }
 
-        public void SetIsSpinned(bool isSpinned)
+        public void SetIsSpinned(bool isSpinned, CancellationTokenSource cancellationTokenSource)
         {
-            if (_leftEyeRenderer != null)
+            _leftEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultLeftEyeSprite;
+            _rightEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultRightEyeSprite;
+
+            if (isSpinned)
             {
-                _leftEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultLeftEyeSprite;
+                _spinnedEyesCanvas.enabled = true;
+                _spinnedEyesAnimator.PlayAnimation(cancellationTokenSource).Forget();   
             }
-            if (_rightEyeRenderer != null)
+            else
             {
-                _rightEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultRightEyeSprite;
+                DisableSpinned();
             }
+        }
+        
+        private void DisableSpinned()
+        {
+            _spinnedEyesAnimator.StopAnimation();
+            _spinnedEyesCanvas.enabled = false;
         }
 
         public void OnSpawned()
@@ -129,9 +164,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void OnDespawned()
         {
+            DisableSentryGunState();
+            DisableSpinned();
             gameObject.SetActive(false);
         }
-        
+
         public Transform GetSpaceShipTransform()
         {
             return _spaceShipTransform;
@@ -180,6 +217,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetIsTailWaving(bool isWaving)
         {
             _tailView.SetIsTailWaving(isWaving);
+        }
+
+        public void SetIsAimArrowShown(bool isShown)
+        {
+            _aimArrowTransform.gameObject.TrySetActive(isShown);
         }
     }
 }

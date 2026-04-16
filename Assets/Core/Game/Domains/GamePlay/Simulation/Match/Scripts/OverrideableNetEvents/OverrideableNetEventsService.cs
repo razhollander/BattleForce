@@ -6,20 +6,36 @@ using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents
 {
+    /// <summary>
+    /// Net Events that we want to be sent only once per tick are registered here
+    /// </summary>
     public class OverrideableNetEventsService : IOverrideableNetEventsService
     {
         private readonly INetEventsDataService _netEventsDataService;
         private FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> _updatePlayerTalentStocksNetEvents;
+        private FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C> _playerMaxShootCooldownChangedNetEvents;
 
         public OverrideableNetEventsService(INetEventsDataService netEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _netEventsDataService = netEventsDataService;
             _updatePlayerTalentStocksNetEvents = new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers * sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
+            _playerMaxShootCooldownChangedNetEvents = new FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void RegisterAllOverridableNetEvents()
         {
             ProcessUpdatePlayerTalentStocksNetEvents();
+            ProcessPlayerMaxShootCooldownChangedNetEvents();
+        }
+
+        private void ProcessPlayerMaxShootCooldownChangedNetEvents()
+        {
+            foreach (var netEvent in _playerMaxShootCooldownChangedNetEvents.AsSpan())
+            {
+                _netEventsDataService.AddPlayerMaxShootCooldownChangedNetEvent(netEvent.OccuredOnTick, netEvent.PlayerId, netEvent.MaxShootCooldown, netEvent.ShootCooldownSecondsLeft);
+            }
+
+            _playerMaxShootCooldownChangedNetEvents.Clear();
         }
 
         private void ProcessUpdatePlayerTalentStocksNetEvents()
@@ -47,7 +63,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEve
 
                 ref var netEvent = ref _updatePlayerTalentStocksNetEvents.GetByIndex(i);
                 netEvent.OccuredOnTick = onTick;
-                netEvent.CasterPlayerId = casterPlayerId;
                 netEvent.TalentType = talentType;
                 netEvent.CurrentStocksAmount = currentStocksAmount;
                 netEvent.RecieveNextStockOnTick = recieveNextStockOnTick;
@@ -60,6 +75,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEve
             packet.TalentType = talentType;
             packet.CurrentStocksAmount = currentStocksAmount;
             packet.RecieveNextStockOnTick = recieveNextStockOnTick;
+        }
+
+        public void OverridePlayerMaxShootCooldownChangedEvent(int onTick, ushort playerId, float maxShootCooldown, float cooldownSecondsLeft)
+        {
+            for (int i = 0; i < _playerMaxShootCooldownChangedNetEvents.Count; i++)
+            {
+                var evt = _playerMaxShootCooldownChangedNetEvents[i];
+                if (evt.PlayerId != playerId)
+                {
+                    continue;
+                }
+
+                ref var netEvent = ref _playerMaxShootCooldownChangedNetEvents.GetByIndex(i);
+                netEvent.OccuredOnTick = onTick;
+                netEvent.MaxShootCooldown = maxShootCooldown;
+                netEvent.ShootCooldownSecondsLeft = cooldownSecondsLeft;
+                return;
+            }
+
+            ref var packet = ref _playerMaxShootCooldownChangedNetEvents.AddAndGet();
+            packet.PlayerId = playerId;
+            packet.OccuredOnTick = onTick;
+            packet.MaxShootCooldown = maxShootCooldown;
+            packet.ShootCooldownSecondsLeft = cooldownSecondsLeft;
         }
     }
 }

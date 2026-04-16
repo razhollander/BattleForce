@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.S
             _lineRenderer.positionCount = totalPoints;
         }
 
-        private void SetSpringPoints(Vector2 startPoint, Vector2 endPoint, int totalPoints, Vector3 perpendicular)
+        private void SetSpringPoints(Vector2 startPoint, Vector2 endPoint, int totalPoints, Vector2 perpendicular)
         {
             for (int i = 0; i < totalPoints; i++)
             {
@@ -36,9 +36,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.S
             }
         }
 
-        private Vector3 CalculatePointPositionAlongWave(Vector2 startPoint, Vector2 endPoint, float interpolation, Vector3 perpendicular)
+        private Vector2 CalculatePointPositionAlongWave(Vector2 startPoint, Vector2 endPoint, float interpolation, Vector2 perpendicular)
         {
-            var basePosition = Vector3.Lerp(startPoint, endPoint, interpolation);
+            var basePosition = Vector2.Lerp(startPoint, endPoint, interpolation);
             float currentAngle = interpolation * _numberOfCoils * Mathf.PI * 2f;
             var sidewaysOffset = perpendicular * Mathf.Sin(currentAngle) * _coilWidth;
             return basePosition + sidewaysOffset;

@@ -13,7 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataServic
         {
             PlayerId = playerId;
             PlayerName = playerName;
-            Spaceship = spaceship;
+            Spaceship = spaceship.GetClone();
             TeamId = teamId;
         }
     }

@@ -4,10 +4,10 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHan
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
 using Zenject;
 

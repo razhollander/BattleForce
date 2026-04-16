@@ -20,7 +20,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly Dictionary<int, PlayerTalentControllers> _talentControllersPerPlayer;
         private readonly ConcurrentPool<PlayerTalentControllers> _talentControllersPool;
 
-        public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig, INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator, IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory)
+        public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig,
+            INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
+            IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory)
         {
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
@@ -93,8 +95,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 return false;
             }
 
-            var isTalentCurrentlyActive = _talentControllersPerPlayer[playerId].IsTalentCurrentlyActive(selectedTalent.TalentType);
-            if (isTalentCurrentlyActive)
+            if (selectedTalent.IsActive)
             {
                 return false;
             }

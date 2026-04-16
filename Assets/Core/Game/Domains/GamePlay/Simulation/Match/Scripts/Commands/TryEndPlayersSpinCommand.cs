@@ -1,19 +1,17 @@
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
-using System.Collections.Generic;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    public class CheckPlayersSpinEndedCommand : BaseCommand, ICommandVoid
+    public class TryEndPlayersSpinCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
-
-        private Dictionary<ushort, bool> _wasSpinningDict = new Dictionary<ushort, bool>();
+        
         private int _tick;
 
-        public CheckPlayersSpinEndedCommand SetTick(int tick)
+        public TryEndPlayersSpinCommand SetTick(int tick)
         {
             _tick = tick;
             return this;
@@ -29,15 +27,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
-                var isSpinningNow = player.Spaceship.Transform.AngularVelocity != 0;
-                _wasSpinningDict.TryGetValue(player.Id, out var wasSpinning);
-
-                if (wasSpinning && !isSpinningNow)
+                var isPlayerSpinned = player.Spaceship.IsSpinned;
+                var isPlayerAngularVelocityZero = player.Spaceship.Transform.AngularVelocity == 0;
+                var isNoLongerSpinning = isPlayerAngularVelocityZero && isPlayerSpinned;
+                if (!isNoLongerSpinning)
                 {
-                    _netEventsDataService.AddPlayerSpinnedEndedNetEvent(_tick, player.Id);
+                    continue;
                 }
 
-                _wasSpinningDict[player.Id] = isSpinningNow;
+                player.Spaceship.IsSpinned = false;
+                _netEventsDataService.AddPlayerSpinnedEndedNetEvent(_tick, player.Id);
             }
         }
     }
