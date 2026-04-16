@@ -22,11 +22,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
             _parent = parent;
         }
 
-        public void CreateView(Vector2 position, Quaternion rotation, Vector2 casterPosition)
+        public void CreateView(Vector2 position, Quaternion rotation, Vector2 casterPosition, bool isAttached)
         {
             _view = _grapplingHookProjectilePool.Spawn();
             _view.name =  HookProjectileName + _hookId;
             _view.transform.SetParent(_parent);
+            _view.SetIsAttached(isAttached);
             _view.Setup(position, rotation, casterPosition);
         }
 

@@ -59,7 +59,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void ProcessTalentInput(bool isTalentInputPressed, int tick, float deltaTime)
         {
-            if (IsCurrentlyActive || !isTalentInputPressed)
+            if (IsCurrentlyActive)
+            {
+                if (isTalentInputPressed)
+                {
+                    ref var currentProjectile = ref _matchDataService.SimulationState.GetGrapplingHookProjectileById(_projectileId);
+                    if (currentProjectile.IsAttached)
+                    {
+                        DeactivateTalent(tick);
+                    }
+                }
+                return;
+            }
+
+            if (!isTalentInputPressed)
             {
                 return;
             }
@@ -77,7 +90,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
             var velocity = direction * config.ProjectileSpeed;
             var size = _sharedConfig.GrapplingHookProjectileSize;
-            var projectilePosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
+            var projectilePosition = casterPlayerState.Spaceship.Transform.Position + direction * casterPlayerState.Spaceship.Transform.Radius;
             var projectile = _matchDataService.AddGrapplingHookProjectile(_casterPlayerId, projectilePosition, velocity);
             _projectileId = projectile.Id;
             _physicsSimulator.AddGrapplingHookProjectile(_projectileId, casterPlayerState.TeamId, projectile.Position, size, velocity);

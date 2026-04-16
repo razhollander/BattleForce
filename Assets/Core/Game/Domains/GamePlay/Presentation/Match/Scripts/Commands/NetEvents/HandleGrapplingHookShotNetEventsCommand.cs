@@ -38,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var casterPosition = _playerControllers.GetPlayerPosition(hookModel.PlayerCasterId);
                 var rotation = hookModel.Position - casterPosition.ToNumericsVector2();
 
-                _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, hookModel.PlayerCasterId, hookModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition);
+                _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, hookModel.PlayerCasterId, hookModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, hookModel.IsAttached);
                 _matchDataService.AddGrapplingHookProjectile(hookModel.Id, hookModel.PlayerCasterId, hookModel.Position);
 
                 // // Hide the aim arrow
