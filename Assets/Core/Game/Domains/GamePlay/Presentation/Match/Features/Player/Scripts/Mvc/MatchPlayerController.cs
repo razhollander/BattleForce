@@ -52,6 +52,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
+            SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
         }
 
         private void SetupPlayerAccordingToHisSelectedTalent(MatchPlayerModel playerModel)
@@ -189,6 +190,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsTailWaving(bool isMoving)
         {
             _playerView.SetIsTailWaving(isMoving);
+        }
+
+        public void SetPlayersSpinnedState(bool isOn)
+        {
+            _playerView.SetIsSpinned(isOn, _stageCancellationTokenProvider.CancellationTokenSource);
         }
     }
 }

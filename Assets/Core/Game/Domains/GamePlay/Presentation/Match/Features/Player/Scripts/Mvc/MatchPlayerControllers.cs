@@ -82,7 +82,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             GetPlayer(playerId).SetSentryGunState(isSentryGun, _stageCancellationTokenProvider.CancellationTokenSource);
         }
-        
+
+        public void SetPlayersSpinnedState(ushort playerId, bool isOn)
+        {
+            GetPlayer(playerId).SetPlayersSpinnedState(isOn);
+        }
+
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)
         {
             GetPlayer(playerId).SetHealth(currentHealth, maxHealth);

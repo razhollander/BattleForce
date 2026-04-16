@@ -28,7 +28,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _gamePlayConfig = gamePlayConfig;
             _talentControllersPerPlayer = new Dictionary<int, PlayerTalentControllers>(networkConfig.MaxCap.ConcurrentPlayers);
-            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, overrideableNetEventsService, commandFactory),networkConfig.MaxCap.ConcurrentPlayers);
+
+            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(
+                () => new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, overrideableNetEventsService,
+                    commandFactory), networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)

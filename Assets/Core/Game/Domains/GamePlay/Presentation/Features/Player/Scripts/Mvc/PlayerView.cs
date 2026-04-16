@@ -32,8 +32,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private SpriteAnimator _sentryGunAnimator;
+        [SerializeField] private Sprite _spinnedEyesSprite;
+        [SerializeField] private Canvas _spinnedEyesCanvas;
+        [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         
         private Transform _transform;
+        private SpriteRenderer _leftEyeRenderer;
+        private SpriteRenderer _rightEyeRenderer;
+        private Sprite _defaultLeftEyeSprite;
+        private Sprite _defaultRightEyeSprite;
 
         public Action Despawn { get; set; }
 
@@ -121,6 +128,32 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _transform = transform;
             _loadingRingView.OnCreated();
             _tailView.OnCreated();
+            _leftEyeRenderer = _leftEye.GetComponent<SpriteRenderer>();
+            _rightEyeRenderer = _rightEye.GetComponent<SpriteRenderer>();
+            _defaultLeftEyeSprite = _leftEyeRenderer.sprite;
+            _defaultRightEyeSprite = _rightEyeRenderer.sprite;
+        }
+
+        public void SetIsSpinned(bool isSpinned, CancellationTokenSource cancellationTokenSource)
+        {
+            _leftEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultLeftEyeSprite;
+            _rightEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultRightEyeSprite;
+
+            if (isSpinned)
+            {
+                _spinnedEyesCanvas.enabled = true;
+                _spinnedEyesAnimator.PlayAnimation(cancellationTokenSource).Forget();   
+            }
+            else
+            {
+                DisableSpinned();
+            }
+        }
+        
+        private void DisableSpinned()
+        {
+            _spinnedEyesAnimator.StopAnimation();
+            _spinnedEyesCanvas.enabled = false;
         }
 
         public void OnSpawned()
@@ -132,9 +165,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnDespawned()
         {
             DisableSentryGunState();
+            DisableSpinned();
             gameObject.SetActive(false);
         }
-        
+
         public Transform GetSpaceShipTransform()
         {
             return _spaceShipTransform;

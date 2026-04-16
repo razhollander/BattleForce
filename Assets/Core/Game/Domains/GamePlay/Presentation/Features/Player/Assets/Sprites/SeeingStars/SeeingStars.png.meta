@@ -1,0 +1,505 @@
+fileFormatVersion: 2
+guid: f64655b0b10df441c805e6719ee0fa07
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2600398229611662288
+    second: SeeingStars_0
+  - first:
+      213: -5286127004656438834
+    second: SeeingStars_1
+  - first:
+      213: 6146805000580188127
+    second: SeeingStars_2
+  - first:
+      213: -593941788705896047
+    second: SeeingStars_3
+  - first:
+      213: 21892358056856987
+    second: SeeingStars_4
+  - first:
+      213: 1424643258793305775
+    second: SeeingStars_5
+  - first:
+      213: 5740759407816118081
+    second: SeeingStars_6
+  - first:
+      213: 808578597502446632
+    second: SeeingStars_7
+  - first:
+      213: -9089516057763264663
+    second: SeeingStars_8
+  - first:
+      213: -9032429271921020272
+    second: SeeingStars_9
+  - first:
+      213: 2401047617654775353
+    second: SeeingStars_10
+  - first:
+      213: -5521042280191839012
+    second: SeeingStars_11
+  - first:
+      213: 9494797553975345
+    second: SeeingStars_12
+  - first:
+      213: 6609209895470326989
+    second: SeeingStars_13
+  - first:
+      213: -4833658354070435667
+    second: SeeingStars_14
+  - first:
+      213: -4186898648023248431
+    second: SeeingStars_15
+  - first:
+      213: -5060855083481432346
+    second: SeeingStars_16
+  - first:
+      213: 4522459385887402604
+    second: SeeingStars_17
+  - first:
+      213: 5352587043064458904
+    second: SeeingStars_18
+  - first:
+      213: 4114335928521610225
+    second: SeeingStars_19
+  - first:
+      213: 204536665003798515
+    second: SeeingStars_20
+  - first:
+      213: 1129803707066757213
+    second: SeeingStars_21
+  - first:
+      213: -3761790044826470482
+    second: SeeingStars_22
+  - first:
+      213: 3614250376257937085
+    second: SeeingStars_23
+  - first:
+      213: -7187626030297969626
+    second: SeeingStars_24
+  - first:
+      213: 5575924069150285196
+    second: SeeingStars_25
+  - first:
+      213: 5805147018051104461
+    second: SeeingStars_26
+  - first:
+      213: -4275149669958769474
+    second: SeeingStars_27
+  - first:
+      213: -3482035312400806164
+    second: SeeingStars_28
+  - first:
+      213: -8734446475962207880
+    second: SeeingStars_29
+  - first:
+      213: 8660373035907311901
+    second: SeeingStars_30
+  - first:
+      213: -3668764950470473354
+    second: SeeingStars_31
+  - first:
+      213: 7596534419497841923
+    second: SeeingStars_32
+  - first:
+      213: -4904210117883489877
+    second: SeeingStars_33
+  - first:
+      213: -6470747285989092434
+    second: SeeingStars_34
+  - first:
+      213: 827924366416153068
+    second: SeeingStars_35
+  - first:
+      213: 1047498725284060438
+    second: SeeingStars_36
+  - first:
+      213: -2062242828120339611
+    second: SeeingStars_37
+  - first:
+      213: 8844524821760986260
+    second: SeeingStars_38
+  - first:
+      213: 1673150054571414337
+    second: SeeingStars_39
+  - first:
+      213: -150853901214623342
+    second: SeeingStars_40
+  - first:
+      213: 1831986322015938935
+    second: SeeingStars_41
+  - first:
+      213: -6814139959387405015
+    second: SeeingStars_42
+  - first:
+      213: -5725932263787138365
+    second: SeeingStars_43
+  - first:
+      213: 4707859165981207996
+    second: SeeingStars_44
+  - first:
+      213: -922861276106861769
+    second: SeeingStars_45
+  - first:
+      213: 6101917998333582453
+    second: SeeingStars_46
+  - first:
+      213: 8675069483004262052
+    second: SeeingStars_47
+  - first:
+      213: -2511236558211456282
+    second: SeeingStars_48
+  - first:
+      213: -2525762966095258995
+    second: SeeingStars_49
+  - first:
+      213: 7818748344219334892
+    second: SeeingStars_50
+  - first:
+      213: 2267115880193919177
+    second: SeeingStars_51
+  - first:
+      213: -3858341378020705800
+    second: SeeingStars_52
+  - first:
+      213: 3432276732106980408
+    second: SeeingStars_53
+  - first:
+      213: 2299760946414811706
+    second: SeeingStars_54
+  - first:
+      213: -5667258154854220742
+    second: SeeingStars_55
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SeeingStars_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 292
+        width: 292
+        height: 292
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65d9b689685f8422093242d59eca9b4e
+      internalID: 1923984289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SeeingStars_1
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 292
+        width: 292
+        height: 292
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c2efa287e6240441fa1e62b05d4f9cec
+      internalID: -1946990444
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SeeingStars_2
+      rect:
+        serializedVersion: 2
+        x: 584
+        y: 292
+        width: 292
+        height: 292
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 64cd4fbc6a8fa4fe0b7227e170661703
+      internalID: -1834032033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SeeingStars_3
+      rect:
+        serializedVersion: 2
+        x: 876
+        y: 292
+        width: 292
+        height: 292
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2ae18cf1518b4155924409b37d834dc
+      internalID: 1240020772
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SeeingStars_4
+      rect:
+        serializedVersion: 2
+        x: 1168
+        y: 292
+        width: 292
+        height: 292
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2adb2de85fe9442e94fe49778eb0d18
+      internalID: -624470122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SeeingStars_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 292
+        height: 292
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff6c489bfd2574ef1b54291f6fc67846
+      internalID: 1745448159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SeeingStars_6
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 0
+        width: 292
+        height: 292
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5dad2c2dc3ad34255a5436a3723fa217
+      internalID: 1109747611
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SeeingStars_7
+      rect:
+        serializedVersion: 2
+        x: 584
+        y: 0
+        width: 292
+        height: 292
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92a303b7135744b668dc2dfc0e0a4480
+      internalID: 2125977674
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SeeingStars_8
+      rect:
+        serializedVersion: 2
+        x: 876
+        y: 0
+        width: 292
+        height: 292
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd493c02666b9470b998c93faacf42d8
+      internalID: -1428976760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: ff08d506e2ee34d4b82264fea4fc9646
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      SeeingStars_0: 1923984289
+      SeeingStars_1: -1946990444
+      SeeingStars_2: -1834032033
+      SeeingStars_3: 1240020772
+      SeeingStars_4: -624470122
+      SeeingStars_5: 1745448159
+      SeeingStars_6: 1109747611
+      SeeingStars_7: 2125977674
+      SeeingStars_8: -1428976760
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

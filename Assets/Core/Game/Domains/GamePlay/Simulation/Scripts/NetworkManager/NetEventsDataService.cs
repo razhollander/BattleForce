@@ -25,6 +25,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>> PlayerSwapNetEventsPerPlayer { get; private set;} // todo: remove events related to player hit when player is destroyed
         public CapacityDict<ushort, FixedClassUnorderedList<TalentCardObtainedNetEventS2C>> TalentCardObtainedNetEventsPerPlayer { get; private set; } // todo: remove events related to player hit when player is destroyed
         public CapacityDict<ushort, FixedUnorderedList<TalentCardHitNetEventS2C>> TalentCardHitNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>> PlayerSpinnedStartedNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>> PlayerSpinnedEndedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> PowerUpBallSpawnedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> PowerUpBallObtainedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> PlayerSwitchTeamNetEventsPerPlayer { get; }
@@ -58,6 +60,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<PlayersSwapNetEventS2C>> _playerSwapListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<TalentCardObtainedNetEventS2C>> _talentCardObtainedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TalentCardHitNetEventS2C>> _talentCardHitListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>> _playerSpinnedStartedListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>> _playerSpinnedEndedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> _powerUpBallsSpawnedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> _powerUpBallsObtainedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> _playerSwitchTeamListPool;
@@ -94,6 +98,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerSwapNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>>(maxConcurrentPlayers);
             TalentCardObtainedNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<TalentCardObtainedNetEventS2C>>(maxConcurrentPlayers);
             TalentCardHitNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<TalentCardHitNetEventS2C>>(maxConcurrentPlayers);
+            PlayerSpinnedStartedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>>(maxConcurrentPlayers);
+            PlayerSpinnedEndedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>>(maxConcurrentPlayers);
             PowerUpBallSpawnedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>>(maxConcurrentPlayers);
             PowerUpBallObtainedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>>(maxConcurrentPlayers);
             PlayerSwitchTeamNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(maxConcurrentPlayers);
@@ -138,6 +144,8 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             _playerSwapListPool= new ConcurrentPool<FixedUnorderedList<PlayersSwapNetEventS2C>>(() => new FixedUnorderedList<PlayersSwapNetEventS2C>(networkConfig.MaxCap.PlayerSwapNetEvents), maxConcurrentPlayers);
             _talentCardObtainedListPool = new ConcurrentPool<FixedClassUnorderedList<TalentCardObtainedNetEventS2C>>(() => new FixedClassUnorderedList<TalentCardObtainedNetEventS2C>(networkConfig.MaxCap.TalentCardObtainedNetEvent, ()=>new TalentCardObtainedNetEventS2C()), maxConcurrentPlayers);
             _talentCardHitListPool = new ConcurrentPool<FixedUnorderedList<TalentCardHitNetEventS2C>>(() => new FixedUnorderedList<TalentCardHitNetEventS2C>(networkConfig.MaxCap.TalentCardHitNetEvents), maxConcurrentPlayers);
+            _playerSpinnedStartedListPool = new ConcurrentPool<FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>>(() => new FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedStartedNetEvents), maxConcurrentPlayers);
+            _playerSpinnedEndedListPool = new ConcurrentPool<FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>>(() => new FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedEndedNetEvents), maxConcurrentPlayers);
             _powerUpBallsSpawnedListPool = new ConcurrentPool<FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>>(() => new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents), maxConcurrentPlayers);
             _powerUpBallsObtainedListPool = new ConcurrentPool<FixedUnorderedList<PowerUpBallObtainedNetEventS2C>>(() => new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents), maxConcurrentPlayers);
             _playerSwitchTeamListPool = new ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(() => new FixedUnorderedList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents), maxConcurrentPlayers);
@@ -245,6 +253,20 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             if (!TalentCardHitNetEventsPerPlayer.ContainsKey(playerId))
             {
                 TalentCardHitNetEventsPerPlayer.Add(playerId, _talentCardHitListPool.Get());
+            }
+
+            if (!PlayerSpinnedStartedNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                PlayerSpinnedStartedNetEventsPerPlayer.Add(playerId, _playerSpinnedStartedListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {playerId}");
+            }
+
+            if (!PlayerSpinnedEndedNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                PlayerSpinnedEndedNetEventsPerPlayer.Add(playerId, _playerSpinnedEndedListPool.Get());
             }
             else
             {
@@ -439,6 +461,13 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             var talentCardHitList = TalentCardHitNetEventsPerPlayer[playerId];
             talentCardHitList.Clear();
             _talentCardHitListPool.Return(talentCardHitList);
+
+            var playerSpinnedList = PlayerSpinnedStartedNetEventsPerPlayer[playerId];
+            playerSpinnedList.Clear();
+            _playerSpinnedStartedListPool.Return(playerSpinnedList);
+            var playerSpinnedEndedList = PlayerSpinnedEndedNetEventsPerPlayer[playerId];
+            playerSpinnedEndedList.Clear();
+            _playerSpinnedEndedListPool.Return(playerSpinnedEndedList);
             var powerUpBallsSpawnedList = PowerUpBallSpawnedNetEventsPerPlayer[playerId];
             powerUpBallsSpawnedList.Clear();
             _powerUpBallsSpawnedListPool.Return(powerUpBallsSpawnedList);
@@ -526,6 +555,8 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
             PlayerSwapNetEventsPerPlayer.Remove(playerId);
             TalentCardObtainedNetEventsPerPlayer.Remove(playerId);
             TalentCardHitNetEventsPerPlayer.Remove(playerId);
+            PlayerSpinnedStartedNetEventsPerPlayer.Remove(playerId);
+            PlayerSpinnedEndedNetEventsPerPlayer.Remove(playerId);
             PowerUpBallSpawnedNetEventsPerPlayer.Remove(playerId);
             PowerUpBallObtainedNetEventsPerPlayer.Remove(playerId);
             PlayerSwitchTeamNetEventsPerPlayer.Remove(playerId);
@@ -716,6 +747,27 @@ _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEvent
                     if(bulletSpawnNetEvents[i].OccuredOnTick<tick)
                     {
                         bulletSpawnNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PlayerSpinnedStartedNetEventsPerPlayer.TryGetValue(playerId, out var playerSpinnedNetEvents))
+            {
+                for (var i = playerSpinnedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerSpinnedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerSpinnedNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+            if (PlayerSpinnedEndedNetEventsPerPlayer.TryGetValue(playerId, out var playerSpinnedEndedNetEvents))
+            {
+                for (var i = playerSpinnedEndedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerSpinnedEndedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerSpinnedEndedNetEvents.RemoveAt(i);
                     }
                 }
             }
@@ -1122,6 +1174,26 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                 packet.OccuredOnTick = onTick;
                 packet.PlayerId = playerId;
                 packet.NewTalentIndex = newTalentIndex;
+            }
+        }
+
+        public void AddPlayerSpinnedStartedNetEvent(int onTick, ushort playerId)
+        {
+            foreach (var kvp in PlayerSpinnedStartedNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
+            }
+        }
+
+        public void AddPlayerSpinnedEndedNetEvent(int onTick, ushort playerId)
+        {
+            foreach (var kvp in PlayerSpinnedEndedNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
             }
         }
 
