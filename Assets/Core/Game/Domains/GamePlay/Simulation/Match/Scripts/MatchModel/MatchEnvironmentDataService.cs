@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private readonly FixedClassUnorderedList<EnvironmentSpringS2C> _springs;
         private readonly FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> _teleportGates;
         private readonly FixedClassUnorderedList<EnvironmentWallS2C> _lavaWalls;
+        private readonly FixedClassUnorderedList<EnvironmentWallS2C> _stageBoundaries;
         private readonly FixedClassUnorderedList<EnvironmentWallS2C> _walls;
         private readonly FixedClassUnorderedList<EnvironmentRotatingWheelS2C> _rotatingWheels;
         private readonly FixedClassUnorderedList<MatchEnvironmentFieldBarrierModel> _fieldBarriers;
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public FixedClassUnorderedList<EnvironmentSpringS2C> Springs => _springs;
         public FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> TeleportGates => _teleportGates;
         public FixedClassUnorderedList<EnvironmentWallS2C> LavaWalls => _lavaWalls;
+        public FixedClassUnorderedList<EnvironmentWallS2C> StageBoundaries => _stageBoundaries;
         public FixedClassUnorderedList<EnvironmentWallS2C> Walls => _walls;
         public FixedClassUnorderedList<MatchEnvironmentFieldBarrierModel> FieldBarriers => _fieldBarriers;
 
@@ -31,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             _springs = new FixedClassUnorderedList<EnvironmentSpringS2C>(networkConfig.MaxCap.ConcurrentEvironmentSprings, ()=> new EnvironmentSpringS2C());
             _teleportGates = new FixedClassUnorderedList<EnvironmentTeleportGatePairS2C>(networkConfig.MaxCap.ConcurrentEvironmentTeleportPairs, ()=> new EnvironmentTeleportGatePairS2C());
             _lavaWalls = new FixedClassUnorderedList<EnvironmentWallS2C>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls, ()=> new EnvironmentWallS2C());
+            _stageBoundaries = new FixedClassUnorderedList<EnvironmentWallS2C>(networkConfig.MaxCap.ConcurrentEvironmentStageBoundaries, ()=> new EnvironmentWallS2C());
             _walls = new FixedClassUnorderedList<EnvironmentWallS2C>(networkConfig.MaxCap.ConcurrentEvironmentWalls, ()=> new EnvironmentWallS2C());
             _rotatingWheels = new FixedClassUnorderedList<EnvironmentRotatingWheelS2C>(networkConfig.MaxCap.ConcurrentEnvironmentRotatingWheels, ()=> new EnvironmentRotatingWheelS2C(networkConfig.MaxCap.EnvironmentRotatingWheelCap));
             _fieldBarriers = new FixedClassUnorderedList<MatchEnvironmentFieldBarrierModel>(networkConfig.MaxCap.ConcurrentFieldBarriers, () => new MatchEnvironmentFieldBarrierModel());
@@ -41,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             _springs.Clear();
             _teleportGates.Clear();
             _lavaWalls.Clear();
+            _stageBoundaries.Clear();
             _walls.Clear();
             _fieldBarriers.Clear();
 
@@ -71,6 +75,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             lavaWall.Transform.WorldPosition = worldPosition;
         }
         
+        public void AddStageBoundary(ushort stageBoundaryId, Vector2[] Points, Vector2 localPosition, Vector2 worldPosition, float worldRotationDegrees)
+        {
+            var stageBoundary = _stageBoundaries.AddAndGet();
+            stageBoundary.Id = stageBoundaryId;
+            stageBoundary.SetPoints(Points);
+            stageBoundary.Transform.WorldRotationDegrees = worldRotationDegrees;
+            stageBoundary.Transform.LocalPosition = localPosition;
+            stageBoundary.Transform.WorldPosition = worldPosition;
+        }
+
         public void AddSpring(ushort springId, Vector2 localPosition, Vector2 worldPosition, float localRotationDegrees, float worldRotationDegrees)
         {
             var spring = _springs.AddAndGet();
@@ -131,6 +145,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public EnvironmentWallS2C GetLavaWall(ushort lavaWallId)
         {
             return _lavaWalls.FindWithId(lavaWallId);
+        }
+
+        public EnvironmentWallS2C GetStageBoundary(ushort stageBoundaryId)
+        {
+            return _stageBoundaries.FindWithId(stageBoundaryId);
         }
         
         public EnvironmentWallS2C GetWall(ushort wallId)

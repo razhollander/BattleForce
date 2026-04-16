@@ -66,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             CreateWalls();
             CreateLavaWalls();
+            CreateStageBoundaries();
             CreateTalentCards();
             CreateEnvironmentSprings();
             CreateTeleportGates();
@@ -270,6 +271,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService.EnvironmentData.AddLavaWall(lavaWallId, lavaWallPoints, lavaWallLocalPosition, lavaWallWorldPosition, lavaWallWorldRotationAngle);
             _physicsSimulator.AddLavaWall(lavaWallId, lavaWallPoints, lavaWallWorldPosition);
+        }
+
+        private void CreateStageBoundaries()
+        {
+            var stageBoundaryConfigs = _matchEnvironmentConfigDataService.StageBoundaries;
+            if (stageBoundaryConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var boundaryConfig in stageBoundaryConfigs)
+            {
+                AddStageBoundaryToEnvironment(boundaryConfig.Id, boundaryConfig.Points, boundaryConfig.Position, boundaryConfig.Position, 0);
+            }
+        }
+
+        private void AddStageBoundaryToEnvironment(ushort stageBoundaryId, Vector2[] stageBoundaryPoints, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle)
+        {
+            _matchDataService.EnvironmentData.AddStageBoundary(stageBoundaryId, stageBoundaryPoints, localPosition, worldPosition, worldRotationAngle);
+            _physicsSimulator.AddStageBoundary(stageBoundaryId, stageBoundaryPoints, worldPosition);
         }
 
         private void CreateTalentCards()

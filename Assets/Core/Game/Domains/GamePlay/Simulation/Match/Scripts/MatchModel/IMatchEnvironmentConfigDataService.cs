@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         EnvironmentSpringConfig[] EnvironmentSprings { get; }
         EnvironmentTeleportGatePairConfig[] TeleportGates { get; }
         WallConfig[] LavaWallConfigs { get; }
+        WallConfig[] StageBoundaries { get; }
         WallConfig[] WallConfigs { get; }
         EnvironmentRotatingWheelConfig[] RotatingWheels { get; }
         EnvironmentFieldBarrierConfig[] FieldBarrierConfigs { get; }

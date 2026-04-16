@@ -27,6 +27,7 @@ namespace Core.Scripts.Network
         public int ConcurrentTalentCards = 128;
         public int ConcurrentEvironmentWalls = 256;
         public int ConcurrentEvironmentLavaWalls = 64;
+        public int ConcurrentEvironmentStageBoundaries = 64;
         public int ConcurrentEvironmentTeleportPairs = 4;
         public int ConcurrentEvironmentSprings = 32;
         public int PacketTypes = 256; // if one day this is changed to a bigger number, need to parse packet types as ushort instead of byte
