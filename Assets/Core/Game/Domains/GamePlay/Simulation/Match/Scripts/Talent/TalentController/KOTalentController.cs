@@ -8,8 +8,10 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
+using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
@@ -23,19 +25,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
+        private readonly SpinPlayerCommand _spinPlayerCommand;
 
         public TalentType TalentType => TalentType.KO;
         public bool IsCurrentlyActive { get; private set; }
         private bool _isInReturnPhase;
 
         public KOTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
+            _spinPlayerCommand = commandFactory.CreateCommandVoid<SpinPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -142,7 +146,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             enemyPlayerState.Spaceship.Transform.Direction = pushDirection;
             enemyPlayerState.Spaceship.IsEngineOn = false;
 
-            _commandFactory.CreateCommandVoid<SpinPlayerCommand>()
+            _spinPlayerCommand
                 .SetPlayer(enemyPlayerId, enemyPlayerState.Spaceship)
                 .SetSpinAmount(randomSpin)
                 .SetTick(tick)
