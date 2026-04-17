@@ -51,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly UpdateKOProjectilesTransformCommand _updateKOProjectilesTransformCommand;
         private readonly HandlePerformDashPulseNetEventsCommand _handlePerformDashPulseNetEventsCommand;
         private readonly HandleUpdatePlayerTalentStocksNetEventsCommand _handleUpdatePlayerTalentStocksNetEventsCommand;
+        private readonly HandleCreateMagenticPullFieldNetEventsCommand _handleCreateMagenticPullFieldNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -91,6 +92,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateKOProjectilesTransformCommand = commandFactory.CreateCommandVoid<UpdateKOProjectilesTransformCommand>();
             _handlePerformDashPulseNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformDashPulseNetEventsCommand>();
             _handleUpdatePlayerTalentStocksNetEventsCommand = commandFactory.CreateCommandVoid<HandleUpdatePlayerTalentStocksNetEventsCommand>();
+            _handleCreateMagenticPullFieldNetEventsCommand = commandFactory.CreateCommandVoid<HandleCreateMagenticPullFieldNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -137,6 +139,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateSentryGunTalentNetEventsCommand.Execute();
             _handlePerformDashPulseNetEventsCommand.Execute();
             _handleUpdatePlayerTalentStocksNetEventsCommand.Execute();
+            _handleCreateMagenticPullFieldNetEventsCommand.Execute();
             _updateKOProjectilesTransformCommand.Execute(); // must be after _handleDeactivateKOTalentNetEventsCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();

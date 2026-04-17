@@ -52,6 +52,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ISwapFieldControllers _swapFieldControllers;
         private IKOProjectilesControllers _koProjectilesControllers;
         private IDashPulseGustEffectController _dashPulseGustEffectController;
+        private Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts.IMagneticPullEffectController _magneticPullEffectController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -83,6 +84,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _swapFieldControllers = _diContainer.Resolve<ISwapFieldControllers>();
             _koProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
+            _magneticPullEffectController = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts.IMagneticPullEffectController>();
         }
 
         public void Execute()
@@ -109,6 +111,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
              _matchDataService.SetLocalPlayer(_enterData.LocalPlayerId);
             _gainBoltEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
+            _magneticPullEffectController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }

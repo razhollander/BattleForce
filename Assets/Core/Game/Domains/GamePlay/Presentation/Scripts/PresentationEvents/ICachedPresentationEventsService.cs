@@ -36,5 +36,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents { get; }
         List<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents { get; }
         List<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents { get; }
+        List<CreateMagenticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents { get; }
     }
 }

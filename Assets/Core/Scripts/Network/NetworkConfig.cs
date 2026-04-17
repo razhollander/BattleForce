@@ -88,6 +88,7 @@ namespace Core.Scripts.Network
         public int PlayerMaxShootCooldownChangedNetEvents = 128;
         public int PlayerSpinnedStartedNetEvents = 128;
         public int PlayerSpinnedEndedNetEvents = 128;
+        public int CreateMagenticPullFieldNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel

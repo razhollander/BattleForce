@@ -54,6 +54,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private SwapFieldView _swapFieldViewPrefab;
         [SerializeField] private KOProjectileView _koProjectileViewPrefab;
         [SerializeField] private DashPulseGustEffectView _dashPulseGustEffectViewPrefab;
+        [SerializeField] private Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts.MagneticPullFieldView _magneticPullFieldViewPrefab;
+        [SerializeField] private Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts.MagneticPullHitEffectView _magneticPullHitEffectViewPrefab;
 
         public override void InstallBindings()
         {
@@ -93,6 +95,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<EnvironmentFieldBarrierControllers>().AsSingle().WithArguments(_environmentFieldBarrierViewPrefab).NonLazy();
             Container.BindInterfacesTo<KOProjectilesControllers>().AsSingle().WithArguments(_koProjectileViewPrefab).NonLazy();
             Container.BindInterfacesTo<DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts.MagneticPullEffectController>().AsSingle().WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab).NonLazy();
         }
     }
 }

@@ -56,6 +56,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PerformDashPulseNetEventS2C> _cachedUnprocessedPerformDashPulseEvents;
         private readonly CapacityList<UpdatePlayerTalentStocksNetEventS2C> _cachedUnprocessedUpdatePlayerTalentStocksEvents;
         private readonly CapacityList<PlayerMaxShootCooldownChangedNetEventS2C> _cachedUnprocessedPlayerMaxShootCooldownChangedEvents;
+        private readonly CapacityList<CreateMagenticPullFieldNetEventS2C> _cachedUnprocessedCreateMagenticPullFieldEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
@@ -97,6 +98,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPerformDashPulseEvents = new CapacityList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents);
             _cachedUnprocessedUpdatePlayerTalentStocksEvents = new CapacityList<UpdatePlayerTalentStocksNetEventS2C>(networkConfig.MaxCap.UpdatePlayerTalentStocksNetEvents);
             _cachedUnprocessedPlayerMaxShootCooldownChangedEvents = new CapacityList<PlayerMaxShootCooldownChangedNetEventS2C>(networkConfig.MaxCap.PlayerMaxShootCooldownChangedNetEvents);
+            _cachedUnprocessedCreateMagenticPullFieldEvents = new CapacityList<CreateMagenticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagenticPullFieldNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -151,6 +153,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPerformDashPulseEvents(latestFullTickPacket.PerformDashPulseNetEvents);
             ProcessUpdatePlayerTalentStockEvents(latestFullTickPacket.UpdatePlayerTalentStocksNetEvents);
             ProcessPlayerMaxShootCooldownChangedEvents(latestFullTickPacket.PlayerMaxShootCooldownChangedNetEvents);
+            ProcessCreateMagenticPullFieldEvents(latestFullTickPacket.CreateMagenticPullFieldNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
@@ -382,6 +385,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedPlayerMaxShootCooldownChangedEvents.Sort();
                 _presentationNetEventsHandler.ProcessPlayerMaxShootCooldownChangedEvents(_cachedUnprocessedPlayerMaxShootCooldownChangedEvents);
+            }
+        }
+
+        private void ProcessCreateMagenticPullFieldEvents(FixedUnorderedList<CreateMagenticPullFieldNetEventS2C> events)
+        {
+            _cachedUnprocessedCreateMagenticPullFieldEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedCreateMagenticPullFieldEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedCreateMagenticPullFieldEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedCreateMagenticPullFieldEvents.Sort();
+                _presentationNetEventsHandler.ProcessCreateMagenticPullFieldEvents(_cachedUnprocessedCreateMagenticPullFieldEvents);
             }
         }
 

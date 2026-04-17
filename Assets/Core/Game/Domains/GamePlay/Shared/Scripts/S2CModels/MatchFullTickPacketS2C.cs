@@ -42,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
         public FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C> PlayerMaxShootCooldownChangedNetEvents;
+        public FixedUnorderedList<CreateMagenticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -82,6 +83,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PlayerMaxShootCooldownChangedNetEvents = new FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>(maxCap.PlayerMaxShootCooldownChangedNetEvents);
             ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
             DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
+            CreateMagenticPullFieldNetEvents = new FixedUnorderedList<CreateMagenticPullFieldNetEventS2C>(maxCap.CreateMagenticPullFieldNetEvents);
         }
         
         // public FullTickPacket(int tick, SimulationStateS2C previousSimulationState,
@@ -131,6 +133,16 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedPlayerSpinnedEndedEvents(writer);
             SerializedDestroySwapFieldNetEvents(writer);
             SerializedPlayerMaxShootCooldownChangedNetEvents(writer);
+            SerializedCreateMagenticPullFieldNetEvents(writer);
+        }
+
+        private void SerializedCreateMagenticPullFieldNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)CreateMagenticPullFieldNetEvents.Count);
+            foreach (var netEvent in CreateMagenticPullFieldNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -319,6 +331,18 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedPlayerSpinnedEndedEvents(reader);
             DeserializedDestroySwapFieldNetEvents(reader);
             DeserializedPlayerMaxShootCooldownChangedNetEvents(reader);
+            DeserializedCreateMagenticPullFieldNetEvents(reader);
+        }
+
+        private void DeserializedCreateMagenticPullFieldNetEvents(NetDataReader reader)
+        {
+            CreateMagenticPullFieldNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref CreateMagenticPullFieldNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
         }
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)

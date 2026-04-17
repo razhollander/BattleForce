@@ -36,5 +36,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents { get; } = new();
         // public List<DeactivateDashPulseTalentNetEventS2C> DeactivateDashPulseTalentNetEvents { get; } = new();
         public List<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents { get; } = new();
+        public List<CreateMagenticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents { get; } = new();
     }
 }
