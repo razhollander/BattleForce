@@ -10,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
         [SerializeField] private float _coilWidth = 1f;
         [SerializeField] private int _numberOfCoils = 8;
         [SerializeField] private int _pointsPerCoil = 15;
+        [SerializeField] private Transform _hookPivot;
         
         private bool _isAttached;
 
@@ -24,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
         public void SetTransform(Vector2 hookPosition, Quaternion rotation, Vector2 lineStartPosition)
         {
             Transform.SetPositionAndRotation(hookPosition, rotation);
-            UpdateLineRenderer(hookPosition, lineStartPosition);
+            UpdateLineRenderer(_hookPivot.position, lineStartPosition);
         }
 
         public void SetIsAttached(bool isAttached)
