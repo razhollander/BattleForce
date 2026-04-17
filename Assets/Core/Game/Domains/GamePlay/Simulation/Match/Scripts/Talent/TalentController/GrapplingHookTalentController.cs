@@ -173,7 +173,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 else
                 {
                     var distanceTraveled = Vector2.Distance(projectile.StartPosition, projectile.Position);
-                    var didHookReachMaxDistance = distanceTraveled >= config.MaxDistance;
+                    var didHookReachMaxDistance = distanceTraveled >= _sharedConfig.GrapplingHookProjectileMaxDistance;
 
                     if (didHookReachMaxDistance)
                     {

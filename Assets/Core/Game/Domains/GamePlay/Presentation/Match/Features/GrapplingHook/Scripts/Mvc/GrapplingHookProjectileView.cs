@@ -7,18 +7,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
     public class GrapplingHookProjectileView : MonoBehaviour, IPoolable
     {
         [SerializeField] private LineRenderer _lineRenderer;
-        [SerializeField] private float _coilWidth = 1f;
+        [SerializeField] private float _coilWidth = 0.3f;
         [SerializeField] private int _numberOfCoils = 8;
         [SerializeField] private int _pointsPerCoil = 15;
         [SerializeField] private Transform _hookPivot;
         
         private bool _isAttached;
+        private float _maxDistance;
 
         public Transform Transform { get; private set; }
         public Action Despawn { get; set; }
 
-        public void Setup(Vector2 hookPosition, Quaternion rotation, Vector2 lineStartPosition)
+        public void Setup(Vector2 hookPosition, Quaternion rotation, Vector2 lineStartPosition, float maxDistance)
         {
+            _maxDistance = maxDistance;
             SetTransform(hookPosition, rotation, lineStartPosition);
         }
 
@@ -35,6 +37,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
 
         private void UpdateLineRenderer(Vector2 startPosition, Vector2 endPosition)
         {
+            float currentDistance = Vector2.Distance(startPosition, endPosition);
+            float stretchFactor = Mathf.Clamp01(1f - (currentDistance / _maxDistance));
+
             if (_isAttached)
             {
                 _lineRenderer.positionCount = 2;
@@ -52,7 +57,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
                     float interpolation = (float)i / (totalPoints - 1);
                     var basePosition = Vector2.Lerp(startPosition, endPosition, interpolation);
                     float currentAngle = interpolation * _numberOfCoils * Mathf.PI * 2f;
-                    var sidewaysOffset = perpendicular * Mathf.Sin(currentAngle) * _coilWidth;
+                    
+                    // The spiral also gets thinner as it stretches
+                    float dynamicCoilWidth = _coilWidth * stretchFactor;
+                    var sidewaysOffset = perpendicular * Mathf.Sin(currentAngle) * dynamicCoilWidth;
+                    
                     var finalPosition = basePosition + sidewaysOffset;
                     _lineRenderer.SetPosition(i, finalPosition);
                 }
@@ -67,7 +76,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
         public void OnCreated()
         {
             Transform = transform;
-            _lineRenderer.positionCount = 2;
         }
 
         public void OnSpawned()

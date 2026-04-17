@@ -9,13 +9,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
     public class GrapplingHookProjectilesControllers : IGrapplingHookProjectilesControllers
     {
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly GrapplingHookProjectilePool _pool;
         private readonly Dictionary<ushort, GrapplingHookProjectileController> _controllers = new();
         private Transform _parentTransform;
 
-        public GrapplingHookProjectilesControllers(GrapplingHookProjectileView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
+        public GrapplingHookProjectilesControllers(GrapplingHookProjectileView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _gamePlayConfig = gamePlayConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _pool = new GrapplingHookProjectilePool(prefab, diContainer);
         }
 
@@ -27,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
 
         public void CreateGrapplingHookProjectile(ushort hookId, ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 casterPosition, bool isAttached)
         {
-            var controller = new GrapplingHookProjectileController(hookId, casterPlayerId, _pool, _parentTransform);
+            var controller = new GrapplingHookProjectileController(hookId, casterPlayerId, _pool, _parentTransform, _sharedGamePlayConfig);
             controller.CreateView(position, rotation.ToQuaternion(), casterPosition, isAttached);
             _controllers.Add(hookId, controller);
         }
