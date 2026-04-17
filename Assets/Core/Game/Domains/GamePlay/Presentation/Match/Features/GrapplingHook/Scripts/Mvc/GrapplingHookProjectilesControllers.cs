@@ -27,10 +27,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
             _pool.InitPool();
         }
 
-        public void CreateGrapplingHookProjectile(ushort hookId, ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 casterPosition, bool isAttached)
+        public void CreateGrapplingHookProjectile(ushort hookId, ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 casterPosition, bool isHookAttached)
         {
             var controller = new GrapplingHookProjectileController(hookId, casterPlayerId, _pool, _parentTransform, _sharedGamePlayConfig);
-            controller.CreateView(position, rotation.ToQuaternion(), casterPosition, isAttached);
+            controller.CreateView(position, rotation.ToQuaternion(), casterPosition, isHookAttached);
             _controllers.Add(hookId, controller);
         }
 

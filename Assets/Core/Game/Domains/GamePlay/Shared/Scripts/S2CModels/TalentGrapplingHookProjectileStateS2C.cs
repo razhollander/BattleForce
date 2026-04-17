@@ -13,7 +13,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public Vector2 StartPosition;
         public Vector2 Position;
         public Vector2 Velocity;
-        public bool IsAttached;
+        public bool IsHookAttached;
         public ushort AttachedWallId;
         public Vector2 AttachedLocalPosition;
 
@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             writer.Put(Id);
             writer.Put(PlayerCasterId);
             writer.PutVector2Quantized(Position);
-            writer.Put(IsAttached);
+            writer.Put(IsHookAttached);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             Id = reader.GetUShort();
             PlayerCasterId = reader.GetUShort();
             Position = reader.GetVector2Quantized();
-            IsAttached = reader.GetBool();
+            IsHookAttached = reader.GetBool();
         }
 
         public void SerializeDelta(NetDataWriter writer)

@@ -24,13 +24,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
-        public void CreateView(Vector2 position, Quaternion rotation, Vector2 casterPosition, bool isAttached)
+        public void CreateView(Vector2 position, Quaternion rotation, Vector2 casterPosition, bool isHookAttached)
         {
             _view = _grapplingHookProjectilePool.Spawn();
             _view.name =  HookProjectileName + _hookId;
             _view.transform.SetParent(_parent);
-            _view.SetIsAttached(isAttached);
             _view.Setup(position, rotation, casterPosition, _sharedGamePlayConfig.GrapplingHookProjectileMaxDistance);
+            _view.SetIsHookAttached(isHookAttached);
         }
 
         public void InterpolateTransform(Vector2 position, Quaternion rotation, Vector2 casterPosition, float decay)
@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
 
         public void UpdateOnHit()
         {
-            _view.UpdateOnHit();
+            _view.SetIsHookAttached(true);
         }
 
         public void Destroy()

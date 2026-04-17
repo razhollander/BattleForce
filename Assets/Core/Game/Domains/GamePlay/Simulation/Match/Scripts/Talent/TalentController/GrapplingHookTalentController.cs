@@ -57,14 +57,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
         {
             if (IsCurrentlyActive)
             {
-                if (isTalentInputPressed)
+                if (wasTalentInputDownThisTick)
                 {
                     ref var currentProjectile = ref _matchDataService.SimulationState.GetGrapplingHookProjectileById(_projectileId);
-                    if (currentProjectile.IsAttached)
+                    if (currentProjectile.IsHookAttached)
                     {
                         DeactivateTalent(tick);
                     }
@@ -72,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            if (!isTalentInputPressed)
+            if (!wasTalentInputDownThisTick)
             {
                 return;
             }
@@ -87,10 +87,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _isInReturnPhase = false;
 
             var config = _gamePlayConfig.Talents.GrapplingHookTalentConfig;
-            var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            var velocity = direction * config.ProjectileSpeed;
+            var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var velocity = aimDirection * config.ProjectileSpeed;
             var size = _sharedConfig.GrapplingHookProjectileSize;
-            var projectilePosition = casterPlayerState.Spaceship.Transform.Position + direction * casterPlayerState.Spaceship.Transform.Radius;
+            var projectilePosition = casterPlayerState.Spaceship.Transform.Position + aimDirection * casterPlayerState.Spaceship.Transform.Radius;
             var projectile = _matchDataService.AddGrapplingHookProjectile(_casterPlayerId, projectilePosition, velocity);
             _projectileId = projectile.Id;
             _physicsSimulator.AddGrapplingHookProjectile(_projectileId, casterPlayerState.TeamId, projectile.Position, size, velocity);
@@ -137,7 +137,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
             else
             {
-                if (projectile.IsAttached)
+                if (projectile.IsHookAttached)
                 {
                     projectile = UpdateHookPositionRelativeToAttachedWall(projectile);
 
@@ -218,13 +218,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             ref var projectile = ref _matchDataService.SimulationState.GetGrapplingHookProjectileById(_projectileId);
-            if (projectile.IsAttached)
+            if (projectile.IsHookAttached)
             {
                 return;
             }
 
             _attachedOnTick = tick;
-            projectile.IsAttached = true;
+            projectile.IsHookAttached = true;
             projectile.Velocity = Vector2.Zero;
             projectile.AttachedWallId = wallId;
 

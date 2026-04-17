@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
         [SerializeField] private int _pointsPerCoil = 15;
         [SerializeField] private Transform _hookPivot;
         
-        private bool _isAttached;
+        private bool _isHookAttached;
         private float _maxDistance;
 
         public Transform Transform { get; private set; }
@@ -30,47 +30,48 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
             UpdateLineRenderer(_hookPivot.position, lineStartPosition);
         }
 
-        public void SetIsAttached(bool isAttached)
+        public void SetIsHookAttached(bool isHookAttached)
         {
-            _isAttached = isAttached;
+            _isHookAttached = isHookAttached;
         }
 
         private void UpdateLineRenderer(Vector2 startPosition, Vector2 endPosition)
         {
-            float currentDistance = Vector2.Distance(startPosition, endPosition);
-            float stretchFactor = Mathf.Clamp01(1f - (currentDistance / _maxDistance));
-
-            if (_isAttached)
+            if (_isHookAttached)
             {
-                _lineRenderer.positionCount = 2;
-                _lineRenderer.SetPosition(0, startPosition);
-                _lineRenderer.SetPosition(1, endPosition);
+                UpdateStriaghtLineRendererPoints(startPosition, endPosition);
             }
             else
             {
-                var totalPoints = _numberOfCoils * _pointsPerCoil;
-                _lineRenderer.positionCount = totalPoints;
-                var perpendicular = (Vector2)CoreDomain.Scripts.Utils.MathUtils.GetPerpendicularDirection(startPosition, endPosition);
-
-                for (int i = 0; i < totalPoints; i++)
-                {
-                    float interpolation = (float)i / (totalPoints - 1);
-                    var basePosition = Vector2.Lerp(startPosition, endPosition, interpolation);
-                    float currentAngle = interpolation * _numberOfCoils * Mathf.PI * 2f;
-                    
-                    // The spiral also gets thinner as it stretches
-                    float dynamicCoilWidth = _coilWidth * stretchFactor;
-                    var sidewaysOffset = perpendicular * Mathf.Sin(currentAngle) * dynamicCoilWidth;
-                    
-                    var finalPosition = basePosition + sidewaysOffset;
-                    _lineRenderer.SetPosition(i, finalPosition);
-                }
+                UpdateWavyLineRendererPoints(startPosition, endPosition);
             }
         }
 
-        public void UpdateOnHit()
+        private void UpdateWavyLineRendererPoints(Vector2 startPosition, Vector2 endPosition)
         {
-            SetIsAttached(true);
+            float currentDistance = Vector2.Distance(startPosition, endPosition);
+            float stretchFactor = Mathf.Clamp01(1f - (currentDistance / _maxDistance));
+            var totalPoints = _numberOfCoils * _pointsPerCoil;
+            _lineRenderer.positionCount = totalPoints;
+            var perpendicular = (Vector2)CoreDomain.Scripts.Utils.MathUtils.GetPerpendicularDirection(startPosition, endPosition);
+
+            for (int i = 0; i < totalPoints; i++)
+            {
+                var interpolation = (float)i / (totalPoints - 1);
+                var basePosition = Vector2.Lerp(startPosition, endPosition, interpolation);
+                var currentAngle = interpolation * _numberOfCoils * Mathf.PI * 2f;
+                var dynamicCoilWidth = _coilWidth * stretchFactor;
+                var sidewaysOffset = perpendicular * Mathf.Sin(currentAngle) * dynamicCoilWidth;
+                var finalPosition = basePosition + sidewaysOffset;
+                _lineRenderer.SetPosition(i, finalPosition);
+            }
+        }
+
+        private void UpdateStriaghtLineRendererPoints(Vector2 startPosition, Vector2 endPosition)
+        {
+            _lineRenderer.positionCount = 2;
+            _lineRenderer.SetPosition(0, startPosition);
+            _lineRenderer.SetPosition(1, endPosition);
         }
 
         public void OnCreated()
@@ -80,7 +81,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
 
         public void OnSpawned()
         {
-            _isAttached = false;
+            _isHookAttached = false;
             gameObject.SetActive(true);
         }
 

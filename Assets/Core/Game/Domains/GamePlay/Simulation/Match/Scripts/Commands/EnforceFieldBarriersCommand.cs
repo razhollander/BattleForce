@@ -105,14 +105,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
         }
         
-        /// <summary>
-        /// Calculates the sliding direction (black arrow) based on 
-        /// movement direction (red) and the surface normal (green).
-        /// </summary>
-        /// <param name="playerVelocity">The player's current movement (Red Arrow)</param>
-        /// <param name="barrierCenter">The center point of the blue sphere</param>
-        /// <param name="playerPosition">The current position of the player</param>
-        /// <returns>The direction tangent to the sphere (Black Arrow)</returns>
         private Vector2 GetPlayerSlidingVeclocityAlongBarrier(Vector2 playerVelocity, Vector2 barrierCenter, Vector2 playerPosition)
         {
             var normal = (playerPosition - barrierCenter).Normalize();
