@@ -89,6 +89,7 @@ namespace Core.Scripts.Network
         public int CreateGrapplingHookProjectileNetEvents = 128;
         public int GrapplingHookHitWallNetEvents = 128;
         public int DeactivateGrapplingHookTalentNetEvents = 128;
+        public int CreateMagneticPullFieldNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel
