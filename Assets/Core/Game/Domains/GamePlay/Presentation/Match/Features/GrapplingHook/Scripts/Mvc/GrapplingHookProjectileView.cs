@@ -7,7 +7,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
     public class GrapplingHookProjectileView : MonoBehaviour, IPoolable
     {
         [SerializeField] private LineRenderer _lineRenderer;
+        [SerializeField] private float _coilWidth = 1f;
+        [SerializeField] private int _numberOfCoils = 8;
+        [SerializeField] private int _pointsPerCoil = 15;
         
+        private bool _isAttached;
+
         public Transform Transform { get; private set; }
         public Action Despawn { get; set; }
 
@@ -22,15 +27,40 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
             UpdateLineRenderer(hookPosition, lineStartPosition);
         }
 
+        public void SetIsAttached(bool isAttached)
+        {
+            _isAttached = isAttached;
+        }
+
         private void UpdateLineRenderer(Vector2 startPosition, Vector2 endPosition)
         {
-            _lineRenderer.SetPosition(0, startPosition);
-            _lineRenderer.SetPosition(1, endPosition);
+            if (_isAttached)
+            {
+                _lineRenderer.positionCount = 2;
+                _lineRenderer.SetPosition(0, startPosition);
+                _lineRenderer.SetPosition(1, endPosition);
+            }
+            else
+            {
+                var totalPoints = _numberOfCoils * _pointsPerCoil;
+                _lineRenderer.positionCount = totalPoints;
+                var perpendicular = (Vector2)CoreDomain.Scripts.Utils.MathUtils.GetPerpendicularDirection(startPosition, endPosition);
+
+                for (int i = 0; i < totalPoints; i++)
+                {
+                    float interpolation = (float)i / (totalPoints - 1);
+                    var basePosition = Vector2.Lerp(startPosition, endPosition, interpolation);
+                    float currentAngle = interpolation * _numberOfCoils * Mathf.PI * 2f;
+                    var sidewaysOffset = perpendicular * Mathf.Sin(currentAngle) * _coilWidth;
+                    var finalPosition = basePosition + sidewaysOffset;
+                    _lineRenderer.SetPosition(i, finalPosition);
+                }
+            }
         }
 
         public void UpdateOnHit()
         {
-            // Empty method to be implemented later
+            SetIsAttached(true);
         }
 
         public void OnCreated()
@@ -41,6 +71,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
 
         public void OnSpawned()
         {
+            _isAttached = false;
             gameObject.SetActive(true);
         }
 

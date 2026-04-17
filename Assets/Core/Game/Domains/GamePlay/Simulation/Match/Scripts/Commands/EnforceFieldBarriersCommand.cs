@@ -6,6 +6,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -67,23 +68,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     var isPlayerOutsideBarrier = distanceSquared > maxAllowedDistance * maxAllowedDistance;
                     if (isPlayerOutsideBarrier)
                     {
+                        var barrierCenter = barrier.Position;
                         player.Spaceship.Transform.Position = barrierPosition + Vector2.Normalize(offsetVector) * maxAllowedDistance;
+                        player.Spaceship.Transform.Velocity = GetPlayerSlidingVeclocityAlongBarrier(player.Spaceship.Transform.Velocity, barrierCenter, playerPosition);
                     }
 
                     break;
                 }
                 case FieldBarrierShape.Rectangle:
                 {
-                    var center = barrier.Position;
-                    var halfSize = barrier.Size * 0.5f;
+                    var barrierCenter = barrier.Position;
+                    var barrierRadius = barrier.Size * 0.5f;
                     
-                    var safeHalfWidth = Math.Max(0, halfSize.X - playerRadius); // Ensure min and max don't cross over if the barrier gets extremely small. 
-                    var safeHalfHeight = Math.Max(0, halfSize.Y - playerRadius);
+                    var safeHalfWidth = Math.Max(0, barrierRadius.X - playerRadius); // Ensure min and max don't cross over if the barrier gets extremely small. 
+                    var safeHalfHeight = Math.Max(0, barrierRadius.Y - playerRadius);
 
-                    var minX = center.X - safeHalfWidth;
-                    var maxX = center.X + safeHalfWidth;
-                    var minY = center.Y - safeHalfHeight;
-                    var maxY = center.Y + safeHalfHeight;
+                    var minX = barrierCenter.X - safeHalfWidth;
+                    var maxX = barrierCenter.X + safeHalfWidth;
+                    var minY = barrierCenter.Y - safeHalfHeight;
+                    var maxY = barrierCenter.Y + safeHalfHeight;
                     
                     var isOutsideX = playerPosition.X < minX || playerPosition.X > maxX;
                     var isOutsideY = playerPosition.Y < minY || playerPosition.Y > maxY;
@@ -94,11 +97,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         var clampedX = Math.Clamp(playerPosition.X, minX, maxX);
                         var clampedY = Math.Clamp(playerPosition.Y, minY, maxY);
                         player.Spaceship.Transform.Position = new Vector2(clampedX, clampedY);
+                        player.Spaceship.Transform.Velocity = GetPlayerSlidingVeclocityAlongBarrier(player.Spaceship.Transform.Velocity, barrierCenter, playerPosition);
                     }
 
                     break;
                 }
             }
+        }
+        
+        /// <summary>
+        /// Calculates the sliding direction (black arrow) based on 
+        /// movement direction (red) and the surface normal (green).
+        /// </summary>
+        /// <param name="playerVelocity">The player's current movement (Red Arrow)</param>
+        /// <param name="barrierCenter">The center point of the blue sphere</param>
+        /// <param name="playerPosition">The current position of the player</param>
+        /// <returns>The direction tangent to the sphere (Black Arrow)</returns>
+        private Vector2 GetPlayerSlidingVeclocityAlongBarrier(Vector2 playerVelocity, Vector2 barrierCenter, Vector2 playerPosition)
+        {
+            var normal = (playerPosition - barrierCenter).Normalize();
+            var projection = Vector2.Dot(playerVelocity, normal);
+            var slidingDirection = playerVelocity - (normal * projection);
+            return slidingDirection;
         }
 
         private void DestroyBulletsOutsideBarriers()
