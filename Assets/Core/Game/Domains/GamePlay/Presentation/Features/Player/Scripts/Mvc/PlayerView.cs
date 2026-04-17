@@ -32,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private SpriteAnimator _sentryGunAnimator;
+        [SerializeField] private UmbrellaStickView _umbrellaStickView;
         
         private Transform _transform;
 
@@ -54,6 +55,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             _sentryGunAnimator.StopAnimation();
             _sentryGunAnimator.gameObject.TrySetActive(false);
+        }
+
+        public void SetUmbrellaState(bool isOn, CancellationTokenSource cancellationTokenSource)
+        {
+            if (isOn)
+            {
+                _umbrellaStickView.PlayAnimation(cancellationTokenSource);
+            }
+            else
+            {
+                _umbrellaStickView.StopAnimation();
+            }
         }
 
         public void UpdateTailBend()
@@ -132,6 +145,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnDespawned()
         {
             DisableSentryGunState();
+            _umbrellaStickView?.StopAnimation();
             gameObject.SetActive(false);
         }
         

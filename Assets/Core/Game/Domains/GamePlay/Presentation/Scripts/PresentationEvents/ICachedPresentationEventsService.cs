@@ -37,5 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents { get; }
         List<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents { get; }
         List<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents { get; }
+        List<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents { get; }
+        List<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents { get; }
     }
 }

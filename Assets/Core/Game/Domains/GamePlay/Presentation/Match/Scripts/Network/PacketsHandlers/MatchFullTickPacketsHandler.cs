@@ -57,6 +57,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PerformDashPulseNetEventS2C> _cachedUnprocessedPerformDashPulseEvents;
         private readonly CapacityList<UpdatePlayerTalentStocksNetEventS2C> _cachedUnprocessedUpdatePlayerTalentStocksEvents;
         private readonly CapacityList<PlayerMaxShootCooldownChangedNetEventS2C> _cachedUnprocessedPlayerMaxShootCooldownChangedEvents;
+        private readonly CapacityList<ActivateUmbrellaTalentNetEventS2C> _cachedUnprocessedActivateUmbrellaTalentEvents;
+        private readonly CapacityList<DeactivateUmbrellaTalentNetEventS2C> _cachedUnprocessedDeactivateUmbrellaTalentEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
@@ -99,6 +101,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPerformDashPulseEvents = new CapacityList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents);
             _cachedUnprocessedUpdatePlayerTalentStocksEvents = new CapacityList<UpdatePlayerTalentStocksNetEventS2C>(networkConfig.MaxCap.UpdatePlayerTalentStocksNetEvents);
             _cachedUnprocessedPlayerMaxShootCooldownChangedEvents = new CapacityList<PlayerMaxShootCooldownChangedNetEventS2C>(networkConfig.MaxCap.PlayerMaxShootCooldownChangedNetEvents);
+            _cachedUnprocessedActivateUmbrellaTalentEvents = new CapacityList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents);
+            _cachedUnprocessedDeactivateUmbrellaTalentEvents = new CapacityList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -154,6 +158,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPerformDashPulseEvents(latestFullTickPacket.PerformDashPulseNetEvents);
             ProcessUpdatePlayerTalentStockEvents(latestFullTickPacket.UpdatePlayerTalentStocksNetEvents);
             ProcessPlayerMaxShootCooldownChangedEvents(latestFullTickPacket.PlayerMaxShootCooldownChangedNetEvents);
+            ProcessActivateUmbrellaTalentEvents(latestFullTickPacket.ActivateUmbrellaTalentNetEvents);
+            ProcessDeactivateUmbrellaTalentEvents(latestFullTickPacket.DeactivateUmbrellaTalentNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
@@ -402,6 +408,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedPerformDashPulseEvents.Sort();
                 _presentationNetEventsHandler.ProcessPerformDashPulseEvents(_cachedUnprocessedPerformDashPulseEvents);
+            }
+        }
+
+        private void ProcessActivateUmbrellaTalentEvents(FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C> activateUmbrellaTalentNetEvents)
+        {
+            _cachedUnprocessedActivateUmbrellaTalentEvents.Clear();
+
+            foreach (var netEvent in activateUmbrellaTalentNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedActivateUmbrellaTalentEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedActivateUmbrellaTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedActivateUmbrellaTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessActivateUmbrellaTalentEvents(_cachedUnprocessedActivateUmbrellaTalentEvents);
+            }
+        }
+
+        private void ProcessDeactivateUmbrellaTalentEvents(FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C> deactivateUmbrellaTalentNetEvents)
+        {
+            _cachedUnprocessedDeactivateUmbrellaTalentEvents.Clear();
+
+            foreach (var netEvent in deactivateUmbrellaTalentNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedDeactivateUmbrellaTalentEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedDeactivateUmbrellaTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDeactivateUmbrellaTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateUmbrellaTalentEvents(_cachedUnprocessedDeactivateUmbrellaTalentEvents);
             }
         }
 

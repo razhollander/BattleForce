@@ -82,6 +82,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             GetPlayer(playerId).SetSentryGunState(isSentryGun, _stageCancellationTokenProvider.CancellationTokenSource);
         }
+
+        public void SetPlayerUmbrellaState(ushort playerId, bool isUmbrella)
+        {
+            GetPlayer(playerId).SetUmbrellaState(isUmbrella, _stageCancellationTokenProvider.CancellationTokenSource);
+        }
         
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)
         {

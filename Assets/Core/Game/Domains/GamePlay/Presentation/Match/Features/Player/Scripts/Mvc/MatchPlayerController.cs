@@ -68,11 +68,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             {
                 SetSentryGunState(currentSelectedTalentState.IsActive, _stageCancellationTokenProvider.CancellationTokenSource);
             }
+            else if (currentSelectedTalentState.TalentType == TalentType.Umbrella)
+            {
+                SetUmbrellaState(currentSelectedTalentState.IsActive, _stageCancellationTokenProvider.CancellationTokenSource);
+            }
         }
 
         public void SetSentryGunState(bool isSentryGun, CancellationTokenSource cancellationTokenSource)
         {
             _playerView.SetSentryGunState(isSentryGun, cancellationTokenSource);
+        }
+
+        public void SetUmbrellaState(bool isUmbrellaActive, CancellationTokenSource cancellationTokenSource)
+        {
+            _playerView.SetUmbrellaState(isUmbrellaActive, cancellationTokenSource);
         }
         
         public void SetSelectedTalent(int talentIndex)

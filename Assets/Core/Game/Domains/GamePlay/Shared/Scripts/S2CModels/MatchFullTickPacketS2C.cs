@@ -43,6 +43,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C> CreateGrapplingHookProjectileNetEvents;
         public FixedUnorderedList<GrapplingHookHitWallNetEventS2C> GrapplingHookHitWallNetEvents;
         public FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents;
+        public FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents;
+        public FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -84,6 +86,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             CreateGrapplingHookProjectileNetEvents = new FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>(maxCap.CreateGrapplingHookProjectileNetEvents);
             GrapplingHookHitWallNetEvents = new FixedUnorderedList<GrapplingHookHitWallNetEventS2C>(maxCap.GrapplingHookHitWallNetEvents);
             DeactivateGrapplingHookTalentNetEvents = new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(maxCap.DeactivateGrapplingHookTalentNetEvents);
+            ActivateUmbrellaTalentNetEvents = new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(maxCap.ActivateUmbrellaTalentNetEvents);
+            DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
         }
         
         // public FullTickPacket(int tick, SimulationStateS2C previousSimulationState,
@@ -134,6 +138,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedCreateGrapplingHookProjectileNetEvents(writer);
             SerializedGrapplingHookHitWallNetEvents(writer);
             SerializedDeactivateGrapplingHookTalentNetEvents(writer);
+            SerializedActivateUmbrellaTalentNetEvents(writer);
+            SerializedDeactivateUmbrellaTalentNetEvents(writer);
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -323,6 +329,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedCreateGrapplingHookProjectileNetEvents(reader);
             DeserializedGrapplingHookHitWallNetEvents(reader);
             DeserializedDeactivateGrapplingHookTalentNetEvents(reader);
+            DeserializedActivateUmbrellaTalentNetEvents(reader);
+            DeserializedDeactivateUmbrellaTalentNetEvents(reader);
         }
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
@@ -768,6 +776,46 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (var i = 0; i < count; i++)
             {
                 ref var netEvent = ref DeactivateGrapplingHookTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateUmbrellaTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateUmbrellaTalentNetEvents.Count);
+            foreach (var netEvent in ActivateUmbrellaTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void SerializedDeactivateUmbrellaTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateUmbrellaTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateUmbrellaTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedActivateUmbrellaTalentNetEvents(NetDataReader reader)
+        {
+            ActivateUmbrellaTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateUmbrellaTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedDeactivateUmbrellaTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateUmbrellaTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateUmbrellaTalentNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

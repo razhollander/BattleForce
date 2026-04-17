@@ -10,5 +10,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         DashPulse = 5,
         KO = 6,
         GrapplingHook = 7,
+        Umbrella = 8,
     }
 }
