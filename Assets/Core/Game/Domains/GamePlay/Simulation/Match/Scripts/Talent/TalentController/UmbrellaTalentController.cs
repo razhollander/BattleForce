@@ -1,26 +1,23 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
-using UnityEngine;
-using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
     public class UmbrellaTalentController : ITalentController
     {
-        private ushort _casterPlayerId;
-        private int _startTick;
-        private bool _wasTalentInputPressed;
-
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IMatchDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
+        
+        private ushort _casterPlayerId;
+        private int _startTick;
+        private bool _wasTalentInputPressed;
 
         public TalentType TalentType => TalentType.Umbrella;
         private bool IsCurrentlyActive
@@ -103,15 +100,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             if (isSpinned || didTimeEnded)
             {
                 DeactivateTalent(tick);
+
                 return;
             }
 
             var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            if (aimDirection.LengthSquared() > 0)
-            {
-                aimDirection = Vector2.Normalize(aimDirection);
-                casterPlayerState.Spaceship.Transform.Velocity += aimDirection * _gamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick;
-            }
+            casterPlayerState.Spaceship.Transform.Velocity += aimDirection * _gamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick;
         }
 
         private void DeactivateTalent(int tick)

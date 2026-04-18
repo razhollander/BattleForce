@@ -50,17 +50,25 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         {
             // use this from the server?
         }
-        
+
         public MatchFullTickPacketS2C(MaxCap maxCap, SharedGamePlayConfig sharedGamePlayConfig)
         {
-            CurrentSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount);
+            CurrentSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
+                maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount);
+
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
-            PlayerJoinAcceptNetEvents = new FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>(maxCap.PlayerJoinAcceptNetEvents, () => new PlayerRejoinAcceptPacketS2C(maxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount));
+
+            PlayerJoinAcceptNetEvents = new FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>(maxCap.PlayerJoinAcceptNetEvents,
+                () => new PlayerRejoinAcceptPacketS2C(maxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount));
+
             PlayerTakeDamageNetEvents = new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(maxCap.PlayerTakeDamageNetEvents);
             PlayerDiedNetEvents = new FixedUnorderedList<PlayerDiedNetEventS2C>(maxCap.PlayerDiedNetEvents);
             BulletDestroyedNetEvents = new FixedUnorderedList<BulletDestroyedNetEventS2C>(maxCap.BulletDestroyedNetEvents);
             PlayerSwapNetEvents = new FixedUnorderedList<PlayersSwapNetEventS2C>(maxCap.PlayerSwapNetEvents);
-            TalentCardObtainedNetEvents = new FixedClassUnorderedList<TalentCardObtainedNetEventS2C>(maxCap.TalentCardObtainedNetEvent, () => new TalentCardObtainedNetEventS2C(sharedGamePlayConfig.MaxConcurrentTalentsForPlayer));
+
+            TalentCardObtainedNetEvents = new FixedClassUnorderedList<TalentCardObtainedNetEventS2C>(maxCap.TalentCardObtainedNetEvent,
+                () => new TalentCardObtainedNetEventS2C(sharedGamePlayConfig.MaxConcurrentTalentsForPlayer));
+
             TalentCardHitNetEvents = new FixedUnorderedList<TalentCardHitNetEventS2C>(maxCap.TalentCardHitNetEvents);
             PowerUpSpawnedNetEvents = new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(maxCap.PowerUpSpawnedNetEvents);
             PowerUpObtainedNetEvents = new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(maxCap.PowerUpObtainedNetEvents);
@@ -69,7 +77,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             TalentSwitchNetEvents = new FixedUnorderedList<TalentSwitchNetEventS2C>(maxCap.TalentSwitchNetEvents);
             EnvironmentSpringPlayerCollisionNetEvents = new FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>(maxCap.EnvironmentSpringPlayerCollisionNetEvents);
             GainBoltsNetEvents = new FixedUnorderedList<GainBoltsNetEventS2C>(maxCap.GainBoltsNetEvents);
-            PlayerToEnvironmentTeleportGateCollisionNetEvents = new FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(maxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents);
+
+            PlayerToEnvironmentTeleportGateCollisionNetEvents =
+                new FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(maxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents);
+
             PreparationPhaseEndedNetEvents = new FixedUnorderedList<PreparationPhaseEndedNetEventS2C>(maxCap.PreparationPhaseEndedNetEvents);
             CreateSwapFieldNetEvents = new FixedUnorderedList<CreateSwapFieldNetEventS2C>(maxCap.CreateSwapFieldNetEvents);
             DestroySwapFieldNetEvents = new FixedUnorderedList<DeactivateSwapTalentNetEventS2C>(maxCap.DestroySwapFieldNetEvents);
@@ -89,20 +100,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             ActivateUmbrellaTalentNetEvents = new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(maxCap.ActivateUmbrellaTalentNetEvents);
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
         }
-        
-        // public FullTickPacket(int tick, SimulationStateS2C previousSimulationState,
-        //     SimulationStateS2C currentSimulationState, List<BulletSpawnNetEventS2C> bulletSpawnNetEvents,
-        //     List<PlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents, List<PlayerTakeDamageNetEventS2C> playerTakeDamageNetEvents,
-        //     List<BulletDestroyedNetEventS2C> bulletDestroyedNetEvents)
-        // {
-        //     Tick = tick;
-        //     //PreviousSimulationState = previousSimulationState;
-        //     CurrentSimulationState = currentSimulationState;
-        //     BulletSpawnNetEvents = bulletSpawnNetEvents;
-        //     PlayerJoinAcceptNetEvents = playerJoinAcceptNetEvents;
-        //     PlayerTakeDamageNetEvents = playerTakeDamageNetEvents;
-        //     BulletDestroyedNetEvents = bulletDestroyedNetEvents;
-        // }
 
         public void Serialize(NetDataWriter writer)
         {

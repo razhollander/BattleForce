@@ -17,13 +17,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put(CasterPlayerId);
+            writer.Put((byte)CasterPlayerId);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            CasterPlayerId = reader.GetUShort();
+            CasterPlayerId = reader.GetByte();
         }
 
         public int CompareTo(ActivateUmbrellaTalentNetEventS2C other)

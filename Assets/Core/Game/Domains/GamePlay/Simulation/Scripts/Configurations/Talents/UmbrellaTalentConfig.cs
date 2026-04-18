@@ -6,6 +6,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
     public class UmbrellaTalentConfig
     {
         public float DurationInSeconds = 5f;
-        public float VelocityGainPerTick = 1f;
+        public float VelocityGainPerTick = 100f;
     }
 }
