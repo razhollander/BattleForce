@@ -15,6 +15,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
     [Serializable]
     public class TalentConfig
     {
-        public bool IsAimArrowActiveWhileSelected;
+        public bool IsArrowShownWhileSelected;
+        public bool IsArrowShownWhileActive;
+        public bool IsFrontArrow;
     }
 }

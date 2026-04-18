@@ -86,6 +86,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     case PhysicsBodyType.EnvironmentTeleportGate: CopyTeleportGateStateToBody(currentBody, bodyData.Id, environmentTeleportGates); break;
                     case PhysicsBodyType.SwapField: CopySwapFieldToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.KOProjectile: CopyKOProjectileToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.GrapplingHookProjectile: CopyGrapplingHookProjectileToBody(currentBody, bodyData.Id, simulationState); break;
                 }
 
                 currentBody = currentBody.GetNext();
@@ -97,6 +98,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var koProjectileState = simulationState.KOProjectiles.FindWithId(koProjectileId);
             koProjectileBody.SetTransform(koProjectileState.Position, koProjectileState.Rotation.ToAngleRadians());
             koProjectileBody.SetLinearVelocity(koProjectileState.Velocity);
+        }
+
+        private void CopyGrapplingHookProjectileToBody(Body grapplingHookProjectileBody, ushort grapplingHookProjectileId, MatchSimulationStateS2C simulationState)
+        {
+            var grapplingHookProjectileState = simulationState.GrapplingHookProjectiles.FindWithId(grapplingHookProjectileId);
+            grapplingHookProjectileBody.SetTransform(grapplingHookProjectileState.Position, 0);
+            grapplingHookProjectileBody.SetLinearVelocity(grapplingHookProjectileState.Velocity);
         }
 
         private void CopySwapFieldToBody(Body swapFieldBody, ushort swapFieldId, MatchSimulationStateS2C simulationState)
@@ -780,6 +788,49 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             RemoveBody(body);
         }
 
+        public void AddGrapplingHookProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.GrapplingHookProjectile);
+            bodyDef.bullet = true;
+            LogService.LogError("AddGrapplingHookProjectile: " + velocity + "");
+            bodyDef.linearVelocity = velocity;
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var shape = GetCircleShape();
+            shape.Radius = radius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0.3f;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            // fixtureDef.filter.groupIndex = (short)-teamId;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.GrapplingHookProjectile.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.GrapplingHookProjectile.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(shape);
+        }
+
+        public void UpdateGrapplingHookProjectile(ushort id, Vector2 position, Vector2 velocity)
+        {
+            var body = GetBody(PhysicsBodyType.GrapplingHookProjectile, id);
+            body.SetTransform(position, 0);
+            body.SetLinearVelocity(velocity);
+        }
+
+        public void RemoveGrapplingHookProjectile(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.GrapplingHookProjectile, id);
+            RemoveBody(body);
+        }
+
         public void AddSwapField(ushort id, ushort teamId, Vector2 position)
         {
             var bodyDef = GetBodyDef();
@@ -854,6 +905,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public Body GetKOProjectile(ushort koProjectileId)
         {
             return GetBody(PhysicsBodyType.KOProjectile, koProjectileId);
+        }
+
+        public Body GetGrapplingHookProjectile(ushort grapplingHookProjectileId)
+        {
+            return GetBody(PhysicsBodyType.GrapplingHookProjectile, grapplingHookProjectileId);
         }
     }
 }

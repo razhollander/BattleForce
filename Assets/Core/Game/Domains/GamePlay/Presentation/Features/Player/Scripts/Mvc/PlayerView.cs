@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private PlayerLoadingRingView _loadingRingView;
         [SerializeField] private Transform _spaceShipTransform;
         [SerializeField] private Transform _aimArrowTransform; // todo move to the match domain
+        [SerializeField] private GameObject _frontArrowGameObject; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
         [SerializeField] private Transform _leftEyeBall;
@@ -32,7 +33,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private SpriteAnimator _sentryGunAnimator;
-        [SerializeField] private Sprite _spinnedEyesSprite;
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         
@@ -136,8 +136,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void SetIsSpinned(bool isSpinned, CancellationTokenSource cancellationTokenSource)
         {
-            _leftEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultLeftEyeSprite;
-            _rightEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultRightEyeSprite;
+            _leftEyeRenderer.sprite = isSpinned ? null : _defaultLeftEyeSprite;
+            _rightEyeRenderer.sprite = isSpinned ? null : _defaultRightEyeSprite;
 
             if (isSpinned)
             {
@@ -219,9 +219,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _tailView.SetIsTailWaving(isWaving);
         }
 
-        public void SetIsAimArrowShown(bool isShown)
+        public void SetIsTalentArrowShown(bool isShown, bool isFrontArrow)
         {
-            _aimArrowTransform.gameObject.TrySetActive(isShown);
+            if (isFrontArrow)
+            {
+                _frontArrowGameObject.TrySetActive(isShown);
+                _aimArrowTransform.gameObject.TrySetActive(false);
+            }
+            else
+            {
+                _aimArrowTransform.gameObject.TrySetActive(isShown);
+                _frontArrowGameObject.gameObject.TrySetActive(false);
+            }
         }
     }
 }

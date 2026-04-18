@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         EnvironmentTeleportGate = 10,
         SwapField = 11,
         KOProjectile = 12,
-        StageBoundary = 13
+        GrapplingHookProjectile = 13,
+        StageBoundary = 14
     }
 }

@@ -19,6 +19,7 @@ MonoBehaviour:
     - rid: 8506109566889754722
     - rid: 8506109566889754723
     - rid: 8476404660102234386
+    - rid: 8476404832654590090
   HammerTalentConfig:
     HammerSpeed: 10
     HammerSize: 1
@@ -40,6 +41,14 @@ MonoBehaviour:
     DurationInSeconds: 3
     ShootCooldownMultiplier: 0.25
     BulletsSpawnOffsetFromPlayerHead: 1.1
+  GrapplingHookTalentConfig:
+    ProjectileSpeed: 40
+    ReturnProjectileSpeedMultiplier: 2
+    ArriveDistance: 2
+    PlayerPullForceWhileHooked: 200
+    PlayerVelocitySquaredThresholdToDeactivateHook: 0.1
+    GraceTicksUntilCheckIfVelocityIsBelowThreshold: 5
+    PlayerRotateSpeedWhileHooked: 500
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:
@@ -50,6 +59,11 @@ MonoBehaviour:
       data:
         TalentType: 4
         CooldownInSeconds: 9
+    - rid: 8476404832654590090
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 7
+        CooldownInSeconds: 2
     - rid: 8506109566889754721
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
