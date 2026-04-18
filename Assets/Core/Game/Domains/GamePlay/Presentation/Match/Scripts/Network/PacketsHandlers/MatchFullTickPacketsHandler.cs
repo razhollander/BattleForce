@@ -174,31 +174,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             _fullTickPackets.Clear();
         }
-
-        private void ProcessIfSelectedTalentForPlayersFinishedCooldown(MatchSimulationStateS2C simulationState)
-        {
-            _cachedPlayerSelectedTalentFinishedCooldownLocalEvents.Clear();
-
-            foreach (var oldPlayerState in _matchDataService.Players)
-            {
-                var newPlayerState = simulationState.GetPlayerById(oldPlayerState.PlayerId);
-                
-                if (newPlayerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var newSelectedTalent) &&
-                    oldPlayerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var oldSelectedTalent) &&
-                    newSelectedTalent.TalentType == oldSelectedTalent.TalentType &&
-                    !newSelectedTalent.IsOnCooldown() && oldSelectedTalent.IsOnCooldown())
-                {
-                    LogService.LogError("Finish cooldown!");
-                    _cachedPlayerSelectedTalentFinishedCooldownLocalEvents.Add(new PlayerSelectedTalentFinishedCooldownLocalEvent(newPlayerState.Id));
-                }
-            }
-
-            if (!_cachedPlayerSelectedTalentFinishedCooldownLocalEvents.IsNullOrEmpty())
-            {
-                _presentationNetEventsHandler.ProcessPlayerSelectedTalentFinishedCooldownEvents(_cachedPlayerSelectedTalentFinishedCooldownLocalEvents);
-            }
-        }
-
+        
         /// <summary>
         /// the server doesn't send this to the client because we prefer to save this redundent bandwidth,
         /// so the client need to clear the cooldowns on its own.
@@ -228,7 +204,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                         var isSelectedTalent = selectedTalentIndex == i;
                         if (isSelectedTalent)
                         {
-                            LogService.LogError("Finish cooldown!");
                             _cachedPlayerSelectedTalentFinishedCooldownLocalEvents.Add(new PlayerSelectedTalentFinishedCooldownLocalEvent(playerModel.PlayerId));
                         }
                     }

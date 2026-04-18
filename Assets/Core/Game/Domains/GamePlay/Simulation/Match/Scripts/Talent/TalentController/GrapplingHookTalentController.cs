@@ -83,6 +83,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
+            ActivateTalent(tick, casterPlayerState);
+        }
+
+        private void ActivateTalent(int tick, PlayerStateS2C casterPlayerState)
+        {
             IsCurrentlyActive = true;
             _isInReturnPhase = false;
 
@@ -226,24 +231,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _attachedOnTick = tick;
             projectile.IsHookAttached = true;
             projectile.Velocity = Vector2.Zero;
-            projectile.AttachedWallId = wallId;
 
-            // Calculate relative offset to wall
+            if (TryGetLocalPositionForWall(wallId, projectile.Position, out var localPositionOfWall))
+            {
+                projectile.AttachedWallId = wallId;
+                projectile.AttachedLocalPosition = localPositionOfWall;
+            }
+            
+            _netEventsDataService.AddGrapplingHookHitWallNetEvent(tick, _projectileId, wallId, projectile.Position);
+        }
+
+        private bool TryGetLocalPositionForWall(ushort wallId, Vector2 worldPosition, out Vector2 localPositionOfWall)
+        {
             if (_matchDataService.EnvironmentData.TryGetEnvironmentWall(wallId, out var wall))
             {
-                Vector2 diff = projectile.Position - wall.Transform.WorldPosition;
+                Vector2 diff = worldPosition - wall.Transform.WorldPosition;
                 float radians = -wall.Transform.WorldRotationDegrees * (System.MathF.PI / 180f);
                 float cos = System.MathF.Cos(radians);
                 float sin = System.MathF.Sin(radians);
 
-                projectile.AttachedLocalPosition = new Vector2(
+                localPositionOfWall = new Vector2(
                     diff.X * cos - diff.Y * sin,
-                    diff.X * sin + diff.Y * cos
-                );
+                    diff.X * sin + diff.Y * cos);
+
+                return true;
             }
-            
-            //_physicsSimulator.UpdateGrapplingHookProjectile(_projectileId, projectile.Position, Vector2.Zero);
-            _netEventsDataService.AddGrapplingHookHitWallNetEvent(tick, _projectileId, wallId, projectile.Position);
+
+            localPositionOfWall = default;
+            return false;
         }
 
         private void StartReturnPhase()
