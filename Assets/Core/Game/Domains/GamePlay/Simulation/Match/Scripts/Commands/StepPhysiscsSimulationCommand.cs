@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ICommandFactory _commandFactory;
         private StepAllWheelsRotationCommand _stepAllWheelsRotationCommand;
         private EnforceFieldBarriersCommand _enforceFieldBarriersCommand;
+        private EnforceStageBarriersCommand _enforceStageBarriersCommand;
 
         private float _deltaTime;
         private int _tick;
@@ -45,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _stepAllWheelsRotationCommand = _commandFactory.CreateCommandVoid<StepAllWheelsRotationCommand>();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
             _enforceFieldBarriersCommand = _commandFactory.CreateCommandVoid<EnforceFieldBarriersCommand>();
+            _enforceStageBarriersCommand = _commandFactory.CreateCommandVoid<EnforceStageBarriersCommand>();
         }
 
         public void Execute()
@@ -73,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             _processCachedCollisionsCommand.SetProcessedTick(_tick).Execute();
             _enforceFieldBarriersCommand.SetTick(_tick).Execute();
+            //_enforceStageBarriersCommand.Execute();
         }
 
         private void ApplyMatchModelToPhysicsSimulation()

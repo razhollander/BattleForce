@@ -1,24 +1,25 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
-    public class HandleGrapplingHookHitNetEventsCommand : BaseCommand, ICommandVoid
+    public class HandlePlayerSpinnedStartedNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
-        private IGrapplingHookProjectilesControllers _hookProjectilesControllers;
+        private IMatchPlayerControllers _playerControllers;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
-            _hookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
+            _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
         }
 
         public void Execute()
         {
-            var events = _cachedPresentationEventsService.PlayerGrapplingHookHitNetEvents;
+            var events = _cachedPresentationEventsService.PlayerSpinnedStartedNetEvents;
             if (events.IsNullOrEmpty())
             {
                 return;
@@ -26,10 +27,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in events)
             {
-                _hookProjectilesControllers.UpdateOnHit(netEvent.ProjectileId);
+                _playerControllers.SetPlayersSpinnedState(netEvent.PlayerId, true);
             }
 
-            _cachedPresentationEventsService.PlayerGrapplingHookHitNetEvents.Clear();
+            events.Clear();
         }
     }
 }

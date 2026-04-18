@@ -17,7 +17,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         
         private ushort _casterPlayerId;
         private int _startTick;
-        private bool _wasTalentInputPressed;
 
         public TalentType TalentType => TalentType.Umbrella;
         private bool IsCurrentlyActive
@@ -45,12 +44,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
         {
-            bool justPressed = isTalentInputPressed && !_wasTalentInputPressed;
-            _wasTalentInputPressed = isTalentInputPressed;
-
-            if (!justPressed)
+            if (!wasTalentInputDownThisTick)
             {
                 return;
             }
@@ -74,7 +70,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             _netEventsDataService.AddActivateUmbrellaTalentNetEvent(tick, _casterPlayerId);
         }
-
+        
         public void StopIfActive(int tick)
         {
             if (!IsCurrentlyActive)
@@ -129,7 +125,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         public void ResetData()
         {
             IsCurrentlyActive = false;
-            _wasTalentInputPressed = false;
         }
     }
 }

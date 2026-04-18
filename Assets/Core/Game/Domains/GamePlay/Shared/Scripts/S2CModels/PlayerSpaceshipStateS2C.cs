@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using Core.Scripts.Extensions;
 using LiteNetLib.Utils;
@@ -12,13 +13,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public PlayerTalentsStateS2C TalentsState;
         public bool IsEngineOn = true;
         public bool IsAlive = true;
-        public bool IsSpinned => Transform.AngularVelocity != 0;
+        public bool IsSpinned;
 
         public PlayerSpaceshipStateS2C(int maxTalents)
         {
             TalentsState = new PlayerTalentsStateS2C(maxTalents);
         }
-
+        
         public void PushAndSpin(Vector2 pushForce, float spinAmount, bool shouldTurnOffEngine = true)
         {
             Transform.Velocity += pushForce;
