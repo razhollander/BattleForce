@@ -5,7 +5,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
-    public class HandleGrapplingHookHitNetEventsCommand : BaseCommand, ICommandVoid
+    public class HandleGrapplingHookHitWallNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IGrapplingHookProjectilesControllers _hookProjectilesControllers;
@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            var events = _cachedPresentationEventsService.PlayerGrapplingHookHitNetEvents;
+            var events = _cachedPresentationEventsService.GrapplingHookHitWallNetEvents;
             if (events.IsNullOrEmpty())
             {
                 return;
@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _hookProjectilesControllers.UpdateOnHit(netEvent.ProjectileId);
             }
 
-            _cachedPresentationEventsService.PlayerGrapplingHookHitNetEvents.Clear();
+            _cachedPresentationEventsService.GrapplingHookHitWallNetEvents.Clear();
         }
     }
 }

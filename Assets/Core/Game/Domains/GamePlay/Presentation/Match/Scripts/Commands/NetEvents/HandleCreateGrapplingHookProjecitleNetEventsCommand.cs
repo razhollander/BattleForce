@@ -4,11 +4,10 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
-    public class HandleGrapplingHookShotNetEventsCommand : BaseCommand, ICommandVoid
+    public class HandleCreateGrapplingHookProjecitleNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IGrapplingHookProjectilesControllers _hookProjectilesControllers;
@@ -26,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            var netEvents = _cachedPresentationEventsService.PlayerGrapplingHookShotNetEvents;
+            var netEvents = _cachedPresentationEventsService.CreateGrapplingHookProjectileNetEvents;
             if (netEvents.Count == 0)
             {
                 return;
@@ -35,21 +34,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in netEvents)
             {
                 var hookModel = netEvent.GrapplingHookProjectile;
-                var casterPosition = _playerControllers.GetPlayerPosition(hookModel.PlayerCasterId);
+                var casterPlayerId = hookModel.PlayerCasterId;
+                var casterPosition = _playerControllers.GetPlayerPosition(casterPlayerId);
                 var rotation = hookModel.Position - casterPosition.ToNumericsVector2();
 
-                _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, hookModel.PlayerCasterId, hookModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, hookModel.IsHookAttached);
-                _matchDataService.AddGrapplingHookProjectile(hookModel.Id, hookModel.PlayerCasterId, hookModel.Position);
+                _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, casterPlayerId, hookModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, hookModel.IsHookAttached);
 
-                // // Hide the aim arrow
-                // var casterPlayerController = _playerControllers.GetPlayerController(hookModel.PlayerCasterId);
-                // if (casterPlayerController != null)
-                // {
-                //     casterPlayerController.SetAimViewActive(false);
-                // }
+                if (_matchDataService.GetPlayer(casterPlayerId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentForCaster))
+                {
+                    _playerControllers.UpdateIsPlayerArrowShownAccordingToTalentState(casterPlayerId, currentSelectedTalentForCaster);
+                }
             }
 
-            _cachedPresentationEventsService.PlayerGrapplingHookShotNetEvents.Clear();
+            _cachedPresentationEventsService.CreateGrapplingHookProjectileNetEvents.Clear();
         }
     }
 }

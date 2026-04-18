@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.LocalEvents;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.UpdateService;
@@ -43,9 +44,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleSwapFieldCreatedNetEventsCommand _handleSwapFieldCreatedNetEventsCommand;
         private readonly HandleKOProjectileCreatedNetEventsCommand _handleKOProjectileCreatedNetEventsCommand;
         private readonly HandleDeactivateKOTalentNetEventsCommand _handleDeactivateKOTalentNetEventsCommand;
-        private readonly HandleGrapplingHookShotNetEventsCommand _handleGrapplingHookShotNetEventsCommand;
-        private readonly HandleGrapplingHookHitNetEventsCommand _handleGrapplingHookHitNetEventsCommand;
-        private readonly HandleGrapplingHookDeactivatedNetEventsCommand _handleGrapplingHookDeactivatedNetEventsCommand;
+        private readonly HandleCreateGrapplingHookProjecitleNetEventsCommand _handleCreateGrapplingHookProjecitleNetEventsCommand;
+        private readonly HandleGrapplingHookHitWallNetEventsCommand _handleGrapplingHookHitWallNetEventsCommand;
+        private readonly HandleDeactivateGrapplingHookTalentNetEventsCommand _handleDeactivateGrapplingHookTalentNetEventsCommand;
         private readonly UpdateGrapplingHookProjectilesTransformCommand _updateGrapplingHookProjectilesTransformCommand;
         private readonly HandleActivateSentryGunTalentNetEventsCommand _handleActivateSentryGunTalentNetEventsCommand;
         private readonly HandleDeactivateSentryGunTalentNetEventsCommand _handleDeactivateSentryGunTalentNetEventsCommand;
@@ -53,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly UpdateKOProjectilesTransformCommand _updateKOProjectilesTransformCommand;
         private readonly HandlePerformDashPulseNetEventsCommand _handlePerformDashPulseNetEventsCommand;
         private readonly HandleUpdatePlayerTalentStocksNetEventsCommand _handleUpdatePlayerTalentStocksNetEventsCommand;
+        private readonly HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -85,9 +87,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleSwapFieldCreatedNetEventsCommand = commandFactory.CreateCommandVoid<HandleSwapFieldCreatedNetEventsCommand>();
             _handleKOProjectileCreatedNetEventsCommand = commandFactory.CreateCommandVoid<HandleKOProjectileCreatedNetEventsCommand>();
             _handleDeactivateKOTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateKOTalentNetEventsCommand>();
-            _handleGrapplingHookShotNetEventsCommand = commandFactory.CreateCommandVoid<HandleGrapplingHookShotNetEventsCommand>();
-            _handleGrapplingHookHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleGrapplingHookHitNetEventsCommand>();
-            _handleGrapplingHookDeactivatedNetEventsCommand = commandFactory.CreateCommandVoid<HandleGrapplingHookDeactivatedNetEventsCommand>();
+            _handleCreateGrapplingHookProjecitleNetEventsCommand = commandFactory.CreateCommandVoid<HandleCreateGrapplingHookProjecitleNetEventsCommand>();
+            _handleGrapplingHookHitWallNetEventsCommand = commandFactory.CreateCommandVoid<HandleGrapplingHookHitWallNetEventsCommand>();
+            _handleDeactivateGrapplingHookTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateGrapplingHookTalentNetEventsCommand>();
             _updateGrapplingHookProjectilesTransformCommand = commandFactory.CreateCommandVoid<UpdateGrapplingHookProjectilesTransformCommand>();
             _handleActivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateSentryGunTalentNetEventsCommand>();
             _handleDeactivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSentryGunTalentNetEventsCommand>();
@@ -95,6 +97,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateKOProjectilesTransformCommand = commandFactory.CreateCommandVoid<UpdateKOProjectilesTransformCommand>();
             _handlePerformDashPulseNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformDashPulseNetEventsCommand>();
             _handleUpdatePlayerTalentStocksNetEventsCommand = commandFactory.CreateCommandVoid<HandleUpdatePlayerTalentStocksNetEventsCommand>();
+            _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands = commandFactory.CreateCommandVoid<HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands>();
         }
         
         public void InitEntryPoint()
@@ -135,9 +138,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTransform();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();
             _handleDeactivateKOTalentNetEventsCommand.Execute();
-            _handleGrapplingHookShotNetEventsCommand.Execute();
-            _handleGrapplingHookHitNetEventsCommand.Execute();
-            _handleGrapplingHookDeactivatedNetEventsCommand.Execute();
+            _handleCreateGrapplingHookProjecitleNetEventsCommand.Execute();
+            _handleGrapplingHookHitWallNetEventsCommand.Execute();
+            _handleDeactivateGrapplingHookTalentNetEventsCommand.Execute();
             _handleActivateSentryGunTalentNetEventsCommand.Execute();
             _handleDeactivateSentryGunTalentNetEventsCommand.Execute();
             _handlePerformDashPulseNetEventsCommand.Execute();
@@ -148,7 +151,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
             _updateObjectTransformInsideRotatingWheelsCommand.Execute();
-
+            _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands.Execute();
             _handleTalentCardObtainedNetEventsCommand.SetCurrentServerTick(lastProcessedTickFromServer).Execute();
         }
     }

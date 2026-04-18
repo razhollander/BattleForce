@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using Core.Scripts.Extensions;
 using LiteNetLib.Utils;
@@ -18,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             TalentsState = new PlayerTalentsStateS2C(maxTalents);
         }
-
+        
         public void PushAndSpin(Vector2 pushForce, float spinAmount, bool shouldTurnOffEngine = true)
         {
             Transform.Velocity += pushForce;

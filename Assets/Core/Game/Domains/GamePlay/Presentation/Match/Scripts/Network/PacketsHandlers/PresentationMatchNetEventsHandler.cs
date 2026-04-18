@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.LocalEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -309,10 +310,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 return;
             }
 
-            foreach (var swapFieldCreatedEvent in createSwapFieldNetEvents)
+            foreach (var netEvent in createSwapFieldNetEvents)
             {
-                _matchDataService.AddSwapField(swapFieldCreatedEvent.SwapFieldId,swapFieldCreatedEvent.CasterPlayerId, swapFieldCreatedEvent.OccuredOnTick, swapFieldCreatedEvent.EndOnTick, swapFieldCreatedEvent.MaxRadius);
-                _cachedPresentationEventsService.CreateSwapFieldNetEvents.Add(swapFieldCreatedEvent);
+                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.Swap);
+                _matchDataService.AddSwapField(netEvent.SwapFieldId,netEvent.CasterPlayerId, netEvent.OccuredOnTick, netEvent.EndOnTick, netEvent.MaxRadius);
+                _cachedPresentationEventsService.CreateSwapFieldNetEvents.Add(netEvent);
             }
         }
 
@@ -325,17 +327,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in deactivateSwapTalentNetEvents)
             {
-                var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
-                var talents = casterPlayer.Spaceship.TalentsState.Talents;
-                for (int i = 0; i < talents.Count; i++)
-                {
-                    ref var talent = ref talents.Get(i);
-                    if (talent.TalentType == TalentType.Swap)
-                    {
-                        talent.NormalCooldown.CooldownEndTick = netEvent.TalentCooldownEndTick;
-                        break;
-                    }
-                }
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Swap, netEvent.TalentCooldownEndTick);
                 _matchDataService.RemoveSwapField(netEvent.SwapFieldId);
                 _cachedPresentationEventsService.DeactivateSwapTalentNetEvents.Add(netEvent);
             }
@@ -363,12 +355,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in createKOProjectileNetEvents)
             {
+                SetPlayerTalentActive(netEvent.KoProjectile.PlayerCasterId, TalentType.KO);
                 _matchDataService.AddKOProjectile(netEvent.KoProjectile.Id, netEvent.KoProjectile.PlayerCasterId, netEvent.OccuredOnTick, netEvent.KoProjectile.Size);
                 _cachedPresentationEventsService.CreateKOProjectileNetEvents.Add(netEvent);
             }
         }
 
-        public void ProcessPlayerGrapplingHookShotEvents(CapacityList<CreateGrapplingHookProjectileNetEventS2C> events)
+        public void ProcessCreatePlayerGrapplingHookProjectileEvents(CapacityList<CreateGrapplingHookProjectileNetEventS2C> events)
         {
             if (events.IsNullOrEmpty())
             {
@@ -377,11 +370,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             
             foreach (var netEvent in events)
             {
-                _cachedPresentationEventsService.PlayerGrapplingHookShotNetEvents.Add(netEvent);
+                var grapplingHookState = netEvent.GrapplingHookProjectile;
+                SetPlayerTalentActive(grapplingHookState.PlayerCasterId, TalentType.GrapplingHook);
+                _matchDataService.AddGrapplingHookProjectile(grapplingHookState.Id, grapplingHookState.PlayerCasterId, grapplingHookState.Position);
+                _cachedPresentationEventsService.CreateGrapplingHookProjectileNetEvents.Add(netEvent);
             }
         }
 
-        public void ProcessPlayerGrapplingHookHitEvents(CapacityList<GrapplingHookHitWallNetEventS2C> events)
+        public void ProcessGrapplingHookHitWallEvents(CapacityList<GrapplingHookHitWallNetEventS2C> events)
         {
             if (events.IsNullOrEmpty())
             {
@@ -390,11 +386,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             
             foreach (var netEvent in events)
             {
-                _cachedPresentationEventsService.PlayerGrapplingHookHitNetEvents.Add(netEvent);
+                _cachedPresentationEventsService.GrapplingHookHitWallNetEvents.Add(netEvent);
             }
         }
 
-        public void ProcessPlayerGrapplingHookDeactivatedEvents(CapacityList<DeactivateGrapplingHookTalentNetEventS2C> events)
+        public void ProcessDeactivateGrapplingHookTalentEvents(CapacityList<DeactivateGrapplingHookTalentNetEventS2C> events)
         {
             if (events.IsNullOrEmpty())
             {
@@ -403,18 +399,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             
             foreach (var netEvent in events)
             {
-                var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
-                var talents = casterPlayer.Spaceship.TalentsState.Talents;
-                for (int i = 0; i < talents.Count; i++)
-                {
-                    ref var talent = ref talents.Get(i);
-                    if (talent.TalentType == TalentType.GrapplingHook)
-                    {
-                        talent.NormalCooldown.CooldownEndTick = netEvent.TalentCooldownEndTick;
-                        break;
-                    }
-                }
-                _cachedPresentationEventsService.PlayerGrapplingHookDeactivatedNetEvents.Add(netEvent);
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.GrapplingHook, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateGrapplingHookTalentNetEvents.Add(netEvent);
             }
         }
 
@@ -427,17 +413,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in deactivateKOTalentNetEvents)
             {
-                var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
-                var talents = casterPlayer.Spaceship.TalentsState.Talents;
-                for (int i = 0; i < talents.Count; i++)
-                {
-                    ref var talent = ref talents.Get(i);
-                    if (talent.TalentType == TalentType.KO)
-                    {
-                        talent.NormalCooldown.CooldownEndTick = netEvent.TalentCooldownEndTick;
-                        break;
-                    }
-                }
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.KO, netEvent.TalentCooldownEndTick);
                 _matchDataService.RemoveKOProjectile(netEvent.KoProjectileId);
                 _cachedPresentationEventsService.DeactivateKOTalentNetEvents.Add(netEvent);
             }
@@ -508,6 +484,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessPlayerSelectedTalentFinishedCooldownEvents(CapacityList<PlayerSelectedTalentFinishedCooldownLocalEvent> playerSelectedTalentFinishedCooldownEvents)
+        {
+            if (playerSelectedTalentFinishedCooldownEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var localEvent in playerSelectedTalentFinishedCooldownEvents)
+            {
+                _cachedPresentationEventsService.PlayerSelectedTalentFinishedCooldownLocalEvents.Add(localEvent);
+            }
+        }
+        
         public void ProcessActivateSentryGunTalentEvents(CapacityList<ActivateSentryGunTalentNetEventS2C> activateSentryGunTalentNetEvents)
         {
             if (activateSentryGunTalentNetEvents.IsNullOrEmpty())
@@ -517,6 +506,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in activateSentryGunTalentNetEvents)
             {
+                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.SentryGun);
                 _cachedPresentationEventsService.ActivateSentryGunTalentNetEvents.Add(netEvent);
             }
         }
@@ -530,18 +520,39 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in deactivateSentryGunTalentNetEvents)
             {
-                var casterPlayer = _matchDataService.GetPlayer(netEvent.CasterPlayerId);
-                var talents = casterPlayer.Spaceship.TalentsState.Talents;
-                for (int i = 0; i < talents.Count; i++)
-                {
-                    ref var talent = ref talents.Get(i);
-                    if (talent.TalentType == TalentType.SentryGun)
-                    {
-                        talent.NormalCooldown.CooldownEndTick = netEvent.TalentCooldownEndTick;
-                        break;
-                    }
-                }
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.SentryGun, netEvent.TalentCooldownEndTick);
                 _cachedPresentationEventsService.DeactivateSentryGunTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        private void SetPlayerTalentActive(ushort playerId, TalentType talentType)
+        {
+            var casterPlayer = _matchDataService.GetPlayer(playerId);
+            var talents = casterPlayer.Spaceship.TalentsState.Talents;
+            for (int i = 0; i < talents.Count; i++)
+            {
+                ref var talent = ref talents.Get(i);
+                if (talent.TalentType == talentType)
+                {
+                    talent.IsActive = true;
+                    break;
+                }
+            }
+        }
+        
+        private void SetPlayerTalentDeactive(ushort playerId, TalentType talentType, int talentCooldownEndTick)
+        {
+            var casterPlayer = _matchDataService.GetPlayer(playerId);
+            var talents = casterPlayer.Spaceship.TalentsState.Talents;
+            for (int i = 0; i < talents.Count; i++)
+            {
+                ref var talent = ref talents.Get(i);
+                if (talent.TalentType == talentType)
+                {
+                    talent.NormalCooldown.CooldownEndTick = talentCooldownEndTick;
+                    talent.IsActive = false;
+                    break;
+                }
             }
         }
     }

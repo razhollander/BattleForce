@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
@@ -21,5 +22,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void SetPlayerTalentSelected(ushort playerId, int talentIndex);
         void SetIsTailWaving(ushort playerId, bool isWaving);
         void SetPlayerSentryGunState(ushort playerId, bool isOn);
+        void UpdateIsPlayerArrowShownAccordingToTalentState(ushort playerId, TalentStateS2C talentStateS2C);
     }
 }

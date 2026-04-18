@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private PlayerLoadingRingView _loadingRingView;
         [SerializeField] private Transform _spaceShipTransform;
         [SerializeField] private Transform _aimArrowTransform; // todo move to the match domain
+        [SerializeField] private GameObject _frontArrowGameObject; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
         [SerializeField] private Transform _leftEyeBall;
@@ -185,9 +186,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _tailView.SetIsTailWaving(isWaving);
         }
 
-        public void SetIsAimArrowShown(bool isShown)
+        public void SetIsTalentArrowShown(bool isShown, bool isFrontArrow)
         {
-            _aimArrowTransform.gameObject.TrySetActive(isShown);
+            if (isFrontArrow)
+            {
+                _frontArrowGameObject.TrySetActive(isShown);
+                _aimArrowTransform.gameObject.TrySetActive(false);
+            }
+            else
+            {
+                _aimArrowTransform.gameObject.TrySetActive(isShown);
+                _frontArrowGameObject.gameObject.TrySetActive(false);
+            }
         }
     }
 }
