@@ -12,6 +12,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
@@ -31,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersTalentsManager _playersTalentsManager;
         private ICommandFactory _commandFactory;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
+        private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
 
         public override void ResolveDependencies()
         {
@@ -47,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
+            _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
         }
 
         public void Execute()
@@ -114,6 +117,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.StartPhaseInitialTick = 0;
             _playersTalentsManager.ResetAllTalentsData();
             _preparationPhaseTimerService.RestartTimer();
+            _playersOutsideStageTrackerService.ClearAllData();
             _stageDataService.ClearData();
         }
 

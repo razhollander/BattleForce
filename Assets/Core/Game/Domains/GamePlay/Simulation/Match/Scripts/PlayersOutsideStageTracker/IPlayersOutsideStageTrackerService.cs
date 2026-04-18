@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker
 {
     public interface IPlayersOutsideStageTrackerService
