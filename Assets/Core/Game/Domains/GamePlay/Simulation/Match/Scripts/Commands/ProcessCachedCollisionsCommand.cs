@@ -31,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
+        private SpinPlayerCommand _spinPlayerCommand;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
         {
@@ -45,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
+            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
@@ -282,7 +284,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var forceMagnitude = _gamePlayConfig.EnvironmentSprings.Force;
             var force = pushDirection * forceMagnitude;
             var randomSpin = RNG.NextFloat(_gamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfig.EnvironmentSprings.MaxSpin);
-            playerState.Spaceship.PushAndSpin(force, randomSpin);
+
+            playerState.Spaceship.Transform.Velocity += force;
+            playerState.Spaceship.Transform.Direction = force.Normalize();
+            playerState.Spaceship.IsEngineOn = false;
+
+            _spinPlayerCommand
+                .SetPlayer(playerId)
+                .SetSpinAmount(randomSpin)
+                .SetTick(_processedTick)
+                .Execute();
 
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
         }

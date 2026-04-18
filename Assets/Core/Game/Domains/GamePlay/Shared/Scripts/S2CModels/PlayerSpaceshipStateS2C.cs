@@ -13,7 +13,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public PlayerTalentsStateS2C TalentsState;
         public bool IsEngineOn = true;
         public bool IsAlive = true;
-        public bool IsSpinned => Transform.AngularVelocity != 0;
+        public bool IsSpinned;
 
         public PlayerSpaceshipStateS2C(int maxTalents)
         {

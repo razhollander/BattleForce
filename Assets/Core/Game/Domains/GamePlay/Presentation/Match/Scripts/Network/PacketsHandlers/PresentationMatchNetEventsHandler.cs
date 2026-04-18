@@ -173,6 +173,38 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessPlayerSpinnedStartedEvents(CapacityList<PlayerSpinnedStartedNetEventS2C> playerSpinnedStartedNetEvents)
+        {
+            if (playerSpinnedStartedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerSpinnedStartedNetEvent in playerSpinnedStartedNetEvents)
+            {
+                var player = _matchDataService.GetPlayer(playerSpinnedStartedNetEvent.PlayerId);
+                player.Spaceship.IsSpinned = true;
+                
+                _cachedPresentationEventsService.PlayerSpinnedStartedNetEvents.Add(playerSpinnedStartedNetEvent);
+            }
+        }
+
+        public void ProcessPlayerSpinnedEndedEvents(CapacityList<PlayerSpinnedEndedNetEventS2C> playerSpinnedEndedNetEvents)
+        {
+            if (playerSpinnedEndedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerSpinnedEndedNetEvent in playerSpinnedEndedNetEvents)
+            {
+                var player = _matchDataService.GetPlayer(playerSpinnedEndedNetEvent.PlayerId);
+                player.Spaceship.IsSpinned = false;
+                
+                _cachedPresentationEventsService.PlayerSpinnedEndedNetEvents.Add(playerSpinnedEndedNetEvent);
+            }
+        }
+
         public void ProcessPowerUpSpawnedEvents(CapacityList<PowerUpBallSpawnedNetEventS2C> powerUpBallSpawnedNetEvents)
         {
             if (powerUpBallSpawnedNetEvents.IsNullOrEmpty())

@@ -16,6 +16,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<PlayersSwapNetEventS2C> PlayerSwapNetEvents { get; }
         List<TalentCardObtainedNetEventS2C> TalentCardObtainedNetEvents { get; }
         List<TalentCardHitNetEventS2C> TalentCardHitNetEvents { get; }
+        List<PlayerSpinnedStartedNetEventS2C> PlayerSpinnedStartedNetEvents { get; }
+        List<PlayerSpinnedEndedNetEventS2C> PlayerSpinnedEndedNetEvents { get; }
         List<PowerUpBallSpawnedNetEventS2C> PowerUpBallSpawnedNetEvents { get; }
         List<PowerUpBallObtainedNetEventS2C> PowerUpBallObtainedNetEvents { get; }
         List<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents { get; }
