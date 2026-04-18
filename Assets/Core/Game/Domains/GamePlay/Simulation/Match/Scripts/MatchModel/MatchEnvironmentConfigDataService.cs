@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public EnvironmentSpringConfig[] EnvironmentSprings { get; private set; }
         public EnvironmentTeleportGatePairConfig[] TeleportGates { get; private set; }
         public WallConfig[] LavaWallConfigs { get; private set; }
+        public WallConfig[] StageBoundaries { get; private set; }
         public WallConfig[] WallConfigs { get; private set; }
         public EnvironmentRotatingWheelConfig[] RotatingWheels { get; private set; }
         public EnvironmentFieldBarrierConfig[] FieldBarrierConfigs { get; private set; }
@@ -26,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         {
             WallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetWalls();
             LavaWallConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetLavaWalls();
+            StageBoundaries = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetStageBoundaries();
             TalentCards = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetTalentCards();
             EnvironmentSprings = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetEnvironmentSprings();
             TeleportGates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetTeleportGates();

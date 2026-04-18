@@ -30,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<ITickProcessor>().To<ServerMatchNetworkTickProcessor>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersTalentsManager>().To<PlayersTalentsManager>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersInLavaTrackerService>().To<PlayersInLavaTrackerService>().AsSingle().NonLazy();
+            _diContainer.Bind<Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker.IPlayersOutsideStageTrackerService>().To<Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker.PlayersOutsideStageTrackerService>().AsSingle().NonLazy();
             _diContainer.Bind<IOverrideableNetEventsService>().To<OverrideableNetEventsService>().AsSingle().NonLazy();
             _diContainer.Bind<IPowerUpsSpawnerService>().To<PowerUpsSpawnTimerService>().AsSingle().NonLazy();
             _diContainer.Bind<IMatchPlayerJoinPacketsHandler>().To<MatchPlayerJoinPacketsHandler>().AsSingle().NonLazy();

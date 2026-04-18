@@ -76,15 +76,18 @@
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PowerUpBallObtainedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/BulletSpawnNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PowerUpBallSpawnedNetEventS2C.cs
+./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerSpinnedEndedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerToEnvironmentTeleportGateCollisionNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PerformDashPulseNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/EnvironmentSpringPlayerCollisionNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/DeactivateGrapplingHookTalentNetEventS2C.cs
+./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerSpinnedStartedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/UpdatePlayerTalentStocksNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/TalentCardObtainedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerSwitchTeamNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/DeactivateSentryGunTalentNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/StartMatchEligibleChangedNetEventS2C.cs
+./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerSpinnedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/DeactivateSwapTalentNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/GainBoltsNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/ActivateSentryGunTalentNetEventS2C.cs
@@ -118,6 +121,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/InitStageCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/AddForceToPlayerCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/StepPhysiscsSimulationCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/TrySnapPlayersOutsideStageCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/EnforceFieldBarriersCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/TrySpawnPowerUpBallsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/TryDamagePlayersInLavaCommand.cs
@@ -128,9 +132,13 @@
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/SetRandomTalentsForPlayerCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/StepAllPlayersTalentsCooldownsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/StepTimersCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/TryEndPlayersSpinCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/TryEndStagePreparationPhaseCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/PlayerGainedBoltsCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/SpinPlayerCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/AddPlayerCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/PlayersOutsideStageTracker/IPlayersOutsideStageTrackerService.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/PlayersOutsideStageTracker/PlayersOutsideStageTrackerService.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/NetworkManager/TickHandlers/PacketsObservers/IMatchPlayerJoinPacketsHandler.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/NetworkManager/TickHandlers/PacketsObservers/IMatchPlayerInputsPacketsHandler.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/NetworkManager/TickHandlers/PacketsObservers/MatchPlayerInputsPacketsHandler.cs
@@ -294,6 +302,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleSwapFieldCreatedNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleActivateSentryGunTalentNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleDeactivateKOTalentNetEventsCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerSpinnedStartedNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleEnvironmentSpringPlayerCollisionNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleGainBoltsNetEventCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerDiedNetEventsCommand.cs
@@ -312,6 +321,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleTeamLostNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePowerUpBallSpawnedNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePowerUpBallObtainedNetEventsCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerSpinnedEndedNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleGrapplingHookDeactivatedNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleGrapplingHookShotNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleBulletSpawnNetEventsCommand.cs

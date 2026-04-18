@@ -9,9 +9,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public ushort Id;
 
         public Vector2[] Points { get; }
+        public int PointsCount { get; private set; }
 
         public void SetPoints(Vector2[] points)
         {
+            PointsCount = points.Length;
             for (int i = 0; i < points.Length; i++)
             {
                 Points[i] = points[i];

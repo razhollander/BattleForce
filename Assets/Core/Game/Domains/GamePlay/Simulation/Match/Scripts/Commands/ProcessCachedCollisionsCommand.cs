@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -28,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IPlayersTalentsManager _playersTalentsManager;
         private ITeleportGateService _teleportGateService;
+        private Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker.IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
@@ -49,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
+            _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
         }
@@ -70,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var objectB = collisionEvent.BodyDataB;
 
                 HandlePlayerLavaCollision(objectA, objectB, collisionEvent.Type);
+                HandlePlayerStageBoundaryCollision(objectA, objectB, collisionEvent.Type);
 
                 if (collisionEvent.Type != PhysicsEventEventType.Begin)
                 {
@@ -352,6 +356,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             else if (eventType == PhysicsEventEventType.End)
             {
                 _playersInLavaTrackerService.OnPlayerExitLava(playerId);
+            }
+        }
+
+        private void HandlePlayerStageBoundaryCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, PhysicsEventEventType eventType)
+        {
+            var isPlayerStageBoundary = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.StageBoundary;
+            var isStageBoundaryPlayer = objectA.PhysicsBodyType == PhysicsBodyType.StageBoundary && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerStageBoundary && !isStageBoundaryPlayer)
+            {
+                return;
+            }
+
+            var playerId = isPlayerStageBoundary ? objectA.Id : objectB.Id;
+
+            if (eventType == PhysicsEventEventType.Begin)
+            {
+                _playersOutsideStageTrackerService.OnPlayerEnterStageBoundary(playerId);
+            }
+            else if (eventType == PhysicsEventEventType.End)
+            {
+                _playersOutsideStageTrackerService.OnPlayerExitStageBoundary(playerId);
             }
         }
 
