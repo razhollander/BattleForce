@@ -138,6 +138,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             return _walls.FindWithId(wallId);
         }
 
+        public bool TryGetEnvironmentWall(ushort wallId, out EnvironmentWallS2C wall)
+        {
+            for (int i = 0; i < _walls.Count; i++)
+            {
+                if (_walls[i].Id == wallId)
+                {
+                    wall = _walls[i];
+                    return true;
+                }
+            }
+
+            wall = null;
+            return false;
+        }
+
         public MatchEnvironmentFieldBarrierModel GetBarrierForTeam(ushort teamId)
         {
             foreach (var barrier in FieldBarriers.AsSpan())

@@ -32,7 +32,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly ChooseNetworkRoleUIView _uiView;
         private readonly ISceneLoaderService _sceneLoaderService;
         private readonly IStateMachineService _stateMachineService;
-        private readonly IClientNetworkManager _clientNetworkManager;
         private readonly NetworkConfig _networkConfig;
         private readonly IPlaybackIOService _playbackIOService;
         private readonly ICommandFactory _commandFactory;
@@ -40,13 +39,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly IDataPersistence _dataPersistence;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
-            IStateMachineService stateMachineService, IClientNetworkManager clientNetworkManager, NetworkConfig networkConfig, IPlaybackIOService playbackIOService,
+            IStateMachineService stateMachineService, NetworkConfig networkConfig, IPlaybackIOService playbackIOService,
             ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig, IDataPersistence dataPersistence)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
             _stateMachineService = stateMachineService;
-            _clientNetworkManager = clientNetworkManager;
             _networkConfig = networkConfig;
             _playbackIOService = playbackIOService;
             _commandFactory = commandFactory;
@@ -64,6 +62,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             
             _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, isLocalHost, ipAddress, port, playerName);
             PopulatePlaybacksDropdown();
+
+            if (PlayerPrefsSettings.ShouldSkipMatchMaking)
+            {
+                OnHostClicked();
+            }
 #if UNITY_SERVER
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             StartServer(cancellationTokenSource, false).Forget();

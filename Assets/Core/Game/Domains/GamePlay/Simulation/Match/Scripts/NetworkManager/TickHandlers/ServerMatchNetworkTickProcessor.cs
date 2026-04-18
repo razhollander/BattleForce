@@ -260,6 +260,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.UpdatePlayerTalentStocksNetEvents = _netEventsDataService.UpdatePlayerTalentStocksNetEventsPerPlayer[playerId];
                 _fullTickPacket.PlayerMaxShootCooldownChangedNetEvents = _netEventsDataService.PlayerMaxShootCooldownChangedNetEventsPerPlayer[playerId];
                 _fullTickPacket.DestroySwapFieldNetEvents = _netEventsDataService.DeactivateSwapTalentNetEventsPerPlayer[playerId];
+                _fullTickPacket.CreateGrapplingHookProjectileNetEvents = _netEventsDataService.CreateGrapplingHookProjectileNetEventsPerPlayer[playerId];
+                _fullTickPacket.GrapplingHookHitWallNetEvents = _netEventsDataService.GrapplingHookHitWallNetEventsPerPlayer[playerId];
+                _fullTickPacket.DeactivateGrapplingHookTalentNetEvents = _netEventsDataService.DeactivateGrapplingHookTalentNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

@@ -29,6 +29,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PlayerHealthS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/JoinResponsePacketS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/EnvironmentTransformS2C.cs
+./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/TalentGrapplingHookProjectileStateS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/SimulationStateS2C_SerialziedDelta.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PlayerShootStateS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PlayerBulletS2C.cs
@@ -63,6 +64,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerDiedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/BulletDestroyedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/KOProjectHitPlayerNetEventS2C.cs
+./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/CreateGrapplingHookProjectileNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/CreateSwapFieldNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayersSwapNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PreparationPhaseEndedNetEventS2C.cs
@@ -70,12 +72,14 @@
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/TeamLostNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/TalentCardHitNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerTakeDamageNetEventS2C.cs
+./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/GrapplingHookHitWallNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PowerUpBallObtainedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/BulletSpawnNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PowerUpBallSpawnedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerToEnvironmentTeleportGateCollisionNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PerformDashPulseNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/EnvironmentSpringPlayerCollisionNetEventS2C.cs
+./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/DeactivateGrapplingHookTalentNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/UpdatePlayerTalentStocksNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/TalentCardObtainedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerSwitchTeamNetEventS2C.cs
@@ -121,6 +125,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/StepAllWheelsRotationCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/TryPerformShootForPlayerIfNotOnCooldownCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/PlayerHitCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/SetRandomTalentsForPlayerCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/StepAllPlayersTalentsCooldownsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/StepTimersCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/TryEndStagePreparationPhaseCommand.cs
@@ -143,6 +148,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/PlayerTalentControllers.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/PlayersTalentsManager.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/IPlayersTalentsManager.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/GrapplingHookTalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/KOTalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/ITalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/DashPulseTalentController.cs
@@ -184,6 +190,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/KOTalentConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/PulseDashConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/SwapTalentConfig.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/GrapplingHookTalentConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/SentryGunTalentConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/HammerTalentConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerExitPointCommand.cs
@@ -266,6 +273,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Models/MatchPlayerModel.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Models/MatchPowerUpBallModel.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Models/MatchSwapFieldModel.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Models/MatchGrapplingHookProjectileModel.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/TickProcessor/ClientMatchPresentationTickProcessor.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/TickProcessor/IClientMatchPresentationTickProcessor.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/TickProcessor/ClientMatchNetworkTickProcessor.cs
@@ -275,6 +283,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/AddMatchPlayerCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/UpdateSwapFieldsTransformCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/SendMatchInputsToServerCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/UpdateGrapplingHookProjectilesTransformCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/EntryPoint/StartGamePlayMatchCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/EntryPoint/ExitGamePlayMatchCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/EntryPoint/LoadGamePlayMatchCommand.cs
@@ -290,6 +299,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerDiedNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePerformDashPulseNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleDeactivateSentryGunTalentNetEventsCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleGrapplingHookHitNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleTalentSwitchNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerSwapNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleKOProjectHitPlayerNetEventsCommand.cs
@@ -302,6 +312,8 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleTeamLostNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePowerUpBallSpawnedNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePowerUpBallObtainedNetEventsCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleGrapplingHookDeactivatedNetEventsCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleGrapplingHookShotNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleBulletSpawnNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleKOProjectileCreatedNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand.cs
@@ -335,6 +347,11 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/SwapFields/Scripts/Mvc/ISwapFieldControllers.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/SwapFields/Scripts/Mvc/SwapFieldController.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/SwapFields/Scripts/Mvc/SwapFieldControllers.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/GrapplingHook/Scripts/Mvc/GrapplingHookProjectileController.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/GrapplingHook/Scripts/Mvc/GrapplingHookProjectilePool.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/GrapplingHook/Scripts/Mvc/IGrapplingHookProjectilesControllers.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/GrapplingHook/Scripts/Mvc/GrapplingHookProjectilesControllers.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/GrapplingHook/Scripts/Mvc/GrapplingHookProjectileView.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/PowerUps/Scripts/Mvc/PowerUpBallView.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/PowerUps/Scripts/Mvc/PowerUpBallPool.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/PowerUps/Scripts/Mvc/PowerUpBallControllers.cs

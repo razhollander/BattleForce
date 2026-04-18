@@ -54,7 +54,56 @@ namespace CoreDomain.Scripts.Utils
             var rotation = Quaternion.FromToRotation(Vector3.up, surfaceNormal);
             return rotation * vector;
         }
+        
+        /// <summary>
+        /// Rotates a Vector2 towards a target Vector2 by a maximum degree delta.
+        /// </summary>
+        public static System.Numerics.Vector2 RotateTowards(System.Numerics.Vector2 current, System.Numerics.Vector2 target, float maxDegreesDelta)
+        {
+            float currentRad = GetAngle(current);
+            float targetRad = GetAngle(target);
 
+            // Calculate the shortest signed difference between angles
+            float deltaRad = DeltaAngleRadians(currentRad, targetRad);
+
+            // Convert max delta to radians and clamp the rotation
+            float maxRadDelta = maxDegreesDelta * (MathF.PI / 180f);
+            float actualRotation = Math.Clamp(deltaRad, -maxRadDelta, maxRadDelta);
+
+            return Rotate(current, actualRotation);
+        }
+
+        /// <summary>
+        /// Returns the angle of the vector in radians using Atan2.
+        /// </summary>
+        public static float GetAngle(System.Numerics.Vector2 vector)
+        {
+            return MathF.Atan2(vector.Y, vector.X);
+        }
+
+        /// <summary>
+        /// Calculates the shortest difference between two radian angles, 
+        /// wrapping correctly around the 2PI boundary.
+        /// </summary>
+        public static float DeltaAngleRadians(float current, float target)
+        {
+            float diff = target - current;
+            // Wrap the angle to -PI to PI range
+            while (diff > MathF.PI) diff -= MathF.PI * 2;
+            while (diff < -MathF.PI) diff += MathF.PI * 2;
+            return diff;
+        }
+
+        /// <summary>
+        /// Rotates a vector by a specific radian amount.
+        /// </summary>
+        public static System.Numerics.Vector2 Rotate(System.Numerics.Vector2 v, float radians)
+        {
+            float ca = MathF.Cos(radians);
+            float sa = MathF.Sin(radians);
+            return new System.Numerics.Vector2(ca * v.X - sa * v.Y, sa * v.X + ca * v.Y);
+        }
+        
         public static Vector2 ExpDecay(Vector2 a, Vector2 b, float decay, float deltaTime)
         {
             return b + (a - b) * Mathf.Exp(-decay * deltaTime);

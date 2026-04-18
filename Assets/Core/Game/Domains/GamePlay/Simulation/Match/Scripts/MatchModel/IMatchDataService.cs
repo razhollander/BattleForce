@@ -20,5 +20,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         PowerUpBallS2C AddPowerUpBall(Vector2 position, Vector2 velocity, PowerUpType powerUpType);
         TalentSwapFieldS2C AddSwapField(ushort casterPlayerId, int tick, int fieldEndTick);
         TalentKOProjectileS2C AddKOProjectile(int tick, ushort casterPlayerId, Vector2 transformPosition, Vector2 rotation, Vector2 velocity, float koConfigProjectileSize);
+        TalentGrapplingHookProjectileStateS2C AddGrapplingHookProjectile(ushort casterPlayerId, Vector2 transformPosition, Vector2 velocity);
     }
 }

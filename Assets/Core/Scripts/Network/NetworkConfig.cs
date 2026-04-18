@@ -84,10 +84,16 @@ namespace Core.Scripts.Network
         public int UpdatePlayerTalentStocksNetEvents = 128;
         public int ActivateSentryGunTalentNetEvents = 128;
         public int DeactivateSentryGunTalentNetEvents = 128;
+        public int PlayerGrapplingHookShotNetEvents = 128;
+        public int PlayerGrapplingHookHitNetEvents = 128;
+        public int PlayerGrapplingHookDeactivatedNetEvents = 128;
         public int UpdatePlayerTalentStocksNetEvent = 128;
         public int PlayerMaxShootCooldownChangedNetEvents = 128;
         public int PlayerSpinnedStartedNetEvents = 128;
         public int PlayerSpinnedEndedNetEvents = 128;
+        public int CreateGrapplingHookProjectileNetEvents = 128;
+        public int GrapplingHookHitWallNetEvents = 128;
+        public int DeactivateGrapplingHookTalentNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel

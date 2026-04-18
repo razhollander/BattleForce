@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             if (!playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
             {
-                _playerView.SetIsAimArrowShown(false);
+                _playerView.SetIsTalentArrowShown(false, false);
                 return;
             }
 
@@ -83,7 +83,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var talentType = talentState.TalentType;
             var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentType];
             _playerView.SetTalentSprite(talentSprite);
-            _playerView.SetIsAimArrowShown(_gamePlayConfig.TalentsConfig.Talents[talentType].IsAimArrowActiveWhileSelected);
+            UpdateIsArrowShownAccordingToTalentState(talentState);
         }
 
         public void UpdateTransform()
@@ -195,6 +195,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetPlayersSpinnedState(bool isOn)
         {
             _playerView.SetIsSpinned(isOn, _stageCancellationTokenProvider.CancellationTokenSource);
+        }
+        
+        public void UpdateIsArrowShownAccordingToTalentState(TalentStateS2C talentState)
+        {
+            var selectedTalentConfig = _gamePlayConfig.TalentsConfig.Talents[talentState.TalentType];
+            var isArrowShown = !talentState.IsOnCooldown() && selectedTalentConfig.IsArrowShownWhileSelected && (talentState.IsActive && selectedTalentConfig.IsArrowShownWhileActive || !talentState.IsActive );
+            _playerView.SetIsTalentArrowShown(isArrowShown, selectedTalentConfig.IsFrontArrow);
         }
     }
 }
