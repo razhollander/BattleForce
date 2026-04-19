@@ -20,5 +20,5 @@ public class SharedGamePlayConfig : ScriptableObject
     public ushort MinEntityId = 1; // 1 and not 0 because Box2D entites start from 1
     public float GrapplingHookProjectileSize = 1f;
     public float GrapplingHookProjectileMaxDistance = 30f;
-    public float MagneticPullFieldSize = 5f;
+    public float MagneticPullFieldRadius = 5f;
 }

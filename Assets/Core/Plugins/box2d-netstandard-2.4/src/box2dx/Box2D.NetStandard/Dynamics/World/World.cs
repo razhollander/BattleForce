@@ -1044,6 +1044,10 @@ namespace Box2D.NetStandard.Dynamics.World
             }
         }
 
+        public bool ShouldCollide(Fixture fixtureA, Fixture fixtureB)
+        {
+            return m_contactManager.ShouldCollide(fixtureA, fixtureB);
+        }
         /// <summary>
         ///  Take a time step. This performs collision detection, integration,
         ///  and constraint solution.

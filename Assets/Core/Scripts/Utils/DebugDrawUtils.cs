@@ -1,13 +1,14 @@
 using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Scripts.Utils
 {
     public static class DebugDrawUtils
     {
         [Conditional("DEBUG_DRAW_ENABLED")]
-        public static void DrawRotatedRect(System.Numerics.Vector2 centerNum, System.Numerics.Vector2 sizeNum, float angleRadians)
+        public static void DrawRotatedRect(Vector2 centerNum, Vector2 sizeNum, float angleRadians)
         {
             // 1. Convert System.Numerics to Unity types
             Vector3 center = new Vector3(centerNum.X, centerNum.Y, 0);
@@ -36,6 +37,30 @@ namespace Core.Scripts.Utils
             Debug.DrawLine(p2, p3, Color.green, duration); // Right
             Debug.DrawLine(p3, p4, Color.green, duration); // Bottom
             Debug.DrawLine(p4, p1, Color.green, duration); // Left
+        }
+
+        public static void DrawPolygon(Vector2 centerNum, Vector2[] localVertices)
+        {
+            if (localVertices == null || localVertices.Length < 2) return;
+
+            Vector3 center = new Vector3(centerNum.X, centerNum.Y, 0);
+            int count = localVertices.Length;
+            float duration = 1f;
+            Color drawColor = Color.green;
+
+            for (int i = 0; i < count; i++)
+            {
+                // 1. Get current and next vertex in local space
+                var currentLocal = localVertices[i];
+                var nextLocal = localVertices[(i + 1) % count]; // Loop back to start
+
+                // 2. Convert and offset to world space
+                Vector3 p1 = center + new Vector3(currentLocal.X, currentLocal.Y, 0);
+                Vector3 p2 = center + new Vector3(nextLocal.X, nextLocal.Y, 0);
+
+                // 3. Draw the segment
+                Debug.DrawLine(p1, p2, drawColor, duration);
+            }
         }
     }
 }

@@ -61,49 +61,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var config = _gamePlayConfig.Talents.MagneticPullTalentConfig;
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            var offset = _sharedGamePlayConfig.MagneticPullFieldSize*0.5f;
+            var offset = _sharedGamePlayConfig.MagneticPullFieldRadius*0.5f;
             var center = casterPlayerState.Spaceship.Transform.Position + (direction * offset);
-            var size = new Vector2(config.FieldWidth, config.FieldHeight);
-
-            // Assuming 0 radians is up (0, 1), we need to calculate angle from direction
-            var angleRadians = (float)Math.Atan2(direction.Y, direction.X);
-
             ushort hitEnemyId = 0;
-            var didHitEnemy = false;
-            var didHitAny = _physicsSimulator.RectangleCast(center, size, angleRadians, PhysicsBodyType.PlayerSpaceship);
-            if (didHitAny)
+            var didHitEnemy = _physicsSimulator.ArcCastOnPlayer(center, _sharedGamePlayConfig.MagneticPullFieldRadius,direction, _gamePlayConfig.Talents.MagneticPullTalentConfig.FieldArcAngle, (short)casterPlayerState.TeamId, out var hitBodyData);
+            if (didHitEnemy)
             {
-                var allPlayers = _matchDataService.SimulationState.Players;
-                foreach (var player in allPlayers.AsSpan())
-                {
-                    if (!player.Spaceship.IsAlive || player.Id == _casterPlayerId || player.TeamId == casterPlayerState.TeamId)
-                        continue;
+                var hitEnemyPlayer = _matchDataService.SimulationState.GetPlayerById(hitBodyData.Id);
+                hitEnemyId = hitEnemyPlayer.Id;
+                var force = config.PushForce;
+                var dirToEnemy = Vector2.Normalize(hitEnemyPlayer.Spaceship.Transform.Position - casterPlayerState.Spaceship.Transform.Position);
 
-                    var enemyPos = player.Spaceship.Transform.Position;
-                    var toEnemy = enemyPos - center;
-                    var rotatedToEnemyX = toEnemy.X * (float)Math.Cos(-angleRadians) - toEnemy.Y * (float)Math.Sin(-angleRadians);
-                    var rotatedToEnemyY = toEnemy.X * (float)Math.Sin(-angleRadians) + toEnemy.Y * (float)Math.Cos(-angleRadians);
-
-                    var extentsX = config.FieldWidth / 2f;
-                    var extentsY = config.FieldHeight / 2f;
-                    var radius = player.Spaceship.Transform.Radius;
-
-                    if (Math.Abs(rotatedToEnemyX) <= extentsX + radius && Math.Abs(rotatedToEnemyY) <= extentsY + radius)
-                    {
-                        hitEnemyId = player.Id;
-                        didHitEnemy = true;
-                        var force = config.PushForce;
-                        var dirToEnemy = Vector2.Normalize(enemyPos - casterPlayerState.Spaceship.Transform.Position);
-
-                        var forceToEnemy = -dirToEnemy * force;
-                        var forceToPlayer = dirToEnemy * force;
-
-                        player.Spaceship.Transform.Velocity += forceToEnemy;
-                        casterPlayerState.Spaceship.Transform.Velocity += forceToPlayer;
-
-                        break;
-                    }
-                }
+                var forceToEnemy = -dirToEnemy * force;
+                var forceToPlayer = dirToEnemy * force;
+                hitEnemyPlayer.Spaceship.Transform.Velocity += forceToEnemy;
+                casterPlayerState.Spaceship.Transform.Velocity += forceToPlayer;
             }
 
             // Put on cooldown

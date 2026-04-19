@@ -309,5 +309,10 @@ namespace Box2D.NetStandard.Dynamics.World
 
             ++m_contactCount;
         }
+
+        public bool ShouldCollide(Fixture fixtureA, Fixture fixtureB)
+        {
+            return m_contactFilter.ShouldCollide(fixtureA, fixtureB);
+        }
     }
 }
