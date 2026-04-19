@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void SetPlayerVelocity(ushort playerId, Vector2 velocity);
         void AddWall(ushort id, Vector2[] points, Vector2 position);
         void AddLavaWall(ushort id, Vector2[] points, Vector2 position);
+        void AddStageBoundary(ushort id, Vector2[] points, Vector2 position);
         void AddTeamFloor(ushort id, Vector2[] points, Vector2 position);
         void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius);
         public FixedUnorderedList<PhysicsCollisionEvent> GetCachedCollisions();
@@ -24,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void CopyDataToSimulation(MatchMakingSimulationStateS2C simulationState);
         Body GetPlayer(ushort playerId);
         Body GetKOProjectile(ushort koProjectileId);
+        Body GetGrapplingHookProjectile(ushort grapplingHookProjectileId);
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
         void AddTalentCard(ushort id, Vector2 position, float length, float height);
         void AddPowerUpBall(ushort id, Vector2 position, Vector2 velocity, float radius);
@@ -40,6 +42,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void RemoveSwapField(ushort id);
         void AddKOProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
         void RemoveKOProjectile(ushort id);
+        void AddGrapplingHookProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
+        void UpdateGrapplingHookProjectile(ushort id, Vector2 position, Vector2 velocity);
+        void RemoveGrapplingHookProjectile(ushort id);
         void ClearAllData();
         void DisableBodyCollider(PhysicsBodyType koProjectile, ushort projectileId);
     }

@@ -31,9 +31,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         public TalentType TalentType => TalentType.DashPulse;
         public bool IsCurrentlyActive => false;
 
-        public void ProcessTalentInput(bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
         {
-            if (!isTalentInputPressed)
+            if (!wasTalentInputDownThisTick)
             {
                 return;
             }

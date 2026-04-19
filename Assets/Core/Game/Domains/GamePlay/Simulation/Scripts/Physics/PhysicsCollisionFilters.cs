@@ -17,7 +17,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsBodyType.EnvironmentSpring)
                                     | GetCollisionMask(PhysicsBodyType.EnvironmentTeleportGate)
                                     | GetCollisionMask(PhysicsBodyType.SwapField)
-                                    | GetCollisionMask(PhysicsBodyType.KOProjectile);
+                                    | GetCollisionMask(PhysicsBodyType.KOProjectile)
+                                    | GetCollisionMask(PhysicsBodyType.StageBoundary);
                     break;
                 case PhysicsBodyType.PlayerBullet:
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
@@ -30,7 +31,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsBodyType.PlayerBullet)
                                     | GetCollisionMask(PhysicsBodyType.PowerUpBall)
-                                    | GetCollisionMask(PhysicsBodyType.KOProjectile);
+                                    | GetCollisionMask(PhysicsBodyType.KOProjectile)
+                                    | GetCollisionMask(PhysicsBodyType.GrapplingHookProjectile);
                     break;
                 case PhysicsBodyType.TalentCard:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerBullet);
@@ -61,6 +63,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     break;
                 case PhysicsBodyType.SwapField:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    break;
+                case PhysicsBodyType.StageBoundary:
+                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    break;
+                case PhysicsBodyType.GrapplingHookProjectile:
+                    collisionMask = GetCollisionMask(PhysicsBodyType.Wall);
                     break;
                 default:
                     collisionMask = 0xFFFF;

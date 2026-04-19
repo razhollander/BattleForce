@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private PlayerLoadingRingView _loadingRingView;
         [SerializeField] private Transform _spaceShipTransform;
         [SerializeField] private Transform _aimArrowTransform; // todo move to the match domain
+        [SerializeField] private GameObject _frontArrowGameObject; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
         [SerializeField] private Transform _leftEyeBall;
@@ -32,9 +33,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private SpriteAnimator _sentryGunAnimator;
-        [SerializeField] private Sprite _spinnedEyesSprite;
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
+        [SerializeField] private UmbrellaStickView _umbrellaStickView;
         
         private Transform _transform;
         private SpriteRenderer _leftEyeRenderer;
@@ -61,6 +62,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             _sentryGunAnimator.StopAnimation();
             _sentryGunAnimator.gameObject.TrySetActive(false);
+        }
+
+        public void SetUmbrellaState(bool isOn)
+        {
+            if (isOn)
+            {
+                _umbrellaStickView.ShowUmbrella();
+            }
+            else
+            {
+                DisableUmbrellaState();
+            }
         }
 
         public void UpdateTailBend()
@@ -136,8 +149,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void SetIsSpinned(bool isSpinned, CancellationTokenSource cancellationTokenSource)
         {
-            _leftEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultLeftEyeSprite;
-            _rightEyeRenderer.sprite = isSpinned ? _spinnedEyesSprite : _defaultRightEyeSprite;
+            _leftEyeRenderer.sprite = isSpinned ? null : _defaultLeftEyeSprite;
+            _rightEyeRenderer.sprite = isSpinned ? null : _defaultRightEyeSprite;
 
             if (isSpinned)
             {
@@ -166,7 +179,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             DisableSentryGunState();
             DisableSpinned();
+            DisableUmbrellaState();
             gameObject.SetActive(false);
+        }
+
+        private void DisableUmbrellaState()
+        {
+            _umbrellaStickView.HideUmbrella();
         }
 
         public Transform GetSpaceShipTransform()
@@ -219,9 +238,38 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _tailView.SetIsTailWaving(isWaving);
         }
 
-        public void SetIsAimArrowShown(bool isShown)
+        public void SetIsTalentArrowShown(bool isShown, bool isFrontArrow)
         {
-            _aimArrowTransform.gameObject.TrySetActive(isShown);
+            if (isFrontArrow)
+            {
+                _frontArrowGameObject.TrySetActive(isShown);
+                _aimArrowTransform.gameObject.TrySetActive(false);
+            }
+            else
+            {
+                _aimArrowTransform.gameObject.TrySetActive(isShown);
+                _frontArrowGameObject.gameObject.TrySetActive(false);
+            }
+        }
+
+        public void InterpolateUmbrellaRotation(System.Numerics.Vector2 rotation, float decay)
+        {
+            if (rotation.LengthSquared() < 0.0001f)
+            {
+                LogService.LogError("Direction is too small (0) to interpolate");
+                return;
+            }
+
+            var targetRotation = rotation.ToQuaternion();
+
+            _umbrellaStickView.SetRotation(MathUtils.ExpDecay(
+                _aimArrowTransform.rotation,
+                targetRotation,
+                decay,
+                Time.deltaTime
+            ));
+
+            UpdateEyesToLookAtAimArrow(rotation);
         }
     }
 }

@@ -12,6 +12,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
@@ -31,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersTalentsManager _playersTalentsManager;
         private ICommandFactory _commandFactory;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
+        private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
 
         public override void ResolveDependencies()
         {
@@ -47,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
+            _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
         }
 
         public void Execute()
@@ -66,6 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             CreateWalls();
             CreateLavaWalls();
+            CreateStageBoundaries();
             CreateTalentCards();
             CreateEnvironmentSprings();
             CreateTeleportGates();
@@ -113,6 +117,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.StartPhaseInitialTick = 0;
             _playersTalentsManager.ResetAllTalentsData();
             _preparationPhaseTimerService.RestartTimer();
+            _playersOutsideStageTrackerService.ClearAllData();
             _stageDataService.ClearData();
         }
 
@@ -123,6 +128,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.TalentCards.Clear();
             _matchDataService.SimulationState.SwapFields.Clear();
             _matchDataService.SimulationState.KOProjectiles.Clear();
+            _matchDataService.SimulationState.GrapplingHookProjectiles.Clear();
             _matchDataService.EnvironmentData.ClearData();
         }
 
@@ -270,6 +276,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService.EnvironmentData.AddLavaWall(lavaWallId, lavaWallPoints, lavaWallLocalPosition, lavaWallWorldPosition, lavaWallWorldRotationAngle);
             _physicsSimulator.AddLavaWall(lavaWallId, lavaWallPoints, lavaWallWorldPosition);
+        }
+
+        private void CreateStageBoundaries()
+        {
+            var stageBoundaryConfigs = _matchEnvironmentConfigDataService.StageBoundaries;
+            if (stageBoundaryConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var boundaryConfig in stageBoundaryConfigs)
+            {
+                AddStageBoundaryToEnvironment(boundaryConfig.Id, boundaryConfig.Points, boundaryConfig.Position, boundaryConfig.Position, 0);
+            }
+        }
+
+        private void AddStageBoundaryToEnvironment(ushort stageBoundaryId, Vector2[] stageBoundaryPoints, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle)
+        {
+            _matchDataService.EnvironmentData.AddStageBoundary(stageBoundaryId, stageBoundaryPoints, localPosition, worldPosition, worldRotationAngle);
+            _physicsSimulator.AddStageBoundary(stageBoundaryId, stageBoundaryPoints, worldPosition);
         }
 
         private void CreateTalentCards()

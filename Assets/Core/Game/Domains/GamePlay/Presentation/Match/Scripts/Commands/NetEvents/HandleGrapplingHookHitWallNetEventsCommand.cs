@@ -1,0 +1,35 @@
+using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
+using Core.Scripts.Extensions;
+using CoreDomain.Scripts.Services.CommandFactory;
+
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
+{
+    public class HandleGrapplingHookHitWallNetEventsCommand : BaseCommand, ICommandVoid
+    {
+        private ICachedPresentationEventsService _cachedPresentationEventsService;
+        private IGrapplingHookProjectilesControllers _hookProjectilesControllers;
+
+        public override void ResolveDependencies()
+        {
+            _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
+            _hookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
+        }
+
+        public void Execute()
+        {
+            var events = _cachedPresentationEventsService.GrapplingHookHitWallNetEvents;
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                _hookProjectilesControllers.UpdateOnHit(netEvent.ProjectileId);
+            }
+
+            _cachedPresentationEventsService.GrapplingHookHitWallNetEvents.Clear();
+        }
+    }
+}

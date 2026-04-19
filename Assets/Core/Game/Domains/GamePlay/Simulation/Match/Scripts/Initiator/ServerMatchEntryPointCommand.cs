@@ -132,9 +132,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                 _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown, isPlayerConnected);
                 _playersTalentsManager.AddPlayer(playerId);
                 _simulationInputService.AddPlayer(playerId);
-                // _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
-                 _playersTalentsManager.TryAddTalentToPlayer(TalentType.KO, playerId, 0, out _, out _);
-                _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
+                _playersTalentsManager.TryAddTalentToPlayer(TalentType.Umbrella, playerId, 0, out _, out _);
+                _playersTalentsManager.TryAddTalentToPlayer(TalentType.KO, playerId, 0, out _, out _);
+                _playersTalentsManager.TryAddTalentToPlayer(TalentType.GrapplingHook, playerId, 0, out _, out _);
                 
                 if (_gamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                 {

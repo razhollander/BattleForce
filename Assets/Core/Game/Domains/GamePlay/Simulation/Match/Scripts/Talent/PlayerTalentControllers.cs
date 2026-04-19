@@ -18,16 +18,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         //private HammerTalentController HammerTalentController;
         //private BombTalentController BombTalentController;
         private readonly SentryGunTalentController _sentryGunTalentController;
+        private readonly GrapplingHookTalentController _grapplingHookTalentController;
+        private readonly UmbrellaTalentController _umbrellaTalentController;
         
         private ushort _casterPlayerId;
 
         public PlayerTalentControllers(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
             _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, commandFactory);
             _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig);
             _sentryGunTalentController = new SentryGunTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig, networkConfig, commandFactory);
+            _grapplingHookTalentController = new GrapplingHookTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig);
+            _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig);
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -37,6 +41,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _koTalentController.SetCasterId(casterPlayerId);
             _dashPulseTalentController.SetCasterId(casterPlayerId);
             _sentryGunTalentController.SetCasterId(casterPlayerId);
+            _grapplingHookTalentController.SetCasterId(casterPlayerId);
+            _umbrellaTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)
@@ -49,13 +55,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 //case TalentType.Bomb: return BombTalentController;
                 case TalentType.SentryGun: return _sentryGunTalentController;
                 case TalentType.DashPulse: return _dashPulseTalentController;
+                case TalentType.GrapplingHook: return _grapplingHookTalentController;
+                case TalentType.Umbrella: return _umbrellaTalentController;
                 default: return default;
             }
         }
 
-        public void ProcessTalentInput(TalentType talentType, bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(TalentType talentType, bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
         {
-            GetTalentByType(talentType).ProcessTalentInput(isTalentInputPressed, tick, deltaTime);
+            GetTalentByType(talentType).ProcessTalentInput(wasTalentInputDownThisTick, isTalentInputPressed, tick, deltaTime);
         }
         
         public void OnTick(int tick, float deltaTime)
@@ -66,6 +74,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             //BombTalentController?.OnTick(tick, deltaTime);
             _sentryGunTalentController?.OnTick(tick, deltaTime);
             _dashPulseTalentController?.OnTick(tick, deltaTime);
+            _grapplingHookTalentController?.OnTick(tick, deltaTime);
+            _umbrellaTalentController?.OnTick(tick, deltaTime);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)
@@ -88,6 +98,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _koTalentController.HitWall();
         }
 
+        public void HitGrapplingHookWithWall(ushort wallId, int tick)
+        {
+            _grapplingHookTalentController.HitWall(wallId, tick);
+        }
+
         public void ResetData()
         {
             _swapTalentController.ResetData();
@@ -96,6 +111,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             // HammerTalentController.ResetData();
             // BombTalentController.ResetData();
             _sentryGunTalentController.ResetData();
+            _grapplingHookTalentController.ResetData();
+            _umbrellaTalentController.ResetData();
         }
     }
 }

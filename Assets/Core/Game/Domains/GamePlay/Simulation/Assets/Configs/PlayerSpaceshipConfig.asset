@@ -20,6 +20,6 @@ MonoBehaviour:
   EngineAcceleration: 70
   VelocityDecelerationPerSecond: 50
   SpinDecelerationPerSecond: 0.05
-  MinSpin: 1
+  MinSpin: 2
   MinVelocity: 0.01
   TurnEngineOnWhenReachVelocity: 0.25

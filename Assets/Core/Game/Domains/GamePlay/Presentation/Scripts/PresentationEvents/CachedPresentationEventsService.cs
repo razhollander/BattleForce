@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.LocalEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 
@@ -31,11 +32,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents { get; } = new();
         public List<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents { get; } = new();
         public List<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents { get; } = new();
+        public List<CreateGrapplingHookProjectileNetEventS2C> CreateGrapplingHookProjectileNetEvents { get; } = new();
+        public List<GrapplingHookHitWallNetEventS2C> GrapplingHookHitWallNetEvents { get; } = new();
+        public List<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents { get; } = new();
         public List<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents { get; } = new();
         public List<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents { get; } = new();
         public List<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents { get; } = new();
-        // public List<DeactivateDashPulseTalentNetEventS2C> DeactivateDashPulseTalentNetEvents { get; } = new();
         public List<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents { get; } = new();
+        public List<PlayerSelectedTalentFinishedCooldownLocalEvent> PlayerSelectedTalentFinishedCooldownLocalEvents { get; } = new();
+        public List<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents { get; } = new();
+        public List<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents { get; } = new();
         public List<CreateMagenticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents { get; } = new();
     }
 }

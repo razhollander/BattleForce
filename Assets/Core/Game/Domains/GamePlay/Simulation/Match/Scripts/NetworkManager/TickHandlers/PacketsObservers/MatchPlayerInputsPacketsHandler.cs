@@ -188,7 +188,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentInput, isTalentInputPressed);
 
             var wasTalentInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.TalentInput);
-            _playersTalentsManager.ProcessPlayerTalentInput(playerId, currentSelectedTalent.TalentType, processedTick, wasTalentInputDownThisTick, deltaTime);
+            _playersTalentsManager.ProcessPlayerTalentInput(playerId, currentSelectedTalent.TalentType, processedTick, wasTalentInputDownThisTick, isTalentInputPressed, deltaTime);
         }
 
         private CapacityDict<ushort, int> GetHeighestProcessedTickFromServerPerPlayer()

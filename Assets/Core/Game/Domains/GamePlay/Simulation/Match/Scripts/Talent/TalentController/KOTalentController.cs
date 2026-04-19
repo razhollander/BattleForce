@@ -58,9 +58,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
         {
-            if (IsCurrentlyActive || !isTalentInputPressed)
+            if (IsCurrentlyActive || !wasTalentInputDownThisTick)
             {
                 return;
             }
@@ -75,10 +75,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _isInReturnPhase = false;
 
             var koConfig = _gamePlayConfig.Talents.KOTalentConfig;
-            var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            var velocity = direction * koConfig.ProjectileSpeed;
-
-            var koProjectile = _matchDataService.AddKOProjectile(tick, _casterPlayerId, casterPlayerState.Spaceship.Transform.Position, direction, velocity, koConfig.ProjectileSize);
+            var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var velocity = aimDirection * koConfig.ProjectileSpeed;
+            var koProjectile = _matchDataService.AddKOProjectile(tick, _casterPlayerId, casterPlayerState.Spaceship.Transform.Position, aimDirection, velocity, koConfig.ProjectileSize);
             _projectileId = koProjectile.Id;
             _physicsSimulator.AddKOProjectile(_projectileId, casterPlayerState.TeamId, koProjectile.Position, koConfig.ProjectileSize, velocity);
             _netEventsDataService.AddCreateKOProjectileNetEvent(tick, _projectileId, _casterPlayerId, koProjectile.Position, velocity, koConfig.ProjectileSize);
