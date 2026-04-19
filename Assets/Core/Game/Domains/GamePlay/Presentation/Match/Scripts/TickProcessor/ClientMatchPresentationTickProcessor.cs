@@ -132,7 +132,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePreparationPhaseEndedNetEventsCommand.Execute();
             _matchPlayerUIControllers.UpdatePlayersTalentCooldowns(lastProcessedTickFromServer);
             _playerControllers.UpdatePlayersTalentCooldowns(lastProcessedTickFromServer);
-            _playerControllers.UpdatePlayersTransform();
+            _playerControllers.UpdatePlayersTickDeltas();
             _handleSwapFieldCreatedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleDeactivateSwapTalentNetEventsCommand.Execute();
             _updateSwapFieldsTransformCommand.SetTick(lastProcessedTickFromServer).Execute();// must be after _playerControllers.UpdatePlayersTransform();

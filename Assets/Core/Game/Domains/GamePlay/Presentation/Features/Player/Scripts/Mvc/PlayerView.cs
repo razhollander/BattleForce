@@ -65,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             }
             else
             {
-                _umbrellaStickView.StopAnimation();
+                DisableUmbrellaState();
             }
         }
 
@@ -145,10 +145,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnDespawned()
         {
             DisableSentryGunState();
-            _umbrellaStickView?.StopAnimation();
+            DisableUmbrellaState();
             gameObject.SetActive(false);
         }
-        
+
+        private void DisableUmbrellaState()
+        {
+            _umbrellaStickView.StopAnimation();
+        }
+
         public Transform GetSpaceShipTransform()
         {
             return _spaceShipTransform;
@@ -202,6 +207,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetIsAimArrowShown(bool isShown)
         {
             _aimArrowTransform.gameObject.TrySetActive(isShown);
+        }
+
+        public void InterpolateUmbrellaRotation(System.Numerics.Vector2 rotation, float decay)
+        {
+            if (rotation.LengthSquared() < 0.0001f)
+            {
+                LogService.LogError("Direction is too small (0) to interpolate");
+                return;
+            }
+
+            var targetRotation = rotation.ToQuaternion();
+
+            _umbrellaStickView.SetRotation(MathUtils.ExpDecay(
+                _aimArrowTransform.rotation,
+                targetRotation,
+                decay,
+                Time.deltaTime
+            ));
+
+            UpdateEyesToLookAtAimArrow(rotation);
         }
     }
 }

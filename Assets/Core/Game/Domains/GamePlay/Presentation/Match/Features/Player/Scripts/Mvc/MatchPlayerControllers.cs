@@ -44,11 +44,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerControllers.Add(playerController);
         }
 
-        public void UpdatePlayersTransform()
+        public void UpdatePlayersTickDeltas()
         {
             foreach (var playerController in _playerControllers)
             {
-                playerController.UpdateTransform();
+                playerController.UpdateTickDeltas();
             }
         }
 

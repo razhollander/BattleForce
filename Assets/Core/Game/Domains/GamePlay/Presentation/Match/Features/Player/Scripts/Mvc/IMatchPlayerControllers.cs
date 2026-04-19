@@ -7,7 +7,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
     {
         void InitEntryPoint();
         void AddPlayer(ushort playerId);
-        void UpdatePlayersTransform();
+        void UpdatePlayersTickDeltas();
         void UpdatePlayersBulletCooldowns();
         void UpdatePlayersTalentCooldowns(int currentServerTick);
         void ShootBulletEffectForPlayer(ushort playerId);

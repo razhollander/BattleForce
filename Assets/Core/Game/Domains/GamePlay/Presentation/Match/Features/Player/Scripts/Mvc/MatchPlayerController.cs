@@ -94,7 +94,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetIsAimArrowShown(_gamePlayConfig.TalentsConfig.Talents[talentType].IsAimArrowActiveWhileSelected);
         }
 
-        public void UpdateTransform()
+        public void UpdateTickDeltas()
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             var playerTransformState = playerModel.Spaceship.Transform;
@@ -103,6 +103,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var decay = _gamePlayConfig.ExponentialDecay;
             _playerView.InterpolateTransform(playerPosition, playerRotation, decay);
             _playerView.InterpolateAimRotation(playerModel.Spaceship.TalentsState.AimDirection, decay);
+
+            if (playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent))
+            {
+                if (selectedTalent.TalentType == TalentType.Umbrella)
+                {
+                    _playerView.InterpolateUmbrellaRotation(playerModel.Spaceship.TalentsState.AimDirection, decay);
+                }
+            }
             _playerView.UpdateTailBend();
         }
 
