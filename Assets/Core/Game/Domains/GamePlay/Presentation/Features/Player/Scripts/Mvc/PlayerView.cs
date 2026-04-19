@@ -64,11 +64,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _sentryGunAnimator.gameObject.TrySetActive(false);
         }
 
-        public void SetUmbrellaState(bool isOn, CancellationTokenSource cancellationTokenSource)
+        public void SetUmbrellaState(bool isOn)
         {
             if (isOn)
             {
-                _umbrellaStickView.PlayAnimation(cancellationTokenSource);
+                _umbrellaStickView.ShowUmbrella();
             }
             else
             {
@@ -185,7 +185,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         private void DisableUmbrellaState()
         {
-            _umbrellaStickView.StopAnimation();
+            _umbrellaStickView.HideUmbrella();
         }
 
         public Transform GetSpaceShipTransform()

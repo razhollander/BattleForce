@@ -71,7 +71,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
             else if (currentSelectedTalentState.TalentType == TalentType.Umbrella)
             {
-                SetUmbrellaState(currentSelectedTalentState.IsActive, _stageCancellationTokenProvider.CancellationTokenSource);
+                SetUmbrellaState(currentSelectedTalentState.IsActive);
             }
         }
 
@@ -80,9 +80,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetSentryGunState(isSentryGun, cancellationTokenSource);
         }
 
-        public void SetUmbrellaState(bool isUmbrellaActive, CancellationTokenSource cancellationTokenSource)
+        public void SetUmbrellaState(bool isUmbrellaActive)
         {
-            _playerView.SetUmbrellaState(isUmbrellaActive, cancellationTokenSource);
+            _playerView.SetUmbrellaState(isUmbrellaActive);
         }
         
         public void SetSelectedTalent(int talentIndex)

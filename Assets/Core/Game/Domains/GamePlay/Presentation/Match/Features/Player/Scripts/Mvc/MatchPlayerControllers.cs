@@ -91,7 +91,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetPlayerUmbrellaState(ushort playerId, bool isUmbrella)
         {
-            GetPlayer(playerId).SetUmbrellaState(isUmbrella, _stageCancellationTokenProvider.CancellationTokenSource);
+            GetPlayer(playerId).SetUmbrellaState(isUmbrella);
         }
         
         public void UpdateIsPlayerArrowShownAccordingToTalentState(ushort playerId, TalentStateS2C talentStateS2C)
