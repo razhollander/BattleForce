@@ -48,7 +48,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents;
         public FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents;
 
-        public MatchFullTickPacketS2C()
+
+        public FixedUnorderedList<ActivateChickenTalentNetEventS2C> ActivateChickenTalentNetEvents;
+        public FixedUnorderedList<DeactivateChickenTalentNetEventS2C> DeactivateChickenTalentNetEvents;
+        public FixedUnorderedList<LayChickenEggNetEventS2C> LayChickenEggNetEvents;
+        public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
+        public FixedUnorderedList<DestroyChickenEggNetEventS2C> DestroyChickenEggNetEvents;
+public MatchFullTickPacketS2C()
         {
             // use this from the server?
         }
@@ -103,7 +109,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateGrapplingHookTalentNetEvents = new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(maxCap.DeactivateGrapplingHookTalentNetEvents);
             ActivateUmbrellaTalentNetEvents = new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(maxCap.ActivateUmbrellaTalentNetEvents);
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
-        }
+
+            ActivateChickenTalentNetEvents = new FixedUnorderedList<ActivateChickenTalentNetEventS2C>(maxCap.ActivateChickenTalentNetEvents);
+            DeactivateChickenTalentNetEvents = new FixedUnorderedList<DeactivateChickenTalentNetEventS2C>(maxCap.DeactivateChickenTalentNetEvents);
+            LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
+            ChickenEggHitNetEvents = new FixedUnorderedList<ChickenEggHitNetEventS2C>(maxCap.ChickenEggHitNetEvents);
+            DestroyChickenEggNetEvents = new FixedUnorderedList<DestroyChickenEggNetEventS2C>(maxCap.DestroyChickenEggNetEvents);
+}
 
         public void Serialize(NetDataWriter writer)
         {
@@ -143,7 +155,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedDeactivateGrapplingHookTalentNetEvents(writer);
             SerializedActivateUmbrellaTalentNetEvents(writer);
             SerializedDeactivateUmbrellaTalentNetEvents(writer);
-        }
+
+            SerializedActivateChickenTalentNetEvents(writer);
+            SerializedDeactivateChickenTalentNetEvents(writer);
+            SerializedLayChickenEggNetEvents(writer);
+            SerializedChickenEggHitNetEvents(writer);
+            SerializedDestroyChickenEggNetEvents(writer);
+}
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
         {
@@ -336,7 +354,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedDeactivateGrapplingHookTalentNetEvents(reader);
             DeserializedActivateUmbrellaTalentNetEvents(reader);
             DeserializedDeactivateUmbrellaTalentNetEvents(reader);
-        }
+
+            DeserializedActivateChickenTalentNetEvents(reader);
+            DeserializedDeactivateChickenTalentNetEvents(reader);
+            DeserializedLayChickenEggNetEvents(reader);
+            DeserializedChickenEggHitNetEvents(reader);
+            DeserializedDestroyChickenEggNetEvents(reader);
+}
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
         {
@@ -865,4 +889,89 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
     }
+
+        private void SerializedActivateChickenTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateChickenTalentNetEvents.Count);
+            foreach (var netEvent in ActivateChickenTalentNetEvents.AsSpan()) netEvent.Serialize(writer);
+        }
+
+        private void DeserializedActivateChickenTalentNetEvents(NetDataReader reader)
+        {
+            ActivateChickenTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateChickenTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateChickenTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateChickenTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateChickenTalentNetEvents.AsSpan()) netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateChickenTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateChickenTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateChickenTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedLayChickenEggNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)LayChickenEggNetEvents.Count);
+            foreach (var netEvent in LayChickenEggNetEvents.AsSpan()) netEvent.Serialize(writer);
+        }
+
+        private void DeserializedLayChickenEggNetEvents(NetDataReader reader)
+        {
+            LayChickenEggNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref LayChickenEggNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedChickenEggHitNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ChickenEggHitNetEvents.Count);
+            foreach (var netEvent in ChickenEggHitNetEvents.AsSpan()) netEvent.Serialize(writer);
+        }
+
+        private void DeserializedChickenEggHitNetEvents(NetDataReader reader)
+        {
+            ChickenEggHitNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ChickenEggHitNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDestroyChickenEggNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DestroyChickenEggNetEvents.Count);
+            foreach (var netEvent in DestroyChickenEggNetEvents.AsSpan()) netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDestroyChickenEggNetEvents(NetDataReader reader)
+        {
+            DestroyChickenEggNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DestroyChickenEggNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
 }

@@ -92,6 +92,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandleKOProjectilePlayerCollision(objectA, objectB);
                 HandleKOProjectileWallCollision(objectA, objectB);
                 HandleGrapplingHookWallCollision(objectA, objectB);
+                HandleChickenEggPlayerCollision(objectA, objectB, collisionEvent.Contact);
             }
 
             _physicsSimulator.ClearCachedCollisions();
@@ -116,6 +117,42 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _playersTalentsManager.HitGrapplingHookWithWall(projectile.PlayerCasterId, projectileId, wallId, _processedTick);
+        }
+
+        private void HandleChickenEggPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            bool isEggToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.ChickenEgg && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            bool isPlayerToEgg = objectB.PhysicsBodyType == PhysicsBodyType.ChickenEgg && objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isEggToPlayer && !isPlayerToEgg) return;
+
+            ushort eggId = isEggToPlayer ? objectA.Id : objectB.Id;
+            ushort playerId = isEggToPlayer ? objectB.Id : objectA.Id;
+            Body eggBody = isEggToPlayer ? contact.FixtureA.Body : contact.FixtureB.Body;
+
+            if (!_matchDataService.SimulationState.TryGetChickenEggById(eggId, out var egg)) return;
+
+            if (egg.IsBroken) return;
+
+            var player = _matchDataService.SimulationState.GetPlayerById(playerId);
+
+            if (egg.PlayerCasterId == player.Id) return;
+            if (player.TeamId == _matchDataService.SimulationState.GetPlayerById(egg.PlayerCasterId).TeamId) return;
+
+            // Mark as broken
+            ref var eggState = ref _matchDataService.SimulationState.GetChickenEggById(eggId);
+            eggState.IsBroken = true;
+            eggState.BrokenTick = _processedTick;
+
+            // Spin the player
+            var config = _gamePlayConfig.Talents.ChickenTalentConfig;
+            _spinPlayerCommand.Execute(player.Id, _processedTick, config.SpinAmount);
+
+            // Send hit event
+            _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId, playerId, eggState.Position);
+
+            // Disable egg collision
+            eggBody.SetEnabled(false);
         }
 
         private void HandleKOProjectileWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)

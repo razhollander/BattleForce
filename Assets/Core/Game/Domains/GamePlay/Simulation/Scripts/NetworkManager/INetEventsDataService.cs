@@ -95,4 +95,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
     }
+
+        CapacityDict<int, FixedUnorderedList<ActivateChickenTalentNetEventS2C>> ActivateChickenTalentNetEventsDict { get; }
+        CapacityDict<int, FixedUnorderedList<DeactivateChickenTalentNetEventS2C>> DeactivateChickenTalentNetEventsDict { get; }
+        CapacityDict<int, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsDict { get; }
+        CapacityDict<int, FixedUnorderedList<ChickenEggHitNetEventS2C>> ChickenEggHitNetEventsDict { get; }
+        CapacityDict<int, FixedUnorderedList<DestroyChickenEggNetEventS2C>> DestroyChickenEggNetEventsDict { get; }
+
+        void AddActivateChickenTalentNetEventS2C(int tick, ushort casterId);
+        void AddDeactivateChickenTalentNetEventS2C(int tick, ushort casterId, int cooldownEndTick);
+        void AddLayChickenEggNetEventS2C(int tick, ushort casterId, ushort eggId, Vector2 position);
+        void AddChickenEggHitNetEventS2C(int tick, ushort eggId, ushort hitPlayerId, Vector2 position);
+        void AddDestroyChickenEggNetEventS2C(int tick, ushort eggId);
 }

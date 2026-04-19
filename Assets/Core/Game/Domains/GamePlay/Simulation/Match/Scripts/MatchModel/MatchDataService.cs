@@ -130,5 +130,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             grapplingHookProjectile.IsHookAttached = false;
             return grapplingHookProjectile;
         }
+
+        public TalentChickenEggStateS2C AddChickenEgg(ushort casterPlayerId, Vector2 position)
+        {
+            ref var egg = ref SimulationState.ChickenEggs.AddAndGet();
+            egg.Id = IdFactory.GetNewId();
+            egg.PlayerCasterId = casterPlayerId;
+            egg.Position = position;
+            egg.IsBroken = false;
+            egg.BrokenTick = 0;
+
+            return egg;
+        }
     }
 }

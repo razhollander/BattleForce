@@ -156,10 +156,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public TalentStocksCooldownStateS2C StocksCooldown;
         public bool IsActive;
         
-        public bool IsOnCooldown() => 
-            CooldownType == TalentCooldownType.Normal
+        public bool IsOnCooldown()
+        {
+            if (CooldownType == TalentCooldownType.AlwaysActive) return false;
+            return CooldownType == TalentCooldownType.Normal
                 ? NormalCooldown.IsOnCooldown()
                 : StocksCooldown.IsOnCooldown();
+        }
 
         public void Setup(TalentType talentType)
         {
@@ -182,6 +185,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             StocksCooldown.MaxSingleStockCooldown = singleStockCooldown;
             StocksCooldown.RecieveNextStockOnTick = 0;
             NormalCooldown = default;
+        }
+
+        public void SetupWithAlwaysActive()
+        {
+            CooldownType = TalentCooldownType.AlwaysActive;
+            NormalCooldown = default;
+            StocksCooldown = default;
         }
 
         public void Serialize(NetDataWriter writer)
@@ -214,6 +224,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 case TalentCooldownType.Stocks: StocksCooldown.ClearCooldown(); break;
                 case TalentCooldownType.Normal: NormalCooldown.ClearCooldown(); break;
+                case TalentCooldownType.AlwaysActive: break;
             }
         }
     }
@@ -225,7 +236,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public int CooldownEndTick; 
         public float MaxCooldown;
 
-        public bool IsOnCooldown() => CooldownEndTick > NO_COOLDOWN_TICK;
+        public bool IsOnCooldown() { if (CooldownType == TalentCooldownType.AlwaysActive) return false; return CooldownEndTick > NO_COOLDOWN_TICK; }
         
         public void Serialize(NetDataWriter writer)
         {
@@ -248,7 +259,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public int MaxStocksAmount;
         public int RecieveNextStockOnTick;
         public float MaxSingleStockCooldown;
-        public bool IsOnCooldown() => CurrentStocksAmount == 0;
+        public bool IsOnCooldown() { if (CooldownType == TalentCooldownType.AlwaysActive) return false; return CurrentStocksAmount == 0; }
         public bool IsAtMaxStocks() => CurrentStocksAmount == MaxStocksAmount;
         public void Serialize(NetDataWriter writer)
         {

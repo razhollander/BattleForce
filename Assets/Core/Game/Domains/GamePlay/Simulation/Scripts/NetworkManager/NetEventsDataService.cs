@@ -16,6 +16,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
     public class NetEventsDataService : INetEventsDataService
     {
+        public CapacityDict<int, FixedUnorderedList<ActivateChickenTalentNetEventS2C>> ActivateChickenTalentNetEventsDict { get; }
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateChickenTalentNetEventS2C>> _activateChickenTalentNetEventsPool;
+
+        public CapacityDict<int, FixedUnorderedList<DeactivateChickenTalentNetEventS2C>> DeactivateChickenTalentNetEventsDict { get; }
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateChickenTalentNetEventS2C>> _deactivateChickenTalentNetEventsPool;
+
+        public CapacityDict<int, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsDict { get; }
+        private readonly ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>> _layChickenEggNetEventsPool;
+
+        public CapacityDict<int, FixedUnorderedList<ChickenEggHitNetEventS2C>> ChickenEggHitNetEventsDict { get; }
+        private readonly ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>> _chickenEggHitNetEventsPool;
+
+        public CapacityDict<int, FixedUnorderedList<DestroyChickenEggNetEventS2C>> DestroyChickenEggNetEventsDict { get; }
+        private readonly ConcurrentPool<FixedUnorderedList<DestroyChickenEggNetEventS2C>> _destroyChickenEggNetEventsPool;
+
         public CapacityDict<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>> BulletSpawnNetEventsPerPlayer { get; private set; } // todo: remove events related to bullet when bullet is destroyed
         public CapacityDict<ushort, FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> PlayerRejoinAcceptNetEventsPerPlayer { get; private set; } // todo: remove events related to player when player is destroyed
         public CapacityDict<ushort, FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>> MatchMakingPlayerJoinAcceptNetEventsPerPlayer { get; private set; } // todo: remove events related to player when player is destroyed
@@ -104,7 +119,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
-            var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
+
+            ActivateChickenTalentNetEventsDict = new CapacityDict<int, FixedUnorderedList<ActivateChickenTalentNetEventS2C>>(NetEventsStorageCapacityTicks);
+            _activateChickenTalentNetEventsPool = new ConcurrentPool<FixedUnorderedList<ActivateChickenTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateChickenTalentNetEventS2C>(_networkConfig.MaxCap.ActivateChickenTalentNetEvents));
+
+            DeactivateChickenTalentNetEventsDict = new CapacityDict<int, FixedUnorderedList<DeactivateChickenTalentNetEventS2C>>(NetEventsStorageCapacityTicks);
+            _deactivateChickenTalentNetEventsPool = new ConcurrentPool<FixedUnorderedList<DeactivateChickenTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateChickenTalentNetEventS2C>(_networkConfig.MaxCap.DeactivateChickenTalentNetEvents));
+
+            LayChickenEggNetEventsDict = new CapacityDict<int, FixedUnorderedList<LayChickenEggNetEventS2C>>(NetEventsStorageCapacityTicks);
+            _layChickenEggNetEventsPool = new ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>>(() => new FixedUnorderedList<LayChickenEggNetEventS2C>(_networkConfig.MaxCap.LayChickenEggNetEvents));
+
+            ChickenEggHitNetEventsDict = new CapacityDict<int, FixedUnorderedList<ChickenEggHitNetEventS2C>>(NetEventsStorageCapacityTicks);
+            _chickenEggHitNetEventsPool = new ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>>(() => new FixedUnorderedList<ChickenEggHitNetEventS2C>(_networkConfig.MaxCap.ChickenEggHitNetEvents));
+
+            DestroyChickenEggNetEventsDict = new CapacityDict<int, FixedUnorderedList<DestroyChickenEggNetEventS2C>>(NetEventsStorageCapacityTicks);
+            _destroyChickenEggNetEventsPool = new ConcurrentPool<FixedUnorderedList<DestroyChickenEggNetEventS2C>>(() => new FixedUnorderedList<DestroyChickenEggNetEventS2C>(_networkConfig.MaxCap.DestroyChickenEggNetEvents));
+var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             BulletSpawnNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>>(maxConcurrentPlayers);
             PlayerRejoinAcceptNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(maxConcurrentPlayers);
             MatchMakingPlayerJoinAcceptNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>>(maxConcurrentPlayers);
