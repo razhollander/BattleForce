@@ -32,11 +32,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var casterPosition = _matchPlayerControllers.GetPlayerPosition(netEvent.CasterPlayerId);
                 // Ensure parent transforms are mapped, maybe just use null or caster for field, but standard is null
-                _magneticPullEffectController.PlayFieldEffect(netEvent.Position.ToUnityVector2(), netEvent.Rotation.ToUnityVector2(), _sharedConfig.MagneticPullFieldSize, null);
+                _magneticPullEffectController.PlayFieldEffect(casterPosition, netEvent.Direction.ToUnityVector2(), _sharedConfig.MagneticPullFieldSize, null);
 
                 if (netEvent.HasHit)
                 {
-                    var enemyPosition = _matchPlayerControllers.GetPlayerPosition(netEvent.HitPlayerId);
+                    var enemyPosition = _matchPlayerControllers.GetPlayerPosition(netEvent.HitEnemyId);
                     _magneticPullEffectController.PlayHitEffect(casterPosition, enemyPosition, null);
                 }
             }

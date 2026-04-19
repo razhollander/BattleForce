@@ -43,6 +43,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<PlayerSelectedTalentFinishedCooldownLocalEvent> PlayerSelectedTalentFinishedCooldownLocalEvents { get; }
         List<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents { get; }
         List<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents { get; }
-        List<CreateMagenticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents { get; }
+        List<CreateMagneticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents { get; }
     }
 }

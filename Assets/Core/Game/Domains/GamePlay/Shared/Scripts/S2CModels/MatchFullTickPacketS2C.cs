@@ -47,8 +47,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents;
         public FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents;
         public FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents;
-        public FixedUnorderedList<CreateMagenticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents;
-
+        public FixedUnorderedList<CreateMagneticPullFieldNetEventS2C> CreateMagneticPullFieldNetEvents;
+        
         public MatchFullTickPacketS2C()
         {
             // use this from the server?
@@ -102,9 +102,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             CreateGrapplingHookProjectileNetEvents = new FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>(maxCap.CreateGrapplingHookProjectileNetEvents);
             GrapplingHookHitWallNetEvents = new FixedUnorderedList<GrapplingHookHitWallNetEventS2C>(maxCap.GrapplingHookHitWallNetEvents);
             DeactivateGrapplingHookTalentNetEvents = new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(maxCap.DeactivateGrapplingHookTalentNetEvents);
+            CreateMagneticPullFieldNetEvents = new FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>(maxCap.CreateMagneticPullFieldNetEvents);
             ActivateUmbrellaTalentNetEvents = new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(maxCap.ActivateUmbrellaTalentNetEvents);
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
-            CreateMagenticPullFieldNetEvents = new FixedUnorderedList<CreateMagenticPullFieldNetEventS2C>(maxCap.CreateMagenticPullFieldNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -143,18 +143,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedCreateGrapplingHookProjectileNetEvents(writer);
             SerializedGrapplingHookHitWallNetEvents(writer);
             SerializedDeactivateGrapplingHookTalentNetEvents(writer);
+            SerializedCreateMagneticPullFieldNetEvents(writer);
             SerializedActivateUmbrellaTalentNetEvents(writer);
             SerializedDeactivateUmbrellaTalentNetEvents(writer);
-            SerializedCreateMagenticPullFieldNetEvents(writer);
-        }
-
-        private void SerializedCreateMagenticPullFieldNetEvents(NetDataWriter writer)
-        {
-            writer.Put((byte)CreateMagenticPullFieldNetEvents.Count);
-            foreach (var netEvent in CreateMagenticPullFieldNetEvents.AsSpan())
-            {
-                netEvent.Serialize(writer);
-            }
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -346,20 +337,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedCreateGrapplingHookProjectileNetEvents(reader);
             DeserializedGrapplingHookHitWallNetEvents(reader);
             DeserializedDeactivateGrapplingHookTalentNetEvents(reader);
+            DeserializedCreateMagneticPullFieldNetEvents(reader);
             DeserializedActivateUmbrellaTalentNetEvents(reader);
             DeserializedDeactivateUmbrellaTalentNetEvents(reader);
-            DeserializedCreateMagenticPullFieldNetEvents(reader);
-        }
-
-        private void DeserializedCreateMagenticPullFieldNetEvents(NetDataReader reader)
-        {
-            CreateMagenticPullFieldNetEvents.Clear();
-            var count = reader.GetByte();
-            for (var i = 0; i < count; i++)
-            {
-                ref var netEvent = ref CreateMagenticPullFieldNetEvents.AddAndGet();
-                netEvent.Deserialize(reader);
-            }
         }
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
@@ -885,6 +865,26 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref DeactivateUmbrellaTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedCreateMagneticPullFieldNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)CreateMagneticPullFieldNetEvents.Count);
+            foreach (var netEvent in CreateMagneticPullFieldNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedCreateMagneticPullFieldNetEvents(NetDataReader reader)
+        {
+            CreateMagneticPullFieldNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref CreateMagneticPullFieldNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

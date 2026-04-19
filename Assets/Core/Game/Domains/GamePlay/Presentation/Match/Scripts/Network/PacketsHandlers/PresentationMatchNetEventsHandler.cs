@@ -509,7 +509,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        public void ProcessCreateMagenticPullFieldEvents(CapacityList<CreateMagenticPullFieldNetEventS2C> netEvents)
+        public void ProcessCreateMagenticPullFieldEvents(CapacityList<CreateMagneticPullFieldNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty())
             {
