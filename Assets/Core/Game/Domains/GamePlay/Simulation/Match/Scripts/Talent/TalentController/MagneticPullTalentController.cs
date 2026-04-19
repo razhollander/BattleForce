@@ -72,13 +72,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             ushort hitEnemyId = 0;
 
-            var didHitAny = _physicsSimulator.RectangleCast(center, size, angleRadians, PhysicsBodyType.Player);
+            var didHitAny = _physicsSimulator.RectangleCast(center, size, angleRadians, PhysicsBodyType.PlayerSpaceship);
             if (didHitAny)
             {
-                var allPlayers = _matchDataService.SimulationState.MatchPlayersS2C;
-                foreach (var player in allPlayers)
+                var allPlayers = _matchDataService.SimulationState.Players;
+                foreach (var player in allPlayers.AsSpan())
                 {
-                    if (!player.IsAlive || player.Id == _casterPlayerId || player.TeamId == casterPlayerState.TeamId)
+                    if (!player.Spaceship.IsAlive || player.Id == _casterPlayerId || player.TeamId == casterPlayerState.TeamId)
                         continue;
 
                     var enemyPos = player.Spaceship.Transform.Position;
