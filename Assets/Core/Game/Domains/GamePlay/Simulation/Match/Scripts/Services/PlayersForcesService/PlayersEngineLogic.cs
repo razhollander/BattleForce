@@ -8,10 +8,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
     public class PlayersEngineLogic : IPlayersEngineLogic
     {
         private readonly SimulationGamePlayConfig _simulationGamePlayConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
 
-        public PlayersEngineLogic(SimulationGamePlayConfig simulationGamePlayConfig)
+        public PlayersEngineLogic(SimulationGamePlayConfig simulationGamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _simulationGamePlayConfig = simulationGamePlayConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void TurnOnEngineForPlayerIfPossible(PlayerSpaceshipStateS2C playerSpaceshipState)
@@ -45,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
 
             var transformState = playerSpaceshipState.Transform;
             var playerMovementSpeed = transformState.Velocity.Length();
-            var targetMovementSpeed = _simulationGamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
+            var targetMovementSpeed = _sharedGamePlayConfig.TargetMovementSpeed;
             var isBelowTargetMovementSpeed = playerMovementSpeed < targetMovementSpeed;
 
             if (!isBelowTargetMovementSpeed)

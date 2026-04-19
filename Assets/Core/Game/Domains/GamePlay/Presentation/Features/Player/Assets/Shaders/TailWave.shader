@@ -13,6 +13,7 @@ Shader "Custom/SineWaveSpiralURP"
         [Header(Spiral Settings)]
         // This is the property you will control from your script
         _SpiralAmount ("Spiral Amount", Float) = 0.0 
+        _MoveSpeedMultiplier ("Move Speed Multiplier", Range(0, 1)) = 1.0
     }
     
     SubShader
@@ -63,6 +64,7 @@ Shader "Custom/SineWaveSpiralURP"
                 float _WaveFrequency;
                 float _WaveAmplitude;
                 float _SpiralAmount; // Replaced Bend with Spiral
+                float _MoveSpeedMultiplier;
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -103,7 +105,7 @@ Shader "Custom/SineWaveSpiralURP"
                 // --- 2. THE SINE WAVE ---
                 // We apply the wave AFTER the spiral, so the ripples 
                 // naturally follow the curve of the curled tail.
-                float wave = sin(uv.y * _WaveFrequency + _Time.y * _WaveSpeed);
+                float wave = sin(uv.y * _WaveFrequency + _Time.y * _WaveSpeed * _MoveSpeedMultiplier);
                 float waveOffset = wave * _WaveAmplitude * uv.y;
                 uv.x += waveOffset;
 

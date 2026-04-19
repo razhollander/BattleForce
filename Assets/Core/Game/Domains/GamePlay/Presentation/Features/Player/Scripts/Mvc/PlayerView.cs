@@ -80,6 +80,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             _tailView.UpdateTail();
         }
+
+        public void UpdateTailWaveMultiplier(float moveRatio)
+        {
+            _tailView.UpdateTailWaveMultiplier(moveRatio);
+        }
         
         public void SetTalentSprite(Sprite sprite)
         {

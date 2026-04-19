@@ -6,6 +6,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
     {
         private static readonly int SPIRAL_SHADER_PROPERTY = Shader.PropertyToID("_SpiralAmount"); 
         private static readonly int WAVE_AMPLITUDE_SHADER_PROPERTY = Shader.PropertyToID("_WaveAmplitude"); 
+        private static readonly int MOVE_SPEED_MULTIPLIER_SHADER_PROPERTY = Shader.PropertyToID("_MoveSpeedMultiplier");
     
         [SerializeField] private SpriteRenderer _spriteRenderer;
 
@@ -28,6 +29,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         private bool _targetTail;
         private float _maxWaveAmplitude;
         private float _currentWaveAmplitude;
+        private float _currentMoveSpeedMultiplier = 1f;
+        private float _targetMoveSpeedMultiplier = 1f;
 
         public void OnCreated()
         {
@@ -41,6 +44,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             UpdateTailBend();
             UpdateTailWaveAmplitude();
+            UpdateTailWaveSpeedMultiplier();
+        }
+
+        public void UpdateTailWaveMultiplier(float moveRatio)
+        {
+            _targetMoveSpeedMultiplier = moveRatio;
+        }
+
+        private void UpdateTailWaveSpeedMultiplier()
+        {
+            if (Mathf.Approximately(_targetMoveSpeedMultiplier, _currentMoveSpeedMultiplier))
+            {
+                return;
+            }
+
+            _currentMoveSpeedMultiplier = Mathf.Lerp(_currentMoveSpeedMultiplier, _targetMoveSpeedMultiplier, Time.deltaTime * _reachMaxWaveSpeed);
+            _tailMaterial.SetFloat(MOVE_SPEED_MULTIPLIER_SHADER_PROPERTY, _currentMoveSpeedMultiplier);
         }
 
         private void UpdateTailWaveAmplitude()
