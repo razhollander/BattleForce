@@ -38,6 +38,7 @@ MonoBehaviour:
     PushForce: 50
     MaxSpin: 55
     MinSpin: 50
+    SpinDuration: 2
   SentryGunTalentConfig:
     DurationInSeconds: 3
     ShootCooldownMultiplier: 0.25
@@ -50,6 +51,9 @@ MonoBehaviour:
     PlayerVelocitySquaredThresholdToDeactivateHook: 0.1
     GraceTicksUntilCheckIfVelocityIsBelowThreshold: 5
     PlayerRotateSpeedWhileHooked: 500
+  UmbrellaTalentConfig:
+    DurationInSeconds: 4
+    VelocityGainPerTick: 80
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:

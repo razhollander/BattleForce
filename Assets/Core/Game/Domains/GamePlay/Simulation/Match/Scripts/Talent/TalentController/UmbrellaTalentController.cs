@@ -101,7 +101,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            casterPlayerState.Spaceship.Transform.Velocity += aimDirection * _gamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick;
+            casterPlayerState.Spaceship.Transform.Velocity += aimDirection * _gamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick * deltaTime;
         }
 
         private void DeactivateTalent(int tick)
