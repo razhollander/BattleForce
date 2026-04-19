@@ -20,17 +20,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
 
         public TalentType TalentType => TalentType.MagneticPull;
 
         public MagneticPullTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -59,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var config = _gamePlayConfig.Talents.MagneticPullTalentConfig;
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            var offset = config.OffsetFromPlayer;
+            var offset = _sharedGamePlayConfig.MagneticPullFieldSize*0.5f;
             var center = casterPlayerState.Spaceship.Transform.Position + (direction * offset);
             var size = new Vector2(config.FieldWidth, config.FieldHeight);
 

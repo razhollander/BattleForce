@@ -7,8 +7,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
     public class MagneticPullTalentConfig
     {
         public float FieldWidth = 3f;
-        public float FieldHeight = 6f;
-        public float OffsetFromPlayer = 2f;
+        public float FieldHeight = 6f; 
         public float PushForce = 15f;
     }
 }

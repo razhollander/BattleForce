@@ -55,6 +55,10 @@ MonoBehaviour:
   UmbrellaTalentConfig:
     DurationInSeconds: 4
     VelocityGainPerTick: 80
+  MagneticPullTalentConfig:
+    FieldWidth: 3
+    FieldHeight: 6
+    PushForce: 30
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:
