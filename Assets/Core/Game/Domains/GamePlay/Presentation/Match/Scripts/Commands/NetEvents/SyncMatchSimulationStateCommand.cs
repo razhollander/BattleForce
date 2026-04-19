@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private MatchSimulationStateS2C _simulationState;
         private IMatchDataService _matchDataService;
         private IMatchBulletControllers _bulletControllers;
+        private Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.IMatchChickenEggsControllers _chickenEggsControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
         private ITalentCardControllers _talentCardControllers;
@@ -65,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
+            _chickenEggsControllers = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.IMatchChickenEggsControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
@@ -102,6 +104,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _worldCameraController.ClearTargets();
             _matchDataService.ClearAll();
             _bulletControllers.DestroyAll();
+            _chickenEggsControllers.DestroyAll();
             _environmentWallsControllers.DestroyAll();
             _environmentSpringControllers.DestroyAll();
             _environmentLavaWallsControllers.DestroyAll();
@@ -133,6 +136,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateSwapField();
             CreateKOPRojectiles();
             CreateGrapplingHookPRojectiles();
+            CreateChickenEggs();
         }
 
         private void CreateFieldBarriers()
@@ -371,6 +375,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 
                 _matchDataService.AddKOProjectile(koProjectile.Id, casterId, koProjectile.CreatedOnTick, koProjectile.Size);
                 _kOProjectilesControllers.CreateKOProjectile(koProjectile.Id, position, rotation, casterPosition, koProjectile.Size);
+            }
+        }
+
+
+        private void CreateChickenEggs()
+        {
+            foreach (var egg in _simulationState.ChickenEggs.Values)
+            {
+                _matchDataService.AddChickenEgg(egg.Id, egg.Position.ToUnityVector2(), egg.IsBroken);
+                _chickenEggsControllers.CreateEgg(egg.Id, egg.Position);
+                if (egg.IsBroken)
+                {
+                    _chickenEggsControllers.BreakEgg(egg.Id);
+                }
             }
         }
 

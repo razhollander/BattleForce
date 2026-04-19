@@ -42,5 +42,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<PlayerSelectedTalentFinishedCooldownLocalEvent> PlayerSelectedTalentFinishedCooldownLocalEvents { get; } = new();
         public List<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents { get; } = new();
         public List<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents { get; } = new();
+        public List<ActivateChickenTalentNetEventS2C> ActivateChickenTalentNetEvents { get; } = new();
+        public List<DeactivateChickenTalentNetEventS2C> DeactivateChickenTalentNetEvents { get; } = new();
+        public List<LayChickenEggNetEventS2C> LayChickenEggNetEvents { get; } = new();
+        public List<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents { get; } = new();
+        public List<DestroyChickenEggNetEventS2C> DestroyChickenEggNetEvents { get; } = new();
+
     }
 }

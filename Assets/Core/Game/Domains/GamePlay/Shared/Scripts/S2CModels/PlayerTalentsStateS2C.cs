@@ -157,9 +157,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsActive;
         
         public bool IsOnCooldown() => 
-            CooldownType == TalentCooldownType.Normal
-                ? NormalCooldown.IsOnCooldown()
-                : StocksCooldown.IsOnCooldown();
+            CooldownType == TalentCooldownType.Normal ? NormalCooldown.IsOnCooldown() : (CooldownType == TalentCooldownType.Stocks ? StocksCooldown.IsOnCooldown() : false);
 
         public void Setup(TalentType talentType)
         {
@@ -174,6 +172,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             StocksCooldown = default;
         }
         
+
+        public void SetupWithAlwaysActiveCooldown()
+        {
+            CooldownType = TalentCooldownType.AlwaysActive;
+            NormalCooldown = default;
+            StocksCooldown = default;
+        }
+
         public void SetupWithStocksCooldown(int maxStocksAmount, float singleStockCooldown)
         {
             CooldownType = TalentCooldownType.Stocks;
@@ -193,6 +199,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 case TalentCooldownType.Stocks: StocksCooldown.Serialize(writer); break;
                 case TalentCooldownType.Normal: NormalCooldown.Serialize(writer); break;
+                case TalentCooldownType.AlwaysActive: break;
             }
         }
 
@@ -205,6 +212,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 case TalentCooldownType.Stocks: StocksCooldown.Deserialize(reader); break;
                 case TalentCooldownType.Normal: NormalCooldown.Deserialize(reader); break;
+                case TalentCooldownType.AlwaysActive: break;
             }
         }
 
@@ -214,6 +222,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 case TalentCooldownType.Stocks: StocksCooldown.ClearCooldown(); break;
                 case TalentCooldownType.Normal: NormalCooldown.ClearCooldown(); break;
+                case TalentCooldownType.AlwaysActive: break;
             }
         }
     }

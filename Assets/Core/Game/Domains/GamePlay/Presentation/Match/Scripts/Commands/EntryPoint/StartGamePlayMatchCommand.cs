@@ -38,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ITalentCardControllers _talentCardControllers;
         private IMatchPlayerControllers _playerControllers;
         private IMatchBulletControllers _bulletControllers;
+        private Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.IMatchChickenEggsControllers _chickenEggsControllers;
         private ITickProcessor _tickProcessor;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
@@ -70,6 +71,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
+            _chickenEggsControllers = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.IMatchChickenEggsControllers>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
@@ -103,6 +105,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _powerUpBallObtainedEffectController.InitEntryPoint();
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
+            _chickenEggsControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
             _environmentSpringControllers.InitEntryPoint();
             _playerTeleportEffectController.InitEntryPoint();

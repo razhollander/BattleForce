@@ -11,5 +11,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         KO = 6,
         GrapplingHook = 7,
         Umbrella = 8,
+        Chicken = 9,
     }
 }

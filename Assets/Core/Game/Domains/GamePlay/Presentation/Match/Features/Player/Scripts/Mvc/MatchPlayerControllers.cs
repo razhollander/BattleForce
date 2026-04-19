@@ -93,6 +93,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             GetPlayer(playerId).SetUmbrellaState(isUmbrella);
         }
+
+        public void SetPlayerChickenState(ushort playerId, bool isChicken)
+        {
+            GetPlayer(playerId).SetChickenState(isChicken);
+        }
+
+        public void PlayLayEggAnimation(ushort playerId)
+        {
+            GetPlayer(playerId).PlayLayEggAnimation();
+        }
         
         public void UpdateIsPlayerArrowShownAccordingToTalentState(ushort playerId, TalentStateS2C talentStateS2C)
         {

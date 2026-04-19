@@ -36,6 +36,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
+        [SerializeField] private GameObject _chickenSprite;
+        [SerializeField] private Core.Scripts.Helpers.SpriteAnimator _chickenLayEggAnimator;
         
         private Transform _transform;
         private SpriteRenderer _leftEyeRenderer;
@@ -62,6 +64,32 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             _sentryGunAnimator.StopAnimation();
             _sentryGunAnimator.gameObject.TrySetActive(false);
+        }
+
+
+        public void SetChickenState(bool isOn)
+        {
+            if (_chickenSprite != null)
+            {
+                _chickenSprite.SetActive(isOn);
+            }
+        }
+
+
+        private System.Threading.CancellationTokenSource _layEggCts;
+
+        public void PlayLayEggAnimation()
+        {
+            if (_chickenLayEggAnimator != null)
+            {
+                _chickenLayEggAnimator.gameObject.SetActive(true);
+                _layEggCts?.Cancel();
+                _layEggCts?.Dispose();
+                _layEggCts = new System.Threading.CancellationTokenSource();
+                _chickenLayEggAnimator.PlayAnimation(_layEggCts).Forget();
+            }
+        }
+
         }
 
         public void SetUmbrellaState(bool isOn)
@@ -180,7 +208,33 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             DisableSentryGunState();
             DisableSpinned();
             DisableUmbrellaState();
+            DisableChickenState();
             gameObject.SetActive(false);
+        }
+
+
+
+        private void DisableChickenState()
+        {
+            if (_chickenSprite != null)
+            {
+                _chickenSprite.SetActive(false);
+            }
+            if (_chickenLayEggAnimator != null)
+            {
+                _chickenLayEggAnimator.StopAnimation();
+                _chickenLayEggAnimator.gameObject.SetActive(false);
+            }
+            _layEggCts?.Cancel();
+            _layEggCts?.Dispose();
+            _layEggCts = null;
+        }
+
+            if (_chickenLayEggAnimator != null)
+            {
+                _chickenLayEggAnimator.StopAnimation();
+                _chickenLayEggAnimator.gameObject.SetActive(false);
+            }
         }
 
         private void DisableUmbrellaState()

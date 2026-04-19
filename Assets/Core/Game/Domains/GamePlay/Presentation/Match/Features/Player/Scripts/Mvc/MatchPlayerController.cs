@@ -73,11 +73,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             {
                 SetUmbrellaState(currentSelectedTalentState.IsActive);
             }
+            else if (currentSelectedTalentState.TalentType == TalentType.Chicken)
+            {
+                SetChickenState(currentSelectedTalentState.IsActive);
+            }
         }
 
         public void SetSentryGunState(bool isSentryGun, CancellationTokenSource cancellationTokenSource)
         {
             _playerView.SetSentryGunState(isSentryGun, cancellationTokenSource);
+        }
+
+        public void PlayLayEggAnimation()
+        {
+            _playerView.PlayLayEggAnimation();
+        }
+
+        public void SetChickenState(bool isChickenActive)
+        {
+            _playerView.SetChickenState(isChickenActive);
         }
 
         public void SetUmbrellaState(bool isUmbrellaActive)

@@ -228,6 +228,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             SwapFields.Clear();
             KOProjectiles.Clear();
             GrapplingHookProjectiles.Clear();
+            _matchSimulationState.ChickenEggs.Clear();
         }
 
         public void SetTeamBolts(ushort teamId, int totalTeamBolts)
@@ -351,5 +352,39 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 
             KOProjectiles.Remove(model);
         }
+
+        public Core.Game.Domains.GamePlay.Shared.S2CModels.ChickenEggModelS2C GetChickenEgg(ushort id)
+        {
+            return _matchSimulationState.ChickenEggs.TryGetValue(id, out var egg) ? egg : default;
+        }
+
+        public void AddChickenEgg(ushort id, UnityEngine.Vector2 position, bool isBroken)
+        {
+            var model = new Core.Game.Domains.GamePlay.Shared.S2CModels.ChickenEggModelS2C
+            {
+                Id = id,
+                Position = position.ToNumericsVector2(),
+                IsBroken = isBroken
+            };
+            _matchSimulationState.ChickenEggs.Add(id, model);
+        }
+
+        public void BreakChickenEgg(ushort id)
+        {
+            if (_matchSimulationState.ChickenEggs.TryGetValue(id, out var egg))
+            {
+                egg.IsBroken = true;
+                _matchSimulationState.ChickenEggs[id] = egg;
+            }
+        }
+
+        public void RemoveChickenEgg(ushort id)
+        {
+            if (_matchSimulationState.ChickenEggs.ContainsKey(id))
+            {
+                _matchSimulationState.ChickenEggs.Remove(id);
+            }
+        }
+
     }
 }
