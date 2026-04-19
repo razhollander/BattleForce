@@ -20,6 +20,7 @@ MonoBehaviour:
     - rid: 8506109566889754723
     - rid: 8476404660102234386
     - rid: 8476404832654590090
+    - rid: 8476404916744356088
   HammerTalentConfig:
     HammerSpeed: 10
     HammerSize: 1
@@ -37,6 +38,7 @@ MonoBehaviour:
     PushForce: 50
     MaxSpin: 55
     MinSpin: 50
+    SpinDuration: 2
   SentryGunTalentConfig:
     DurationInSeconds: 3
     ShootCooldownMultiplier: 0.25
@@ -49,6 +51,9 @@ MonoBehaviour:
     PlayerVelocitySquaredThresholdToDeactivateHook: 0.1
     GraceTicksUntilCheckIfVelocityIsBelowThreshold: 5
     PlayerRotateSpeedWhileHooked: 500
+  UmbrellaTalentConfig:
+    DurationInSeconds: 4
+    VelocityGainPerTick: 80
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:
@@ -63,6 +68,11 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 7
+        CooldownInSeconds: 2
+    - rid: 8476404916744356088
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 8
         CooldownInSeconds: 2
     - rid: 8506109566889754721
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}

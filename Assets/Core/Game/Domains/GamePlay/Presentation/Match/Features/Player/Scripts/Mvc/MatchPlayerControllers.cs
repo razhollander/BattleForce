@@ -45,11 +45,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerControllers.Add(playerController);
         }
 
-        public void UpdatePlayersTransform()
+        public void UpdatePlayersTickDeltas()
         {
             foreach (var playerController in _playerControllers)
             {
-                playerController.UpdateTransform();
+                playerController.UpdateTickDeltas();
             }
         }
 
@@ -87,6 +87,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetPlayersSpinnedState(ushort playerId, bool isOn)
         {
             GetPlayer(playerId).SetPlayersSpinnedState(isOn);
+        }
+
+        public void SetPlayerUmbrellaState(ushort playerId, bool isUmbrella)
+        {
+            GetPlayer(playerId).SetUmbrellaState(isUmbrella);
         }
         
         public void UpdateIsPlayerArrowShownAccordingToTalentState(ushort playerId, TalentStateS2C talentStateS2C)

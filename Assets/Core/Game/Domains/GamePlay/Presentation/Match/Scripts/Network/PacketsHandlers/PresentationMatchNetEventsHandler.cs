@@ -464,6 +464,34 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessActivateUmbrellaTalentEvents(CapacityList<ActivateUmbrellaTalentNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.Umbrella);
+                _cachedPresentationEventsService.ActivateUmbrellaTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateUmbrellaTalentEvents(CapacityList<DeactivateUmbrellaTalentNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Umbrella, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateUmbrellaTalentNetEvents.Add(netEvent);
+            }
+        }
+
         public void ProcessPlayerMaxShootCooldownChangedEvents(CapacityList<PlayerMaxShootCooldownChangedNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty())

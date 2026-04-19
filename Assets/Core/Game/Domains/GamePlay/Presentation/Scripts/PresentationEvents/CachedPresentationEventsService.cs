@@ -40,5 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents { get; } = new();
         public List<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents { get; } = new();
         public List<PlayerSelectedTalentFinishedCooldownLocalEvent> PlayerSelectedTalentFinishedCooldownLocalEvents { get; } = new();
+        public List<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents { get; } = new();
+        public List<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents { get; } = new();
     }
 }

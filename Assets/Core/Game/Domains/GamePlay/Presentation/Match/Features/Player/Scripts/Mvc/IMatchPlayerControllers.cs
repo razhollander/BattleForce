@@ -8,7 +8,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
     {
         void InitEntryPoint();
         void AddPlayer(ushort playerId);
-        void UpdatePlayersTransform();
+        void UpdatePlayersTickDeltas();
         void UpdatePlayersBulletCooldowns();
         void UpdatePlayersTalentCooldowns(int currentServerTick);
         void ShootBulletEffectForPlayer(ushort playerId);
@@ -24,5 +24,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void SetPlayerSentryGunState(ushort playerId, bool isOn);
         void SetPlayersSpinnedState(ushort playerId, bool isOn);
         void UpdateIsPlayerArrowShownAccordingToTalentState(ushort playerId, TalentStateS2C talentStateS2C);
+        void SetPlayerUmbrellaState(ushort playerId, bool isOn);
     }
 }

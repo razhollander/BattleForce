@@ -35,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private SpriteAnimator _sentryGunAnimator;
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
+        [SerializeField] private UmbrellaStickView _umbrellaStickView;
         
         private Transform _transform;
         private SpriteRenderer _leftEyeRenderer;
@@ -61,6 +62,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             _sentryGunAnimator.StopAnimation();
             _sentryGunAnimator.gameObject.TrySetActive(false);
+        }
+
+        public void SetUmbrellaState(bool isOn)
+        {
+            if (isOn)
+            {
+                _umbrellaStickView.ShowUmbrella();
+            }
+            else
+            {
+                DisableUmbrellaState();
+            }
         }
 
         public void UpdateTailBend()
@@ -166,7 +179,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             DisableSentryGunState();
             DisableSpinned();
+            DisableUmbrellaState();
             gameObject.SetActive(false);
+        }
+
+        private void DisableUmbrellaState()
+        {
+            _umbrellaStickView.HideUmbrella();
         }
 
         public Transform GetSpaceShipTransform()
@@ -231,6 +250,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
                 _aimArrowTransform.gameObject.TrySetActive(isShown);
                 _frontArrowGameObject.gameObject.TrySetActive(false);
             }
+        }
+
+        public void InterpolateUmbrellaRotation(System.Numerics.Vector2 rotation, float decay)
+        {
+            if (rotation.LengthSquared() < 0.0001f)
+            {
+                LogService.LogError("Direction is too small (0) to interpolate");
+                return;
+            }
+
+            var targetRotation = rotation.ToQuaternion();
+
+            _umbrellaStickView.SetRotation(MathUtils.ExpDecay(
+                _aimArrowTransform.rotation,
+                targetRotation,
+                decay,
+                Time.deltaTime
+            ));
+
+            UpdateEyesToLookAtAimArrow(rotation);
         }
     }
 }
