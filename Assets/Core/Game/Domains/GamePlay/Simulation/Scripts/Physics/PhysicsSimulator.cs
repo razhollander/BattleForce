@@ -103,7 +103,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private void CopyGrapplingHookProjectileToBody(Body grapplingHookProjectileBody, ushort grapplingHookProjectileId, MatchSimulationStateS2C simulationState)
         {
             var grapplingHookProjectileState = simulationState.GrapplingHookProjectiles.FindWithId(grapplingHookProjectileId);
-            grapplingHookProjectileBody.SetTransform(grapplingHookProjectileState.Position, grapplingHookProjectileState.Rotation.ToAngleRadians());
+            grapplingHookProjectileBody.SetTransform(grapplingHookProjectileState.Position, 0);
             grapplingHookProjectileBody.SetLinearVelocity(grapplingHookProjectileState.Velocity);
         }
 
@@ -320,6 +320,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
             _polygonShapePool.Return(lavaShape);
+        }
+
+        public void AddStageBoundary(ushort id, Vector2[] points, Vector2 position)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.StageBoundary);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var boundaryShape = GetPolygonShape();
+            boundaryShape.Set(points);
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = boundaryShape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.StageBoundary.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.StageBoundary.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(boundaryShape);
         }
 
         public void AddTeamFloor(ushort id, Vector2[] points, Vector2 position)
@@ -769,6 +795,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.position = position;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.GrapplingHookProjectile);
             bodyDef.bullet = true;
+            LogService.LogError("AddGrapplingHookProjectile: " + velocity + "");
             bodyDef.linearVelocity = velocity;
 
             var body = _world.CreateBody(bodyDef);

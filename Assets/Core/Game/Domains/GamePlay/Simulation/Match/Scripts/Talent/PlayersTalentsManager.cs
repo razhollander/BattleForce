@@ -106,9 +106,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             return true;
         }
 
-        public void ProcessPlayerTalentInput(ushort playerId, TalentType talentType, int tick, bool isTalentInputPressed, float deltaTime)
+        public void ProcessPlayerTalentInput(ushort playerId, TalentType talentType, int tick, bool wasTalentInputDownThisTick, bool isTalentInputPressed, float deltaTime)
         {
-            _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, isTalentInputPressed, tick, deltaTime);
+            _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, wasTalentInputDownThisTick, isTalentInputPressed, tick, deltaTime);
         }
 
         public void ProcessAllTalentsTickOfPlayer(ushort playerId, int tick, float deltaTime)

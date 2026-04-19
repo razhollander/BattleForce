@@ -1,17 +1,13 @@
 using System;
 using System.Numerics;
-using Box2D.NetStandard.Dynamics.Bodies;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
-using Core.Scripts.Extensions;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
-using System.Collections.Generic;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
@@ -42,9 +38,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
         {
-            if (!isTalentInputPressed)
+            if (!wasTalentInputDownThisTick)
             {
                 return;
             }

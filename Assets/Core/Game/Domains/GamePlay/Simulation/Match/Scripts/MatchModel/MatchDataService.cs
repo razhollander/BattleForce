@@ -118,19 +118,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             return koProjectile;
         }
 
-        public TalentGrapplingHookProjectileS2C AddGrapplingHookProjectile(int tick, ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 velocity, float size)
+        public TalentGrapplingHookProjectileStateS2C AddGrapplingHookProjectile(ushort casterPlayerId, Vector2 position, Vector2 velocity)
         {
             ref var grapplingHookProjectile = ref _simulationState.GrapplingHookProjectiles.AddAndGet();
-            var projectileId = (ushort)(++_lastGrapplingHookProjectileCreatedId % ushort.MaxValue);
-            grapplingHookProjectile.CreatedOnTick = tick;
+            var projectileId = (ushort)(++_lastGrapplingHookProjectileCreatedId % ushort.MaxValue); 
             grapplingHookProjectile.Id = projectileId;
             grapplingHookProjectile.PlayerCasterId = casterPlayerId;
             grapplingHookProjectile.StartPosition = position;
             grapplingHookProjectile.Position = position;
-            grapplingHookProjectile.Rotation = rotation;
             grapplingHookProjectile.Velocity = velocity;
-            grapplingHookProjectile.Size = size;
-            grapplingHookProjectile.IsAttached = false;
+            grapplingHookProjectile.IsHookAttached = false;
             return grapplingHookProjectile;
         }
     }

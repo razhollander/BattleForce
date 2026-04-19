@@ -12,5 +12,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
         public float PushForce = 50f;
         public float MaxSpin = 55f;
         public float MinSpin = 50f;
+        public float SpinDuration = 2f;
     }
 }

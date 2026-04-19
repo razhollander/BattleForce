@@ -1,7 +1,6 @@
 using System.Numerics;
 using Core.Scripts.Utils.CustomCollections;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
-using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
@@ -201,6 +200,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             TalentType = (TalentType)reader.GetByte();
             CooldownType = (TalentCooldownType)reader.GetByte();
+            
             switch (CooldownType)
             {
                 case TalentCooldownType.Stocks: StocksCooldown.Deserialize(reader); break;

@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
@@ -12,12 +13,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IDashPulseGustEffectController _dashPulseGustEffectController;
         private IMatchDataService _matchDataService;
+        private IMatchPlayerControllers _playerControllers;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
         }
 
         public void Execute()
@@ -27,9 +30,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
-            foreach (var evt in _cachedPresentationEventsService.PerformDashPulseNetEvents)
+            foreach (var netEvent in _cachedPresentationEventsService.PerformDashPulseNetEvents)
             {
-                PlayDashPulseEffectForPlayer(evt.CasterPlayerId);
+                PlayDashPulseEffectForPlayer(netEvent.CasterPlayerId);
+                
+                var casterPlayerId = netEvent.CasterPlayerId;
+
+                if (_matchDataService.GetPlayer(casterPlayerId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentForCaster))
+                {
+                    _playerControllers.UpdateIsPlayerArrowShownAccordingToTalentState(casterPlayerId, currentSelectedTalentForCaster);
+                }
             }
 
             _cachedPresentationEventsService.PerformDashPulseNetEvents.Clear();

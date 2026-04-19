@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWal
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
@@ -24,7 +25,6 @@ using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -53,6 +53,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ISwapFieldControllers _swapFieldControllers;
         private IKOProjectilesControllers _kOProjectilesControllers;
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
+        private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -84,6 +85,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _swapFieldControllers = _diContainer.Resolve<ISwapFieldControllers>();
             _kOProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
+            _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
         }
 
         public void Execute()
@@ -112,6 +114,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _environmentFieldBarrierControllers.DestroyAll();
             _swapFieldControllers.DestroyAll();
             _kOProjectilesControllers.DestroyAll();
+            _grapplingHookProjectilesControllers.DestroyAll();
         }
 
         private void CreateAll()
@@ -127,6 +130,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateTeamBoards();
             CreateTeleportGates();
             CreateFieldBarriers();
+            CreateSwapField();
+            CreateKOPRojectiles();
+            CreateGrapplingHookPRojectiles();
         }
 
         private void CreateFieldBarriers()
@@ -337,6 +343,49 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                         _teleportGateControllers.CreateGatePair(teleportPairConfig.Id);
                     }
                 }
+            }
+        }
+        
+        private void CreateSwapField()
+        {
+            foreach (var swapField in _simulationState.SwapFields.AsSpan())
+            {
+                var casterId = swapField.PlayerCasterId;
+                var casterState = _simulationState.GetPlayerById(casterId);
+                var position = casterState.Spaceship.Transform.Position.ToUnityVector2();
+                
+                _matchDataService.AddSwapField(swapField.Id, casterId, swapField.CreatedOnTick, swapField.EndTick, swapField.Radius);
+                _swapFieldControllers.CreateSwapField(swapField.Id, swapField.Radius, position);
+            }
+        }
+
+        private void CreateKOPRojectiles()
+        {
+            foreach (var koProjectile in _simulationState.KOProjectiles.AsSpan())
+            {
+                var casterId = koProjectile.PlayerCasterId;
+                var casterState = _simulationState.GetPlayerById(casterId);
+                var position = koProjectile.Position.ToUnityVector2();
+                var rotation = koProjectile.Rotation.ToUnityVector2();
+                var casterPosition = casterState.Spaceship.Transform.Position.ToUnityVector2();
+                
+                _matchDataService.AddKOProjectile(koProjectile.Id, casterId, koProjectile.CreatedOnTick, koProjectile.Size);
+                _kOProjectilesControllers.CreateKOProjectile(koProjectile.Id, position, rotation, casterPosition, koProjectile.Size);
+            }
+        }
+
+        private void CreateGrapplingHookPRojectiles()
+        {
+            foreach (var grapplingHookProjectile in _simulationState.GrapplingHookProjectiles.AsSpan())
+            {
+                var casterId = grapplingHookProjectile.PlayerCasterId;
+                var casterState = _simulationState.GetPlayerById(casterId);
+                var position = grapplingHookProjectile.Position;
+                var casterPosition = casterState.Spaceship.Transform.Position.ToUnityVector2();
+                var rotation = grapplingHookProjectile.Position - casterPosition.ToNumericsVector2();
+
+                _matchDataService.AddGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position);
+                _grapplingHookProjectilesControllers.CreateGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, grapplingHookProjectile.IsHookAttached);
             }
         }
     }

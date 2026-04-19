@@ -27,6 +27,7 @@ namespace Core.Scripts.Network
         public int ConcurrentTalentCards = 128;
         public int ConcurrentEvironmentWalls = 256;
         public int ConcurrentEvironmentLavaWalls = 64;
+        public int ConcurrentEvironmentStageBoundaries = 256;
         public int ConcurrentEvironmentTeleportPairs = 4;
         public int ConcurrentEvironmentSprings = 32;
         public int PacketTypes = 256; // if one day this is changed to a bigger number, need to parse packet types as ushort instead of byte
@@ -84,11 +85,18 @@ namespace Core.Scripts.Network
         public int UpdatePlayerTalentStocksNetEvents = 128;
         public int ActivateSentryGunTalentNetEvents = 128;
         public int DeactivateSentryGunTalentNetEvents = 128;
+        public int PlayerGrapplingHookShotNetEvents = 128;
+        public int PlayerGrapplingHookHitNetEvents = 128;
+        public int PlayerGrapplingHookDeactivatedNetEvents = 128;
         public int UpdatePlayerTalentStocksNetEvent = 128;
         public int PlayerMaxShootCooldownChangedNetEvents = 128;
+        public int PlayerSpinnedStartedNetEvents = 128;
+        public int PlayerSpinnedEndedNetEvents = 128;
         public int CreateGrapplingHookProjectileNetEvents = 128;
         public int GrapplingHookHitWallNetEvents = 128;
         public int DeactivateGrapplingHookTalentNetEvents = 128;
+        public int ActivateUmbrellaTalentNetEvents = 128;
+        public int DeactivateUmbrellaTalentNetEvents = 128;
         public int CreateMagneticPullFieldNetEvents = 128;
 
         [Serializable]

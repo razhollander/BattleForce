@@ -17,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<PowerUpBallS2C> PowerUpBalls;
         public FixedUnorderedList<TalentSwapFieldS2C> SwapFields;
         public FixedUnorderedList<TalentKOProjectileS2C> KOProjectiles;
-        public FixedUnorderedList<TalentGrapplingHookProjectileS2C> GrapplingHookProjectiles;
+        public FixedUnorderedList<TalentGrapplingHookProjectileStateS2C> GrapplingHookProjectiles;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
         public int EnvironmentLayoutId;
@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             PowerUpBalls = new FixedUnorderedList<PowerUpBallS2C>(maxPowerUpBalls);
             SwapFields = new FixedUnorderedList<TalentSwapFieldS2C>(maxPlayers);
             KOProjectiles = new FixedUnorderedList<TalentKOProjectileS2C>(maxPlayers);
-            GrapplingHookProjectiles = new FixedUnorderedList<TalentGrapplingHookProjectileS2C>(maxPlayers);
+            GrapplingHookProjectiles = new FixedUnorderedList<TalentGrapplingHookProjectileStateS2C>(maxPlayers);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
         }
@@ -382,7 +382,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             throw new System.Exception($"No ko projectile for id {koProjectileId}!");
         }
 
-        public bool TryGetGrapplingHookProjectileById(ushort projectileId, out TalentGrapplingHookProjectileS2C projectile)
+        public bool TryGetGrapplingHookProjectileById(ushort projectileId, out TalentGrapplingHookProjectileStateS2C projectile)
         {
             for (int i = 0; i < GrapplingHookProjectiles.Count; i++)
             {
@@ -397,7 +397,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return false;
         }
 
-        public ref TalentGrapplingHookProjectileS2C GetGrapplingHookProjectileById(ushort projectileId)
+        public ref TalentGrapplingHookProjectileStateS2C GetGrapplingHookProjectileById(ushort projectileId)
         {
             for (int i = 0; i < GrapplingHookProjectiles.Count; i++)
             {

@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
 using UnityEngine;
 using Zenject;
@@ -44,11 +45,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerControllers.Add(playerController);
         }
 
-        public void UpdatePlayersTransform()
+        public void UpdatePlayersTickDeltas()
         {
             foreach (var playerController in _playerControllers)
             {
-                playerController.UpdateTransform();
+                playerController.UpdateTickDeltas();
             }
         }
 
@@ -82,7 +83,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             GetPlayer(playerId).SetSentryGunState(isSentryGun, _stageCancellationTokenProvider.CancellationTokenSource);
         }
+
+        public void SetPlayersSpinnedState(ushort playerId, bool isOn)
+        {
+            GetPlayer(playerId).SetPlayersSpinnedState(isOn);
+        }
+
+        public void SetPlayerUmbrellaState(ushort playerId, bool isUmbrella)
+        {
+            GetPlayer(playerId).SetUmbrellaState(isUmbrella);
+        }
         
+        public void UpdateIsPlayerArrowShownAccordingToTalentState(ushort playerId, TalentStateS2C talentStateS2C)
+        {
+            GetPlayer(playerId).UpdateIsArrowShownAccordingToTalentState(talentStateS2C);
+        }
+
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)
         {
             GetPlayer(playerId).SetHealth(currentHealth, maxHealth);

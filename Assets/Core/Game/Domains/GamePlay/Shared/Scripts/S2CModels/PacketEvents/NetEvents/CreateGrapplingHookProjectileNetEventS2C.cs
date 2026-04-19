@@ -6,9 +6,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     public struct CreateGrapplingHookProjectileNetEventS2C : INetSerializable, IComparable<CreateGrapplingHookProjectileNetEventS2C>
     {
         public int OccuredOnTick;
-        public TalentGrapplingHookProjectileS2C GrapplingHookProjectile;
+        public TalentGrapplingHookProjectileStateS2C GrapplingHookProjectile;
 
-        public CreateGrapplingHookProjectileNetEventS2C(int occuredOnTick, TalentGrapplingHookProjectileS2C projectile)
+        public CreateGrapplingHookProjectileNetEventS2C(int occuredOnTick, TalentGrapplingHookProjectileStateS2C projectile)
         {
             OccuredOnTick = occuredOnTick;
             GrapplingHookProjectile = projectile;

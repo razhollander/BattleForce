@@ -34,7 +34,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Fie
             {
                 FieldBarrierShape.Rectangle => MeshUtils.CreateRectangleMesh(fieldBarrierModel.Size, layerOrder),
                 FieldBarrierShape.Circle => MeshUtils.CreateCircleMesh(fieldBarrierModel.CircleRadius, _gamePlayConfig.FieldBarriers.Thickness,
-                    _gamePlayConfig.FieldBarriers.CircleBarrierSegmentsAmount, layerOrder)
+                    _gamePlayConfig.FieldBarriers.CircleBarrierSegmentsAmount, layerOrder),
+                _ => throw new System.ArgumentOutOfRangeException()
             };
             
             _view.SetMesh(mesh);
