@@ -52,13 +52,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
+            SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
         }
 
         private void SetupPlayerAccordingToHisSelectedTalent(MatchPlayerModel playerModel)
         {
             if (!playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
             {
-                _playerView.SetIsAimArrowShown(false);
+                _playerView.SetIsTalentArrowShown(false, false);
                 return;
             }
 
@@ -91,7 +92,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var talentType = talentState.TalentType;
             var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentType];
             _playerView.SetTalentSprite(talentSprite);
-            _playerView.SetIsAimArrowShown(_gamePlayConfig.TalentsConfig.Talents[talentType].IsAimArrowActiveWhileSelected);
+            UpdateIsArrowShownAccordingToTalentState(talentState);
         }
 
         public void UpdateTickDeltas()
@@ -101,17 +102,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerPosition = playerTransformState.Position.ToUnityVector2();
             var playerRotation = playerTransformState.Direction.ToUnityVector2().ToQuaternion();
             var decay = _gamePlayConfig.ExponentialDecay;
+            var aimDirection = playerModel.Spaceship.TalentsState.AimDirection;
             _playerView.InterpolateTransform(playerPosition, playerRotation, decay);
-            _playerView.InterpolateAimRotation(playerModel.Spaceship.TalentsState.AimDirection, decay);
-
-            if (playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent))
-            {
-                if (selectedTalent.TalentType == TalentType.Umbrella)
-                {
-                    _playerView.InterpolateUmbrellaRotation(playerModel.Spaceship.TalentsState.AimDirection, decay);
-                }
-            }
+            _playerView.InterpolateAimRotation(aimDirection, decay);
             _playerView.UpdateTailBend();
+
+            if (playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) &&
+                selectedTalent.TalentType == TalentType.Umbrella)
+            {
+                _playerView.InterpolateUmbrellaRotation(aimDirection, decay);
+            }
         }
 
         public void UpdateBulletCooldown()
@@ -206,6 +206,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsTailWaving(bool isMoving)
         {
             _playerView.SetIsTailWaving(isMoving);
+        }
+
+        public void SetPlayersSpinnedState(bool isOn)
+        {
+            _playerView.SetIsSpinned(isOn, _stageCancellationTokenProvider.CancellationTokenSource);
+        }
+        
+        public void UpdateIsArrowShownAccordingToTalentState(TalentStateS2C talentState)
+        {
+            var selectedTalentConfig = _gamePlayConfig.TalentsConfig.Talents[talentState.TalentType];
+            var isArrowShown = !talentState.IsOnCooldown() && selectedTalentConfig.IsArrowShownWhileSelected && (talentState.IsActive && selectedTalentConfig.IsArrowShownWhileActive || !talentState.IsActive );
+            _playerView.SetIsTalentArrowShown(isArrowShown, selectedTalentConfig.IsFrontArrow);
         }
     }
 }

@@ -13,10 +13,23 @@ MonoBehaviour:
   m_Name: TalentsConfig
   m_EditorClassIdentifier: 
   Talents:
-    m_keys: 0400000001000000070000000500000006000000
+    m_keys: 040000000100000007000000050000000600000008000000
     m_values:
-    - IsAimArrowActiveWhileSelected: 0
-    - IsAimArrowActiveWhileSelected: 0
-    - IsAimArrowActiveWhileSelected: 1
-    - IsAimArrowActiveWhileSelected: 0
-    - IsAimArrowActiveWhileSelected: 1
+    - IsArrowShownWhileSelected: 1
+      IsArrowShownWhileActive: 0
+      IsFrontArrow: 1
+    - IsArrowShownWhileSelected: 0
+      IsArrowShownWhileActive: 0
+      IsFrontArrow: 0
+    - IsArrowShownWhileSelected: 1
+      IsArrowShownWhileActive: 0
+      IsFrontArrow: 0
+    - IsArrowShownWhileSelected: 1
+      IsArrowShownWhileActive: 0
+      IsFrontArrow: 1
+    - IsArrowShownWhileSelected: 1
+      IsArrowShownWhileActive: 0
+      IsFrontArrow: 0
+    - IsArrowShownWhileSelected: 1
+      IsArrowShownWhileActive: 0
+      IsFrontArrow: 0

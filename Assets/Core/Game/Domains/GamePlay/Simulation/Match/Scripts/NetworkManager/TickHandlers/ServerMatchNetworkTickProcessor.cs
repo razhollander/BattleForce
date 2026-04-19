@@ -23,14 +23,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
     public class ServerMatchNetworkTickProcessor : ITickProcessor
     {
         private readonly NetworkConfig _networkConfig;
-        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly IServerNetworkManager _networkManager;
         private readonly IMatchPlayerInputsPacketsHandler _playerInputsPacketsHandler;
         private readonly IMatchDataService _matchDataService;
         private readonly IMatchPlayerJoinPacketsHandler _matchPlayerJoinPacketsHandler;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IStateMachineService _stateMachineService;
-        private readonly IPhysicsSimulator _physicsSimulator;
         private readonly ICommandFactory _commandFactory;
         private readonly ITickService _tickService;
         private readonly IHeadLessQuitterController _headLessQuitterController;
@@ -41,28 +39,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private StepTimersCommand _stepTimersCommand;
-        private readonly MatchFullTickPacketS2C _fullTickPacket;
-        private StartMatchPacketS2C _cachedStartMatchPacket;
-        private StartStagePacketS2C _startStagePacket;
+        private TryEndPlayersSpinCommand _tryEndPlayersSpinCommand;
         private TryEndStagePreparationPhaseCommand _tryEndStagePreparationPhaseCommand;
         private StepAllPlayersTalentsCooldownsCommand _stepAllPlayersTalentsCooldownsCommand;
-        //private TimerFixedThreaded2 _pollEventsFixedTimer;
-        private Stopwatch _sw;
-        private long _last;
+        
+        private readonly MatchFullTickPacketS2C _fullTickPacket;
+        private readonly StartMatchPacketS2C _cachedStartMatchPacket;
+        private readonly StartStagePacketS2C _startStagePacket;
 
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IServerNetworkManager networkManager,
             IMatchPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
-            IMatchPlayerJoinPacketsHandler iIMatchPlayerJoinPacketsHandler, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator,
+            IMatchPlayerJoinPacketsHandler iIMatchPlayerJoinPacketsHandler, INetEventsDataService iNetEventsDataService,
             ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController, IStageDataService stageDataService, IOverrideableNetEventsService overrideableNetEventsService)
         {
             _networkConfig = networkConfig;
-            _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkManager = networkManager;
             _playerInputsPacketsHandler = playerInputsPacketsHandler;
             _matchDataService = matchDataService;
             _matchPlayerJoinPacketsHandler = iIMatchPlayerJoinPacketsHandler;
             _netEventsDataService = iNetEventsDataService;
-            _physicsSimulator = physicsSimulator;
             _commandFactory = commandFactory;
             _tickService = tickService;
             _headLessQuitterController = headLessQuitterController;
@@ -75,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         public void InitEntryPoint()
         {
+            _tryEndPlayersSpinCommand = _commandFactory.CreateCommandVoid<TryEndPlayersSpinCommand>();
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
@@ -82,22 +78,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _tryEndStagePreparationPhaseCommand = _commandFactory.CreateCommandVoid<TryEndStagePreparationPhaseCommand>();
             _stepAllPlayersTalentsCooldownsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCooldownsCommand>();
             _tickService.RegisterObserver(this);
-        }
-
-        private void PollEvents()
-        {
-            // _sw = Stopwatch.StartNew();
-            // _last = _sw.ElapsedMilliseconds;
-            //
-            //     long now = _sw.ElapsedMilliseconds;
-            //     long dt = now - _last;
-            //     _last = now;
-
-                //if (dt > 20)
-              //      Debug.LogError($"PollEvents stall: {dt}ms");
-
-            // In playback, we DO poll events, but the NetworkManager handles fetching from PlaybackService
-            //_networkManager.PollEvents();
         }
 
         public void InitExitPoint()
@@ -119,6 +99,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
+                _tryEndPlayersSpinCommand.SetTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
                 _overrideableNetEventsService.RegisterAllOverridableNetEvents();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
@@ -236,6 +217,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.PlayerSwapNetEvents = _netEventsDataService.PlayerSwapNetEventsPerPlayer[playerId];
                 _fullTickPacket.TalentCardObtainedNetEvents = _netEventsDataService.TalentCardObtainedNetEventsPerPlayer[playerId];
                 _fullTickPacket.TalentCardHitNetEvents = _netEventsDataService.TalentCardHitNetEventsPerPlayer[playerId];
+                _fullTickPacket.PlayerSpinnedStartedNetEvents = _netEventsDataService.PlayerSpinnedStartedNetEventsPerPlayer[playerId];
+                _fullTickPacket.PlayerSpinnedEndedNetEvents = _netEventsDataService.PlayerSpinnedEndedNetEventsPerPlayer[playerId];
                 _fullTickPacket.PowerUpSpawnedNetEvents = _netEventsDataService.PowerUpBallSpawnedNetEventsPerPlayer[playerId];
                 _fullTickPacket.PowerUpObtainedNetEvents = _netEventsDataService.PowerUpBallObtainedNetEventsPerPlayer[playerId];
                 _fullTickPacket.StageEndNetEvents = _netEventsDataService.StageEndNetEventsPerPlayer[playerId];
@@ -258,6 +241,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.CreateGrapplingHookProjectileNetEvents = _netEventsDataService.CreateGrapplingHookProjectileNetEventsPerPlayer[playerId];
                 _fullTickPacket.GrapplingHookHitWallNetEvents = _netEventsDataService.GrapplingHookHitWallNetEventsPerPlayer[playerId];
                 _fullTickPacket.DeactivateGrapplingHookTalentNetEvents = _netEventsDataService.DeactivateGrapplingHookTalentNetEventsPerPlayer[playerId];
+                _fullTickPacket.ActivateUmbrellaTalentNetEvents = _netEventsDataService.ActivateUmbrellaTalentNetEventsPerPlayer[playerId];
+                _fullTickPacket.DeactivateUmbrellaTalentNetEvents = _netEventsDataService.DeactivateUmbrellaTalentNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

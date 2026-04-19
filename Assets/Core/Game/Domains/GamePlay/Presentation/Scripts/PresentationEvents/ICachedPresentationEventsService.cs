@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.LocalEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 
@@ -15,6 +16,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<PlayersSwapNetEventS2C> PlayerSwapNetEvents { get; }
         List<TalentCardObtainedNetEventS2C> TalentCardObtainedNetEvents { get; }
         List<TalentCardHitNetEventS2C> TalentCardHitNetEvents { get; }
+        List<PlayerSpinnedStartedNetEventS2C> PlayerSpinnedStartedNetEvents { get; }
+        List<PlayerSpinnedEndedNetEventS2C> PlayerSpinnedEndedNetEvents { get; }
         List<PowerUpBallSpawnedNetEventS2C> PowerUpBallSpawnedNetEvents { get; }
         List<PowerUpBallObtainedNetEventS2C> PowerUpBallObtainedNetEvents { get; }
         List<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents { get; }
@@ -30,13 +33,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<KOProjectHitPlayerNetEventS2C> KOProjectHitPlayerNetEvents { get; }
         List<CreateKOProjectileNetEventS2C> CreateKOProjectileNetEvents { get; }
         List<DeactivateKOTalentNetEventS2C> DeactivateKOTalentNetEvents { get; }
-        List<CreateGrapplingHookProjectileNetEventS2C> PlayerGrapplingHookShotNetEvents { get; }
-        List<GrapplingHookHitWallNetEventS2C> PlayerGrapplingHookHitNetEvents { get; }
-        List<DeactivateGrapplingHookTalentNetEventS2C> PlayerGrapplingHookDeactivatedNetEvents { get; }
+        List<CreateGrapplingHookProjectileNetEventS2C> CreateGrapplingHookProjectileNetEvents { get; }
+        List<GrapplingHookHitWallNetEventS2C> GrapplingHookHitWallNetEvents { get; }
+        List<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents { get; }
         List<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents { get; }
         List<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents { get; }
         List<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents { get; }
         List<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents { get; }
+        List<PlayerSelectedTalentFinishedCooldownLocalEvent> PlayerSelectedTalentFinishedCooldownLocalEvents { get; }
         List<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents { get; }
         List<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents { get; }
     }

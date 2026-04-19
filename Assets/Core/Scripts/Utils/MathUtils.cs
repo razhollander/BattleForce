@@ -212,5 +212,14 @@ namespace CoreDomain.Scripts.Utils
                 return (shouldChangeRight, shouldChangeLeft);
             }
         }
+        
+        public static System.Numerics.Vector2 GetClosestPointOnSegment(System.Numerics.Vector2 p1, System.Numerics.Vector2 p2, System.Numerics.Vector2 point)
+        {
+            var l2 = System.Numerics.Vector2.DistanceSquared(p1, p2);
+            if (l2 == 0) return p1;
+
+            var t = Math.Max(0, Math.Min(1, System.Numerics.Vector2.Dot(point - p1, p2 - p1) / l2));
+            return p1 + t * (p2 - p1);
+        }
     }
 }

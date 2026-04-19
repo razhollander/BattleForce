@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private PlayerLoadingRingView _loadingRingView;
         [SerializeField] private Transform _spaceShipTransform;
         [SerializeField] private Transform _aimArrowTransform; // todo move to the match domain
+        [SerializeField] private GameObject _frontArrowGameObject; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
         [SerializeField] private Transform _leftEyeBall;
@@ -32,9 +33,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private SpriteAnimator _sentryGunAnimator;
+        [SerializeField] private Canvas _spinnedEyesCanvas;
+        [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
         
         private Transform _transform;
+        private SpriteRenderer _leftEyeRenderer;
+        private SpriteRenderer _rightEyeRenderer;
+        private Sprite _defaultLeftEyeSprite;
+        private Sprite _defaultRightEyeSprite;
 
         public Action Despawn { get; set; }
 
@@ -134,6 +141,32 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _transform = transform;
             _loadingRingView.OnCreated();
             _tailView.OnCreated();
+            _leftEyeRenderer = _leftEye.GetComponent<SpriteRenderer>();
+            _rightEyeRenderer = _rightEye.GetComponent<SpriteRenderer>();
+            _defaultLeftEyeSprite = _leftEyeRenderer.sprite;
+            _defaultRightEyeSprite = _rightEyeRenderer.sprite;
+        }
+
+        public void SetIsSpinned(bool isSpinned, CancellationTokenSource cancellationTokenSource)
+        {
+            _leftEyeRenderer.sprite = isSpinned ? null : _defaultLeftEyeSprite;
+            _rightEyeRenderer.sprite = isSpinned ? null : _defaultRightEyeSprite;
+
+            if (isSpinned)
+            {
+                _spinnedEyesCanvas.enabled = true;
+                _spinnedEyesAnimator.PlayAnimation(cancellationTokenSource).Forget();   
+            }
+            else
+            {
+                DisableSpinned();
+            }
+        }
+        
+        private void DisableSpinned()
+        {
+            _spinnedEyesAnimator.StopAnimation();
+            _spinnedEyesCanvas.enabled = false;
         }
 
         public void OnSpawned()
@@ -145,6 +178,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnDespawned()
         {
             DisableSentryGunState();
+            DisableSpinned();
             DisableUmbrellaState();
             gameObject.SetActive(false);
         }
@@ -204,9 +238,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _tailView.SetIsTailWaving(isWaving);
         }
 
-        public void SetIsAimArrowShown(bool isShown)
+        public void SetIsTalentArrowShown(bool isShown, bool isFrontArrow)
         {
-            _aimArrowTransform.gameObject.TrySetActive(isShown);
+            if (isFrontArrow)
+            {
+                _frontArrowGameObject.TrySetActive(isShown);
+                _aimArrowTransform.gameObject.TrySetActive(false);
+            }
+            else
+            {
+                _aimArrowTransform.gameObject.TrySetActive(isShown);
+                _frontArrowGameObject.gameObject.TrySetActive(false);
+            }
         }
 
         public void InterpolateUmbrellaRotation(System.Numerics.Vector2 rotation, float decay)

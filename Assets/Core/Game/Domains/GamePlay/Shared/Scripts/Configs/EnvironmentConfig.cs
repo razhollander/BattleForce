@@ -53,6 +53,23 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 #endif
         }
 
+        public void SetStageBoundaries(WallConfig[] wallConfigs, int index)
+        {
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetStageBoundariesJson(wallConfigs.ToJson());
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetStageBoundariesJson(wallConfigs.ToJson());
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
+
         public void SetEnvironmentSprings(S2CModels.EnvironmentSpringConfig[] environmentSprings, int index)
         {
              if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
@@ -121,6 +138,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 
                     CheckConfigArray(layout.GetWalls(), $"Layout {index} Wall", errorBuilder);
                     CheckConfigArray(layout.GetLavaWalls(), $"Layout {index} LavaWall", errorBuilder);
+                    CheckConfigArray(layout.GetStageBoundaries(), $"Layout {index} StageBoundary", errorBuilder);
                     CheckConfigArray(layout.GetTalentCards(), $"Layout {index} TalentCard", errorBuilder);
                     CheckConfigArray(layout.GetEnvironmentSprings(), $"Layout {index} EnvironmentSpring", errorBuilder);
                     CheckConfigArray(layout.GetTeleportGates(), $"Layout {index} TeleportGate", errorBuilder);

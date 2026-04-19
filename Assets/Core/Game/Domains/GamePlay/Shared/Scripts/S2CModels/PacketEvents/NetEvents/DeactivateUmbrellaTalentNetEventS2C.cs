@@ -1,7 +1,7 @@
 using System;
 using LiteNetLib.Utils;
 
-namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
+namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
     public struct DeactivateUmbrellaTalentNetEventS2C : INetSerializable, IComparable<DeactivateUmbrellaTalentNetEventS2C>
     {

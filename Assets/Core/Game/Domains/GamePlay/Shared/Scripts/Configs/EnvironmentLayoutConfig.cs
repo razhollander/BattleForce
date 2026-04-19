@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [TextArea(1, 5)] [SerializeField] private string _teleportGatesJson;
         [TextArea(1, 5)] [SerializeField] private string _rotatingWheelsJson;
         [TextArea(1, 5)] [SerializeField] private string _fieldBarriersJson;
+        [TextArea(1, 5)] [SerializeField] private string _stageBoundriesWallsJson;
 
         public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
         {
@@ -39,6 +40,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             return _lavaWallsJson.FromJson<WallConfig[]>();
         }
 
+        public WallConfig[] GetStageBoundaries()
+        {
+            return _stageBoundriesWallsJson.FromJson<WallConfig[]>();
+        }
+
         public void SetWallsJson(string wallsJson)
         {
             _wallsJson = wallsJson;
@@ -47,6 +53,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public void SetLavaWallsJson(string lavaWallsJson)
         {
             _lavaWallsJson = lavaWallsJson;
+        }
+
+        public void SetStageBoundariesJson(string stageBoundriesWallsJson)
+        {
+            _stageBoundriesWallsJson = stageBoundriesWallsJson;
         }
 
         public void SetEnvironmentSpringsJson(string environmentSpringsJson)

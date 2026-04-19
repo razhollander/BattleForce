@@ -45,7 +45,6 @@ MonoBehaviour:
   GrapplingHookTalentConfig:
     ProjectileSpeed: 40
     ReturnProjectileSpeedMultiplier: 2
-    MaxDistance: 100
     ArriveDistance: 2
     PlayerPullForceWhileHooked: 200
     PlayerVelocitySquaredThresholdToDeactivateHook: 0.1

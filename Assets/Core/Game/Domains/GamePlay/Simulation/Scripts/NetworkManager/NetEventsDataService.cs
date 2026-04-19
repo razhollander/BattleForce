@@ -25,6 +25,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>> PlayerSwapNetEventsPerPlayer { get; private set;} // todo: remove events related to player hit when player is destroyed
         public CapacityDict<ushort, FixedClassUnorderedList<TalentCardObtainedNetEventS2C>> TalentCardObtainedNetEventsPerPlayer { get; private set; } // todo: remove events related to player hit when player is destroyed
         public CapacityDict<ushort, FixedUnorderedList<TalentCardHitNetEventS2C>> TalentCardHitNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>> PlayerSpinnedStartedNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>> PlayerSpinnedEndedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> PowerUpBallSpawnedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> PowerUpBallObtainedNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> PlayerSwitchTeamNetEventsPerPlayer { get; }
@@ -54,6 +56,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> CreateGrapplingHookProjectileNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> GrapplingHookHitWallNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> DeactivateGrapplingHookTalentNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerPlayer { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -64,6 +68,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<PlayersSwapNetEventS2C>> _playerSwapListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<TalentCardObtainedNetEventS2C>> _talentCardObtainedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TalentCardHitNetEventS2C>> _talentCardHitListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>> _playerSpinnedStartedListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>> _playerSpinnedEndedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> _powerUpBallsSpawnedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> _powerUpBallsObtainedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> _playerSwitchTeamListPool;
@@ -93,6 +99,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> _createGrapplingHookProjectileNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> _grapplingHookHitWallNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> _deactivateGrapplingHookTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> _activateUmbrellaTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> _deactivateUmbrellaTalentNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -106,6 +114,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerSwapNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayersSwapNetEventS2C>>(maxConcurrentPlayers);
             TalentCardObtainedNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<TalentCardObtainedNetEventS2C>>(maxConcurrentPlayers);
             TalentCardHitNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<TalentCardHitNetEventS2C>>(maxConcurrentPlayers);
+            PlayerSpinnedStartedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>>(maxConcurrentPlayers);
+            PlayerSpinnedEndedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>>(maxConcurrentPlayers);
             PowerUpBallSpawnedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>>(maxConcurrentPlayers);
             PowerUpBallObtainedNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>>(maxConcurrentPlayers);
             PlayerSwitchTeamNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(maxConcurrentPlayers);
@@ -135,6 +145,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             CreateGrapplingHookProjectileNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>>(maxConcurrentPlayers);
             GrapplingHookHitWallNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>>(maxConcurrentPlayers);
             DeactivateGrapplingHookTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(maxConcurrentPlayers);
+            ActivateUmbrellaTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateUmbrellaTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -156,6 +168,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _playerSwapListPool= new ConcurrentPool<FixedUnorderedList<PlayersSwapNetEventS2C>>(() => new FixedUnorderedList<PlayersSwapNetEventS2C>(networkConfig.MaxCap.PlayerSwapNetEvents), maxConcurrentPlayers);
             _talentCardObtainedListPool = new ConcurrentPool<FixedClassUnorderedList<TalentCardObtainedNetEventS2C>>(() => new FixedClassUnorderedList<TalentCardObtainedNetEventS2C>(networkConfig.MaxCap.TalentCardObtainedNetEvent, ()=>new TalentCardObtainedNetEventS2C()), maxConcurrentPlayers);
             _talentCardHitListPool = new ConcurrentPool<FixedUnorderedList<TalentCardHitNetEventS2C>>(() => new FixedUnorderedList<TalentCardHitNetEventS2C>(networkConfig.MaxCap.TalentCardHitNetEvents), maxConcurrentPlayers);
+            _playerSpinnedStartedListPool = new ConcurrentPool<FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>>(() => new FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedStartedNetEvents), maxConcurrentPlayers);
+            _playerSpinnedEndedListPool = new ConcurrentPool<FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>>(() => new FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedEndedNetEvents), maxConcurrentPlayers);
             _powerUpBallsSpawnedListPool = new ConcurrentPool<FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>>(() => new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents), maxConcurrentPlayers);
             _powerUpBallsObtainedListPool = new ConcurrentPool<FixedUnorderedList<PowerUpBallObtainedNetEventS2C>>(() => new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents), maxConcurrentPlayers);
             _playerSwitchTeamListPool = new ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(() => new FixedUnorderedList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents), maxConcurrentPlayers);
@@ -190,6 +204,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _createGrapplingHookProjectileNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>>(() => new FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>(networkConfig.MaxCap.CreateGrapplingHookProjectileNetEvents), maxConcurrentPlayers);
             _grapplingHookHitWallNetEventsListPool = new ConcurrentPool<FixedUnorderedList<GrapplingHookHitWallNetEventS2C>>(() => new FixedUnorderedList<GrapplingHookHitWallNetEventS2C>(networkConfig.MaxCap.GrapplingHookHitWallNetEvents), maxConcurrentPlayers);
             _deactivateGrapplingHookTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(networkConfig.MaxCap.DeactivateGrapplingHookTalentNetEvents), maxConcurrentPlayers);
+            _activateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
+            _deactivateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingPlayerEvents(ushort playerId)
@@ -269,6 +285,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             if (!TalentCardHitNetEventsPerPlayer.ContainsKey(playerId))
             {
                 TalentCardHitNetEventsPerPlayer.Add(playerId, _talentCardHitListPool.Get());
+            }
+
+            if (!PlayerSpinnedStartedNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                PlayerSpinnedStartedNetEventsPerPlayer.Add(playerId, _playerSpinnedStartedListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {playerId}");
+            }
+
+            if (!PlayerSpinnedEndedNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                PlayerSpinnedEndedNetEventsPerPlayer.Add(playerId, _playerSpinnedEndedListPool.Get());
             }
             else
             {
@@ -456,6 +486,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 DeactivateGrapplingHookTalentNetEventsPerPlayer.Add(playerId, _deactivateGrapplingHookTalentNetEventsListPool.Get());
             }
+            if (!ActivateUmbrellaTalentNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                ActivateUmbrellaTalentNetEventsPerPlayer.Add(playerId, _activateUmbrellaTalentNetEventsListPool.Get());
+            }
+            if (!DeactivateUmbrellaTalentNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                DeactivateUmbrellaTalentNetEventsPerPlayer.Add(playerId, _deactivateUmbrellaTalentNetEventsListPool.Get());
+            }
         }
         
         public void StopSavingPlayerEvents(ushort playerId)
@@ -487,6 +525,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var talentCardHitList = TalentCardHitNetEventsPerPlayer[playerId];
             talentCardHitList.Clear();
             _talentCardHitListPool.Return(talentCardHitList);
+
+            var playerSpinnedList = PlayerSpinnedStartedNetEventsPerPlayer[playerId];
+            playerSpinnedList.Clear();
+            _playerSpinnedStartedListPool.Return(playerSpinnedList);
+            var playerSpinnedEndedList = PlayerSpinnedEndedNetEventsPerPlayer[playerId];
+            playerSpinnedEndedList.Clear();
+            _playerSpinnedEndedListPool.Return(playerSpinnedEndedList);
             var powerUpBallsSpawnedList = PowerUpBallSpawnedNetEventsPerPlayer[playerId];
             powerUpBallsSpawnedList.Clear();
             _powerUpBallsSpawnedListPool.Return(powerUpBallsSpawnedList);
@@ -586,6 +631,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             deactivateGrapplingHookTalentNetEventsList.Clear();
             _deactivateGrapplingHookTalentNetEventsListPool.Return(deactivateGrapplingHookTalentNetEventsList);
 
+            var activateUmbrellaTalentNetEventsList = ActivateUmbrellaTalentNetEventsPerPlayer[playerId];
+            activateUmbrellaTalentNetEventsList.Clear();
+            _activateUmbrellaTalentNetEventsListPool.Return(activateUmbrellaTalentNetEventsList);
+
+            var deactivateUmbrellaTalentNetEventsList = DeactivateUmbrellaTalentNetEventsPerPlayer[playerId];
+            deactivateUmbrellaTalentNetEventsList.Clear();
+            _deactivateUmbrellaTalentNetEventsListPool.Return(deactivateUmbrellaTalentNetEventsList);
+
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
             MatchMakingPlayerJoinAcceptNetEventsPerPlayer.Remove(playerId);
@@ -595,6 +648,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerSwapNetEventsPerPlayer.Remove(playerId);
             TalentCardObtainedNetEventsPerPlayer.Remove(playerId);
             TalentCardHitNetEventsPerPlayer.Remove(playerId);
+            PlayerSpinnedStartedNetEventsPerPlayer.Remove(playerId);
+            PlayerSpinnedEndedNetEventsPerPlayer.Remove(playerId);
             PowerUpBallSpawnedNetEventsPerPlayer.Remove(playerId);
             PowerUpBallObtainedNetEventsPerPlayer.Remove(playerId);
             PlayerSwitchTeamNetEventsPerPlayer.Remove(playerId);
@@ -621,6 +676,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             DeactivateSentryGunTalentNetEventsPerPlayer.Remove(playerId);
             UpdatePlayerTalentStocksNetEventsPerPlayer.Remove(playerId);
             PlayerMaxShootCooldownChangedNetEventsPerPlayer.Remove(playerId);
+            ActivateUmbrellaTalentNetEventsPerPlayer.Remove(playerId);
+            DeactivateUmbrellaTalentNetEventsPerPlayer.Remove(playerId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -788,6 +845,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     if(bulletSpawnNetEvents[i].OccuredOnTick<tick)
                     {
                         bulletSpawnNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PlayerSpinnedStartedNetEventsPerPlayer.TryGetValue(playerId, out var playerSpinnedNetEvents))
+            {
+                for (var i = playerSpinnedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerSpinnedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerSpinnedNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+            if (PlayerSpinnedEndedNetEventsPerPlayer.TryGetValue(playerId, out var playerSpinnedEndedNetEvents))
+            {
+                for (var i = playerSpinnedEndedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerSpinnedEndedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerSpinnedEndedNetEvents.RemoveAt(i);
                     }
                 }
             }
@@ -1156,6 +1234,28 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                     }
                 }
             }
+
+            if (ActivateUmbrellaTalentNetEventsPerPlayer.TryGetValue(playerId, out var activateUmbrellaTalentNetEvents))
+            {
+                for (int i = activateUmbrellaTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateUmbrellaTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateUmbrellaTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateUmbrellaTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivateUmbrellaTalentNetEvents))
+            {
+                for (int i = deactivateUmbrellaTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateUmbrellaTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateUmbrellaTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
@@ -1227,6 +1327,26 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                 packet.OccuredOnTick = onTick;
                 packet.PlayerId = playerId;
                 packet.NewTalentIndex = newTalentIndex;
+            }
+        }
+
+        public void AddPlayerSpinnedStartedNetEvent(int onTick, ushort playerId)
+        {
+            foreach (var kvp in PlayerSpinnedStartedNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
+            }
+        }
+
+        public void AddPlayerSpinnedEndedNetEvent(int onTick, ushort playerId)
+        {
+            foreach (var kvp in PlayerSpinnedEndedNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
             }
         }
 
@@ -1414,6 +1534,27 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                 packet.OccuredOnTick = onTick;
                 packet.CasterPlayerId = casterPlayerId;
                 packet.ProjectileId = projectileId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+            }
+        }
+
+        public void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in ActivateUmbrellaTalentNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddDeactivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick)
+        {
+            foreach (var kvp in DeactivateUmbrellaTalentNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
                 packet.TalentCooldownEndTick = talentCooldownEndTick;
             }
         }

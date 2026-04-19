@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 46751d792b62b4343aee1dd9356a5c95
+guid: 9dbf864e054e04c35bc89dc71c950ddc
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8663698108609604317
-    second: DashPulse_256_0
+      213: -3261065019722410569
+    second: GrapplingHookTalentIcon_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -48,7 +48,7 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 1
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: DashPulse_256_0
+      name: GrapplingHookTalentIcon_0
       rect:
         serializedVersion: 2
-        x: 53
-        y: 53
-        width: 151
-        height: 148
+        x: 63
+        y: 66
+        width: 137
+        height: 138
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 325d913f87c54c780800000000000000
-      internalID: -8663698108609604317
+      spriteID: 7b55ef574ae5eb2d0800000000000000
+      internalID: -3261065019722410569
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      DashPulse_256_0: -8663698108609604317
+      GrapplingHookTalentIcon_0: -3261065019722410569
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
