@@ -1,7 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -32,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var casterPosition = _matchPlayerControllers.GetPlayerPosition(netEvent.CasterPlayerId);
                 // Ensure parent transforms are mapped, maybe just use null or caster for field, but standard is null
-                _magneticPullEffectController.PlayFieldEffect(netEvent.Position, netEvent.Rotation, _sharedConfig.MagneticPullFieldSize, null);
+                _magneticPullEffectController.PlayFieldEffect(netEvent.Position.ToUnityVector2(), netEvent.Rotation.ToUnityVector2(), _sharedConfig.MagneticPullFieldSize, null);
 
                 if (netEvent.HasHit)
                 {
