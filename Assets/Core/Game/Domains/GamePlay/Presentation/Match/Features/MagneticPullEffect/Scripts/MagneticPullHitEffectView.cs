@@ -13,7 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEff
         [SerializeField] private SpriteAnimator _spriteAnimator;
         public Action Despawn { get; set; }
 
-        public async Awaitable PlayAndDespawn(Vector2 startPosition, Vector2 endPosition, Transform parent, CancellationTokenSource cancellationTokenSource)
+        public async Awaitable PlayAndDespawn(Vector2 startPosition, Vector2 endPosition, CancellationTokenSource cancellationTokenSource)
         {
             var direction = (endPosition - startPosition).normalized;
             var distance = Vector2.Distance(startPosition, endPosition);
@@ -22,7 +22,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEff
             transform.position = centerPosition;
             transform.up = direction;
             transform.localScale = new Vector3(1f, distance, 1f);
-            transform.SetParent(parent);
 
             try
             {

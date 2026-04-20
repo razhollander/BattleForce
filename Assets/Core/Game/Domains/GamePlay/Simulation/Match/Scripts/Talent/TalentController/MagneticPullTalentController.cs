@@ -9,6 +9,7 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -24,7 +25,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private readonly ICommandFactory _commandFactory;
         private readonly SpinPlayerCommand _spinPlayerCommand;
 
         public TalentType TalentType => TalentType.MagneticPull;
@@ -38,8 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _sharedGamePlayConfig = sharedGamePlayConfig;
-            _commandFactory = commandFactory;
-            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _spinPlayerCommand = commandFactory.CreateCommandVoid<SpinPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -55,18 +54,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            if (casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown())
+            var isCurrentSelectedTalentOnCooldown = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown();
+            if (isCurrentSelectedTalentOnCooldown)
             {
                 return;
             }
 
-            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.MagneticPull, out int talentIndex))
+            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType, out int talentIndex))
             {
                 LogService.LogError($"No MagneticPull talent found for player id {_casterPlayerId}");
                 return;
             }
-
-            var config = _gamePlayConfig.Talents.MagneticPullTalentConfig;
+            
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
             var offset = casterPlayerState.Spaceship.Transform.Radius;
             var center = casterPlayerState.Spaceship.Transform.Position + (direction * offset);
@@ -76,21 +75,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 _gamePlayConfig.Talents.MagneticPullTalentConfig.FieldArcAngle, (short) casterPlayerState.TeamId, out var hitBodyData);
             if (didHitEnemy)
             {
-                var hitEnemyPlayer = _matchDataService.SimulationState.GetPlayerById(hitBodyData.Id);
-                hitEnemyId = hitEnemyPlayer.Id;
-                var force = config.PushForce;
-                var dirToEnemy = Vector2.Normalize(hitEnemyPlayer.Spaceship.Transform.Position - casterPlayerState.Spaceship.Transform.Position);
-
-                var forceToEnemy = -dirToEnemy * force;
-                var forceToPlayer = dirToEnemy * force;
-                hitEnemyPlayer.Spaceship.Transform.Velocity += forceToEnemy;
-                casterPlayerState.Spaceship.Transform.Velocity += forceToPlayer;
-                
-                var randomSpin = RNG.NextFloat(config.MinSpin, config.MaxSpin);
-                _spinPlayerCommand.SetPlayer(hitEnemyId).SetSpinAmount(randomSpin).SetTick(tick).Execute();
+                hitEnemyId = hitBodyData.Id;
+                ApplyPullToEnemyPhysics(tick, hitEnemyId, casterPlayerState);
             }
-
-            // Put on cooldown
+            
             ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
             var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
             talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
@@ -98,14 +86,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _netEventsDataService.AddCreateMagneticPullFieldNetEventS2C(tick, _casterPlayerId, center, direction, cooldownEndTick, didHitEnemy, hitEnemyId);
         }
 
+        private void ApplyPullToEnemyPhysics(int tick, ushort enemyId, PlayerStateS2C casterPlayerState)
+        {
+            var config = _gamePlayConfig.Talents.MagneticPullTalentConfig;
+            var hitEnemyPlayer = _matchDataService.SimulationState.GetPlayerById(enemyId);
+            var pullForce = config.PushForce;
+            var directionToEnemy = Vector2.Normalize(hitEnemyPlayer.Spaceship.Transform.Position - casterPlayerState.Spaceship.Transform.Position);
+
+            var forceToEnemy = -directionToEnemy * pullForce;
+            var forceToPlayer = directionToEnemy * pullForce;
+            hitEnemyPlayer.Spaceship.Transform.Velocity += forceToEnemy;
+            casterPlayerState.Spaceship.Transform.Velocity += forceToPlayer;
+                
+            var randomSpin = RNG.NextFloat(config.MinSpin, config.MaxSpin);
+            _spinPlayerCommand.SetPlayer(hitEnemyPlayer.Id).SetSpinAmount(randomSpin).SetTick(tick).Execute();
+        }
+
         public void StopIfActive(int tick)
         {
-            // Instant cast, nothing to stop
+            
         }
 
         public void OnTick(int tick, float deltaTime)
         {
-            // Instant cast, nothing to update
+            
         }
 
         public void ResetData()

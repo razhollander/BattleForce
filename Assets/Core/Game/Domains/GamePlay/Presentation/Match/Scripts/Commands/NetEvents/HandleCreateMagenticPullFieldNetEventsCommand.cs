@@ -30,13 +30,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in _cachedPresentationEventsService.CreateMagenticPullFieldNetEvents)
             {
-                _magneticPullEffectController.PlayFieldEffect(netEvent.Position.ToUnityVector2(), netEvent.Direction.ToUnityVector2(), _sharedConfig.MagneticPullFieldRadius, null);
+                _magneticPullEffectController.PlayFieldEffect(netEvent.Position.ToUnityVector2(), netEvent.Direction.ToUnityVector2(), _sharedConfig.MagneticPullFieldRadius);
 
                 if (netEvent.HasHit)
                 {
                     var enemyPosition = _matchPlayerControllers.GetPlayerPosition(netEvent.HitEnemyId);
                     var casterPosition = _matchPlayerControllers.GetPlayerPosition(netEvent.CasterPlayerId);
-                    _magneticPullEffectController.PlayHitEffect(casterPosition, enemyPosition, null);
+                    _magneticPullEffectController.PlayHitEffect(casterPosition, enemyPosition);
                 }
             }
 

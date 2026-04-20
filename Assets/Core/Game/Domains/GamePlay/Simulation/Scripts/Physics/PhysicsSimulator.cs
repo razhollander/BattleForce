@@ -623,12 +623,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         public bool ArcCastOnPlayers(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData)
         {
-            // Debug draw - you'll need a matching utility for arcs
             var arcAngleRad = arcAngleDegrees.ToRadians();
             var startAngleRad = directon.ToAngleRadians()-arcAngleRad*0.5f;
             var hasCollision = false;
-
-            // 1. Generate vertices for the pie-slice approximation
+            
             // We use 1 point for the center, leaving up to 7 points for the outer curve
             int vertexCount = 8;
             var vertices = new Vector2[vertexCount];
@@ -877,7 +875,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.position = position;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.GrapplingHookProjectile);
             bodyDef.bullet = true;
-            LogService.LogError("AddGrapplingHookProjectile: " + velocity + "");
             bodyDef.linearVelocity = velocity;
 
             var body = _world.CreateBody(bodyDef);
@@ -891,7 +888,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.density = 0.3f;
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
-            // fixtureDef.filter.groupIndex = (short)-teamId;
             fixtureDef.filter.categoryBits = PhysicsBodyType.GrapplingHookProjectile.GetCollisionsCategory();
             fixtureDef.filter.maskBits = PhysicsBodyType.GrapplingHookProjectile.GetCollisionMask();
 

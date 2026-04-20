@@ -17,12 +17,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEff
 
         public Action Despawn { get; set; }
 
-        public async Awaitable PlayAndDespawn(Vector2 position, Vector2 rotation, float size, Transform parent, CancellationTokenSource cancellationTokenSource)
+        public async Awaitable PlayAndDespawn(Vector2 position, Vector2 rotation, float size, CancellationTokenSource cancellationTokenSource)
         {
             transform.position = position;
             transform.rotation = rotation.ToQuaternion();
             transform.localScale = new Vector3(size, size, 1f);
-            transform.SetParent(parent);
             
             var color = _spriteRenderer.color;
             color.a = 1;

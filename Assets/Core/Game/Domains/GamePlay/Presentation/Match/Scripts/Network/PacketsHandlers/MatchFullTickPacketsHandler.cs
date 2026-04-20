@@ -19,6 +19,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib.Utils;
+using UnityEditor;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers
@@ -69,11 +70,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<DeactivateUmbrellaTalentNetEventS2C> _cachedUnprocessedDeactivateUmbrellaTalentEvents;
         private readonly CapacityList<CreateMagneticPullFieldNetEventS2C> _cachedUnprocessedCreateMagenticPullFieldEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
+
         private int _largestPacketSizeInLast5Seconds;
-        private int _avaragePacketSizeReceived;
+        private int _averagePacketSizeReceived;
         private long _totalBytesReceived;
         private int _totalPacketsReceived;
         private float _lastLargestPacketResetTime;
+        private GUIStyle _highVisStyle;
+
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
 
@@ -1003,7 +1007,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             var packetSize = reader.RawDataSize;
             _totalPacketsReceived++;
             _totalBytesReceived += packetSize;
-            _avaragePacketSizeReceived = (int)(_totalBytesReceived / _totalPacketsReceived);
+            _averagePacketSizeReceived = (int)(_totalBytesReceived / _totalPacketsReceived);
 
             if (Time.realtimeSinceStartup - _lastLargestPacketResetTime > 5f)
             {
@@ -1076,9 +1080,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         public void ManagedOnGUI()
         {
-            GUILayout.Label($"Avarage packet size received: {_avaragePacketSizeReceived} bytes, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds} bytes");
+            InitStyles();
+            GUILayout.Box($"Average packet size received: {_averagePacketSizeReceived} bytes, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds} bytes", _highVisStyle);
         }
-
+        
+        private void InitStyles()
+        {
+            if (_highVisStyle == null)
+            {
+                _highVisStyle = new GUIStyle(GUI.skin.box); 
+                _highVisStyle.normal.background = Texture2D.whiteTexture;
+                _highVisStyle.fontSize = 16; 
+                _highVisStyle.fontStyle = FontStyle.Bold;
+                _highVisStyle.normal.textColor = Color.black;
+            }
+        }
+        
         public void ManagedOnDrawGizmos()
         {
             
