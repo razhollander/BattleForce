@@ -509,6 +509,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessCreateMagenticPullFieldEvents(CapacityList<CreateMagneticPullFieldNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                _cachedPresentationEventsService.CreateMagenticPullFieldNetEvents.Add(netEvent);
+            }
+        }
+
         public void ProcessUpdatePlayerTalentStocksEvents(CapacityList<UpdatePlayerTalentStocksNetEventS2C> updatePlayerTalentStocksEvents)
         {
             if (updatePlayerTalentStocksEvents.IsNullOrEmpty())

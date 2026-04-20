@@ -59,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandlePerformDashPulseNetEventsCommand _handlePerformDashPulseNetEventsCommand;
         private readonly HandleUpdatePlayerTalentStocksNetEventsCommand _handleUpdatePlayerTalentStocksNetEventsCommand;
         private readonly HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands;
+        private readonly HandleCreateMagenticPullFieldNetEventsCommand _handleCreateMagenticPullFieldNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -105,6 +106,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateKOProjectilesTransformCommand = commandFactory.CreateCommandVoid<UpdateKOProjectilesTransformCommand>();
             _handlePerformDashPulseNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformDashPulseNetEventsCommand>();
             _handleUpdatePlayerTalentStocksNetEventsCommand = commandFactory.CreateCommandVoid<HandleUpdatePlayerTalentStocksNetEventsCommand>();
+            _handleCreateMagenticPullFieldNetEventsCommand = commandFactory.CreateCommandVoid<HandleCreateMagenticPullFieldNetEventsCommand>();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands = commandFactory.CreateCommandVoid<HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands>();
         }
         
@@ -157,6 +159,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateUmbrellaTalentNetEventsCommand.Execute();
             _handlePerformDashPulseNetEventsCommand.Execute();
             _handleUpdatePlayerTalentStocksNetEventsCommand.Execute();
+            _handleCreateMagenticPullFieldNetEventsCommand.Execute();
             _updateKOProjectilesTransformCommand.Execute(); // must be after _handleDeactivateKOTalentNetEventsCommand.Execute();
             _updateGrapplingHookProjectilesTransformCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();

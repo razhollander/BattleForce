@@ -17,15 +17,20 @@ using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
+using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib.Utils;
+using UnityEditor;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers
 {
-    public class MatchFullTickPacketsHandler : IFullTickPacketsHandler
+    public class MatchFullTickPacketsHandler : IFullTickPacketsHandler, IGUIUpdatable
     {
         private readonly NetworkConfig _networkConfig;
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
+        private readonly IUpdateSubscriptionService _updateSubscriptionService;
+
         private readonly PresentationMatchNetEventsHandler _presentationNetEventsHandler;
         private readonly CapacityDict<int, MatchFullTickPacketS2C> _fullTickPackets;
         private readonly CapacityList<PlayerRejoinAcceptPacketS2C> _cachedUnprocessedPlayerRejoinedEvents;
@@ -63,16 +68,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PlayerSelectedTalentFinishedCooldownLocalEvent> _cachedPlayerSelectedTalentFinishedCooldownLocalEvents;
         private readonly CapacityList<ActivateUmbrellaTalentNetEventS2C> _cachedUnprocessedActivateUmbrellaTalentEvents;
         private readonly CapacityList<DeactivateUmbrellaTalentNetEventS2C> _cachedUnprocessedDeactivateUmbrellaTalentEvents;
+        private readonly CapacityList<CreateMagneticPullFieldNetEventS2C> _cachedUnprocessedCreateMagenticPullFieldEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
+
+        private int _largestPacketSizeInLast5Seconds;
+        private int _averagePacketSizeReceived;
+        private long _totalBytesReceived;
+        private int _totalPacketsReceived;
+        private float _lastLargestPacketResetTime;
+        private GUIStyle _highVisStyle;
+
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
 
         public MatchFullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
-            IMatchDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory)
+            IMatchDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory, IUpdateSubscriptionService updateSubscriptionService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
+            _updateSubscriptionService = updateSubscriptionService;
             _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory);
             _fullTickPackets = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerRejoinedEvents = new CapacityList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
@@ -110,12 +125,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedPlayerSelectedTalentFinishedCooldownLocalEvents = new CapacityList<PlayerSelectedTalentFinishedCooldownLocalEvent>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedUnprocessedActivateUmbrellaTalentEvents = new CapacityList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents);
             _cachedUnprocessedDeactivateUmbrellaTalentEvents = new CapacityList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents);
+            _cachedUnprocessedCreateMagenticPullFieldEvents = new CapacityList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
         public void InitEntryPoint()
         {
             _networkManager.RegisterPacketsObserver(this);
+            _updateSubscriptionService.RegisterGuiUpdatable(this);
         }
 
         public void ProcessStateLatestTick()
@@ -169,6 +186,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPlayerMaxShootCooldownChangedEvents(latestFullTickPacket.PlayerMaxShootCooldownChangedNetEvents);
             ProcessActivateUmbrellaTalentEvents(latestFullTickPacket.ActivateUmbrellaTalentNetEvents);
             ProcessDeactivateUmbrellaTalentEvents(latestFullTickPacket.DeactivateUmbrellaTalentNetEvents);
+            ProcessCreateMagenticPullFieldEvents(latestFullTickPacket.CreateMagneticPullFieldNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
@@ -507,6 +525,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedPlayerMaxShootCooldownChangedEvents.Sort();
                 _presentationNetEventsHandler.ProcessPlayerMaxShootCooldownChangedEvents(_cachedUnprocessedPlayerMaxShootCooldownChangedEvents);
+            }
+        }
+
+        private void ProcessCreateMagenticPullFieldEvents(FixedUnorderedList<CreateMagneticPullFieldNetEventS2C> events)
+        {
+            _cachedUnprocessedCreateMagenticPullFieldEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedCreateMagenticPullFieldEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedCreateMagenticPullFieldEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedCreateMagenticPullFieldEvents.Sort();
+                _presentationNetEventsHandler.ProcessCreateMagenticPullFieldEvents(_cachedUnprocessedCreateMagenticPullFieldEvents);
             }
         }
 
@@ -967,6 +1004,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         
         public void OnPacketReceived(NetDataReader reader)
         {
+            var packetSize = reader.RawDataSize;
+            _totalPacketsReceived++;
+            _totalBytesReceived += packetSize;
+            _averagePacketSizeReceived = (int)(_totalBytesReceived / _totalPacketsReceived);
+
+            if (Time.realtimeSinceStartup - _lastLargestPacketResetTime > 5f)
+            {
+                _largestPacketSizeInLast5Seconds = packetSize;
+                _lastLargestPacketResetTime = Time.realtimeSinceStartup;
+            }
+            else if (packetSize > _largestPacketSizeInLast5Seconds)
+            {
+                _largestPacketSizeInLast5Seconds = packetSize;
+            }
+
             var newPacket = _fullTickPacketsPool.Get();
             newPacket.Deserialize(reader);
             OnFullTickReceived(newPacket);
@@ -987,6 +1039,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private void UnregisterListeners()
         {
             _networkManager.UnregisterPacketsObserver(this);
+            _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
 
         private void ProcessActivateSentryGunTalentEvents(FixedUnorderedList<ActivateSentryGunTalentNetEventS2C> activateSentryGunTalentNetEvents)
@@ -1024,5 +1077,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _presentationNetEventsHandler.ProcessDeactivateSentryGunTalentEvents(_cachedUnprocessedDeactivateSentryGunTalentEvents);
             }
         }
-}
+
+        public void ManagedOnGUI()
+        {
+            InitStyles();
+            GUILayout.Box($"Average packet size received: {_averagePacketSizeReceived} bytes, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds} bytes", _highVisStyle);
+        }
+        
+        private void InitStyles()
+        {
+            if (_highVisStyle == null)
+            {
+                _highVisStyle = new GUIStyle(GUI.skin.box); 
+                _highVisStyle.normal.background = Texture2D.whiteTexture;
+                _highVisStyle.fontSize = 16; 
+                _highVisStyle.fontStyle = FontStyle.Bold;
+                _highVisStyle.normal.textColor = Color.black;
+            }
+        }
+        
+        public void ManagedOnDrawGizmos()
+        {
+            
+        }
+    }
 }

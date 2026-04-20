@@ -59,12 +59,14 @@
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/PlayerRejoinAcceptPacketS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/Enums/PacketTypeS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/TalentSwitchNetEventS2C.cs
+./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/CreateMagneticPullFieldNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/StageEndNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerMaxShootCooldownChangedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerDiedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/BulletDestroyedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/KOProjectHitPlayerNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/CreateGrapplingHookProjectileNetEventS2C.cs
+./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/CreateMagenticPullFieldNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/CreateSwapFieldNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayersSwapNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PreparationPhaseEndedNetEventS2C.cs
@@ -81,6 +83,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerToEnvironmentTeleportGateCollisionNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PerformDashPulseNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/EnvironmentSpringPlayerCollisionNetEventS2C.cs
+./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerSpinnedStartedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/DeactivateGrapplingHookTalentNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerSpinnedStartedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/UpdatePlayerTalentStocksNetEventS2C.cs
@@ -164,6 +167,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/ITalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/DashPulseTalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/SwapTalentController.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/MagneticPullTalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/SentryGunTalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/HammerTalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/BombTalentController.cs
@@ -205,6 +209,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/UmbrellaTalentConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/SentryGunTalentConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/HammerTalentConfig.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/MagneticPullTalentConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerExitPointCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/IServerInitiator.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerInitiator.cs
@@ -325,6 +330,8 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleTeamLostNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePowerUpBallSpawnedNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePowerUpBallObtainedNetEventsCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleCreateMagenticPullFieldNetEventsCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerSpinnedEndedNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleGrapplingHookDeactivatedNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleGrapplingHookShotNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerSpinnedEndedNetEventsCommand.cs
@@ -407,6 +414,12 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/Environment/LavaWalls/Scripts/EnvironmentLavaWallsControllers.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/Environment/LavaWalls/Scripts/EnvironmentLavaWallController.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/Environment/LavaWalls/Scripts/EnvironmentLavaWallView.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/MagneticPullEffect/Scripts/IMagneticPullEffectController.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/MagneticPullEffect/Scripts/MagneticPullHitEffectPool.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/MagneticPullEffect/Scripts/MagneticPullEffectController.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/MagneticPullEffect/Scripts/MagneticPullHitEffectView.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/MagneticPullEffect/Scripts/MagneticPullFieldPool.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/MagneticPullEffect/Scripts/MagneticPullFieldView.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/KOProjectiles/Scripts/KOProjectilePool.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/KOProjectiles/Scripts/Mvc/KOProjectileView.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/KOProjectiles/Scripts/Mvc/IKOProjectilesControllers.cs

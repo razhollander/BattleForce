@@ -620,7 +620,87 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             return hasCollision;
         }
-        
+
+        public bool ArcCastOnPlayers(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        {
+            var arcAngleRad = arcAngleDegrees.ToRadians();
+            var startAngleRad = directon.ToAngleRadians()-arcAngleRad*0.5f;
+            var hasCollision = false;
+            
+            // We use 1 point for the center, leaving up to 7 points for the outer curve
+            int vertexCount = 8;
+            var vertices = new Vector2[vertexCount];
+            vertices[0] = Vector2.Zero; // Center in local space
+
+            for (int i = 0; i < vertexCount - 1; i++)
+            {
+                // Distribute the remaining points across the arc angle
+                float currentAngle = startAngleRad + (arcAngleRad * (i / (float) (vertexCount - 2)));
+
+                vertices[i + 1] = new Vector2(
+                    MathF.Cos(currentAngle) * radius,
+                    MathF.Sin(currentAngle) * radius
+                );
+            }
+
+            // 2. Calculate AABB for broadphase query
+            // We calculate this in world space to match your RectangleCast logic
+            var min = center;
+            var max = center;
+
+            foreach (var v in vertices)
+            {
+                var worldV = v + center;
+                min = Vector2.Min(min, worldV);
+                max = Vector2.Max(max, worldV);
+            }
+
+            _unityMainThreadDispatcher.EnqueueDraw(() => DebugDrawUtils.DrawPolygon(center, vertices));
+
+            var aabb = new AABB(min, max);
+            PhysicsBodyData hitBody = default;
+
+            // 3. Query the world
+            _world.QueryAABB(fixture =>
+            {
+                var currentBodyData = (PhysicsBodyData) fixture.Body.UserData;
+                var shouldContinueQuery = true;
+                var isPlayerFromNotIgnoredTeam = currentBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && fixture.FilterData.groupIndex != -ignoreTeamId;
+                if (isPlayerFromNotIgnoredTeam)
+                {
+                    var polygonShape = GetPolygonShape();
+
+                    // Set the approximation vertices
+                    polygonShape.Set(vertices);
+
+                    var input = new ShapeCastInput();
+                    input.proxyA.Set(polygonShape, 0);
+                    input.proxyB.Set(fixture.Shape, 0);
+
+                    // transformA handles the position. Rotation is baked into vertices
+                    // but we pass Identity to stay consistent with local-space vertices.
+                    input.transformA = new Transform(center, Matrix3x2.Identity);
+                    input.transformB = fixture.Body.GetTransform();
+                    input.translationB = Vector2.Zero;
+                    
+                    if (Contact.ShapeCast(out _, input))
+                    {
+                        hasCollision = true;
+                        hitBody = currentBodyData;
+                    }
+
+                    _polygonShapePool.Return(polygonShape);
+                    shouldContinueQuery = !hasCollision;
+                }
+
+                return shouldContinueQuery;
+            }, aabb);
+
+            hitBodyData = hitBody;
+
+            return hasCollision;
+        }
+
         public void ManagedOnGUI()
         {
             
@@ -795,7 +875,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.position = position;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.GrapplingHookProjectile);
             bodyDef.bullet = true;
-            LogService.LogError("AddGrapplingHookProjectile: " + velocity + "");
             bodyDef.linearVelocity = velocity;
 
             var body = _world.CreateBody(bodyDef);
@@ -809,7 +888,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.density = 0.3f;
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
-            // fixtureDef.filter.groupIndex = (short)-teamId;
             fixtureDef.filter.categoryBits = PhysicsBodyType.GrapplingHookProjectile.GetCollisionsCategory();
             fixtureDef.filter.maskBits = PhysicsBodyType.GrapplingHookProjectile.GetCollisionMask();
 

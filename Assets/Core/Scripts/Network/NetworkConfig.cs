@@ -97,6 +97,7 @@ namespace Core.Scripts.Network
         public int DeactivateGrapplingHookTalentNetEvents = 128;
         public int ActivateUmbrellaTalentNetEvents = 128;
         public int DeactivateUmbrellaTalentNetEvents = 128;
+        public int CreateMagneticPullFieldNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel
