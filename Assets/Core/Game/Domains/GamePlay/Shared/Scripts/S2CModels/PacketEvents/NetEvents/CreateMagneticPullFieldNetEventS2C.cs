@@ -9,15 +9,17 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     {
         public int OccuredOnTick;
         public ushort CasterPlayerId;
+        public Vector2 Position;
         public Vector2 Direction;
         public int TalentCooldownEndTick;
         public bool HasHit;
         public ushort HitEnemyId;
-
-        public CreateMagneticPullFieldNetEventS2C(int occuredOnTick, ushort casterPlayerId, Vector2 direction, int talentCooldownEndTick, bool hasHit, ushort hitEnemyId)
+        
+        public CreateMagneticPullFieldNetEventS2C(int occuredOnTick, ushort casterPlayerId, Vector2 position, Vector2 direction, int talentCooldownEndTick, bool hasHit, ushort hitEnemyId)
         {
             OccuredOnTick = occuredOnTick;
             CasterPlayerId = casterPlayerId;
+            Position = position;
             Direction = direction;
             TalentCooldownEndTick = talentCooldownEndTick;
             HitEnemyId = hitEnemyId;
@@ -28,9 +30,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)CasterPlayerId);
+            writer.PutVector2Quantized(Position);
             writer.PutVector2AsAngle16(Direction);
             writer.Put(TalentCooldownEndTick);
-            writer.Put(HitEnemyId);
+            writer.Put((byte)HitEnemyId);
             writer.Put(HasHit);
         }
 
@@ -38,9 +41,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             OccuredOnTick = reader.GetInt();
             CasterPlayerId = reader.GetByte();
+            Position = reader.GetVector2Quantized();
             Direction = reader.GetVector2FromAngle16();
             TalentCooldownEndTick = reader.GetInt();
-            HitEnemyId = reader.GetUShort();
+            HitEnemyId = reader.GetByte();
             HasHit = reader.GetBool();
         }
 

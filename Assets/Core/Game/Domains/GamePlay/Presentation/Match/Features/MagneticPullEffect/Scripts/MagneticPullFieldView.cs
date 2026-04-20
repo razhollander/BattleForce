@@ -3,6 +3,7 @@ using System.Threading;
 using Core.Scripts.Extensions;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Helpers.Pools;
+using CoreDomain.Scripts.Services.Logger.Base;
 using DG.Tweening;
 using UnityEngine;
 
@@ -10,8 +11,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEff
 {
     public class MagneticPullFieldView : MonoBehaviour, IPoolable
     {
-        [SerializeField] private float _showDuration = 2f;
+        [SerializeField] private float _showDurationInSeconds = 1f;
+        [SerializeField] private float _fadeDurationInSeconds = 0.2f;
         [SerializeField] private SpriteRenderer _spriteRenderer;
+
+        public Action Despawn { get; set; }
 
         public async Awaitable PlayAndDespawn(Vector2 position, Vector2 rotation, float size, Transform parent, CancellationTokenSource cancellationTokenSource)
         {
@@ -19,48 +23,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEff
             transform.rotation = rotation.ToQuaternion();
             transform.localScale = new Vector3(size, size, 1f);
             transform.SetParent(parent);
+            
+            var color = _spriteRenderer.color;
+            color.a = 1;
+            _spriteRenderer.color = color;
 
-            // Optionally add fade in / fade out if _spriteRenderer exists
-            if (_spriteRenderer != null)
+            try
             {
-                var color = _spriteRenderer.color;
-                color.a = 0;
-                _spriteRenderer.color = color;
-
-                _spriteRenderer.DOFade(1, 0.2f).WithCancellationSafe(cancellationTokenSource.Token).Forget();
-
-                try
-                {
-                    await Awaitable.WaitForSecondsAsync(_showDuration - 0.2f, cancellationTokenSource.Token);
-                    await _spriteRenderer.DOFade(0, 0.2f).WithCancellationSafe(cancellationTokenSource.Token);
-                }
-                finally
-                {
-                    Despawn();
-                }
+                await Awaitable.WaitForSecondsAsync(_showDurationInSeconds - _fadeDurationInSeconds, cancellationTokenSource.Token);
+                await _spriteRenderer.DOFade(0, _fadeDurationInSeconds).WithCancellationSafe(cancellationTokenSource.Token);
             }
-            else
+            finally
             {
-                try
-                {
-                    await Awaitable.WaitForSecondsAsync(_showDuration, cancellationTokenSource.Token);
-                }
-                finally
-                {
-                    Despawn();
-                }
+                Despawn();
             }
         }
 
         public void OnCreated()
         {
-            if (_spriteRenderer == null)
-            {
-                _spriteRenderer = GetComponent<SpriteRenderer>();
-            }
+          
         }
 
-        public Action Despawn { get; set; }
         public void OnSpawned()
         {
             gameObject.SetActive(true);

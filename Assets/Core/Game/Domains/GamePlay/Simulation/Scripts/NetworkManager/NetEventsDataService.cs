@@ -1583,13 +1583,14 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
             }
         }
 
-        public void AddCreateMagneticPullFieldNetEventS2C(int onTick, ushort casterPlayerId, Vector2 direction, int talentCooldownEndTick, bool hasHit, ushort hitEnemyId)
+        public void AddCreateMagneticPullFieldNetEventS2C(int onTick, ushort casterPlayerId, Vector2 position, Vector2 direction, int talentCooldownEndTick, bool hasHit, ushort hitEnemyId)
         {
             foreach (var kvp in CreateMagneticPullFieldNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.CasterPlayerId = casterPlayerId;
+                packet.Position = position;
                 packet.Direction = direction;
                 packet.TalentCooldownEndTick = talentCooldownEndTick;
                 packet.HasHit = hasHit;

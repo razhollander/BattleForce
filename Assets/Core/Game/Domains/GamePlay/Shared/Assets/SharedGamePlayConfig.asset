@@ -28,3 +28,6 @@ MonoBehaviour:
   NoTeamId: 5
   TeamIds: 0100020003000400
   MinEntityId: 1
+  GrapplingHookProjectileSize: 1
+  GrapplingHookProjectileMaxDistance: 30
+  MagneticPullFieldRadius: 10

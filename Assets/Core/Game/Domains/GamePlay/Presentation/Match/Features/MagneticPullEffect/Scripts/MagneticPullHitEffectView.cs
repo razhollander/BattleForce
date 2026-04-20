@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Core.Scripts.Helpers;
+using Core.Scripts.Utils;
 using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 
@@ -16,14 +17,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEff
         {
             var direction = (endPosition - startPosition).normalized;
             var distance = Vector2.Distance(startPosition, endPosition);
-            var centerPosition = startPosition + direction * (distance / 2f);
+            var centerPosition = startPosition + direction * (distance * 0.5f);
 
             transform.position = centerPosition;
             transform.up = direction;
             transform.localScale = new Vector3(1f, distance, 1f);
             transform.SetParent(parent);
-            await _spriteAnimator.PlayAnimation(cancellationTokenSource);
-            Despawn();
+
+            try
+            {
+                _spriteAnimator.PlayAnimation(cancellationTokenSource).Forget();
+                await Awaitable.WaitForSecondsAsync(_showDuration, cancellationTokenSource.Token);
+            }
+            finally
+            {
+                Despawn();
+            }
         }
 
         public void OnCreated()

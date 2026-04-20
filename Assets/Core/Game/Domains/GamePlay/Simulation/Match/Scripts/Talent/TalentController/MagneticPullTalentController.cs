@@ -8,6 +8,9 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
+using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
@@ -21,11 +24,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
+        private readonly ICommandFactory _commandFactory;
+        private readonly SpinPlayerCommand _spinPlayerCommand;
 
         public TalentType TalentType => TalentType.MagneticPull;
 
         public MagneticPullTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
@@ -33,6 +38,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _sharedGamePlayConfig = sharedGamePlayConfig;
+            _commandFactory = commandFactory;
+            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -61,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var config = _gamePlayConfig.Talents.MagneticPullTalentConfig;
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            var offset = _sharedGamePlayConfig.MagneticPullFieldRadius*0.5f;
+            var offset = casterPlayerState.Spaceship.Transform.Radius;
             var center = casterPlayerState.Spaceship.Transform.Position + (direction * offset);
             ushort hitEnemyId = 0;
 
@@ -78,6 +85,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 var forceToPlayer = dirToEnemy * force;
                 hitEnemyPlayer.Spaceship.Transform.Velocity += forceToEnemy;
                 casterPlayerState.Spaceship.Transform.Velocity += forceToPlayer;
+                
+                var randomSpin = RNG.NextFloat(config.MinSpin, config.MaxSpin);
+                _spinPlayerCommand.SetPlayer(hitEnemyId).SetSpinAmount(randomSpin).SetTick(tick).Execute();
             }
 
             // Put on cooldown
@@ -85,7 +95,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
             talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
-            _netEventsDataService.AddCreateMagneticPullFieldNetEventS2C(tick, _casterPlayerId, direction, cooldownEndTick, didHitEnemy, hitEnemyId);
+            _netEventsDataService.AddCreateMagneticPullFieldNetEventS2C(tick, _casterPlayerId, center, direction, cooldownEndTick, didHitEnemy, hitEnemyId);
         }
 
         public void StopIfActive(int tick)

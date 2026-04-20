@@ -7,5 +7,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
     {
         public float FieldArcAngle = 90f; 
         public float PushForce = 15f;
+        public float MaxSpin = 55f;
+        public float MinSpin = 50f;
     }
 }
