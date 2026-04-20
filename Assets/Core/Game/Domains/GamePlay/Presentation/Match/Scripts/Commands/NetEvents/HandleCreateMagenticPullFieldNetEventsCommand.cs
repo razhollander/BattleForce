@@ -31,8 +31,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in _cachedPresentationEventsService.CreateMagenticPullFieldNetEvents)
             {
                 var casterPosition = _matchPlayerControllers.GetPlayerPosition(netEvent.CasterPlayerId);
+                var spawnPosition = casterPosition + netEvent.Direction.ToUnityVector2() * _sharedConfig.MagneticPullFieldRadius * 0.5f;
                 // Ensure parent transforms are mapped, maybe just use null or caster for field, but standard is null
-                _magneticPullEffectController.PlayFieldEffect(casterPosition, netEvent.Direction.ToUnityVector2(), _sharedConfig.MagneticPullFieldRadius, null);
+                _magneticPullEffectController.PlayFieldEffect(spawnPosition, netEvent.Direction.ToUnityVector2(), _sharedConfig.MagneticPullFieldRadius, null);
 
                 if (netEvent.HasHit)
                 {

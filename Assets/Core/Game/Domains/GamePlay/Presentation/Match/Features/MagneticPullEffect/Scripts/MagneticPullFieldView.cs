@@ -16,7 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEff
         public async Awaitable PlayAndDespawn(Vector2 position, Vector2 rotation, float size, Transform parent, CancellationTokenSource cancellationTokenSource)
         {
             transform.position = position;
-            transform.up = rotation;
+            transform.rotation = rotation.ToQuaternion();
             transform.localScale = new Vector3(size, size, 1f);
             transform.SetParent(parent);
 

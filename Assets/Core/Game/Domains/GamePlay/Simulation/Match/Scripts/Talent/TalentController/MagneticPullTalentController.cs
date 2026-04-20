@@ -64,7 +64,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var offset = _sharedGamePlayConfig.MagneticPullFieldRadius*0.5f;
             var center = casterPlayerState.Spaceship.Transform.Position + (direction * offset);
             ushort hitEnemyId = 0;
-            var didHitEnemy = _physicsSimulator.ArcCastOnPlayer(center, _sharedGamePlayConfig.MagneticPullFieldRadius,direction, _gamePlayConfig.Talents.MagneticPullTalentConfig.FieldArcAngle, (short)casterPlayerState.TeamId, out var hitBodyData);
+
+            var didHitEnemy = _physicsSimulator.ArcCastOnPlayers(center, _sharedGamePlayConfig.MagneticPullFieldRadius, direction,
+                _gamePlayConfig.Talents.MagneticPullTalentConfig.FieldArcAngle, (short) casterPlayerState.TeamId, out var hitBodyData);
             if (didHitEnemy)
             {
                 var hitEnemyPlayer = _matchDataService.SimulationState.GetPlayerById(hitBodyData.Id);

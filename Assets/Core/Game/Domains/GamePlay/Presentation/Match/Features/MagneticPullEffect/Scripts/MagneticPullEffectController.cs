@@ -26,9 +26,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEff
             _hitEffectPool.InitPool();
         }
 
-        public void PlayFieldEffect(Vector2 position, Vector2 rotation, float size, Transform parent)
+        public void PlayFieldEffect(Vector2 position, Vector2 rotation, float Radius, Transform parent)
         {
-            PlayFieldEffectAsync(position, rotation, size, parent, _stageCancellationTokenProvider.CancellationTokenSource).Forget();
+            PlayFieldEffectAsync(position, rotation, Radius, parent, _stageCancellationTokenProvider.CancellationTokenSource).Forget();
         }
 
         public void PlayHitEffect(Vector2 casterPosition, Vector2 enemyPosition, Transform parent)
@@ -36,10 +36,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEff
             PlayHitEffectAsync(casterPosition, enemyPosition, parent, _stageCancellationTokenProvider.CancellationTokenSource).Forget();
         }
 
-        private async Awaitable PlayFieldEffectAsync(Vector2 position, Vector2 rotation, float size, Transform parent, CancellationTokenSource cancellationTokenSource)
+        private async Awaitable PlayFieldEffectAsync(Vector2 position, Vector2 rotation, float radius, Transform parent, CancellationTokenSource cancellationTokenSource)
         {
             var view = _fieldPool.Spawn();
-            await view.PlayAndDespawn(position, rotation, size, parent, cancellationTokenSource);
+            await view.PlayAndDespawn(position, rotation, radius, parent, cancellationTokenSource);
         }
 
         private async Awaitable PlayHitEffectAsync(Vector2 casterPosition, Vector2 enemyPosition, Transform parent, CancellationTokenSource cancellationTokenSource)

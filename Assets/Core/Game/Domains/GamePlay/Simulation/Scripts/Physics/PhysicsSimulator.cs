@@ -621,7 +621,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return hasCollision;
         }
 
-        public bool ArcCastOnPlayer(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        public bool ArcCastOnPlayers(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData)
         {
             // Debug draw - you'll need a matching utility for arcs
             var arcAngleRad = arcAngleDegrees.ToRadians();

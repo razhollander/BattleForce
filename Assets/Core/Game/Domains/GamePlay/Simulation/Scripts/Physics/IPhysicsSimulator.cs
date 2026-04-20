@@ -47,6 +47,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void RemoveGrapplingHookProjectile(ushort id);
         void ClearAllData();
         void DisableBodyCollider(PhysicsBodyType koProjectile, ushort projectileId);
-        bool ArcCastOnPlayer(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ingoredTeamId, out PhysicsBodyData hitBodyData);
+        bool ArcCastOnPlayers(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ingoredTeamId, out PhysicsBodyData hitBodyData);
     }
 }
