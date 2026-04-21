@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly SentryGunTalentController _sentryGunTalentController;
         private readonly GrapplingHookTalentController _grapplingHookTalentController;
         private readonly UmbrellaTalentController _umbrellaTalentController;
+        private readonly MagneticPullTalentController _magneticPullTalentController;
         private readonly ChickenTalentController _chickenTalentController;
         
         private ushort _casterPlayerId;
@@ -31,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _sentryGunTalentController = new SentryGunTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig, networkConfig, commandFactory);
             _grapplingHookTalentController = new GrapplingHookTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig);
             _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig);
+            _magneticPullTalentController = new MagneticPullTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
             _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfig, networkConfig, physicsSimulator);
         }
 
@@ -43,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _sentryGunTalentController.SetCasterId(casterPlayerId);
             _grapplingHookTalentController.SetCasterId(casterPlayerId);
             _umbrellaTalentController.SetCasterId(casterPlayerId);
+            _magneticPullTalentController.SetCasterId(casterPlayerId);
             _chickenTalentController.SetCasterId(casterPlayerId);
         }
 
@@ -56,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.DashPulse: return _dashPulseTalentController;
                 case TalentType.GrapplingHook: return _grapplingHookTalentController;
                 case TalentType.Umbrella: return _umbrellaTalentController;
+                case TalentType.MagneticPull: return _magneticPullTalentController;
                 case TalentType.Chicken: return _chickenTalentController;
                 default: return default;
             }
@@ -74,6 +78,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _dashPulseTalentController?.OnTick(tick, deltaTime);
             _grapplingHookTalentController?.OnTick(tick, deltaTime);
             _umbrellaTalentController?.OnTick(tick, deltaTime);
+            _magneticPullTalentController?.OnTick(tick, deltaTime);
             _chickenTalentController?.OnTick(tick, deltaTime);
         }
 
@@ -110,6 +115,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _sentryGunTalentController.ResetData();
             _grapplingHookTalentController.ResetData();
             _umbrellaTalentController.ResetData();
+            _magneticPullTalentController.ResetData();
             _chickenTalentController.ResetData();
         }
     }

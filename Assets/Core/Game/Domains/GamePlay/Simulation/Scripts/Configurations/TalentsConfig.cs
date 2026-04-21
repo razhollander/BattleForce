@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public SentryGunTalentConfig SentryGunTalentConfig;
         public GrapplingHookTalentConfig GrapplingHookTalentConfig;
         public UmbrellaTalentConfig UmbrellaTalentConfig;
+        public MagneticPullTalentConfig MagneticPullTalentConfig;
         public ChickenTalentConfig ChickenTalentConfig;
         public float TalentCardWidth = 1.602175f;
         public float TalentCardHeight = 2.382844f;

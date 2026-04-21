@@ -56,8 +56,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             newPlayer.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
             newPlayer.Spaceship.Shoot.MaxCooldown = shootCooldown;
             TeamIds.Add(teamId);
-            _simulationState.GemsPerTeamId.Add(teamId, 0);
-            _simulationState.BoltsPerTeam.Add(teamId, 0);
+            _simulationState.GemsPerTeamId.TryAdd(teamId, 0);
+            _simulationState.BoltsPerTeam.TryAdd(teamId, 0);
             return newPlayer;
         }
 

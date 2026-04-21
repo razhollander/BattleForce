@@ -155,8 +155,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, playerState.Spaceship);
             Players.Add(newPlayer);
             TeamIds.Add(playerTeamId);
-            BoltsPerTeam.Add(playerTeamId, 0);
-            GemsPerTeam.Add(playerTeamId, 0);
+            BoltsPerTeam.TryAdd(playerTeamId, 0);
+            GemsPerTeam.TryAdd(playerTeamId, 0);
             return newPlayer;
         }
 
