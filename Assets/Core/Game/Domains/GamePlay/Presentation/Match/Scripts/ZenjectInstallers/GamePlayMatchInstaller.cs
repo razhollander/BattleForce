@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
@@ -18,6 +19,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
@@ -56,7 +58,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private KOProjectileView _koProjectileViewPrefab;
         [SerializeField] private GrapplingHookProjectileView _grapplingHookProjectileViewPrefab;
         [SerializeField] private DashPulseGustEffectView _dashPulseGustEffectViewPrefab;
-        [SerializeField] private Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.Mvc.ChickenEggView _chickenEggViewPrefab;
+        [SerializeField] private MagneticPullFieldView _magneticPullFieldViewPrefab;
+        [SerializeField] private MagneticPullHitEffectView _magneticPullHitEffectViewPrefab;
+        [SerializeField] private ChickenEggView _chickenEggViewPrefab;
 
         public override void InstallBindings()
         {
@@ -98,6 +102,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<KOProjectilesControllers>().AsSingle().WithArguments(_koProjectileViewPrefab).NonLazy();
             Container.BindInterfacesTo<GrapplingHookProjectilesControllers>().AsSingle().WithArguments(_grapplingHookProjectileViewPrefab).NonLazy();
             Container.BindInterfacesTo<DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<MagneticPullEffectController>().AsSingle().WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab).NonLazy();
         }
     }
 }

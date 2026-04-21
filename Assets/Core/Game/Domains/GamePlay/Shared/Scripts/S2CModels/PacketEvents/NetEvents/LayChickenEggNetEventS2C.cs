@@ -1,22 +1,23 @@
 using System;
-using System.Numerics;
 using LiteNetLib.Utils;
+using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.Extensions;
 
-namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
+namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
     public struct LayChickenEggNetEventS2C : INetSerializable, IComparable<LayChickenEggNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort CasterPlayerId;
-        public Vector2 Position;
         public ushort EggId;
+        public Vector2 Position;
 
-        public LayChickenEggNetEventS2C(int occuredOnTick, ushort casterPlayerId, Vector2 position, ushort eggId)
+        public LayChickenEggNetEventS2C(int occuredOnTick, ushort casterPlayerId, ushort eggId, Vector2 position)
         {
             OccuredOnTick = occuredOnTick;
             CasterPlayerId = casterPlayerId;
-            Position = position;
             EggId = eggId;
+            Position = position;
         }
 
         public void Serialize(NetDataWriter writer)
@@ -24,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             writer.Put(OccuredOnTick);
             writer.Put((byte)CasterPlayerId);
             writer.Put(EggId);
+            writer.PutVector2Quantized(Position);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -31,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             OccuredOnTick = reader.GetInt();
             CasterPlayerId = reader.GetByte();
             EggId = reader.GetUShort();
+            Position = reader.GetVector2Quantized();
         }
 
         public int CompareTo(LayChickenEggNetEventS2C other)

@@ -47,9 +47,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents;
         public FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents;
         public FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents;
+        public FixedUnorderedList<CreateMagneticPullFieldNetEventS2C> CreateMagneticPullFieldNetEvents;
         public FixedUnorderedList<LayChickenEggNetEventS2C> LayChickenEggNetEvents;
         public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
-
+        
         public MatchFullTickPacketS2C()
         {
             // use this from the server?
@@ -103,6 +104,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             CreateGrapplingHookProjectileNetEvents = new FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>(maxCap.CreateGrapplingHookProjectileNetEvents);
             GrapplingHookHitWallNetEvents = new FixedUnorderedList<GrapplingHookHitWallNetEventS2C>(maxCap.GrapplingHookHitWallNetEvents);
             DeactivateGrapplingHookTalentNetEvents = new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(maxCap.DeactivateGrapplingHookTalentNetEvents);
+            CreateMagneticPullFieldNetEvents = new FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>(maxCap.CreateMagneticPullFieldNetEvents);
             ActivateUmbrellaTalentNetEvents = new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(maxCap.ActivateUmbrellaTalentNetEvents);
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
@@ -145,6 +147,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedCreateGrapplingHookProjectileNetEvents(writer);
             SerializedGrapplingHookHitWallNetEvents(writer);
             SerializedDeactivateGrapplingHookTalentNetEvents(writer);
+            SerializedCreateMagneticPullFieldNetEvents(writer);
             SerializedActivateUmbrellaTalentNetEvents(writer);
             SerializedDeactivateUmbrellaTalentNetEvents(writer);
             SerializedLayChickenEggNetEvents(writer);
@@ -340,6 +343,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedCreateGrapplingHookProjectileNetEvents(reader);
             DeserializedGrapplingHookHitWallNetEvents(reader);
             DeserializedDeactivateGrapplingHookTalentNetEvents(reader);
+            DeserializedCreateMagneticPullFieldNetEvents(reader);
             DeserializedActivateUmbrellaTalentNetEvents(reader);
             DeserializedDeactivateUmbrellaTalentNetEvents(reader);
             DeserializedLayChickenEggNetEvents(reader);
@@ -873,20 +877,37 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
-        private void SerializedLayChickenEggNetEvents(NetDataWriter writer)
+        private void SerializedCreateMagneticPullFieldNetEvents(NetDataWriter writer)
         {
-            writer.Put((byte)LayChickenEggNetEvents.Count);
-            foreach (var netEvent in LayChickenEggNetEvents.AsSpan())
+            writer.Put((byte)CreateMagneticPullFieldNetEvents.Count);
+            foreach (var netEvent in CreateMagneticPullFieldNetEvents.AsSpan())
             {
                 netEvent.Serialize(writer);
             }
+        }
+
+        private void DeserializedCreateMagneticPullFieldNetEvents(NetDataReader reader)
+        {
+            CreateMagneticPullFieldNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref CreateMagneticPullFieldNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+        
+        private void SerializedLayChickenEggNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)LayChickenEggNetEvents.Count);
+            foreach (var netEvent in LayChickenEggNetEvents.AsSpan()) netEvent.Serialize(writer);
         }
 
         private void DeserializedLayChickenEggNetEvents(NetDataReader reader)
         {
             LayChickenEggNetEvents.Clear();
             var count = reader.GetByte();
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref LayChickenEggNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
@@ -896,17 +917,14 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         private void SerializedChickenEggHitNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)ChickenEggHitNetEvents.Count);
-            foreach (var netEvent in ChickenEggHitNetEvents.AsSpan())
-            {
-                netEvent.Serialize(writer);
-            }
+            foreach (var netEvent in ChickenEggHitNetEvents.AsSpan()) netEvent.Serialize(writer);
         }
 
         private void DeserializedChickenEggHitNetEvents(NetDataReader reader)
         {
             ChickenEggHitNetEvents.Clear();
             var count = reader.GetByte();
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref ChickenEggHitNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
