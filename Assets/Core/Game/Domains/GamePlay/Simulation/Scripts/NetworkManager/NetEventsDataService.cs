@@ -59,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>> CreateMagneticPullFieldNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> ActivateYearsOfPainTalentNetEventsPerPlayer { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -103,6 +104,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>> _createMagneticPullFieldNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> _activateUmbrellaTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> _deactivateUmbrellaTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> _activateYearsOfPainTalentNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -150,6 +152,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             CreateMagneticPullFieldNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>>(maxConcurrentPlayers);
             ActivateUmbrellaTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateUmbrellaTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
+            ActivateYearsOfPainTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(maxConcurrentPlayers);
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -210,6 +213,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _createMagneticPullFieldNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>>(() => new FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents), maxConcurrentPlayers);
             _activateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
             _deactivateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
+            _activateYearsOfPainTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingPlayerEvents(ushort playerId)
@@ -502,6 +506,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 DeactivateUmbrellaTalentNetEventsPerPlayer.Add(playerId, _deactivateUmbrellaTalentNetEventsListPool.Get());
             }
+            if (!ActivateYearsOfPainTalentNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                ActivateYearsOfPainTalentNetEventsPerPlayer.Add(playerId, _activateYearsOfPainTalentNetEventsListPool.Get());
+            }
         }
         
         public void StopSavingPlayerEvents(ushort playerId)
@@ -652,6 +660,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             deactivateUmbrellaTalentNetEventsList.Clear();
             _deactivateUmbrellaTalentNetEventsListPool.Return(deactivateUmbrellaTalentNetEventsList);
 
+            var activateYearsOfPainTalentNetEventsList = ActivateYearsOfPainTalentNetEventsPerPlayer[playerId];
+            activateYearsOfPainTalentNetEventsList.Clear();
+            _activateYearsOfPainTalentNetEventsListPool.Return(activateYearsOfPainTalentNetEventsList);
+
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
             MatchMakingPlayerJoinAcceptNetEventsPerPlayer.Remove(playerId);
@@ -691,6 +703,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerMaxShootCooldownChangedNetEventsPerPlayer.Remove(playerId);
             ActivateUmbrellaTalentNetEventsPerPlayer.Remove(playerId);
             DeactivateUmbrellaTalentNetEventsPerPlayer.Remove(playerId);
+            ActivateYearsOfPainTalentNetEventsPerPlayer.Remove(playerId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -1280,6 +1293,17 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                     }
                 }
             }
+
+            if (ActivateYearsOfPainTalentNetEventsPerPlayer.TryGetValue(playerId, out var activateYearsOfPainTalentNetEvents))
+            {
+                for (int i = activateYearsOfPainTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateYearsOfPainTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateYearsOfPainTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
@@ -1586,6 +1610,21 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
         public void AddCreateMagneticPullFieldNetEventS2C(int onTick, ushort casterPlayerId, Vector2 position, Vector2 direction, int talentCooldownEndTick, bool hasHit, ushort hitEnemyId)
         {
             foreach (var kvp in CreateMagneticPullFieldNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.Position = position;
+                packet.Direction = direction;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+                packet.HasHit = hasHit;
+                packet.HitEnemyId = hitEnemyId;
+            }
+        }
+
+        public void AddActivateYearsOfPainTalentNetEventS2C(int onTick, ushort casterPlayerId, Vector2 position, Vector2 direction, int talentCooldownEndTick, bool hasHit, ushort hitEnemyId)
+        {
+            foreach (var kvp in ActivateYearsOfPainTalentNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;

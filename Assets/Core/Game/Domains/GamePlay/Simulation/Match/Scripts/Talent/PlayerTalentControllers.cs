@@ -21,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly GrapplingHookTalentController _grapplingHookTalentController;
         private readonly UmbrellaTalentController _umbrellaTalentController;
         private readonly MagneticPullTalentController _magneticPullTalentController;
+        private readonly YearsOfPainTalentController _yearsOfPainTalentController;
         
         private ushort _casterPlayerId;
 
@@ -34,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _grapplingHookTalentController = new GrapplingHookTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig);
             _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig);
             _magneticPullTalentController = new MagneticPullTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
+            _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -46,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _grapplingHookTalentController.SetCasterId(casterPlayerId);
             _umbrellaTalentController.SetCasterId(casterPlayerId);
             _magneticPullTalentController.SetCasterId(casterPlayerId);
+            _yearsOfPainTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)
@@ -61,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.GrapplingHook: return _grapplingHookTalentController;
                 case TalentType.Umbrella: return _umbrellaTalentController;
                 case TalentType.MagneticPull: return _magneticPullTalentController;
+                case TalentType.YearsOfPain: return _yearsOfPainTalentController;
                 default: return default;
             }
         }
@@ -81,6 +85,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _grapplingHookTalentController?.OnTick(tick, deltaTime);
             _umbrellaTalentController?.OnTick(tick, deltaTime);
             _magneticPullTalentController?.OnTick(tick, deltaTime);
+            _yearsOfPainTalentController?.OnTick(tick, deltaTime);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)
@@ -119,6 +124,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _grapplingHookTalentController.ResetData();
             _umbrellaTalentController.ResetData();
             _magneticPullTalentController.ResetData();
+            _yearsOfPainTalentController.ResetData();
         }
     }
 }

@@ -48,5 +48,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void ClearAllData();
         void DisableBodyCollider(PhysicsBodyType koProjectile, ushort projectileId);
         bool ArcCastOnPlayers(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ingoredTeamId, out PhysicsBodyData hitBodyData);
+        bool RectangleCastOnPlayers(Vector2 center, Vector2 size, float angleRadians, short ignoreTeamId, out PhysicsBodyData hitBodyData);
     }
 }
