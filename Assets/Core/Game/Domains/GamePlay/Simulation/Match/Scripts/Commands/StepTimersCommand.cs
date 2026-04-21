@@ -15,7 +15,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         
         private float _deltaTime;
-        private int _processedTick;
    
         public StepTimersCommand SetStepDeltaTime(float deltaTime)
         {

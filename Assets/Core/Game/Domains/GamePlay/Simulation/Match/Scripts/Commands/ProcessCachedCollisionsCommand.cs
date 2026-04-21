@@ -136,14 +136,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             if (egg.PlayerCasterId == player.Id) return;
             if (player.TeamId == _matchDataService.SimulationState.GetPlayerById(egg.PlayerCasterId).TeamId) return;
 
-            // Mark as broken
-            ref var eggState = ref _matchDataService.SimulationState.GetChickenEggById(eggId);
-
-            // Spin the player
             var config = _gamePlayConfig.Talents.ChickenTalentConfig;
             _spinPlayerCommand.SetPlayer(player.Id).SetSpinAmount(config.SpinAmount).SetTick(_processedTick).Execute();
             
-            _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId, playerId, eggState.Position);
+            _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId, playerId);
             _physicsSimulator.RemoveChickenEgg(egg.Id);
             _matchDataService.SimulationState.RemoveChickenEggById(egg.Id);
         }

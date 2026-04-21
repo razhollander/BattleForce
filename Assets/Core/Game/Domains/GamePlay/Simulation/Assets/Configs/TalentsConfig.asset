@@ -21,6 +21,7 @@ MonoBehaviour:
     - rid: 8476404660102234386
     - rid: 8476404832654590090
     - rid: 8476404916744356088
+    - rid: 8476404916744356304
   HammerTalentConfig:
     HammerSpeed: 10
     HammerSize: 1
@@ -54,6 +55,10 @@ MonoBehaviour:
   UmbrellaTalentConfig:
     DurationInSeconds: 4
     VelocityGainPerTick: 80
+  ChickenTalentConfig:
+    CountdownDuration: 3
+    PushForce: 10
+    SpinAmount: 50
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:
@@ -74,6 +79,10 @@ MonoBehaviour:
       data:
         TalentType: 8
         CooldownInSeconds: 2
+    - rid: 8476404916744356304
+      type: {class: TalentAlwaysActiveCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 9
     - rid: 8506109566889754721
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:

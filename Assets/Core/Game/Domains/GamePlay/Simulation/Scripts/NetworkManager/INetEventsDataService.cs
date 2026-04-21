@@ -97,6 +97,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddLayChickenEggNetEventS2C(int tick, ushort casterId, ushort eggId, Vector2 position);
-        void AddChickenEggHitNetEventS2C(int tick, ushort eggId, ushort hitPlayerId, Vector2 position);
+        void AddChickenEggHitNetEventS2C(int tick, ushort eggId, ushort hitPlayerId);
     }
 }

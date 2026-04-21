@@ -7,7 +7,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
     {
         public float CountdownDuration = 3f;
         public float PushForce = 10f;
-        public float DestroyDelayInSeconds = 5f;
-        public float SpinAmount = 5f;
+        public float SpinAmount = 50f;
     }
 }

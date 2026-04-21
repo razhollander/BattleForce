@@ -674,5 +674,16 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             playerState = default;
             return false;
         }
+
+        public void ClearObjectStates()
+        {
+            Bullets.Clear();
+            PowerUpBalls.Clear();
+            TalentCards.Clear();
+            SwapFields.Clear();
+            KOProjectiles.Clear();
+            GrapplingHookProjectiles.Clear();
+            ChickenEggs.Clear();
+        }
     }
 }

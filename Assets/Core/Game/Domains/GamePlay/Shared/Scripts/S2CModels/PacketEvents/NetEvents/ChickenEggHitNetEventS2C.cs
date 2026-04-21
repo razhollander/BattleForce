@@ -1,7 +1,5 @@
 using System;
 using LiteNetLib.Utils;
-using System.Numerics;
-using Core.Game.Domains.GamePlay.Shared.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
@@ -9,31 +7,27 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
     {
         public int OccuredOnTick;
         public ushort EggId;
-        public ushort HitPlayerId;
-        public Vector2 Position;
+        public ushort HitByPlayerId;
 
-        public ChickenEggHitNetEventS2C(int occuredOnTick, ushort eggId, ushort hitPlayerId, Vector2 position)
+        public ChickenEggHitNetEventS2C(int occuredOnTick, ushort eggId, ushort hitByPlayerId)
         {
             OccuredOnTick = occuredOnTick;
             EggId = eggId;
-            HitPlayerId = hitPlayerId;
-            Position = position;
+            HitByPlayerId = hitByPlayerId;
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
             writer.Put(EggId);
-            writer.Put((byte)HitPlayerId);
-            writer.PutVector2Quantized(Position);
+            writer.Put((byte)HitByPlayerId);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
             EggId = reader.GetUShort();
-            HitPlayerId = reader.GetByte();
-            Position = reader.GetVector2Quantized();
+            HitByPlayerId = reader.GetByte();
         }
 
         public int CompareTo(ChickenEggHitNetEventS2C other)
