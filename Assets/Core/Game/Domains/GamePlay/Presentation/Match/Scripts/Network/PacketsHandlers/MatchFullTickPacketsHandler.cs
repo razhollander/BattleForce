@@ -63,8 +63,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PlayerSelectedTalentFinishedCooldownLocalEvent> _cachedPlayerSelectedTalentFinishedCooldownLocalEvents;
         private readonly CapacityList<ActivateUmbrellaTalentNetEventS2C> _cachedUnprocessedActivateUmbrellaTalentEvents;
         private readonly CapacityList<DeactivateUmbrellaTalentNetEventS2C> _cachedUnprocessedDeactivateUmbrellaTalentEvents;
-        private readonly CapacityList<ActivateChickenTalentNetEventS2C> _cachedUnprocessedActivateChickenTalentEvents;
-        private readonly CapacityList<DeactivateChickenTalentNetEventS2C> _cachedUnprocessedDeactivateChickenTalentEvents;
         private readonly CapacityList<LayChickenEggNetEventS2C> _cachedUnprocessedLayChickenEggEvents;
         private readonly CapacityList<ChickenEggHitNetEventS2C> _cachedUnprocessedChickenEggHitEvents;
 
@@ -115,8 +113,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedPlayerSelectedTalentFinishedCooldownLocalEvents = new CapacityList<PlayerSelectedTalentFinishedCooldownLocalEvent>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedUnprocessedActivateUmbrellaTalentEvents = new CapacityList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents);
             _cachedUnprocessedDeactivateUmbrellaTalentEvents = new CapacityList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents);
-            _cachedUnprocessedActivateChickenTalentEvents = new CapacityList<ActivateChickenTalentNetEventS2C>(networkConfig.MaxCap.ActivateChickenTalentNetEvents);
-            _cachedUnprocessedDeactivateChickenTalentEvents = new CapacityList<DeactivateChickenTalentNetEventS2C>(networkConfig.MaxCap.DeactivateChickenTalentNetEvents);
             _cachedUnprocessedLayChickenEggEvents = new CapacityList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents);
             _cachedUnprocessedChickenEggHitEvents = new CapacityList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents);
 
@@ -179,8 +175,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPlayerMaxShootCooldownChangedEvents(latestFullTickPacket.PlayerMaxShootCooldownChangedNetEvents);
             ProcessActivateUmbrellaTalentEvents(latestFullTickPacket.ActivateUmbrellaTalentNetEvents);
             ProcessDeactivateUmbrellaTalentEvents(latestFullTickPacket.DeactivateUmbrellaTalentNetEvents);
-            ProcessActivateChickenTalentEvents(latestFullTickPacket.ActivateChickenTalentNetEvents);
-            ProcessDeactivateChickenTalentEvents(latestFullTickPacket.DeactivateChickenTalentNetEvents);
             ProcessLayChickenEggEvents(latestFullTickPacket.LayChickenEggNetEvents);
             ProcessChickenEggHitEvents(latestFullTickPacket.ChickenEggHitNetEvents);
 
@@ -1037,42 +1031,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedDeactivateSentryGunTalentEvents.Sort();
                 _presentationNetEventsHandler.ProcessDeactivateSentryGunTalentEvents(_cachedUnprocessedDeactivateSentryGunTalentEvents);
-            }
-        }
-
-        private void ProcessActivateChickenTalentEvents(FixedUnorderedList<ActivateChickenTalentNetEventS2C> activateChickenTalentNetEvents)
-        {
-            _cachedUnprocessedActivateChickenTalentEvents.Clear();
-            foreach (var netEvent in activateChickenTalentNetEvents.AsSpan())
-            {
-                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
-                {
-                    _cachedUnprocessedActivateChickenTalentEvents.Add(netEvent);
-                }
-            }
-
-            if (!_cachedUnprocessedActivateChickenTalentEvents.IsNullOrEmpty())
-            {
-                _cachedUnprocessedActivateChickenTalentEvents.Sort();
-                _presentationNetEventsHandler.ProcessActivateChickenTalentEvents(_cachedUnprocessedActivateChickenTalentEvents);
-            }
-        }
-
-        private void ProcessDeactivateChickenTalentEvents(FixedUnorderedList<DeactivateChickenTalentNetEventS2C> deactivateChickenTalentNetEvents)
-        {
-            _cachedUnprocessedDeactivateChickenTalentEvents.Clear();
-            foreach (var netEvent in deactivateChickenTalentNetEvents.AsSpan())
-            {
-                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
-                {
-                    _cachedUnprocessedDeactivateChickenTalentEvents.Add(netEvent);
-                }
-            }
-
-            if (!_cachedUnprocessedDeactivateChickenTalentEvents.IsNullOrEmpty())
-            {
-                _cachedUnprocessedDeactivateChickenTalentEvents.Sort();
-                _presentationNetEventsHandler.ProcessDeactivateChickenTalentEvents(_cachedUnprocessedDeactivateChickenTalentEvents);
             }
         }
 

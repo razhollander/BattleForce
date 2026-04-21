@@ -478,27 +478,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-
-        public void ProcessActivateChickenTalentEvents(CapacityList<ActivateChickenTalentNetEventS2C> netEvents)
-        {
-            if (netEvents.IsNullOrEmpty()) return;
-            foreach (var netEvent in netEvents)
-            {
-                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.Chicken);
-                _cachedPresentationEventsService.ActivateChickenTalentNetEvents.Add(netEvent);
-            }
-        }
-
-        public void ProcessDeactivateChickenTalentEvents(CapacityList<DeactivateChickenTalentNetEventS2C> netEvents)
-        {
-            if (netEvents.IsNullOrEmpty()) return;
-            foreach (var netEvent in netEvents)
-            {
-                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Chicken, netEvent.TalentCooldownEndTick);
-                _cachedPresentationEventsService.DeactivateChickenTalentNetEvents.Add(netEvent);
-            }
-        }
-
         public void ProcessLayChickenEggEvents(CapacityList<LayChickenEggNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty()) return;

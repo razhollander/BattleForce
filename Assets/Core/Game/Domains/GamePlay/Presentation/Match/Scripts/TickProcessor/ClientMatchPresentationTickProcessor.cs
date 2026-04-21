@@ -55,8 +55,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleKOProjectHitPlayerNetEventsCommand _handleKOProjectHitPlayerNetEventsCommand;
         private readonly HandleActivateUmbrellaTalentNetEventsCommand _handleActivateUmbrellaTalentNetEventsCommand;
         private readonly HandleDeactivateUmbrellaTalentNetEventsCommand _handleDeactivateUmbrellaTalentNetEventsCommand;
-        private readonly HandleActivateChickenTalentNetEventsCommand _handleActivateChickenTalentNetEventsCommand;
-        private readonly HandleDeactivateChickenTalentNetEventsCommand _handleDeactivateChickenTalentNetEventsCommand;
         private readonly HandleLayChickenEggNetEventsCommand _handleLayChickenEggNetEventsCommand;
         private readonly HandleChickenEggHitNetEventsCommand _handleChickenEggHitNetEventsCommand;
         private readonly UpdateKOProjectilesTransformCommand _updateKOProjectilesTransformCommand;
@@ -105,8 +103,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSentryGunTalentNetEventsCommand>();
             _handleActivateUmbrellaTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateUmbrellaTalentNetEventsCommand>();
             _handleDeactivateUmbrellaTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateUmbrellaTalentNetEventsCommand>();
-            _handleActivateChickenTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateChickenTalentNetEventsCommand>();
-            _handleDeactivateChickenTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateChickenTalentNetEventsCommand>();
             _handleLayChickenEggNetEventsCommand = commandFactory.CreateCommandVoid<HandleLayChickenEggNetEventsCommand>();
             _handleChickenEggHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleChickenEggHitNetEventsCommand>();
             _handleKOProjectHitPlayerNetEventsCommand = commandFactory.CreateCommandVoid<HandleKOProjectHitPlayerNetEventsCommand>();
@@ -163,9 +159,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateSentryGunTalentNetEventsCommand.Execute();
             _handleActivateUmbrellaTalentNetEventsCommand.Execute();
             _handleDeactivateUmbrellaTalentNetEventsCommand.Execute();
-            _handleActivateChickenTalentNetEventsCommand.Execute();
-            _handleDeactivateChickenTalentNetEventsCommand.Execute();
-            _handleLayChickenEggNetEventsCommand.Execute();
+            _handleLayChickenEggNetEventsCommand.Execute(); // must be after _handleTalentSwitchNetEventsCommand.Execute();
             _handleChickenEggHitNetEventsCommand.Execute();
             _handlePerformDashPulseNetEventsCommand.Execute();
             _handleUpdatePlayerTalentStocksNetEventsCommand.Execute();

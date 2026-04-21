@@ -107,6 +107,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentType];
             _playerView.SetTalentSprite(talentSprite);
             UpdateIsArrowShownAccordingToTalentState(talentState);
+            var isInChickenState = talentType == TalentType.Chicken;
+            SetChickenState(isInChickenState);
         }
 
         public void UpdateTickDeltas()
