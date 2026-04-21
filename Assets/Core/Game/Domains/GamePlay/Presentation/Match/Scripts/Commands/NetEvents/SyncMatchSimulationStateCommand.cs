@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
@@ -33,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private MatchSimulationStateS2C _simulationState;
         private IMatchDataService _matchDataService;
         private IMatchBulletControllers _bulletControllers;
-        private Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.IMatchChickenEggsControllers _chickenEggsControllers;
+        private IMatchChickenEggsControllers _chickenEggsControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
         private ITalentCardControllers _talentCardControllers;
@@ -66,7 +67,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
-            _chickenEggsControllers = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.IMatchChickenEggsControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
@@ -88,6 +88,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
+            _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
         }
 
         public void Execute()
@@ -104,7 +105,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _worldCameraController.ClearTargets();
             _matchDataService.ClearAll();
             _bulletControllers.DestroyAll();
-            _chickenEggsControllers.DestroyAll();
             _environmentWallsControllers.DestroyAll();
             _environmentSpringControllers.DestroyAll();
             _environmentLavaWallsControllers.DestroyAll();
@@ -118,6 +118,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _swapFieldControllers.DestroyAll();
             _kOProjectilesControllers.DestroyAll();
             _grapplingHookProjectilesControllers.DestroyAll();
+            _chickenEggsControllers.DestroyAll();
         }
 
         private void CreateAll()
@@ -378,17 +379,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
 
-
         private void CreateChickenEggs()
         {
-            foreach (var egg in _simulationState.ChickenEggs.Values)
+            foreach (var egg in _simulationState.ChickenEggs.AsSpan())
             {
-                _matchDataService.AddChickenEgg(egg.Id, egg.Position.ToUnityVector2(), egg.IsBroken);
+                _matchDataService.AddChickenEgg(egg.Id, egg.CasterPlayerId,egg.Position.ToUnityVector2());
                 _chickenEggsControllers.CreateEgg(egg.Id, egg.Position);
-                if (egg.IsBroken)
-                {
-                    _chickenEggsControllers.BreakEgg(egg.Id);
-                }
             }
         }
 

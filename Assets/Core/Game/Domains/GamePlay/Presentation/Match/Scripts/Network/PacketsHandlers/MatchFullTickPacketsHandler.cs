@@ -67,7 +67,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<DeactivateChickenTalentNetEventS2C> _cachedUnprocessedDeactivateChickenTalentEvents;
         private readonly CapacityList<LayChickenEggNetEventS2C> _cachedUnprocessedLayChickenEggEvents;
         private readonly CapacityList<ChickenEggHitNetEventS2C> _cachedUnprocessedChickenEggHitEvents;
-        private readonly CapacityList<DestroyChickenEggNetEventS2C> _cachedUnprocessedDestroyChickenEggEvents;
 
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
@@ -120,7 +119,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedDeactivateChickenTalentEvents = new CapacityList<DeactivateChickenTalentNetEventS2C>(networkConfig.MaxCap.DeactivateChickenTalentNetEvents);
             _cachedUnprocessedLayChickenEggEvents = new CapacityList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents);
             _cachedUnprocessedChickenEggHitEvents = new CapacityList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents);
-            _cachedUnprocessedDestroyChickenEggEvents = new CapacityList<DestroyChickenEggNetEventS2C>(networkConfig.MaxCap.DestroyChickenEggNetEvents);
 
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
@@ -185,7 +183,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessDeactivateChickenTalentEvents(latestFullTickPacket.DeactivateChickenTalentNetEvents);
             ProcessLayChickenEggEvents(latestFullTickPacket.LayChickenEggNetEvents);
             ProcessChickenEggHitEvents(latestFullTickPacket.ChickenEggHitNetEvents);
-            ProcessDestroyChickenEggEvents(latestFullTickPacket.DestroyChickenEggNetEvents);
 
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
@@ -1112,24 +1109,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedChickenEggHitEvents.Sort();
                 _presentationNetEventsHandler.ProcessChickenEggHitEvents(_cachedUnprocessedChickenEggHitEvents);
-            }
-        }
-
-        private void ProcessDestroyChickenEggEvents(FixedUnorderedList<DestroyChickenEggNetEventS2C> destroyChickenEggNetEvents)
-        {
-            _cachedUnprocessedDestroyChickenEggEvents.Clear();
-            foreach (var netEvent in destroyChickenEggNetEvents.AsSpan())
-            {
-                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
-                {
-                    _cachedUnprocessedDestroyChickenEggEvents.Add(netEvent);
-                }
-            }
-
-            if (!_cachedUnprocessedDestroyChickenEggEvents.IsNullOrEmpty())
-            {
-                _cachedUnprocessedDestroyChickenEggEvents.Sort();
-                _presentationNetEventsHandler.ProcessDestroyChickenEggEvents(_cachedUnprocessedDestroyChickenEggEvents);
             }
         }
     }

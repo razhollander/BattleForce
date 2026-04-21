@@ -62,9 +62,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         void RemoveGrapplingHookProjectile(ushort id);
         MatchKOProjectileModel GetKOProjectile(ushort id);
         void RemoveKOProjectile(ushort id);
-        Core.Game.Domains.GamePlay.Shared.S2CModels.ChickenEggModelS2C GetChickenEgg(ushort id);
-        void AddChickenEgg(ushort id, UnityEngine.Vector2 position, bool isBroken);
-        void BreakChickenEgg(ushort id);
+        MatchChickenEggModel GetChickenEgg(ushort id);
+        MatchChickenEggModel AddChickenEgg(ushort id, ushort casterPlayerId, UnityEngine.Vector2 position);
         void RemoveChickenEgg(ushort id);
     }
 }

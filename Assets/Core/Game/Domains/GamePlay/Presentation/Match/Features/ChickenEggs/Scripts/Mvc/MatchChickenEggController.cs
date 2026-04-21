@@ -1,6 +1,5 @@
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
-using Core.Scripts.Extensions;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc
@@ -19,22 +18,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
             _eggsParent = eggsParent;
         }
 
-        public void CreateEggView(System.Numerics.Vector2 position)
+        public void CreateEggView(Vector2 position)
         {
             _chickenEggView = _chickenEggPool.Spawn();
             _chickenEggView.name = "ChickenEgg_" + EggId;
             _chickenEggView.transform.SetParent(_eggsParent);
-            _chickenEggView.SetPosition(position.ToUnityVector2());
+            _chickenEggView.SetPosition(position);
         }
 
-        public void InterpolatePosition(System.Numerics.Vector2 position, float decay)
+        public async Awaitable PlayBreakAnimation(CancellationTokenSource cancellationTokenSource)
         {
-            _chickenEggView.InterpolatePosition(position.ToUnityVector2(), decay);
-        }
-
-        public void PlayBreakAnimation()
-        {
-            _chickenEggView.PlayBreakAnimation();
+            await _chickenEggView.PlayBreakAnimation(cancellationTokenSource);
         }
 
         public void Destroy()

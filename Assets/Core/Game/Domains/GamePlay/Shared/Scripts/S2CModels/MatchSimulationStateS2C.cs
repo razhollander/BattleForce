@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentSwapFieldS2C> SwapFields;
         public FixedUnorderedList<TalentKOProjectileS2C> KOProjectiles;
         public FixedUnorderedList<TalentGrapplingHookProjectileStateS2C> GrapplingHookProjectiles;
-        public Core.Scripts.Utils.CustomCollections.CapacityDict<ChickenEggModelS2C> ChickenEggs;
+        public FixedUnorderedList<ChickenEggStateS2C> ChickenEggs;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
         public int EnvironmentLayoutId;
@@ -28,17 +28,17 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
         public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams)
         {
-            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer));
+            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, () => new PlayerStateS2C(maxTalentsPerPlayer));
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
             TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
             PowerUpBalls = new FixedUnorderedList<PowerUpBallS2C>(maxPowerUpBalls);
             SwapFields = new FixedUnorderedList<TalentSwapFieldS2C>(maxPlayers);
             KOProjectiles = new FixedUnorderedList<TalentKOProjectileS2C>(maxPlayers);
             GrapplingHookProjectiles = new FixedUnorderedList<TalentGrapplingHookProjectileStateS2C>(maxPlayers);
+            ChickenEggs = new FixedUnorderedList<ChickenEggStateS2C>(64);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
-
-            ChickenEggs = new Core.Scripts.Utils.CustomCollections.CapacityDict<ChickenEggModelS2C>(64);}
+        }
 
         public void Serialize(NetDataWriter writer)
         {
@@ -478,7 +478,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 grapplingHookProjectile.SerializeDelta(writer);
             }
-            SerializeChickenEggs(writer);
         }
 
         public void DeserializeTransforms(NetDataReader reader)
@@ -522,7 +521,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 ref var grapplingHookProjectile = ref GrapplingHookProjectiles.AddAndGet();
                 grapplingHookProjectile.DeserializeDelta(reader);
             }
-            DeserializeChickenEggs(reader);
         }
         
         public ref PowerUpBallS2C GetPowerUpBallById(ushort powerUpBallId)
@@ -622,27 +620,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             playerState = default;
             return false;
-        }
-
-        private void SerializeChickenEggs(LiteNetLib.Utils.NetDataWriter writer)
-        {
-            writer.Put((ushort)ChickenEggs.Count);
-            foreach (var egg in ChickenEggs.Values)
-            {
-                egg.Serialize(writer);
-            }
-        }
-
-        private void DeserializeChickenEggs(LiteNetLib.Utils.NetDataReader reader)
-        {
-            var count = reader.GetUShort();
-            ChickenEggs.Clear();
-            for (int i = 0; i < count; i++)
-            {
-                var egg = new ChickenEggModelS2C();
-                egg.Deserialize(reader);
-                ChickenEggs.Add(egg.Id, egg);
-            }
         }
     }
 }

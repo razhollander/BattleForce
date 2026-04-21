@@ -1,7 +1,6 @@
 using System;
 using System.Numerics;
 using LiteNetLib.Utils;
-using Core.Game.Domains.GamePlay.Shared.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
 {
@@ -24,7 +23,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)CasterPlayerId);
-            writer.PutVector2(Position);
             writer.Put(EggId);
         }
 
@@ -32,7 +30,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             OccuredOnTick = reader.GetInt();
             CasterPlayerId = reader.GetByte();
-            Position = reader.GetVector2();
             EggId = reader.GetUShort();
         }
 

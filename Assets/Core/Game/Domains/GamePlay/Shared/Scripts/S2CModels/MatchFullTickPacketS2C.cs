@@ -51,7 +51,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<DeactivateChickenTalentNetEventS2C> DeactivateChickenTalentNetEvents;
         public FixedUnorderedList<LayChickenEggNetEventS2C> LayChickenEggNetEvents;
         public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
-        public FixedUnorderedList<DestroyChickenEggNetEventS2C> DestroyChickenEggNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -112,7 +111,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateChickenTalentNetEvents = new FixedUnorderedList<DeactivateChickenTalentNetEventS2C>(maxCap.DeactivateChickenTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
             ChickenEggHitNetEvents = new FixedUnorderedList<ChickenEggHitNetEventS2C>(maxCap.ChickenEggHitNetEvents);
-            DestroyChickenEggNetEvents = new FixedUnorderedList<DestroyChickenEggNetEventS2C>(maxCap.DestroyChickenEggNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -157,7 +155,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedDeactivateChickenTalentNetEvents(writer);
             SerializedLayChickenEggNetEvents(writer);
             SerializedChickenEggHitNetEvents(writer);
-            SerializedDestroyChickenEggNetEvents(writer);
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -355,7 +352,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedDeactivateChickenTalentNetEvents(reader);
             DeserializedLayChickenEggNetEvents(reader);
             DeserializedChickenEggHitNetEvents(reader);
-            DeserializedDestroyChickenEggNetEvents(reader);
         }
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
@@ -964,26 +960,5 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
                 netEvent.Deserialize(reader);
             }
         }
-
-        private void SerializedDestroyChickenEggNetEvents(NetDataWriter writer)
-        {
-            writer.Put((byte)DestroyChickenEggNetEvents.Count);
-            foreach (var netEvent in DestroyChickenEggNetEvents.AsSpan())
-            {
-                netEvent.Serialize(writer);
-            }
-        }
-
-        private void DeserializedDestroyChickenEggNetEvents(NetDataReader reader)
-        {
-            DestroyChickenEggNetEvents.Clear();
-            var count = reader.GetByte();
-            for (var i = 0; i < count; i++)
-            {
-                ref var netEvent = ref DestroyChickenEggNetEvents.AddAndGet();
-                netEvent.Deserialize(reader);
-            }
-        }
-
     }
 }

@@ -11,14 +11,14 @@ namespace Core.Scripts.Helpers
         [SerializeField] private float _framesPerSecond = 10f;
         [SerializeField] private SpriteRenderer _spriteRenderer;
         
-        private CancellationTokenSource _animationCts;
+        private CancellationTokenSource _animationCancellationTokenSource;
 
         public async Awaitable PlayAnimation(CancellationTokenSource cancellationTokenSource)
         {
             // Clean up any existing animation task
             StopAnimation();
-            _animationCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
-            await RunAnimationLoop(_animationCts.Token);
+            _animationCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
+            await RunAnimationLoop(_animationCancellationTokenSource.Token);
         }
 
         private async Awaitable RunAnimationLoop(CancellationToken token)
@@ -49,15 +49,15 @@ namespace Core.Scripts.Helpers
 
         public void StopAnimation()
         {
-            var isAnimationRunning = _animationCts != null;
+            var isAnimationRunning = _animationCancellationTokenSource != null;
             if (!isAnimationRunning)
             {
                 return;
             }
 
-            _animationCts.Cancel();
-            _animationCts.Dispose();
-            _animationCts = null;
+            _animationCancellationTokenSource.Cancel();
+            _animationCancellationTokenSource.Dispose();
+            _animationCancellationTokenSource = null;
         }
     }
 }

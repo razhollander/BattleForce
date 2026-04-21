@@ -46,7 +46,5 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<DeactivateChickenTalentNetEventS2C> DeactivateChickenTalentNetEvents { get; } = new();
         public List<LayChickenEggNetEventS2C> LayChickenEggNetEvents { get; } = new();
         public List<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents { get; } = new();
-        public List<DestroyChickenEggNetEventS2C> DestroyChickenEggNetEvents { get; } = new();
-
     }
 }

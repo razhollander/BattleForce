@@ -27,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
+        public List<MatchChickenEggModel> ChickenEggs { get; private set; }
 
         public MatchPlayerModel LocalPlayer { get; private set; }
         public bool IsPlayerJoined => LocalPlayer != null;
@@ -228,7 +229,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             SwapFields.Clear();
             KOProjectiles.Clear();
             GrapplingHookProjectiles.Clear();
-            _matchSimulationState.ChickenEggs.Clear();
+            ChickenEggs.Clear();
         }
 
         public void SetTeamBolts(ushort teamId, int totalTeamBolts)
@@ -353,38 +354,41 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             KOProjectiles.Remove(model);
         }
 
-        public Core.Game.Domains.GamePlay.Shared.S2CModels.ChickenEggModelS2C GetChickenEgg(ushort id)
+        public MatchChickenEggModel GetChickenEgg(ushort id)
         {
-            return _matchSimulationState.ChickenEggs.TryGetValue(id, out var egg) ? egg : default;
+            var model = ChickenEggs.Find(x => x.Id == id);
+            if (model == null)
+            {
+                LogService.LogError($"Couldn't find chieck egg with id {id}");
+            }
+
+            return model;
         }
 
-        public void AddChickenEgg(ushort id, UnityEngine.Vector2 position, bool isBroken)
+        public MatchChickenEggModel AddChickenEgg(ushort id, ushort casterPlayerId, UnityEngine.Vector2 position)
         {
-            var model = new Core.Game.Domains.GamePlay.Shared.S2CModels.ChickenEggModelS2C
+            var model = new MatchChickenEggModel
             {
                 Id = id,
+                CasterPlayerId = casterPlayerId,
                 Position = position.ToNumericsVector2(),
-                IsBroken = isBroken
             };
-            _matchSimulationState.ChickenEggs.Add(id, model);
-        }
-
-        public void BreakChickenEgg(ushort id)
-        {
-            if (_matchSimulationState.ChickenEggs.TryGetValue(id, out var egg))
-            {
-                egg.IsBroken = true;
-                _matchSimulationState.ChickenEggs[id] = egg;
-            }
+            
+            ChickenEggs.Add(model);
+            return model;
         }
 
         public void RemoveChickenEgg(ushort id)
         {
-            if (_matchSimulationState.ChickenEggs.ContainsKey(id))
-            {
-                _matchSimulationState.ChickenEggs.Remove(id);
-            }
-        }
+            var model = GetChickenEgg(id);
 
+            if (model == null)
+            {
+                LogService.LogError($"No chieck egg to remove with id {id}!");
+                return;
+            }
+
+            ChickenEggs.Remove(model);
+        }
     }
 }

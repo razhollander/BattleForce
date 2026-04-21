@@ -37,13 +37,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
         [SerializeField] private GameObject _chickenSprite;
-        [SerializeField] private Core.Scripts.Helpers.SpriteAnimator _chickenLayEggAnimator;
+        [SerializeField] private SpriteAnimator _chickenLayEggAnimator;
         
         private Transform _transform;
         private SpriteRenderer _leftEyeRenderer;
         private SpriteRenderer _rightEyeRenderer;
         private Sprite _defaultLeftEyeSprite;
         private Sprite _defaultRightEyeSprite;
+        
+        private CancellationTokenSource _layEggCancellationTokenSource;
 
         public Action Despawn { get; set; }
 
@@ -74,22 +76,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
                 _chickenSprite.SetActive(isOn);
             }
         }
-
-
-        private System.Threading.CancellationTokenSource _layEggCts;
-
+        
         public void PlayLayEggAnimation()
         {
-            if (_chickenLayEggAnimator != null)
-            {
-                _chickenLayEggAnimator.gameObject.SetActive(true);
-                _layEggCts?.Cancel();
-                _layEggCts?.Dispose();
-                _layEggCts = new System.Threading.CancellationTokenSource();
-                _chickenLayEggAnimator.PlayAnimation(_layEggCts).Forget();
-            }
-        }
-
+            _chickenLayEggAnimator.gameObject.SetActive(true);
+            _layEggCancellationTokenSource?.Cancel();
+            _layEggCancellationTokenSource?.Dispose();
+            _layEggCancellationTokenSource = new CancellationTokenSource();
+            _chickenLayEggAnimator.PlayAnimation(_layEggCancellationTokenSource).Forget();
         }
 
         public void SetUmbrellaState(bool isOn)
@@ -216,27 +210,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         private void DisableChickenState()
         {
-            if (_chickenSprite != null)
-            {
-                _chickenSprite.SetActive(false);
-            }
+            _chickenSprite.SetActive(false);
+            
             if (_chickenLayEggAnimator != null)
             {
                 _chickenLayEggAnimator.StopAnimation();
                 _chickenLayEggAnimator.gameObject.SetActive(false);
             }
-            _layEggCts?.Cancel();
-            _layEggCts?.Dispose();
-            _layEggCts = null;
+            
+            _layEggCancellationTokenSource?.Cancel();
+            _layEggCancellationTokenSource?.Dispose();
+            _layEggCancellationTokenSource = null;
         }
-
-            if (_chickenLayEggAnimator != null)
-            {
-                _chickenLayEggAnimator.StopAnimation();
-                _chickenLayEggAnimator.gameObject.SetActive(false);
-            }
-        }
-
+        
         private void DisableUmbrellaState()
         {
             _umbrellaStickView.HideUmbrella();

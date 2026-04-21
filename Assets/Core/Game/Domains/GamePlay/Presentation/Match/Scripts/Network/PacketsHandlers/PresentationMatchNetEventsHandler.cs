@@ -504,6 +504,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             if (netEvents.IsNullOrEmpty()) return;
             foreach (var netEvent in netEvents)
             {
+                _matchDataService.AddChickenEgg(netEvent.EggId, netEvent.CasterPlayerId, netEvent.Position.ToUnityVector2());
                 _cachedPresentationEventsService.LayChickenEggNetEvents.Add(netEvent);
             }
         }
@@ -513,19 +514,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             if (netEvents.IsNullOrEmpty()) return;
             foreach (var netEvent in netEvents)
             {
+                _matchDataService.RemoveChickenEgg(netEvent.EggId);
                 _cachedPresentationEventsService.ChickenEggHitNetEvents.Add(netEvent);
             }
         }
-
-        public void ProcessDestroyChickenEggEvents(CapacityList<DestroyChickenEggNetEventS2C> netEvents)
-        {
-            if (netEvents.IsNullOrEmpty()) return;
-            foreach (var netEvent in netEvents)
-            {
-                _cachedPresentationEventsService.DestroyChickenEggNetEvents.Add(netEvent);
-            }
-        }
-
+        
         public void ProcessDeactivateUmbrellaTalentEvents(CapacityList<DeactivateUmbrellaTalentNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty())

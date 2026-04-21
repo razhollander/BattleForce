@@ -18,7 +18,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly IMatchPlayerControllers _playerControllers;
         private readonly IMatchBulletControllers _bulletControllers;
-        private readonly Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.IMatchChickenEggsControllers _chickenEggsControllers;
         private readonly IPowerUpBallControllers _powerUpBallControllers;
         private readonly IMatchPlayerUIControllers _matchPlayerUIControllers;
         private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
@@ -60,20 +59,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleDeactivateChickenTalentNetEventsCommand _handleDeactivateChickenTalentNetEventsCommand;
         private readonly HandleLayChickenEggNetEventsCommand _handleLayChickenEggNetEventsCommand;
         private readonly HandleChickenEggHitNetEventsCommand _handleChickenEggHitNetEventsCommand;
-        private readonly HandleDestroyChickenEggNetEventsCommand _handleDestroyChickenEggNetEventsCommand;
-
         private readonly UpdateKOProjectilesTransformCommand _updateKOProjectilesTransformCommand;
         private readonly HandlePerformDashPulseNetEventsCommand _handlePerformDashPulseNetEventsCommand;
         private readonly HandleUpdatePlayerTalentStocksNetEventsCommand _handleUpdatePlayerTalentStocksNetEventsCommand;
         private readonly HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IMatchBulletControllers bulletControllers, Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.IMatchChickenEggsControllers chickenEggsControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
+            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
             _bulletControllers = bulletControllers;
-            _chickenEggsControllers = chickenEggsControllers;
             _powerUpBallControllers = powerUpBallControllers;
             _matchPlayerUIControllers = matchPlayerUIControllers;
             _fullTickPacketsHandler = fullTickPacketsHandler;
@@ -113,8 +109,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateChickenTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateChickenTalentNetEventsCommand>();
             _handleLayChickenEggNetEventsCommand = commandFactory.CreateCommandVoid<HandleLayChickenEggNetEventsCommand>();
             _handleChickenEggHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleChickenEggHitNetEventsCommand>();
-            _handleDestroyChickenEggNetEventsCommand = commandFactory.CreateCommandVoid<HandleDestroyChickenEggNetEventsCommand>();
-
             _handleKOProjectHitPlayerNetEventsCommand = commandFactory.CreateCommandVoid<HandleKOProjectHitPlayerNetEventsCommand>();
             _updateKOProjectilesTransformCommand = commandFactory.CreateCommandVoid<UpdateKOProjectilesTransformCommand>();
             _handlePerformDashPulseNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformDashPulseNetEventsCommand>();
@@ -173,15 +167,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateChickenTalentNetEventsCommand.Execute();
             _handleLayChickenEggNetEventsCommand.Execute();
             _handleChickenEggHitNetEventsCommand.Execute();
-            _handleDestroyChickenEggNetEventsCommand.Execute();
-
             _handlePerformDashPulseNetEventsCommand.Execute();
             _handleUpdatePlayerTalentStocksNetEventsCommand.Execute();
             _updateKOProjectilesTransformCommand.Execute(); // must be after _handleDeactivateKOTalentNetEventsCommand.Execute();
             _updateGrapplingHookProjectilesTransformCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
-            _chickenEggsControllers.UpdateEggsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
             _updateObjectTransformInsideRotatingWheelsCommand.Execute();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands.Execute();

@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Scripts.Extensions;
+using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
@@ -10,18 +14,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
 {
     public class MatchChickenEggsControllers : IMatchChickenEggsControllers
     {
-        private readonly IMatchDataService _matchDataService;
         private readonly ChickenEggPool _chickenEggPool;
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly List<MatchChickenEggController> _eggControllers = new ();
         private Transform _eggsParent;
 
-        public MatchChickenEggsControllers(IMatchDataService matchDataService, ChickenEggView chickenEggViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
+        public MatchChickenEggsControllers(ChickenEggView chickenEggViewPrefab, DiContainer diContainer)
         {
-            _matchDataService = matchDataService;
-
             _chickenEggPool = new ChickenEggPool(chickenEggViewPrefab, diContainer);
-            _gamePlayConfig = gamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -33,26 +32,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
         public void CreateEgg(ushort eggId, Vector2 position)
         {
             var controller = new MatchChickenEggController(eggId, _chickenEggPool, _eggsParent);
-            controller.CreateEggView(position);
+            controller.CreateEggView(position.ToUnityVector2());
             _eggControllers.Add(controller);
-        }
-
-        public void UpdateEggsTransform()
-        {
-            foreach (var controller in _eggControllers)
-            {
-                var model = _matchDataService.GetChickenEgg(controller.EggId);
-                controller.InterpolatePosition(model.Position, _gamePlayConfig.ExponentialDecay);
-            }
-        }
-
-        public void BreakEgg(ushort eggId)
-        {
-            var controller = GetEgg(eggId);
-            if (controller != null)
-            {
-                controller.PlayBreakAnimation();
-            }
         }
 
         private MatchChickenEggController GetEgg(ushort eggId)
@@ -60,14 +41,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
             return _eggControllers.Find(x => x.EggId == eggId);
         }
 
+        public async Awaitable BreakAndDestroyEgg(ushort eggId, CancellationTokenSource cancellationTokenSource)
+        {
+            try
+            {
+                await GetEgg(eggId).PlayBreakAnimation(cancellationTokenSource);
+                LogService.LogError("reach break end!");
+            }
+            finally
+            {
+                LogService.LogError("destroy in finally!");
+                DestroyEgg(eggId);
+            }
+        }
+
         public void DestroyEgg(ushort eggId)
         {
             var controller = GetEgg(eggId);
-            if (controller != null)
+            if (controller == null)
             {
-                controller.Destroy();
-                _eggControllers.Remove(controller);
+                LogService.LogError($"Tried destroy chieck egg {eggId} but it wasn't found!");
+                return;
             }
+            
+            controller.Destroy();
+            _eggControllers.Remove(controller);
         }
 
         public void DestroyAll()

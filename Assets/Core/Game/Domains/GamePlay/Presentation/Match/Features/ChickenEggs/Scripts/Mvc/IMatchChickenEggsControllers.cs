@@ -1,3 +1,4 @@
+using System.Threading;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
@@ -7,9 +8,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
     {
         void InitEntryPoint();
         void CreateEgg(ushort eggId, Vector2 position);
-        void UpdateEggsTransform();
-        void BreakEgg(ushort eggId);
-        void DestroyEgg(ushort eggId);
         void DestroyAll();
+        Awaitable BreakAndDestroyEgg(ushort eggId, CancellationTokenSource cancellationTokenSource);
     }
 }
