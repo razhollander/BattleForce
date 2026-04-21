@@ -518,6 +518,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in netEvents)
             {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.MagneticPull, netEvent.TalentCooldownEndTick);
                 _cachedPresentationEventsService.CreateMagenticPullFieldNetEvents.Add(netEvent);
             }
         }
