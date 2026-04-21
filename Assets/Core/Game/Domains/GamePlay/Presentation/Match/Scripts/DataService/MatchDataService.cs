@@ -54,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             SwapFields = new List<MatchSwapFieldModel>(networkConfig.MaxCap.ConcurrentPlayers);
             KOProjectiles = new List<MatchKOProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
             GrapplingHookProjectiles = new List<MatchGrapplingHookProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
+            ChickenEggs = new List<MatchChickenEggModel>(networkConfig.MaxCap.ConcurrentChickenEggs);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)

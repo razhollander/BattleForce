@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public int StartPhaseInitialTick;
         public bool IsInPreparationPhase;
 
-        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams)
+        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs)
         {
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer));
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             SwapFields = new FixedUnorderedList<TalentSwapFieldS2C>(maxPlayers);
             KOProjectiles = new FixedUnorderedList<TalentKOProjectileS2C>(maxPlayers);
             GrapplingHookProjectiles = new FixedUnorderedList<TalentGrapplingHookProjectileStateS2C>(maxPlayers);
-            ChickenEggs = new FixedUnorderedList<TalentChickenEggStateS2C>(maxPlayers);
+            ChickenEggs = new FixedUnorderedList<TalentChickenEggStateS2C>(maxChickenEggs);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
         }

@@ -1275,8 +1275,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _chickenBodyGameObject: {fileID: 5178523066598195037}
   _chickenCrestGameObject: {fileID: 4310598030607142936}
-  _chickenLaySprite: {fileID: 21300000, guid: a4999c3557b10414a90284675c02719b, type: 3}
-  _chickenIdleSprite: {fileID: 21300000, guid: d1d385c280b724848a709eda7b841b16, type: 3}
+  _chickenLaySprite: {fileID: 21300000, guid: d1d385c280b724848a709eda7b841b16, type: 3}
+  _chickenIdleSprite: {fileID: 21300000, guid: a4999c3557b10414a90284675c02719b, type: 3}
   _chikenBodySpriteRenderer: {fileID: 8478726995473180026}
   _layAnimationDurationInSeconds: 0.5
 --- !u!1 &5285940023680706921
@@ -2012,7 +2012,7 @@ MonoBehaviour:
   _spinnedEyesCanvas: {fileID: 2524781208092136356}
   _spinnedEyesAnimator: {fileID: 3321683973095918071}
   _umbrellaStickView: {fileID: 8863235197371764063}
-  _playerChickenView: {fileID: 0}
+  _playerChickenView: {fileID: 7054734808911222309}
 --- !u!1 &8268790909231806898
 GameObject:
   m_ObjectHideFlags: 0

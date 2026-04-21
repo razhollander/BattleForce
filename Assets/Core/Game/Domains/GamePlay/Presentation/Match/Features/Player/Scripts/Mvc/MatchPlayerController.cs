@@ -75,7 +75,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
             else if (currentSelectedTalentState.TalentType == TalentType.Chicken)
             {
-                SetChickenState(currentSelectedTalentState.IsActive);
+                SetChickenState(true);
             }
         }
 
@@ -165,6 +165,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 case TalentCooldownType.Stocks:
                     maxCooldown = currentSelectedTalentState.StocksCooldown.MaxSingleStockCooldown;
                     cooldownLeft = currentSelectedTalentState.StocksCooldown.CurrentStocksAmount > 0 ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, currentSelectedTalentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
+                    break;
+                case TalentCooldownType.AlwaysActive:
+                    maxCooldown = 0;
+                    cooldownLeft = 0;
                     break;
                 default:
                     LogService.LogError("Not implemented cooldown type: " + currentSelectedTalentState.CooldownType);

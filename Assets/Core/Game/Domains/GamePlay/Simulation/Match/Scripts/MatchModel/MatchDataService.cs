@@ -26,13 +26,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             EnvironmentData = new MatchEnvironmentDataService(networkConfig);
+            var maxCap = networkConfig.MaxCap;
+
             _simulationState = new MatchSimulationStateS2C(
-                networkConfig.MaxCap.ConcurrentPlayers,
-                networkConfig.MaxCap.ConcurrentBullets,
+                maxCap.ConcurrentPlayers,
+                maxCap.ConcurrentBullets,
                 sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
-                networkConfig.MaxCap.ConcurrentTalentCards,
-                networkConfig.MaxCap.ConcurrentPowerUpBalls,
-                sharedGamePlayConfig.MaxTeamsAmount);
+                maxCap.ConcurrentTalentCards,
+                maxCap.ConcurrentPowerUpBalls,
+                sharedGamePlayConfig.MaxTeamsAmount,
+                maxCap.ConcurrentChickenEggs);
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);

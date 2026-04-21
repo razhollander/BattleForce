@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
@@ -59,7 +60,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public MatchFullTickPacketS2C(MaxCap maxCap, SharedGamePlayConfig sharedGamePlayConfig)
         {
             CurrentSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
-                maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount);
+                maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount, maxCap.ConcurrentChickenEggs);
 
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
 
@@ -900,7 +901,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         private void SerializedLayChickenEggNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)LayChickenEggNetEvents.Count);
-            foreach (var netEvent in LayChickenEggNetEvents.AsSpan()) netEvent.Serialize(writer);
+
+            foreach (var netEvent in LayChickenEggNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
         }
 
         private void DeserializedLayChickenEggNetEvents(NetDataReader reader)
@@ -910,6 +915,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref LayChickenEggNetEvents.AddAndGet();
+                LogService.LogError($"CLIENT Deserialize egg");
                 netEvent.Deserialize(reader);
             }
         }
@@ -917,7 +923,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         private void SerializedChickenEggHitNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)ChickenEggHitNetEvents.Count);
-            foreach (var netEvent in ChickenEggHitNetEvents.AsSpan()) netEvent.Serialize(writer);
+
+            foreach (var netEvent in ChickenEggHitNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
         }
 
         private void DeserializedChickenEggHitNetEvents(NetDataReader reader)

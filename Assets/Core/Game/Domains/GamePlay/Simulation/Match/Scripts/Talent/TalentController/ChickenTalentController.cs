@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
@@ -67,11 +68,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var config = _gamePlayConfig.Talents.ChickenTalentConfig;
 
-            var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            casterPlayerState.Spaceship.Transform.Velocity += aimDirection * config.PushForce;
+            var movementDirection = casterPlayerState.Spaceship.Transform.Direction;
+            casterPlayerState.Spaceship.Transform.Velocity += movementDirection * config.PushForce;
 
             var egg = _matchDataService.AddChickenEgg(_casterPlayerId, casterPlayerState.Spaceship.Transform.Position);
             _physicsSimulator.AddChickenEgg(egg.Id, casterPlayerState.TeamId, egg.Position, casterPlayerState.Spaceship.Transform.Radius);
+            LogService.LogError($"SERVER lay egg {egg.Id}");
             _netEventsDataService.AddLayChickenEggNetEventS2C(tick, _casterPlayerId, egg.Id, egg.Position);
             
             _countdownEndTick = TickUtils.GetTickPassedAfterDuration(tick, config.CountdownDuration, _networkConfig.DeltaTime);

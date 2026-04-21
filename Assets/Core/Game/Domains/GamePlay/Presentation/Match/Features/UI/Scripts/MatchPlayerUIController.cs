@@ -74,12 +74,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                     case TalentCooldownType.Stocks: 
                         UpdateTalentViewStocksCooldown(talentState, i, currentServerTick);
                         break;
+                    case TalentCooldownType.AlwaysActive:
+                        //UpdateTalentViewAlwaysActiveCooldown(talentState, i, currentServerTick);
+                        break;
                     default: LogService.LogError("Not implemented cooldown type: " + talentState.CooldownType);
                         break;
                 }
             }
         }
 
+        private void UpdateTalentViewAlwaysActiveCooldown(TalentStateS2C talentState, int talentViewIndex, int currentServerTick)
+        {
+            var maxCooldown = talentState.StocksCooldown.MaxSingleStockCooldown;
+            var isOnCooldown = talentState.StocksCooldown.IsOnCooldown();
+            var cooldownLeft = talentState.StocksCooldown.IsAtMaxStocks() ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
+            _view.UpdateTalentCooldown(talentViewIndex, maxCooldown, cooldownLeft, isOnCooldown);
+            _view.UpdateTalentStocks(talentViewIndex, talentState.StocksCooldown.CurrentStocksAmount);
+        }
+        
         private void UpdateTalentViewStocksCooldown(TalentStateS2C talentState, int talentViewIndex, int currentServerTick)
         {
             var maxCooldown = talentState.StocksCooldown.MaxSingleStockCooldown;
@@ -126,6 +138,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                         var cooldownLeft2 = talentState.StocksCooldown.IsAtMaxStocks() ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
                         talentVisualData.IsStockable = true;
                         _view.UpdateTalentCooldown(i, maxCooldown2, cooldownLeft2, isOnCooldown2);
+                        break;
+                    case TalentCooldownType.AlwaysActive:
+                        _view.UpdateTalentCooldown(i, 1, 1, true);
                         break;
                     default: LogService.LogError("Not implemented cooldown type: " + talentState.CooldownType);
                         break;
