@@ -1,6 +1,7 @@
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Scripts.Utils;
+using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 using Zenject;
 
@@ -15,8 +16,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.YearsOfPainEffe
         public YearsOfPainEffectController(YearsOfPainView fieldPrefab, YearsOfPainHitEffectView hitEffectPrefab, DiContainer diContainer, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
-            _fieldPool = new YearsOfPainViewPool(fieldPrefab, diContainer);
-            _hitEffectPool = new YearsOfPainHitEffectPool(hitEffectPrefab, diContainer);
+            _fieldPool = new YearsOfPainViewPool(new PoolData(3,1), fieldPrefab, diContainer);
+            _hitEffectPool = new YearsOfPainHitEffectPool(new PoolData(3,1), hitEffectPrefab, diContainer);
         }
 
         public void InitEntryPoint()

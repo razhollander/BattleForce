@@ -5,7 +5,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.YearsOfPainEffe
 {
     public class YearsOfPainViewPool : PrefabsPool<YearsOfPainView>
     {
-        public YearsOfPainViewPool(YearsOfPainView prefab, DiContainer container) : base(prefab, container)
+        protected override string ParentGameObjectName => "YearsOfPainViewPool";
+
+        public YearsOfPainViewPool(PoolData poolData, YearsOfPainView prefab, DiContainer container) : base(poolData, container, prefab)
         {
         }
     }
