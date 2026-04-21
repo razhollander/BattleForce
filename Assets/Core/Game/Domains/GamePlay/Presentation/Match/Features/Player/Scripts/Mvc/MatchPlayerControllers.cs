@@ -101,7 +101,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void PlayLayEggAnimation(ushort playerId)
         {
-            GetPlayer(playerId).PlayLayEggAnimation();
+            GetPlayer(playerId).PlayLayEggAnimation(_stageCancellationTokenProvider.CancellationTokenSource);
         }
         
         public void UpdateIsPlayerArrowShownAccordingToTalentState(ushort playerId, TalentStateS2C talentStateS2C)

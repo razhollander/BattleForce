@@ -386,7 +386,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             foreach (var egg in _simulationState.ChickenEggs.AsSpan())
             {
-                _matchDataService.AddChickenEgg(egg.Id, egg.CasterPlayerId,egg.Position.ToUnityVector2());
+                _matchDataService.AddChickenEgg(egg.Id, egg.PlayerCasterId,egg.Position.ToUnityVector2());
                 _chickenEggsControllers.CreateEgg(egg.Id, egg.Position);
             }
         }

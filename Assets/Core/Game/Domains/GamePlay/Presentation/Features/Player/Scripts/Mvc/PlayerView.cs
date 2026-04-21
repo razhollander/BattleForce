@@ -36,8 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
-        [SerializeField] private GameObject _chickenSprite;
-        [SerializeField] private SpriteAnimator _chickenLayEggAnimator;
+        [SerializeField] private PlayerChickenView _playerChickenView;
         
         private Transform _transform;
         private SpriteRenderer _leftEyeRenderer;
@@ -45,8 +44,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         private Sprite _defaultLeftEyeSprite;
         private Sprite _defaultRightEyeSprite;
         
-        private CancellationTokenSource _layEggCancellationTokenSource;
-
         public Action Despawn { get; set; }
 
         public void SetSentryGunState(bool isOn, CancellationTokenSource cancellationTokenSource)
@@ -71,19 +68,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void SetChickenState(bool isOn)
         {
-            if (_chickenSprite != null)
-            {
-                _chickenSprite.SetActive(isOn);
-            }
+            _playerChickenView.SetChickenState(isOn);
+            
         }
         
-        public void PlayLayEggAnimation()
+        public void PlayLayEggAnimation(CancellationTokenSource cancellationTokenSource)
         {
-            _chickenLayEggAnimator.gameObject.SetActive(true);
-            _layEggCancellationTokenSource?.Cancel();
-            _layEggCancellationTokenSource?.Dispose();
-            _layEggCancellationTokenSource = new CancellationTokenSource();
-            _chickenLayEggAnimator.PlayAnimation(_layEggCancellationTokenSource).Forget();
+            _playerChickenView.PlayLayEggAnimation(cancellationTokenSource).Forget();
         }
 
         public void SetUmbrellaState(bool isOn)
@@ -202,25 +193,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             DisableSentryGunState();
             DisableSpinned();
             DisableUmbrellaState();
-            DisableChickenState();
+            _playerChickenView.SetChickenState(false);
             gameObject.SetActive(false);
-        }
-
-
-
-        private void DisableChickenState()
-        {
-            _chickenSprite.SetActive(false);
-            
-            if (_chickenLayEggAnimator != null)
-            {
-                _chickenLayEggAnimator.StopAnimation();
-                _chickenLayEggAnimator.gameObject.SetActive(false);
-            }
-            
-            _layEggCancellationTokenSource?.Cancel();
-            _layEggCancellationTokenSource?.Dispose();
-            _layEggCancellationTokenSource = null;
         }
         
         private void DisableUmbrellaState()

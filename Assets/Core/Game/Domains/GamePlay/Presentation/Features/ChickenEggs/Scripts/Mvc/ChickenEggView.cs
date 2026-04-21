@@ -8,8 +8,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.M
 {
     public class ChickenEggView : MonoBehaviour, IPoolable
     {
-        [SerializeField] private SpriteRenderer _spriteRenderer;
-        [SerializeField] private Core.Scripts.Helpers.SpriteAnimator _breakAnimator;
+        [SerializeField] private SpriteRenderer _eggSpriteRenderer;
+        [SerializeField] private SpriteRenderer _borkenEggSpriteRenderer;
+        [SerializeField] private float _brokenDurationInSeconds;
 
         private CancellationTokenSource _breakCancellationTokenSource;
         public Action Despawn { get; set; }
@@ -21,11 +22,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.M
 
         public async Awaitable PlayBreakAnimation(CancellationTokenSource cancellationTokenSource)
         {
-            _spriteRenderer.enabled = false;
-            _breakAnimator.gameObject.SetActive(true);
+            _eggSpriteRenderer.enabled = false;
+            _borkenEggSpriteRenderer.enabled = true;
             _breakCancellationTokenSource?.Cancel();
             _breakCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
-            await _breakAnimator.PlayAnimation(_breakCancellationTokenSource);
+            await Awaitable.WaitForSecondsAsync(_brokenDurationInSeconds, cancellationTokenSource.Token);
         }
 
         public void OnCreated()
@@ -37,9 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.M
         public void OnSpawned()
         {
             gameObject.SetActive(true);
-            _spriteRenderer.enabled = true;
-            _breakAnimator.StopAnimation();
-            _breakAnimator.gameObject.SetActive(false);
+            _eggSpriteRenderer.enabled = true;
         }
 
         public void OnDespawned()

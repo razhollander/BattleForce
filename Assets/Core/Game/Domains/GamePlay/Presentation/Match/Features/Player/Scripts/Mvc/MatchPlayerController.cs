@@ -84,9 +84,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetSentryGunState(isSentryGun, cancellationTokenSource);
         }
 
-        public void PlayLayEggAnimation()
+        public void PlayLayEggAnimation(CancellationTokenSource cancellationTokenSource)
         {
-            _playerView.PlayLayEggAnimation();
+            _playerView.PlayLayEggAnimation(cancellationTokenSource);
         }
 
         public void SetChickenState(bool isChickenActive)
