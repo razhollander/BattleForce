@@ -47,14 +47,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents;
         public FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents;
         public FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents;
-
-
         public FixedUnorderedList<ActivateChickenTalentNetEventS2C> ActivateChickenTalentNetEvents;
         public FixedUnorderedList<DeactivateChickenTalentNetEventS2C> DeactivateChickenTalentNetEvents;
         public FixedUnorderedList<LayChickenEggNetEventS2C> LayChickenEggNetEvents;
         public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
         public FixedUnorderedList<DestroyChickenEggNetEventS2C> DestroyChickenEggNetEvents;
-public MatchFullTickPacketS2C()
+        
+        public MatchFullTickPacketS2C()
         {
             // use this from the server?
         }
@@ -888,8 +887,7 @@ public MatchFullTickPacketS2C()
                 netEvent.Deserialize(reader);
             }
         }
-    }
-
+        
         private void SerializedActivateChickenTalentNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)ActivateChickenTalentNetEvents.Count);
@@ -974,4 +972,5 @@ public MatchFullTickPacketS2C()
                 netEvent.Deserialize(reader);
             }
         }
+    }
 }
