@@ -523,6 +523,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessActivateYearsOfPainTalentEvents(CapacityList<ActivateYearsOfPainTalentNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.YearsOfPain, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.ActivateYearsOfPainTalentNetEvents.Add(netEvent);
+            }
+        }
+
         public void ProcessUpdatePlayerTalentStocksEvents(CapacityList<UpdatePlayerTalentStocksNetEventS2C> updatePlayerTalentStocksEvents)
         {
             if (updatePlayerTalentStocksEvents.IsNullOrEmpty())

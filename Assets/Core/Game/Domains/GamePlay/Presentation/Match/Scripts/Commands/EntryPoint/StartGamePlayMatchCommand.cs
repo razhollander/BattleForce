@@ -55,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
         private IDashPulseGustEffectController _dashPulseGustEffectController;
         private Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts.IMagneticPullEffectController _magneticPullEffectController;
+        private Core.Game.Domains.GamePlay.Presentation.Match.Features.YearsOfPainEffect.Scripts.IYearsOfPainEffectController _yearsOfPainEffectController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -88,6 +89,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
             _magneticPullEffectController = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts.IMagneticPullEffectController>();
+            _yearsOfPainEffectController = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.YearsOfPainEffect.Scripts.IYearsOfPainEffectController>();
         }
 
         public void Execute()
@@ -116,6 +118,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _gainBoltEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();
+            _yearsOfPainEffectController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }
