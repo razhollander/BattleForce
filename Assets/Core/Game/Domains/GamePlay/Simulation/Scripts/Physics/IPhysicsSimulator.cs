@@ -47,5 +47,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void RemoveGrapplingHookProjectile(ushort id);
         void ClearAllData();
         void DisableBodyCollider(PhysicsBodyType koProjectile, ushort projectileId);
+        void AddChickenEgg(ushort eggId, ushort teamId, Vector2 position, float eggRadius);
+        Body GetChickenEgg(ushort chieckEggId);
+        void RemoveChickenEgg(ushort eggId);
     }
 }

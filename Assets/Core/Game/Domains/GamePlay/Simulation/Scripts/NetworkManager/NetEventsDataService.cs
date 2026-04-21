@@ -16,21 +16,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
     public class NetEventsDataService : INetEventsDataService
     {
-        public CapacityDict<int, FixedUnorderedList<ActivateChickenTalentNetEventS2C>> ActivateChickenTalentNetEventsDict { get; }
-        private readonly ConcurrentPool<FixedUnorderedList<ActivateChickenTalentNetEventS2C>> _activateChickenTalentNetEventsPool;
-
-        public CapacityDict<int, FixedUnorderedList<DeactivateChickenTalentNetEventS2C>> DeactivateChickenTalentNetEventsDict { get; }
-        private readonly ConcurrentPool<FixedUnorderedList<DeactivateChickenTalentNetEventS2C>> _deactivateChickenTalentNetEventsPool;
-
-        public CapacityDict<int, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsDict { get; }
-        private readonly ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>> _layChickenEggNetEventsPool;
-
-        public CapacityDict<int, FixedUnorderedList<ChickenEggHitNetEventS2C>> ChickenEggHitNetEventsDict { get; }
-        private readonly ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>> _chickenEggHitNetEventsPool;
-
-        public CapacityDict<int, FixedUnorderedList<DestroyChickenEggNetEventS2C>> DestroyChickenEggNetEventsDict { get; }
-        private readonly ConcurrentPool<FixedUnorderedList<DestroyChickenEggNetEventS2C>> _destroyChickenEggNetEventsPool;
-
         public CapacityDict<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>> BulletSpawnNetEventsPerPlayer { get; private set; } // todo: remove events related to bullet when bullet is destroyed
         public CapacityDict<ushort, FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> PlayerRejoinAcceptNetEventsPerPlayer { get; private set; } // todo: remove events related to player when player is destroyed
         public CapacityDict<ushort, FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>> MatchMakingPlayerJoinAcceptNetEventsPerPlayer { get; private set; } // todo: remove events related to player when player is destroyed
@@ -73,7 +58,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> DeactivateGrapplingHookTalentNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerPlayer { get; }
-
+        public CapacityDict<ushort, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsPerPlayer { get; }
+        public CapacityDict<ushort, FixedUnorderedList<ChickenEggHitNetEventS2C>> ChickenEggHitNetEventsPerPlayer { get; }
+        
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>> _matchMakingPlayerJoinAcceptListPool;
@@ -116,25 +103,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> _deactivateGrapplingHookTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> _activateUmbrellaTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> _deactivateUmbrellaTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>> _layChickenEggNetEventsPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>> _chickenEggHitNetEventsPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
-
-            ActivateChickenTalentNetEventsDict = new CapacityDict<int, FixedUnorderedList<ActivateChickenTalentNetEventS2C>>(NetEventsStorageCapacityTicks);
-            _activateChickenTalentNetEventsPool = new ConcurrentPool<FixedUnorderedList<ActivateChickenTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateChickenTalentNetEventS2C>(_networkConfig.MaxCap.ActivateChickenTalentNetEvents));
-
-            DeactivateChickenTalentNetEventsDict = new CapacityDict<int, FixedUnorderedList<DeactivateChickenTalentNetEventS2C>>(NetEventsStorageCapacityTicks);
-            _deactivateChickenTalentNetEventsPool = new ConcurrentPool<FixedUnorderedList<DeactivateChickenTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateChickenTalentNetEventS2C>(_networkConfig.MaxCap.DeactivateChickenTalentNetEvents));
-
-            LayChickenEggNetEventsDict = new CapacityDict<int, FixedUnorderedList<LayChickenEggNetEventS2C>>(NetEventsStorageCapacityTicks);
-            _layChickenEggNetEventsPool = new ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>>(() => new FixedUnorderedList<LayChickenEggNetEventS2C>(_networkConfig.MaxCap.LayChickenEggNetEvents));
-
-            ChickenEggHitNetEventsDict = new CapacityDict<int, FixedUnorderedList<ChickenEggHitNetEventS2C>>(NetEventsStorageCapacityTicks);
-            _chickenEggHitNetEventsPool = new ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>>(() => new FixedUnorderedList<ChickenEggHitNetEventS2C>(_networkConfig.MaxCap.ChickenEggHitNetEvents));
-
-            DestroyChickenEggNetEventsDict = new CapacityDict<int, FixedUnorderedList<DestroyChickenEggNetEventS2C>>(NetEventsStorageCapacityTicks);
-            _destroyChickenEggNetEventsPool = new ConcurrentPool<FixedUnorderedList<DestroyChickenEggNetEventS2C>>(() => new FixedUnorderedList<DestroyChickenEggNetEventS2C>(_networkConfig.MaxCap.DestroyChickenEggNetEvents));
-var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
+            var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             BulletSpawnNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<BulletSpawnNetEventS2C>>(maxConcurrentPlayers);
             PlayerRejoinAcceptNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(maxConcurrentPlayers);
             MatchMakingPlayerJoinAcceptNetEventsPerPlayer = new CapacityDict<ushort, FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>>(maxConcurrentPlayers);
@@ -177,6 +151,9 @@ var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             DeactivateGrapplingHookTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(maxConcurrentPlayers);
             ActivateUmbrellaTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateUmbrellaTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
+            LayChickenEggNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<LayChickenEggNetEventS2C>>(maxConcurrentPlayers);
+            ChickenEggHitNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<ChickenEggHitNetEventS2C>>(maxConcurrentPlayers);
+            
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -236,6 +213,8 @@ var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             _deactivateGrapplingHookTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(networkConfig.MaxCap.DeactivateGrapplingHookTalentNetEvents), maxConcurrentPlayers);
             _activateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
             _deactivateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
+            _layChickenEggNetEventsPool = new ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>>(() => new FixedUnorderedList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents), maxConcurrentPlayers);
+            _chickenEggHitNetEventsPool = new ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>>(() => new FixedUnorderedList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingPlayerEvents(ushort playerId)
@@ -524,6 +503,14 @@ var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             {
                 DeactivateUmbrellaTalentNetEventsPerPlayer.Add(playerId, _deactivateUmbrellaTalentNetEventsListPool.Get());
             }
+            if (!LayChickenEggNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                LayChickenEggNetEventsPerPlayer.Add(playerId, _layChickenEggNetEventsPool.Get());
+            }
+            if (!ChickenEggHitNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                ChickenEggHitNetEventsPerPlayer.Add(playerId, _chickenEggHitNetEventsPool.Get());
+            }
         }
         
         public void StopSavingPlayerEvents(ushort playerId)
@@ -668,7 +655,15 @@ var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             var deactivateUmbrellaTalentNetEventsList = DeactivateUmbrellaTalentNetEventsPerPlayer[playerId];
             deactivateUmbrellaTalentNetEventsList.Clear();
             _deactivateUmbrellaTalentNetEventsListPool.Return(deactivateUmbrellaTalentNetEventsList);
-
+            
+            var layChickenEggNetEventsList = LayChickenEggNetEventsPerPlayer[playerId];
+            layChickenEggNetEventsList.Clear();
+            _layChickenEggNetEventsPool.Return(layChickenEggNetEventsList);
+            
+            var chickenEggHitNetEventsList = ChickenEggHitNetEventsPerPlayer[playerId];
+            chickenEggHitNetEventsList.Clear();
+            _chickenEggHitNetEventsPool.Return(chickenEggHitNetEventsList);
+            
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
             MatchMakingPlayerJoinAcceptNetEventsPerPlayer.Remove(playerId);
@@ -708,6 +703,8 @@ var maxConcurrentPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             PlayerMaxShootCooldownChangedNetEventsPerPlayer.Remove(playerId);
             ActivateUmbrellaTalentNetEventsPerPlayer.Remove(playerId);
             DeactivateUmbrellaTalentNetEventsPerPlayer.Remove(playerId);
+            LayChickenEggNetEventsPerPlayer.Remove(playerId);
+            ChickenEggHitNetEventsPerPlayer.Remove(playerId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -1286,6 +1283,28 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                     }
                 }
             }
+
+            if (LayChickenEggNetEventsPerPlayer.TryGetValue(playerId, out var layChickenEggNetEvents))
+            {
+                for (int i = layChickenEggNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (layChickenEggNetEvents[i].OccuredOnTick < tick)
+                    {
+                        layChickenEggNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (ChickenEggHitNetEventsPerPlayer.TryGetValue(playerId, out var chickenEggHitNetEvents))
+            {
+                for (int i = chickenEggHitNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (chickenEggHitNetEvents[i].OccuredOnTick < tick)
+                    {
+                        chickenEggHitNetEvents.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
@@ -1586,6 +1605,30 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                 packet.OccuredOnTick = onTick;
                 packet.CasterPlayerId = casterPlayerId;
                 packet.TalentCooldownEndTick = talentCooldownEndTick;
+            }
+        }
+
+        public void AddLayChickenEggNetEventS2C(int tick, ushort casterId, ushort eggId, Vector2 position)
+        {
+            foreach (var kvp in LayChickenEggNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = tick;
+                packet.CasterPlayerId = casterId;
+                packet.EggId = eggId;
+                packet.Position = position;
+            }
+        }
+
+        public void AddChickenEggHitNetEventS2C(int tick, ushort eggId, ushort hitPlayerId, Vector2 position)
+        {
+            foreach (var kvp in ChickenEggHitNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = tick;
+                packet.EggId = eggId;
+                packet.HitPlayerId = hitPlayerId;
+                packet.Position = position;
             }
         }
     }

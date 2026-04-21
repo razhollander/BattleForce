@@ -902,6 +902,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.SetAwake(true); // not sure needed
         }
 
+        public void AddChickenEgg(ushort eggId, ushort teamId, Vector2 position, float eggRadius)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(eggId, PhysicsBodyType.ChickenEgg);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var shape = GetCircleShape();
+            shape.Radius = eggRadius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.groupIndex = (short)-teamId;
+
+            fixtureDef.filter.categoryBits = PhysicsBodyType.ChickenEgg.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.ChickenEgg.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(shape);
+        }
+
         public Body GetKOProjectile(ushort koProjectileId)
         {
             return GetBody(PhysicsBodyType.KOProjectile, koProjectileId);
@@ -910,6 +939,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public Body GetGrapplingHookProjectile(ushort grapplingHookProjectileId)
         {
             return GetBody(PhysicsBodyType.GrapplingHookProjectile, grapplingHookProjectileId);
+        }
+        
+        public Body GetChickenEgg(ushort chieckEggId)
+        {
+            return GetBody(PhysicsBodyType.ChickenEgg, chieckEggId);
+        }
+
+        public void RemoveChickenEgg(ushort eggId)
+        {
+            var body = GetBody(PhysicsBodyType.ChickenEgg, eggId);
+            RemoveBody(body);
         }
     }
 }

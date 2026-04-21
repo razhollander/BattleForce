@@ -128,11 +128,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             ushort eggId = isEggToPlayer ? objectA.Id : objectB.Id;
             ushort playerId = isEggToPlayer ? objectB.Id : objectA.Id;
-            Body eggBody = isEggToPlayer ? contact.FixtureA.Body : contact.FixtureB.Body;
 
             if (!_matchDataService.SimulationState.TryGetChickenEggById(eggId, out var egg)) return;
-
-            if (egg.IsBroken) return;
 
             var player = _matchDataService.SimulationState.GetPlayerById(playerId);
 
@@ -141,18 +138,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             // Mark as broken
             ref var eggState = ref _matchDataService.SimulationState.GetChickenEggById(eggId);
-            eggState.IsBroken = true;
-            eggState.BrokenTick = _processedTick;
 
             // Spin the player
             var config = _gamePlayConfig.Talents.ChickenTalentConfig;
-            _spinPlayerCommand.Execute(player.Id, _processedTick, config.SpinAmount);
-
-            // Send hit event
+            _spinPlayerCommand.SetPlayer(player.Id).SetSpinAmount(config.SpinAmount).SetTick(_processedTick).Execute();
+            
             _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId, playerId, eggState.Position);
-
-            // Disable egg collision
-            eggBody.SetEnabled(false);
+            _physicsSimulator.RemoveChickenEgg(egg.Id);
+            _matchDataService.SimulationState.RemoveChickenEggById(egg.Id);
         }
 
         private void HandleKOProjectileWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)

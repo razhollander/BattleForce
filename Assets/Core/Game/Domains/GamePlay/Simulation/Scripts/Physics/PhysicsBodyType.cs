@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         SwapField = 11,
         KOProjectile = 12,
         GrapplingHookProjectile = 13,
-        StageBoundary = 14
+        StageBoundary = 14,
+        ChickenEgg = 15,
     }
 }

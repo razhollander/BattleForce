@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastSwapFieldCreatedId = 0;
         private ushort _lastKOProjectileCreatedId = 0;
         private ushort _lastGrapplingHookProjectileCreatedId = 0;
+        private ushort _lastChickenEggCreatedId = 0;
         public List<int> DidntPlayYetStageIndexes { get; } = new List<int>();
         public MatchEnvironmentDataService EnvironmentData { get; private set; }
         public HashSet<ushort> TeamIds { get; private set; }
@@ -134,11 +135,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public TalentChickenEggStateS2C AddChickenEgg(ushort casterPlayerId, Vector2 position)
         {
             ref var egg = ref SimulationState.ChickenEggs.AddAndGet();
-            egg.Id = IdFactory.GetNewId();
+            var eggId = (ushort)(++_lastChickenEggCreatedId % ushort.MaxValue);
+            egg.Id = eggId;
             egg.PlayerCasterId = casterPlayerId;
             egg.Position = position;
-            egg.IsBroken = false;
-            egg.BrokenTick = 0;
 
             return egg;
         }

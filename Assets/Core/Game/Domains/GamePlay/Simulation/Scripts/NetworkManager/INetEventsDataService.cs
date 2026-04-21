@@ -52,6 +52,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<ushort, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> DeactivateGrapplingHookTalentNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerPlayer { get; }
         CapacityDict<ushort, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerPlayer { get; }
+        CapacityDict<ushort, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsPerPlayer { get; }
+        CapacityDict<ushort, FixedUnorderedList<ChickenEggHitNetEventS2C>> ChickenEggHitNetEventsPerPlayer { get; }
         void StartSavingPlayerEvents(ushort playerId);
         void StopSavingPlayerEvents(ushort playerId);
         void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius);
@@ -94,17 +96,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddDeactivateGrapplingHookTalentNetEvent(int onTick, ushort casterPlayerId, ushort projectileId, int talentCooldownEndTick);
         void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
-    }
-
-        CapacityDict<int, FixedUnorderedList<ActivateChickenTalentNetEventS2C>> ActivateChickenTalentNetEventsDict { get; }
-        CapacityDict<int, FixedUnorderedList<DeactivateChickenTalentNetEventS2C>> DeactivateChickenTalentNetEventsDict { get; }
-        CapacityDict<int, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsDict { get; }
-        CapacityDict<int, FixedUnorderedList<ChickenEggHitNetEventS2C>> ChickenEggHitNetEventsDict { get; }
-        CapacityDict<int, FixedUnorderedList<DestroyChickenEggNetEventS2C>> DestroyChickenEggNetEventsDict { get; }
-
-        void AddActivateChickenTalentNetEventS2C(int tick, ushort casterId);
-        void AddDeactivateChickenTalentNetEventS2C(int tick, ushort casterId, int cooldownEndTick);
         void AddLayChickenEggNetEventS2C(int tick, ushort casterId, ushort eggId, Vector2 position);
         void AddChickenEggHitNetEventS2C(int tick, ushort eggId, ushort hitPlayerId, Vector2 position);
-        void AddDestroyChickenEggNetEventS2C(int tick, ushort eggId);
+    }
 }

@@ -493,13 +493,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 grapplingHookProjectile.SerializeDelta(writer);
             }
-            
-            var chickenEggsCount = ChickenEggs.Count;
-            writer.Put((byte)chickenEggsCount);
-            foreach (var chickenEgg in ChickenEggs.AsSpan())
-            {
-                chickenEgg.SerializeDelta(writer);
-            }
         }
 
         public void DeserializeTransforms(NetDataReader reader)
@@ -542,14 +535,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var grapplingHookProjectile = ref GrapplingHookProjectiles.AddAndGet();
                 grapplingHookProjectile.DeserializeDelta(reader);
-            }
-            
-            var chickenEggsCount = reader.GetByte();
-            ChickenEggs.Clear();
-            for (int i = 0; i < chickenEggsCount; i++)
-            {
-                ref var chickenEgg = ref ChickenEggs.AddAndGet();
-                chickenEgg.DeserializeDelta(reader);
             }
         }
 
