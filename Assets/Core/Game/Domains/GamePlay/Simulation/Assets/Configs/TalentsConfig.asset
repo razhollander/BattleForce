@@ -68,8 +68,8 @@ MonoBehaviour:
   YearsOfPainTalentConfig:
     RectangleColliderSize: {x: 3, y: 1.5}
     PushForce: 100
-    MaxSpin: 100
-    MinSpin: 80
+    MaxSpin: 200
+    MinSpin: 180
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:
