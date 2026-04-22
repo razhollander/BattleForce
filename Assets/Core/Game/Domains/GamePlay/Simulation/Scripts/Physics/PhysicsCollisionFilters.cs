@@ -18,7 +18,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsBodyType.EnvironmentTeleportGate)
                                     | GetCollisionMask(PhysicsBodyType.SwapField)
                                     | GetCollisionMask(PhysicsBodyType.KOProjectile)
-                                    | GetCollisionMask(PhysicsBodyType.StageBoundary);
+                                    | GetCollisionMask(PhysicsBodyType.StageBoundary)
+                                    | GetCollisionMask(PhysicsBodyType.ChickenEgg);
                     break;
                 case PhysicsBodyType.PlayerBullet:
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
@@ -59,7 +60,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     break;
                 case PhysicsBodyType.KOProjectile:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
-                                    | GetCollisionMask(PhysicsBodyType.Wall);
+                                    | GetCollisionMask(PhysicsBodyType.Wall)
+                                    | GetCollisionMask(PhysicsBodyType.ChickenEgg);
                     break;
                 case PhysicsBodyType.SwapField:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
@@ -69,6 +71,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     break;
                 case PhysicsBodyType.GrapplingHookProjectile:
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall);
+                    break;
+                case PhysicsBodyType.ChickenEgg:
+                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsBodyType.KOProjectile);
                     break;
                 default:
                     collisionMask = 0xFFFF;

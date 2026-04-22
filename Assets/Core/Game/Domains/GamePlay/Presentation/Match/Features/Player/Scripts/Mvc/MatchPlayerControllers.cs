@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationTok
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
+using Sirenix.Utilities;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
@@ -93,7 +94,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             GetPlayer(playerId).SetUmbrellaState(isUmbrella);
         }
-        
+
+        public void SetPlayerChickenState(ushort playerId, bool isChicken)
+        {
+            GetPlayer(playerId).SetChickenState(isChicken);
+        }
+
+        public void PlayLayEggAnimation(ushort playerId)
+        {
+            GetPlayer(playerId).PlayLayEggAnimation(_stageCancellationTokenProvider.CancellationTokenSource);
+        }
+
+        public void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction)
+        {
+            GetPlayer(playerId).PlayerYearsOfPain(direction);
+        }
+
+        public void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled)
+        {
+            GetPlayer(playerId).SetIsDeadAuraEnabled(isEnabled);
+        }
+
         public void UpdateIsPlayerArrowShownAccordingToTalentState(ushort playerId, TalentStateS2C talentStateS2C)
         {
             GetPlayer(playerId).UpdateIsArrowShownAccordingToTalentState(talentStateS2C);

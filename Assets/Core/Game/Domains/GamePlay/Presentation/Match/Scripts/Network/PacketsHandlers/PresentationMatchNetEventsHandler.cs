@@ -478,6 +478,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessLayChickenEggEvents(CapacityList<LayChickenEggNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty()) return;
+            foreach (var netEvent in netEvents)
+            {
+                _matchDataService.AddChickenEgg(netEvent.EggId, netEvent.CasterPlayerId, netEvent.Position.ToUnityVector2());
+                _cachedPresentationEventsService.LayChickenEggNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessChickenEggHitEvents(CapacityList<ChickenEggHitNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty()) return;
+            foreach (var netEvent in netEvents)
+            {
+                _matchDataService.RemoveChickenEgg(netEvent.EggId);
+                _cachedPresentationEventsService.ChickenEggHitNetEvents.Add(netEvent);
+            }
+        }
+        
         public void ProcessDeactivateUmbrellaTalentEvents(CapacityList<DeactivateUmbrellaTalentNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty())
@@ -506,6 +526,34 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 shoot.MaxCooldown = netEvent.MaxShootCooldown;
                 shoot.CooldownSecondsLeft = netEvent.ShootCooldownSecondsLeft;
                 player.Spaceship.Shoot = shoot;
+            }
+        }
+
+        public void ProcessCreateMagenticPullFieldEvents(CapacityList<CreateMagneticPullFieldNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.MagneticPull, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.CreateMagenticPullFieldNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessActivateYearsOfPainTalentEvents(CapacityList<ActivateYearsOfPainTalentNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.YearsOfPain, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.ActivateYearsOfPainTalentNetEvents.Add(netEvent);
             }
         }
 

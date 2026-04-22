@@ -123,12 +123,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void ClearStageObjectsInSimulationState()
         {
-            _matchDataService.SimulationState.Bullets.Clear();
-            _matchDataService.SimulationState.PowerUpBalls.Clear();
-            _matchDataService.SimulationState.TalentCards.Clear();
-            _matchDataService.SimulationState.SwapFields.Clear();
-            _matchDataService.SimulationState.KOProjectiles.Clear();
-            _matchDataService.SimulationState.GrapplingHookProjectiles.Clear();
+            _matchDataService.SimulationState.ClearObjectStates();
             _matchDataService.EnvironmentData.ClearData();
         }
 

@@ -21,6 +21,9 @@ MonoBehaviour:
     - rid: 8476404660102234386
     - rid: 8476404832654590090
     - rid: 8476404916744356088
+    - rid: 8476404916744356134
+    - rid: 8476404916744356331
+    - rid: 8476405024203735241
   HammerTalentConfig:
     HammerSpeed: 10
     HammerSize: 1
@@ -38,7 +41,6 @@ MonoBehaviour:
     PushForce: 50
     MaxSpin: 55
     MinSpin: 50
-    SpinDuration: 2
   SentryGunTalentConfig:
     DurationInSeconds: 3
     ShootCooldownMultiplier: 0.25
@@ -54,6 +56,20 @@ MonoBehaviour:
   UmbrellaTalentConfig:
     DurationInSeconds: 4
     VelocityGainPerTick: 80
+  MagneticPullTalentConfig:
+    FieldArcAngle: 90
+    PushForce: 30
+    MaxSpin: 55
+    MinSpin: 50
+  ChickenTalentConfig:
+    CountdownDuration: 3
+    PushForce: 15
+    SpinAmount: 50
+  YearsOfPainTalentConfig:
+    RectangleColliderSize: {x: 3, y: 1.5}
+    PushForce: 100
+    MaxSpin: 200
+    MinSpin: 180
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:
@@ -73,6 +89,20 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 8
+        CooldownInSeconds: 2
+    - rid: 8476404916744356134
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 9
+        CooldownInSeconds: 2
+    - rid: 8476404916744356331
+      type: {class: TalentAlwaysActiveCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 10
+    - rid: 8476405024203735241
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 2
         CooldownInSeconds: 2
     - rid: 8506109566889754721
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}

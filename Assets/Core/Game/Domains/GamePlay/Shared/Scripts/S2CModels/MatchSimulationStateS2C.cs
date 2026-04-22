@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentSwapFieldS2C> SwapFields;
         public FixedUnorderedList<TalentKOProjectileS2C> KOProjectiles;
         public FixedUnorderedList<TalentGrapplingHookProjectileStateS2C> GrapplingHookProjectiles;
+        public FixedUnorderedList<TalentChickenEggStateS2C> ChickenEggs;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
         public int EnvironmentLayoutId;
@@ -25,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public int StartPhaseInitialTick;
         public bool IsInPreparationPhase;
 
-        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams)
+        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs)
         {
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer));
             Bullets = new FixedUnorderedList<PlayerBulletS2C>(maxBullets);
@@ -34,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             SwapFields = new FixedUnorderedList<TalentSwapFieldS2C>(maxPlayers);
             KOProjectiles = new FixedUnorderedList<TalentKOProjectileS2C>(maxPlayers);
             GrapplingHookProjectiles = new FixedUnorderedList<TalentGrapplingHookProjectileStateS2C>(maxPlayers);
+            ChickenEggs = new FixedUnorderedList<TalentChickenEggStateS2C>(maxChickenEggs);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
         }
@@ -101,6 +103,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var grapplingHookProjectile in GrapplingHookProjectiles.AsSpan())
             {
                 grapplingHookProjectile.Serialize(writer);
+            }
+
+            var chickenEggsCount = ChickenEggs.Count;
+            writer.Put((byte)chickenEggsCount);
+            foreach (var chickenEgg in ChickenEggs.AsSpan())
+            {
+                chickenEgg.Serialize(writer);
             }
 
             writer.Put((byte)EnvironmentLayoutId);
@@ -183,6 +192,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var grapplingHookProjectile = ref GrapplingHookProjectiles.AddAndGet();
                 grapplingHookProjectile.Deserialize(reader);
+            }
+
+            var chickenEggsCount = reader.GetByte();
+            ChickenEggs.Clear();
+            for (var i = 0; i < chickenEggsCount; i++)
+            {
+                ref var chickenEgg = ref ChickenEggs.AddAndGet();
+                chickenEgg.Deserialize(reader);
             }
 
             EnvironmentLayoutId = reader.GetByte();
@@ -520,7 +537,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 grapplingHookProjectile.DeserializeDelta(reader);
             }
         }
-        
+
         public ref PowerUpBallS2C GetPowerUpBallById(ushort powerUpBallId)
         {
             for (int i = 0; i < PowerUpBalls.Count; i++)
@@ -605,6 +622,44 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             throw new System.Exception($"No grappling hook projectile for id {projectileId}!");
         }
 
+
+        public bool TryGetChickenEggById(ushort eggId, out TalentChickenEggStateS2C egg)
+        {
+            for (int i = 0; i < ChickenEggs.Count; i++)
+            {
+                if (ChickenEggs[i].Id == eggId)
+                {
+                    egg = ChickenEggs.GetByIndex(i);
+                    return true;
+                }
+            }
+            egg = default;
+            return false;
+        }
+
+        public ref TalentChickenEggStateS2C GetChickenEggById(ushort eggId)
+        {
+            for (int i = 0; i < ChickenEggs.Count; i++)
+            {
+                if (ChickenEggs[i].Id == eggId)
+                    return ref ChickenEggs.GetByIndex(i);
+            }
+            throw new System.Exception($"No chicken egg for id {eggId}!");
+        }
+
+        public void RemoveChickenEggById(ushort eggId)
+        {
+            for (int i = 0; i < ChickenEggs.Count; i++)
+            {
+                if (ChickenEggs[i].Id == eggId)
+                {
+                    ChickenEggs.RemoveAt(i);
+                    return;
+                }
+            }
+            throw new System.Exception($"No chicken egg for id {eggId}!");
+        }
+
         public  bool TryGetPlayerByName(string playerName, out PlayerStateS2C playerState)
         {
             for (int i = 0; i < Players.Count; i++)
@@ -618,6 +673,17 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             playerState = default;
             return false;
+        }
+
+        public void ClearObjectStates()
+        {
+            Bullets.Clear();
+            PowerUpBalls.Clear();
+            TalentCards.Clear();
+            SwapFields.Clear();
+            KOProjectiles.Clear();
+            GrapplingHookProjectiles.Clear();
+            ChickenEggs.Clear();
         }
     }
 }

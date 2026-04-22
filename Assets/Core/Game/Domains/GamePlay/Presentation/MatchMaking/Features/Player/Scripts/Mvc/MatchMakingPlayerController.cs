@@ -54,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             _playerView.InterpolateTransform(playerPosition, playerRotation, exponentialDecay);
             var currentPosition = _playerView.GetPosition();
 
-            var distance = Vector2.Distance(lastPosition, currentPosition);
+            var distance = Vector2.Distance(lastPosition.ToNumericsVector2(), currentPosition.ToNumericsVector2());
             var speed = distance / Time.deltaTime;
             var moveRatio = Mathf.Clamp01(speed / _sharedGamePlayConfig.TargetMovementSpeed);
             _playerView.UpdateTailWaveMultiplier(moveRatio);

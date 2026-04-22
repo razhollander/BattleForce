@@ -8,8 +8,10 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Scripts.Extensions;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Utils;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
@@ -27,6 +29,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedConfig;
+        private readonly ICommandFactory _commandFactory;
+        private readonly SpinPlayerCommand _spinPlayerCommand;
 
         public TalentType TalentType => TalentType.GrapplingHook;
         private bool IsCurrentlyActive

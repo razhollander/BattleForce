@@ -30,6 +30,7 @@ namespace Core.Scripts.Network
         public int ConcurrentEvironmentStageBoundaries = 256;
         public int ConcurrentEvironmentTeleportPairs = 4;
         public int ConcurrentEvironmentSprings = 32;
+        public int ConcurrentChickenEggs = 128;
         public int PacketTypes = 256; // if one day this is changed to a bigger number, need to parse packet types as ushort instead of byte
         public int ConcurrentEnvironmentRotatingWheels = 16;
         public int ConcurrentFieldBarriers = 16;
@@ -97,6 +98,10 @@ namespace Core.Scripts.Network
         public int DeactivateGrapplingHookTalentNetEvents = 128;
         public int ActivateUmbrellaTalentNetEvents = 128;
         public int DeactivateUmbrellaTalentNetEvents = 128;
+        public int CreateMagneticPullFieldNetEvents = 128;
+        public int LayChickenEggNetEvents = 128;
+        public int ChickenEggHitNetEvents = 128;
+        public int ActivateYearsOfPainTalentNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel

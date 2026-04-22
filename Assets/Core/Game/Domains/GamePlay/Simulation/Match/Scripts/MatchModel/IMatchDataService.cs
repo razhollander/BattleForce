@@ -21,5 +21,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         TalentSwapFieldS2C AddSwapField(ushort casterPlayerId, int tick, int fieldEndTick);
         TalentKOProjectileS2C AddKOProjectile(int tick, ushort casterPlayerId, Vector2 transformPosition, Vector2 rotation, Vector2 velocity, float koConfigProjectileSize);
         TalentGrapplingHookProjectileStateS2C AddGrapplingHookProjectile(ushort casterPlayerId, Vector2 transformPosition, Vector2 velocity);
+        TalentChickenEggStateS2C AddChickenEgg(ushort casterPlayerId, Vector2 position);
     }
 }

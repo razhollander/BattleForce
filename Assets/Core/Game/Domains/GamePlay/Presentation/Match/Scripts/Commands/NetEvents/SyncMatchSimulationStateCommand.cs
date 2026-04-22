@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
@@ -9,6 +10,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Telepor
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
@@ -33,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private MatchSimulationStateS2C _simulationState;
         private IMatchDataService _matchDataService;
         private IMatchBulletControllers _bulletControllers;
+        private IMatchChickenEggsControllers _chickenEggsControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
         private ITalentCardControllers _talentCardControllers;
@@ -54,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IKOProjectilesControllers _kOProjectilesControllers;
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
+        private IMagneticPullEffectController _magneticPullEffectController;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -86,6 +90,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
+            _magneticPullEffectController = _diContainer.Resolve<IMagneticPullEffectController>();
+            _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
         }
 
         public void Execute()
@@ -115,6 +121,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _swapFieldControllers.DestroyAll();
             _kOProjectilesControllers.DestroyAll();
             _grapplingHookProjectilesControllers.DestroyAll();
+            _chickenEggsControllers.DestroyAll();
         }
 
         private void CreateAll()
@@ -133,6 +140,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateSwapField();
             CreateKOPRojectiles();
             CreateGrapplingHookPRojectiles();
+            CreateChickenEggs();
         }
 
         private void CreateFieldBarriers()
@@ -371,6 +379,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 
                 _matchDataService.AddKOProjectile(koProjectile.Id, casterId, koProjectile.CreatedOnTick, koProjectile.Size);
                 _kOProjectilesControllers.CreateKOProjectile(koProjectile.Id, position, rotation, casterPosition, koProjectile.Size);
+            }
+        }
+
+        private void CreateChickenEggs()
+        {
+            foreach (var egg in _simulationState.ChickenEggs.AsSpan())
+            {
+                var casterPlayerId = egg.PlayerCasterId;
+                _matchDataService.AddChickenEgg(egg.Id, casterPlayerId, egg.Position.ToUnityVector2());
+                var playerCasterTeamId = _matchDataService.GetPlayerTeamId(casterPlayerId);
+                _chickenEggsControllers.CreateEgg(egg.Id, egg.Position, playerCasterTeamId);
             }
         }
 

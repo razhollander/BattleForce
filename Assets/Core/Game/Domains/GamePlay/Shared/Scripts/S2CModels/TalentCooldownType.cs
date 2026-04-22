@@ -4,5 +4,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     {
         Normal = 0,
         Stocks = 1,
+        AlwaysActive = 2,
     }
 }

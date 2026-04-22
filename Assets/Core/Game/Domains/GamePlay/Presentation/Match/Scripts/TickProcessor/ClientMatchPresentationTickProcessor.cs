@@ -55,10 +55,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleKOProjectHitPlayerNetEventsCommand _handleKOProjectHitPlayerNetEventsCommand;
         private readonly HandleActivateUmbrellaTalentNetEventsCommand _handleActivateUmbrellaTalentNetEventsCommand;
         private readonly HandleDeactivateUmbrellaTalentNetEventsCommand _handleDeactivateUmbrellaTalentNetEventsCommand;
+        private readonly HandleLayChickenEggNetEventsCommand _handleLayChickenEggNetEventsCommand;
+        private readonly HandleChickenEggHitNetEventsCommand _handleChickenEggHitNetEventsCommand;
         private readonly UpdateKOProjectilesTransformCommand _updateKOProjectilesTransformCommand;
         private readonly HandlePerformDashPulseNetEventsCommand _handlePerformDashPulseNetEventsCommand;
         private readonly HandleUpdatePlayerTalentStocksNetEventsCommand _handleUpdatePlayerTalentStocksNetEventsCommand;
         private readonly HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands;
+        private readonly HandleCreateMagenticPullFieldNetEventsCommand _handleCreateMagenticPullFieldNetEventsCommand;
+        private readonly HandleActivateYearsOfPainTalentNetEventsCommand _handleActivateYearsOfPainTalentNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -101,11 +105,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSentryGunTalentNetEventsCommand>();
             _handleActivateUmbrellaTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateUmbrellaTalentNetEventsCommand>();
             _handleDeactivateUmbrellaTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateUmbrellaTalentNetEventsCommand>();
+            _handleLayChickenEggNetEventsCommand = commandFactory.CreateCommandVoid<HandleLayChickenEggNetEventsCommand>();
+            _handleChickenEggHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleChickenEggHitNetEventsCommand>();
             _handleKOProjectHitPlayerNetEventsCommand = commandFactory.CreateCommandVoid<HandleKOProjectHitPlayerNetEventsCommand>();
             _updateKOProjectilesTransformCommand = commandFactory.CreateCommandVoid<UpdateKOProjectilesTransformCommand>();
             _handlePerformDashPulseNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformDashPulseNetEventsCommand>();
             _handleUpdatePlayerTalentStocksNetEventsCommand = commandFactory.CreateCommandVoid<HandleUpdatePlayerTalentStocksNetEventsCommand>();
+            _handleCreateMagenticPullFieldNetEventsCommand = commandFactory.CreateCommandVoid<HandleCreateMagenticPullFieldNetEventsCommand>();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands = commandFactory.CreateCommandVoid<HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands>();
+            _handleActivateYearsOfPainTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateYearsOfPainTalentNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -155,8 +163,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateSentryGunTalentNetEventsCommand.Execute();
             _handleActivateUmbrellaTalentNetEventsCommand.Execute();
             _handleDeactivateUmbrellaTalentNetEventsCommand.Execute();
+            _handleLayChickenEggNetEventsCommand.Execute(); // must be after _handleTalentSwitchNetEventsCommand.Execute();
+            _handleChickenEggHitNetEventsCommand.Execute();
             _handlePerformDashPulseNetEventsCommand.Execute();
             _handleUpdatePlayerTalentStocksNetEventsCommand.Execute();
+            _handleCreateMagenticPullFieldNetEventsCommand.Execute();
+            _handleActivateYearsOfPainTalentNetEventsCommand.Execute();
             _updateKOProjectilesTransformCommand.Execute(); // must be after _handleDeactivateKOTalentNetEventsCommand.Execute();
             _updateGrapplingHookProjectilesTransformCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();

@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastSwapFieldCreatedId = 0;
         private ushort _lastKOProjectileCreatedId = 0;
         private ushort _lastGrapplingHookProjectileCreatedId = 0;
+        private ushort _lastChickenEggCreatedId = 0;
         public List<int> DidntPlayYetStageIndexes { get; } = new List<int>();
         public MatchEnvironmentDataService EnvironmentData { get; private set; }
         public HashSet<ushort> TeamIds { get; private set; }
@@ -25,13 +26,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             EnvironmentData = new MatchEnvironmentDataService(networkConfig);
+            var maxCap = networkConfig.MaxCap;
+
             _simulationState = new MatchSimulationStateS2C(
-                networkConfig.MaxCap.ConcurrentPlayers,
-                networkConfig.MaxCap.ConcurrentBullets,
+                maxCap.ConcurrentPlayers,
+                maxCap.ConcurrentBullets,
                 sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
-                networkConfig.MaxCap.ConcurrentTalentCards,
-                networkConfig.MaxCap.ConcurrentPowerUpBalls,
-                sharedGamePlayConfig.MaxTeamsAmount);
+                maxCap.ConcurrentTalentCards,
+                maxCap.ConcurrentPowerUpBalls,
+                sharedGamePlayConfig.MaxTeamsAmount,
+                maxCap.ConcurrentChickenEggs);
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
@@ -55,8 +59,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             newPlayer.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
             newPlayer.Spaceship.Shoot.MaxCooldown = shootCooldown;
             TeamIds.Add(teamId);
-            _simulationState.GemsPerTeamId.Add(teamId, 0);
-            _simulationState.BoltsPerTeam.Add(teamId, 0);
+            _simulationState.GemsPerTeamId.TryAdd(teamId, 0);
+            _simulationState.BoltsPerTeam.TryAdd(teamId, 0);
             return newPlayer;
         }
 
@@ -129,6 +133,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             grapplingHookProjectile.Velocity = velocity;
             grapplingHookProjectile.IsHookAttached = false;
             return grapplingHookProjectile;
+        }
+
+        public TalentChickenEggStateS2C AddChickenEgg(ushort casterPlayerId, Vector2 position)
+        {
+            ref var egg = ref SimulationState.ChickenEggs.AddAndGet();
+            var eggId = (ushort)(++_lastChickenEggCreatedId % ushort.MaxValue);
+            egg.Id = eggId;
+            egg.PlayerCasterId = casterPlayerId;
+            egg.Position = position;
+
+            return egg;
         }
     }
 }

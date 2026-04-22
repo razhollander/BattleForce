@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
@@ -47,7 +48,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents;
         public FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents;
         public FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents;
-
+        public FixedUnorderedList<CreateMagneticPullFieldNetEventS2C> CreateMagneticPullFieldNetEvents;
+        public FixedUnorderedList<LayChickenEggNetEventS2C> LayChickenEggNetEvents;
+        public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
+        public FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C> ActivateYearsOfPainTalentNetEvents;
+        
         public MatchFullTickPacketS2C()
         {
             // use this from the server?
@@ -56,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public MatchFullTickPacketS2C(MaxCap maxCap, SharedGamePlayConfig sharedGamePlayConfig)
         {
             CurrentSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
-                maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount);
+                maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount, maxCap.ConcurrentChickenEggs);
 
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
 
@@ -101,8 +106,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             CreateGrapplingHookProjectileNetEvents = new FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>(maxCap.CreateGrapplingHookProjectileNetEvents);
             GrapplingHookHitWallNetEvents = new FixedUnorderedList<GrapplingHookHitWallNetEventS2C>(maxCap.GrapplingHookHitWallNetEvents);
             DeactivateGrapplingHookTalentNetEvents = new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(maxCap.DeactivateGrapplingHookTalentNetEvents);
+            CreateMagneticPullFieldNetEvents = new FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>(maxCap.CreateMagneticPullFieldNetEvents);
+            ActivateYearsOfPainTalentNetEvents = new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(maxCap.ActivateYearsOfPainTalentNetEvents);
             ActivateUmbrellaTalentNetEvents = new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(maxCap.ActivateUmbrellaTalentNetEvents);
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
+            LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
+            ChickenEggHitNetEvents = new FixedUnorderedList<ChickenEggHitNetEventS2C>(maxCap.ChickenEggHitNetEvents);
+            ActivateYearsOfPainTalentNetEvents = new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(maxCap.ActivateYearsOfPainTalentNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -141,8 +151,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedCreateGrapplingHookProjectileNetEvents(writer);
             SerializedGrapplingHookHitWallNetEvents(writer);
             SerializedDeactivateGrapplingHookTalentNetEvents(writer);
+            SerializedCreateMagneticPullFieldNetEvents(writer);
+            SerializedActivateYearsOfPainTalentNetEvents(writer);
             SerializedActivateUmbrellaTalentNetEvents(writer);
             SerializedDeactivateUmbrellaTalentNetEvents(writer);
+            SerializedLayChickenEggNetEvents(writer);
+            SerializedChickenEggHitNetEvents(writer);
+            SerializedActivateYearsOfPainTalentNetEvents(writer);
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -334,8 +349,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedCreateGrapplingHookProjectileNetEvents(reader);
             DeserializedGrapplingHookHitWallNetEvents(reader);
             DeserializedDeactivateGrapplingHookTalentNetEvents(reader);
+            DeserializedCreateMagneticPullFieldNetEvents(reader);
+            DeserializedActivateYearsOfPainTalentNetEvents(reader);
             DeserializedActivateUmbrellaTalentNetEvents(reader);
             DeserializedDeactivateUmbrellaTalentNetEvents(reader);
+            DeserializedLayChickenEggNetEvents(reader);
+            DeserializedChickenEggHitNetEvents(reader);
+            DeserializedActivateYearsOfPainTalentNetEvents(reader);
         }
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
@@ -861,6 +881,88 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref DeactivateUmbrellaTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedCreateMagneticPullFieldNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)CreateMagneticPullFieldNetEvents.Count);
+            foreach (var netEvent in CreateMagneticPullFieldNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedCreateMagneticPullFieldNetEvents(NetDataReader reader)
+        {
+            CreateMagneticPullFieldNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref CreateMagneticPullFieldNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+        
+        private void SerializedLayChickenEggNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)LayChickenEggNetEvents.Count);
+
+            foreach (var netEvent in LayChickenEggNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedLayChickenEggNetEvents(NetDataReader reader)
+        {
+            LayChickenEggNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref LayChickenEggNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedChickenEggHitNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ChickenEggHitNetEvents.Count);
+
+            foreach (var netEvent in ChickenEggHitNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedChickenEggHitNetEvents(NetDataReader reader)
+        {
+            ChickenEggHitNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ChickenEggHitNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateYearsOfPainTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateYearsOfPainTalentNetEvents.Count);
+            foreach (var netEvent in ActivateYearsOfPainTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedActivateYearsOfPainTalentNetEvents(NetDataReader reader)
+        {
+            ActivateYearsOfPainTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateYearsOfPainTalentNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

@@ -195,6 +195,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                     var stocksCooldownConfig = (TalentStocksCooldownConfig) cooldownConfig;
                     newTalent.SetupWithStocksCooldown(stocksCooldownConfig.MaxStocks, stocksCooldownConfig.SingleStockCooldownInSeconds);
                     break;
+                case TalentCooldownType.AlwaysActive:
+                    newTalent.SetupWithAlwaysActive();
+                    break;
             }
         }
 

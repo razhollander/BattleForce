@@ -987,6 +987,9 @@ MonoBehaviour:
   _koProjectileViewPrefab: {fileID: 9213814470890300496, guid: a86c63ffab0304d369270a78cedc91d7, type: 3}
   _grapplingHookProjectileViewPrefab: {fileID: 4452206169606535078, guid: 058d6f8127a1043acaa0d8648f261868, type: 3}
   _dashPulseGustEffectViewPrefab: {fileID: 2651892565007212038, guid: 26b876fb431b54fffa58daf61e4d5811, type: 3}
+  _magneticPullFieldViewPrefab: {fileID: 4847719626318205942, guid: 7cd482f6bf67d433481abe04296c2986, type: 3}
+  _magneticPullHitEffectViewPrefab: {fileID: 6034426605437557338, guid: 7297de5ffddd34a6da8a721a6d79795c, type: 3}
+  _chickenEggViewPrefab: {fileID: 8334673388257318348, guid: 76fd7cd9194ac401cbae9285ed1554de, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

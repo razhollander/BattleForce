@@ -36,13 +36,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
+        [SerializeField] private PlayerChickenView _playerChickenView;
+        [SerializeField] private YearsOfPainView _yearsOfPainView;
+        [SerializeField] private GameObject _deadAura;
         
         private Transform _transform;
         private SpriteRenderer _leftEyeRenderer;
         private SpriteRenderer _rightEyeRenderer;
         private Sprite _defaultLeftEyeSprite;
         private Sprite _defaultRightEyeSprite;
-
+        
         public Action Despawn { get; set; }
 
         public void SetSentryGunState(bool isOn, CancellationTokenSource cancellationTokenSource)
@@ -62,6 +65,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             _sentryGunAnimator.StopAnimation();
             _sentryGunAnimator.gameObject.TrySetActive(false);
+        }
+
+        public void SetChickenState(bool isOn)
+        {
+            _playerChickenView.SetChickenState(isOn);
+        }
+        
+        public void PlayLayEggAnimation(CancellationTokenSource cancellationTokenSource)
+        {
+            _playerChickenView.PlayLayEggAnimation(cancellationTokenSource).Forget();
+        }
+        
+        public void PlayYearsOfPainAnimation(Vector2 direction, CancellationTokenSource cancellationTokenSource)
+        {
+            _yearsOfPainView.PlayAndHide(direction, cancellationTokenSource).Forget();
         }
 
         public void SetUmbrellaState(bool isOn)
@@ -185,9 +203,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             DisableSentryGunState();
             DisableSpinned();
             DisableUmbrellaState();
+            _playerChickenView.SetChickenState(false);
             gameObject.SetActive(false);
         }
-
+        
         private void DisableUmbrellaState()
         {
             _umbrellaStickView.HideUmbrella();
@@ -275,6 +294,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             ));
 
             UpdateEyesToLookAtAimArrow(rotation);
+        }
+
+        public void SetIsDeadAuraEnabled(bool isEnabled)
+        {
+            _deadAura.SetActive(isEnabled);
         }
     }
 }

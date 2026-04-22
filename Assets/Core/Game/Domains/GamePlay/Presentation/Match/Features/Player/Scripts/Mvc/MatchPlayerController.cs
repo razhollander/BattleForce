@@ -51,6 +51,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
+            var isDead = playerModel.Spaceship.Health.CurrentHealth == 0;
+            SetIsDeadAuraEnabled(isDead);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
         }
@@ -73,11 +75,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             {
                 SetUmbrellaState(currentSelectedTalentState.IsActive);
             }
+            else if (currentSelectedTalentState.TalentType == TalentType.Chicken)
+            {
+                SetChickenState(true);
+            }
         }
 
         public void SetSentryGunState(bool isSentryGun, CancellationTokenSource cancellationTokenSource)
         {
             _playerView.SetSentryGunState(isSentryGun, cancellationTokenSource);
+        }
+
+        public void PlayLayEggAnimation(CancellationTokenSource cancellationTokenSource)
+        {
+            _playerView.PlayLayEggAnimation(cancellationTokenSource);
+        }
+
+        public void SetChickenState(bool isChickenActive)
+        {
+            _playerView.SetChickenState(isChickenActive);
         }
 
         public void SetUmbrellaState(bool isUmbrellaActive)
@@ -93,6 +109,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentType];
             _playerView.SetTalentSprite(talentSprite);
             UpdateIsArrowShownAccordingToTalentState(talentState);
+            var isInChickenState = talentType == TalentType.Chicken;
+            SetChickenState(isInChickenState);
         }
 
         public void UpdateTickDeltas()
@@ -149,6 +167,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 case TalentCooldownType.Stocks:
                     maxCooldown = currentSelectedTalentState.StocksCooldown.MaxSingleStockCooldown;
                     cooldownLeft = currentSelectedTalentState.StocksCooldown.CurrentStocksAmount > 0 ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, currentSelectedTalentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
+                    break;
+                case TalentCooldownType.AlwaysActive:
+                    maxCooldown = 0;
+                    cooldownLeft = 0;
                     break;
                 default:
                     LogService.LogError("Not implemented cooldown type: " + currentSelectedTalentState.CooldownType);
@@ -218,6 +240,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var selectedTalentConfig = _gamePlayConfig.TalentsConfig.Talents[talentState.TalentType];
             var isArrowShown = !talentState.IsOnCooldown() && selectedTalentConfig.IsArrowShownWhileSelected && (talentState.IsActive && selectedTalentConfig.IsArrowShownWhileActive || !talentState.IsActive );
             _playerView.SetIsTalentArrowShown(isArrowShown, selectedTalentConfig.IsFrontArrow);
+        }
+
+        public void PlayerYearsOfPain(Vector2 direction)
+        {
+            _playerView.PlayYearsOfPainAnimation(direction.ToUnityVector2(), _stageCancellationTokenProvider.CancellationTokenSource);
+        }
+
+        public void SetIsDeadAuraEnabled(bool isEnabled)
+        {
+            _playerView.SetIsDeadAuraEnabled(isEnabled);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         
         public StartStagePacketS2C(MaxCap maxCap, int maxTalentsPerPlayer, int maxTeams)
         {
-            InitialState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, maxTeams);
+            InitialState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, maxTeams, maxCap.ConcurrentChickenEggs);
         }
 
         public void Serialize(NetDataWriter writer)
