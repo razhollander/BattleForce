@@ -13,6 +13,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
+using Core.Scripts.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
