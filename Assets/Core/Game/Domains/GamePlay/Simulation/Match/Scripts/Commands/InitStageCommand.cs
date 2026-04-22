@@ -154,7 +154,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
 
                 var direction = RNG.NextFloat(0, 360).AngleToVector();
-                var velocity = direction * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
+                var velocity = direction * _sharedGamePlayConfig.TargetMovementSpeed;
 
                 player.Spaceship.Health.CurrentHealth = health;
                 player.Spaceship.Health.MaxHealth = health;

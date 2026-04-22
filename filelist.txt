@@ -354,6 +354,8 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleActivateUmbrellaTalentNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleCreateGrapplingHookProjecitleNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleActivateUmbrellaTalentNetEventsCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleCreateGrapplingHookProjecitleNetEventsCommand.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleActivateUmbrellaTalentNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleCreateMagenticPullFieldNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleActivateUmbrellaTalentNetEventsCommand.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandleCreateGrapplingHookProjecitleNetEventsCommand.cs

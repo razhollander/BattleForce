@@ -21,4 +21,5 @@ public class SharedGamePlayConfig : ScriptableObject
     public float GrapplingHookProjectileSize = 1f;
     public float GrapplingHookProjectileMaxDistance = 30f;
     public float MagneticPullFieldRadius = 5f;
+    public float TargetMovementSpeed = 5f;
 }

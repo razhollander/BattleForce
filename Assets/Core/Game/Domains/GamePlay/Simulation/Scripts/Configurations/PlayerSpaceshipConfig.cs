@@ -7,7 +7,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
     public class PlayerSpaceshipConfig : ScriptableObject
     {
         public ushort StartHealth = 5;
-        public float TargetMovementSpeed = 5f;
         public float RotationSpeed = 5f;
         public float ShootCooldown = 0.7f;
         public float DefaultPlayerRadius = 0.7f;

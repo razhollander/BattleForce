@@ -12,16 +12,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
     {
         private readonly IMatchMakingDataService _matchDataService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly Transform _parent;
         public readonly ushort PlayerId;
         private PlayerView _playerView;
         private readonly PlayerViewPool _playerPool;
 
-        public MatchMakingPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchMakingDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, Transform parent)
+        public MatchMakingPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchMakingDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig, Transform parent)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _parent = parent;
             PlayerId = playerId;
         }
@@ -47,7 +49,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             var playerPosition = playerTransformState.Position.ToUnityVector2();
             var playerRotation = playerTransformState.Direction.ToUnityVector2().ToQuaternion();
             var exponentialDecay = _gamePlayConfig.ExponentialDecay;
+
+            var lastPosition = _playerView.GetPosition();
             _playerView.InterpolateTransform(playerPosition, playerRotation, exponentialDecay);
+            var currentPosition = _playerView.GetPosition();
+
+            var distance = Vector2.Distance(lastPosition.ToNumericsVector2(), currentPosition.ToNumericsVector2());
+            var speed = distance / Time.deltaTime;
+            var moveRatio = Mathf.Clamp01(speed / _sharedGamePlayConfig.TargetMovementSpeed);
+            _playerView.UpdateTailWaveMultiplier(moveRatio);
+
             _playerView.UpdateTailBend();
         }
 

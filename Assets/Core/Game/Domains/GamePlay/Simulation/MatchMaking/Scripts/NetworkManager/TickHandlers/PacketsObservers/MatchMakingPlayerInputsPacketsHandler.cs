@@ -25,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly IMatchMakingDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
 
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IPhysicsSimulator _physicsSimulator;
@@ -37,12 +38,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
 
         public MatchMakingPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
-            SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService)
+            SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _netEventsDataService = iNetEventsDataService;
             _physicsSimulator = physicsSimulator;
             _updateSubscriptionService = updateSubscriptionService;
@@ -207,7 +209,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             playerModel.Spaceship.Transform.Direction = rotatedVector;
             if (playerInputPacket.IsMoveForwardInputPressed)
             {
-                playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
+                playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _sharedGamePlayConfig.TargetMovementSpeed;
             }
             else
             {
