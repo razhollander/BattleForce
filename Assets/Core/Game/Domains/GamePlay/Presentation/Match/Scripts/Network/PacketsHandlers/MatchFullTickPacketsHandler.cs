@@ -196,7 +196,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessCreateMagenticPullFieldEvents(latestFullTickPacket.CreateMagneticPullFieldNetEvents);
             ProcessLayChickenEggEvents(latestFullTickPacket.LayChickenEggNetEvents);
             ProcessChickenEggHitEvents(latestFullTickPacket.ChickenEggHitNetEvents);
-
             ProcessActivateYearsOfPainTalentEvents(latestFullTickPacket.ActivateYearsOfPainTalentNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);

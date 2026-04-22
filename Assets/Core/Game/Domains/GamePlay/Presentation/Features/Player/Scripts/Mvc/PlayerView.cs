@@ -38,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
         [SerializeField] private PlayerChickenView _playerChickenView;
         [SerializeField] private YearsOfPainView _yearsOfPainView;
+        [SerializeField] private GameObject _deadAura;
         
         private Transform _transform;
         private SpriteRenderer _leftEyeRenderer;
@@ -288,6 +289,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             ));
 
             UpdateEyesToLookAtAimArrow(rotation);
+        }
+
+        public void SetIsDeadAuraEnabled(bool isEnabled)
+        {
+            _deadAura.SetActive(isEnabled);
         }
     }
 }

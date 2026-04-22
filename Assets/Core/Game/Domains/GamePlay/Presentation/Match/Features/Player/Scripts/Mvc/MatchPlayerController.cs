@@ -51,6 +51,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
+            var isDead = playerModel.Spaceship.Health.CurrentHealth == 0;
+            SetIsDeadAuraEnabled(isDead);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
         }
@@ -243,6 +245,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void PlayerYearsOfPain(Vector2 direction)
         {
             _playerView.PlayYearsOfPainAnimation(direction.ToUnityVector2(), _stageCancellationTokenProvider.CancellationTokenSource);
+        }
+
+        public void SetIsDeadAuraEnabled(bool isEnabled)
+        {
+            _playerView.SetIsDeadAuraEnabled(isEnabled);
         }
     }
 }

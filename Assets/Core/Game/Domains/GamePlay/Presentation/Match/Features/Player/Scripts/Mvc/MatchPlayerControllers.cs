@@ -110,6 +110,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).PlayerYearsOfPain(direction);
         }
 
+        public void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled)
+        {
+            GetPlayer(playerId).SetIsDeadAuraEnabled(isEnabled);
+        }
+
         public void UpdateIsPlayerArrowShownAccordingToTalentState(ushort playerId, TalentStateS2C talentStateS2C)
         {
             GetPlayer(playerId).UpdateIsArrowShownAccordingToTalentState(talentStateS2C);

@@ -36,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                  
                 _matchPlayerControllers.HidePlayerHealthBar(playerDiedEvent.PlayerId);
                 _matchPlayerControllers.SetIsTailWaving(playerDiedEvent.PlayerId, false);
+                _matchPlayerControllers.SetIsDeadAuraEnabled(playerDiedEvent.PlayerId, true);
                 _matchPlayerUIControllers.SwitchToPlayerDeadState(playerId);
             }
 
