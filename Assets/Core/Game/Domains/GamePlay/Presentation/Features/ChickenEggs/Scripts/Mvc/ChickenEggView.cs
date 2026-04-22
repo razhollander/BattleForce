@@ -26,19 +26,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.M
             _borkenEggSpriteRenderer.enabled = true;
             _breakCancellationTokenSource?.Cancel();
             _breakCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
-            await Awaitable.WaitForSecondsAsync(_brokenDurationInSeconds, cancellationTokenSource.Token);
+            await Awaitable.WaitForSecondsAsync(_brokenDurationInSeconds, _breakCancellationTokenSource.Token);
         }
 
         public void OnCreated()
         {
             
         }
-
-
+        
         public void OnSpawned()
         {
             gameObject.SetActive(true);
             _eggSpriteRenderer.enabled = true;
+            _borkenEggSpriteRenderer.enabled = false;
         }
 
         public void OnDespawned()
