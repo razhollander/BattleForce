@@ -60,7 +60,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     break;
                 case PhysicsBodyType.KOProjectile:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
-                                    | GetCollisionMask(PhysicsBodyType.Wall);
+                                    | GetCollisionMask(PhysicsBodyType.Wall)
+                                    | GetCollisionMask(PhysicsBodyType.ChickenEgg);
                     break;
                 case PhysicsBodyType.SwapField:
                     collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
@@ -72,7 +73,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     collisionMask = GetCollisionMask(PhysicsBodyType.Wall);
                     break;
                 case PhysicsBodyType.ChickenEgg:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsBodyType.KOProjectile);
                     break;
                 default:
                     collisionMask = 0xFFFF;

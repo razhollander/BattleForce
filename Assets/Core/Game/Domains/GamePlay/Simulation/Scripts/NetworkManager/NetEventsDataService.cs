@@ -1659,14 +1659,13 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
             }
         }
 
-        public void AddChickenEggHitNetEventS2C(int tick, ushort eggId, ushort hitPlayerId)
+        public void AddChickenEggHitNetEventS2C(int tick, ushort eggId)
         {
             foreach (var kvp in ChickenEggHitNetEventsPerPlayer)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = tick;
                 packet.EggId = eggId;
-                packet.HitByPlayerId = hitPlayerId;
             }
         }
     }

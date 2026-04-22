@@ -12,12 +12,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchPlayerControllers _matchPlayerControllers;
         private IMatchChickenEggsControllers _chickenEggsControllers;
+        private IMatchDataService _matchDataService;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
+            _matchDataService = _diContainer.Resolve<IMatchDataService>();
         }
 
         public void Execute()
@@ -27,8 +29,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in netEvents)
             {
-                _matchPlayerControllers.PlayLayEggAnimation(netEvent.CasterPlayerId);
-                _chickenEggsControllers.CreateEgg(netEvent.EggId, netEvent.Position);
+                var casterPlayerId = netEvent.CasterPlayerId;
+                var playerCasterTeamId = _matchDataService.GetPlayerTeamId(casterPlayerId);
+                _matchPlayerControllers.PlayLayEggAnimation(casterPlayerId);
+                _chickenEggsControllers.CreateEgg(netEvent.EggId, netEvent.Position, playerCasterTeamId);
             }
 
             netEvents.Clear();

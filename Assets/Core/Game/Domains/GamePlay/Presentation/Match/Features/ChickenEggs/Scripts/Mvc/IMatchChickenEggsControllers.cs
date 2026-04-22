@@ -7,7 +7,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
     public interface IMatchChickenEggsControllers
     {
         void InitEntryPoint();
-        void CreateEgg(ushort eggId, Vector2 position);
+        void CreateEgg(ushort eggId, Vector2 position, ushort teamId);
         void DestroyAll();
         Awaitable BreakAndDestroyEgg(ushort eggId, CancellationTokenSource cancellationTokenSource);
     }

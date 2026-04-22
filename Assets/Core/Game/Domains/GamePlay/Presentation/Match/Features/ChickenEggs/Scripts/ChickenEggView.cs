@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using Core.Scripts.Utils;
 using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 
@@ -8,16 +7,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.M
 {
     public class ChickenEggView : MonoBehaviour, IPoolable
     {
+        private static readonly int OUTLINE_SHADER_PROPERTY = Shader.PropertyToID("_OutlineColor");
+
         [SerializeField] private SpriteRenderer _eggSpriteRenderer;
         [SerializeField] private SpriteRenderer _borkenEggSpriteRenderer;
         [SerializeField] private float _brokenDurationInSeconds;
+        
+        private Material _eggMaterial;
 
         private CancellationTokenSource _breakCancellationTokenSource;
         public Action Despawn { get; set; }
 
-        public void SetPosition(Vector2 position)
+        public void Setup(Vector2 position, Color outlineColor)
         {
             transform.position = position;
+            _eggMaterial.SetColor(OUTLINE_SHADER_PROPERTY, outlineColor);
         }
 
         public async Awaitable PlayBreakAnimation(CancellationTokenSource cancellationTokenSource)
@@ -31,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.M
 
         public void OnCreated()
         {
-            
+            _eggMaterial = _eggSpriteRenderer.material;
         }
         
         public void OnSpawned()

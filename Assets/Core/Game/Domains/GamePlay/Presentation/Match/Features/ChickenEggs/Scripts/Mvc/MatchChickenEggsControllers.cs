@@ -14,12 +14,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
 {
     public class MatchChickenEggsControllers : IMatchChickenEggsControllers
     {
+        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IMatchDataService _matchDataService;
         private readonly ChickenEggPool _chickenEggPool;
         private readonly List<MatchChickenEggController> _eggControllers = new ();
         private Transform _eggsParent;
 
-        public MatchChickenEggsControllers(ChickenEggView chickenEggViewPrefab, DiContainer diContainer)
+        public MatchChickenEggsControllers(ChickenEggView chickenEggViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
         {
+            _gamePlayConfig = gamePlayConfig;
             _chickenEggPool = new ChickenEggPool(chickenEggViewPrefab, diContainer);
         }
 
@@ -29,10 +32,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
             _chickenEggPool.InitPool();
         }
 
-        public void CreateEgg(ushort eggId, Vector2 position)
+        public void CreateEgg(ushort eggId, Vector2 position, ushort teamId)
         {
+            var outlineColor = _gamePlayConfig.ColorPerTeamId[teamId];
             var controller = new MatchChickenEggController(eggId, _chickenEggPool, _eggsParent);
-            controller.CreateEggView(position.ToUnityVector2());
+            controller.CreateEggView(position.ToUnityVector2(), outlineColor);
             _eggControllers.Add(controller);
         }
 

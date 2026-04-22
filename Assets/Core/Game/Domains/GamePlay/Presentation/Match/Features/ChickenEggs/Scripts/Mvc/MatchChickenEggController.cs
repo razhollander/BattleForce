@@ -18,12 +18,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
             _eggsParent = eggsParent;
         }
 
-        public void CreateEggView(Vector2 position)
+        public void CreateEggView(Vector2 position, Color outlineColor)
         {
             _chickenEggView = _chickenEggPool.Spawn();
             _chickenEggView.name = "ChickenEgg_" + EggId;
             _chickenEggView.transform.SetParent(_eggsParent);
-            _chickenEggView.SetPosition(position);
+            _chickenEggView.Setup(position, outlineColor);
         }
 
         public async Awaitable PlayBreakAnimation(CancellationTokenSource cancellationTokenSource)
