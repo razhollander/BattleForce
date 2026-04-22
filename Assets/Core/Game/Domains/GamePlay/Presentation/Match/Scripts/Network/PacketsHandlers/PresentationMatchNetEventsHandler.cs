@@ -483,7 +483,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             if (netEvents.IsNullOrEmpty()) return;
             foreach (var netEvent in netEvents)
             {
-                LogService.LogError($"CLIENT Lay chicken egg {netEvent.EggId}");
                 _matchDataService.AddChickenEgg(netEvent.EggId, netEvent.CasterPlayerId, netEvent.Position.ToUnityVector2());
                 _cachedPresentationEventsService.LayChickenEggNetEvents.Add(netEvent);
             }
@@ -541,6 +540,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.MagneticPull, netEvent.TalentCooldownEndTick);
                 _cachedPresentationEventsService.CreateMagenticPullFieldNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessActivateYearsOfPainTalentEvents(CapacityList<ActivateYearsOfPainTalentNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.YearsOfPain, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.ActivateYearsOfPainTalentNetEvents.Add(netEvent);
             }
         }
 

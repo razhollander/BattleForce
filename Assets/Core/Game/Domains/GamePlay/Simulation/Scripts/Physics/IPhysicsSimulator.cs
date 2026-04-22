@@ -51,5 +51,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void AddChickenEgg(ushort eggId, ushort teamId, Vector2 position, float eggRadius);
         Body GetChickenEgg(ushort chieckEggId);
         void RemoveChickenEgg(ushort eggId);
+        bool RectangleCastOnPlayers(Vector2 center, Vector2 size, float angleRadians, short ignoreTeamId, out PhysicsBodyData hitBodyData);
     }
 }

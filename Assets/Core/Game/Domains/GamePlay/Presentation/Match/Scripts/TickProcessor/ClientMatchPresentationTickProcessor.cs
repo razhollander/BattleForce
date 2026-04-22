@@ -62,6 +62,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleUpdatePlayerTalentStocksNetEventsCommand _handleUpdatePlayerTalentStocksNetEventsCommand;
         private readonly HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands;
         private readonly HandleCreateMagenticPullFieldNetEventsCommand _handleCreateMagenticPullFieldNetEventsCommand;
+        private readonly HandleActivateYearsOfPainTalentNetEventsCommand _handleActivateYearsOfPainTalentNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -112,6 +113,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleUpdatePlayerTalentStocksNetEventsCommand = commandFactory.CreateCommandVoid<HandleUpdatePlayerTalentStocksNetEventsCommand>();
             _handleCreateMagenticPullFieldNetEventsCommand = commandFactory.CreateCommandVoid<HandleCreateMagenticPullFieldNetEventsCommand>();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands = commandFactory.CreateCommandVoid<HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands>();
+            _handleActivateYearsOfPainTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateYearsOfPainTalentNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -166,6 +168,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePerformDashPulseNetEventsCommand.Execute();
             _handleUpdatePlayerTalentStocksNetEventsCommand.Execute();
             _handleCreateMagenticPullFieldNetEventsCommand.Execute();
+            _handleActivateYearsOfPainTalentNetEventsCommand.Execute();
             _updateKOProjectilesTransformCommand.Execute(); // must be after _handleDeactivateKOTalentNetEventsCommand.Execute();
             _updateGrapplingHookProjectilesTransformCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TalentCardsConfig
   m_EditorClassIdentifier: 
   TalentSprites:
-    m_keys: 010000000700000005000000040000000600000008000000090000000a000000
+    m_keys: 010000000700000005000000040000000600000008000000090000000a00000002000000
     m_values:
     - {fileID: 21300000, guid: 2746287099e6d4f679296cffec516a5d, type: 3}
     - {fileID: 21300000, guid: 9dbf864e054e04c35bc89dc71c950ddc, type: 3}
@@ -23,3 +23,4 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 67c3bca6297274e838781eef2da69fc4, type: 3}
     - {fileID: 21300000, guid: 0316ca3048a8245188eddd7377d928de, type: 3}
     - {fileID: 21300000, guid: 3b729afa4603d42278138824cb238fc8, type: 3}
+    - {fileID: 21300000, guid: 41068d8362aca4c21a9f91be3489d42b, type: 3}

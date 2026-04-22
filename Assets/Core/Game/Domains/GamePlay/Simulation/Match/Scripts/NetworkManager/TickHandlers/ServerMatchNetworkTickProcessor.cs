@@ -246,6 +246,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.CreateMagneticPullFieldNetEvents = _netEventsDataService.CreateMagneticPullFieldNetEventsPerPlayer[playerId];
                 _fullTickPacket.LayChickenEggNetEvents = _netEventsDataService.LayChickenEggNetEventsPerPlayer[playerId];
                 _fullTickPacket.ChickenEggHitNetEvents = _netEventsDataService.ChickenEggHitNetEventsPerPlayer[playerId];
+                _fullTickPacket.ActivateYearsOfPainTalentNetEvents = _netEventsDataService.ActivateYearsOfPainTalentNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

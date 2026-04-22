@@ -61,7 +61,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<ushort, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsPerPlayer { get; }
         public CapacityDict<ushort, FixedUnorderedList<ChickenEggHitNetEventS2C>> ChickenEggHitNetEventsPerPlayer { get; }
-        
+        public CapacityDict<ushort, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> ActivateYearsOfPainTalentNetEventsPerPlayer { get; }
+
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>> _matchMakingPlayerJoinAcceptListPool;
@@ -107,6 +108,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> _deactivateUmbrellaTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>> _layChickenEggNetEventsPool;
         private readonly ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>> _chickenEggHitNetEventsPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> _activateYearsOfPainTalentNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -156,7 +158,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             DeactivateUmbrellaTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
             LayChickenEggNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<LayChickenEggNetEventS2C>>(maxConcurrentPlayers);
             ChickenEggHitNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<ChickenEggHitNetEventS2C>>(maxConcurrentPlayers);
-            
+            ActivateYearsOfPainTalentNetEventsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(maxConcurrentPlayers);
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -219,6 +221,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _deactivateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
             _layChickenEggNetEventsPool = new ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>>(() => new FixedUnorderedList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents), maxConcurrentPlayers);
             _chickenEggHitNetEventsPool = new ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>>(() => new FixedUnorderedList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents), maxConcurrentPlayers);
+            _activateYearsOfPainTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingPlayerEvents(ushort playerId)
@@ -519,6 +522,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 ChickenEggHitNetEventsPerPlayer.Add(playerId, _chickenEggHitNetEventsPool.Get());
             }
+            if (!ActivateYearsOfPainTalentNetEventsPerPlayer.ContainsKey(playerId))
+            {
+                ActivateYearsOfPainTalentNetEventsPerPlayer.Add(playerId, _activateYearsOfPainTalentNetEventsListPool.Get());
+            }
         }
         
         public void StopSavingPlayerEvents(ushort playerId)
@@ -676,7 +683,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var chickenEggHitNetEventsList = ChickenEggHitNetEventsPerPlayer[playerId];
             chickenEggHitNetEventsList.Clear();
             _chickenEggHitNetEventsPool.Return(chickenEggHitNetEventsList);
-            
+
+            var activateYearsOfPainTalentNetEventsList = ActivateYearsOfPainTalentNetEventsPerPlayer[playerId];
+            activateYearsOfPainTalentNetEventsList.Clear();
+            _activateYearsOfPainTalentNetEventsListPool.Return(activateYearsOfPainTalentNetEventsList);
+
             BulletSpawnNetEventsPerPlayer.Remove(playerId);
             PlayerRejoinAcceptNetEventsPerPlayer.Remove(playerId);
             MatchMakingPlayerJoinAcceptNetEventsPerPlayer.Remove(playerId);
@@ -718,6 +729,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             DeactivateUmbrellaTalentNetEventsPerPlayer.Remove(playerId);
             LayChickenEggNetEventsPerPlayer.Remove(playerId);
             ChickenEggHitNetEventsPerPlayer.Remove(playerId);
+            ActivateYearsOfPainTalentNetEventsPerPlayer.Remove(playerId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -1329,6 +1341,17 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                     }
                 }
             }
+
+            if (ActivateYearsOfPainTalentNetEventsPerPlayer.TryGetValue(playerId, out var activateYearsOfPainTalentNetEvents))
+            {
+                for (int i = activateYearsOfPainTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateYearsOfPainTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateYearsOfPainTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
@@ -1656,6 +1679,20 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                 packet.CasterPlayerId = casterId;
                 packet.EggId = eggId;
                 packet.Position = position;
+            }
+        }
+
+        public void AddActivateYearsOfPainTalentNetEventS2C(int onTick, ushort casterPlayerId, Vector2 direction, int talentCooldownEndTick, bool hasHit, ushort hitEnemyId)
+        {
+            foreach (var kvp in ActivateYearsOfPainTalentNetEventsPerPlayer)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.Direction = direction;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+                packet.HasHit = hasHit;
+                packet.HitEnemyId = hitEnemyId;
             }
         }
 

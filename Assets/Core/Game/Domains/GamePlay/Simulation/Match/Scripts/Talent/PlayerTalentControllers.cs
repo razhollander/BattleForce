@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly UmbrellaTalentController _umbrellaTalentController;
         private readonly MagneticPullTalentController _magneticPullTalentController;
         private readonly ChickenTalentController _chickenTalentController;
+        private readonly YearsOfPainTalentController _yearsOfPainTalentController;
         
         private ushort _casterPlayerId;
 
@@ -34,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig);
             _magneticPullTalentController = new MagneticPullTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
             _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfig, networkConfig, physicsSimulator);
+            _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, commandFactory);
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -47,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _umbrellaTalentController.SetCasterId(casterPlayerId);
             _magneticPullTalentController.SetCasterId(casterPlayerId);
             _chickenTalentController.SetCasterId(casterPlayerId);
+            _yearsOfPainTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)
@@ -61,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.Umbrella: return _umbrellaTalentController;
                 case TalentType.MagneticPull: return _magneticPullTalentController;
                 case TalentType.Chicken: return _chickenTalentController;
+                case TalentType.YearsOfPain: return _yearsOfPainTalentController;
                 default: return default;
             }
         }
@@ -80,6 +84,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _umbrellaTalentController?.OnTick(tick, deltaTime);
             _magneticPullTalentController?.OnTick(tick, deltaTime);
             _chickenTalentController?.OnTick(tick, deltaTime);
+            _yearsOfPainTalentController?.OnTick(tick, deltaTime);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)
@@ -117,6 +122,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _umbrellaTalentController.ResetData();
             _magneticPullTalentController.ResetData();
             _chickenTalentController.ResetData();
+            _yearsOfPainTalentController.ResetData();
         }
     }
 }
