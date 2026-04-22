@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.M
         private CancellationTokenSource _breakCancellationTokenSource;
         public Action Despawn { get; set; }
 
-        public void Setup(Vector2 position, Color outlineColor)
+        public void Setup(Vector3 position, Color outlineColor)
         {
             transform.position = position;
             _eggMaterial.SetColor(OUTLINE_SHADER_PROPERTY, outlineColor);

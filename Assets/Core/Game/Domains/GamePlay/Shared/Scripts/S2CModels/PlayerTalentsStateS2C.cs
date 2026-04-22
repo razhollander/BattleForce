@@ -176,6 +176,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             NormalCooldown.MaxCooldown = maxCooldown;
             NormalCooldown.CooldownEndTick = 0;
             StocksCooldown = default;
+            AlwaysActiveCooldown = default;
         }
         
         public void SetupWithStocksCooldown(int maxStocksAmount, float singleStockCooldown)
@@ -186,6 +187,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             StocksCooldown.MaxSingleStockCooldown = singleStockCooldown;
             StocksCooldown.RecieveNextStockOnTick = 0;
             NormalCooldown = default;
+            AlwaysActiveCooldown = default;
         }
 
         public void SetupWithAlwaysActive()

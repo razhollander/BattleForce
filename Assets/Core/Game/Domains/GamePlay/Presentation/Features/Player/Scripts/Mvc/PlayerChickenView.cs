@@ -24,16 +24,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
                 return;
             }
 
-            _layEggCancellationTokenSource?.Cancel();
-            _layEggCancellationTokenSource?.Dispose();
-            _layEggCancellationTokenSource = null;
+            StopLayEggAnimation();
         }
 
         public async Awaitable PlayLayEggAnimation(CancellationTokenSource cancellationTokenSource)
         {
             _chikenBodySpriteRenderer.sprite = _chickenLaySprite;
-            _layEggCancellationTokenSource?.Cancel();
-            _layEggCancellationTokenSource?.Dispose();
+            StopLayEggAnimation();
             _layEggCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
 
             try
@@ -44,6 +41,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             {
                 _chikenBodySpriteRenderer.sprite = _chickenIdleSprite;
             }
+        }
+
+        private void StopLayEggAnimation()
+        {
+            _layEggCancellationTokenSource?.Cancel();
+            _layEggCancellationTokenSource?.Dispose();
+            _layEggCancellationTokenSource = null;
         }
     }
 }

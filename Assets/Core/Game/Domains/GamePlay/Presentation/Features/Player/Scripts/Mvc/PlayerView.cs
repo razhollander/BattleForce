@@ -69,7 +69,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetChickenState(bool isOn)
         {
             _playerChickenView.SetChickenState(isOn);
-            
         }
         
         public void PlayLayEggAnimation(CancellationTokenSource cancellationTokenSource)

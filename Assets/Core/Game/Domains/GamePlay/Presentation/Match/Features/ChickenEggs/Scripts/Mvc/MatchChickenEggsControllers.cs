@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.Mvc;
@@ -59,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
             }
         }
 
-        public void DestroyEgg(ushort eggId)
+        private void DestroyEgg(ushort eggId)
         {
             var controller = GetEgg(eggId);
             if (controller == null)

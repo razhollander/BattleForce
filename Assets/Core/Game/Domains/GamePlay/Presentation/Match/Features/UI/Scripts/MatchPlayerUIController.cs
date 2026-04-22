@@ -75,21 +75,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                         UpdateTalentViewStocksCooldown(talentState, i, currentServerTick);
                         break;
                     case TalentCooldownType.AlwaysActive:
-                        //UpdateTalentViewAlwaysActiveCooldown(talentState, i, currentServerTick);
                         break;
                     default: LogService.LogError("Not implemented cooldown type: " + talentState.CooldownType);
                         break;
                 }
             }
-        }
-
-        private void UpdateTalentViewAlwaysActiveCooldown(TalentStateS2C talentState, int talentViewIndex, int currentServerTick)
-        {
-            var maxCooldown = talentState.StocksCooldown.MaxSingleStockCooldown;
-            var isOnCooldown = talentState.StocksCooldown.IsOnCooldown();
-            var cooldownLeft = talentState.StocksCooldown.IsAtMaxStocks() ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
-            _view.UpdateTalentCooldown(talentViewIndex, maxCooldown, cooldownLeft, isOnCooldown);
-            _view.UpdateTalentStocks(talentViewIndex, talentState.StocksCooldown.CurrentStocksAmount);
         }
         
         private void UpdateTalentViewStocksCooldown(TalentStateS2C talentState, int talentViewIndex, int currentServerTick)

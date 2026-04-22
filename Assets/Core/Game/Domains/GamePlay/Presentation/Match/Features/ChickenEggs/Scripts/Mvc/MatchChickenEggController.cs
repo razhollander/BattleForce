@@ -1,5 +1,6 @@
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.LayerOrders;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc
@@ -23,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
             _chickenEggView = _chickenEggPool.Spawn();
             _chickenEggView.name = "ChickenEgg_" + EggId;
             _chickenEggView.transform.SetParent(_eggsParent);
-            _chickenEggView.Setup(position, outlineColor);
+            _chickenEggView.Setup(new Vector3(position.x, position.y, LayerOrder.ChickenEgg), outlineColor);
         }
 
         public async Awaitable PlayBreakAnimation(CancellationTokenSource cancellationTokenSource)
