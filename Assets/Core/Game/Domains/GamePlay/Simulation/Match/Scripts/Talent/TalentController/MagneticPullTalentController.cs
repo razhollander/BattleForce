@@ -95,8 +95,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var forceToEnemy = -directionToEnemy * pullForce;
             var forceToPlayer = directionToEnemy * pullForce;
-            hitEnemyPlayer.Spaceship.Transform.Velocity += forceToEnemy;
-            casterPlayerState.Spaceship.Transform.Velocity += forceToPlayer;
+            _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>().SetPlayerId(hitEnemyPlayer.Id).SetForce(forceToEnemy).ShouldTurnOffEngine(false).Execute();
+            _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>().SetPlayerId(casterPlayerState.Id).SetForce(forceToPlayer).ShouldTurnOffEngine(false).Execute();
                 
             var randomSpin = RNG.NextFloat(config.MinSpin, config.MaxSpin);
             _spinPlayerCommand.SetPlayer(hitEnemyPlayer.Id).SetSpinAmount(randomSpin).SetTick(tick).Execute();

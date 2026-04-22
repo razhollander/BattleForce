@@ -36,6 +36,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         bool CircleCast(Vector2 center, float radius, params PhysicsBodyType[] bodyTypes);
         bool RectangleCast(Vector2 center, Vector2 size, float angleRadians, params PhysicsBodyType[] bodyTypes);
         void AddStartMatchWall(ushort id, Vector2 position, float radius);
+        void AddRockWall(ushort id, Vector2 position, float radius);
+        void RemoveRockWall(ushort id);
         void AddEnvironmentSpring(ushort id, Vector2 position, float rotationDegrees, Vector2 size);
         void AddTeleportGate(ushort id, Vector2 position, float rotation, Vector2 size);
         void AddSwapField(ushort id, ushort teamId, Vector2 position);

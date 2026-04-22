@@ -1,9 +1,11 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.CommandFactory;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -17,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly INetEventsDataService _netEventsDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
+        private readonly ICommandFactory _commandFactory;
         private readonly IPhysicsSimulator _physicsSimulator;
 
         private ushort _casterPlayerId;
@@ -69,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var config = _gamePlayConfig.Talents.ChickenTalentConfig;
 
             var movementDirection = casterPlayerState.Spaceship.Transform.Direction;
-            casterPlayerState.Spaceship.Transform.Velocity += movementDirection * config.PushForce;
+            _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>().SetPlayerId(_casterPlayerId).SetForce(movementDirection * config.PushForce).ShouldTurnOffEngine(false).Execute();
 
             var egg = _matchDataService.AddChickenEgg(_casterPlayerId, casterPlayerState.Spaceship.Transform.Position);
             _physicsSimulator.AddChickenEgg(egg.Id, casterPlayerState.TeamId, egg.Position, casterPlayerState.Spaceship.Transform.Radius);

@@ -10,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         GrapplingHook = 7,
         Umbrella = 8,
         MagneticPull = 9,
-        Chicken = 10
+        Chicken = 10,
+        Rock = 11
     }
 }

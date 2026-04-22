@@ -1,9 +1,11 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
@@ -14,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IMatchDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
+        private readonly ICommandFactory _commandFactory;
         
         private ushort _casterPlayerId;
         private int _startTick;
@@ -31,12 +34,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
         }
 
-        public UmbrellaTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
+        public UmbrellaTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
+            _commandFactory = commandFactory;
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -101,7 +105,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            casterPlayerState.Spaceship.Transform.Velocity += aimDirection * _gamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick * deltaTime;
+            _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>().SetPlayerId(_casterPlayerId).SetForce(aimDirection * _gamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick * deltaTime).ShouldTurnOffEngine(false).Execute();
         }
 
         private void DeactivateTalent(int tick)

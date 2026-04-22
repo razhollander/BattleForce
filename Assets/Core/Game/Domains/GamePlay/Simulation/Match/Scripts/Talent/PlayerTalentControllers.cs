@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly UmbrellaTalentController _umbrellaTalentController;
         private readonly MagneticPullTalentController _magneticPullTalentController;
         private readonly ChickenTalentController _chickenTalentController;
+        private readonly RockTalentController _rockTalentController;
         
         private ushort _casterPlayerId;
 
@@ -28,12 +29,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         {
             _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
             _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, commandFactory);
-            _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig);
+            _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig, commandFactory);
             _sentryGunTalentController = new SentryGunTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig, networkConfig, commandFactory);
-            _grapplingHookTalentController = new GrapplingHookTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig);
-            _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig);
+            _grapplingHookTalentController = new GrapplingHookTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
+            _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig, commandFactory);
             _magneticPullTalentController = new MagneticPullTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
-            _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfig, networkConfig, physicsSimulator);
+            _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfig, networkConfig, physicsSimulator, commandFactory);
+            _rockTalentController = new RockTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig, physicsSimulator);
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -47,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _umbrellaTalentController.SetCasterId(casterPlayerId);
             _magneticPullTalentController.SetCasterId(casterPlayerId);
             _chickenTalentController.SetCasterId(casterPlayerId);
+            _rockTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)
@@ -61,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.Umbrella: return _umbrellaTalentController;
                 case TalentType.MagneticPull: return _magneticPullTalentController;
                 case TalentType.Chicken: return _chickenTalentController;
+                case TalentType.Rock: return _rockTalentController;
                 default: return default;
             }
         }
@@ -80,6 +84,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _umbrellaTalentController?.OnTick(tick, deltaTime);
             _magneticPullTalentController?.OnTick(tick, deltaTime);
             _chickenTalentController?.OnTick(tick, deltaTime);
+            _rockTalentController?.OnTick(tick, deltaTime);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)
@@ -117,6 +122,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _umbrellaTalentController.ResetData();
             _magneticPullTalentController.ResetData();
             _chickenTalentController.ResetData();
+            _rockTalentController.ResetData();
         }
     }
 }

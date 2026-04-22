@@ -40,6 +40,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents;
         public FixedUnorderedList<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents;
         public FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents;
+        public FixedUnorderedList<ActivateRockTalentNetEventS2C> ActivateRockTalentNetEvents;
+        public FixedUnorderedList<DeactivateRockTalentNetEventS2C> DeactivateRockTalentNetEvents;
         public FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
         public FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C> PlayerMaxShootCooldownChangedNetEvents;
@@ -98,6 +100,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PerformDashPulseNetEvents = new FixedUnorderedList<PerformDashPulseNetEventS2C>(maxCap.PerformDashPulseNetEvents);
             ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
             DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
+            ActivateRockTalentNetEvents = new FixedUnorderedList<ActivateRockTalentNetEventS2C>(maxCap.ActivateRockTalentNetEvents);
+            DeactivateRockTalentNetEvents = new FixedUnorderedList<DeactivateRockTalentNetEventS2C>(maxCap.DeactivateRockTalentNetEvents);
             UpdatePlayerTalentStocksNetEvents = new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(maxCap.UpdatePlayerTalentStocksNetEvents);
             PlayerMaxShootCooldownChangedNetEvents = new FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>(maxCap.PlayerMaxShootCooldownChangedNetEvents);
             ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
@@ -140,6 +144,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedPerformDashPulseNetEvents(writer);
             SerializedActivateSentryGunTalentNetEvents(writer);
             SerializedDeactivateSentryGunTalentNetEvents(writer);
+            SerializedActivateRockTalentNetEvents(writer);
+            SerializedDeactivateRockTalentNetEvents(writer);
             SerializedUpdatePlayerTalentStocksNetEvents(writer);
             SerializedPlayerSpinnedStartedEvents(writer);
             SerializedPlayerSpinnedEndedEvents(writer);
@@ -336,6 +342,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedPerformDashPulseNetEvents(reader);
             DeserializedActivateSentryGunTalentNetEvents(reader);
             DeserializedDeactivateSentryGunTalentNetEvents(reader);
+            DeserializedActivateRockTalentNetEvents(reader);
+            DeserializedDeactivateRockTalentNetEvents(reader);
             DeserializedUpdatePlayerTalentStocksNetEvents(reader);
             DeserializedPlayerSpinnedStartedEvents(reader);
             DeserializedPlayerSpinnedEndedEvents(reader);
@@ -383,6 +391,47 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
                 netEvent.Deserialize(reader);
             }
         }
+
+        private void SerializedActivateRockTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateRockTalentNetEvents.Count);
+            foreach (var netEvent in ActivateRockTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void SerializedDeactivateRockTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateRockTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateRockTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedActivateRockTalentNetEvents(NetDataReader reader)
+        {
+            var count = reader.GetByte();
+            ActivateRockTalentNetEvents.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateRockTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedDeactivateRockTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateRockTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateRockTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
 
         private void DeserializedDeactivateKOTalentNetEvents(NetDataReader reader)
         {

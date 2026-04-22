@@ -362,9 +362,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var force = pushDirection * forceMagnitude;
             var randomSpin = RNG.NextFloat(_gamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfig.EnvironmentSprings.MaxSpin);
 
-            playerState.Spaceship.Transform.Velocity += force;
-            playerState.Spaceship.Transform.Direction = force.Normalize();
-            playerState.Spaceship.IsEngineOn = false;
+            _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>().SetPlayerId(playerId).SetForce(force).ShouldTurnOffEngine(true).Execute();
+            if (!_matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.Rock))
+            {
+                playerState.Spaceship.Transform.Direction = force.Normalize();
+            }
 
             _spinPlayerCommand
                 .SetPlayer(playerId)

@@ -28,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
+        private readonly ICommandFactory _commandFactory;
         private readonly SharedGamePlayConfig _sharedConfig;
         private readonly ICommandFactory _commandFactory;
         private readonly SpinPlayerCommand _spinPlayerCommand;
@@ -171,7 +172,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                         else
                         {
                             var directionToHook = Vector2.Normalize(projectile.Position - casterPlayerState.Spaceship.Transform.Position);
-                            casterPlayerState.Spaceship.Transform.Velocity += directionToHook * config.PlayerPullForceWhileHooked * deltaTime;
+                            _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>().SetPlayerId(_casterPlayerId).SetForce(directionToHook * config.PlayerPullForceWhileHooked * deltaTime).ShouldTurnOffEngine(false).Execute();
 
                             casterPlayerState.Spaceship.Transform.Direction = MathUtils.RotateTowards(casterPlayerState.Spaceship.Transform.Direction,
                                 casterPlayerState.Spaceship.Transform.Velocity, config.PlayerRotateSpeedWhileHooked * deltaTime);

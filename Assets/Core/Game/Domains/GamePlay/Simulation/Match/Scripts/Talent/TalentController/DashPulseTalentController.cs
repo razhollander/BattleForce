@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 
@@ -9,18 +10,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 {
     public class DashPulseTalentController : ITalentController
     {
+        private readonly ICommandFactory _commandFactory;
         private ushort _casterPlayerId;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IOverrideableNetEventsService _overrideableNetEventsService;
         private readonly IMatchDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
 
-        public DashPulseTalentController(INetEventsDataService netEventsDataService, IOverrideableNetEventsService overrideableNetEventsService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig)
+        public DashPulseTalentController(INetEventsDataService netEventsDataService, IOverrideableNetEventsService overrideableNetEventsService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _overrideableNetEventsService = overrideableNetEventsService;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
+            _commandFactory = commandFactory;
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -58,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var direction = casterPlayerState.Spaceship.Transform.Direction;
             var pushForce = direction * _gamePlayConfig.Talents.PulseDashConfig.DashVelocity;
-            casterPlayerState.Spaceship.Transform.Velocity += pushForce;
+            _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>().SetPlayerId(_casterPlayerId).SetForce(pushForce).ShouldTurnOffEngine(false).Execute();
 
             _netEventsDataService.AddPerformDashPulseNetEvent(tick, _casterPlayerId);
             

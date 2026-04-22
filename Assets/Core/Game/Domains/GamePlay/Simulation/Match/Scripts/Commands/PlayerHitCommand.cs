@@ -92,6 +92,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(_playerIdGotHit);
 
+            var isRockActive = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerIdGotHit, TalentType.Rock);
+            if (isRockActive)
+            {
+                return;
+            }
+
             if (!playerState.Spaceship.IsAlive)
             {
                 return;

@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -45,6 +46,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public void Execute()
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(_playerId);
+
+            var isRockActive = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerId, TalentType.Rock);
+            if (isRockActive)
+            {
+                return;
+            }
             playerState.Spaceship.Transform.Velocity += _force;
 
             if (_shouldTurnOffEngine)

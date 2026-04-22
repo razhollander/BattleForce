@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -39,6 +40,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
+            var isRockActive = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerId, TalentType.Rock);
+            if (isRockActive)
+            {
+                return;
+            }
             var playerSpaceship = _matchDataService.SimulationState.GetPlayerById(_playerId).Spaceship;
             playerSpaceship.Transform.AngularVelocity += _spinAmount;
             var isSpinningNow = playerSpaceship.Transform.AngularVelocity != 0;

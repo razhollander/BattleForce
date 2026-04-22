@@ -746,6 +746,45 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return shape;
         }
 
+                private readonly Dictionary<ushort, Body> _rockWalls = new Dictionary<ushort, Body>();
+
+        public void AddRockWall(ushort id, Vector2 position, float radius)
+        {
+            var circleShape = new CircleShape();
+            circleShape.Radius = radius;
+
+            var bd = new BodyDef();
+            bd.type = BodyType.Static;
+            bd.position = position;
+
+            var body = _world.CreateBody(bd);
+
+            var fd = new FixtureDef();
+            fd.shape = circleShape;
+            fd.friction = 0.0f;
+            fd.restitution = 1.0f;
+
+            var fixtureData = new PhysicsBodyData
+            {
+                Type = PhysicsBodyType.EnvironmentWall,
+                Id = id
+            };
+
+            var fixture = body.CreateFixture(fd);
+            fixture.UserData = fixtureData;
+
+            _rockWalls[id] = body;
+        }
+
+        public void RemoveRockWall(ushort id)
+        {
+            if (_rockWalls.TryGetValue(id, out var body))
+            {
+                _world.DestroyBody(body);
+                _rockWalls.Remove(id);
+            }
+        }
+
         public void AddStartMatchWall(ushort id, Vector2 position, float radius)
         {
             var bodyDef = GetBodyDef();

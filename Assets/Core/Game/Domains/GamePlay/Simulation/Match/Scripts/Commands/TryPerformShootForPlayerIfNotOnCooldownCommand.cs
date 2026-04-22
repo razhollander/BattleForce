@@ -46,6 +46,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             var playerModel = _matchDataService.SimulationState.GetPlayerById(_playerId);
             var shootState = playerModel.Spaceship.Shoot;
+            var isRockActive = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerId, TalentType.Rock);
+            if (isRockActive) return;
             var shouldShoot = shootState.CooldownSecondsLeft == shootState.MaxCooldown;
             if (!shouldShoot)
             {
