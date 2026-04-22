@@ -167,6 +167,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/ITalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/DashPulseTalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/SwapTalentController.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/YearsOfPainTalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/MagneticPullTalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/SentryGunTalentController.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Talent/TalentController/HammerTalentController.cs
@@ -206,6 +207,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/PulseDashConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/SwapTalentConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/GrapplingHookTalentConfig.cs
+./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/YearsOfPainTalentConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/UmbrellaTalentConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/SentryGunTalentConfig.cs
 ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/Talents/HammerTalentConfig.cs

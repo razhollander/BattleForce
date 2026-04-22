@@ -107,6 +107,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             ActivateYearsOfPainTalentNetEvents = new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(maxCap.ActivateYearsOfPainTalentNetEvents);
             ActivateUmbrellaTalentNetEvents = new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(maxCap.ActivateUmbrellaTalentNetEvents);
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
+            ActivateYearsOfPainTalentNetEvents = new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(maxCap.ActivateYearsOfPainTalentNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -149,6 +150,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedActivateYearsOfPainTalentNetEvents(writer);
             SerializedActivateUmbrellaTalentNetEvents(writer);
             SerializedDeactivateUmbrellaTalentNetEvents(writer);
+            SerializedActivateYearsOfPainTalentNetEvents(writer);
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -344,6 +346,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedActivateYearsOfPainTalentNetEvents(reader);
             DeserializedActivateUmbrellaTalentNetEvents(reader);
             DeserializedDeactivateUmbrellaTalentNetEvents(reader);
+            DeserializedActivateYearsOfPainTalentNetEvents(reader);
         }
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)

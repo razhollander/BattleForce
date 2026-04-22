@@ -621,6 +621,62 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return hasCollision;
         }
 
+        public bool RectangleCastOnPlayers(Vector2 center, Vector2 size, float angleRadians, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        {
+            _unityMainThreadDispatcher.EnqueueDraw(()=>DebugDrawUtils.DrawRotatedRect(center, size, angleRadians));
+            var hasCollision = false;
+            hitBodyData = default;
+
+            var hx = size.X * 0.5f;
+            var hy = size.Y * 0.5f;
+
+            var rot = Matrix3x2.CreateRotation(angleRadians);
+            var v1 = Vector2.Transform(new Vector2(-hx, -hy), rot) + center;
+            var v2 = Vector2.Transform(new Vector2(hx, -hy), rot) + center;
+            var v3 = Vector2.Transform(new Vector2(hx, hy), rot) + center;
+            var v4 = Vector2.Transform(new Vector2(-hx, hy), rot) + center;
+
+            var min = Vector2.Min(Vector2.Min(v1, v2), Vector2.Min(v3, v4));
+            var max = Vector2.Max(Vector2.Max(v1, v2), Vector2.Max(v3, v4));
+
+            var aabb = new AABB(min, max);
+            PhysicsBodyData hitBody = default;
+
+            _world.QueryAABB(fixture =>
+            {
+                var currentBodyData = (PhysicsBodyData) fixture.Body.UserData;
+                var shouldContinueQuery = true;
+                var isPlayerFromNotIgnoredTeam = currentBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && fixture.FilterData.groupIndex != -ignoreTeamId;
+                if (isPlayerFromNotIgnoredTeam)
+                {
+                    var polygonShape = GetPolygonShape();
+                    polygonShape.SetAsBox(hx, hy);
+
+                    var input = new ShapeCastInput();
+                    input.proxyA.Set(polygonShape, 0);
+                    input.proxyB.Set(fixture.Shape, 0);
+                    input.transformA = new Transform(center, rot);
+                    input.transformB = fixture.Body.GetTransform();
+                    input.translationB = Vector2.Zero;
+
+                    if (Contact.ShapeCast(out _, input))
+                    {
+                        hasCollision = true;
+                        hitBody = currentBodyData;
+                    }
+
+                    _polygonShapePool.Return(polygonShape);
+                    shouldContinueQuery = !hasCollision;
+                }
+
+                return shouldContinueQuery;
+            }, aabb);
+
+            hitBodyData = hitBody;
+
+            return hasCollision;
+        }
+
         public bool ArcCastOnPlayers(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData)
         {
             var arcAngleRad = arcAngleDegrees.ToRadians();
