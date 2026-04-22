@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _grapplingHookTalentController = new GrapplingHookTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig);
             _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig);
             _magneticPullTalentController = new MagneticPullTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
-            _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
+            _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, commandFactory);
         }
 
         public void SetCasterId(ushort casterPlayerId)
