@@ -37,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
         [SerializeField] private PlayerChickenView _playerChickenView;
+        [SerializeField] private YearsOfPainView _yearsOfPainView;
         
         private Transform _transform;
         private SpriteRenderer _leftEyeRenderer;
@@ -65,7 +66,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _sentryGunAnimator.gameObject.TrySetActive(false);
         }
 
-
         public void SetChickenState(bool isOn)
         {
             _playerChickenView.SetChickenState(isOn);
@@ -74,6 +74,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void PlayLayEggAnimation(CancellationTokenSource cancellationTokenSource)
         {
             _playerChickenView.PlayLayEggAnimation(cancellationTokenSource).Forget();
+        }
+        
+        public void PlayYearsOfPainAnimation(Vector2 direction, CancellationTokenSource cancellationTokenSource)
+        {
+            _yearsOfPainView.PlayAndHide(direction, cancellationTokenSource).Forget();
         }
 
         public void SetUmbrellaState(bool isOn)

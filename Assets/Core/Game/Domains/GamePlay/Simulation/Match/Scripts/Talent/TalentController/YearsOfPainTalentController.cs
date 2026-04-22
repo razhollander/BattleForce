@@ -66,11 +66,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
             var offset = casterPlayerState.Spaceship.Transform.Radius;
             var config = _gamePlayConfig.Talents.YearsOfPainTalentConfig;
-            var center = casterPlayerState.Spaceship.Transform.Position + (direction * (offset + config.RectSize.Y * 0.5f));
+            var colliderSize = config.RectangleColliderSize.ToNumericsVector2();
+            var center = casterPlayerState.Spaceship.Transform.Position + (direction * (offset + colliderSize.Y * 0.5f));
             var angleRadians = direction.ToAngleRadians();
             ushort hitEnemyId = 0;
 
-            var didHitEnemy = _physicsSimulator.RectangleCastOnPlayers(center, config.RectSize, angleRadians, (short) casterPlayerState.TeamId, out var hitBodyData);
+            var didHitEnemy = _physicsSimulator.RectangleCastOnPlayers(center, colliderSize, angleRadians, (short) casterPlayerState.TeamId, out var hitBodyData);
             if (didHitEnemy)
             {
                 hitEnemyId = hitBodyData.Id;

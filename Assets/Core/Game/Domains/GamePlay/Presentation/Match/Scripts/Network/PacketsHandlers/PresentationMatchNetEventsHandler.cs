@@ -483,7 +483,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             if (netEvents.IsNullOrEmpty()) return;
             foreach (var netEvent in netEvents)
             {
-                LogService.LogError($"CLIENT Lay chicken egg {netEvent.EggId}");
                 _matchDataService.AddChickenEgg(netEvent.EggId, netEvent.CasterPlayerId, netEvent.Position.ToUnityVector2());
                 _cachedPresentationEventsService.LayChickenEggNetEvents.Add(netEvent);
             }

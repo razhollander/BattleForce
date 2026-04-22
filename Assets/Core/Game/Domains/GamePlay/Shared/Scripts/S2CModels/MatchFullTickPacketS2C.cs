@@ -922,7 +922,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref LayChickenEggNetEvents.AddAndGet();
-                LogService.LogError($"CLIENT Deserialize egg");
                 netEvent.Deserialize(reader);
             }
         }

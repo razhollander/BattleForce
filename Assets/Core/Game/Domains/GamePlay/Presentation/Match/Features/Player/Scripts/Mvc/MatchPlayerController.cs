@@ -239,5 +239,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var isArrowShown = !talentState.IsOnCooldown() && selectedTalentConfig.IsArrowShownWhileSelected && (talentState.IsActive && selectedTalentConfig.IsArrowShownWhileActive || !talentState.IsActive );
             _playerView.SetIsTalentArrowShown(isArrowShown, selectedTalentConfig.IsFrontArrow);
         }
+
+        public void PlayerYearsOfPain(Vector2 direction)
+        {
+            _playerView.PlayYearsOfPainAnimation(direction.ToUnityVector2(), _stageCancellationTokenProvider.CancellationTokenSource);
+        }
     }
 }

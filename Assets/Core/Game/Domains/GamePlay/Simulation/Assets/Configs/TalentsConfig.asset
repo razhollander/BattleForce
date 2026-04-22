@@ -66,9 +66,10 @@ MonoBehaviour:
     PushForce: 15
     SpinAmount: 50
   YearsOfPainTalentConfig:
-    PushForce: 20
-    MaxSpin: 60
-    MinSpin: 40
+    RectangleColliderSize: {x: 3, y: 1.5}
+    PushForce: 100
+    MaxSpin: 100
+    MinSpin: 80
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:

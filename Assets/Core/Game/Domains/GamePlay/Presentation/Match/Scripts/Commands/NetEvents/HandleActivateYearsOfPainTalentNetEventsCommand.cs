@@ -1,7 +1,5 @@
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.YearsOfPainEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -9,13 +7,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     public class HandleActivateYearsOfPainTalentNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
-        private IYearsOfPainEffectController _yearsOfPainEffectController;
         private IMatchPlayerControllers _matchPlayerControllers;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
-            _yearsOfPainEffectController = _diContainer.Resolve<IYearsOfPainEffectController>();
             _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
         }
 
@@ -28,14 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in _cachedPresentationEventsService.ActivateYearsOfPainTalentNetEvents)
             {
-                var casterTransform = _matchPlayerControllers.GetPlayerSpaceshipTransform(netEvent.CasterPlayerId);
-                _yearsOfPainEffectController.PlayFieldEffect(casterTransform, netEvent.Direction.ToUnityVector2());
-
-                if (netEvent.HasHit)
-                {
-                    var enemyPosition = _matchPlayerControllers.GetPlayerPosition(netEvent.HitEnemyId);
-                    _yearsOfPainEffectController.PlayHitEffect(enemyPosition);
-                }
+                _matchPlayerControllers.PlayerYearsOfPainForPlayer(netEvent.CasterPlayerId, netEvent.Direction);
             }
 
             _cachedPresentationEventsService.ActivateYearsOfPainTalentNetEvents.Clear();

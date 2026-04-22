@@ -17,10 +17,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mv
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.YearsOfPainEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
@@ -62,8 +60,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private MagneticPullFieldView _magneticPullFieldViewPrefab;
         [SerializeField] private MagneticPullHitEffectView _magneticPullHitEffectViewPrefab;
         [SerializeField] private ChickenEggView _chickenEggViewPrefab;
-        [SerializeField] private YearsOfPainView _yearsOfPainFieldViewPrefab;
-        [SerializeField] private YearsOfPainHitEffectView _yearsOfPainHitEffectViewPrefab;
 
         public override void InstallBindings()
         {
@@ -106,7 +102,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<GrapplingHookProjectilesControllers>().AsSingle().WithArguments(_grapplingHookProjectileViewPrefab).NonLazy();
             Container.BindInterfacesTo<DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<MagneticPullEffectController>().AsSingle().WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab).NonLazy();
-            Container.BindInterfacesTo<YearsOfPainEffectController>().AsSingle().WithArguments(_yearsOfPainFieldViewPrefab, _yearsOfPainHitEffectViewPrefab).NonLazy();
         }
     }
 }
