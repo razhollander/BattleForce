@@ -117,6 +117,7 @@ MonoBehaviour:
         \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\": { \"x\": 50.0, \"y\":
         0.5 },\n    \"Size\": { \"x\": 1.2, \"y\": 1.2 },\n    \"Shape\": \"Circle\"\n 
         }\n]"
+      _stageBoundriesWallsJson: 
     - _environmentName: 
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
@@ -140,6 +141,7 @@ MonoBehaviour:
       _teleportGatesJson: 
       _rotatingWheelsJson: 
       _fieldBarriersJson: 
+      _stageBoundriesWallsJson: 
     - _environmentName: A
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: "[\n  {\n    \"Id\": 1,\n    \"Points\": [\n      { \"X\": 20.0,
@@ -261,6 +263,7 @@ MonoBehaviour:
         { \"X\": 0.5, \"Y\": -20.0 },\n          { \"X\": -0.5, \"Y\": -20.0 }\n       
         ]\n      }\n    ]\n  }\n]"
       _fieldBarriersJson: 
+      _stageBoundriesWallsJson: 
     - _environmentName: GPU
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: "[\n  {\"Id\": 1, \"Points\": [{\"X\": 22.50, \"Y\": 14.00}, {\"X\":
@@ -603,6 +606,7 @@ MonoBehaviour:
         \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\": { \"x\": 18.0, \"y\":
         8.0 },\n    \"Size\": { \"x\": 3.5, \"y\": 3.5 },\n    \"Shape\": \"Circle\"\n 
         }\n]"
+      _stageBoundriesWallsJson: 
     - _environmentName: Middle Lava River
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
@@ -646,6 +650,7 @@ MonoBehaviour:
         \"y\": 5\n    },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\":
         {\n      \"x\": 22,\n      \"y\": -14\n    },\n    \"Size\": {\n      \"x\":
         5,\n      \"y\": 5\n    },\n    \"Shape\": \"Circle\"\n  }\n]"
+      _stageBoundriesWallsJson: 
     - _environmentName: Swiss
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: "[\n  {\n    \"Id\": 6,\n    \"Points\": [\n      { \"X\": -28.16,
@@ -690,6 +695,7 @@ MonoBehaviour:
         {\n    \"Position\": {\n      \"x\": 14.32,\n      \"y\": 14.32\n    },\n   
         \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\":
         \"Circle\"\n  }\n]"
+      _stageBoundriesWallsJson: 
     - _environmentName: 4 rooms
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: "[\n  { \"Id\": 1, \"Points\": [{\"X\": 2, \"Y\": 26.16}, {\"X\":
@@ -754,6 +760,7 @@ MonoBehaviour:
         {\n    \"Position\": {\n      \"x\": -10.08,\n      \"y\": -10.08\n    },\n   
         \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\":
         \"Circle\"\n  }\n]"
+      _stageBoundriesWallsJson: 
     - _environmentName: Testing
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
@@ -781,4 +788,5 @@ MonoBehaviour:
       _teleportGatesJson: 
       _rotatingWheelsJson: 
       _fieldBarriersJson: 
+      _stageBoundriesWallsJson: 
   AvailableLayoutIndexes: 00000000030000000400000005000000

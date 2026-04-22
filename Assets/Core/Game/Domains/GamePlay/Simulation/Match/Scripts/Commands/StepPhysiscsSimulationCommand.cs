@@ -75,7 +75,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             _processCachedCollisionsCommand.SetProcessedTick(_tick).Execute();
             _enforceFieldBarriersCommand.SetTick(_tick).Execute();
-            //_enforceStageBarriersCommand.Execute();
         }
 
         private void ApplyMatchModelToPhysicsSimulation()

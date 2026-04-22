@@ -17,9 +17,3 @@ MonoBehaviour:
     - Id: 1
       Name: Raz
       TeamId: 1
-    - Id: 2
-      Name: Alon
-      TeamId: 2
-    - Id: 3
-      Name: Chen
-      TeamId: 1

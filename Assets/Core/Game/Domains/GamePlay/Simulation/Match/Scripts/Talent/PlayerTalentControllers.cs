@@ -15,12 +15,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly SwapTalentController _swapTalentController;
         private readonly KOTalentController _koTalentController;
         private readonly DashPulseTalentController _dashPulseTalentController;
-        //private HammerTalentController HammerTalentController;
-        //private BombTalentController BombTalentController;
         private readonly SentryGunTalentController _sentryGunTalentController;
         private readonly GrapplingHookTalentController _grapplingHookTalentController;
         private readonly UmbrellaTalentController _umbrellaTalentController;
         private readonly MagneticPullTalentController _magneticPullTalentController;
+        private readonly ChickenTalentController _chickenTalentController;
         
         private ushort _casterPlayerId;
 
@@ -34,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _grapplingHookTalentController = new GrapplingHookTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig);
             _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig);
             _magneticPullTalentController = new MagneticPullTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
+            _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfig, networkConfig, physicsSimulator);
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -46,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _grapplingHookTalentController.SetCasterId(casterPlayerId);
             _umbrellaTalentController.SetCasterId(casterPlayerId);
             _magneticPullTalentController.SetCasterId(casterPlayerId);
+            _chickenTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)
@@ -54,13 +55,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             {
                 case TalentType.Swap: return _swapTalentController;
                 case TalentType.KO: return _koTalentController;
-                //case TalentType.Hammer: return HammerTalentController;
-                //case TalentType.Bomb: return BombTalentController;
                 case TalentType.SentryGun: return _sentryGunTalentController;
                 case TalentType.DashPulse: return _dashPulseTalentController;
                 case TalentType.GrapplingHook: return _grapplingHookTalentController;
                 case TalentType.Umbrella: return _umbrellaTalentController;
                 case TalentType.MagneticPull: return _magneticPullTalentController;
+                case TalentType.Chicken: return _chickenTalentController;
                 default: return default;
             }
         }
@@ -74,13 +74,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         {
             _swapTalentController?.OnTick(tick, deltaTime);
             _koTalentController?.OnTick(tick, deltaTime);
-            //HammerTalentController?.OnTick(tick, deltaTime);
-            //BombTalentController?.OnTick(tick, deltaTime);
             _sentryGunTalentController?.OnTick(tick, deltaTime);
             _dashPulseTalentController?.OnTick(tick, deltaTime);
             _grapplingHookTalentController?.OnTick(tick, deltaTime);
             _umbrellaTalentController?.OnTick(tick, deltaTime);
             _magneticPullTalentController?.OnTick(tick, deltaTime);
+            _chickenTalentController?.OnTick(tick, deltaTime);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)
@@ -113,12 +112,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _swapTalentController.ResetData();
             _koTalentController.ResetData();
             _dashPulseTalentController.ResetData();
-            // HammerTalentController.ResetData();
-            // BombTalentController.ResetData();
             _sentryGunTalentController.ResetData();
             _grapplingHookTalentController.ResetData();
             _umbrellaTalentController.ResetData();
             _magneticPullTalentController.ResetData();
+            _chickenTalentController.ResetData();
         }
     }
 }

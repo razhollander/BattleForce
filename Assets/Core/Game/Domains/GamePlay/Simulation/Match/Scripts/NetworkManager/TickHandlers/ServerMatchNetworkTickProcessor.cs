@@ -244,6 +244,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.ActivateUmbrellaTalentNetEvents = _netEventsDataService.ActivateUmbrellaTalentNetEventsPerPlayer[playerId];
                 _fullTickPacket.DeactivateUmbrellaTalentNetEvents = _netEventsDataService.DeactivateUmbrellaTalentNetEventsPerPlayer[playerId];
                 _fullTickPacket.CreateMagneticPullFieldNetEvents = _netEventsDataService.CreateMagneticPullFieldNetEventsPerPlayer[playerId];
+                _fullTickPacket.LayChickenEggNetEvents = _netEventsDataService.LayChickenEggNetEventsPerPlayer[playerId];
+                _fullTickPacket.ChickenEggHitNetEvents = _netEventsDataService.ChickenEggHitNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }
