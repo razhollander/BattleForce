@@ -12,16 +12,16 @@ namespace Core.Scripts.Helpers
         [SerializeField] private float _framesPerSecond = 10f;
         [SerializeField] private Image _uiImage;
         
-        private CancellationTokenSource _animationCts;
+        private CancellationTokenSource _animationCancellationTokenSource;
 
         public async Awaitable PlayAnimation(CancellationTokenSource cancellationTokenSource)
         {
             StopAnimation();
-            _animationCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
+            _animationCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
             
             try 
             {
-                await RunAnimationLoop(_animationCts.Token);
+                await RunAnimationLoop(_animationCancellationTokenSource.Token);
             }
             catch (System.OperationCanceledException)
             {
@@ -62,11 +62,11 @@ namespace Core.Scripts.Helpers
 
         public void StopAnimation()
         {
-            if (_animationCts == null) return;
+            if (_animationCancellationTokenSource == null) return;
 
-            _animationCts.Cancel();
-            _animationCts.Dispose();
-            _animationCts = null;
+            _animationCancellationTokenSource.Cancel();
+            _animationCancellationTokenSource.Dispose();
+            _animationCancellationTokenSource = null;
         }
 
         private void OnDestroy()

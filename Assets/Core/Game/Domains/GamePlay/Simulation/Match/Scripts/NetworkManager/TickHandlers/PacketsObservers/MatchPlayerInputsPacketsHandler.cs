@@ -134,24 +134,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 var playerState = _matchDataService.SimulationState.GetPlayerByIndex(i);
                 var playerId = playerState.Id;
                 // UpdatePlayerShoot(processedTick, true, playerState);
-
-                if (!earliestInputPerPlayers.TryGetValue(playerId, out var playerInputPacket))
+                var isTalentInputPressed = false;
+                if (earliestInputPerPlayers.TryGetValue(playerId, out var playerInputPacket))
                 {
-                    LogService.LogTopic($"Didn't find any last cached inputs for player {playerId}!", LogTopicType.ServerNetwork);
-                    continue;
+                    playerState.Spaceship.TalentsState.AimDirection = playerInputPacket.AimDirection;
+                    UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
+                    UpdatePlayerDirection(playerInputPacket, playerState);
+                    ProcessPlayerSwitchTalentInput(processedTick, playerId, playerInputPacket, playerState);
+                    isTalentInputPressed = playerInputPacket.IsTalentInputPressed;
+                    
+                    if (_lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastPlayerInput))
+                    {
+                        _playerInputPacketsPool.Return(lastPlayerInput);
+                    }
+                    _lastProcessedInputPerPlayer[playerId] = playerInputPacket;
                 }
-
-                playerState.Spaceship.TalentsState.AimDirection = playerInputPacket.AimDirection;
-                UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
-                UpdatePlayerDirection(playerInputPacket, playerState);
-                ProcessPlayerTalentInput(processedTick, playerInputPacket.IsTalentInputPressed, playerState, deltaTime);
-                ProcessPlayerSwitchTalentInput(processedTick, playerId, playerInputPacket, playerState);
-
-                if (_lastProcessedInputPerPlayer.TryGetValue(playerId, out var lastPlayerInput))
-                {
-                    _playerInputPacketsPool.Return(lastPlayerInput);
-                }
-                _lastProcessedInputPerPlayer[playerId] = playerInputPacket;
+                
+                ProcessPlayerTalentInput(processedTick, isTalentInputPressed, playerState, deltaTime);
             }
 
             return earliestInputPerPlayers;

@@ -154,12 +154,16 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public TalentCooldownType CooldownType;
         public TalentNormalCooldownStateS2C NormalCooldown;
         public TalentStocksCooldownStateS2C StocksCooldown;
+        public TalentAwalysActiveCooldownStateS2C AlwaysActiveCooldown;
         public bool IsActive;
         
-        public bool IsOnCooldown() => 
-            CooldownType == TalentCooldownType.Normal
+        public bool IsOnCooldown()
+        {
+            if (CooldownType == TalentCooldownType.AlwaysActive) return false;
+            return CooldownType == TalentCooldownType.Normal
                 ? NormalCooldown.IsOnCooldown()
                 : StocksCooldown.IsOnCooldown();
+        }
 
         public void Setup(TalentType talentType)
         {
@@ -172,6 +176,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             NormalCooldown.MaxCooldown = maxCooldown;
             NormalCooldown.CooldownEndTick = 0;
             StocksCooldown = default;
+            AlwaysActiveCooldown = default;
         }
         
         public void SetupWithStocksCooldown(int maxStocksAmount, float singleStockCooldown)
@@ -182,6 +187,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             StocksCooldown.MaxSingleStockCooldown = singleStockCooldown;
             StocksCooldown.RecieveNextStockOnTick = 0;
             NormalCooldown = default;
+            AlwaysActiveCooldown = default;
+        }
+
+        public void SetupWithAlwaysActive()
+        {
+            CooldownType = TalentCooldownType.AlwaysActive;
+            NormalCooldown = default;
+            StocksCooldown = default;
         }
 
         public void Serialize(NetDataWriter writer)
@@ -225,7 +238,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public int CooldownEndTick; 
         public float MaxCooldown;
 
-        public bool IsOnCooldown() => CooldownEndTick > NO_COOLDOWN_TICK;
+        public bool IsOnCooldown() { return CooldownEndTick > NO_COOLDOWN_TICK; }
         
         public void Serialize(NetDataWriter writer)
         {
@@ -248,7 +261,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public int MaxStocksAmount;
         public int RecieveNextStockOnTick;
         public float MaxSingleStockCooldown;
-        public bool IsOnCooldown() => CurrentStocksAmount == 0;
+        public bool IsOnCooldown() { return CurrentStocksAmount == 0; }
         public bool IsAtMaxStocks() => CurrentStocksAmount == MaxStocksAmount;
         public void Serialize(NetDataWriter writer)
         {
@@ -271,5 +284,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             CurrentStocksAmount = MaxStocksAmount;
             RecieveNextStockOnTick = 0;
         }
+    }
+    
+    public struct TalentAwalysActiveCooldownStateS2C
+    {
+        
     }
 }

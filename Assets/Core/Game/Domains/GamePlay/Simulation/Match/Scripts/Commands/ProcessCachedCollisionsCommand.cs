@@ -92,9 +92,48 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandleKOProjectilePlayerCollision(objectA, objectB);
                 HandleKOProjectileWallCollision(objectA, objectB);
                 HandleGrapplingHookWallCollision(objectA, objectB);
+                HandleChickenEggPlayerCollision(objectA, objectB);
+                HandleChickenEggKOProjectileCollision(objectA, objectB);
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandleChickenEggKOProjectileCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            bool isEggToKOProjectile = objectA.PhysicsBodyType == PhysicsBodyType.ChickenEgg && objectB.PhysicsBodyType == PhysicsBodyType.KOProjectile;
+            bool isKOProjectileToEgg = objectB.PhysicsBodyType == PhysicsBodyType.ChickenEgg && objectA.PhysicsBodyType == PhysicsBodyType.KOProjectile;
+
+            if (!isEggToKOProjectile && !isKOProjectileToEgg)
+            {
+                return;
+            }
+
+            ushort eggId = isEggToKOProjectile ? objectA.Id : objectB.Id;
+            ushort koProjectileId = isEggToKOProjectile ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetChickenEggById(eggId, out var egg))
+            {
+                return;
+            }
+
+            if (!_matchDataService.SimulationState.TryGetKOProjectileById(koProjectileId, out var koProjectile))
+            {
+                return;
+            }
+            
+            var eggTeam = _matchDataService.SimulationState.GetPlayerById(egg.PlayerCasterId).TeamId;
+            var koProjectileTeam = _matchDataService.SimulationState.GetPlayerById(koProjectile.PlayerCasterId).TeamId;
+            var areFromTheSameTeam = koProjectileTeam == eggTeam;
+
+            if (areFromTheSameTeam)
+            {
+                return;
+            }
+            
+            _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId);
+            _physicsSimulator.RemoveChickenEgg(egg.Id);
+            _matchDataService.SimulationState.RemoveChickenEggById(egg.Id);
         }
 
         private void HandleGrapplingHookWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -116,6 +155,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _playersTalentsManager.HitGrapplingHookWithWall(projectile.PlayerCasterId, projectileId, wallId, _processedTick);
+        }
+
+        private void HandleChickenEggPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            bool isEggToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.ChickenEgg && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            bool isPlayerToEgg = objectB.PhysicsBodyType == PhysicsBodyType.ChickenEgg && objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isEggToPlayer && !isPlayerToEgg)
+            {
+                return;
+            }
+
+            ushort eggId = isEggToPlayer ? objectA.Id : objectB.Id;
+            ushort playerId = isEggToPlayer ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetChickenEggById(eggId, out var egg))
+            {
+                return;
+            }
+
+            var player = _matchDataService.SimulationState.GetPlayerById(playerId);
+            var areFromTheSameTeam = player.TeamId == _matchDataService.SimulationState.GetPlayerById(egg.PlayerCasterId).TeamId;
+
+            if (areFromTheSameTeam)
+            {
+                return;
+            }
+
+            var config = _gamePlayConfig.Talents.ChickenTalentConfig;
+            _spinPlayerCommand.SetPlayer(player.Id).SetSpinAmount(config.SpinAmount).SetTick(_processedTick).Execute();
+            
+            _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId);
+            _physicsSimulator.RemoveChickenEgg(egg.Id);
+            _matchDataService.SimulationState.RemoveChickenEggById(egg.Id);
         }
 
         private void HandleKOProjectileWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)

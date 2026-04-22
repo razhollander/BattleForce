@@ -22,6 +22,8 @@ MonoBehaviour:
     - rid: 8476404832654590090
     - rid: 8476404916744356088
     - rid: 8476404916744356134
+    - rid: 8476404916744356331
+    - rid: 8476405024203735241
   HammerTalentConfig:
     HammerSpeed: 10
     HammerSize: 1
@@ -39,7 +41,6 @@ MonoBehaviour:
     PushForce: 50
     MaxSpin: 55
     MinSpin: 50
-    SpinDuration: 2
   SentryGunTalentConfig:
     DurationInSeconds: 3
     ShootCooldownMultiplier: 0.25
@@ -56,9 +57,18 @@ MonoBehaviour:
     DurationInSeconds: 4
     VelocityGainPerTick: 80
   MagneticPullTalentConfig:
-    FieldWidth: 3
-    FieldHeight: 6
+    FieldArcAngle: 90
     PushForce: 30
+    MaxSpin: 55
+    MinSpin: 50
+  ChickenTalentConfig:
+    CountdownDuration: 3
+    PushForce: 15
+    SpinAmount: 50
+  YearsOfPainTalentConfig:
+    PushForce: 20
+    MaxSpin: 60
+    MinSpin: 40
   TalentCardWidth: 1.602175
   TalentCardHeight: 2.382844
   references:
@@ -83,6 +93,15 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 9
+        CooldownInSeconds: 2
+    - rid: 8476404916744356331
+      type: {class: TalentAlwaysActiveCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 10
+    - rid: 8476405024203735241
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 2
         CooldownInSeconds: 2
     - rid: 8506109566889754721
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}

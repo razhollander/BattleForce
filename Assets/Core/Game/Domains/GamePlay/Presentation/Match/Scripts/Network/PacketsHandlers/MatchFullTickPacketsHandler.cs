@@ -19,7 +19,6 @@ using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib.Utils;
-using UnityEditor;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers
@@ -69,6 +68,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<ActivateUmbrellaTalentNetEventS2C> _cachedUnprocessedActivateUmbrellaTalentEvents;
         private readonly CapacityList<DeactivateUmbrellaTalentNetEventS2C> _cachedUnprocessedDeactivateUmbrellaTalentEvents;
         private readonly CapacityList<CreateMagneticPullFieldNetEventS2C> _cachedUnprocessedCreateMagenticPullFieldEvents;
+        private readonly CapacityList<LayChickenEggNetEventS2C> _cachedUnprocessedLayChickenEggEvents;
+        private readonly CapacityList<ChickenEggHitNetEventS2C> _cachedUnprocessedChickenEggHitEvents;
+
         private readonly CapacityList<ActivateYearsOfPainTalentNetEventS2C> _cachedUnprocessedActivateYearsOfPainTalentEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
 
@@ -127,6 +129,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedActivateUmbrellaTalentEvents = new CapacityList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents);
             _cachedUnprocessedDeactivateUmbrellaTalentEvents = new CapacityList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents);
             _cachedUnprocessedCreateMagenticPullFieldEvents = new CapacityList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents);
+            _cachedUnprocessedLayChickenEggEvents = new CapacityList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents);
+            _cachedUnprocessedChickenEggHitEvents = new CapacityList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents);
+
             _cachedUnprocessedActivateYearsOfPainTalentEvents = new CapacityList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
@@ -189,6 +194,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessActivateUmbrellaTalentEvents(latestFullTickPacket.ActivateUmbrellaTalentNetEvents);
             ProcessDeactivateUmbrellaTalentEvents(latestFullTickPacket.DeactivateUmbrellaTalentNetEvents);
             ProcessCreateMagenticPullFieldEvents(latestFullTickPacket.CreateMagneticPullFieldNetEvents);
+            ProcessLayChickenEggEvents(latestFullTickPacket.LayChickenEggNetEvents);
+            ProcessChickenEggHitEvents(latestFullTickPacket.ChickenEggHitNetEvents);
+
             ProcessActivateYearsOfPainTalentEvents(latestFullTickPacket.ActivateYearsOfPainTalentNetEvents);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
@@ -1121,6 +1129,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public void ManagedOnDrawGizmos()
         {
             
+        }
+
+        private void ProcessLayChickenEggEvents(FixedUnorderedList<LayChickenEggNetEventS2C> layChickenEggNetEvents)
+        {
+            _cachedUnprocessedLayChickenEggEvents.Clear();
+            foreach (var netEvent in layChickenEggNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedLayChickenEggEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedLayChickenEggEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedLayChickenEggEvents.Sort();
+                _presentationNetEventsHandler.ProcessLayChickenEggEvents(_cachedUnprocessedLayChickenEggEvents);
+            }
+        }
+
+        private void ProcessChickenEggHitEvents(FixedUnorderedList<ChickenEggHitNetEventS2C> chickenEggHitNetEvents)
+        {
+            _cachedUnprocessedChickenEggHitEvents.Clear();
+            foreach (var netEvent in chickenEggHitNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedChickenEggHitEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedChickenEggHitEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedChickenEggHitEvents.Sort();
+                _presentationNetEventsHandler.ProcessChickenEggHitEvents(_cachedUnprocessedChickenEggHitEvents);
+            }
         }
     }
 }
