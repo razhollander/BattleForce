@@ -1,5 +1,3 @@
-using System;
-using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -9,10 +7,8 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using CoreDomain.Scripts.Services.CommandFactory;
-using Core.Game.Domains.GamePlay.Shared.Extensions;
 using Core.Scripts.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
@@ -26,20 +22,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
-        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly SpinPlayerCommand _spinPlayerCommand;
 
         public TalentType TalentType => TalentType.YearsOfPain;
 
         public YearsOfPainTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ICommandFactory commandFactory)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
-            _sharedGamePlayConfig = sharedGamePlayConfig;
             _spinPlayerCommand = commandFactory.CreateCommandVoid<SpinPlayerCommand>();
         }
 
@@ -56,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
+
             var isCurrentSelectedTalentOnCooldown = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown();
             if (isCurrentSelectedTalentOnCooldown)
             {
@@ -64,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType, out int talentIndex))
             {
-                LogService.LogError($"No YearsOfPain talent found for player id {_casterPlayerId}");
+                LogService.LogError($"No Years Of Pain talent found for player id {_casterPlayerId}");
                 return;
             }
 
