@@ -99,6 +99,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetChickenState(isChicken);
         }
 
+        public void SetPlayerRockState(ushort playerId, bool isOn)
+        {
+            GetPlayer(playerId).SetRockState(isOn);
+        }
+
         public void PlayLayEggAnimation(ushort playerId)
         {
             GetPlayer(playerId).PlayLayEggAnimation(_stageCancellationTokenProvider.CancellationTokenSource);

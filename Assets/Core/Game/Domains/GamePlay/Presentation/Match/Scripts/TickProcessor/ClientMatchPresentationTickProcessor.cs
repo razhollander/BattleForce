@@ -57,6 +57,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleDeactivateUmbrellaTalentNetEventsCommand _handleDeactivateUmbrellaTalentNetEventsCommand;
         private readonly HandleLayChickenEggNetEventsCommand _handleLayChickenEggNetEventsCommand;
         private readonly HandleChickenEggHitNetEventsCommand _handleChickenEggHitNetEventsCommand;
+        private readonly HandleActivateRockTalentNetEventsCommand _handleActivateRockTalentNetEventsCommand;
+        private readonly HandleDeactivateRockTalentNetEventsCommand _handleDeactivateRockTalentNetEventsCommand;
         private readonly UpdateKOProjectilesTransformCommand _updateKOProjectilesTransformCommand;
         private readonly HandlePerformDashPulseNetEventsCommand _handlePerformDashPulseNetEventsCommand;
         private readonly HandleUpdatePlayerTalentStocksNetEventsCommand _handleUpdatePlayerTalentStocksNetEventsCommand;
@@ -106,6 +108,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateUmbrellaTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateUmbrellaTalentNetEventsCommand>();
             _handleLayChickenEggNetEventsCommand = commandFactory.CreateCommandVoid<HandleLayChickenEggNetEventsCommand>();
             _handleChickenEggHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleChickenEggHitNetEventsCommand>();
+            _handleActivateRockTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateRockTalentNetEventsCommand>();
+            _handleDeactivateRockTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateRockTalentNetEventsCommand>();
             _handleKOProjectHitPlayerNetEventsCommand = commandFactory.CreateCommandVoid<HandleKOProjectHitPlayerNetEventsCommand>();
             _updateKOProjectilesTransformCommand = commandFactory.CreateCommandVoid<UpdateKOProjectilesTransformCommand>();
             _handlePerformDashPulseNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformDashPulseNetEventsCommand>();
@@ -163,6 +167,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateUmbrellaTalentNetEventsCommand.Execute();
             _handleLayChickenEggNetEventsCommand.Execute(); // must be after _handleTalentSwitchNetEventsCommand.Execute();
             _handleChickenEggHitNetEventsCommand.Execute();
+            _handleActivateRockTalentNetEventsCommand.Execute();
+            _handleDeactivateRockTalentNetEventsCommand.Execute();
             _handlePerformDashPulseNetEventsCommand.Execute();
             _handleUpdatePlayerTalentStocksNetEventsCommand.Execute();
             _handleCreateMagenticPullFieldNetEventsCommand.Execute();

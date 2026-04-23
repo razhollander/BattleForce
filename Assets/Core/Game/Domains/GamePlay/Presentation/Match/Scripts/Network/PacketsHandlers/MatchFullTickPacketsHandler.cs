@@ -70,6 +70,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<CreateMagneticPullFieldNetEventS2C> _cachedUnprocessedCreateMagenticPullFieldEvents;
         private readonly CapacityList<LayChickenEggNetEventS2C> _cachedUnprocessedLayChickenEggEvents;
         private readonly CapacityList<ChickenEggHitNetEventS2C> _cachedUnprocessedChickenEggHitEvents;
+        private readonly CapacityList<ActivateRockTalentNetEventS2C> _cachedUnprocessedActivateRockTalentEvents;
+        private readonly CapacityList<DeactivateRockTalentNetEventS2C> _cachedUnprocessedDeactivateRockTalentEvents;
 
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
 
@@ -130,6 +132,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedCreateMagenticPullFieldEvents = new CapacityList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents);
             _cachedUnprocessedLayChickenEggEvents = new CapacityList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents);
             _cachedUnprocessedChickenEggHitEvents = new CapacityList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents);
+            _cachedUnprocessedActivateRockTalentEvents = new CapacityList<ActivateRockTalentNetEventS2C>(networkConfig.MaxCap.ActivateRockTalentNetEvents);
+            _cachedUnprocessedDeactivateRockTalentEvents = new CapacityList<DeactivateRockTalentNetEventS2C>(networkConfig.MaxCap.DeactivateRockTalentNetEvents);
 
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
@@ -194,6 +198,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessCreateMagenticPullFieldEvents(latestFullTickPacket.CreateMagneticPullFieldNetEvents);
             ProcessLayChickenEggEvents(latestFullTickPacket.LayChickenEggNetEvents);
             ProcessChickenEggHitEvents(latestFullTickPacket.ChickenEggHitNetEvents);
+            ProcessActivateRockTalentEvents(latestFullTickPacket.ActivateRockTalentNetEvents);
+            ProcessDeactivateRockTalentEvents(latestFullTickPacket.DeactivateRockTalentNetEvents);
 
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
@@ -1124,6 +1130,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedLayChickenEggEvents.Sort();
                 _presentationNetEventsHandler.ProcessLayChickenEggEvents(_cachedUnprocessedLayChickenEggEvents);
+            }
+        }
+
+        private void ProcessActivateRockTalentEvents(FixedUnorderedList<ActivateRockTalentNetEventS2C> activateRockTalentNetEvents)
+        {
+            _cachedUnprocessedActivateRockTalentEvents.Clear();
+
+            foreach (var netEvent in activateRockTalentNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedActivateRockTalentEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedActivateRockTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedActivateRockTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessActivateRockTalentEvents(_cachedUnprocessedActivateRockTalentEvents);
+            }
+        }
+
+        private void ProcessDeactivateRockTalentEvents(FixedUnorderedList<DeactivateRockTalentNetEventS2C> deactivateRockTalentNetEvents)
+        {
+            _cachedUnprocessedDeactivateRockTalentEvents.Clear();
+
+            foreach (var netEvent in deactivateRockTalentNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedDeactivateRockTalentEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedDeactivateRockTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDeactivateRockTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateRockTalentEvents(_cachedUnprocessedDeactivateRockTalentEvents);
             }
         }
 

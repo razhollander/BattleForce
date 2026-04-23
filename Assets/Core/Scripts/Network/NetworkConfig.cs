@@ -101,6 +101,8 @@ namespace Core.Scripts.Network
         public int CreateMagneticPullFieldNetEvents = 128;
         public int LayChickenEggNetEvents = 128;
         public int ChickenEggHitNetEvents = 128;
+        public int ActivateRockTalentNetEvents = 128;
+        public int DeactivateRockTalentNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel

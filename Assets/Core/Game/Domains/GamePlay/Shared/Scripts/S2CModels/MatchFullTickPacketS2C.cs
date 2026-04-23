@@ -51,6 +51,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<CreateMagneticPullFieldNetEventS2C> CreateMagneticPullFieldNetEvents;
         public FixedUnorderedList<LayChickenEggNetEventS2C> LayChickenEggNetEvents;
         public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
+        public FixedUnorderedList<ActivateRockTalentNetEventS2C> ActivateRockTalentNetEvents;
+        public FixedUnorderedList<DeactivateRockTalentNetEventS2C> DeactivateRockTalentNetEvents;
         
         public MatchFullTickPacketS2C()
         {
@@ -110,6 +112,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
             ChickenEggHitNetEvents = new FixedUnorderedList<ChickenEggHitNetEventS2C>(maxCap.ChickenEggHitNetEvents);
+            ActivateRockTalentNetEvents = new FixedUnorderedList<ActivateRockTalentNetEventS2C>(maxCap.ActivateRockTalentNetEvents);
+            DeactivateRockTalentNetEvents = new FixedUnorderedList<DeactivateRockTalentNetEventS2C>(maxCap.DeactivateRockTalentNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -153,6 +157,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedDeactivateUmbrellaTalentNetEvents(writer);
             SerializedLayChickenEggNetEvents(writer);
             SerializedChickenEggHitNetEvents(writer);
+            SerializedActivateRockTalentNetEvents(writer);
+            SerializedDeactivateRockTalentNetEvents(writer);
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -349,6 +355,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedDeactivateUmbrellaTalentNetEvents(reader);
             DeserializedLayChickenEggNetEvents(reader);
             DeserializedChickenEggHitNetEvents(reader);
+            DeserializedActivateRockTalentNetEvents(reader);
+            DeserializedDeactivateRockTalentNetEvents(reader);
         }
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
@@ -927,6 +935,46 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             foreach (var netEvent in ChickenEggHitNetEvents.AsSpan())
             {
                 netEvent.Serialize(writer);
+            }
+        }
+
+        private void SerializedActivateRockTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateRockTalentNetEvents.Count);
+            foreach (var netEvent in ActivateRockTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedActivateRockTalentNetEvents(NetDataReader reader)
+        {
+            ActivateRockTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateRockTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateRockTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateRockTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateRockTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedDeactivateRockTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateRockTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateRockTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
             }
         }
 

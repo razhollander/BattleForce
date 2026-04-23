@@ -45,5 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<CreateMagneticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents { get; } = new();
         public List<LayChickenEggNetEventS2C> LayChickenEggNetEvents { get; } = new();
         public List<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents { get; } = new();
+        public List<ActivateRockTalentNetEventS2C> ActivateRockTalentNetEvents { get; } = new();
+        public List<DeactivateRockTalentNetEventS2C> DeactivateRockTalentNetEvents { get; } = new();
     }
 }

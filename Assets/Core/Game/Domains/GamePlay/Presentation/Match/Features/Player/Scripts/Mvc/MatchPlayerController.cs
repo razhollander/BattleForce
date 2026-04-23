@@ -77,6 +77,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             {
                 SetChickenState(true);
             }
+            else if (currentSelectedTalentState.TalentType == TalentType.Rock)
+            {
+                SetRockState(currentSelectedTalentState.IsActive);
+            }
         }
 
         public void SetSentryGunState(bool isSentryGun, CancellationTokenSource cancellationTokenSource)
@@ -92,6 +96,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetChickenState(bool isChickenActive)
         {
             _playerView.SetChickenState(isChickenActive);
+        }
+
+        public void SetRockState(bool isRockActive)
+        {
+            _playerView.SetRockState(isRockActive);
         }
 
         public void SetUmbrellaState(bool isUmbrellaActive)

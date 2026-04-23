@@ -37,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
         [SerializeField] private PlayerChickenView _playerChickenView;
+        [SerializeField] private SpriteRenderer _rockSpriteRenderer;
         
         private Transform _transform;
         private SpriteRenderer _leftEyeRenderer;
@@ -85,6 +86,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             else
             {
                 DisableUmbrellaState();
+            }
+        }
+
+        public void SetRockState(bool isOn)
+        {
+            _rockSpriteRenderer.gameObject.SetActive(isOn);
+            SetIsHealthBarShown(!isOn);
+
+            if (isOn)
+            {
+                _spaceShipTransform.localScale = new Vector3(2f, 2f, 2f);
+            }
+            else
+            {
+                _spaceShipTransform.localScale = new Vector3(1f, 1f, 1f);
             }
         }
 
@@ -192,6 +208,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             DisableSentryGunState();
             DisableSpinned();
             DisableUmbrellaState();
+            SetRockState(false);
             _playerChickenView.SetChickenState(false);
             gameObject.SetActive(false);
         }
