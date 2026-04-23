@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Box2D.NetStandard.Collision;
 using Box2D.NetStandard.Collision.Shapes;
@@ -462,8 +463,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.position = position;
             bodyDef.linearVelocity = velocity;
             bodyDef.fixedRotation = true;
-            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PowerUpBall);
-
+ 
             var body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
 
@@ -745,44 +745,37 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             shape.Reset();
             return shape;
         }
-
-                private readonly Dictionary<ushort, Body> _rockWalls = new Dictionary<ushort, Body>();
-
+        
         public void AddRockWall(ushort id, Vector2 position, float radius)
         {
-            var circleShape = new CircleShape();
-            circleShape.Radius = radius;
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.RockWall);
 
-            var bd = new BodyDef();
-            bd.type = BodyType.Static;
-            bd.position = position;
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
 
-            var body = _world.CreateBody(bd);
+            var wallShape = GetCircleShape();
+            wallShape.Radius = radius;
+            wallShape.Center = position;
 
-            var fd = new FixtureDef();
-            fd.shape = circleShape;
-            fd.friction = 0.0f;
-            fd.restitution = 1.0f;
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = wallShape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.Wall.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsBodyType.Wall.GetCollisionMask();
 
-            var fixtureData = new PhysicsBodyData
-            {
-                Type = PhysicsBodyType.EnvironmentWall,
-                Id = id
-            };
-
-            var fixture = body.CreateFixture(fd);
-            fixture.UserData = fixtureData;
-
-            _rockWalls[id] = body;
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(wallShape);
         }
 
         public void RemoveRockWall(ushort id)
         {
-            if (_rockWalls.TryGetValue(id, out var body))
-            {
-                _world.DestroyBody(body);
-                _rockWalls.Remove(id);
-            }
+            var rockWallBody = GetBody(PhysicsBodyType.RockWall, id);
+            RemoveBody(rockWallBody);
         }
 
         public void AddStartMatchWall(ushort id, Vector2 position, float radius)

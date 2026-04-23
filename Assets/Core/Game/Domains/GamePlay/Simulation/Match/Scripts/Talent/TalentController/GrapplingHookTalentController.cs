@@ -30,7 +30,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
         private readonly ICommandFactory _commandFactory;
         private readonly SharedGamePlayConfig _sharedConfig;
-        private readonly ICommandFactory _commandFactory;
         private readonly SpinPlayerCommand _spinPlayerCommand;
 
         public TalentType TalentType => TalentType.GrapplingHook;

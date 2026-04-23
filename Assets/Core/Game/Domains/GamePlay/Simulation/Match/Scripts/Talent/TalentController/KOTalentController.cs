@@ -26,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SpinPlayerCommand _spinPlayerCommand;
+        private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
 
         public TalentType TalentType => TalentType.KO;
         private bool IsCurrentlyActive
@@ -51,6 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _spinPlayerCommand = commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -152,7 +154,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var pushForce = pushDirection * koConfig.PushForce;
             var randomSpin = RNG.NextFloat(koConfig.MinSpin, koConfig.MaxSpin);
 
-            _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>().SetPlayerId(enemyPlayerId).SetForce(pushForce).ShouldTurnOffEngine(true).Execute();
+            _addForceToPlayerCommand.SetPlayerId(enemyPlayerId).SetForce(pushForce).ShouldTurnOffEngine(true).Execute();
             if (!_matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(enemyPlayerId, TalentType.Rock))
             {
                 enemyPlayerState.Spaceship.Transform.Direction = pushDirection;

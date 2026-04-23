@@ -5,17 +5,19 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
+using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
     public class DashPulseTalentController : ITalentController
     {
         private readonly ICommandFactory _commandFactory;
-        private ushort _casterPlayerId;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IOverrideableNetEventsService _overrideableNetEventsService;
         private readonly IMatchDataService _matchDataService;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
+        
+        private ushort _casterPlayerId;
 
         public DashPulseTalentController(INetEventsDataService netEventsDataService, IOverrideableNetEventsService overrideableNetEventsService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, ICommandFactory commandFactory)
         {

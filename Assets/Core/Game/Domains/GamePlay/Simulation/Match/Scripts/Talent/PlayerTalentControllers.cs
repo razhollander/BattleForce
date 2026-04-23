@@ -31,10 +31,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, commandFactory);
             _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig, commandFactory);
             _sentryGunTalentController = new SentryGunTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig, networkConfig, commandFactory);
-            _grapplingHookTalentController = new GrapplingHookTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
+            _grapplingHookTalentController = new GrapplingHookTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig);
             _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig, commandFactory);
             _magneticPullTalentController = new MagneticPullTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
-            _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfig, networkConfig, physicsSimulator, commandFactory);
+            _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfig, networkConfig, physicsSimulator);
             _rockTalentController = new RockTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig, physicsSimulator);
         }
 

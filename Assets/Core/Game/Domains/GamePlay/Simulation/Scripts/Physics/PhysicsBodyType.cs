@@ -19,5 +19,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         GrapplingHookProjectile = 13,
         StageBoundary = 14,
         ChickenEgg = 15,
+        RockWall = 16
     }
 }
