@@ -1,3 +1,4 @@
+using System;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
@@ -19,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
     public class InitStageCommand : BaseCommand, ICommandVoid
     {
+        private static int _stageNumber = 0;
         private IMatchDataService _matchDataService;
         private IPhysicsSimulator _physicsSimulator;
         private SimulationGamePlayConfig _gamePlayConfig;
@@ -32,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersTalentsManager _playersTalentsManager;
         private ICommandFactory _commandFactory;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
+        private TryAddARandomTalentForPlayerCommand _tryAddARandomTalentForPlayerCommand;
         private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
 
         public override void ResolveDependencies()
@@ -49,6 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
+            _tryAddARandomTalentForPlayerCommand = _commandFactory.CreateCommandVoid<TryAddARandomTalentForPlayerCommand>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
         }
 
@@ -59,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             CreateEnvironmentLayout();
             SetupPlayers();
+            _stageNumber++;
         }
 
         private void CreateEnvironmentLayout()
@@ -170,6 +175,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 if (_gamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                 {
                     _setRandomTalentsForPlayerCommand.SetPlayerId(player.Id).SetTalentsAmount(_gamePlayConfig.RandomTalentsForPlayersAmount).Execute();
+                }
+                else if (_gamePlayConfig.ShouldAddTalentEveryXStages)
+                {
+                    var didReachStage = _stageNumber % _gamePlayConfig.EveryXStages == 0;
+                    if (didReachStage /*&& _stageNumber<5*/)
+                    {
+                        _tryAddARandomTalentForPlayerCommand.SetPlayerId(player.Id).Execute();
+                    }
                 }
 
                 var talentsCount = player.Spaceship.TalentsState.Talents.Count;

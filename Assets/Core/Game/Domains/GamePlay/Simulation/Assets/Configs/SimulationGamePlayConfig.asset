@@ -20,7 +20,7 @@ MonoBehaviour:
   EnvironmentSprings: {fileID: 11400000, guid: f5e079ad119bc4e0faccf5c96bb9a9b7, type: 2}
   Physics: {fileID: 0}
   DeafultEnvironmentId: 6
-  ShouldChooseRandomStage: 0
+  ShouldChooseRandomStage: 1
   ShouldChooseRandomTalentsForPlayer: 0
   RandomTalentsForPlayersAmount: 1
   StartMatchCountdownDuration: 1
@@ -33,3 +33,5 @@ MonoBehaviour:
   BoltsGainedPerKill: 50
   TeleportGateCooldownInSeconds: 0.5
   PreparationPhaseDuration: 4
+  ShouldAddTalentEveryXStages: 1
+  EveryXStages: 2

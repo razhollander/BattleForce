@@ -1,14 +1,8 @@
 using System;
-using System.Linq;
 using System.Threading;
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
-using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
-using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -17,7 +11,6 @@ using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.SceneService;
 using CoreDomain.Scripts.Services.StateMachineService;
 using LiteNetLib;
-using Sirenix.OdinInspector.Editor;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.Scripts

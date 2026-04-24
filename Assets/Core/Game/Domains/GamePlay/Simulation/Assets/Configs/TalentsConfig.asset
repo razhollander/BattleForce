@@ -62,7 +62,7 @@ MonoBehaviour:
     MaxSpin: 55
     MinSpin: 50
   ChickenTalentConfig:
-    CountdownDuration: 3
+    CountdownDuration: 4
     PushForce: 15
     SpinAmount: 50
   YearsOfPainTalentConfig:
@@ -84,17 +84,17 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 7
-        CooldownInSeconds: 2
+        CooldownInSeconds: 6
     - rid: 8476404916744356088
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 8
-        CooldownInSeconds: 2
+        CooldownInSeconds: 8
     - rid: 8476404916744356134
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 9
-        CooldownInSeconds: 2
+        CooldownInSeconds: 5
     - rid: 8476404916744356331
       type: {class: TalentAlwaysActiveCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
@@ -103,7 +103,7 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 2
-        CooldownInSeconds: 2
+        CooldownInSeconds: 6
     - rid: 8506109566889754721
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:

@@ -30,5 +30,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public int BoltsGainedPerKill = 50;
         public float TeleportGateCooldownInSeconds = 0.5f;
         public float PreparationPhaseDuration = 5f;
+        public bool ShouldAddTalentEveryXStages = false;
+        [ConditionalField(nameof(ShouldAddTalentEveryXStages), true)]
+        public int EveryXStages = 2;
     }
 }

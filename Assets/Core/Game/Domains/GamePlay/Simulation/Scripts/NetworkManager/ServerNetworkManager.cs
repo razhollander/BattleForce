@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public int ConnectedPeersCount => _netManager.ConnectedPeersCount;
         public event Action OnPacketReceivedEvent;
-        public event Action OnPeerDisconnectedEvent;
+        public event Action<ushort> OnPeerDisconnectedEvent;
 
         public ServerNetworkManager(NetworkConfig networkConfig)
         {
@@ -48,9 +48,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             OnPacketReceivedEvent?.Invoke();
         }
 
-        private void OnPeerDisconnected()
+        private void OnPeerDisconnected(ushort playerId)
         {
-            OnPeerDisconnectedEvent?.Invoke();
+            OnPeerDisconnectedEvent?.Invoke(playerId);
         }
 
         

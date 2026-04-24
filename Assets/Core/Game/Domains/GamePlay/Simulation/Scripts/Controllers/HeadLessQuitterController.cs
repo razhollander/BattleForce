@@ -74,7 +74,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers
             _timePassedSinceLastPacket = 0;
         }
 
-        private void OnPeerDisconnected()
+        private void OnPeerDisconnected(ushort playerId)
         {
             if (_networkManager.ConnectedPeersCount == 0)
             {
@@ -94,9 +94,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers
 
         private bool IsHeadless()
         {
-//#if UNITY_SERVER
+#if UNITY_SERVER
             return true;
-//#endif
+#endif
             return false;
         }
     }

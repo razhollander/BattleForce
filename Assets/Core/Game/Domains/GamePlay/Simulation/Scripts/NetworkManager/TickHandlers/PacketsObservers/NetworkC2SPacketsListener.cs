@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly CapacityList<IRawPacketsObserver> _rawPacketsObservers;
 
         public event Action OnPacketReceivedEvent;
-        public event Action OnPeerDisconnectedEvent;
+        public event Action<ushort> OnPeerDisconnectedEvent;
 
         public NetworkC2SPacketsListener(NetworkConfig networkConfig)
         {
@@ -75,18 +75,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
 
         void INetEventListener.OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
         {
-            OnPeerDisconnectedEvent?.Invoke();
-            // LogService.Log("[S] Player disconnected: " + disconnectInfo.Reason);
-            //
-            // if (peer.Tag != null)
-            // {
-            //     byte playerId = (byte)peer.Id;
-            //     if (_playerManager.RemovePlayer(playerId))
-            //     {
-            //         var plp = new PlayerLeavedPacket { Id = (byte)peer.Id };
-            //         _netManager.SendToAll(WritePacket(plp), DeliveryMethod.ReliableOrdered);
-            //     }
-            // }
+            if (peer.Tag == null)
+            {
+                LogService.LogError($"Disconnected null peer");
+                return;
+            }
+            
+            var playerId = (ushort)peer.Tag;
+            LogService.LogError($"Player {playerId} disconnected! reason: {disconnectInfo.Reason}, SocketErrorCode:{disconnectInfo.SocketErrorCode}");
+            OnPeerDisconnectedEvent?.Invoke(playerId);
         }
 
         void INetEventListener.OnNetworkError(IPEndPoint endPoint, SocketError socketError)
