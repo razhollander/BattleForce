@@ -179,12 +179,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, MatchMakingPlayerStateS2C playerModel)
         {
             var shootState = playerModel.Spaceship.Shoot;
-            var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
-            if (shouldShoot)
+            var isReadyToShoot = shootState.CooldownSecondsLeft == shootState.MaxCooldown;
+
+            if (isReadyToShoot)
             {
-                shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
-                playerModel.Spaceship.Shoot = shootState;
-                CreateBulletForPlayer(processedTick, playerModel);
+                var didHitEnemy = _physicsSimulator.ArcCastOnPlayers(
+                    playerModel.Spaceship.Transform.Position,
+                    _gamePlayConfig.PlayerSpaceship.AutoShootRange,
+                    playerModel.Spaceship.Transform.Direction,
+                    _gamePlayConfig.PlayerSpaceship.AutoShootAngleDegrees,
+                    (short)playerModel.TeamId,
+                    out var hitBodyData);
+
+                if (didHitEnemy)
+                {
+                    shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
+                    playerModel.Spaceship.Shoot = shootState;
+                    CreateBulletForPlayer(processedTick, playerModel);
+                }
             }
         }
 
