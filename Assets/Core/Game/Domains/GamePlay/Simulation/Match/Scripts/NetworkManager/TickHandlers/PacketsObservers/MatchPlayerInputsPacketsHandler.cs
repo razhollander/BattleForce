@@ -133,12 +133,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 var playerState = _matchDataService.SimulationState.GetPlayerByIndex(i);
                 var playerId = playerState.Id;
+                UpdatePlayerShoot(processedTick, true, playerState);
+
                 // UpdatePlayerShoot(processedTick, true, playerState);
                 var isTalentInputPressed = false;
                 if (earliestInputPerPlayers.TryGetValue(playerId, out var playerInputPacket))
                 {
                     playerState.Spaceship.TalentsState.AimDirection = playerInputPacket.AimDirection;
-                    UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
                     UpdatePlayerDirection(playerInputPacket, playerState);
                     ProcessPlayerSwitchTalentInput(processedTick, playerId, playerInputPacket, playerState);
                     isTalentInputPressed = playerInputPacket.IsTalentInputPressed;
@@ -241,7 +242,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
                 if (didHitEnemy)
                 {
-                    _tryPerformShootForPlayerIfNotOnCooldownCommand.SetPlayerId(playerId).SetTick(processedTick).Execute();
+                    var enemyId = hitBodyData.Id;
+                    var enemyPlayerModel = _matchDataService.SimulationState.GetPlayerById(enemyId);
+                    var doesPlayersLookAtSameDirection = System.Numerics.Vector2.Dot(playerModel.Spaceship.Transform.Direction, enemyPlayerModel.Spaceship.Transform.Direction) > 0;
+                    if (doesPlayersLookAtSameDirection)
+                    {
+                        _tryPerformShootForPlayerIfNotOnCooldownCommand.SetPlayerId(playerId).SetTick(processedTick).Execute();
+                    }
                 }
             }
         }
