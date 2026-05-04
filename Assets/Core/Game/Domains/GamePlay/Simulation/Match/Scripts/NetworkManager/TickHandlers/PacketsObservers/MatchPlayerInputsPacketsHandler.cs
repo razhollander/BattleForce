@@ -230,26 +230,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var shootState = playerModel.Spaceship.Shoot;
             var isReadyToShoot = shootState.CooldownSecondsLeft == shootState.MaxCooldown;
 
-            if (isReadyToShoot)
+            if (!isReadyToShoot)
             {
-                var didHitEnemy = _physicsSimulator.ArcCastOnPlayers(
-                    playerModel.Spaceship.Transform.Position,
-                    _gamePlayConfig.PlayerSpaceship.AutoShootRange,
-                    playerModel.Spaceship.Transform.Direction,
-                    _gamePlayConfig.PlayerSpaceship.AutoShootAngleDegrees,
-                    (short)playerModel.TeamId,
-                    out var hitBodyData);
+                return;
+            }
 
-                if (didHitEnemy)
-                {
-                    var enemyId = hitBodyData.Id;
-                    var enemyPlayerModel = _matchDataService.SimulationState.GetPlayerById(enemyId);
-                    var doesPlayersLookAtSameDirection = System.Numerics.Vector2.Dot(playerModel.Spaceship.Transform.Direction, enemyPlayerModel.Spaceship.Transform.Direction) > 0;
-                    if (doesPlayersLookAtSameDirection)
-                    {
-                        _tryPerformShootForPlayerIfNotOnCooldownCommand.SetPlayerId(playerId).SetTick(processedTick).Execute();
-                    }
-                }
+            var isEnemyInfrontOfPlayer = _physicsSimulator.ArcCastOnPlayers(
+                playerModel.Spaceship.Transform.Position,
+                _gamePlayConfig.PlayerSpaceship.AutoShootRange,
+                playerModel.Spaceship.Transform.Direction,
+                _gamePlayConfig.PlayerSpaceship.AutoShootAngleDegrees,
+                (short)playerModel.TeamId,
+                out var hitBodyData);
+
+            if (!isEnemyInfrontOfPlayer)
+            {
+                return;
+            }
+
+            var enemyId = hitBodyData.Id;
+            var enemyPlayerModel = _matchDataService.SimulationState.GetPlayerById(enemyId);
+            var doesPlayersLookAtSameDirection = System.Numerics.Vector2.Dot(playerModel.Spaceship.Transform.Direction, enemyPlayerModel.Spaceship.Transform.Direction) > 0;
+            if (doesPlayersLookAtSameDirection)
+            {
+                _tryPerformShootForPlayerIfNotOnCooldownCommand.SetPlayerId(playerId).SetTick(processedTick).Execute();
             }
         }
 
