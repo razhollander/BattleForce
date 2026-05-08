@@ -15,7 +15,9 @@ MonoBehaviour:
   StartHealth: 5
   TargetMovementSpeed: 5
   RotationSpeed: 150
-  ShootCooldown: 0.7
+  ShootCooldown: 0.35
+  AutoShootRange: 12
+  AutoShootAngleDegrees: 30
   DefaultPlayerRadius: 0.8
   EngineAcceleration: 70
   VelocityDecelerationPerSecond: 50

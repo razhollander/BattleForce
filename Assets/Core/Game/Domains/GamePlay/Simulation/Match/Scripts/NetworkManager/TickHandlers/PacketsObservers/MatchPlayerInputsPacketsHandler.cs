@@ -133,12 +133,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 var playerState = _matchDataService.SimulationState.GetPlayerByIndex(i);
                 var playerId = playerState.Id;
+                UpdatePlayerShoot(processedTick, true, playerState);
+
                 // UpdatePlayerShoot(processedTick, true, playerState);
                 var isTalentInputPressed = false;
                 if (earliestInputPerPlayers.TryGetValue(playerId, out var playerInputPacket))
                 {
                     playerState.Spaceship.TalentsState.AimDirection = playerInputPacket.AimDirection;
-                    UpdatePlayerShoot(processedTick, playerInputPacket.IsShootInputPressed, playerState);
                     UpdatePlayerDirection(playerInputPacket, playerState);
                     ProcessPlayerSwitchTalentInput(processedTick, playerId, playerInputPacket, playerState);
                     isTalentInputPressed = playerInputPacket.IsTalentInputPressed;
@@ -225,23 +226,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         {
             var playerId = playerModel.Id;
             _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, isShootInputPressed);
-            var wasShootInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
-            // var wasShootInputDownThisTick = true;
-            if (wasShootInputDownThisTick)
+
+            var shootState = playerModel.Spaceship.Shoot;
+            var isReadyToShoot = shootState.CooldownSecondsLeft == shootState.MaxCooldown;
+
+            if (!isReadyToShoot)
+            {
+                return;
+            }
+
+            var isEnemyInfrontOfPlayer = _physicsSimulator.ArcCastOnPlayers(
+                playerModel.Spaceship.Transform.Position,
+                _gamePlayConfig.PlayerSpaceship.AutoShootRange,
+                playerModel.Spaceship.Transform.Direction,
+                _gamePlayConfig.PlayerSpaceship.AutoShootAngleDegrees,
+                (short)playerModel.TeamId,
+                out var hitBodyData);
+
+            if (!isEnemyInfrontOfPlayer)
+            {
+                return;
+            }
+
+            var enemyId = hitBodyData.Id;
+            var enemyPlayerModel = _matchDataService.SimulationState.GetPlayerById(enemyId);
+            var doesPlayersLookAtSameDirection = System.Numerics.Vector2.Dot(playerModel.Spaceship.Transform.Direction, enemyPlayerModel.Spaceship.Transform.Direction) > 0;
+            if (doesPlayersLookAtSameDirection)
             {
                 _tryPerformShootForPlayerIfNotOnCooldownCommand.SetPlayerId(playerId).SetTick(processedTick).Execute();
-                
-                //
-                // var rectSize = new System.Numerics.Vector2(10, 5);
-                // var rectDistanceFromPlayer = playerModel.Spaceship.Transform.Radius + rectSize.X / 2;
-                // var center = playerModel.Spaceship.Transform.Position+rectDistanceFromPlayer*playerModel.Spaceship.TalentsState.AimDirection;
-                //
-                // float angleRadians = playerModel.Spaceship.TalentsState.AimDirection.ToAngleRadians();
-                // if (_physicsSimulator.RectangleCast(center, rectSize, angleRadians,
-                //         PhysicsBodyType.Wall))
-                // {
-                //     LogService.LogError("Hit!");
-                // }
             }
         }
 

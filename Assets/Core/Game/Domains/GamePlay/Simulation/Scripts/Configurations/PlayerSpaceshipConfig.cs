@@ -10,6 +10,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float TargetMovementSpeed = 5f;
         public float RotationSpeed = 5f;
         public float ShootCooldown = 0.7f;
+        public float AutoShootRange = 15f;
+        public float AutoShootAngleDegrees = 30f;
         public float DefaultPlayerRadius = 0.7f;
         public float EngineAcceleration = 1f;
         public float VelocityDecelerationPerSecond = 1f;
