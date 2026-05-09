@@ -1,6 +1,7 @@
 using System;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
@@ -21,18 +22,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly IMatchMakingDataService _matchMakingDataService;
         private readonly ISceneLoaderService _sceneLoaderService;
         private readonly IStateMachineService _stateMachineService;
+        private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
         private readonly StartMatchPacketS2C _startMatchPacket;
         private bool _didReceiveStartMatchPacket;
         private bool _didSwitcToMatch;
 
         public PacketTypeS2C PacketType => PacketTypeS2C.StartMatch;
 
-        public StartMatchPacketHandler(IClientNetworkManager networkManager, IMatchMakingDataService matchMakingDataService, ISceneLoaderService sceneLoaderService, IStateMachineService stateMachineService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public StartMatchPacketHandler(IClientNetworkManager networkManager, IMatchMakingDataService matchMakingDataService, ISceneLoaderService sceneLoaderService, IStateMachineService stateMachineService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ILastFullSyncTickDataService lastFullSyncTickDataService)
         {
             _networkManager = networkManager;
             _matchMakingDataService = matchMakingDataService;
             _sceneLoaderService = sceneLoaderService;
             _stateMachineService = stateMachineService;
+            _lastFullSyncTickDataService = lastFullSyncTickDataService;
             _startMatchPacket = new StartMatchPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount);
         }
 
@@ -71,6 +74,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         {
             _startMatchPacket.Deserialize(reader);
             _didReceiveStartMatchPacket = true;
+            _lastFullSyncTickDataService.LastFullSyncTick = _startMatchPacket.OccuredOnTick;
             LogService.LogTopic("Start Match accepted received", LogTopicType.ClientNetwork);
         }
     }
