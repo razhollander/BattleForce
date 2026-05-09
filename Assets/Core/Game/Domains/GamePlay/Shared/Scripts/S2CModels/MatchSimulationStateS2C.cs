@@ -278,7 +278,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 } 
             }
             
-            throw new System.Exception("No bullet for id {playerId}!");
+            throw new System.Exception($"No bullet for id {bulletId}!");
         }
         
         public bool TryGetBulletById(ushort bulletId, out PlayerBulletS2C bulletState)
