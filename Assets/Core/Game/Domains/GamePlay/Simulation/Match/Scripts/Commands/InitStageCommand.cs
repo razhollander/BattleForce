@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
     public class InitStageCommand : BaseCommand, ICommandVoid
     {
-        private static int _stageNumber = 0;
+        private static int _stageNumber = 1;
         private IMatchDataService _matchDataService;
         private IPhysicsSimulator _physicsSimulator;
         private SimulationGamePlayConfig _gamePlayConfig;

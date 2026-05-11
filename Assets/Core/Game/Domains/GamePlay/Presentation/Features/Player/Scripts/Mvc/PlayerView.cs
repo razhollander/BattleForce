@@ -24,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _spaceShipTransform;
         [SerializeField] private GameObject _aimArrowTransform; // todo move to the match domain
         [SerializeField] private GameObject _moveAssistArrowTransform; // todo move to the match domain
+        [SerializeField] private SpriteRenderer _moveAssistArrowSpriteRenderer; // todo move to the match domain
         [SerializeField] private Transform _assistArrowParentTransform; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
@@ -115,6 +116,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _spriteRenderer.color = color;
             _tailView.SetColor(color);
             _availableBulletSpriteRenderer.color = color;
+            _moveAssistArrowSpriteRenderer.color = color.Darken(0.3f);
         }
 
         public void SetBulletLoading(float cooldownLeft, float maxCooldown)

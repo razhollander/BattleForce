@@ -86,6 +86,27 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return false;
         }
         
+        public bool TrySetIsTalentAiming(TalentType talentType, bool isAiming)
+        {
+            if (Talents.Count == 0)
+            {
+                return false;
+            }
+            
+            for (int i = 0; i < Talents.Count; i++)
+            {
+                var talent = Talents[i];
+                if (talent.TalentType == talentType)
+                {
+                    ref var talentState = ref Talents.Get(i);
+                    talentState.IsCurrentlyAiming = isAiming;
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
         public bool TryGetCurrentSelectedTalent(out TalentStateS2C selectedTalent)
         {
             if (Talents.Count == 0)

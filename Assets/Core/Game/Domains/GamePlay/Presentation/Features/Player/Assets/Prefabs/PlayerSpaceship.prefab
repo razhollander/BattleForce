@@ -249,7 +249,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.616, y: 0.014, z: 0}
-  m_LocalScale: {x: 0.925, y: 0.7940625, z: 1}
+  m_LocalScale: {x: 1.6597968, y: 0.9496491, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8455100147721814953}
@@ -2405,7 +2405,8 @@ MonoBehaviour:
   _loadingRingView: {fileID: 7054667237423659150}
   _spaceShipTransform: {fileID: 6367321170785206256}
   _aimArrowTransform: {fileID: 8268790909231806898}
-  _moveAssistArrowTransform: {fileID: 0}
+  _moveAssistArrowTransform: {fileID: 1233231225019515603}
+  _moveAssistArrowSpriteRenderer: {fileID: 5065660125430167243}
   _assistArrowParentTransform: {fileID: 8455100147721814953}
   _playerNameText: {fileID: 2447704602733785927}
   _selectedTalentImage: {fileID: 5923260587429490229}

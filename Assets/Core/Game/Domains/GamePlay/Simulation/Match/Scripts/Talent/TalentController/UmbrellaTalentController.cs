@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -30,6 +31,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 _matchDataService.SimulationState.SetIsTalentCurrentlyActiveForPlayer(_casterPlayerId, TalentType, value);
             }
         }
+        
+        private bool IsCurrentlyAiming
+        {
+            get
+            {
+                return _matchDataService.SimulationState.GetIsTalentAimingForPlayer(_casterPlayerId, TalentType);
+            }
+            set
+            {
+                _matchDataService.SimulationState.SetIsTalentCurrentlyAimingForPlayer(_casterPlayerId, TalentType, value);
+            }
+        }
 
         public UmbrellaTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
         {
@@ -46,28 +59,44 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick, int tick, float deltaTime)
         {
-            if (!wasTalentInputReleasedThisTick)
-            {
-                return;
-            }
-
-            if (IsCurrentlyActive)
-            {
-                DeactivateTalent(tick);
-                return;
-            }
-
+            var isCurrentlyAiming = IsCurrentlyAiming;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            var isOnCooldown = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown();
-
+            var isOnCooldown = !casterPlayerState.Spaceship.TalentsState.TryGetTalentByType(TalentType, out var talentState) || talentState.IsOnCooldown();
             if (isOnCooldown)
             {
                 return;
             }
+            
+            if (wasTalentInputDownThisTick)
+            {
+                if (IsCurrentlyActive)
+                {
+                    DeactivateTalent(tick);
+                    return;
+                }
 
+                if (!isCurrentlyAiming)
+                {
+                    IsCurrentlyAiming = true;
+                    casterPlayerState.Spaceship.AssistArrowType = PlayerAssistArrowType.AimArrow;
+                }
+            }
+
+
+            if (IsCurrentlyActive)
+            {
+                return;
+            }
+            
+            if (!wasTalentInputReleasedThisTick || !isCurrentlyAiming)
+            {
+                return;
+            }
+            
+            casterPlayerState.Spaceship.AssistArrowType = PlayerAssistArrowType.Hidden;
+            IsCurrentlyAiming = false;
             IsCurrentlyActive = true;
             _startTick = tick;
-
             _netEventsDataService.AddActivateUmbrellaTalentNetEvent(tick, _casterPlayerId);
         }
         
