@@ -106,9 +106,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             return true;
         }
 
-        public void ProcessPlayerTalentInput(ushort playerId, TalentType talentType, int tick, bool wasTalentInputDownThisTick, bool isTalentInputPressed, float deltaTime)
+        public bool TrySwitchToTalent(ushort playerId, int talentIndex)
         {
-            _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, wasTalentInputDownThisTick, isTalentInputPressed, tick, deltaTime);
+            var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+            var talents = playerState.Spaceship.TalentsState;
+
+            if (!talents.TryGetCurrentSelectedTalent(out var selectedTalent))
+            {
+                return false;
+            }
+
+            if (selectedTalent.IsActive)
+            {
+                return false;
+            }
+
+            if (talentIndex >= talents.Talents.Count)
+            {
+                LogService.LogError($"Tryed to switch to talent index {talentIndex} which is out of range of {talents.Talents.Count} talents");
+                return false;
+            }
+
+            talents.SelectedTalentIndex = talentIndex;
+            return true;
+        }
+
+        public void ProcessPlayerTalentInput(ushort playerId, TalentType talentType, int tick, bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick,
+            float deltaTime)
+        {
+            _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, wasTalentInputDownThisTick, isTalentInputPressed, wasTalentInputReleasedThisTick, tick, deltaTime);
         }
 
         public void ProcessAllTalentsTickOfPlayer(ushort playerId, int tick, float deltaTime)

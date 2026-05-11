@@ -6,7 +6,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
     public interface ITalentController
     {
         TalentType TalentType { get; }
-        void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime);
+        void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick, int tick, float deltaTime);
         void StopIfActive(int tick);
         void OnTick(int tick,  float deltaTime);
         void ResetData();

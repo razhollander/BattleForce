@@ -73,7 +73,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed
 
         private bool IsGamePadCurrentlyUsed()
         {
-            var currentAimDirection = _gameInputActionsController.GetAimDirection();
+            var currentAimDirection = _gameInputActionsController.GetMoveDirection();
             var currentMoveDirection = _gameInputActionsController.GetMoveDirection();
             var didChange = _lastGamePadAimDirection != currentAimDirection || _lastGamePadMoveDirection != currentMoveDirection;
             

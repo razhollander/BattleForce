@@ -156,6 +156,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public TalentStocksCooldownStateS2C StocksCooldown;
         public TalentAwalysActiveCooldownStateS2C AlwaysActiveCooldown;
         public bool IsActive;
+        // public bool IsInputPressed;
         
         public bool IsOnCooldown()
         {

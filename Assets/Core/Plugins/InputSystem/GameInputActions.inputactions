@@ -76,6 +76,33 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "TalentA",
+                    "type": "Button",
+                    "id": "c42e12eb-5c8c-4186-a619-4c8c44f282fd",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "TalentB",
+                    "type": "Button",
+                    "id": "8af47024-c122-4e44-9b93-f95d5cc7f5ea",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "TalentC",
+                    "type": "Button",
+                    "id": "b9a3e9be-3a48-49cc-88f6-15dab28b95b6",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -92,8 +119,8 @@
                 },
                 {
                     "name": "",
-                    "id": "c7547370-5b71-47a3-a3bf-8851ddc06613",
-                    "path": "<DualShockGamepad>/leftTrigger",
+                    "id": "ddfb4e4f-6d5d-49bb-9ef1-4797ffd26f63",
+                    "path": "<Gamepad>/rightTrigger",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -148,7 +175,7 @@
                 {
                     "name": "",
                     "id": "91151ed4-558d-4b75-a517-39b737ec2b2c",
-                    "path": "<Keyboard>/w",
+                    "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
@@ -158,56 +185,12 @@
                 },
                 {
                     "name": "",
-                    "id": "fc3b7c09-d857-4f7d-b0d4-2a5c392cda02",
-                    "path": "<DualShockGamepad>/leftShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Joystick;Gamepad",
-                    "action": "MoveLeft",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "61860cec-2245-481c-90bd-7ca2622c8e1d",
-                    "path": "<DualShockGamepad>/dpad/left",
+                    "id": "8efc91f0-9031-482a-a831-b4e17f8975b2",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MoveLeft",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "8cf7ce48-ccf3-4828-8432-93f4f6b1e116",
-                    "path": "<DualShockGamepad>/rightShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Joystick;Gamepad",
-                    "action": "MoveRight",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "3b16907d-a971-4655-90ba-4a92c58fca2d",
-                    "path": "<DualShockGamepad>/dpad/right",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "MoveRight",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "6e848ecb-3969-43f2-989e-f4b38ed904e4",
-                    "path": "<DualShockGamepad>/buttonEast",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Joystick;Gamepad",
-                    "action": "Talent",
+                    "action": "MoveForward",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -224,28 +207,6 @@
                 },
                 {
                     "name": "",
-                    "id": "ddb5432c-68a7-4065-a5ac-b80cb15a0729",
-                    "path": "<DualShockGamepad>/buttonNorth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Joystick;Gamepad",
-                    "action": "SwitchTalent",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "d7968f86-f6ba-4b16-95e9-904f1c703a83",
-                    "path": "<DualShockGamepad>/rightShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "SwitchTalent",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "b1451725-632f-4f93-b1b9-75e678ceb35c",
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",
@@ -257,19 +218,74 @@
                 },
                 {
                     "name": "",
-                    "id": "3394b24e-e7f6-435b-9cd7-75df959f90ce",
-                    "path": "<Gamepad>/rightStick",
+                    "id": "9379fa2c-50a7-4a5d-be6e-7f581178f032",
+                    "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
-                    "action": "Aim",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "TalentA",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "13cfce55-da79-47eb-b25a-4e5b6a1635c6",
-                    "path": "<Gamepad>/rightStick",
+                    "id": "65b09e3d-c29a-4fb4-8a41-b1f39bce5445",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TalentA",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a282a848-debd-4def-9e40-e473e45b7d06",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "TalentB",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bc095a2a-da3f-494d-be95-ebfb5cdce4cf",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TalentB",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "18c3629f-a68c-4c4e-b5c9-bcfa8d7aa632",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "TalentC",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a05ecb9a-59f8-4d5d-83b3-d37346a11c0f",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TalentC",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e6de9193-2924-4bc7-ba5e-1e7aa137f7dc",
+                    "path": "<Gamepad>/leftStick",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
