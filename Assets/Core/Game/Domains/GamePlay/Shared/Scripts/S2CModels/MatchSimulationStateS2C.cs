@@ -257,7 +257,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             if (GetPlayerById(playerId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent))
             {
-                return selectedTalent.TalentType == talentType && selectedTalent.IsActive;
+                return selectedTalent.TalentType == talentType && selectedTalent.IsCurrentlyActive;
             }
 
             return false;

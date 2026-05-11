@@ -24,6 +24,26 @@ MonoBehaviour:
     - rid: 8476404916744356134
     - rid: 8476404916744356331
     - rid: 8476405024203735241
+  TalentsArrowConfigs:
+    TalentCooldownConfigs:
+    - TalentType: 1
+      IsArrowShownOnlyWhilePressed: 0
+    - TalentType: 2
+      IsArrowShownOnlyWhilePressed: 1
+    - TalentType: 4
+      IsArrowShownOnlyWhilePressed: 0
+    - TalentType: 5
+      IsArrowShownOnlyWhilePressed: 0
+    - TalentType: 6
+      IsArrowShownOnlyWhilePressed: 1
+    - TalentType: 7
+      IsArrowShownOnlyWhilePressed: 1
+    - TalentType: 8
+      IsArrowShownOnlyWhilePressed: 1
+    - TalentType: 9
+      IsArrowShownOnlyWhilePressed: 1
+    - TalentType: 10
+      IsArrowShownOnlyWhilePressed: 0
   HammerTalentConfig:
     HammerSpeed: 10
     HammerSize: 1

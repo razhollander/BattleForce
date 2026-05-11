@@ -3,13 +3,16 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
+using UnityEngine.InputSystem.HID;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
@@ -21,12 +24,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly NetworkConfig _networkConfig;
         private readonly Transform _parent;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
+        private readonly IInputBeingUsedService _inputBeingUsedService;
         public readonly ushort PlayerId;
         private PlayerView _playerView;
         private readonly PlayerViewPool _playerPool;
 
         public MatchPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider)
+            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService) 
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
@@ -34,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _networkConfig = networkConfig;
             _parent = parent;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
+            _inputBeingUsedService = inputBeingUsedService;
             PlayerId = playerId;
         }
 
@@ -61,7 +66,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             if (!playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
             {
-                _playerView.SetIsTalentArrowShown(false, false);
                 return;
             }
 
@@ -69,11 +73,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
             if (currentSelectedTalentState.TalentType == TalentType.SentryGun)
             {
-                SetSentryGunState(currentSelectedTalentState.IsActive, _stageCancellationTokenProvider.CancellationTokenSource);
+                SetSentryGunState(currentSelectedTalentState.IsCurrentlyActive, _stageCancellationTokenProvider.CancellationTokenSource);
             }
             else if (currentSelectedTalentState.TalentType == TalentType.Umbrella)
             {
-                SetUmbrellaState(currentSelectedTalentState.IsActive);
+                SetUmbrellaState(currentSelectedTalentState.IsCurrentlyActive);
             }
             else if (currentSelectedTalentState.TalentType == TalentType.Chicken)
             {
@@ -108,7 +112,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var talentType = talentState.TalentType;
             var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentType];
             _playerView.SetTalentSprite(talentSprite);
-            UpdateIsArrowShownAccordingToTalentState(talentState);
             var isInChickenState = talentType == TalentType.Chicken;
             SetChickenState(isInChickenState);
         }
@@ -122,14 +125,36 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var decay = _gamePlayConfig.ExponentialDecay;
             var aimDirection = playerModel.Spaceship.TalentsState.AimDirection;
             _playerView.InterpolateTransform(playerPosition, playerRotation, decay);
-            _playerView.InterpolateAimRotation(aimDirection, decay);
             _playerView.UpdateTailBend();
+            UpdateAim(playerModel.Spaceship.AssistArrowType, aimDirection, decay);
 
             if (playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) &&
                 selectedTalent.TalentType == TalentType.Umbrella)
             {
                 _playerView.InterpolateUmbrellaRotation(aimDirection, decay);
             }
+        }
+
+        private void UpdateAim(PlayerAssistArrowType arrowType, Vector2 aimDirection, float decay)
+        {
+            _playerView.InterpolateAimRotation(aimDirection, decay);
+
+            var shouldShowMoveAssistArrow = arrowType == PlayerAssistArrowType.Hidden && _inputBeingUsedService.InputTypeBeingUsed == SupportedInputType.GamePad;
+
+            if (shouldShowMoveAssistArrow)
+            {
+                _playerView.ShowMoveAssistArrow();
+                return;
+            }
+
+            var shouldShowAimArrow = arrowType == PlayerAssistArrowType.AimArrow;
+            if (shouldShowAimArrow)
+            {
+                _playerView.ShowAimAssistArrow();
+                return;
+            }
+
+            _playerView.HideAssistArrow();
         }
 
         public void UpdateBulletCooldown()
@@ -233,13 +258,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetPlayersSpinnedState(bool isOn)
         {
             _playerView.SetIsSpinned(isOn, _stageCancellationTokenProvider.CancellationTokenSource);
-        }
-        
-        public void UpdateIsArrowShownAccordingToTalentState(TalentStateS2C talentState)
-        {
-            var selectedTalentConfig = _gamePlayConfig.TalentsConfig.Talents[talentState.TalentType];
-            var isArrowShown = !talentState.IsOnCooldown() && selectedTalentConfig.IsArrowShownWhileSelected && (talentState.IsActive && selectedTalentConfig.IsArrowShownWhileActive || !talentState.IsActive );
-            _playerView.SetIsTalentArrowShown(isArrowShown, selectedTalentConfig.IsFrontArrow);
         }
 
         public void PlayerYearsOfPain(Vector2 direction)

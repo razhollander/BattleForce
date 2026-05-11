@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents;
-using CoreDomain.Scripts.Helpers.SerializableDictionary;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
@@ -13,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public ushort TalentCardHealth = 2;
         [BF_SubclassList.SubclassList(typeof(BaseTalentCooldownConfig)), SerializeField]
         public TalentsCooldownsConfigs TalentsCooldownsConfigs;
+        public TalentsArrowConfigs TalentsArrowConfigs;
         public HammerTalentConfig HammerTalentConfig;
         public SwapTalentConfig SwapTalentConfig;
         public PulseDashConfig PulseDashConfig;
@@ -33,5 +33,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         [SerializeReference]
         public List<BaseTalentCooldownConfig> TalentCooldownConfigs;
     }
-        
+    
+    [Serializable]
+    public class TalentsArrowConfigs
+    {
+        public List<TalentArrowConfig> TalentCooldownConfigs;
+    }
+    
+    [Serializable]
+    public class TalentArrowConfig
+    {
+        public TalentType TalentType;
+        // public bool IsArrowShownWhileSelected;
+        // public bool IsArrowShownWhileActive;
+        public bool IsArrowShownOnlyWhilePressed;
+        // public bool IsFrontArrow;
+    }
 }

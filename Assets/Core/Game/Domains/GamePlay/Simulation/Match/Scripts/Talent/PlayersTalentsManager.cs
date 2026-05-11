@@ -92,7 +92,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 return false;
             }
 
-            if (selectedTalent.IsActive)
+            if (selectedTalent.IsCurrentlyActive)
             {
                 return false;
             }
@@ -116,7 +116,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 return false;
             }
 
-            if (selectedTalent.IsActive)
+            if (selectedTalent.IsCurrentlyActive)
             {
                 return false;
             }
