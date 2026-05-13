@@ -64,6 +64,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
+            if (!wasTalentInputDownThisTick)
+            {
+                return;
+            }
+            
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             var isOnCooldown = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown();
 
@@ -71,11 +76,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             {
                 return;
             }
-
+            
             IsCurrentlyActive = true;
             _startTick = tick;
-
-
+            
             casterPlayerState.Spaceship.IsEngineOn = false;
             casterPlayerState.Spaceship.Transform.StopMotion();
             ChangePlayerMaxShootCooldown(casterPlayerState, _gamePlayConfig.Talents.SentryGunTalentConfig.ShootCooldownMultiplier);
