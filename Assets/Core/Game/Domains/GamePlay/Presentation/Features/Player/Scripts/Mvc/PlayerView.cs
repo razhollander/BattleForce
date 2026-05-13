@@ -28,15 +28,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _assistArrowParentTransform; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
-        [SerializeField] private Transform _leftEyeBall;
-        [SerializeField] private Transform _leftEye;
-        [SerializeField] private Transform _rightEyeBall;
-        [SerializeField] private Transform _rightEye;
-        [SerializeField] private float _eyeMovementRadius = 0.1f;
+        [SerializeField] private PlayerEyesView _playerEyesView;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private SpriteAnimator _sentryGunAnimator;
-        [SerializeField] private Canvas _spinnedEyesCanvas;
-        [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
         [SerializeField] private PlayerChickenView _playerChickenView;
         [SerializeField] private YearsOfPainView _yearsOfPainView;
@@ -44,10 +38,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _heart;
         
         private Transform _transform;
-        private SpriteRenderer _leftEyeRenderer;
-        private SpriteRenderer _rightEyeRenderer;
-        private Sprite _defaultLeftEyeSprite;
-        private Sprite _defaultRightEyeSprite;
         
         public Action Despawn { get; set; }
 
@@ -164,32 +154,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _transform = transform;
             _loadingRingView.OnCreated();
             _tailView.OnCreated();
-            _leftEyeRenderer = _leftEye.GetComponent<SpriteRenderer>();
-            _rightEyeRenderer = _rightEye.GetComponent<SpriteRenderer>();
-            _defaultLeftEyeSprite = _leftEyeRenderer.sprite;
-            _defaultRightEyeSprite = _rightEyeRenderer.sprite;
+            _playerEyesView.OnCreated();
         }
 
         public void SetIsSpinned(bool isSpinned, CancellationTokenSource cancellationTokenSource)
         {
-            _leftEyeRenderer.sprite = isSpinned ? null : _defaultLeftEyeSprite;
-            _rightEyeRenderer.sprite = isSpinned ? null : _defaultRightEyeSprite;
-
-            if (isSpinned)
-            {
-                _spinnedEyesCanvas.enabled = true;
-                _spinnedEyesAnimator.PlayAnimation(cancellationTokenSource).Forget();   
-            }
-            else
-            {
-                DisableSpinned();
-            }
-        }
-        
-        private void DisableSpinned()
-        {
-            _spinnedEyesAnimator.StopAnimation();
-            _spinnedEyesCanvas.enabled = false;
+            _playerEyesView.SetIsSpinned(isSpinned, cancellationTokenSource);
         }
 
         public void OnSpawned()
@@ -201,7 +171,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnDespawned()
         {
             DisableSentryGunState();
-            DisableSpinned();
+            _playerEyesView.OnDespawned();
             DisableUmbrellaState();
             _playerChickenView.SetChickenState(false);
             gameObject.SetActive(false);
@@ -250,11 +220,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         private void UpdateEyesToLookAtAimArrow(System.Numerics.Vector2 aimArrowDirection)
         {
-            var eyeOffset = new Vector2(aimArrowDirection.X, aimArrowDirection.Y).normalized * _eyeMovementRadius;
-            var leftPosition = _leftEye.position.ToVector2XY() + eyeOffset;
-            var rightPosition = _rightEye.position.ToVector2XY() + eyeOffset;
-            _leftEyeBall.position = new Vector3(leftPosition.x, leftPosition.y, _leftEyeBall.position.z);
-            _rightEyeBall.position = new Vector3(rightPosition.x, rightPosition.y, _rightEyeBall.position.z);
+            _playerEyesView.UpdateEyesToLookAtDirection(aimArrowDirection);
         }
 
         public void SetIsTailWaving(bool isWaving)
