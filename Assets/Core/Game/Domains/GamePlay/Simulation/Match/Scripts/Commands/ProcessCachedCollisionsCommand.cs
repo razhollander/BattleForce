@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IPlayersTalentsManager _playersTalentsManager;
         private ITeleportGateService _teleportGateService;
-        private Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker.IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
+        private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
         
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
@@ -84,6 +84,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePowerUpBallWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandleBulletWallCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerHeartBulletCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerEnvironmentSpringCollision(objectA, objectB);
@@ -464,10 +465,45 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
             
-            ushort playerId;
             Body bulletBody;
             PlayerBulletS2C bulletModel;
             if (isPlayerToBulletCollision)
+            {
+                if (!_matchDataService.SimulationState.TryGetBulletById(objectB.Id, out bulletModel))
+                {
+                    LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                    return;
+                }
+                bulletBody = contact.FixtureB.Body;
+            }
+            else
+            {
+                if (!_matchDataService.SimulationState.TryGetBulletById(objectA.Id, out bulletModel))
+                {
+                    LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                    return;
+                }
+                
+                bulletBody = contact.FixtureA.Body;
+            }
+
+            DestroyBullet(bulletModel, bulletBody);
+        }
+        
+        private void HandlePlayerHeartBulletCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBulletToHeartCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.PlayerHeart;
+            var isHeartToBulletCollision = objectA.PhysicsBodyType == PhysicsBodyType.PlayerHeart && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+            var isCollision = isHeartToBulletCollision || isBulletToHeartCollision;
+            if (!isCollision)
+            {
+                return;
+            }
+            
+            ushort playerId;
+            Body bulletBody;
+            PlayerBulletS2C bulletModel;
+            if (isHeartToBulletCollision)
             {
                 if (!_matchDataService.SimulationState.TryGetBulletById(objectB.Id, out bulletModel))
                 {
@@ -497,6 +533,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 .SetProcessedTick(_processedTick)
                 .Execute();
         }
+
 
         private void DestroyBullet(PlayerBulletS2C bulletModel, Body bulletBody)
         {

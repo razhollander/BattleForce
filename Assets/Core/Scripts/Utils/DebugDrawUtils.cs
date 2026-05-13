@@ -40,7 +40,7 @@ namespace Core.Scripts.Utils
 
             Vector3 center = new Vector3(centerNum.X, centerNum.Y, 0);
             int count = localVertices.Length;
-            float duration = 1f;
+            float duration = 0.02f;
             Color drawColor = Color.green;
 
             for (int i = 0; i < count; i++)
