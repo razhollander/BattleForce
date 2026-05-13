@@ -8,7 +8,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     public class PlayerTalentsStateS2C
     {
         public int SelectedTalentIndex;
-        public Vector2 AimDirection;
+        public Vector2 AimDirection; // todo move out of here
         public FixedOrderedList<TalentStateS2C> Talents;
 
         public PlayerTalentsStateS2C(int maxTalents)
@@ -78,7 +78,28 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 if (talent.TalentType == talentType)
                 {
                     ref var talentState = ref Talents.Get(i);
-                    talentState.IsActive = isActive;
+                    talentState.IsCurrentlyActive = isActive;
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        public bool TrySetIsTalentAiming(TalentType talentType, bool isAiming)
+        {
+            if (Talents.Count == 0)
+            {
+                return false;
+            }
+            
+            for (int i = 0; i < Talents.Count; i++)
+            {
+                var talent = Talents[i];
+                if (talent.TalentType == talentType)
+                {
+                    ref var talentState = ref Talents.Get(i);
+                    talentState.IsCurrentlyAiming = isAiming;
                     return true;
                 }
             }
@@ -155,7 +176,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public TalentNormalCooldownStateS2C NormalCooldown;
         public TalentStocksCooldownStateS2C StocksCooldown;
         public TalentAwalysActiveCooldownStateS2C AlwaysActiveCooldown;
-        public bool IsActive;
+        public bool IsCurrentlyActive;
+        public bool IsCurrentlyAiming;
         
         public bool IsOnCooldown()
         {

@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         [SerializeField] private Button _playPlaybackButton;
         
         [SerializeField] private Toggle _localHostToggle;
+        [SerializeField] private Toggle _gamePadToggle;
         [SerializeField] private TMP_InputField _ipInputField;
         [SerializeField] private TMP_InputField _portInputField;
         [SerializeField] private TMP_Dropdown _playbacksDropdown;
@@ -31,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             return PlaybacksDropdown.options[selectedOptionIndex].text;
         }
         
-        public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked, Action onPlayPlaybackClicked, bool defaultOnlyLocal, string defaultIp, int defaultPort, string playerName)
+        public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked, Action onPlayPlaybackClicked, bool defaultOnlyLocal, string defaultIp, int defaultPort, string playerName, bool defaultIsGamePad)
         {
             _onClientClicked = onClientClicked;
             _onHostClicked = onHostClicked;
@@ -43,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _playPlaybackButton.onClick.AddListener(OnPlayPlaybackClicked);
 
             _localHostToggle.isOn = defaultOnlyLocal;
+            _gamePadToggle.isOn = defaultIsGamePad;
             _ipInputField.text = defaultIp;
             _portInputField.text = defaultPort.ToString();
             _playerNameInputField.text = playerName;
@@ -57,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         }
 
         public bool IsLocalHost => _localHostToggle.isOn;
+        public bool IsGamePad => _gamePadToggle.isOn;
         public string IpAddress => _ipInputField.text;
         public string PlayerName => _playerNameInputField.text;
 

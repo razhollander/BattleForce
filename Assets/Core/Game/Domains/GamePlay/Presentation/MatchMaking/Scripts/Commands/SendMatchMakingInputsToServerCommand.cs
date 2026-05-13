@@ -1,4 +1,6 @@
-using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
@@ -13,42 +15,50 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
     public class SendMatchMakingInputsToServerCommand : BaseCommand, ICommandVoid
     {
         private IClientNetworkManager _clientNetworkManager;
-        private IGameInputActionsController _gameInputActionsController;
-        private ITickProcessor _tickProcessor;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private ITickCounterService _tickCounterService;
+        private GetCalculatedPlayerInputsCommand _getCalculatedPlayerInputsCommand;
+        private IMatchMakingPlayerControllers _matchMakingPlayerControllers;
+        private IMatchMakingDataService _matchMakingDataService;
 
+        private ushort _playerId;
+
+        public SendMatchMakingInputsToServerCommand SetPlayerId(ushort playerId)
+        {
+            _playerId = playerId;
+            return this;
+        }
+        
         public override void ResolveDependencies()
         {
              _clientNetworkManager = _diContainer.Resolve<IClientNetworkManager>();
-             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
-             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
              _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
              _tickCounterService = _diContainer.Resolve<ITickCounterService>();
+             _matchMakingPlayerControllers = _diContainer.Resolve<IMatchMakingPlayerControllers>();
+             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
+             var commandFactory = _diContainer.Resolve<ICommandFactory>();
+             _getCalculatedPlayerInputsCommand = commandFactory.CreateCommandWithResult<GetCalculatedPlayerInputsCommand, GetCalculatedPlayerInputsCommand.Result>();
         }
 
         public void Execute()
         {
-            // if (PlaybackSettings.IsPlaybackEnabled)
-            // {
-            //     return;
-            // }
-
-            var isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
-            var isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
-            var isShootInputPressed = _gameInputActionsController.IsShootInputPressed();
-            var isMoveForwardInputPressed = _gameInputActionsController.IsMoveForwardInputPressed();
+            var playerPosition = _matchMakingPlayerControllers.GetPlayerPosition(_playerId);
+            var playerDirection = _matchMakingDataService.GetPlayer(_playerId).Spaceship.Transform.Direction;
+            var calculatedInputs = _getCalculatedPlayerInputsCommand
+                .SetPlayerDirection(playerDirection)
+                .SetPlayerPosition(playerPosition)
+                .Execute();
             LogService.LogTopic(
-                $"Sending: isMoveRightInputPressed:{isMoveRightInputPressed},isMoveLeftInputPressed:{isMoveLeftInputPressed},isShootInputPressed:{isShootInputPressed}",
+                $"Sending: isMoveRightInputPressed:{calculatedInputs.IsMoveRightInputPressed},isMoveLeftInputPressed:{calculatedInputs.IsMoveLeftInputPressed},isShootInputPressed:{calculatedInputs.IsShootInputPressed}",
                 LogTopicType.ClientNetwork);
             var playerInputPacket = new MatchMakingPlayerInputPacketC2S
             {
                 Tick = _tickCounterService.CurrentClientTick,
                 HeighestProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer,
-                IsMoveLeftInputPressed = isMoveLeftInputPressed,
-                IsMoveRightInputPressed = isMoveRightInputPressed,
-                IsShootInputPressed = isShootInputPressed,
-                IsMoveForwardInputPressed = isMoveForwardInputPressed,
+                IsMoveLeftInputPressed = calculatedInputs.IsMoveLeftInputPressed,
+                IsMoveRightInputPressed = calculatedInputs.IsMoveRightInputPressed,
+                IsShootInputPressed = calculatedInputs.IsShootInputPressed,
+                IsMoveForwardInputPressed = calculatedInputs.IsMoveForawrdInputPressed
             };
 
             _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchMakingPlayerInput, playerInputPacket, DeliveryMethod.Unreliable);

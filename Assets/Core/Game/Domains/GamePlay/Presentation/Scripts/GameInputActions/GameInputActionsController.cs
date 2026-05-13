@@ -97,14 +97,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             return _gameInputActions.GamePlay.Shoot.IsPressed();
         }
 
-        public bool IsTalentInputPressed()
+        public bool IsTalentAInputPressed()
         {
-            return _gameInputActions.GamePlay.Talent.IsPressed();
+            return _gameInputActions.GamePlay.TalentA.IsPressed();
         }
-
-        public bool IsSwitchTalentInputPressed()
+        public bool IsTalentBInputPressed()
         {
-            return _gameInputActions.GamePlay.SwitchTalent.IsPressed();
+            return _gameInputActions.GamePlay.TalentB.IsPressed();
+        }
+        public bool IsTalentCInputPressed()
+        {
+            return _gameInputActions.GamePlay.TalentC.IsPressed();
         }
 
         public async Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui = false)

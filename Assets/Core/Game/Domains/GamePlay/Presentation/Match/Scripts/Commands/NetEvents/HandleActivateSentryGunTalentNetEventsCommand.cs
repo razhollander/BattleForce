@@ -30,12 +30,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in events)
             {
                 _playerControllers.SetPlayerSentryGunState(netEvent.CasterPlayerId, true);
-                var casterPlayerId = netEvent.CasterPlayerId;
-
-                if (_matchDataService.GetPlayer(casterPlayerId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentForCaster))
-                {
-                    _playerControllers.UpdateIsPlayerArrowShownAccordingToTalentState(casterPlayerId, currentSelectedTalentForCaster);
-                }
             }
 
             _cachedPresentationEventsService.ActivateSentryGunTalentNetEvents.Clear();

@@ -23,7 +23,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void SetIsTailWaving(ushort playerId, bool isWaving);
         void SetPlayerSentryGunState(ushort playerId, bool isOn);
         void SetPlayersSpinnedState(ushort playerId, bool isOn);
-        void UpdateIsPlayerArrowShownAccordingToTalentState(ushort playerId, TalentStateS2C talentStateS2C);
         void SetPlayerUmbrellaState(ushort playerId, bool isOn);
         void SetPlayerChickenState(ushort playerId, bool isOn);
         void PlayLayEggAnimation(ushort playerId);

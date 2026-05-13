@@ -257,7 +257,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             if (GetPlayerById(playerId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent))
             {
-                return selectedTalent.TalentType == talentType && selectedTalent.IsActive;
+                return selectedTalent.TalentType == talentType && selectedTalent.IsCurrentlyActive;
             }
 
             return false;
@@ -266,6 +266,21 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public void SetIsTalentCurrentlyActiveForPlayer(ushort playerId, TalentType talentType, bool isActive)
         {
             GetPlayerById(playerId).Spaceship.TalentsState.TrySetIsTalentActive(talentType, isActive);
+        }
+        
+        public bool GetIsTalentAimingForPlayer(ushort playerId, TalentType talentType)
+        {
+            if (GetPlayerById(playerId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent))
+            {
+                return selectedTalent.TalentType == talentType && selectedTalent.IsCurrentlyAiming;
+            }
+
+            return false;
+        }
+
+        public void SetIsTalentCurrentlyAimingForPlayer(ushort playerId, TalentType talentType, bool isActive)
+        {
+            GetPlayerById(playerId).Spaceship.TalentsState.TrySetIsTalentAiming(talentType, isActive);
         }
         
         public ref PlayerBulletS2C GetBulletById(ushort bulletId)

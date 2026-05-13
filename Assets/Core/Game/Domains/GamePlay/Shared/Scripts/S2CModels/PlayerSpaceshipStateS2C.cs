@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
 using LiteNetLib.Utils;
 
@@ -14,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsEngineOn = true;
         public bool IsAlive = true;
         public bool IsSpinned;
+        public PlayerAssistArrowType AssistArrowType;
 
         public PlayerSpaceshipStateS2C(int maxTalents)
         {
@@ -55,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentsState.Serialize(writer);
             writer.Put(IsEngineOn);
             writer.Put(IsAlive);
+            writer.Put((ushort)AssistArrowType);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -65,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentsState.Deserialize(reader);
             IsEngineOn = reader.GetBool();
             IsAlive = reader.GetBool();
+            AssistArrowType = (PlayerAssistArrowType)reader.GetUShort();
         }
 
         public void SerializeDeltas(NetDataWriter writer)
@@ -72,6 +76,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Transform.SerializeDeltas(writer);
             Shoot.SerializeDeltas(writer);
             TalentsState.SerializeDeltas(writer);
+            writer.Put((ushort)AssistArrowType);
         }
 
         public void DeserializeDeltas(NetDataReader reader)
@@ -79,6 +84,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Transform.DeserializeDeltas(reader);
             Shoot.DeserializeDeltas(reader);
             TalentsState.DeserializeDeltas(reader);
+            AssistArrowType = (PlayerAssistArrowType)reader.GetUShort();
         }
     }
 }

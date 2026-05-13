@@ -22,8 +22,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private GameObject _healthBarGameObject; // todo move to the match domain
         [SerializeField] private PlayerLoadingRingView _loadingRingView;
         [SerializeField] private Transform _spaceShipTransform;
-        [SerializeField] private Transform _aimArrowTransform; // todo move to the match domain
-        [SerializeField] private GameObject _frontArrowGameObject; // todo move to the match domain
+        [SerializeField] private GameObject _aimArrowTransform; // todo move to the match domain
+        [SerializeField] private GameObject _moveAssistArrowTransform; // todo move to the match domain
+        [SerializeField] private SpriteRenderer _moveAssistArrowSpriteRenderer; // todo move to the match domain
+        [SerializeField] private Transform _assistArrowParentTransform; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
         [SerializeField] private Transform _leftEyeBall;
@@ -114,6 +116,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _spriteRenderer.color = color;
             _tailView.SetColor(color);
             _availableBulletSpriteRenderer.color = color;
+            _moveAssistArrowSpriteRenderer.color = color.Darken(0.3f);
         }
 
         public void SetBulletLoading(float cooldownLeft, float maxCooldown)
@@ -233,8 +236,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
             var targetRotation = direction.ToQuaternion();
 
-            _aimArrowTransform.rotation = MathUtils.ExpDecay(
-                _aimArrowTransform.rotation,
+            _assistArrowParentTransform.rotation = MathUtils.ExpDecay(
+                _assistArrowParentTransform.rotation,
                 targetRotation,
                 decay,
                 Time.deltaTime
@@ -257,20 +260,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _tailView.SetIsTailWaving(isWaving);
         }
 
-        public void SetIsTalentArrowShown(bool isShown, bool isFrontArrow)
-        {
-            if (isFrontArrow)
-            {
-                _frontArrowGameObject.TrySetActive(isShown);
-                _aimArrowTransform.gameObject.TrySetActive(false);
-            }
-            else
-            {
-                _aimArrowTransform.gameObject.TrySetActive(isShown);
-                _frontArrowGameObject.gameObject.TrySetActive(false);
-            }
-        }
-
         public void InterpolateUmbrellaRotation(System.Numerics.Vector2 rotation, float decay)
         {
             if (rotation.LengthSquared() < 0.0001f)
@@ -282,7 +271,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             var targetRotation = rotation.ToQuaternion();
 
             _umbrellaStickView.SetRotation(MathUtils.ExpDecay(
-                _aimArrowTransform.rotation,
+                _assistArrowParentTransform.rotation,
                 targetRotation,
                 decay,
                 Time.deltaTime
@@ -294,6 +283,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetIsDeadAuraEnabled(bool isEnabled)
         {
             _deadAura.SetActive(isEnabled);
+        }
+
+        public void ShowMoveAssistArrow()
+        {
+            _aimArrowTransform.TrySetActive(false);
+            _moveAssistArrowTransform.TrySetActive(true);
+        }
+
+        public void ShowAimAssistArrow()
+        {
+            _aimArrowTransform.TrySetActive(true);
+            _moveAssistArrowTransform.TrySetActive(false);
+        }
+
+        public void HideAssistArrow()
+        {
+            _aimArrowTransform.TrySetActive(false);
+            _moveAssistArrowTransform.TrySetActive(false);
         }
     }
 }

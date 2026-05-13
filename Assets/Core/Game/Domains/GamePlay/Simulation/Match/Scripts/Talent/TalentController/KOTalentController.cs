@@ -40,6 +40,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
         }
         
+        private bool IsCurrentlyAiming
+        {
+            get
+            {
+                return _matchDataService.SimulationState.GetIsTalentAimingForPlayer(_casterPlayerId, TalentType);
+            }
+            set
+            {
+                _matchDataService.SimulationState.SetIsTalentCurrentlyAimingForPlayer(_casterPlayerId, TalentType, value);
+            }
+        }
+        
         private bool _isInReturnPhase;
 
         public KOTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
@@ -58,19 +70,36 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick, int tick, float deltaTime)
         {
-            if (IsCurrentlyActive || !wasTalentInputDownThisTick)
-            {
-                return;
-            }
-
+            var isCurrentlyAiming = IsCurrentlyAiming;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             if (casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown())
             {
                 return;
             }
 
+            if (wasTalentInputDownThisTick)
+            {
+                if (!IsCurrentlyActive && !isCurrentlyAiming)
+                {
+                    IsCurrentlyAiming = true;
+                    casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.AimArrow;
+                }
+            }
+
+            if (IsCurrentlyActive)
+            {
+                return;
+            }
+
+            if (!wasTalentInputReleasedThisTick || !isCurrentlyAiming)
+            {
+                return;
+            }
+
+            casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.Hidden;
+            IsCurrentlyAiming = false;
             IsCurrentlyActive = true;
             _isInReturnPhase = false;
 

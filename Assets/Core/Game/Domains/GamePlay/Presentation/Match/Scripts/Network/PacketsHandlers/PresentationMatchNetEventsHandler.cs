@@ -642,7 +642,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 ref var talent = ref talents.Get(i);
                 if (talent.TalentType == talentType)
                 {
-                    talent.IsActive = true;
+                    talent.IsCurrentlyActive = true;
                     break;
                 }
             }
@@ -658,7 +658,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 if (talent.TalentType == talentType)
                 {
                     talent.NormalCooldown.CooldownEndTick = talentCooldownEndTick;
-                    talent.IsActive = false;
+                    talent.IsCurrentlyActive = false;
                     break;
                 }
             }

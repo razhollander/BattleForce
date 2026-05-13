@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
             }
 
             var isPlayerInSentryGun = playerSpaceshipState.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) 
-                                               && selectedTalent is {TalentType: TalentType.SentryGun, IsActive: true};
+                                               && selectedTalent is {TalentType: TalentType.SentryGun, IsCurrentlyActive: true};
 
             if (isPlayerInSentryGun)
             {

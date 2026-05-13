@@ -24,7 +24,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
         MatchPlayerModel LocalPlayer { get; }
         bool IsPlayerJoined { get; }
-        
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);

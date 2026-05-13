@@ -70,7 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             
             if (_matchDataService.IsPlayerJoined)
             {
-                _sendMatchInputsToServerCommand.Execute();
+                _sendMatchInputsToServerCommand.SetPlayerId(_matchDataService.LocalPlayer.PlayerId).Execute();
                 _deltaMS = DateTime.Now.Millisecond - _lastSendTime.Millisecond;
                 _highestMs = Mathf.Max(_deltaMS, _highestMs);
                 _lastSendTime = DateTime.Now;

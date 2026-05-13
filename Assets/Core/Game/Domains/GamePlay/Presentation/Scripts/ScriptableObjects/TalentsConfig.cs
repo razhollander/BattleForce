@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
     {
         public bool IsArrowShownWhileSelected;
         public bool IsArrowShownWhileActive;
+        public bool IsArrowShownOnlyWhilePressed;
         public bool IsFrontArrow;
     }
 }

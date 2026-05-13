@@ -34,12 +34,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var koProjectileId = netEvent.KoProjectileId;
                 _koProjectilesControllers.DestroyKOProjectile(koProjectileId);
-                var casterPlayerId = netEvent.CasterPlayerId;
-
-                if (_matchDataService.GetPlayer(casterPlayerId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentForCaster))
-                {
-                    _playerControllers.UpdateIsPlayerArrowShownAccordingToTalentState(casterPlayerId, currentSelectedTalentForCaster);
-                }
             }
 
             _cachedPresentationEventsService.DeactivateKOTalentNetEvents.Clear();

@@ -35,11 +35,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                 _koProjectilesControllers.CreateKOProjectile(koProjectileModel.Id, koProjectileModel.Position.ToUnityVector2(), koProjectileModel.Rotation.ToUnityVector2(),
                     playerCasterPosition, koProjectileModel.Size);
-                
-                if (_matchDataService.GetPlayer(playerCasterId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentForCaster))
-                {
-                    _playerControllers.UpdateIsPlayerArrowShownAccordingToTalentState(playerCasterId, currentSelectedTalentForCaster);
-                }
             }
             
             _cachedPresentationEventsService.CreateKOProjectileNetEvents.Clear();

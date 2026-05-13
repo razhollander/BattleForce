@@ -44,6 +44,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 _matchDataService.SimulationState.SetIsTalentCurrentlyActiveForPlayer(_casterPlayerId, TalentType, value);
             }
         }
+        
+        private bool IsCurrentlyAiming
+        {
+            get
+            {
+                return _matchDataService.SimulationState.GetIsTalentAimingForPlayer(_casterPlayerId, TalentType);
+            }
+            set
+            {
+                _matchDataService.SimulationState.SetIsTalentCurrentlyAimingForPlayer(_casterPlayerId, TalentType, value);
+            }
+        }
 
         public GrapplingHookTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
             IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedConfig)
@@ -61,8 +73,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick, int tick, float deltaTime)
         {
+            var isCurrentlyAiming = IsCurrentlyAiming;
+            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
+            if (casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown())
+            {
+                return;
+            }
+
+            if (wasTalentInputDownThisTick)
+            {
+                if (!IsCurrentlyActive && !isCurrentlyAiming)
+                {
+                    IsCurrentlyAiming = true;
+                    casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.AimArrow;
+                }
+            }
+
             if (IsCurrentlyActive)
             {
                 if (wasTalentInputDownThisTick)
@@ -76,17 +104,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            if (!wasTalentInputDownThisTick)
+            if (!wasTalentInputReleasedThisTick || !isCurrentlyAiming)
             {
                 return;
             }
 
-            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            if (casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown())
-            {
-                return;
-            }
-
+            casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.Hidden;
+            IsCurrentlyAiming = false;
             ActivateTalent(tick, casterPlayerState);
         }
 
