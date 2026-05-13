@@ -2409,7 +2409,9 @@ MonoBehaviour:
   _moveAssistArrowSpriteRenderer: {fileID: 5065660125430167243}
   _assistArrowParentTransform: {fileID: 8455100147721814953}
   _playerNameText: {fileID: 2447704602733785927}
-  _selectedTalentImage: {fileID: 5923260587429490229}
+  _talentViewPrefab: {fileID: 3613967119639632681}
+  _talentsContainer: {fileID: 1218084602524261265}
+  _talentViews: []
   _leftEyeBall: {fileID: 4600549616047267990}
   _leftEye: {fileID: 9138266757602045038}
   _rightEyeBall: {fileID: 3831587375936345955}

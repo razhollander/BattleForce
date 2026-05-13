@@ -25,8 +25,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly List<MatchPlayerController> _playerControllers = new ();
         private Transform _playersParent;
 
+        private readonly Core.Game.Domains.GamePlay.Shared.Scripts.ScriptableObjects.SharedGamePlayConfig _sharedGamePlayConfig;
+
         public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService)
+            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService, Core.Game.Domains.GamePlay.Shared.Scripts.ScriptableObjects.SharedGamePlayConfig sharedGamePlayConfig)
         {
             _matchDataService = matchDataService;
             _playerPool = new PlayerViewPool(playerViewPrefab, diContainer);
@@ -34,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _inputBeingUsedService = inputBeingUsedService;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -46,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform,
                 _stageCancellationTokenProvider, _inputBeingUsedService);
-            playerController.CreatePlayerView();
+            playerController.CreatePlayerView(_sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
             _playerControllers.Add(playerController);
         }
 
@@ -161,6 +164,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetPlayerTalentSelected(ushort playerId, int talentIndex)
         {
             GetPlayer(playerId).SetSelectedTalent(talentIndex);
+        }
+
+        public void UpdatePlayerTalents(ushort playerId, Core.Scripts.Utils.CustomCollections.FixedOrderedList<Core.Game.Domains.GamePlay.Shared.S2CModels.TalentStateS2C> talents, int currentServerTick)
+        {
+            var selectedTalentIndex = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.SelectedTalentIndex;
+            GetPlayer(playerId).UpdateTalents(talents, selectedTalentIndex, currentServerTick);
         }
 
         public void SetIsTailWaving(ushort playerId, bool isWaving)

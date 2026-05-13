@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void HidePlayerHealthBar(ushort playerId);
         void DestroyAll();
         void SetPlayerTalentSelected(ushort playerId, int talentIndex);
+        void UpdatePlayerTalents(ushort playerId, Core.Scripts.Utils.CustomCollections.FixedOrderedList<Core.Game.Domains.GamePlay.Shared.S2CModels.TalentStateS2C> talents, int currentServerTick);
         void SetIsTailWaving(ushort playerId, bool isWaving);
         void SetPlayerSentryGunState(ushort playerId, bool isOn);
         void SetPlayersSpinnedState(ushort playerId, bool isOn);

@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
@@ -42,13 +43,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             PlayerId = playerId;
         }
 
-        public void CreatePlayerView()
+        public void CreatePlayerView(int maxTalents)
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             var playerName = playerModel.PlayerName;
             _playerView = _playerPool.Spawn();
             _playerView.transform.SetParent(_parent);
             _playerView.name = "Player_" + PlayerId + "_" + playerName;
+            _playerView.CreateTalents(maxTalents);
             _playerView.SetPlayerName(playerName);
             _playerView.SetIsTailWaving(true);
             var playerTransform = playerModel.Spaceship.Transform;
@@ -58,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
             var isDead = playerModel.Spaceship.Health.CurrentHealth == 0;
             SetIsDeadAuraEnabled(isDead);
+            UpdateTalents(playerModel.Spaceship.TalentsState.Talents, playerModel.Spaceship.TalentsState.SelectedTalentIndex, 0);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
         }
@@ -110,8 +113,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             var talentState = playerModel.Spaceship.TalentsState.Talents[talentIndex];
             var talentType = talentState.TalentType;
-            var talentSprite = _gamePlayConfig.TalentCards.TalentSprites[talentType];
-            _playerView.SetTalentSprite(talentSprite);
+            _playerView.SetSelectedTalent(talentIndex);
             var isInChickenState = talentType == TalentType.Chicken;
             SetChickenState(isInChickenState);
         }
@@ -174,35 +176,61 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             var talentsState = playerModel.Spaceship.TalentsState;
+
+            for (int i = 0; i < talentsState.Talents.Count; i++)
+            {
+                var talentState = talentsState.Talents[i];
+
+                switch (talentState.CooldownType)
+                {
+                    case TalentCooldownType.Normal:
+                        var maxCooldown = talentState.NormalCooldown.MaxCooldown;
+                        var isOnCooldown = talentState.NormalCooldown.IsOnCooldown();
+                        var cooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
+                        _playerView.UpdateTalentCooldown(i, maxCooldown, cooldownLeft, isOnCooldown);
+                        break;
+                    case TalentCooldownType.Stocks:
+                        var maxCooldownStocks = talentState.StocksCooldown.MaxSingleStockCooldown;
+                        var isOnCooldownStocks = talentState.StocksCooldown.IsOnCooldown();
+                        var cooldownLeftStocks = talentState.StocksCooldown.IsAtMaxStocks() ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
+                        _playerView.UpdateTalentCooldown(i, maxCooldownStocks, cooldownLeftStocks, isOnCooldownStocks);
+                        _playerView.UpdateTalentStocks(i, talentState.StocksCooldown.CurrentStocksAmount);
+                        break;
+                    case TalentCooldownType.AlwaysActive:
+                        break;
+                    default: LogService.LogError("Not implemented cooldown type: " + talentState.CooldownType);
+                        break;
+                }
+            }
+
+            // Also keep updating the loading ring based on the current selected talent if needed, or remove SetTalentLoading
+            // Wait, we still need SetTalentLoading for the loading ring maybe?
+            // Yes, let's keep SetTalentLoading for the currently selected talent.
             if (!talentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
             {
                 return;
             }
-            
 
-            float maxCooldown = 0;
-            float cooldownLeft = 0;
+            float maxCooldownRing = 0;
+            float cooldownLeftRing = 0;
 
             switch (currentSelectedTalentState.CooldownType)
             {
                 case TalentCooldownType.Normal:
-                    maxCooldown = currentSelectedTalentState.NormalCooldown.MaxCooldown;
-                    cooldownLeft = currentSelectedTalentState.NormalCooldown.IsOnCooldown() ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, currentSelectedTalentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
+                    maxCooldownRing = currentSelectedTalentState.NormalCooldown.MaxCooldown;
+                    cooldownLeftRing = currentSelectedTalentState.NormalCooldown.IsOnCooldown() ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, currentSelectedTalentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
                     break;
                 case TalentCooldownType.Stocks:
-                    maxCooldown = currentSelectedTalentState.StocksCooldown.MaxSingleStockCooldown;
-                    cooldownLeft = currentSelectedTalentState.StocksCooldown.CurrentStocksAmount > 0 ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, currentSelectedTalentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
+                    maxCooldownRing = currentSelectedTalentState.StocksCooldown.MaxSingleStockCooldown;
+                    cooldownLeftRing = currentSelectedTalentState.StocksCooldown.CurrentStocksAmount > 0 ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, currentSelectedTalentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
                     break;
                 case TalentCooldownType.AlwaysActive:
-                    maxCooldown = 0;
-                    cooldownLeft = 0;
-                    break;
-                default:
-                    LogService.LogError("Not implemented cooldown type: " + currentSelectedTalentState.CooldownType);
+                    maxCooldownRing = 0;
+                    cooldownLeftRing = 0;
                     break;
             }
             
-            _playerView.SetTalentLoading(cooldownLeft, maxCooldown);
+            _playerView.SetTalentLoading(cooldownLeftRing, maxCooldownRing);
         }
 
         public void RestoreBulletEffect()
@@ -269,5 +297,54 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _playerView.SetIsDeadAuraEnabled(isEnabled);
         }
+
+        private TalentVisualData[] ConvertTalentsToVisualData(Core.Scripts.Utils.CustomCollections.FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
+        {
+            var talentsVisualData = new TalentVisualData[talents.Count];
+
+            for (int i = 0; i < talentsVisualData.Length; i++)
+            {
+                var talentVisualData = new TalentVisualData();
+                var talentState = talents[i];
+                talentVisualData.Icon = _gamePlayConfig.TalentCards.TalentSprites[talentState.TalentType];
+
+                switch (talentState.CooldownType)
+                {
+                    case TalentCooldownType.Normal:
+                        var isOnCooldown = talentState.IsOnCooldown();
+                        talentVisualData.IsOnCooldown = isOnCooldown;
+                        talentVisualData.IsStockable = false;
+                        talentVisualData.CooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
+                        break;
+                    case TalentCooldownType.Stocks:
+                        var maxCooldown2 = talentState.StocksCooldown.MaxSingleStockCooldown;
+                        var isOnCooldown2 = talentState.StocksCooldown.IsOnCooldown();
+                        var cooldownLeft2 = talentState.StocksCooldown.IsAtMaxStocks() ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
+                        talentVisualData.IsStockable = true;
+                        talentVisualData.StocksAmount = talentState.StocksCooldown.CurrentStocksAmount;
+                        talentVisualData.CooldownLeft = cooldownLeft2;
+                        talentVisualData.MaxCooldown = maxCooldown2;
+                        talentVisualData.IsOnCooldown = isOnCooldown2;
+                        break;
+                    case TalentCooldownType.AlwaysActive:
+                        talentVisualData.CooldownLeft = 1;
+                        talentVisualData.MaxCooldown = 1;
+                        talentVisualData.IsOnCooldown = true;
+                        break;
+                    default: LogService.LogError("Not implemented cooldown type: " + talentState.CooldownType);
+                        break;
+                }
+                talentsVisualData[i] = talentVisualData;
+            }
+
+            return talentsVisualData;
+        }
+
+        public void UpdateTalents(Core.Scripts.Utils.CustomCollections.FixedOrderedList<TalentStateS2C> talents, int selectedTalentIndex, int currentServerTick)
+        {
+            _playerView.UpdateTalents(ConvertTalentsToVisualData(talents, currentServerTick));
+            _playerView.SetSelectedTalent(selectedTalentIndex);
+        }
+
     }
 }

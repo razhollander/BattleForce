@@ -51,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _talentCardObtainedEffectController.PlayEffect(talentCardPosition, playerPosition);
                 _talentCardControllers.DestroyTalentCard(talentCardObtainedNetEvent.TalentCardId);
                 _matchPlayerUIControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.PlayerTalents, _currentServerTick);
+                _playerControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.PlayerTalents, _currentServerTick);
                 
                 var isFirstTalentObtained = talentCardObtainedNetEvent.PlayerTalents.Count == 1;
                 if (isFirstTalentObtained || talentCardObtainedNetEvent.DidReplaceTalent)

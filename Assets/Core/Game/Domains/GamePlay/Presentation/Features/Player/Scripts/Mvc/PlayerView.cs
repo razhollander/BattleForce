@@ -27,7 +27,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private SpriteRenderer _moveAssistArrowSpriteRenderer; // todo move to the match domain
         [SerializeField] private Transform _assistArrowParentTransform; // todo move to the match domain
         [SerializeField] private TextMeshProUGUI _playerNameText;
-        [SerializeField] private Image _selectedTalentImage; // todo move to the match domain
+        [SerializeField] private Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.MatchPlayerTalentUIView _talentViewPrefab;
+        [SerializeField] private Transform _talentsContainer;
+        private Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.MatchPlayerTalentUIView[] _talentViews;
         [SerializeField] private Transform _leftEyeBall;
         [SerializeField] private Transform _leftEye;
         [SerializeField] private Transform _rightEyeBall;
@@ -101,9 +103,60 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _tailView.UpdateTail();
         }
         
-        public void SetTalentSprite(Sprite sprite)
+        public void UpdateTalents(Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TalentVisualData[] talents)
         {
-            _selectedTalentImage.sprite = sprite;
+            if (_talentViews == null) return;
+            for (int i = 0; i < _talentViews.Length; i++)
+            {
+                var view = _talentViews[i];
+                if (i > talents.Length - 1)
+                {
+                    view.SetNoneTalent();
+                }
+                else
+                {
+                    view.SetTalent(talents[i]);
+                }
+            }
+        }
+
+        public void SetSelectedTalent(int selectedTalentIndex)
+        {
+            if (_talentViews == null) return;
+            for (int i = 0; i < _talentViews.Length; i++)
+            {
+                var talentView = _talentViews[i];
+                talentView.SetIsSelected(selectedTalentIndex == i);
+            }
+        }
+
+        public void UpdateTalentCooldown(int talentIndex, float maxCooldown, float cooldownLeft, bool isOnCooldown)
+        {
+            if (_talentViews != null && talentIndex < _talentViews.Length)
+            {
+                _talentViews[talentIndex].UpdateCooldown(maxCooldown, cooldownLeft, isOnCooldown);
+            }
+        }
+
+        public void UpdateTalentStocks(int talentIndex, int stockAmount)
+        {
+            if (_talentViews != null && talentIndex < _talentViews.Length)
+            {
+                _talentViews[talentIndex].SetStocksAmount(stockAmount);
+            }
+        }
+
+        public void CreateTalents(int maxTalentsAmount)
+        {
+            if (_talentViews != null || _talentViewPrefab == null || _talentsContainer == null) return;
+
+            _talentViews = new Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.MatchPlayerTalentUIView[maxTalentsAmount];
+            for (int i = 0; i < maxTalentsAmount; i++)
+            {
+                var view = Instantiate(_talentViewPrefab, _talentsContainer);
+                view.SetNoneTalent();
+                _talentViews[i] = view;
+            }
         }
 
         public void SetPlayerName(string playerName)
