@@ -63,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             var startingDirection = Vector2.One;
             var velocity = startingDirection * 0.01f;
             var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
+            var heartRadius = _gamePlayConfig.PlayerSpaceship.DefaultHeartRadius;
             var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
 
             foreach (var kvp in _playerJoinedPacketsPerPeer)
@@ -94,7 +95,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                     peer.Tag = playerId;
                     
                     _simulationInputService.AddPlayer(playerId);
-                    _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius);
+                    _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius, heartRadius);
                     _networkManager.AddPlayerPeer(playerId, peer);
                     _netEventsDataService.StartSavingPlayerEvents(playerId);
                     _netEventsDataService.AddMatchMakingPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);
