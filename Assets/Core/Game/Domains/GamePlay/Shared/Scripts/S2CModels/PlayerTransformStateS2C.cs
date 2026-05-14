@@ -34,6 +34,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return Position + Direction * Radius;
         }
         
+        public Vector2 GetHeartPosition()
+        {
+            return Position - Direction * Radius;
+        }
+        
         public void Serialize(NetDataWriter writer)
         {
             writer.PutVector2Quantized(Position);

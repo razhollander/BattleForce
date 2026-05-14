@@ -9,72 +9,71 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             switch (type)
             {
                 case PhysicsBodyType.PlayerSpaceship:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
-                                    | GetCollisionMask(PhysicsBodyType.PlayerBullet)
-                                    | GetCollisionMask(PhysicsBodyType.Lava)
-                                    | GetCollisionMask(PhysicsBodyType.TeamFloor)
-                                    | GetCollisionMask(PhysicsBodyType.StartMatchWall)
-                                    | GetCollisionMask(PhysicsBodyType.EnvironmentSpring)
-                                    | GetCollisionMask(PhysicsBodyType.EnvironmentTeleportGate)
-                                    | GetCollisionMask(PhysicsBodyType.SwapField)
-                                    | GetCollisionMask(PhysicsBodyType.KOProjectile)
-                                    | GetCollisionMask(PhysicsBodyType.StageBoundary)
-                                    | GetCollisionMask(PhysicsBodyType.ChickenEgg);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
+                                    | GetCollisionMask(PhysicsCollisionType.StartMatchWall)
+                                    | GetCollisionMask(PhysicsCollisionType.CollideOnlyWithPlayer)
+                                    | GetCollisionMask(PhysicsCollisionType.KOProjectile)
+                                    | GetCollisionMask(PhysicsCollisionType.ChickenEgg)
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerBullet);
+                    break;
+                case PhysicsBodyType.PlayerHeart:
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerBullet);
                     break;
                 case PhysicsBodyType.PlayerBullet:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
-                                    | GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
-                                    | GetCollisionMask(PhysicsBodyType.TalentCard)
-                                    | GetCollisionMask(PhysicsBodyType.PowerUpBall)
-                                    | GetCollisionMask(PhysicsBodyType.StartMatchWall);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerHeart)
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsCollisionType.TalentCard)
+                                    | GetCollisionMask(PhysicsCollisionType.PowerUpBall)
+                                    | GetCollisionMask(PhysicsCollisionType.StartMatchWall);
                     break;
                 case PhysicsBodyType.Wall:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
-                                    | GetCollisionMask(PhysicsBodyType.PlayerBullet)
-                                    | GetCollisionMask(PhysicsBodyType.PowerUpBall)
-                                    | GetCollisionMask(PhysicsBodyType.KOProjectile)
-                                    | GetCollisionMask(PhysicsBodyType.GrapplingHookProjectile);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerBullet)
+                                    | GetCollisionMask(PhysicsCollisionType.PowerUpBall)
+                                    | GetCollisionMask(PhysicsCollisionType.KOProjectile)
+                                    | GetCollisionMask(PhysicsCollisionType.GrapplingHookProjectile);
                     break;
                 case PhysicsBodyType.TalentCard:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerBullet);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerBullet);
                     break;
                 case PhysicsBodyType.Lava:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.PowerUpBall:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.Wall)
-                                    | GetCollisionMask(PhysicsBodyType.PlayerBullet);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerBullet);
                     break;
                 case PhysicsBodyType.TeamFloor:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.StartMatchWall:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
-                                    | GetCollisionMask(PhysicsBodyType.PlayerBullet);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerBullet);
                     break;
                 case PhysicsBodyType.EnvironmentSpring:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.EnvironmentTeleportGate:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.KOProjectile:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
-                                    | GetCollisionMask(PhysicsBodyType.Wall)
-                                    | GetCollisionMask(PhysicsBodyType.ChickenEgg);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsCollisionType.Wall)
+                                    | GetCollisionMask(PhysicsCollisionType.ChickenEgg);
                     break;
                 case PhysicsBodyType.SwapField:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.StageBoundary:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.GrapplingHookProjectile:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.Wall);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.Wall);
                     break;
                 case PhysicsBodyType.ChickenEgg:
-                    collisionMask = GetCollisionMask(PhysicsBodyType.PlayerSpaceship)
-                                    | GetCollisionMask(PhysicsBodyType.KOProjectile);
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsCollisionType.KOProjectile);
                     break;
                 default:
                     collisionMask = 0xFFFF;
@@ -84,7 +83,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return (ushort) collisionMask;
         }
 
-        public static ushort GetCollisionMask(this PhysicsBodyType type)
+        public static ushort GetCollisionMask(this PhysicsCollisionType type)
         {
             return (ushort) (1 << (int) type);
         }
