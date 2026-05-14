@@ -389,7 +389,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _polygonShapePool.Return(shape);
         }
 
-        public void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius)
+        public void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius, float heartRadius)
         {
             var bodyDef = GetBodyDef();
             bodyDef.position = position;
@@ -425,7 +425,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _bodyDefPool.Return(heartBodyDef);
 
             var heartShape = GetCircleShape();
-            heartShape.Radius = radius * 0.8f; // Smaller radius for the heart
+            heartShape.Radius = heartRadius; // Smaller radius for the heart
 
             var heartFixtureDef = GetFixtureDef();
             heartFixtureDef.shape = heartShape;

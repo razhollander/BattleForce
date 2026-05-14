@@ -144,6 +144,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
                 var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
                 var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
+                var heartRadius = _gamePlayConfig.PlayerSpaceship.DefaultHeartRadius;
 
                 var teamId = player.TeamId;
                 Vector2 position;
@@ -192,7 +193,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     talentState.ClearCooldown();
                 }
                 
-                _physicsSimulator.AddPlayer(player.Id, player.TeamId, position, velocity, radius);
+                _physicsSimulator.AddPlayer(player.Id, player.TeamId, position, velocity, radius, heartRadius);
             }
         }
 
