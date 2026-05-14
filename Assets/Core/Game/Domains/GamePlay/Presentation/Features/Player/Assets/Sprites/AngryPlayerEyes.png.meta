@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 1efd4be48bc4f4f98bb90f71269251cb
+guid: 9f7208de736d34c1da2ee91838f907e8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3428420044005246694
-    second: FrontArrow_0
+      213: -2743243157238744820
+    second: AngryPlayerEyes 1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,7 +72,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 256
+    maxTextureSize: 128
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: FrontArrow_0
+      name: AngryPlayerEyes 1_0
       rect:
         serializedVersion: 2
-        x: 1
-        y: 67
-        width: 199
-        height: 111
+        x: 12
+        y: 18
+        width: 65
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a19fc30722ecb60d0800000000000000
-      internalID: -3428420044005246694
+      spriteID: c09734002ea0ee9d0800000000000000
+      internalID: -2743243157238744820
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      FrontArrow_0: -3428420044005246694
+      AngryPlayerEyes 1_0: -2743243157238744820
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
