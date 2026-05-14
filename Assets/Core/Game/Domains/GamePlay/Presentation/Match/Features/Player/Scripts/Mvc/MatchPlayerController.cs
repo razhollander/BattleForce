@@ -27,10 +27,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly IInputBeingUsedService _inputBeingUsedService;
         public readonly ushort PlayerId;
-        private PlayerView _playerView;
-        private readonly PlayerViewPool _playerPool;
+        private MatchPlayerView _playerView;
+        private readonly MatchPlayerViewPool _playerPool;
 
-        public MatchPlayerController(PlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
+        public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
             NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService) 
         {
             _playerPool = playerPool;
@@ -51,11 +51,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.transform.SetParent(_parent);
             _playerView.name = "Player_" + PlayerId + "_" + playerName;
             _playerView.CreateTalents(maxTalents);
-            _playerView.SetPlayerName(playerName);
-            _playerView.SetIsTailWaving(true);
+            _playerView.Base.SetPlayerName(playerName);
+            _playerView.Base.SetIsTailWaving(true);
             var playerTransform = playerModel.Spaceship.Transform;
-            _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
-            _playerView.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
+            _playerView.Base.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
+            _playerView.Base.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
             var isDead = playerModel.Spaceship.Health.CurrentHealth == 0;
@@ -126,8 +126,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerRotation = playerTransformState.Direction.ToUnityVector2().ToQuaternion();
             var decay = _gamePlayConfig.ExponentialDecay;
             var aimDirection = playerModel.Spaceship.TalentsState.AimDirection;
-            _playerView.InterpolateTransform(playerPosition, playerRotation, decay);
-            _playerView.UpdateTailBend();
+            _playerView.Base.InterpolateTransform(playerPosition, playerRotation, decay);
+            _playerView.Base.UpdateTailBend();
             UpdateAim(playerModel.Spaceship.AssistArrowType, aimDirection, decay);
 
             if (playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) &&
@@ -165,7 +165,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerShootState = playerModel.Spaceship.Shoot;
             var maxShootCooldown = playerShootState.MaxCooldown;
             var cooldownSecondsLeft = playerShootState.CooldownSecondsLeft;
-            _playerView.SetBulletLoading(cooldownSecondsLeft, maxShootCooldown);
+            _playerView.Base.SetBulletLoading(cooldownSecondsLeft, maxShootCooldown);
             if (Mathf.Approximately(cooldownSecondsLeft, maxShootCooldown))
             {
                 RestoreBulletEffect();
@@ -230,17 +230,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                     break;
             }
             
-            _playerView.SetTalentLoading(cooldownLeftRing, maxCooldownRing);
+            _playerView.Base.SetTalentLoading(cooldownLeftRing, maxCooldownRing);
         }
 
         public void RestoreBulletEffect()
         {
-            _playerView.ShowIsBulletAvailable(true);
+            _playerView.Base.ShowIsBulletAvailable(true);
         }
         
         public void DoShootEffect()
         {
-            _playerView.ShowIsBulletAvailable(false);
+            _playerView.Base.ShowIsBulletAvailable(false);
         }
 
         public void SetHealth(ushort currentHealth, ushort maxHealth)
@@ -250,17 +250,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetTransform(Vector2 position, Vector2 direction)
         {
-            _playerView.SetPositionAndRotation(position.ToUnityVector2(), direction.ToUnityVector2().ToQuaternion());
+            _playerView.Base.SetPositionAndRotation(position.ToUnityVector2(), direction.ToUnityVector2().ToQuaternion());
         }
 
         public UnityEngine.Vector2 GetPosition()
         {
-            return _playerView.GetPosition();
+            return _playerView.Base.GetPosition();
         }
 
         public Transform GetSpaceShipTransform()
         {
-            return _playerView.GetSpaceShipTransform();
+            return _playerView.Base.GetSpaceShipTransform();
         }
 
         public void SetIsHealthBarShown(bool isShown)
@@ -270,17 +270,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void Destroy()
         {
-            _playerView.Despawn();
+            _playerView.Base.Despawn();
         }
 
         public Transform GetTransform()
         {
-            return _playerView.GetTransform();
+            return _playerView.Base.GetTransform();
         }
 
         public void SetIsTailWaving(bool isMoving)
         {
-            _playerView.SetIsTailWaving(isMoving);
+            _playerView.Base.SetIsTailWaving(isMoving);
         }
 
         public void SetPlayersSpinnedState(bool isOn)

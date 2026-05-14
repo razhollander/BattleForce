@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
 {
     public class GamePlayMatchInstaller : MonoInstaller
     {
-        [SerializeField] private PlayerView _playerViewPrefab;
+        [SerializeField] private MatchPlayerView _playerViewPrefab;
         [SerializeField] private EnvironmentLavaWallView _environmentLavaWallViewPrefab;
         [SerializeField] private TalentCardView _talentCardViewPrefab;
         [SerializeField] private TalentCardObtainedEffectView _talentCardObtainedEffectView;

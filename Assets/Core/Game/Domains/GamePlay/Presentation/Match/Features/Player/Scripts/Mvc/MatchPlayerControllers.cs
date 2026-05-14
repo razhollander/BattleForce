@@ -17,21 +17,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
     public class MatchPlayerControllers : IMatchPlayerControllers
     {
         private readonly IMatchDataService _matchDataService;
-        private readonly PlayerViewPool _playerPool;
+        private readonly MatchPlayerViewPool _playerPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly IInputBeingUsedService _inputBeingUsedService;
         private readonly List<MatchPlayerController> _playerControllers = new ();
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private Transform _playersParent;
 
-        private readonly Core.Game.Domains.GamePlay.Shared.Scripts.ScriptableObjects.SharedGamePlayConfig _sharedGamePlayConfig;
 
-        public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService, Core.Game.Domains.GamePlay.Shared.Scripts.ScriptableObjects.SharedGamePlayConfig sharedGamePlayConfig)
+        public MatchPlayerControllers(IMatchDataService matchDataService, MatchPlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
+            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _matchDataService = matchDataService;
-            _playerPool = new PlayerViewPool(playerViewPrefab, diContainer);
+            _playerPool = new MatchPlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
