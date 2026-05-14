@@ -43,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private PlayerChickenView _playerChickenView;
         [SerializeField] private YearsOfPainView _yearsOfPainView;
         [SerializeField] private GameObject _deadAura;
+        [SerializeField] private Transform _heart;
         
         private Transform _transform;
         private SpriteRenderer _leftEyeRenderer;
@@ -186,6 +187,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             transform.position = position;
             _spaceShipTransform.rotation = rotation;
+            _heart.rotation = Quaternion.identity;
         }
 
         public void ShowIsBulletAvailable(bool isAvailable)
