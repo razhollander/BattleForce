@@ -215,12 +215,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
                 Time.deltaTime
             );
 
-            UpdateEyesToLookAtAimArrow(direction);
-        }
-
-        private void UpdateEyesToLookAtAimArrow(System.Numerics.Vector2 aimArrowDirection)
-        {
-            _playerEyesView.UpdateEyesToLookAtDirection(aimArrowDirection);
+            _playerEyesView.UpdateEyesToLookAtDirection(direction);
         }
 
         public void SetIsTailWaving(bool isWaving)
@@ -245,7 +240,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
                 Time.deltaTime
             ));
 
-            UpdateEyesToLookAtAimArrow(rotation);
+            _playerEyesView.UpdateEyesToLookAtDirection(rotation);
         }
 
         public void SetIsDeadAuraEnabled(bool isEnabled)

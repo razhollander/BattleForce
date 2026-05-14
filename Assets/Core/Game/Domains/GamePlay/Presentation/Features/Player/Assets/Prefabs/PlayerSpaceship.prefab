@@ -1833,10 +1833,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64541dafd98e64ce4b7710e4d8daf824, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _leftEyeBall: {fileID: 6919752368278847262}
-  _leftEye: {fileID: 4600549616047267990}
-  _rightEyeBall: {fileID: 6203939059367246872}
-  _rightEye: {fileID: 3831587375936345955}
+  _leftEyeBall: {fileID: 4600549616047267990}
+  _leftEye: {fileID: 6919752368278847262}
+  _rightEyeBall: {fileID: 3831587375936345955}
+  _rightEye: {fileID: 6203939059367246872}
   _eyeMovementRadius: 0.1
   _spinnedEyesCanvas: {fileID: 2524781208092136356}
   _spinnedEyesAnimator: {fileID: 3321683973095918071}
