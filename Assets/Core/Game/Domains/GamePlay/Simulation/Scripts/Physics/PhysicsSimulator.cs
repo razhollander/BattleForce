@@ -409,30 +409,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.filter.categoryBits = PhysicsBodyType.PlayerSpaceship.GetCollisionsCategory();
             fixtureDef.filter.maskBits = PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
-            fixtureDef.filter.groupIndex = (short)-teamId;
+            var playerGroupIndex = (short)-teamId;
+            fixtureDef.filter.groupIndex = playerGroupIndex;
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
             _circleShapePool.Return(circleShape);
             
-            // Add PlayerHeart body
+            AddPlayerHeart(id, position, heartRadius, playerGroupIndex);
+        }
+
+        private void AddPlayerHeart(ushort id, Vector2 position, float heartRadius, short groupIndex)
+        {
             var heartBodyDef = GetBodyDef();
-            heartBodyDef.position = position; // Same initial position
+            heartBodyDef.position = position;
             heartBodyDef.type = BodyType.Static;
-            heartBodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PlayerHeart); // Use same player ID
+            heartBodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PlayerHeart);
             heartBodyDef.allowSleep = false;
             var heartBody = _world.CreateBody(heartBodyDef);
             _bodyDefPool.Return(heartBodyDef);
 
             var heartShape = GetCircleShape();
-            heartShape.Radius = heartRadius; // Smaller radius for the heart
+            heartShape.Radius = heartRadius;
 
             var heartFixtureDef = GetFixtureDef();
             heartFixtureDef.shape = heartShape;
-            heartFixtureDef.isSensor = true; // It's a trigger
+            heartFixtureDef.isSensor = true;
             heartFixtureDef.filter.categoryBits = PhysicsBodyType.PlayerHeart.GetCollisionsCategory();
             heartFixtureDef.filter.maskBits = PhysicsCollisionType.PlayerHeart.GetCollisionMask();
-            heartFixtureDef.filter.groupIndex = (short)-teamId; // Same team as player
+            heartFixtureDef.filter.groupIndex = groupIndex;
 
             heartBody.CreateFixture(heartFixtureDef);
             _fixtureDefPool.Return(heartFixtureDef);
