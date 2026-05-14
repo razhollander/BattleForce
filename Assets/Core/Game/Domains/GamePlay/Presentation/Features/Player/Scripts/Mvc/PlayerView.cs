@@ -132,6 +132,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _availableBulletSpriteRenderer.gameObject.TrySetActive(isAvailable);
         }
 
+        public void MakeAngryForShortDuration(CancellationToken cancellationToken)
+        {
+            _playerEyesView.MakeAngryForShortDuration(cancellationToken);
+        }
+        
         public void UpdateHealthBar(int health, int maxHealth)
         {
             _healthBar.UpdateBar(health, maxHealth);

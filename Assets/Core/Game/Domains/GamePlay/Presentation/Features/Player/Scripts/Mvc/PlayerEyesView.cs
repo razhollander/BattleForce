@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using Core.Scripts.Extensions;
 using Core.Scripts.Helpers;
@@ -12,14 +13,46 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private Transform _leftEye;
         [SerializeField] private Transform _rightEyeBall;
         [SerializeField] private Transform _rightEye;
+        [SerializeField] private GameObject _angryRightEye;
+        [SerializeField] private GameObject _angryLeftEye;
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
+        [SerializeField] private float _angryDurationInSeconds = 0.5f;
         
         private SpriteRenderer _leftEyeRenderer;
         private SpriteRenderer _rightEyeRenderer;
         private Sprite _defaultLeftEyeSprite;
         private Sprite _defaultRightEyeSprite;
+        private CancellationTokenSource _angryEyesCancellationTokenSource;
+
+        public void MakeAngryForShortDuration(CancellationToken cancellationToken)
+        {
+            DisableSpinned();
+            _angryEyesCancellationTokenSource?.Cancel();
+            _angryEyesCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            SetAngryForShortDurationAsync(_angryEyesCancellationTokenSource.Token).Forget();
+        }
+
+        private async Awaitable SetAngryForShortDurationAsync(CancellationToken cancellationToken)
+        {
+            _angryLeftEye.TrySetActive(true);
+            _angryRightEye.TrySetActive(true);
+            _leftEye.gameObject.TrySetActive(false);
+            _rightEye.gameObject.TrySetActive(false);
+            
+            try
+            {
+                await Awaitable.WaitForSecondsAsync(_angryDurationInSeconds, cancellationToken);
+            }
+            finally
+            {
+                _angryLeftEye.TrySetActive(false);
+                _angryRightEye.TrySetActive(false);
+                _leftEye.gameObject.TrySetActive(true);
+                _rightEye.gameObject.TrySetActive(true);
+            }
+        }
 
         public void OnCreated()
         {
@@ -36,6 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
             if (isSpinned)
             {
+                _angryEyesCancellationTokenSource.Cancel();
                 _spinnedEyesCanvas.enabled = true;
                 _spinnedEyesAnimator.PlayAnimation(cancellationTokenSource).Forget();   
             }
