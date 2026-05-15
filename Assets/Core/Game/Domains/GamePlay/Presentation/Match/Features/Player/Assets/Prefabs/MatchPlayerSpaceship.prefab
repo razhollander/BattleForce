@@ -1698,6 +1698,18 @@ PrefabInstance:
       value: 87.1725
       objectReference: {fileID: 0}
     - target: {fileID: 4845709276333870003, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 4845709276333870003, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 4845709276333870003, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.012999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 4845709276333870003, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -1727,11 +1739,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4845709276333870003, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1.706
+      value: 2.322
       objectReference: {fileID: 0}
     - target: {fileID: 4845709276333870003, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.344
+      value: 1.238
       objectReference: {fileID: 0}
     - target: {fileID: 4845709276333870003, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1754,15 +1766,15 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
---- !u!114 &6183489977009604646 stripped
+--- !u!114 &3040328858012371818 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8124898196248710364, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
+  m_CorrespondingSourceObject: {fileID: 1089922233196285840, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
   m_PrefabInstance: {fileID: 2670991387604108538}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b7a29214a20b48dfad5cf6bec30513b, type: 3}
+  m_Script: {fileID: 11500000, guid: 41a8022567035442c9fa63961c314266, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!224 &7362873474621591369 stripped
@@ -1950,8 +1962,6 @@ MonoBehaviour:
   _moveAssistArrowTransform: {fileID: 4566698426157827872}
   _moveAssistArrowSpriteRenderer: {fileID: 6530910294401955900}
   _assistArrowParentTransform: {fileID: 4214723716863076604}
-  _talentViewPrefab: {fileID: 6183489977009604646}
-  _talentsContainer: {fileID: 0}
   _sentryGunAnimator: {fileID: 3777991267959456427}
   _spinnedEyesCanvas: {fileID: 8214285384492488812}
   _spinnedEyesAnimator: {fileID: 8074049545984705949}
@@ -1960,6 +1970,7 @@ MonoBehaviour:
   _yearsOfPainView: {fileID: 1747984457448988530}
   _deadAura: {fileID: 8956675606127571364}
   _playerEyesView: {fileID: 6666478967031745484}
+  _talentsHudView: {fileID: 3040328858012371818}
   _eyeMovementRadius: 0.1
 --- !u!4 &3673364497760119067 stripped
 Transform:

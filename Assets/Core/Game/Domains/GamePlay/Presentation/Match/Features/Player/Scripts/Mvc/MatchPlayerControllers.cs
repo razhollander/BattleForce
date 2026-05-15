@@ -49,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform,
                 _stageCancellationTokenProvider, _inputBeingUsedService);
-            playerController.CreatePlayerView(_sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
+            playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
         }
 

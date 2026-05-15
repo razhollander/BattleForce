@@ -22,8 +22,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private GameObject _moveAssistArrowTransform; 
         [SerializeField] private SpriteRenderer _moveAssistArrowSpriteRenderer; 
         [SerializeField] private Transform _assistArrowParentTransform; 
-        [SerializeField] private MatchPlayerTalentUIView _talentViewPrefab;
-        [SerializeField] private Transform _talentsContainer;
         [SerializeField] private SpriteAnimator _sentryGunAnimator;
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
@@ -32,72 +30,36 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private YearsOfPainView _yearsOfPainView;
         [SerializeField] private GameObject _deadAura;
         [SerializeField] private PlayerEyesView _playerEyesView;
+        [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
         
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         
         public Action Despawn { get; set; }
-
-        private MatchPlayerTalentUIView[] _talentViews;
+        
         public PlayerView Base => _playerView;
         public void UpdateTalents(TalentVisualData[] talents)
         {
-            if (_talentViews == null) return;
-            for (int i = 0; i < _talentViews.Length; i++)
-            {
-                var view = _talentViews[i];
-                if (i > talents.Length - 1)
-                {
-                    view.SetNoneTalent();
-                }
-                else
-                {
-                    view.SetTalent(talents[i]);
-                }
-            }
-        }
-
-        public void MakeAngryForShortDuration(CancellationToken cancellationToken)
-        {
-            _playerEyesView.MakeAngryForShortDuration(cancellationToken);
-        }
-        
-        public void SetSelectedTalent(int selectedTalentIndex)
-        {
-            if (_talentViews == null) return;
-            for (int i = 0; i < _talentViews.Length; i++)
-            {
-                var talentView = _talentViews[i];
-                talentView.SetIsSelected(selectedTalentIndex == i);
-            }
+            _talentsHudView.UpdateTalents(talents);
         }
 
         public void UpdateTalentCooldown(int talentIndex, float maxCooldown, float cooldownLeft, bool isOnCooldown)
         {
-            if (_talentViews != null && talentIndex < _talentViews.Length)
-            {
-                _talentViews[talentIndex].UpdateCooldown(maxCooldown, cooldownLeft, isOnCooldown);
-            }
+            _talentsHudView.UpdateTalentCooldown(talentIndex, maxCooldown, cooldownLeft, isOnCooldown);
         }
 
         public void UpdateTalentStocks(int talentIndex, int stockAmount)
         {
-            if (_talentViews != null && talentIndex < _talentViews.Length)
-            {
-                _talentViews[talentIndex].SetStocksAmount(stockAmount);
-            }
+            _talentsHudView.UpdateTalentStocks(talentIndex, stockAmount);
         }
-
-        public void CreateTalents(int maxTalentsAmount)
+        
+        public void SetSelectedTalent(int selectedTalentIndex)
         {
-            if (_talentViews != null || _talentViewPrefab == null || _talentsContainer == null) return;
-
-            _talentViews = new Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.MatchPlayerTalentUIView[maxTalentsAmount];
-            for (int i = 0; i < maxTalentsAmount; i++)
-            {
-                var view = Instantiate(_talentViewPrefab, _talentsContainer);
-                view.SetNoneTalent();
-                _talentViews[i] = view;
-            }
+            _talentsHudView.SelectTalent(selectedTalentIndex);
+        }
+        
+        public void MakeAngryForShortDuration(CancellationToken cancellationToken)
+        {
+            _playerEyesView.MakeAngryForShortDuration(cancellationToken);
         }
 
         public void SetSentryGunState(bool isOn, CancellationTokenSource cancellationTokenSource)

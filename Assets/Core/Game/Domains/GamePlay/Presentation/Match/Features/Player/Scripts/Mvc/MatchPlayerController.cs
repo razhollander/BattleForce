@@ -43,14 +43,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             PlayerId = playerId;
         }
 
-        public void CreatePlayerView(int maxTalents)
+        public void CreatePlayerView()
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             var playerName = playerModel.PlayerName;
             _playerView = _playerPool.Spawn();
             _playerView.transform.SetParent(_parent);
             _playerView.name = "Player_" + PlayerId + "_" + playerName;
-            _playerView.CreateTalents(maxTalents);
             _playerView.Base.SetPlayerName(playerName);
             _playerView.Base.SetIsTailWaving(true);
             var playerTransform = playerModel.Spaceship.Transform;
