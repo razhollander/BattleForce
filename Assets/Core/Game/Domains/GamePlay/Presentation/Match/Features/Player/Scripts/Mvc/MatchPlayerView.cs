@@ -31,16 +31,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private PlayerChickenView _playerChickenView;
         [SerializeField] private YearsOfPainView _yearsOfPainView;
         [SerializeField] private GameObject _deadAura;
-        [SerializeField] private SpriteRenderer _leftEyeRenderer;
-        [SerializeField] private SpriteRenderer _rightEyeRenderer;
-        [SerializeField] private Transform _leftEyeBall;
-        [SerializeField] private Transform _leftEye;
-        [SerializeField] private Transform _rightEyeBall;
-        [SerializeField] private Transform _rightEye;
+        [SerializeField] private PlayerEyesView _playerEyesView;
+        
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         
-        private Sprite _defaultLeftEyeSprite;
-        private Sprite _defaultRightEyeSprite;
         public Action Despawn { get; set; }
 
         private MatchPlayerTalentUIView[] _talentViews;
@@ -62,6 +56,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
         }
 
+        public void MakeAngryForShortDuration(CancellationToken cancellationToken)
+        {
+            _playerEyesView.MakeAngryForShortDuration(cancellationToken);
+        }
+        
         public void SetSelectedTalent(int selectedTalentIndex)
         {
             if (_talentViews == null) return;
@@ -138,31 +137,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         
         public void SetIsSpinned(bool isSpinned, CancellationTokenSource cancellationTokenSource)
         {
-            var leftEyeSprite = isSpinned ? null : _defaultLeftEyeSprite;
-            var rightEyeSprite = isSpinned ? null : _defaultRightEyeSprite;
-            SetEyesSprites(leftEyeSprite, rightEyeSprite);
-
-            if (isSpinned)
-            {
-                _spinnedEyesCanvas.enabled = true;
-                _spinnedEyesAnimator.PlayAnimation(cancellationTokenSource).Forget();   
-            }
-            else
-            {
-                DisableSpinned();
-            }
-        }
-        
-        private void SetEyesSprites(Sprite leftEyeSprite, Sprite rightEyeSprite)
-        {
-            _leftEyeRenderer.sprite = leftEyeSprite;
-            _rightEyeRenderer.sprite = rightEyeSprite;
-        }
-        
-        private void DisableSpinned()
-        {
-            _spinnedEyesAnimator.StopAnimation();
-            _spinnedEyesCanvas.enabled = false;
+            _playerEyesView.SetIsSpinned(isSpinned, cancellationTokenSource);
         }
         
         public void PlayLayEggAnimation(CancellationTokenSource cancellationTokenSource)
@@ -210,22 +185,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 Time.deltaTime
             );
 
-            UpdateEyesToLookAtAimArrow(direction);
-        }
-        
-        private void UpdateEyesToLookAtAimArrow(System.Numerics.Vector2 aimArrowDirection)
-        {
-            var eyeOffset = new Vector2(aimArrowDirection.X, aimArrowDirection.Y).normalized * _eyeMovementRadius;
-            var leftPosition = _leftEye.position.ToVector2XY() + eyeOffset;
-            var rightPosition = _rightEye.position.ToVector2XY() + eyeOffset;
-            _leftEyeBall.position = new Vector3(leftPosition.x, leftPosition.y, _leftEyeBall.position.z);
-            _rightEyeBall.position = new Vector3(rightPosition.x, rightPosition.y, _rightEyeBall.position.z);
+            _playerEyesView.UpdateEyesToLookAtDirection(direction);
         }
         
         public void OnDespawned()
         {
             DisableSentryGunState();
-            DisableSpinned();
+            _playerEyesView.OnDespawned();
             _playerChickenView.SetChickenState(false);
             DisableUmbrellaState();
             Base.OnDespawned();
@@ -238,8 +204,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         
         public void OnCreated()
         {
-            _defaultLeftEyeSprite = _leftEyeRenderer.sprite;
-            _defaultRightEyeSprite = _rightEyeRenderer.sprite;
+            _playerEyesView.OnCreated();
             Base.OnCreated();
         }
 
@@ -260,7 +225,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 Time.deltaTime
             ));
 
-            UpdateEyesToLookAtAimArrow(rotation);
+            _playerEyesView.UpdateEyesToLookAtDirection(rotation);
         }
         public void SetIsDeadAuraEnabled(bool isEnabled)
         {

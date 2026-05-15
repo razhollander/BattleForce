@@ -241,6 +241,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void DoShootEffect()
         {
             _playerView.Base.ShowIsBulletAvailable(false);
+            _playerView.MakeAngryForShortDuration(_stageCancellationTokenProvider.CancellationTokenSource.Token);
         }
 
         public void SetHealth(ushort currentHealth, ushort maxHealth)

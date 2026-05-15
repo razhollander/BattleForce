@@ -119,6 +119,8 @@ MonoBehaviour:
   _playerChickenView: {fileID: 3682533271659659296}
   _yearsOfPainView: {fileID: 7503556577900317544}
   _deadAura: {fileID: 1992250901657095586}
+  _playerEyesView: {fileID: 6116288255888390764}
+  _eyeMovementRadius: 0.1
 --- !u!4 &2858382065964389804 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8455100147721814953, guid: 62780855e77504170a719c539f4d7be9, type: 3}
@@ -156,6 +158,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1233231225019515603, guid: 62780855e77504170a719c539f4d7be9, type: 3}
   m_PrefabInstance: {fileID: 5980093736227984901}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6116288255888390764 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 440477907961687145, guid: 62780855e77504170a719c539f4d7be9, type: 3}
+  m_PrefabInstance: {fileID: 5980093736227984901}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64541dafd98e64ce4b7710e4d8daf824, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7270943366553733788 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3898459118037589145, guid: 62780855e77504170a719c539f4d7be9, type: 3}
