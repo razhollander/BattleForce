@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ITickProcessor _tickProcessor;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private IStartStagePacketHandler _startStagePacketHandler;
+        private IBackgroundParallaxController _backgroundParallaxController;
 
         public override void ResolveDependencies()
         {
@@ -20,10 +22,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
             _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
+            _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
         }
 
         public void Execute()
         {
+            _backgroundParallaxController.InitExitPoint();
             _clientPresentationTickProcessor.InitExitPoint();
             _tickProcessor.StopTick();
             _fullTickPacketsHandler.InitExitPoint();
