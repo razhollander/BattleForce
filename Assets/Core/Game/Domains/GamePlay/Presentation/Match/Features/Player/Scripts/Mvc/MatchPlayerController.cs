@@ -139,7 +139,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _playerView.InterpolateAimRotation(aimDirection, decay);
 
-            var shouldShowMoveAssistArrow = arrowType == PlayerAssistArrowType.Hidden && _inputBeingUsedService.InputTypeBeingUsed == SupportedInputType.GamePad;
+            var shouldShowMoveAssistArrow = arrowType == PlayerAssistArrowType.Hidden /*&& _inputBeingUsedService.InputTypeBeingUsed == SupportedInputType.GamePad*/;
 
             if (shouldShowMoveAssistArrow)
             {
@@ -195,6 +195,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                         _playerView.UpdateTalentStocks(i, talentState.StocksCooldown.CurrentStocksAmount);
                         break;
                     case TalentCooldownType.AlwaysActive:
+                        _playerView.UpdateTalentCooldown(i, 1, 0, false);
                         break;
                     default: LogService.LogError("Not implemented cooldown type: " + talentState.CooldownType);
                         break;

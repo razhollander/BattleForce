@@ -69,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
             if (isSpinned)
             {
-                _angryEyesCancellationTokenSource.Cancel();
+                _angryEyesCancellationTokenSource?.Cancel();
                 _spinnedEyesCanvas.enabled = true;
                 _spinnedEyesAnimator.PlayAnimation(cancellationTokenSource).Forget();   
             }
