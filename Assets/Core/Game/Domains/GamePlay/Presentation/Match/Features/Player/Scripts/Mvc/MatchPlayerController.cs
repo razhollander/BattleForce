@@ -52,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.Base.SetPlayerName(playerName);
             _playerView.Base.SetIsTailWaving(true);
             var playerTransform = playerModel.Spaceship.Transform;
-            _playerView.Base.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
+            _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.Base.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
@@ -269,7 +269,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void Destroy()
         {
-            _playerView.Base.Despawn();
+            _playerView.Despawn();
         }
 
         public Transform GetTransform()
