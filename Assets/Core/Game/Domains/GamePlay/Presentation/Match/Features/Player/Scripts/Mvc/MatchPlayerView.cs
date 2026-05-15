@@ -31,9 +31,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private GameObject _deadAura;
         [SerializeField] private PlayerEyesView _playerEyesView;
         [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
-        
-        [SerializeField] private float _eyeMovementRadius = 0.1f;
-        
         public Action Despawn { get; set; }
         
         public PlayerView Base => _playerView;

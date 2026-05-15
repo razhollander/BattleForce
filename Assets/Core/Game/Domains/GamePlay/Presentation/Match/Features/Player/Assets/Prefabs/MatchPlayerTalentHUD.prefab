@@ -230,8 +230,8 @@ MonoBehaviour:
   _noneTalentSprite: {fileID: 21300000, guid: bc47e4f2b85614740aac22078e60e81a, type: 3}
   _canvasGroup: {fileID: 1316995605320919409}
   _stockView: {fileID: 8853536457919447583}
-  _cooldownOverlayColor: {r: 1, g: 1, b: 1, a: 1}
-  _cooldownOverlayColorWhenOnCooldown: {r: 0, g: 0, b: 0, a: 1}
+  _cooldownOverlayColor: {r: 1, g: 1, b: 1, a: 0.70980394}
+  _cooldownOverlayColorWhenOnCooldown: {r: 0, g: 0, b: 0, a: 0.70980394}
 --- !u!225 &1316995605320919409
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -271,7 +271,7 @@ RectTransform:
   m_GameObject: {fileID: 2128400022830362028}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.000000066625944}
-  m_LocalScale: {x: 0.92929, y: 0.92929, z: 0.92929}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3592965589191044179}
@@ -876,7 +876,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 35fad018f993a4e0caed572bdfec3960, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 56014c097b21f4ca39985a00b54c6644, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
