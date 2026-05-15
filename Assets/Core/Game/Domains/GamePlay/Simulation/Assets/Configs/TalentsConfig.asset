@@ -63,7 +63,7 @@ MonoBehaviour:
     MinSpin: 50
   SentryGunTalentConfig:
     DurationInSeconds: 3
-    ShootCooldownMultiplier: 0.25
+    ShootCooldownMultiplier: 0.5
     BulletsSpawnOffsetFromPlayerHead: 1.1
   GrapplingHookTalentConfig:
     ProjectileSpeed: 40
