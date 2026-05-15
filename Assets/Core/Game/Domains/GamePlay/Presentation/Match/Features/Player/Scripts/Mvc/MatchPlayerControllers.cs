@@ -17,23 +17,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
     public class MatchPlayerControllers : IMatchPlayerControllers
     {
         private readonly IMatchDataService _matchDataService;
-        private readonly PlayerViewPool _playerPool;
+        private readonly MatchPlayerViewPool _playerPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly IInputBeingUsedService _inputBeingUsedService;
         private readonly List<MatchPlayerController> _playerControllers = new ();
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private Transform _playersParent;
 
-        public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService)
+
+        public MatchPlayerControllers(IMatchDataService matchDataService, MatchPlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
+            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _matchDataService = matchDataService;
-            _playerPool = new PlayerViewPool(playerViewPrefab, diContainer);
+            _playerPool = new MatchPlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _inputBeingUsedService = inputBeingUsedService;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -161,6 +164,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetPlayerTalentSelected(ushort playerId, int talentIndex)
         {
             GetPlayer(playerId).SetSelectedTalent(talentIndex);
+        }
+
+        public void UpdatePlayerTalents(ushort playerId, Core.Scripts.Utils.CustomCollections.FixedOrderedList<Core.Game.Domains.GamePlay.Shared.S2CModels.TalentStateS2C> talents, int currentServerTick)
+        {
+            var selectedTalentIndex = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.SelectedTalentIndex;
+            GetPlayer(playerId).UpdateTalents(talents, selectedTalentIndex, currentServerTick);
         }
 
         public void SetIsTailWaving(ushort playerId, bool isWaving)

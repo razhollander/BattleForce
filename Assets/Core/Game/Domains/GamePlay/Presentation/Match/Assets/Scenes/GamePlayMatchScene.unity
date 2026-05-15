@@ -967,7 +967,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 219bb1c956bf448298b3642e747e73e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerViewPrefab: {fileID: 3197719174041810226, guid: 62780855e77504170a719c539f4d7be9, type: 3}
+  _playerViewPrefab: {fileID: 2247064673969666127, guid: fd22cb69c8e1b42439213e5ef0c5c4ef, type: 3}
   _environmentLavaWallViewPrefab: {fileID: 1512091146582007432, guid: cbf576cbeb8d94c4f9ab864226b44a15, type: 3}
   _talentCardViewPrefab: {fileID: 2527229573026246615, guid: 3b5204661c9d34a2d8b032d046577f31, type: 3}
   _talentCardObtainedEffectView: {fileID: 4070831197063270025, guid: d83c71c50f5ad45899f349e5076e74ed, type: 3}

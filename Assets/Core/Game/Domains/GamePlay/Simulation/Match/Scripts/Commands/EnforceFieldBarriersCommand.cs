@@ -119,7 +119,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             for (int i = bullets.Count - 1; i >= 0; i--)
             {
-                ref var bullet = ref bullets.GetByIndex(i);
+                ref var bullet = ref bullets.Get(i);
                 var playerId = bullet.BelongToPlayerId;
                 var teamId = _matchDataService.SimulationState.GetPlayerById(playerId).TeamId;
                 var barrier = _matchDataService.EnvironmentData.GetBarrierForTeam(teamId);
