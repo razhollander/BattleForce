@@ -118,7 +118,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4845709276333870003}
   - component: {fileID: 1089922233196285840}
-  - component: {fileID: 4513879461861874214}
   m_Layer: 5
   m_Name: MatchPlayerTalentsHUD
   m_TagString: Untagged
@@ -160,31 +159,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41a8022567035442c9fa63961c314266, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _animation: {fileID: 4513879461861874214}
-  _secondsOfCrossFadeAnimation: 0.3
+  _scaleTweenDuration: 0.3
+  _scaleTweenEase: 6
+  _unselectedScaleX: 0.6
+  _selectedScaleY: 1
   _talentViews:
   - {fileID: 6878737021406154249}
   - {fileID: 3292911616950305867}
   - {fileID: 4861115794136646098}
---- !u!111 &4513879461861874214
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6084997679020814226}
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: 19084deba1ad04a98a4e86136170b5de, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 19084deba1ad04a98a4e86136170b5de, type: 2}
-  - {fileID: 7400000, guid: 57b1305078b594729b0a282a7a299c6e, type: 2}
-  - {fileID: 7400000, guid: c768344ff456d4717abc6ba1acc7e180, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 0
-  m_AnimatePhysics: 0
-  m_UpdateMode: 0
-  m_CullingType: 0
+  _talentViewsPivots:
+  - {fileID: 8340895797382347895}
+  - {fileID: 8717432588767631125}
+  - {fileID: 4277936420672314679}
 --- !u!1001 &687142219858554939
 PrefabInstance:
   m_ObjectHideFlags: 0

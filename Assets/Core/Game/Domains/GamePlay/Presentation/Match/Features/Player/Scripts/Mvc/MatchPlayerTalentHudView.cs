@@ -7,6 +7,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
     public class MatchPlayerTalentHudView : MonoBehaviour
     {
         [SerializeField] private Image[] _cooldownOverlays;
+        [SerializeField] private Image _filledCooldownOverlay;
         [SerializeField] private TextMeshProUGUI _cooldownText;
         [SerializeField] private Image _background;
         [SerializeField] private Sprite _normalBackground;
@@ -30,12 +31,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         public void SetStocksAmount(int amount)
         {
             _stockView.SetStockAmount(amount);
-        }
-
-        public void SetIsSelected(bool isSelected)
-        {
-            _background.sprite = isSelected ? _selectedBackground : _normalBackground;
-            _talentImage.transform.localScale = isSelected ? _selectedScale : _normalScale;
         }
 
         public void SetTalent(TalentVisualData talentVisualData)
@@ -84,10 +79,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 _cooldownText.gameObject.SetActive(false);
             }
 
-            foreach (var cooldownOverlay in _cooldownOverlays)
-            {
-                //cooldownOverlay.color = isOnCooldown ? _cooldownOverlayColorWhenOnCooldown : _cooldownOverlayColor;
-            }
+            _filledCooldownOverlay.color = isOnCooldown ? _cooldownOverlayColorWhenOnCooldown : _cooldownOverlayColor;
         }
     }
 }

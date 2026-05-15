@@ -1,6 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using System.Threading;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
@@ -11,9 +10,9 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
@@ -112,7 +111,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerModel = _matchDataService.GetPlayer(PlayerId);
             var talentState = playerModel.Spaceship.TalentsState.Talents[talentIndex];
             var talentType = talentState.TalentType;
-            _playerView.SetSelectedTalent(talentIndex);
+            _playerView.SetSelectedTalent(talentIndex, _stageCancellationTokenProvider.CancellationTokenSource.Token);
             var isInChickenState = talentType == TalentType.Chicken;
             SetChickenState(isInChickenState);
         }
@@ -298,7 +297,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetIsDeadAuraEnabled(isEnabled);
         }
 
-        private TalentVisualData[] ConvertTalentsToVisualData(Core.Scripts.Utils.CustomCollections.FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
+        private TalentVisualData[] ConvertTalentsToVisualData(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
         {
             var talentsVisualData = new TalentVisualData[talents.Count];
 
@@ -340,10 +339,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return talentsVisualData;
         }
 
-        public void UpdateTalents(Core.Scripts.Utils.CustomCollections.FixedOrderedList<TalentStateS2C> talents, int selectedTalentIndex, int currentServerTick)
+        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents, int selectedTalentIndex, int currentServerTick)
         {
             _playerView.UpdateTalents(ConvertTalentsToVisualData(talents, currentServerTick));
-            _playerView.SetSelectedTalent(selectedTalentIndex);
+            _playerView.SetSelectedTalent(selectedTalentIndex, _stageCancellationTokenProvider.CancellationTokenSource.Token);
         }
 
     }

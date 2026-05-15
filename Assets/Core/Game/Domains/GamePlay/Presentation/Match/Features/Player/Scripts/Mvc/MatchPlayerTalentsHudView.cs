@@ -1,18 +1,26 @@
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
+using Core.Scripts.Extensions;
+using Core.Scripts.Utils;
 using UnityEngine;
+using DG.Tweening;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
 {
     public class MatchPlayerTalentsHudView : MonoBehaviour
     {
-        private const string TANELT_A_SELECTED_ANIMTION_NAME = "TaneltASelected";
-        private const string TANELT_B_SELECTED_ANIMTION_NAME = "TaneltBSelected";
-        private const string TANELT_C_SELECTED_ANIMTION_NAME = "TaneltCSelected";
+        [Header("Tween Settings")]
+        [SerializeField] private float _scaleTweenDuration = 0.3f;
+        [SerializeField] private Ease _scaleTweenEase = Ease.OutQuad;
+        [SerializeField] private float _unselectedScaleX = 0.6f;
+        [SerializeField] private float _selectedScaleY = 1f;
         
-        [SerializeField] private Animation _animation;
-        [SerializeField] private float _secondsOfCrossFadeAnimation=0.3f;
+        [Header("References")]
         [SerializeField] private MatchPlayerTalentHudView[] _talentViews;
+        [SerializeField] private Transform[] _talentViewsPivots;
 
+        private CancellationTokenSource _selectTalentCancellationToken;
+        
         public void UpdateTalentCooldown(int talentIndex, float maxCooldown, float cooldownLeft, bool isOnCooldown)
         {
             if (_talentViews != null && talentIndex < _talentViews.Length)
@@ -46,36 +54,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
         }
         
-        public void SelectTalent(int talentIndex)
+        public void SelectTalent(int talentIndex, CancellationToken cancellationToken)
         {
-            switch (talentIndex)
+            if (_selectTalentCancellationToken != null)
             {
-                case 0:
-                    SelectTalentA();
-
-                    break;
-                case 1:
-                    SelectTalentB();
-
-                    break;
-                case 2:
-                    SelectTalentC();
-
-                    break;
+                _selectTalentCancellationToken.Cancel();
+                _selectTalentCancellationToken.Dispose();
             }
-        }
-        
-        private void SelectTalentA()
-        {
-            _animation.CrossFade(TANELT_A_SELECTED_ANIMTION_NAME, _secondsOfCrossFadeAnimation);
-        }
-        private void SelectTalentB()
-        {
-            _animation.CrossFade(TANELT_B_SELECTED_ANIMTION_NAME, _secondsOfCrossFadeAnimation);
-        }
-        private void SelectTalentC()
-        {
-            _animation.CrossFade(TANELT_C_SELECTED_ANIMTION_NAME, _secondsOfCrossFadeAnimation);
+            
+            _selectTalentCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            for (int i = 0; i < _talentViewsPivots.Length; i++)
+            {
+                var view = _talentViewsPivots[i];
+                var isSelected = i == talentIndex;
+                var targetScaleValue = isSelected ? _selectedScaleY : _unselectedScaleX;
+                var targetScale = new Vector3(targetScaleValue, targetScaleValue, 1f);
+                view.DOScale(targetScale, _scaleTweenDuration)
+                    .SetEase(_scaleTweenEase)
+                    .WithCancellationSafe(_selectTalentCancellationToken.Token).Forget();
+            }
         }
     }
 }

@@ -219,6 +219,7 @@ MonoBehaviour:
   - {fileID: 8241488446876862487}
   - {fileID: 6346816998731175860}
   - {fileID: 8770389298051348027}
+  _filledCooldownOverlay: {fileID: 8770389298051348027}
   _cooldownText: {fileID: 8800734926070113746}
   _background: {fileID: 3415183121702765830}
   _normalBackground: {fileID: 21300000, guid: 35fad018f993a4e0caed572bdfec3960, type: 3}

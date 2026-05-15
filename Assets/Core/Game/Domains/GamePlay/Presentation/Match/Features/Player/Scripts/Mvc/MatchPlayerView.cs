@@ -52,9 +52,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _talentsHudView.UpdateTalentStocks(talentIndex, stockAmount);
         }
         
-        public void SetSelectedTalent(int selectedTalentIndex)
+        public void SetSelectedTalent(int selectedTalentIndex, CancellationToken cancellationToken)
         {
-            _talentsHudView.SelectTalent(selectedTalentIndex);
+            _talentsHudView.SelectTalent(selectedTalentIndex, cancellationToken);
         }
         
         public void MakeAngryForShortDuration(CancellationToken cancellationToken)
