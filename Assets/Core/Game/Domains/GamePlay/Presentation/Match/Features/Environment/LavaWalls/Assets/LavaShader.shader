@@ -6,9 +6,14 @@ Shader "Custom/StylizedLavaWorldUV_Stretch"
         _ColorDeep ("Deep Color", Color) = (0.5, 0, 0, 1)
         _ColorBright ("Bright Color", Color) = (1, 0.5, 0, 1)
         _ScrollSpeed ("Scroll Speed", Vector) = (0.1, 0.05, 0.1, -0.05)
-        _Stretch ("World Stretch (X, Y)", Vector) = (1, 1, 0, 0) // New Stretch Control
+        _Stretch ("World Stretch (X, Y)", Vector) = (1, 1, 0, 0)
         _Bands ("Color Bands", Float) = 4.0
         _Emission ("Emission Intensity", Float) = 2.0
+        
+        _WobbleStrength ("Wobble Strength", Range(0.0, 0.2)) = 0.03
+        _WobbleSpeed ("Wobble Speed", Float) = 2.0
+        _WobbleFrequency ("Wobble Frequency", Float) = 4.0
+
         [MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
     }
 
@@ -62,6 +67,11 @@ Shader "Custom/StylizedLavaWorldUV_Stretch"
             float _Bands;
             float _Emission;
 
+            // Wobble uniform variables
+            float _WobbleStrength;
+            float _WobbleSpeed;
+            float _WobbleFrequency;
+
             Varyings vert (Attributes input)
             {
                 Varyings output;
@@ -76,7 +86,7 @@ Shader "Custom/StylizedLavaWorldUV_Stretch"
                 output.worldUV = worldPos.xy * _Stretch;
 
                 #ifdef PIXELSNAP_ON
-//                output.positionCS = UnityPixelSnap(output.positionCS);
+                // output.positionCS = UnityPixelSnap(output.positionCS);
                 #endif
 
                 return output;
@@ -84,9 +94,17 @@ Shader "Custom/StylizedLavaWorldUV_Stretch"
 
             float4 frag (Varyings input) : SV_Target
             {
-                // Calculate scrolling using the stretched worldUV
-                float2 uv1 = frac(input.worldUV + _ScrollSpeed.xy * _Time.y);
-                float2 uv2 = frac(input.worldUV - _ScrollSpeed.zw * _Time.y);
+                // Create a dynamic sine-based displacement offset over time
+                float waveX = sin(input.worldUV.y * _WobbleFrequency + _Time.y * _WobbleSpeed) * _WobbleStrength;
+                float waveY = cos(input.worldUV.x * _WobbleFrequency + _Time.y * _WobbleSpeed) * _WobbleStrength;
+                float2 wobbleOffset = float2(waveX, waveY);
+
+                // Add the wobble displacement into the baseline world UV mapping
+                float2 distortedWorldUV = input.worldUV + wobbleOffset;
+
+                // Calculate scrolling using the newly distorted worldUV coordinates
+                float2 uv1 = frac(distortedWorldUV + _ScrollSpeed.xy * _Time.y);
+                float2 uv2 = frac(distortedWorldUV - _ScrollSpeed.zw * _Time.y);
 
                 float noise1 = tex2D(_MainTex, uv1).r;
                 float noise2 = tex2D(_MainTex, uv2).r;
