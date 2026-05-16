@@ -11,42 +11,121 @@ namespace Core.Scripts.Utils.Shadows
         [System.Serializable]
         public class Settings
         {
+            [Header("Layer Setup")]
+            public LayerMask backgroundLayer;
+            public LayerMask shadowLayers;
+
+            [Header("Shadow Settings")]
             public Color shadowColor = new Color(0f, 0f, 0f, 0.5f);
             public Vector2 shadowOffset = new Vector2(0.1f, -0.1f);
-            public LayerMask shadowLayers;
+            
+            [Header("Pipeline Alignment")]
             public RenderPassEvent renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
         }
 
         public Settings settings = new Settings();
+        
+        private SpriteBackgroundPass _backgroundPass;
         private SpriteShadowPass _shadowPass;
 
         public override void Create()
         {
+            _backgroundPass = new SpriteBackgroundPass(settings);
             _shadowPass = new SpriteShadowPass(settings);
         }
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            // Only render for designated game cameras
             if (renderingData.cameraData.cameraType == CameraType.Game || renderingData.cameraData.cameraType == CameraType.SceneView)
             {
+                renderer.EnqueuePass(_backgroundPass);
                 renderer.EnqueuePass(_shadowPass);
             }
         }
     }
 
-    public class SpriteShadowPass : ScriptableRenderPass
+    // --- PASS 1: BACKGROUND RENDERER ---
+    public class SpriteBackgroundPass : ScriptableRenderPass
     {
         private readonly SpriteShadowRenderFeature.Settings _settings;
-        private readonly List<SpriteRenderer> _cachedRenderers = new List<SpriteRenderer>();
-        private Material _shadowMaterial;
+        // Changed pool type to the base Renderer class
+        private readonly List<Renderer> _cachedBackgrounds = new List<Renderer>();
         private float _lastRefreshTime;
         private const float RefreshInterval = 0.5f;
 
-        // Class to pass data safely into the Render Graph context
         private class PassData
         {
-            public List<SpriteRenderer> renderers;
+            public List<Renderer> renderers;
+        }
+
+        public SpriteBackgroundPass(SpriteShadowRenderFeature.Settings settings)
+        {
+            _settings = settings;
+            renderPassEvent = settings.renderPassEvent;
+        }
+
+        private void RefreshRenderers()
+        {
+            _cachedBackgrounds.Clear();
+            // Find all base Renderers (Sprites, Meshes, etc.)
+            var allRenderers = Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None);
+            foreach (var renderer in allRenderers)
+            {
+                if (((1 << renderer.gameObject.layer) & _settings.backgroundLayer) != 0)
+                {
+                    _cachedBackgrounds.Add(renderer);
+                }
+            }
+            _lastRefreshTime = Time.time;
+        }
+
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
+        {
+            if (Time.time - _lastRefreshTime > RefreshInterval || _cachedBackgrounds.Count == 0)
+            {
+                RefreshRenderers();
+            }
+
+            if (_cachedBackgrounds.Count == 0) return;
+
+            using (var builder = renderGraph.AddRasterRenderPass<PassData>("Custom Sprite Background Pass", out var passData))
+            {
+                passData.renderers = _cachedBackgrounds;
+
+                UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+                builder.SetRenderAttachment(resourceData.activeColorTexture, 0, AccessFlags.Write);
+                builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture, AccessFlags.ReadWrite);
+
+                builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
+                {
+                    foreach (var renderer in data.renderers)
+                    {
+                        if (renderer != null && renderer.gameObject.activeInHierarchy && renderer.enabled)
+                        {
+                            context.cmd.DrawRenderer(renderer, renderer.sharedMaterial, 0, 0);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    // --- PASS 2: SHADOW RENDERER ---
+    public class SpriteShadowPass : ScriptableRenderPass
+    {
+        private readonly SpriteShadowRenderFeature.Settings _settings;
+        // Changed pool type to the base Renderer class
+        private readonly List<Renderer> _cachedRenderers = new List<Renderer>();
+        private Material _shadowMaterial;
+        private float _lastRefreshTime;
+        private const float RefreshInterval = 0.5f;
+        
+        // Reusable Property Block to handle MeshRenderer textures dynamically without allocating garbage
+        private static MaterialPropertyBlock _mpb;
+
+        private class PassData
+        {
+            public List<Renderer> renderers;
             public Material material;
             public Color color;
             public Matrix4x4 shadowViewMatrix;
@@ -62,25 +141,17 @@ namespace Core.Scripts.Utils.Shadows
 
             if (_shadowMaterial == null)
             {
-                // Swap out the default shader for your new silhouette shader
                 Shader silhouetteShader = Shader.Find("Custom/SpriteSilhouette");
-                if (silhouetteShader != null)
-                {
-                    _shadowMaterial = new Material(silhouetteShader);
-                }
-                else
-                {
-                    Debug.LogError("Could not find 'Custom/SpriteSilhouette' shader. Falling back to default.");
-                    _shadowMaterial = new Material(Shader.Find("Sprites/Default"));
-                }
+                _shadowMaterial = silhouetteShader != null ? new Material(silhouetteShader) : new Material(Shader.Find("Sprites/Default"));
             }
+            
+            if (_mpb == null) _mpb = new MaterialPropertyBlock();
         }
 
         private void RefreshRenderers()
         {
             _cachedRenderers.Clear();
-            var allRenderers = Object.FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None);
-
+            var allRenderers = Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None);
             foreach (var renderer in allRenderers)
             {
                 if (((1 << renderer.gameObject.layer) & _settings.shadowLayers) != 0)
@@ -88,7 +159,6 @@ namespace Core.Scripts.Utils.Shadows
                     _cachedRenderers.Add(renderer);
                 }
             }
-
             _lastRefreshTime = Time.time;
         }
 
@@ -100,7 +170,7 @@ namespace Core.Scripts.Utils.Shadows
             }
 
             if (_cachedRenderers.Count == 0) return;
-            Debug.Log("_cachedRenderers.Count: "+_cachedRenderers.Count);
+
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             Camera camera = cameraData.camera;
 
@@ -110,16 +180,13 @@ namespace Core.Scripts.Utils.Shadows
                 passData.material = _shadowMaterial;
                 passData.color = _settings.shadowColor;
 
-                // Cache original matrices to restore them later
                 passData.originalViewMatrix = camera.worldToCameraMatrix;
                 passData.originalProjMatrix = camera.projectionMatrix;
 
-                // Calculate shadow matrices
                 Matrix4x4 offsetMatrix = Matrix4x4.Translate(new Vector3(_settings.shadowOffset.x, _settings.shadowOffset.y, 0.01f));
                 passData.shadowViewMatrix = camera.worldToCameraMatrix * offsetMatrix.inverse;
-                passData.shadowProjMatrix = camera.projectionMatrix; // Keeping projection the same, but you can modify this if needed
+                passData.shadowProjMatrix = camera.projectionMatrix;
 
-                // Configure graph resource hooks
                 UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
                 builder.SetRenderAttachment(resourceData.activeColorTexture, 0, AccessFlags.Write);
                 builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture, AccessFlags.ReadWrite);
@@ -129,19 +196,36 @@ namespace Core.Scripts.Utils.Shadows
                     if (data.material == null) return;
 
                     data.material.color = data.color;
-
-                    // Apply the custom View and Projection matrices directly to the raw command buffer
                     context.cmd.SetViewProjectionMatrices(data.shadowViewMatrix, data.shadowProjMatrix);
 
                     foreach (var renderer in data.renderers)
                     {
                         if (renderer != null && renderer.gameObject.activeInHierarchy && renderer.enabled)
                         {
+                            // Smart Texture extraction for transparent MeshRenderers
+                            if (renderer is MeshRenderer || renderer is SkinnedMeshRenderer)
+                            {
+                                Material sharedMat = renderer.sharedMaterial;
+                                if (sharedMat != null)
+                                {
+                                    // Try getting standard URP texture property names
+                                    Texture targetTex = sharedMat.HasProperty("_BaseMap") ? sharedMat.GetTexture("_BaseMap") : 
+                                                       sharedMat.HasProperty("_MainTex") ? sharedMat.GetTexture("_MainTex") : null;
+
+                                    if (targetTex != null)
+                                    {
+                                        _mpb.SetTexture("_MainTex", targetTex);
+                                        context.cmd.DrawRenderer(renderer, data.material, 0, 0/*, _mpb*/);
+                                        continue;
+                                    }
+                                }
+                            }
+
+                            // Default fallback path for standard SpriteRenderers or untextured 3D geometry
                             context.cmd.DrawRenderer(renderer, data.material, 0, 0);
                         }
                     }
 
-                    // CRITICAL: Revert back to the camera's original matrices so subsequent passes aren't broken
                     context.cmd.SetViewProjectionMatrices(data.originalViewMatrix, data.originalProjMatrix);
                 });
             }

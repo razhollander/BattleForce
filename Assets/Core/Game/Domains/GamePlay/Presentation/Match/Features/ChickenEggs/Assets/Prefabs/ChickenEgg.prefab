@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6919629635225406556}
   - component: {fileID: 8895000484713437858}
   - component: {fileID: 8334673388257318348}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ChickenEgg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,7 +114,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8347398604955469197}
   - component: {fileID: 9188543488349073047}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BrokenEgg
   m_TagString: Untagged
   m_Icon: {fileID: 0}

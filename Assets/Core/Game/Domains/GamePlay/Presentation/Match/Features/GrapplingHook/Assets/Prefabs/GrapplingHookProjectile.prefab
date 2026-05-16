@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4340002848157574996}
   - component: {fileID: 2478222180325078353}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4097003888310790302}
   - component: {fileID: 4452206169606535078}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: GrapplingHookProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -148,7 +148,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2752148287511681976}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Pivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -180,7 +180,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2418734962382507825}
   - component: {fileID: 4491270901833381800}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Line
   m_TagString: Untagged
   m_Icon: {fileID: 0}

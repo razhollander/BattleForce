@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2890336428233353126}
   - component: {fileID: 2558030701847765148}
   - component: {fileID: 49664296879137677}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 1763318118227690860}
   - component: {fileID: 7628018806567988709}
   - component: {fileID: 6186951682495552436}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: EnvironmentFieldBarrierCircle
   m_TagString: Untagged
   m_Icon: {fileID: 0}

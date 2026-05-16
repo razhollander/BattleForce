@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4921557195634842213}
   - component: {fileID: 694739742130266104}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CardImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6209739359390128177}
   - component: {fileID: 1330387983599803050}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: TalentImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -184,7 +184,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2439601460871101957}
   - component: {fileID: 2527229573026246615}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: TalentCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}

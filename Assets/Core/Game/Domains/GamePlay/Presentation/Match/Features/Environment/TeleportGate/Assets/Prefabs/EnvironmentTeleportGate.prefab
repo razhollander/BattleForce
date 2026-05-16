@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2308857961570147464}
   - component: {fileID: 1761154982624354696}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: EnvironmentTeleportGate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49,6 +49,7 @@ MonoBehaviour:
   _renderer: {fileID: 5119700104229755946}
   _animationScale: 1.1
   _animationDuration: 0.2
+  Transform: {fileID: 0}
 --- !u!1 &6409818763090221950
 GameObject:
   m_ObjectHideFlags: 0
@@ -59,7 +60,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5748503713841141370}
   - component: {fileID: 5119700104229755946}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}

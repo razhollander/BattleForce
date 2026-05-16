@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7756366555715235163}
   - component: {fileID: 9213814470890300496}
   - component: {fileID: 4770398435417815595}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: KOProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -113,7 +113,7 @@ GameObject:
   - component: {fileID: 7023835064219284648}
   - component: {fileID: 1752797247947345830}
   - component: {fileID: 6111551144618547207}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Spring
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -397,7 +397,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2924927139313831623}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: EndPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -428,7 +428,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6271413423327002287}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: StartPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}

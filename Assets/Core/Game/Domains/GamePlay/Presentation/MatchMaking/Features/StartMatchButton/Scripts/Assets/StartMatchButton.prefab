@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5930628015565140293}
   - component: {fileID: 1501552198481346904}
   - component: {fileID: 7374366345173492168}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CountdownText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -187,7 +187,7 @@ GameObject:
   - component: {fileID: 680537534040701352}
   - component: {fileID: 5742178271469298621}
   - component: {fileID: 7825008787094683018}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: StartText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -366,7 +366,7 @@ GameObject:
   m_Component:
   - component: {fileID: 735187960035475062}
   - component: {fileID: 6288577380358505431}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: DisabledOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -454,7 +454,7 @@ GameObject:
   - component: {fileID: 7860721219675764553}
   - component: {fileID: 3089737735963446641}
   - component: {fileID: 1429378958978371035}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: StartMatchButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
