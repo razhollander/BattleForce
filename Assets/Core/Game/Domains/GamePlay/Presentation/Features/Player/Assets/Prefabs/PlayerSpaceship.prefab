@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1747447107653791070}
   - component: {fileID: 6410895377248298025}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Angry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4600549616047267990}
   - component: {fileID: 8346463410990312882}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: EyeBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -184,7 +184,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3831587375936345955}
   - component: {fileID: 9021828890261106304}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: EyeBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -271,7 +271,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6919752368278847262}
   - component: {fileID: 4630110223183440480}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Default
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -358,7 +358,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9138266757602045038}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: LeftEye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -391,7 +391,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 421401659335743815}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: RightEye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -514,7 +514,7 @@ GameObject:
   - component: {fileID: 2950194799611718988}
   - component: {fileID: 598992009253385239}
   - component: {fileID: 1297966097049568600}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -613,7 +613,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 989648957420627833}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Eyes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -648,7 +648,7 @@ GameObject:
   - component: {fileID: 7783656238177499217}
   - component: {fileID: 9173525631492212318}
   - component: {fileID: 4753437220465657810}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Heart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -949,7 +949,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8660608062844915603}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: HeartPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1087,7 +1087,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2218643179861248833}
   - component: {fileID: 8946611057136246870}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Angry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1227,7 +1227,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6203939059367246872}
   - component: {fileID: 2950080992787537679}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Default
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1316,7 +1316,7 @@ GameObject:
   - component: {fileID: 4049911479800080256}
   - component: {fileID: 5618484039258392637}
   - component: {fileID: 2447704602733785927}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: PlayerNameText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
