@@ -76,7 +76,7 @@ Shader "Custom/StylizedLavaWorldUV_Stretch"
                 output.worldUV = worldPos.xy * _Stretch;
 
                 #ifdef PIXELSNAP_ON
-                output.positionCS = UnityPixelSnap(output.positionCS);
+//                output.positionCS = UnityPixelSnap(output.positionCS);
                 #endif
 
                 return output;
