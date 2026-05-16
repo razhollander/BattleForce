@@ -14,7 +14,7 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         [SerializeField] private Camera _camera;
 
         private CancellationTokenSource _shakeCancellationTokenSource;
-
+        public Camera Camera => _camera;
         public void AddTarget(Transform target, float weight, float radius)
         {
             _targetGroup.AddMember(target, weight, radius);

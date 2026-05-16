@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8792475699155652146}
   - component: {fileID: 2253939483484461437}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2495515980733055325}
   - component: {fileID: 3758963260886631903}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PowerUpBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}

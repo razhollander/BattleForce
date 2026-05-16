@@ -1,11 +1,11 @@
-using System.Collections.Generic;
 using Core.Scripts.Utils;
+using Core.Scripts.Utils.Shadows;
+using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
-using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
 
-namespace CoreDomain.Scripts.Mvc.WorldCamera
+namespace Core.Scripts.Mvc.WorldCamera
 {
     public class WorldCameraController : IWorldCameraController
     {
@@ -18,6 +18,16 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             _stateMachineService = stateMachineService;
         }
 
+        public void InitEntryPoint()
+        {
+           // _customSpriteShadowRenderer.InitEntryPoint(_worldCameraView.Camera);
+        }
+        
+        public void InitExitPoint()
+        {
+          //  _customSpriteShadowRenderer.InitExitPoint();
+        }
+        
         public void AddTarget(Transform target)
         {
             LogService.LogTopic($"Add camera target {target.gameObject.name}", LogTopicType.Camera);

@@ -1,3 +1,4 @@
+using Core.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
