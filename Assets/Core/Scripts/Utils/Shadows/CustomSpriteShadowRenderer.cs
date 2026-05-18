@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using CoreDomain.Scripts.Services.Logger.Base;
+using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
@@ -11,11 +13,6 @@ namespace Core.Scripts.Utils.Shadows
         [System.Serializable]
         public class Settings
         {
-            [Header("Layer Setup")]
-            public LayerMask backgroundLayer;
-            public LayerMask shadowLayers;
-            public LayerMask outlineLayers;
-
             [Header("Shadow Settings")]
             public Color shadowColor = new Color(0f, 0f, 0f, 0.5f);
             public Vector2 shadowOffset = new Vector2(0.1f, -0.1f);
@@ -56,9 +53,20 @@ namespace Core.Scripts.Utils.Shadows
     public class SpriteBackgroundPass : ScriptableRenderPass
     {
         private readonly SpriteShadowRenderFeature.Settings _settings;
-        private readonly List<Renderer> _cachedBackgrounds = new List<Renderer>();
-        private float _lastRefreshTime;
-        private const float RefreshInterval = 0.5f;
+        private static readonly List<Renderer> _cachedRenderers = new List<Renderer>();
+        private static bool _areBackgroundsDirty;
+
+        public static void RegisterRenderer(Renderer renderer)
+        {
+            _areBackgroundsDirty = true;
+            _cachedRenderers.Add(renderer);
+        }
+        
+        public static void UnregisterRenderer(Renderer renderer)
+        {
+            //_areBackgroundsDirty = true;
+            _cachedRenderers.Remove(renderer);
+        }
 
         private class PassData
         {
@@ -73,32 +81,24 @@ namespace Core.Scripts.Utils.Shadows
 
         private void RefreshRenderers()
         {
-            _cachedBackgrounds.Clear();
-            var allRenderers = Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None);
-            foreach (var renderer in allRenderers)
+            if (!_areBackgroundsDirty || _cachedRenderers.IsNullOrEmpty())
             {
-                if (((1 << renderer.gameObject.layer) & _settings.backgroundLayer) != 0)
-                {
-                    _cachedBackgrounds.Add(renderer);
-                }
+                return;
             }
-            
-            _cachedBackgrounds.Sort((a, b) => b.transform.position.z.CompareTo(a.transform.position.z));
-            _lastRefreshTime = Time.time;
+
+            _cachedRenderers.Sort((a, b) => b.transform.position.z.CompareTo(a.transform.position.z));
+            _areBackgroundsDirty = false;
         }
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            if (Time.time - _lastRefreshTime > RefreshInterval || _cachedBackgrounds.Count == 0)
-            {
-                RefreshRenderers();
-            }
-
-            if (_cachedBackgrounds.Count == 0) return;
+            if (_cachedRenderers.Count == 0) return;
+            
+            RefreshRenderers();
 
             using (var builder = renderGraph.AddRasterRenderPass<PassData>("Custom Sprite Background Pass", out var passData))
             {
-                passData.renderers = _cachedBackgrounds;
+                passData.renderers = _cachedRenderers;
 
                 UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
                 builder.SetRenderAttachment(resourceData.activeColorTexture, 0, AccessFlags.Write);
@@ -122,10 +122,22 @@ namespace Core.Scripts.Utils.Shadows
     public class SpriteShadowPass : ScriptableRenderPass
     {
         private readonly SpriteShadowRenderFeature.Settings _settings;
-        private readonly List<Renderer> _cachedRenderers = new List<Renderer>();
+        private static readonly List<Renderer> _cachedRenderers = new List<Renderer>();
+        private static bool _areBackgroundsDirty;
+
+        public static void RegisterRenderer(Renderer renderer)
+        {
+            _areBackgroundsDirty = true;
+            _cachedRenderers.Add(renderer);
+        }
+        
+        public static void UnregisterRenderer(Renderer renderer)
+        {
+            //_areBackgroundsDirty = true;
+            _cachedRenderers.Remove(renderer);
+        }
+        
         private Material _shadowMaterial;
-        private float _lastRefreshTime;
-        private const float RefreshInterval = 0.5f;
         
         private static MaterialPropertyBlock _mpb;
 
@@ -156,26 +168,23 @@ namespace Core.Scripts.Utils.Shadows
 
         private void RefreshRenderers()
         {
-            _cachedRenderers.Clear();
-            var allRenderers = Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None);
-            foreach (var renderer in allRenderers)
+            if (!_areBackgroundsDirty || _cachedRenderers.IsNullOrEmpty())
             {
-                if (((1 << renderer.gameObject.layer) & _settings.shadowLayers) != 0)
-                {
-                    _cachedRenderers.Add(renderer);
-                }
+                return;
             }
-            _lastRefreshTime = Time.time;
+
+            _cachedRenderers.Sort((a, b) => b.transform.position.z.CompareTo(a.transform.position.z));
+            _areBackgroundsDirty = false;
         }
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            if (Time.time - _lastRefreshTime > RefreshInterval || _cachedRenderers.Count == 0)
+            if (_cachedRenderers.Count == 0)
             {
-                RefreshRenderers();
+                return;
             }
-
-            if (_cachedRenderers.Count == 0) return;
+            
+            RefreshRenderers();
 
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             Camera camera = cameraData.camera;
@@ -239,10 +248,22 @@ namespace Core.Scripts.Utils.Shadows
     public class SpriteOutlinePass : ScriptableRenderPass
     {
         private readonly SpriteShadowRenderFeature.Settings _settings;
-        private readonly List<Renderer> _cachedRenderers = new List<Renderer>();
+        private static readonly List<Renderer> _cachedRenderers = new List<Renderer>();
+        private static bool _areBackgroundsDirty;
+
+        public static void RegisterRenderer(Renderer renderer)
+        {
+            _areBackgroundsDirty = true;
+            _cachedRenderers.Add(renderer);
+        }
+        
+        public static void UnregisterRenderer(Renderer renderer)
+        {
+            //_areBackgroundsDirty = true;
+            _cachedRenderers.Remove(renderer);
+        }
+        
         private Material _outlineMaterial;
-        private float _lastRefreshTime;
-        private const float RefreshInterval = 0.5f;
         
         private static MaterialPropertyBlock _mpb;
 
@@ -279,26 +300,20 @@ namespace Core.Scripts.Utils.Shadows
 
         private void RefreshRenderers()
         {
-            _cachedRenderers.Clear();
-            var allRenderers = Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None);
-            foreach (var renderer in allRenderers)
+            if (!_areBackgroundsDirty || _cachedRenderers.IsNullOrEmpty())
             {
-                if (((1 << renderer.gameObject.layer) & _settings.outlineLayers) != 0)
-                {
-                    _cachedRenderers.Add(renderer);
-                }
+                return;
             }
-            _lastRefreshTime = Time.time;
+
+            _cachedRenderers.Sort((a, b) => b.transform.position.z.CompareTo(a.transform.position.z));
+            _areBackgroundsDirty = false;
         }
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
-            if (Time.time - _lastRefreshTime > RefreshInterval || _cachedRenderers.Count == 0)
-            {
-                RefreshRenderers();
-            }
-
             if (_cachedRenderers.Count == 0) return;
+         
+            RefreshRenderers();
 
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();
             Camera camera = cameraData.camera;
@@ -331,10 +346,10 @@ namespace Core.Scripts.Utils.Shadows
 
                         foreach (var renderer in data.renderers)
                         {
-                            if (renderer != null && renderer.gameObject.activeInHierarchy && renderer.enabled)
+                            /*if (renderer != null && renderer.gameObject.activeInHierarchy && renderer.enabled)
                             {
                                 if (renderer is MeshRenderer || renderer is SkinnedMeshRenderer)
-                                {
+                                {*/
                                     Material sharedMat = renderer.sharedMaterial;
                                     if (sharedMat != null)
                                     {
@@ -347,8 +362,8 @@ namespace Core.Scripts.Utils.Shadows
                                             context.cmd.DrawRenderer(renderer, data.material, 0, 0);
                                             continue;
                                         }
-                                    }
-                                }
+                                    /*}
+                                }*/
 
                                 context.cmd.DrawRenderer(renderer, data.material, 0, 0);
                             }

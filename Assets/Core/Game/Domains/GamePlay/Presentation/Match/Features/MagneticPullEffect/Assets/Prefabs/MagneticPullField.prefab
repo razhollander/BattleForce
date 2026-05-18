@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6150504749417918277}
   - component: {fileID: 8277463836479550913}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3088995717242856752}
   - component: {fileID: 4847719626318205942}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: MagneticPullField
   m_TagString: Untagged
   m_Icon: {fileID: 0}

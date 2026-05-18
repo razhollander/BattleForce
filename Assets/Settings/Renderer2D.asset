@@ -14,14 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    backgroundLayer:
-      serializedVersion: 2
-      m_Bits: 128
-    shadowLayers:
-      serializedVersion: 2
-      m_Bits: 64
-    shadowColor: {r: 0.6037736, g: 0.6037736, b: 0.6037736, a: 1}
+    shadowColor: {r: 0.63177425, g: 0.62077254, b: 0.8490566, a: 1}
     shadowOffset: {x: 0.3, y: 0.5}
+    outlineColor: {r: 0, g: 0, b: 0, a: 1}
+    outlineSize: 0.2
     renderPassEvent: 450
 --- !u!114 &11400000
 MonoBehaviour:

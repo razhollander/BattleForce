@@ -110,7 +110,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4214723716863076604}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: AssistArrowPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -144,7 +144,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7725237340882638268}
   - component: {fileID: 243055411788352409}
-  m_Layer: 6
+  - component: {fileID: 564954534674999688}
+  - component: {fileID: 8085555867528220846}
+  m_Layer: 0
   m_Name: AimArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -221,6 +223,30 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &564954534674999688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 738518240283131814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8085555867528220846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 738518240283131814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &755881188434665528
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,7 +257,9 @@ GameObject:
   m_Component:
   - component: {fileID: 3467120083810468326}
   - component: {fileID: 6689624149873784762}
-  m_Layer: 6
+  - component: {fileID: 4387401070701072810}
+  - component: {fileID: 8950216307076655922}
+  m_Layer: 0
   m_Name: YearsOfPainLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -308,6 +336,30 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4387401070701072810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755881188434665528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8950216307076655922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755881188434665528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1051169645292315488
 GameObject:
   m_ObjectHideFlags: 0
@@ -318,7 +370,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6809646527262555406}
   - component: {fileID: 5030860053105673769}
-  m_Layer: 6
+  - component: {fileID: 4608995954892013583}
+  - component: {fileID: 7239709796773722224}
+  m_Layer: 0
   m_Name: SentryGunChild
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -395,6 +449,30 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4608995954892013583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051169645292315488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7239709796773722224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051169645292315488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1370132522065639406
 GameObject:
   m_ObjectHideFlags: 0
@@ -405,7 +483,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8486144522332043497}
   - component: {fileID: 5203181440066512604}
-  m_Layer: 6
+  - component: {fileID: 2780436702165882914}
+  m_Layer: 0
   m_Name: ChickenImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -482,6 +561,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2780436702165882914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1370132522065639406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1988585940966865074
 GameObject:
   m_ObjectHideFlags: 0
@@ -552,7 +643,9 @@ GameObject:
   m_Component:
   - component: {fileID: 3206318490632365646}
   - component: {fileID: 6185847033578544608}
-  m_Layer: 6
+  - component: {fileID: 384561829496222211}
+  - component: {fileID: 3471372570427742316}
+  m_Layer: 0
   m_Name: YearsOfPainRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -629,6 +722,30 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &384561829496222211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3085576189749296149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3471372570427742316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3085576189749296149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4096315426680966469
 GameObject:
   m_ObjectHideFlags: 0
@@ -640,7 +757,7 @@ GameObject:
   - component: {fileID: 6542191637674785490}
   - component: {fileID: 1747984457448988530}
   - component: {fileID: 6712503331206209323}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: YearsOfPainPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -706,7 +823,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1212893326493904077}
   - component: {fileID: 6530910294401955900}
-  m_Layer: 6
+  - component: {fileID: 1578419563288998996}
+  - component: {fileID: 615994240959494124}
+  m_Layer: 0
   m_Name: MoveArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -783,6 +902,30 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1578419563288998996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4566698426157827872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &615994240959494124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4566698426157827872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4873999045055397805
 GameObject:
   m_ObjectHideFlags: 0
@@ -793,7 +936,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4227594752874179535}
   - component: {fileID: 4018261408394349044}
-  m_Layer: 6
+  - component: {fileID: 5989434413525100636}
+  - component: {fileID: 4493581156180643745}
+  m_Layer: 0
   m_Name: FrontArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -870,6 +1015,30 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &5989434413525100636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4873999045055397805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4493581156180643745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4873999045055397805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4983262613335276701
 GameObject:
   m_ObjectHideFlags: 0
@@ -880,7 +1049,7 @@ GameObject:
   m_Component:
   - component: {fileID: 800629822375896339}
   - component: {fileID: 6500615767110647254}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: UmbrellaArrowPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -926,7 +1095,9 @@ GameObject:
   m_Component:
   - component: {fileID: 956614699808643123}
   - component: {fileID: 7001834317941210009}
-  m_Layer: 6
+  - component: {fileID: 6232997971411731156}
+  - component: {fileID: 2285266540157183559}
+  m_Layer: 0
   m_Name: UmbrellaStick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1003,6 +1174,30 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &6232997971411731156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6619847214657190306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2285266540157183559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6619847214657190306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7943647199770267924
 GameObject:
   m_ObjectHideFlags: 0
@@ -1100,7 +1295,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4692078833405911848}
   - component: {fileID: 3777991267959456427}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: SentryGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1152,7 +1347,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2823681329976273824}
   - component: {fileID: 7017320390673259590}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Chicken
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1876,7 +2071,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4764998580777574277, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5285940023680706921, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       propertyPath: m_Layer
@@ -1900,11 +2095,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6048271819881284906, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7215136495514641199, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7309389298408549281, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       propertyPath: m_Layer
@@ -1916,7 +2111,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: fa478e67752a34717b69476f982647ae, type: 3}
     - target: {fileID: 7878617058649918533, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8048267696897542281, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       propertyPath: m_Layer
@@ -1928,7 +2123,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8218143705077051413, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8477916259467920202, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       propertyPath: m_Layer
@@ -1940,7 +2135,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8969142055974948290, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 1283520457403978823}
   - component: {fileID: 3287229912238137115}
   - component: {fileID: 5098656257286592944}
-  m_Layer: 6
+  - component: {fileID: 7623228389237735073}
+  m_Layer: 0
   m_Name: PlayerBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,3 +102,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spriteRenderer: {fileID: 3287229912238137115}
+--- !u!114 &7623228389237735073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4013787446729024299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

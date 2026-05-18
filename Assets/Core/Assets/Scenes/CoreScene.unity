@@ -881,6 +881,10 @@ PrefabInstance:
       propertyPath: near clip plane
       value: -10
       objectReference: {fileID: 0}
+    - target: {fileID: 5516514484391682885, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 23
+      objectReference: {fileID: 0}
     - target: {fileID: 6329727978539686723, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
       propertyPath: 'm_Cameras.Array.data[0]'
       value: 
@@ -895,7 +899,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8101176250634575614, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -30
       objectReference: {fileID: 0}
     - target: {fileID: 8101176250634575614, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
       propertyPath: m_LocalRotation.w

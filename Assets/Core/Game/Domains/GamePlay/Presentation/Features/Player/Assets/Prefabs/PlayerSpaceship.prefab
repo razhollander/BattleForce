@@ -425,7 +425,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2881847196631721300}
   - component: {fileID: 8336207131367985468}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Equipment
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -752,7 +752,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6367321170785206256}
   - component: {fileID: 5887557028104628595}
-  m_Layer: 6
+  - component: {fileID: 3932841006748404272}
+  m_Layer: 0
   m_Name: SpaceShip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -835,6 +836,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &3932841006748404272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6048271819881284906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7215136495514641199
 GameObject:
   m_ObjectHideFlags: 0
@@ -846,7 +859,7 @@ GameObject:
   - component: {fileID: 2743151170629309137}
   - component: {fileID: 6683947586830087238}
   - component: {fileID: 7054667237423659150}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: LoadingRing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -983,7 +996,7 @@ GameObject:
   - component: {fileID: 8602332146659507469}
   - component: {fileID: 9212962959922570277}
   - component: {fileID: 2261358914737223833}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Tail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1174,7 +1187,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1541767573961622650}
   - component: {fileID: 3197719174041810226}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: PlayerSpaceship
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1451,7 +1464,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6486562566168459950}
   - component: {fileID: 7373953308403036658}
-  m_Layer: 6
+  - component: {fileID: 2006945207990204518}
+  m_Layer: 0
   m_Name: Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1528,3 +1542,15 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2006945207990204518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8969142055974948290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

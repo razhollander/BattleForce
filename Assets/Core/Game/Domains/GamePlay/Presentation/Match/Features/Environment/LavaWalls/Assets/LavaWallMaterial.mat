@@ -112,9 +112,15 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _UVSec: 0
+    - _VertexWobbleFreq: 5
+    - _VertexWobbleSpeed: 3
+    - _VertexWobbleStrength: 0.489
     - _WaveAmplitude: 0.1
     - _WaveFrequency: 10
     - _WaveSpeed: 3
+    - _WobbleFrequency: 4
+    - _WobbleSpeed: 1
+    - _WobbleStrength: 0.051
     - _WorldScale: 1
     - _ZWrite: 1
     m_Colors:
