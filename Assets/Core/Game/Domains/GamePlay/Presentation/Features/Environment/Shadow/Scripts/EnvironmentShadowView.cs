@@ -15,7 +15,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Sc
 
         private void OnEnable()
         {
-            SpriteShadowPass.RegisterRenderer(_renderer);
+            if (_renderer is SpriteRenderer sr)
+            {
+                SpriteShadowCommandBufferPass.RegisterRenderer(sr);
+            }
+            //SpriteShadowPass.RegisterRenderer(_renderer);
         }
 
         private void OnDisable()
@@ -30,7 +34,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Sc
 
         private void UnregisterRenderer()
         {
-            SpriteShadowPass.UnregisterRenderer(_renderer);
+            if (_renderer is SpriteRenderer sr)
+            {
+                SpriteShadowCommandBufferPass.UnregisterRenderer(sr);
+            }
+            //SpriteShadowPass.UnregisterRenderer(_renderer);
         }
     }
 }
