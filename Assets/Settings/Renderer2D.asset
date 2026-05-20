@@ -12,13 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6a1482305770422aab614679bc66679, type: 3}
   m_Name: SpriteShadowRenderFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
     shadowColor: {r: 0.63177425, g: 0.62077254, b: 0.8490566, a: 1}
     shadowOffset: {x: 0.3, y: 0.5}
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
     outlineSize: 0.2
     renderPassEvent: 450
+--- !u!114 &-4158964614082320912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 333766459ab74bd98bfecb6fcc604c8e, type: 3}
+  m_Name: SpriteShadowRendererFeature2
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  shadowMaterial: {fileID: 2100000, guid: 99280632e01854f95a5448e1b0754683, type: 2}
+  _renderPassEvent: 450
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45,7 +60,8 @@ MonoBehaviour:
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
   - {fileID: -6189519340098954628}
-  m_RendererFeatureMap: 7cdafd22f4681aaa
+  - {fileID: -4158964614082320912}
+  m_RendererFeatureMap: 7cdafd22f4681aaaf02534f8b76348c6
   m_UseNativeRenderPass: 0
   m_LayerMask:
     serializedVersion: 2
