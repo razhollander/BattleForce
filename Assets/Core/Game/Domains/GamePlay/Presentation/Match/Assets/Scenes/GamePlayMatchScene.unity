@@ -127,9 +127,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1767135008251478236, guid: 4d01925354382446c8a1d3d7270e277b, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1803821491716489768, guid: 4d01925354382446c8a1d3d7270e277b, type: 3}
       propertyPath: m_Name
       value: BackGround
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803821491716489768, guid: 4d01925354382446c8a1d3d7270e277b, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4240901867088155947, guid: 4d01925354382446c8a1d3d7270e277b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -169,6 +177,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4240901867088155947, guid: 4d01925354382446c8a1d3d7270e277b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4367293717753854080, guid: 4d01925354382446c8a1d3d7270e277b, type: 3}
+      propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
