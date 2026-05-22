@@ -4,16 +4,24 @@ using UnityEngine.Rendering.Universal;
 public class SpriteShadowRendererFeature2 : ScriptableRendererFeature
 {
     [SerializeField] private Material shadowMaterial;
+    [SerializeField] private Material outlineMaterial;
+    [SerializeField] private float outlineThickness;
     [SerializeField] private RenderPassEvent _renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
     
-    private SpriteShadowCommandBufferPass _shadowPass;
+    private SpriteShadowPass _shadowPass;
+    private SpriteOutlinePass _outlinePass;
     
     // Called when the feature is first loaded, or when settings change in the inspector
     public override void Create()
     {
         if (shadowMaterial != null)
         {
-            _shadowPass = new SpriteShadowCommandBufferPass(shadowMaterial, _renderPassEvent);
+            _shadowPass = new SpriteShadowPass(shadowMaterial, _renderPassEvent);
+        }
+        
+        if (shadowMaterial != null)
+        {
+            _outlinePass = new SpriteOutlinePass(outlineMaterial, outlineThickness, _renderPassEvent);
         }
     }
 
@@ -27,5 +35,6 @@ public class SpriteShadowRendererFeature2 : ScriptableRendererFeature
         }
 
         renderer.EnqueuePass(_shadowPass);
+        renderer.EnqueuePass(_outlinePass);
     }
 }

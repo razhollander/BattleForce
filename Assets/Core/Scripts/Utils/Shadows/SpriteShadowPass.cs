@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 
-public class SpriteShadowCommandBufferPass : ScriptableRenderPass
+public class SpriteShadowPass : ScriptableRenderPass
 {
     private Material shadowMaterial;
     private Mesh quadMesh;
@@ -31,7 +31,7 @@ public class SpriteShadowCommandBufferPass : ScriptableRenderPass
         _cachedRenderers.Remove(renderer);
     }
     
-    public SpriteShadowCommandBufferPass(Material material, RenderPassEvent renderPassEvent)
+    public SpriteShadowPass(Material material, RenderPassEvent renderPassEvent)
     {
         this.shadowMaterial = material;
         this.renderPassEvent = renderPassEvent;

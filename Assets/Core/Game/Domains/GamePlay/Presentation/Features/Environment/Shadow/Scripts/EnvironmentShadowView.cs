@@ -17,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Sc
         {
             if (_renderer is SpriteRenderer sr)
             {
-                SpriteShadowCommandBufferPass.RegisterRenderer(sr);
+                SpriteShadowPass.RegisterRenderer(sr);
             }
             //SpriteShadowPass.RegisterRenderer(_renderer);
         }
@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Sc
         {
             if (_renderer is SpriteRenderer sr)
             {
-                SpriteShadowCommandBufferPass.UnregisterRenderer(sr);
+                SpriteShadowPass.UnregisterRenderer(sr);
             }
             //SpriteShadowPass.UnregisterRenderer(_renderer);
         }

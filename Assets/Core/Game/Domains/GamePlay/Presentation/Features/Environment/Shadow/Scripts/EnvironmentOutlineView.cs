@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Scripts
 {
-    [RequireComponent(typeof(Renderer))]
+    [RequireComponent(typeof(SpriteRenderer))]
     public class EnvironmentOutlineView : MonoBehaviour
     {
-        private Renderer _renderer;
+        private SpriteRenderer _renderer;
 
         private void Awake()
         {
-            _renderer = GetComponent<Renderer>();
+            _renderer = GetComponent<SpriteRenderer>();
         }
 
         private void OnEnable()
