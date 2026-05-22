@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1064797891662729060}
   - component: {fileID: 6574485162619562972}
   - component: {fileID: 5173718942259597351}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: EnvironmentTeamFloor
   m_TagString: Untagged
   m_Icon: {fileID: 0}

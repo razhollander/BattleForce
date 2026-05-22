@@ -875,15 +875,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4126886619047320635, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
       propertyPath: Lens.NearClipPlane
-      value: -10
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 5516514484391682885, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
       propertyPath: near clip plane
-      value: -10
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 5516514484391682885, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
       propertyPath: m_CullingMask.m_Bits
-      value: 23
+      value: 151
       objectReference: {fileID: 0}
     - target: {fileID: 6329727978539686723, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
       propertyPath: 'm_Cameras.Array.data[0]'

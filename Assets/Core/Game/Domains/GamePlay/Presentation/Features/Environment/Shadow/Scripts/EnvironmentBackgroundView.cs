@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Sc
             // {
             //     SpriteShadowCommandBufferPass.RegisterRenderer(sr);
             // }
-           // SpriteBackgroundPass.RegisterRenderer(_renderer);
+           SpriteBackgroundPass.RegisterRenderer(_renderer);
         }
 
         private void OnDisable()
@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Sc
             //     SpriteShadowCommandBufferPass.UnregisterRenderer(sr);
             // }
             
-            //SpriteBackgroundPass.UnregisterRenderer(_renderer);
+            SpriteBackgroundPass.UnregisterRenderer(_renderer);
         }
     }
 }

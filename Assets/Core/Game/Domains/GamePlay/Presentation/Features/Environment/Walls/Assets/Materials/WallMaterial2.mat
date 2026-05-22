@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: WallMaterial2
-  m_Shader: {fileID: 4800000, guid: 1cec93fc7e784dfaa6406308f5d5fab7, type: 3}
+  m_Shader: {fileID: 4800000, guid: 13c02b14c4d048fa9653293d54f6e0e1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -37,7 +37,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 28684132378477856, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+        m_Texture: {fileID: 2800000, guid: ad4148593b05d0f47980774815c325fe, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskTex:
@@ -78,6 +78,7 @@ Material:
     - _IsShadow: 0
     - _LightAngle: 0
     - _OutlineMode: 0
+    - _OutlineWidth: -0.87
     - _QueueOffset: 0
     - _Reflectivity: 5
     - _SampleGI: 0
@@ -102,6 +103,7 @@ Material:
     - _FaceText_ST: {r: 1, g: 1, b: 0, a: 0}
     - _FaceUVSpeed: {r: 0, g: 0, b: 0, a: 0}
     - _IsoPerimeter: {r: 0, g: 0, b: 0, a: 0}
+    - _OutlineColor: {r: 1, g: 0.072127916, b: 0, a: 1}
     - _OutlineColor1: {r: 0, g: 1, b: 1, a: 1}
     - _OutlineColor2: {r: 0.009433985, g: 0.02534519, b: 1, a: 1}
     - _OutlineColor3: {r: 0, g: 0, b: 0, a: 1}

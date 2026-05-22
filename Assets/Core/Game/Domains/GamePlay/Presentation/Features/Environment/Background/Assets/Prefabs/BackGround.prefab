@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3063599031452302413}
   - component: {fileID: 5413606755166485873}
   - component: {fileID: 2794694558977373448}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Layer1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,13 +110,13 @@ GameObject:
   m_Component:
   - component: {fileID: 4240901867088155947}
   - component: {fileID: 8477379511663451538}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: BackGround
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4240901867088155947
 Transform:
   m_ObjectHideFlags: 0
@@ -162,7 +162,7 @@ GameObject:
   - component: {fileID: 891988030412264752}
   - component: {fileID: 2384289980984760512}
   - component: {fileID: 3288726641716670061}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Layer2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
