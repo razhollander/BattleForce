@@ -1,0 +1,23 @@
+--- ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Physics/PhysicsSimulator.cs
++++ ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Physics/PhysicsSimulator.cs
+@@ -754,15 +754,20 @@
+         {
+             bool hit = false;
+             PhysicsBodyData bestHitData = default;
++            float closestFraction = 1f;
+
+             void RayCastCallback(Box2D.NetStandard.Dynamics.Fixtures.Fixture fixture, Vector2 point, Vector2 normal, float fraction)
+             {
+                 var body = fixture.Body;
+                 if (body != null && body.UserData is PhysicsBodyData data)
+                 {
+-                    hit = true;
+-                    bestHitData = data;
++                    if (fraction <= closestFraction)
++                    {
++                        hit = true;
++                        closestFraction = fraction;
++                        bestHitData = data;
++                    }
+                 }
+             }

@@ -1,0 +1,29 @@
+--- ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Physics/PhysicsSimulator.cs
++++ ./Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Physics/PhysicsSimulator.cs
+@@ -750,5 +750,26 @@
+             var body = GetBody(PhysicsBodyType.ChickenEgg, eggId);
+             RemoveBody(body);
+         }
++
++        public bool RayCast(Vector2 point1, Vector2 point2, out PhysicsBodyData hitBodyData)
++        {
++            bool hit = false;
++            PhysicsBodyData bestHitData = default;
++
++            void RayCastCallback(Box2D.NetStandard.Dynamics.Fixtures.Fixture fixture, Vector2 point, Vector2 normal, float fraction)
++            {
++                var body = fixture.Body;
++                if (body != null && body.UserData is PhysicsBodyData data)
++                {
++                    hit = true;
++                    bestHitData = data;
++                }
++            }
++
++            _world.RayCast(RayCastCallback, point1, point2);
++
++            hitBodyData = bestHitData;
++            return hit;
++        }
+     }
+ }

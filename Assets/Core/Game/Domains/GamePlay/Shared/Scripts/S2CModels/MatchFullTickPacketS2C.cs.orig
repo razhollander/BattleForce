@@ -1,5 +1,4 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
@@ -54,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
         public FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C> ActivateYearsOfPainTalentNetEvents;
         public FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents;
-        
+
         public MatchFullTickPacketS2C()
         {
             // use this from the server?
@@ -191,7 +190,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
                 netEvent.Serialize(writer);
             }
         }
-        
+
         private void SerializedCreateSwapFieldNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)CreateSwapFieldNetEvents.Count);
@@ -538,7 +537,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
                 talentCardHitEvent.Deserialize(reader);
             }
         }
-        
+
         private void DeserializedTalentCardObtainedEvents(NetDataReader reader)
         {
             TalentCardObtainedNetEvents.Clear();
@@ -549,7 +548,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
                 talentCardObtainedEvent.Deserialize(reader);
             }
         }
-        
+
         private void DeserializedPlayerSwapEvents(NetDataReader reader)
         {
             PlayerSwapNetEvents.Clear();
@@ -699,7 +698,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
                 netEvent.Serialize(writer);
             }
         }
-        
+
         private void DeserializedActivateSentryGunTalentNetEvents(NetDataReader reader)
         {
             var count = reader.GetByte();
@@ -910,7 +909,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
                 netEvent.Deserialize(reader);
             }
         }
-        
+
         private void SerializedLayChickenEggNetEvents(NetDataWriter writer)
         {
             writer.Put((byte)LayChickenEggNetEvents.Count);
@@ -969,26 +968,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (var i = 0; i < count; i++)
             {
                 ref var netEvent = ref ActivateYearsOfPainTalentNetEvents.AddAndGet();
-                netEvent.Deserialize(reader);
-            }
-        }
-
-        private void SerializedPlayerLockOnHeartTargetsChangedNetEvents(NetDataWriter writer)
-        {
-            writer.Put((byte)PlayerLockOnHeartTargetsChangedNetEvents.Count);
-            foreach (var netEvent in PlayerLockOnHeartTargetsChangedNetEvents.AsSpan())
-            {
-                netEvent.Serialize(writer);
-            }
-        }
-
-        private void DeserializedPlayerLockOnHeartTargetsChangedNetEvents(NetDataReader reader)
-        {
-            PlayerLockOnHeartTargetsChangedNetEvents.Clear();
-            var count = reader.GetByte();
-            for (var i = 0; i < count; i++)
-            {
-                ref var netEvent = ref PlayerLockOnHeartTargetsChangedNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

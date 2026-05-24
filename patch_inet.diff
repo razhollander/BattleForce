@@ -1,0 +1,12 @@
+<<<<<<< SEARCH
+        void AddGainBoltsNetEvent(int processedTick, ushort playerId, int boltsAmount);
+        void AddPlayerMaxShootCooldownChangedNetEvent(int processedTick, ushort playerId, float newMaxCooldown);
+    }
+}
+=======
+        void AddGainBoltsNetEvent(int processedTick, ushort playerId, int boltsAmount);
+        void AddPlayerMaxShootCooldownChangedNetEvent(int processedTick, ushort playerId, float newMaxCooldown);
+        void AddPlayerLockOnHeartTargetsChangedNetEvent(int processedTick, ushort playerId, Core.Scripts.Utils.CustomCollections.FixedUnorderedList<ushort> targetHeartIds);
+    }
+}
+>>>>>>> REPLACE

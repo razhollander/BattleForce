@@ -1,52 +1,48 @@
-1. **Define TalentType**: Add `MagneticPull = 7` to `TalentType` enum in `Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/TalentType.cs`.
+1. **Simulation Configuration (`PlayerSpaceshipConfig.cs`)**:
+   - Update `PlayerSpaceshipConfig` in `Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Configurations/PlayerSpaceshipConfig.cs` to add `public float LockOnHeartMaxDistance = 15f;` and `public float LockOnHeartMaxAngleDegrees = 30f;`.
 
-2. **Add Network Event**:
-   - Create `CreateMagenticPullFieldNetEventS2C` in `Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/CreateMagenticPullFieldNetEventS2C.cs`.
-   - Fields:
-     - `int OccuredOnTick`
-     - `Vector2 Position`
-     - `Vector2 Rotation`
-     - `bool HasHit`
-     - `ushort HitPlayerId`
-     - `ushort CasterPlayerId`
-   - Implement `INetSerializable` and `IComparable`. Note: `HasHit` is required because `HitPlayerId` is optional.
-   - Verify the event structure and namespaces match other events using `read_file`.
+2. **Simulation Data Models**:
+   - Create a new network event `PlayerLockOnHeartTargetsChangedNetEventS2C` in `Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PlayerLockOnHeartTargetsChangedNetEventS2C.cs`. It will contain `LockedOnHeartIds` (`FixedUnorderedList<ushort>`) and `PlayerId` (`ushort`). Add constructor accepting `int maxHeartsIdsOnTarget` to initialize the list.
+   - Update `MaxCap` in `Assets/Core/Scripts/Network/NetworkConfig.cs` to add `public int MaxHeartsIdsOnTarget = 8;` and `public int PlayerLockOnHeartTargetsChangedNetEvents = 8;`.
+   - Add `public FixedUnorderedList<ushort> PlayerHeartsIdsOnTarget;` to `PlayerSpaceshipStateS2C`. Modify its constructor to accept an `int maxHeartsIdsOnTarget` parameter, and initialize the list with it. Update custom serialization / deserialization methods. Copy it properly in `GetClone()`.
+   - Modify `PlayerStateS2C` constructor to accept `int maxHeartsIdsOnTarget` and pass it to the `PlayerSpaceshipStateS2C` constructor. Update `PlayerStateS2C` instantiation points (`SimulationStateS2C`, `MatchSimulationStateS2C`, `PlayerRejoinAcceptPacketS2C`, `MatchPlayerJoinPacketsHandler`) to pass the appropriate `MaxCap.MaxHeartsIdsOnTarget` or use `networkConfig.MaxCap.MaxHeartsIdsOnTarget` depending on available context.
+   - Update `MatchFullTickPacketS2C` in `Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/MatchFullTickPacketS2C.cs` to include `public FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents;`. Initialize it using `MaxCap.PlayerLockOnHeartTargetsChangedNetEvents` and `MaxCap.MaxHeartsIdsOnTarget`. Handle its serialization and deserialization. Make sure to `Clear()` before deserialization.
 
-3. **Update Full Tick Packet**:
-   - Add `CreateMagenticPullFieldNetEvents` configuration to `NetworkConfig` and `MaxCap`. Add `public int CreateMagenticPullFieldNetEvents = 128;` to `Assets/Core/Scripts/Network/NetworkConfig.cs`.
-   - Add a `FixedUnorderedList<CreateMagenticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents` field to `Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/MatchFullTickPacketS2C.cs` and implement its serialization / deserialization methods properly. Make sure to `Clear()` the collection before deserialization.
-   - Verify serialization methods in `MatchFullTickPacketS2C.cs` are properly configured using `grep`.
+3. **Net Events Service**:
+   - Add a method to `INetEventsDataService` and `NetEventsDataService` to trigger this event: `void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<ushort> targetHeartIds)`.
 
-4. **Update Shared Config**:
-   - Add a property `public float MagneticPullFieldSize = 5f;` to `SharedGamePlayConfig` in `Assets/Core/Game/Domains/GamePlay/Shared/Scripts/Configs/SharedGamePlayConfig.cs`.
+4. **PhysicsSimulator**:
+   - Add `bool RayCast(Vector2 point1, Vector2 point2, out PhysicsBodyData hitBodyData)` method to `IPhysicsSimulator.cs` and `PhysicsSimulator.cs`.
+   - Use Box2D's internal callback. I'll create a local function to handle this and return the `PhysicsBodyData` of the closest hit.
 
-5. **Client Caching of Network Event**:
-   - Add `List<CreateMagenticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents` to `Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/PresentationEvents/ICachedPresentationEventsService.cs` and its implementation `Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/PresentationEvents/CachedPresentationEventsService.cs`.
-   - Add `CapacityList<CreateMagenticPullFieldNetEventS2C> _cachedUnprocessedCreateMagenticPullFieldEvents` to `Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Network/PacketsHandlers/MatchFullTickPacketsHandler.cs`, process these events from `MatchFullTickPacketS2C`, sort them, and call `ProcessCreateMagenticPullFieldEvents`.
-   - Add `ProcessCreateMagenticPullFieldEvents(CapacityList<CreateMagenticPullFieldNetEventS2C> events)` to `Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Network/PacketsHandlers/PresentationMatchNetEventsHandler.cs` which adds them to the cache.
+5. **Simulation Logic - LockOnHeartTargetService**:
+   - Create `LockOnHeartTargetService` (and interface `ILockOnHeartTargetService`) inside `Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Services/LockOnHeartTargetService/LockOnHeartTargetService.cs`. The service will contain `public void Process(int processedTick, PlayerStateS2C playerState);`.
+   - It will depend on `IMatchDataService`, `IPhysicsSimulator`, `SimulationGamePlayConfig`, and `INetEventsDataService`. (Check `IMatchDataService.cs` using `read_file` to verify access to simulation state).
+   - Add a Zenject binding for `ILockOnHeartTargetService` to `LockOnHeartTargetService` in `Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Initiator/ServerMatchInstaller.cs`.
+   - In `MatchPlayerInputsPacketsHandler.cs`: Inject `ILockOnHeartTargetService` via constructor and assign to `_lockOnHeartTargetService`. Inside `UpdatePlayerShoot`, call `_lockOnHeartTargetService.Process(processedTick, playerModel)`.
+   - The method logic for `LockOnHeartTargetService.Process`:
+     - Loop over `_matchDataService.SimulationState.Players` using a `for` loop.
+     - Ignore self.
+     - Calculate RayCast start (head): `playerState.Spaceship.Transform.Position + playerState.Spaceship.Transform.Direction * _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius`.
+     - Calculate target (heart): `enemyState.Spaceship.Transform.GetHeartPosition()`.
+     - Call `RayCast`. If hit, check if `hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerHeart` and `hitBodyData.Id == enemyState.Id`.
+     - If true, calculate distance squared and angle. If within thresholds, add to list.
+     - Compare lists and trigger `AddPlayerLockOnHeartTargetsChangedNetEvent` if changed.
 
-6. **Create Views, Pools, and Controllers**:
-   - In `Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/MagneticPullEffect/Scripts/`:
-     - Create `MagneticPullFieldView.cs` extending `MonoBehaviour`, implementing `IPoolable`. It will take a size from config and scale itself. It needs a serialized field for duration, `[SerializeField] private float _showDuration = 2f;`.
-     - Create `MagneticPullHitEffectView.cs` extending `MonoBehaviour`, implementing `IPoolable`. Serialize field for duration `[SerializeField] private float _showDuration = 2f;`.
-     - Create `MagneticPullFieldPool.cs` and `MagneticPullHitEffectPool.cs` extending `PrefabsPool<View>`.
-     - Create `IMagneticPullEffectController.cs` and `MagneticPullEffectController.cs`. Controller implements `InitEntryPoint()` to initialize pools, and methods like `PlayFieldEffect(Vector2 position, Vector2 rotation, float size)` and `PlayHitEffect(Vector2 casterPos, Vector2 enemyPos)`.
-   - Verify scripts compile without issues using a test script or `dotnet build` if available. Wait, since it's unity, I'll write the scripts carefully and verify the contents.
+6. **Testing**:
+   - Test by running the following bash commands to create a temporary console project, build the project with `--no-restore`, and clean up:
+     ```bash
+     dotnet new console -n TempCompileTest
+     cp -R Assets TempCompileTest/
+     cd TempCompileTest
+     dotnet build --no-restore
+     cd ..
+     rm -rf TempCompileTest
+     ```
+   - Make any necessary fixes if there are compilation errors.
 
-7. **Implement Command to Execute Network Events**:
-   - Create `HandleCreateMagenticPullFieldNetEventsCommand.cs` in `Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/`.
-   - Implement `ICommandVoid` and `BaseCommand`. Iterate through `_cachedPresentationEventsService.CreateMagenticPullFieldNetEvents`.
-   - For each event, invoke `_magneticPullEffectController.PlayFieldEffect(event.Position, event.Rotation, sharedConfig.MagneticPullFieldSize)`.
-   - If `event.HasHit`, get positions of Caster and Hit player from `_matchDataService.GetPlayer(id).Transform.Position`. Then call `_magneticPullEffectController.PlayHitEffect(casterPos, hitPos)`.
-   - Finally `Clear()` the cached events list.
-   - Register the command in `Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/TickProcessor/ClientMatchPresentationTickProcessor.cs` and execute it during `ManagedUpdate()`.
-   - Verify the command is registered in `ClientMatchPresentationTickProcessor` correctly.
+7. **Pre-commit**:
+   - Complete pre-commit steps to ensure proper testing, verification, review, and reflection are done.
 
-8. **Zenject Installer Integration**:
-   - Update `Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/ZenjectInstallers/GamePlayMatchInstaller.cs` to add `Container.BindInterfacesTo<MagneticPullEffectController>().AsSingle().WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab).NonLazy();`. Add `[SerializeField] private MagneticPullFieldView _magneticPullFieldViewPrefab;` and `[SerializeField] private MagneticPullHitEffectView _magneticPullHitEffectViewPrefab;` to the installer. We must use `EditableRef` or similar if required by project, but unity normal `SerializeField` works.
-   - Also add `.WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab)` assuming I injected them to controller.
-
-9. **Tests and Compilation**:
-   - Run any available scripts like `./test_compilation.sh` to ensure no major syntax issues.
-
-10. **Pre commit step**: Complete pre-commit steps to ensure proper testing, verification, review, and reflection are done.
+8. **Submit**:
+   - Submit the implementation.

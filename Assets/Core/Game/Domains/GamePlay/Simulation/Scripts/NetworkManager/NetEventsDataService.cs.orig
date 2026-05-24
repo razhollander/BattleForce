@@ -166,14 +166,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 list.Clear();
                 return list;
             }, maxConcurrentPlayers);
-            
+
             _matchMakingPlayerJoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>>(() =>
             {
                 var list =new FixedClassUnorderedList<MatchMakingPlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents, ()=>new MatchMakingPlayerJoinAcceptPacketS2C(networkConfig.MaxCap));
                 list.Clear();
                 return list;
             }, maxConcurrentPlayers);
-            
+
             _playerTakeDamageListPool = new ConcurrentPool<FixedUnorderedList<PlayerTakeDamageNetEventS2C>>(() => new FixedUnorderedList<PlayerTakeDamageNetEventS2C>(networkConfig.MaxCap.PlayerTakeDamageNetEvents), maxConcurrentPlayers);
             _playerDiedListPool = new ConcurrentPool<FixedUnorderedList<PlayerDiedNetEventS2C>>(() => new FixedUnorderedList<PlayerDiedNetEventS2C>(networkConfig.MaxCap.PlayerDiedNetEvents), maxConcurrentPlayers);
             _bulletDestroyedListPool = new ConcurrentPool<FixedUnorderedList<BulletDestroyedNetEventS2C>>(() => new FixedUnorderedList<BulletDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents), maxConcurrentPlayers);
@@ -224,22 +224,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _activateYearsOfPainTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents), maxConcurrentPlayers);
         }
 
-        public void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, Core.Scripts.Utils.CustomCollections.FixedUnorderedList<ushort> targetHeartIds)
-        {
-            var pkt = GetNextFreeFullTickPacket(onTick);
-            ref var netEvent = ref pkt.PlayerLockOnHeartTargetsChangedNetEvents.AddAndGet();
-            netEvent.PlayerId = playerId;
-            netEvent.LockedOnHeartIds.Clear();
-            for (int i = 0; i < targetHeartIds.Count; i++)
-            {
-                netEvent.LockedOnHeartIds.Add(targetHeartIds[i]);
-            }
-            LogService.LogTopic($"Created AddPlayerLockOnHeartTargetsChangedNetEvent for player {playerId} in tick {onTick} with {targetHeartIds.Count} hearts.", LogTopicType.ServerSimulationEvents);
-        }
-
         public void StartSavingPlayerEvents(ushort playerId)
         {
-            if (!BulletSpawnNetEventsPerPlayer.ContainsKey(playerId)) // don't use TryAdd since it will _bulletSpawnListPool.Get() an object from the pool! 
+            if (!BulletSpawnNetEventsPerPlayer.ContainsKey(playerId)) // don't use TryAdd since it will _bulletSpawnListPool.Get() an object from the pool!
             {
                 BulletSpawnNetEventsPerPlayer.Add(playerId, _bulletSpawnListPool.Get());
             }
@@ -256,7 +243,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
-            
+
             if (!MatchMakingPlayerJoinAcceptNetEventsPerPlayer.ContainsKey(playerId))
             {
                 MatchMakingPlayerJoinAcceptNetEventsPerPlayer.Add(playerId, _matchMakingPlayerJoinAcceptListPool.Get());
@@ -265,7 +252,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
-            
+
             if (!PlayerTakeDamageNetEventsPerPlayer.ContainsKey(playerId))
             {
                 PlayerTakeDamageNetEventsPerPlayer.Add(playerId, _playerTakeDamageListPool.Get());
@@ -283,7 +270,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
-            
+
             if (!BulletDestroyedNetEventsPerPlayer.ContainsKey(playerId))
             {
                 BulletDestroyedNetEventsPerPlayer.Add(playerId, _bulletDestroyedListPool.Get());
@@ -291,8 +278,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             else
             {
                 LogService.LogError($"Player already exists! {playerId}");
-            }    
-            
+            }
+
             if (!PlayerSwapNetEventsPerPlayer.ContainsKey(playerId))
             {
                 PlayerSwapNetEventsPerPlayer.Add(playerId, _playerSwapListPool.Get());
@@ -310,7 +297,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
-            
+
             if (!TalentCardHitNetEventsPerPlayer.ContainsKey(playerId))
             {
                 TalentCardHitNetEventsPerPlayer.Add(playerId, _talentCardHitListPool.Get());
@@ -333,7 +320,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
-            
+
             if (!PowerUpBallSpawnedNetEventsPerPlayer.ContainsKey(playerId))
             {
                 PowerUpBallSpawnedNetEventsPerPlayer.Add(playerId, _powerUpBallsSpawnedListPool.Get());
@@ -342,7 +329,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 LogService.LogError($"Player already exists! {playerId}");
             }
-            
+
             if (!PowerUpBallObtainedNetEventsPerPlayer.ContainsKey(playerId))
             {
                 PowerUpBallObtainedNetEventsPerPlayer.Add(playerId, _powerUpBallsObtainedListPool.Get());
@@ -540,7 +527,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 ActivateYearsOfPainTalentNetEventsPerPlayer.Add(playerId, _activateYearsOfPainTalentNetEventsListPool.Get());
             }
         }
-        
+
         public void StopSavingPlayerEvents(ushort playerId)
         {
             var bulletSpawnedList = BulletSpawnNetEventsPerPlayer[playerId];
@@ -643,7 +630,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _playerGrapplingHookShotNetEventsListPool.Return(playerGrapplingHookShotNetEventsList);
             _playerGrapplingHookHitNetEventsListPool.Return(playerGrapplingHookHitNetEventsList);
             _playerGrapplingHookDeactivatedNetEventsListPool.Return(playerGrapplingHookDeactivatedNetEventsList);
-            
+
             var performDashPulseNetEventsList = PerformDashPulseNetEventsPerPlayer[playerId];
             performDashPulseNetEventsList.Clear();
             _performDashPulseNetEventsListPool.Return(performDashPulseNetEventsList);
@@ -655,11 +642,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var deactivateSentryGunTalentNetEventsList = DeactivateSentryGunTalentNetEventsPerPlayer[playerId];
             deactivateSentryGunTalentNetEventsList.Clear();
             _deactivateSentryGunTalentNetEventsListPool.Return(deactivateSentryGunTalentNetEventsList);
-            
+
             var updatePlayerTalentStocksNetEventsList = UpdatePlayerTalentStocksNetEventsPerPlayer[playerId];
             updatePlayerTalentStocksNetEventsList.Clear();
             _updatePlayerTalentStocksNetEventsListPool.Return(updatePlayerTalentStocksNetEventsList);
-            
+
             var playerMaxShootCooldownChangedList = PlayerMaxShootCooldownChangedNetEventsPerPlayer[playerId];
             playerMaxShootCooldownChangedList.Clear();
             _playerMaxShootCooldownChangedListPool.Return(playerMaxShootCooldownChangedList);
@@ -688,11 +675,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var deactivateUmbrellaTalentNetEventsList = DeactivateUmbrellaTalentNetEventsPerPlayer[playerId];
             deactivateUmbrellaTalentNetEventsList.Clear();
             _deactivateUmbrellaTalentNetEventsListPool.Return(deactivateUmbrellaTalentNetEventsList);
-            
+
             var layChickenEggNetEventsList = LayChickenEggNetEventsPerPlayer[playerId];
             layChickenEggNetEventsList.Clear();
             _layChickenEggNetEventsPool.Return(layChickenEggNetEventsList);
-            
+
             var chickenEggHitNetEventsList = ChickenEggHitNetEventsPerPlayer[playerId];
             chickenEggHitNetEventsList.Clear();
             _chickenEggHitNetEventsPool.Return(chickenEggHitNetEventsList);
@@ -744,7 +731,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             ChickenEggHitNetEventsPerPlayer.Remove(playerId);
             ActivateYearsOfPainTalentNetEventsPerPlayer.Remove(playerId);
         }
-        
+
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
         {
             foreach (var kvp in PlayerTakeDamageNetEventsPerPlayer)
@@ -934,7 +921,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
-            
+
             if (PlayerRejoinAcceptNetEventsPerPlayer.TryGetValue(playerId, out var joinAcceptNetEvents))
             {
                 for (int i = joinAcceptNetEvents.Count - 1; i >= 0; i--)
@@ -944,8 +931,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                         joinAcceptNetEvents.RemoveAt(i);
                     }
                 }
-            } 
-            
+            }
+
             if (MatchMakingPlayerJoinAcceptNetEventsPerPlayer.TryGetValue(playerId, out var makingPlayerJoinAcceptNetEvents))
             {
                 for (int i = makingPlayerJoinAcceptNetEvents.Count - 1; i >= 0; i--)
@@ -989,7 +976,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
-            
+
             if (PlayerSwapNetEventsPerPlayer.TryGetValue(playerId, out var playerSwapNetEvents))
             {
                 for (int i = playerSwapNetEvents.Count - 1; i >= 0; i--)
@@ -1011,7 +998,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
-            
+
             if (TalentCardHitNetEventsPerPlayer.TryGetValue(playerId, out var talentCardHitNetEvents))
             {
                 for (int i = talentCardHitNetEvents.Count - 1; i >= 0; i--)
@@ -1022,7 +1009,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
-            
+
             if (PlayerSwitchTeamNetEventsPerPlayer.TryGetValue(playerId, out var playerSwitchTeamNetEvents))
             {
                 for (int i = playerSwitchTeamNetEvents.Count - 1; i >= 0; i--)
@@ -1033,7 +1020,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
-            
+
             if (PowerUpBallSpawnedNetEventsPerPlayer.TryGetValue(playerId, out var powerUpBallSpawnedNetEvents))
             {
                 for (int i = powerUpBallSpawnedNetEvents.Count - 1; i >= 0; i--)
@@ -1044,7 +1031,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
-            
+
             if (PowerUpBallObtainedNetEventsPerPlayer.TryGetValue(playerId, out var powerUpBallObtainedNetEvents))
             {
                 for (int i = powerUpBallObtainedNetEvents.Count - 1; i >= 0; i--)
@@ -1055,7 +1042,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
-            
+
             if (StartMatchCountdownNetEventsPerPlayer.TryGetValue(playerId, out var startMatchCountdownNetEvents))
             {
                 for (int i = startMatchCountdownNetEvents.Count - 1; i >= 0; i--)
@@ -1566,7 +1553,7 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
                 packet.TalentCooldownEndTick = talentCooldownEndTick;
             }
         }
-        
+
         public void AddPerformDashPulseNetEvent(int onTick, ushort casterPlayerId)
         {
             foreach (var kvp in PerformDashPulseNetEventsPerPlayer)
