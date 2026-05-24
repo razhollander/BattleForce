@@ -17,6 +17,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private Transform _heart;
+        [SerializeField] private GameObject _lockOnHeartsField;
+
         
         private Transform _transform;
         
@@ -101,9 +103,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             return _transform;
         }
 
+        public Transform GetHeartTransform()
+        {
+            return _heart;
+        }
+
+
         public void SetIsTailWaving(bool isWaving)
         {
             _tailView.SetIsTailWaving(isWaving);
         }
+
+        public void SetLockOnHeartsFieldActive(bool isActive)
+        {
+            _lockOnHeartsField.TrySetActive(isActive);
+        }
+
     }
 }

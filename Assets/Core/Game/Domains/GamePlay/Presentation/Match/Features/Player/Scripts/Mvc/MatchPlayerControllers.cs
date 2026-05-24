@@ -11,6 +11,8 @@ using Sirenix.Utilities;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
+using CoreDomain.Scripts.Services.UpdateService;
+
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
 {
@@ -147,10 +149,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return GetPlayer(playerId).GetTransform();
         }
 
+        public Transform GetPlayerHeartTransform(ushort playerId)
+        {
+            var controller = GetPlayer(playerId);
+            return controller?.GetHeartTransform();
+        }
+
+
         public void HidePlayerHealthBar(ushort playerId)
         {
             GetPlayer(playerId).SetIsHealthBarShown(false);
         }
+
 
         public void DestroyAll()
         {
@@ -160,6 +170,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
             _playerControllers.Clear();
         }
+
+        public void ManagedUpdate()
+        {
+            foreach (var controller in _playerControllers)
+            {
+                controller.ManagedUpdate();
+            }
+        }
+
 
         public void SetPlayerTalentSelected(ushort playerId, int talentIndex)
         {

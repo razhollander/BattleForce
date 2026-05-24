@@ -278,10 +278,33 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return _playerView.Base.GetTransform();
         }
 
+        public Transform GetHeartTransform()
+        {
+            return _playerView.Base.GetHeartTransform();
+        }
+
+        public void ManagedUpdate()
+        {
+            var playerModel = _matchDataService.GetPlayer(PlayerId);
+            if (playerModel != null)
+            {
+                var isActive = playerModel.Spaceship.PlayerHeartsOnTarget != null && playerModel.Spaceship.PlayerHeartsOnTarget.Count > 0;
+                SetLockOnHeartsFieldActive(isActive);
+            }
+        }
+
+
+
         public void SetIsTailWaving(bool isMoving)
         {
             _playerView.Base.SetIsTailWaving(isMoving);
         }
+
+        public void SetLockOnHeartsFieldActive(bool isActive)
+        {
+            _playerView.Base.SetLockOnHeartsFieldActive(isActive);
+        }
+
 
         public void SetPlayersSpinnedState(bool isOn)
         {

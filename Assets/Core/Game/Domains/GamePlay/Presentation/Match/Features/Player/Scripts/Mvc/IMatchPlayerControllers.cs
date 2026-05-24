@@ -1,10 +1,12 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
+using CoreDomain.Scripts.Services.UpdateService;
+
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
 {
-    public interface IMatchPlayerControllers
+    public interface IMatchPlayerControllers : IGUIUpdatable
     {
         void InitEntryPoint();
         void AddPlayer(ushort playerId);
@@ -17,8 +19,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         UnityEngine.Vector2 GetPlayerPosition(ushort playerId);
         Transform GetPlayerSpaceshipTransform(ushort playerId);
         Transform GetPlayerTransform(ushort playerId);
+        Transform GetPlayerHeartTransform(ushort playerId);
         void HidePlayerHealthBar(ushort playerId);
         void DestroyAll();
+        void ManagedUpdate();
         void SetPlayerTalentSelected(ushort playerId, int talentIndex);
         void UpdatePlayerTalents(ushort playerId, Core.Scripts.Utils.CustomCollections.FixedOrderedList<Core.Game.Domains.GamePlay.Shared.S2CModels.TalentStateS2C> talents, int currentServerTick);
         void SetIsTailWaving(ushort playerId, bool isWaving);

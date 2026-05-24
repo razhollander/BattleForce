@@ -86,6 +86,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PerformDashPulseNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/EnvironmentSpringPlayerCollisionNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/DeactivateGrapplingHookTalentNetEventS2C.cs
+./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerLockOnHeartTargetsChangedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/PlayerSpinnedStartedNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/UpdatePlayerTalentStocksNetEventS2C.cs
 ./Assets/Core/Game/Domains/GamePlay/Shared/Scripts/S2CModels/PacketEvents/NetEvents/ActivateYearsOfPainTalentNetEventS2C.cs
@@ -399,9 +400,17 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/PowerUps/Scripts/ObtainedEffect/IPowerUpBallObtainedEffectController.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/PowerUps/Scripts/ObtainedEffect/PowerUpBallObtainedEffectPool.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/PowerUps/Scripts/ObtainedEffect/PowerUpBallObtainedEffectController.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/Player/Scripts/Mvc/MatchPlayerViewPool.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/Player/Scripts/Mvc/MatchPlayerTalentHudView.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/Player/Scripts/Mvc/MatchPlayerControllers.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/Player/Scripts/Mvc/IMatchPlayerControllers.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/Player/Scripts/Mvc/MatchPlayerView.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/Player/Scripts/Mvc/MatchPlayerController.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/Player/Scripts/Mvc/MatchPlayerTalentsHudView.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/LockOnHeartSights/Scripts/LockOnHeartSightsEffectPool.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/LockOnHeartSights/Scripts/LockOnHeartSightEffectView.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/LockOnHeartSights/Scripts/LockOnHeartSightsEffectController.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/LockOnHeartSights/Scripts/ILockOnHeartSightsEffectController.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/GainBoltEffect/Scripts/GainBoltEffectController.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/GainBoltEffect/Scripts/GainBoltEffectView.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/GainBoltEffect/Scripts/IGainBoltEffectController.cs
@@ -554,6 +563,7 @@
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/YearsOfPainView.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerChickenView.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerTailView.cs
+./Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerEyesView.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Features/Simple Health Bar/Scripts/SimpleHealthBar.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Features/Simple Health Bar/Editor/SimpleHealthBarWindow.cs
 ./Assets/Core/Game/Domains/GamePlay/Presentation/Features/Simple Health Bar/Editor/SimpleHealthBarEditor.cs

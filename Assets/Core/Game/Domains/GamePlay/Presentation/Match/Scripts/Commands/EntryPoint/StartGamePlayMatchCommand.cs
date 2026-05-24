@@ -90,6 +90,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
             _magneticPullEffectController = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts.IMagneticPullEffectController>();
+            _lockOnHeartSightsEffectController = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts.ILockOnHeartSightsEffectController>();
+
         }
 
         public void Execute()
@@ -119,6 +121,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _gainBoltEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();
+            _lockOnHeartSightsEffectController.InitEntryPoint();
+
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }
