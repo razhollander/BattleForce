@@ -128,7 +128,7 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 1
-        CooldownInSeconds: 8
+        CooldownInSeconds: 1
     - rid: 8506109566889754722
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:

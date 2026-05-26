@@ -1,4 +1,5 @@
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.TeamFloor.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs;
@@ -37,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
         private NetworkConfig _networkConfig;
         private IClientMatchMakingPresentationTickProcessor _clientPresentationTickProcessor;
         private IMatchMakingDataService _matchMakingDataService;
+        private IBackgroundParallaxController _backgroundParallaxController;
 
         public StartGamePlayMatchMakingCommand SetEnterData(GamePlayMatchMakingInitiatorEnterData enterData)
         {
@@ -61,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _clientPresentationTickProcessor = _diContainer.Resolve<IClientMatchMakingPresentationTickProcessor>();
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
+            _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -74,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _startMatchButtonController.InitEntryPoint();
             _matchMakingUiController.InitEntryPoint(_enterData.IPAddress, _enterData.Port, _enterData.IsHost);
             _tickProcessor.InitEntryPoint();
+            _backgroundParallaxController.InitEntryPoint();
             
             _commandFactory.CreateCommandVoid<SyncMatchMakingSimulationStateCommand>()
                 .SetSimulationState(_enterData.SimulationState).Execute();
