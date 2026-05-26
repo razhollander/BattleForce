@@ -1,25 +1,20 @@
-using Core.Scripts.Utils.Shadows;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Scripts
 {
-    [RequireComponent(typeof(Renderer))]
+    [RequireComponent(typeof(SpriteRenderer))]
     public class EnvironmentShadowView : MonoBehaviour
     {
-        private Renderer _renderer;
+        private SpriteRenderer _renderer;
         
         private void Awake()
         {
-            _renderer = GetComponent<Renderer>();
+            _renderer = GetComponent<SpriteRenderer>();
         }
 
         private void OnEnable()
         {
-            if (_renderer is SpriteRenderer sr)
-            {
-                SpriteShadowPass.RegisterRenderer(sr);
-            }
-            //SpriteShadowPass.RegisterRenderer(_renderer);
+            SpriteShadowPass.RegisterRenderer(_renderer);
         }
 
         private void OnDisable()
@@ -33,12 +28,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Sc
         }
 
         private void UnregisterRenderer()
-        {
-            if (_renderer is SpriteRenderer sr)
-            {
-                SpriteShadowPass.UnregisterRenderer(sr);
-            }
-            //SpriteShadowPass.UnregisterRenderer(_renderer);
+        { 
+            SpriteShadowPass.UnregisterRenderer(_renderer);
         }
     }
 }

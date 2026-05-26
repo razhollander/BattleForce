@@ -3,28 +3,33 @@ using Core.Scripts.Utils.Shadows;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
+using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
 
 namespace Core.Scripts.Mvc.WorldCamera
 {
-    public class WorldCameraController : IWorldCameraController
+    public class WorldCameraController : IWorldCameraController, ILateUpdatable
     {
         private readonly WorldCameraView _worldCameraView;
         private readonly IStateMachineService _stateMachineService;
+        private readonly IUpdateSubscriptionService _updateSubscriptionService;
 
-        public WorldCameraController(WorldCameraView worldCameraView, IStateMachineService stateMachineService)
+        public WorldCameraController(WorldCameraView worldCameraView, IStateMachineService stateMachineService, IUpdateSubscriptionService updateSubscriptionService)
         {
             _worldCameraView = worldCameraView;
             _stateMachineService = stateMachineService;
+            _updateSubscriptionService = updateSubscriptionService;
         }
 
         public void InitEntryPoint()
         {
+            _updateSubscriptionService.RegisterLateUpdatable(this);
            // _customSpriteShadowRenderer.InitEntryPoint(_worldCameraView.Camera);
         }
         
         public void InitExitPoint()
         {
+            _updateSubscriptionService.UnregisterLateUpdatable(this);
           //  _customSpriteShadowRenderer.InitExitPoint();
         }
         
@@ -55,6 +60,11 @@ namespace Core.Scripts.Mvc.WorldCamera
         public Vector3 ScreenToWorldPoint(Vector3 position)
         {
             return _worldCameraView.ScreenToWorldPoint(position);
+        }
+
+        public void ManagedLateUpdate()
+        {
+//            _worldCameraView.BaseCamera.orthographicSize = _worldCameraView.Camera.orthographicSize;
         }
     }
 }

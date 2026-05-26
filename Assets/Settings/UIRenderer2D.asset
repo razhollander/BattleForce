@@ -27,23 +27,6 @@ MonoBehaviour:
       a: 1
     outlineSize: 0.2
     renderPassEvent: 450
---- !u!114 &-4158964614082320912
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 333766459ab74bd98bfecb6fcc604c8e, type: 3}
-  m_Name: SpriteShadowRendererFeature2
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  shadowMaterial: {fileID: 2100000, guid: 99280632e01854f95a5448e1b0754683, type: 2}
-  outlineMaterial: {fileID: 2100000, guid: c019208d9ecf4489fa6ed9bc9f828362, type: 2}
-  outlineThickness: 0.1
-  _renderPassEvent: 450
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54,7 +37,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11145981673336645838492a2d98e247, type: 3}
-  m_Name: Renderer2D
+  m_Name: UIRenderer2D
   m_EditorClassIdentifier: 
   debugShaders:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
@@ -68,14 +51,12 @@ MonoBehaviour:
     probeSamplingDebugMesh: {fileID: -3555484719484374845, guid: 57d7c4c16e2765b47a4d2069b311bffe, type: 3}
     probeSamplingDebugTexture: {fileID: 2800000, guid: 24ec0e140fb444a44ab96ee80844e18e, type: 3}
     probeVolumeBlendStatesCS: {fileID: 0}
-  m_RendererFeatures:
-  - {fileID: -4158964614082320912}
-  - {fileID: 4153829607449226058}
-  m_RendererFeatureMap: f02534f8b76348c64aeb8221055ea539
+  m_RendererFeatures: []
+  m_RendererFeatureMap: 
   m_UseNativeRenderPass: 0
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 215
+    m_Bits: 32
   m_TransparencySortMode: 0
   m_TransparencySortAxis: {x: 0, y: 1, z: 0}
   m_HDREmulationScale: 1
@@ -102,27 +83,3 @@ MonoBehaviour:
   m_PostProcessData: {fileID: 0}
   m_DefaultMaterialType: 0
   m_DefaultCustomMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
---- !u!114 &4153829607449226058
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 094fb979ba634c03a20478ae1f8f8b02, type: 3}
-  m_Name: SilhouetteRenderFeature
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  settings:
-    layerMask:
-      serializedVersion: 2
-      m_Bits: 128
-    overrideMaterial: {fileID: 2100000, guid: f42985511004143d89840114b2bb1c76, type: 2}
-    shadowColor: {r: 0.63177425, g: 0.62077254, b: 0.8490566, a: 1}
-    shadowOffset: {x: -0.3, y: -0.5}
-    outlineColor: {r: 0, g: 0, b: 0, a: 1}
-    outlineWidth: 0.15
-    use8Directions: 1
-    renderPassEvent: 450

@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 1848450532861189530}
   - component: {fileID: 1064797891662729060}
   - component: {fileID: 6574485162619562972}
-  - component: {fileID: 3065465513910463702}
-  - component: {fileID: 325005423315537230}
   m_Layer: 7
   m_Name: EnvironmentWall
   m_TagString: Untagged
@@ -102,27 +100,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3065465513910463702
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1350475781227517356}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &325005423315537230
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1350475781227517356}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

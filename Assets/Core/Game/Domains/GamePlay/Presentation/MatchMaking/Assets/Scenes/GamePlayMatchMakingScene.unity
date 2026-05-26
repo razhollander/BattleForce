@@ -485,6 +485,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BackGround
       objectReference: {fileID: 0}
+    - target: {fileID: 1803821491716489768, guid: 4d01925354382446c8a1d3d7270e277b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4240901867088155947, guid: 4d01925354382446c8a1d3d7270e277b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

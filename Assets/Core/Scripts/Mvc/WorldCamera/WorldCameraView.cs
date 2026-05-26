@@ -12,9 +12,12 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         [SerializeField] private CinemachineTargetGroup _targetGroup;
         [SerializeField] private CinemachineBasicMultiChannelPerlin _perlin;
         [SerializeField] private Camera _camera;
+        [SerializeField] private Camera _baseCamera;
 
         private CancellationTokenSource _shakeCancellationTokenSource;
         public Camera Camera => _camera;
+        public Camera BaseCamera => _baseCamera;
+        
         public void AddTarget(Transform target, float weight, float radius)
         {
             _targetGroup.AddMember(target, weight, radius);
