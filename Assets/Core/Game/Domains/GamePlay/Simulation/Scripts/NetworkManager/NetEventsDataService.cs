@@ -224,7 +224,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _activateYearsOfPainTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents), maxConcurrentPlayers);
         }
 
-        public void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, Core.Scripts.Utils.CustomCollections.FixedUnorderedList<ushort> targetHeartIds)
+        public void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<ushort> targetHeartIds)
         {
             var pkt = GetNextFreeFullTickPacket(onTick);
             ref var netEvent = ref pkt.PlayerLockOnHeartTargetsChangedNetEvents.AddAndGet();

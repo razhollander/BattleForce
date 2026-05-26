@@ -31,7 +31,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (int i = 0; i < count; i++)
             {
-                LockedOnHeartIds.Add(reader.GetUShort());
+                ref var lockOnHeartId = ref LockedOnHeartIds.AddAndGet();
+                lockOnHeartId = reader.GetUShort();
             }
         }
     }

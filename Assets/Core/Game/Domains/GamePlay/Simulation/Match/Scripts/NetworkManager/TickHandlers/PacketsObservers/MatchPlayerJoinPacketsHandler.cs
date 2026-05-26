@@ -20,20 +20,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IServerNetworkManager _networkManager;
         private readonly IMatchDataService _matchDataService;
         private readonly INetEventsDataService _netEventsDataService;
+        private readonly NetworkConfig _networkConfig;
         private readonly ISimulationInputService _simulationInputService;
         private readonly CapacityDict<NetPeer, JoinRequestPacketC2S> _playerRejoinedPacketsPerPeer;
         private readonly ConcurrentPool<JoinRequestPacketC2S> _joinedRequestPacketsPool;
         private readonly ConcurrentPool<JoinResponsePacketS2C> _joinedResponsePacketsPool;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
 
         public PacketTypeC2S PacketType => PacketTypeC2S.JoinRequest;
 
         public MatchPlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
-            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ISimulationInputService simulationInputService)
+            INetEventsDataService netEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ISimulationInputService simulationInputService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
-            _netEventsDataService = iNetEventsDataService;
+            _netEventsDataService = netEventsDataService;
+            _networkConfig = networkConfig;
             _simulationInputService = simulationInputService;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _playerRejoinedPacketsPerPeer = new CapacityDict<NetPeer, JoinRequestPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _joinedRequestPacketsPool = new ConcurrentPool<JoinRequestPacketC2S>(() => new JoinRequestPacketC2S(), networkConfig.MaxCap.JoinRequestPackets);
             _joinedResponsePacketsPool = new ConcurrentPool<JoinResponsePacketS2C>(() => new JoinResponsePacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount), networkConfig.MaxCap.JoinRequestPackets);
@@ -72,7 +76,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     var nr = new NetDataReader();
                     existingPlayerState.Serialize(nw);
                     nr.SetSource(nw);
-                    var playerStateCopy = new PlayerStateS2C(3);
+                    var playerStateCopy = new PlayerStateS2C(_sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, _networkConfig.MaxCap.ConcurrentPlayers - 1);
                     playerStateCopy.Deserialize(nr);
                     _netEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, playerStateCopy, _matchDataService.SimulationState);
                 }

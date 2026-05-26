@@ -261,5 +261,25 @@ namespace Core.Scripts.Extensions.Linq
 
             return result;
         }
+        
+        
+        public static bool IsIdentical(this FixedUnorderedList<ushort> ListA, FixedUnorderedList<ushort> ListB)
+        {
+            if (ListA.Count != ListB.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < ListA.Count; i++)
+            {
+                var isDifferent = ListA[i] != ListB[i];
+                if (isDifferent)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

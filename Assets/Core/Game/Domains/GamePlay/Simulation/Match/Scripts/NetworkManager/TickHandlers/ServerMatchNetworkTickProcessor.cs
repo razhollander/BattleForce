@@ -49,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IServerNetworkManager networkManager,
             IMatchPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
-            IMatchPlayerJoinPacketsHandler iIMatchPlayerJoinPacketsHandler, INetEventsDataService iNetEventsDataService,
+            IMatchPlayerJoinPacketsHandler iIMatchPlayerJoinPacketsHandler, INetEventsDataService netEventsDataService,
             ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController, IStageDataService stageDataService, IOverrideableNetEventsService overrideableNetEventsService)
         {
             _networkConfig = networkConfig;
@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _playerInputsPacketsHandler = playerInputsPacketsHandler;
             _matchDataService = matchDataService;
             _matchPlayerJoinPacketsHandler = iIMatchPlayerJoinPacketsHandler;
-            _netEventsDataService = iNetEventsDataService;
+            _netEventsDataService = netEventsDataService;
             _commandFactory = commandFactory;
             _tickService = tickService;
             _headLessQuitterController = headLessQuitterController;

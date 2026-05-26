@@ -38,13 +38,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
 
         public MatchMakingPlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
             SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
-            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ISimulationInputService simulationInputService)
+            INetEventsDataService netEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ISimulationInputService simulationInputService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _physicsSimulator = physicsSimulator;
-            _netEventsDataService = iNetEventsDataService;
+            _netEventsDataService = netEventsDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _simulationInputService = simulationInputService;
             _networkConfig = networkConfig;

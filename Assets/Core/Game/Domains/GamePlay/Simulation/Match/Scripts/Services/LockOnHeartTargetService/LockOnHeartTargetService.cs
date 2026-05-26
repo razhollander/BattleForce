@@ -1,117 +1,116 @@
-using System;
-using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Scripts.Extensions.Linq;
+using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Utils;
+using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.LockOnHeartTargetService
 {
-    public class LockOnHeartTargetService : ILockOnHeartTargetService
+    public class LockOnHeartTargetService : ILockOnHeartTargetService // move to a command, and make this a timer service that has the timer of each player targets
     {
         private readonly IMatchDataService _matchDataService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly INetEventsDataService _netEventsDataService;
-        private readonly FixedUnorderedList<ushort> _tempLockedOnHeartIds;
+        private readonly FixedUnorderedList<ushort> _cachedLockedOnHeartIds;
 
-        public LockOnHeartTargetService(IMatchDataService matchDataService, IPhysicsSimulator physicsSimulator, SimulationGamePlayConfig gamePlayConfig, INetEventsDataService netEventsDataService)
+        public LockOnHeartTargetService(IMatchDataService matchDataService, IPhysicsSimulator physicsSimulator, SimulationGamePlayConfig gamePlayConfig, INetEventsDataService netEventsDataService, NetworkConfig networkConfig)
         {
             _matchDataService = matchDataService;
             _physicsSimulator = physicsSimulator;
             _gamePlayConfig = gamePlayConfig;
             _netEventsDataService = netEventsDataService;
-            // A temporary list to store locked-on targets before updating the state
-            _tempLockedOnHeartIds = new FixedUnorderedList<ushort>(8);
+            _cachedLockedOnHeartIds = new FixedUnorderedList<ushort>(networkConfig.MaxCap.ConcurrentPlayers - 1);
         }
 
-        public void Process(int processedTick, PlayerStateS2C playerState)
+        public void Process(int processedTick, PlayerStateS2C casterPlayerState)
         {
-            if (!playerState.Spaceship.IsAlive)
+            if (!casterPlayerState.Spaceship.IsAlive)
             {
                 return;
             }
 
-            _tempLockedOnHeartIds.Clear();
+            _cachedLockedOnHeartIds.Clear();
+            GetTargetedEnemyIds(casterPlayerState, _cachedLockedOnHeartIds);
+            _cachedLockedOnHeartIds.Sort();
 
-            var playerPos = playerState.Spaceship.Transform.Position;
-            var playerDir = playerState.Spaceship.Transform.Direction;
-            var rayStart = playerPos + playerDir * _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
+            var casterTargetedEnemyIds = casterPlayerState.Spaceship.TargetedEnemyIds;
+            var areIdentical = _cachedLockedOnHeartIds.IsIdentical(casterTargetedEnemyIds);
 
-            var maxDistSq = _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxDistance * _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxDistance;
-            var maxAngle = _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxAngleDegrees;
+            if (areIdentical)
+            {
+                return;
+            }
+
+            casterTargetedEnemyIds.Clear();
+
+            for (int i = 0; i < _cachedLockedOnHeartIds.Count; i++)
+            {
+                ref var targetedEnemyId = ref casterTargetedEnemyIds.AddAndGet();
+                targetedEnemyId = _cachedLockedOnHeartIds[i];
+            }
+
+            _netEventsDataService.AddPlayerLockOnHeartTargetsChangedNetEvent(processedTick, casterPlayerState.Id, casterTargetedEnemyIds);
+        }
+
+        private void GetTargetedEnemyIds(PlayerStateS2C casterPlayerState, FixedUnorderedList<ushort> outputTargetedEnemyIds)
+        {
+            var rayDirection = casterPlayerState.Spaceship.Transform.Direction;
+            var rayOriginPosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
+
+            var maxLockOnHeartRangeSquare = _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange * _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange;
 
             var players = _matchDataService.SimulationState.Players;
             for (int i = 0; i < players.Count; i++)
             {
-                var enemyState = players[i];
-                if (enemyState.Id == playerState.Id || !enemyState.Spaceship.IsAlive)
+                var targetedPlayerState = players[i];
+                var shouldTryTargetPlayer = targetedPlayerState.TeamId != casterPlayerState.TeamId && targetedPlayerState.Spaceship.IsAlive;
+                if (!shouldTryTargetPlayer)
                 {
                     continue;
                 }
 
-                var enemyHeartPos = enemyState.Spaceship.Transform.GetHeartPosition();
-                var distSq = Vector2.DistanceSquared(rayStart, enemyHeartPos);
+                var enemyHeartPos = targetedPlayerState.Spaceship.Transform.GetHeartPosition();
+                var rayOriginToEnemyHeartDistanceSquared = Vector2.DistanceSquared(rayOriginPosition, enemyHeartPos);
+                var isEnemyHeartInRange = rayOriginToEnemyHeartDistanceSquared <= maxLockOnHeartRangeSquare;
 
-                if (distSq <= maxDistSq)
+                if (!isEnemyHeartInRange)
                 {
-                    var dirToEnemy = Vector2.Normalize(enemyHeartPos - rayStart);
-
-                    // Vector2.Dot to calculate angle
-                    var dot = Vector2.Dot(playerDir, dirToEnemy);
-                    dot = Math.Clamp(dot, -1f, 1f);
-                    var angleRad = Math.Acos(dot);
-                    var angleDeg = angleRad * (180.0 / Math.PI);
-
-                    if (angleDeg <= maxAngle)
-                    {
-                        var didHit = _physicsSimulator.RayCast(rayStart, enemyHeartPos, out var hitBodyData);
-                        if (didHit && hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerHeart && hitBodyData.Id == enemyState.Id)
-                        {
-                            _tempLockedOnHeartIds.Add(enemyState.Id);
-                        }
-                    }
+                    continue;
                 }
-            }
 
-            bool isChanged = false;
-            var currentTargets = playerState.Spaceship.PlayerHeartsIdsOnTarget;
+                var directionToEnemy = enemyHeartPos - rayOriginPosition;
+                var deltaAngleRadians = MathUtils.DeltaAngleRadians(MathUtils.GetAngle(rayDirection), MathUtils.GetAngle(directionToEnemy));
+                var deltaAngleDegrees = deltaAngleRadians * Mathf.Rad2Deg;
+                // var directionToEnemy = Vector2.Normalize(enemyHeartPos - rayOriginPosition);
+                // var dot = Vector2.Dot(rayDirection, directionToEnemy);
+                // dot = Math.Clamp(dot, -1f, 1f);
+                // var angleRad = Math.Acos(dot);
+                // var angleDeg = angleRad * (180.0 / Math.PI);
+                var maxLockOnHeartAngle = _gamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees;
+                var isInAngleRange = deltaAngleDegrees <= maxLockOnHeartAngle;
 
-            if (_tempLockedOnHeartIds.Count != currentTargets.Count)
-            {
-                isChanged = true;
-            }
-            else
-            {
-                for (int i = 0; i < _tempLockedOnHeartIds.Count; i++)
+                if (!isInAngleRange)
                 {
-                    bool found = false;
-                    for (int j = 0; j < currentTargets.Count; j++)
-                    {
-                        if (_tempLockedOnHeartIds[i] == currentTargets[j])
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)
-                    {
-                        isChanged = true;
-                        break;
-                    }
+                    continue;
                 }
-            }
 
-            if (isChanged)
-            {
-                currentTargets.Clear();
-                for (int i = 0; i < _tempLockedOnHeartIds.Count; i++)
+                var didHit = _physicsSimulator.RayCast(rayOriginPosition, enemyHeartPos, out var hitBodyData);
+                var didHitEnemyHeart = didHit && hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerHeart && hitBodyData.Id == targetedPlayerState.Id;
+
+                if (!didHitEnemyHeart)
                 {
-                    currentTargets.Add(_tempLockedOnHeartIds[i]);
+                    continue;
                 }
-                _netEventsDataService.AddPlayerLockOnHeartTargetsChangedNetEvent(processedTick, playerState.Id, currentTargets);
+
+                ref var targetedPlayerId = ref outputTargetedEnemyIds.AddAndGet();
+                targetedPlayerId = targetedPlayerState.Id;
             }
         }
     }

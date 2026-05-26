@@ -54,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         }
         
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
-            SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService iNetEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
+            SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, INetEventsDataService netEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
             IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, ISimulationInputService simulationInputService,
             Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.LockOnHeartTargetService.ILockOnHeartTargetService lockOnHeartTargetService)
         {
@@ -62,7 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
-            _netEventsDataService = iNetEventsDataService;
+            _netEventsDataService = netEventsDataService;
             _physicsSimulator = physicsSimulator;
             _updateSubscriptionService = updateSubscriptionService;
             _commandFactory = commandFactory;
@@ -295,7 +295,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _lockOnHeartTargetService.Process(processedTick, playerModel);
 
             var shootState = playerModel.Spaceship.Shoot;
-            var isReadyToShoot = shootState.CooldownSecondsLeft == shootState.MaxCooldown;
+            var isReadyToShoot = false;//shootState.CooldownSecondsLeft == shootState.MaxCooldown;
 
             if (!isReadyToShoot)
             {

@@ -4,6 +4,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.LockOnHea
 {
     public interface ILockOnHeartTargetService
     {
-        void Process(int processedTick, PlayerStateS2C playerState);
+        void Process(int processedTick, PlayerStateS2C casterPlayerState);
     }
 }
