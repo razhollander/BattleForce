@@ -454,6 +454,8 @@ GameObject:
   - component: {fileID: 7860721219675764553}
   - component: {fileID: 3089737735963446641}
   - component: {fileID: 1429378958978371035}
+  - component: {fileID: -5571939354978488415}
+  - component: {fileID: -51087592880861967}
   m_Layer: 0
   m_Name: StartMatchButton
   m_TagString: Untagged
@@ -549,3 +551,27 @@ MonoBehaviour:
   _startTextTransform: {fileID: 2756115647403516455}
   _countdownText: {fileID: 7374366345173492168}
   _disabledOverlay: {fileID: 7753437788085285193}
+--- !u!114 &-5571939354978488415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8511446469406941043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-51087592880861967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8511446469406941043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

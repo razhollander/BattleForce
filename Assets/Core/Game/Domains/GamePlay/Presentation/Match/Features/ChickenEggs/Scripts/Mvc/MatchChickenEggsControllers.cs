@@ -49,11 +49,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scr
             try
             {
                 await GetEgg(eggId).PlayBreakAnimation(cancellationTokenSource);
-                LogService.LogError("reach break end!");
             }
             finally
             {
-                LogService.LogError("destroy in finally!");
                 DestroyEgg(eggId);
             }
         }

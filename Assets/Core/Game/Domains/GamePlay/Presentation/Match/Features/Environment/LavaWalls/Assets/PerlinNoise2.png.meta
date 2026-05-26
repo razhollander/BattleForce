@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      PerlinNoise2_0: 713482807421453192
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

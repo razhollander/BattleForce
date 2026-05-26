@@ -1,33 +1,48 @@
-using System.Collections.Generic;
 using Core.Scripts.Utils;
+using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
 
-namespace CoreDomain.Scripts.Mvc.WorldCamera
+namespace Core.Scripts.Mvc.WorldCamera
 {
-    public class WorldCameraController : IWorldCameraController
+    public class WorldCameraController : IWorldCameraController, ILateUpdatable
     {
+        private const float CameraTargetWeight = 1f;
+        private const float CameraTargetRadius = 5f;
+        
         private readonly WorldCameraView _worldCameraView;
         private readonly IStateMachineService _stateMachineService;
+        private readonly IUpdateSubscriptionService _updateSubscriptionService;
 
-        public WorldCameraController(WorldCameraView worldCameraView, IStateMachineService stateMachineService)
+        public WorldCameraController(WorldCameraView worldCameraView, IStateMachineService stateMachineService, IUpdateSubscriptionService updateSubscriptionService)
         {
             _worldCameraView = worldCameraView;
             _stateMachineService = stateMachineService;
+            _updateSubscriptionService = updateSubscriptionService;
         }
 
-        public void AddTarget(Transform target)
+        public void InitEntryPoint()
+        {
+            _updateSubscriptionService.RegisterLateUpdatable(this);
+        }
+        
+        public void InitExitPoint()
+        {
+            _updateSubscriptionService.UnregisterLateUpdatable(this);
+        }
+        
+        public void AddFollowTarget(Transform target)
         {
             LogService.LogTopic($"Add camera target {target.gameObject.name}", LogTopicType.Camera);
-            _worldCameraView.AddTarget(target, 1f, 5f);
+            _worldCameraView.AddFollowTarget(target, CameraTargetWeight, CameraTargetRadius);
         }
 
-        public void RemoveTarget(Transform target)
+        public void RemoveFollowTarget(Transform target)
         {
             LogService.LogTopic($"Remove camera target {target.gameObject.name}", LogTopicType.Camera);
-            _worldCameraView.RemoveTarget(target);
+            _worldCameraView.RemoveFollowTarget(target);
         }
 
         public void ClearTargets()
@@ -45,6 +60,11 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         public Vector3 ScreenToWorldPoint(Vector3 position)
         {
             return _worldCameraView.ScreenToWorldPoint(position);
+        }
+
+        public void ManagedLateUpdate()
+        {
+            _worldCameraView.BaseCamera.orthographicSize = _worldCameraView.Camera.orthographicSize;
         }
     }
 }

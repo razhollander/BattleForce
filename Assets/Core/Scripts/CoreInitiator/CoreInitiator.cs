@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Core.Scripts.Mvc.WorldCamera;
 using Core.Scripts.Network;
 using Core.Scripts.Services.UnityThreadDispatcher;
 using CoreDomain.Scripts.Audio;
@@ -21,10 +22,11 @@ namespace CoreDomain.Scripts.CoreInitiator
         private CoreAudioClipsScriptableObject _coreAudioClipsScriptableObject;
         private NetworkConfig _networkConfig;
         private IUnityMainThreadDispatcher _unityMainThreadDispatcher;
+        private IWorldCameraController _worldCameraController;
 
         [Inject]
         private void Setup(GameInputActions gameInputActions, ISceneLoaderService sceneLoaderService, IAudioService audioService, ILoadingScreenController loadingScreenController,
-            CoreAudioClipsScriptableObject coreAudioClipsScriptableObject, NetworkConfig networkConfig, IUnityMainThreadDispatcher unityMainThreadDispatcher)
+            CoreAudioClipsScriptableObject coreAudioClipsScriptableObject, NetworkConfig networkConfig, IUnityMainThreadDispatcher unityMainThreadDispatcher, IWorldCameraController worldCameraController)
         {
             _gameInputActions = gameInputActions;
             _sceneLoaderService = sceneLoaderService;
@@ -33,6 +35,7 @@ namespace CoreDomain.Scripts.CoreInitiator
             _coreAudioClipsScriptableObject = coreAudioClipsScriptableObject;
             _networkConfig = networkConfig;
             _unityMainThreadDispatcher = unityMainThreadDispatcher;
+            _worldCameraController = worldCameraController;
         }
 
         private void Start()
@@ -47,6 +50,7 @@ namespace CoreDomain.Scripts.CoreInitiator
                 UpdateApplicationSettings();
                 // _loadingScreenController.Show();
                 InitializeServices();
+                InitializeControllers();
                 // _audioService.AddAudioClips(_coreAudioClipsScriptableObject);
                 await LoadGameScene(cancellationTokenSource);
                 //await _loadingScreenController.SetLoadingSlider(1, cancellationTokenSource);
@@ -79,6 +83,11 @@ namespace CoreDomain.Scripts.CoreInitiator
             _audioService.InitEntryPoint();
             _sceneLoaderService.InitEntryPoint();
             _unityMainThreadDispatcher.InitEntryPoint();
+        }
+
+        private void InitializeControllers()
+        {
+            _worldCameraController.InitEntryPoint();
         }
 
         private async Awaitable LoadGameScene(CancellationTokenSource cancellationTokenSource)
