@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             _matchDataService.AddPlayer(_playerState);
             _playerControllers.AddPlayer(playerId);
             _playerUIControllers.AddPlayer(playerId, _currentServerTick);
-            _worldCameraController.AddTarget(_playerControllers.GetPlayerSpaceshipTransform(playerId));
+            _worldCameraController.AddFollowTarget(_playerControllers.GetPlayerSpaceshipTransform(playerId));
         }
     }
 }

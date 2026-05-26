@@ -4,8 +4,8 @@ namespace Core.Scripts.Mvc.WorldCamera
 {
     public interface IWorldCameraController
     {
-        void AddTarget(Transform target);
-        void RemoveTarget(Transform target);
+        void AddFollowTarget(Transform target);
+        void RemoveFollowTarget(Transform target);
         void ClearTargets();
         void ShakeCamera(float intensity, float durationInSeconds);
 

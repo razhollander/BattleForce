@@ -18,12 +18,12 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         public Camera Camera => _camera;
         public Camera BaseCamera => _baseCamera;
         
-        public void AddTarget(Transform target, float weight, float radius)
+        public void AddFollowTarget(Transform target, float weight, float radius)
         {
             _targetGroup.AddMember(target, weight, radius);
         }
 
-        public void RemoveTarget(Transform target)
+        public void RemoveFollowTarget(Transform target)
         {
             _targetGroup.RemoveMember(target);
         }

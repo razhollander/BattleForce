@@ -1,10 +1,9 @@
-using Core.Scripts.Utils.Shadows;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Scripts
+namespace Core.URPRenderFeatures.SpriteRendererSilhouetteRenderFeature.Scripts
 {
     [RequireComponent(typeof(SpriteRenderer))]
-    public class EnvironmentOutlineView : MonoBehaviour
+    public class SpriteRendererOutlineEffectView : MonoBehaviour
     {
         private SpriteRenderer _renderer;
 
@@ -15,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Sc
 
         private void OnEnable()
         {
-            SpriteOutlinePass.RegisterRenderer(_renderer);
+            SpriteRendererOutlinePass.RegisterRenderer(_renderer);
         }
 
         private void OnDisable()
@@ -30,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Environment.Shadow.Sc
 
         private void UnregisterRenderer()
         {
-            SpriteOutlinePass.UnregisterRenderer(_renderer);
+            SpriteRendererOutlinePass.UnregisterRenderer(_renderer);
         }
     }
 }

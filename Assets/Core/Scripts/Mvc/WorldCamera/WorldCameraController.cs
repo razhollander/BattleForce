@@ -1,5 +1,4 @@
 using Core.Scripts.Utils;
-using Core.Scripts.Utils.Shadows;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
@@ -10,6 +9,9 @@ namespace Core.Scripts.Mvc.WorldCamera
 {
     public class WorldCameraController : IWorldCameraController, ILateUpdatable
     {
+        private const float CameraTargetWeight = 1f;
+        private const float CameraTargetRadius = 5f;
+        
         private readonly WorldCameraView _worldCameraView;
         private readonly IStateMachineService _stateMachineService;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
@@ -24,25 +26,23 @@ namespace Core.Scripts.Mvc.WorldCamera
         public void InitEntryPoint()
         {
             _updateSubscriptionService.RegisterLateUpdatable(this);
-           // _customSpriteShadowRenderer.InitEntryPoint(_worldCameraView.Camera);
         }
         
         public void InitExitPoint()
         {
             _updateSubscriptionService.UnregisterLateUpdatable(this);
-          //  _customSpriteShadowRenderer.InitExitPoint();
         }
         
-        public void AddTarget(Transform target)
+        public void AddFollowTarget(Transform target)
         {
             LogService.LogTopic($"Add camera target {target.gameObject.name}", LogTopicType.Camera);
-            _worldCameraView.AddTarget(target, 1f, 5f);
+            _worldCameraView.AddFollowTarget(target, CameraTargetWeight, CameraTargetRadius);
         }
 
-        public void RemoveTarget(Transform target)
+        public void RemoveFollowTarget(Transform target)
         {
             LogService.LogTopic($"Remove camera target {target.gameObject.name}", LogTopicType.Camera);
-            _worldCameraView.RemoveTarget(target);
+            _worldCameraView.RemoveFollowTarget(target);
         }
 
         public void ClearTargets()
