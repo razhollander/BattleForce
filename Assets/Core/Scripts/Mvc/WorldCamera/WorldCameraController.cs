@@ -64,7 +64,7 @@ namespace Core.Scripts.Mvc.WorldCamera
 
         public void ManagedLateUpdate()
         {
-//            _worldCameraView.BaseCamera.orthographicSize = _worldCameraView.Camera.orthographicSize;
+            _worldCameraView.BaseCamera.orthographicSize = _worldCameraView.Camera.orthographicSize;
         }
     }
 }
