@@ -57,5 +57,11 @@ namespace Core.Scripts.Utils
                 Debug.DrawLine(p1, p2, drawColor, duration);
             }
         }
+        
+        public static void DrawLine(Vector3 point1, Vector3 point2, Color color)
+        {
+            float duration = 0.02f;
+            Debug.DrawLine(point1, point2, color, duration);
+        }
     }
 }

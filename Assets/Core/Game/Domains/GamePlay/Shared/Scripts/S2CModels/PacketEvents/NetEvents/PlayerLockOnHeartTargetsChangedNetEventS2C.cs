@@ -12,8 +12,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 
         public PlayerLockOnHeartTargetsChangedNetEventS2C(int maxTargets)
         {
-            OccuredOnTick = 0;
-            PlayerId = 0;
             PlayerIdsLockedOnTarget = new FixedUnorderedList<ushort>(maxTargets);
         }
 

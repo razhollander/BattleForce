@@ -155,7 +155,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedGrapplingHookHitWallNetEvents(writer);
             SerializedDeactivateGrapplingHookTalentNetEvents(writer);
             SerializedCreateMagneticPullFieldNetEvents(writer);
-            SerializedActivateYearsOfPainTalentNetEvents(writer);
             SerializedActivateUmbrellaTalentNetEvents(writer);
             SerializedDeactivateUmbrellaTalentNetEvents(writer);
             SerializedLayChickenEggNetEvents(writer);
@@ -354,7 +353,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedGrapplingHookHitWallNetEvents(reader);
             DeserializedDeactivateGrapplingHookTalentNetEvents(reader);
             DeserializedCreateMagneticPullFieldNetEvents(reader);
-            DeserializedActivateYearsOfPainTalentNetEvents(reader);
             DeserializedActivateUmbrellaTalentNetEvents(reader);
             DeserializedDeactivateUmbrellaTalentNetEvents(reader);
             DeserializedLayChickenEggNetEvents(reader);

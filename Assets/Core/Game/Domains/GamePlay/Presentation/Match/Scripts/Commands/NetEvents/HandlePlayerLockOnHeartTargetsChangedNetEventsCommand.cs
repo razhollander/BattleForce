@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _matchPlayerControllers.SetPlayerIsLockOnHeartSightShown(netEvent.PlayerId, isLockOnHeartSightShown);
             }
 
-            _cachedPresentationEventsService.ActivateYearsOfPainTalentNetEvents.Clear();
+            _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Clear();
         }
     }
 }

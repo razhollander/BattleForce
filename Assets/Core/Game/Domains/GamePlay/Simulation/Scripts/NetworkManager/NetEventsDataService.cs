@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
@@ -913,6 +914,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         
         public void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<ushort> playerIdsLockedOnTarget)
         {
+            LogService.LogError($"[Server] playerIdsLockedOnTarget: {playerIdsLockedOnTarget.ToJson()}, player id: {playerId}");
+
             foreach (var kvp in PlayerLockOnHeartTargetsChangedNetEventsPerPlayer)
             {
                 var packet = kvp.Value.AddAndGet();

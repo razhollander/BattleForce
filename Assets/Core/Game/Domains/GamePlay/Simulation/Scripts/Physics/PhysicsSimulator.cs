@@ -1148,6 +1148,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     bodyHitData = bodyData;
                 }
             }
+            
+            _unityMainThreadDispatcher.EnqueueDraw(() => DebugDrawUtils.DrawLine(point1.ToUnityVector2(), point2.ToUnityVector2(), didHit ? UnityEngine.Color.green : UnityEngine.Color.red));
 
             hitBodyData = bodyHitData;
             return didHit;

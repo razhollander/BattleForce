@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         private INetEventsDataService _netEventsDataService;
         
         private FixedUnorderedList<ushort> _cachedLockedOnHeartIds;
-        private readonly PhysicsBodyType[] _cachedBodyTypesRayCastCanHit = {PhysicsBodyType.PlayerHeart, PhysicsBodyType.Wall, PhysicsBodyType.StartMatchWall};
+        private readonly PhysicsBodyType[] _cachedBodyTypesRayCastCanHit = {PhysicsBodyType.PlayerHeart, PhysicsBodyType.Wall, PhysicsBodyType.PlayerSpaceship, PhysicsBodyType.StartMatchWall};
         private int _processedTick;
         private ushort _playerId;
 
@@ -73,13 +73,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 ref var targetedEnemyId = ref casterTargetedEnemyIds.AddAndGet();
                 targetedEnemyId = _cachedLockedOnHeartIds[i];
             }
-
+            
             _netEventsDataService.AddPlayerLockOnHeartTargetsChangedNetEvent(_processedTick, casterPlayerState.Id, casterTargetedEnemyIds);
         }
         
          private void GetTargetedEnemyIds(PlayerStateS2C casterPlayerState, FixedUnorderedList<ushort> outputTargetedEnemyIds)
         {
-            var rayDirection = casterPlayerState.Spaceship.Transform.Direction;
             var rayOriginPosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
 
             var maxLockOnHeartRangeSquare = _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange * _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange;
@@ -104,7 +103,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 }
 
                 var directionToEnemy = enemyHeartPos - rayOriginPosition;
-                var deltaAngleRadians = MathUtils.DeltaAngleRadians(MathUtils.GetAngle(rayDirection), MathUtils.GetAngle(directionToEnemy));
+                var playerCasterDirection = casterPlayerState.Spaceship.Transform.Direction;
+                var deltaAngleRadians = MathUtils.DeltaAngleRadians(MathUtils.GetAngle(playerCasterDirection), MathUtils.GetAngle(directionToEnemy));
                 var deltaAngleDegrees = deltaAngleRadians * Mathf.Rad2Deg;
                 // var directionToEnemy = Vector2.Normalize(enemyHeartPos - rayOriginPosition);
                 // var dot = Vector2.Dot(rayDirection, directionToEnemy);
