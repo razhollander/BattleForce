@@ -2,9 +2,8 @@ using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
-using LiteNetLib.Utils;
 using Core.Scripts.Utils.CustomCollections;
-
+using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
@@ -18,45 +17,35 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsAlive = true;
         public bool IsSpinned;
         public PlayerAssistArrowType AssistArrowType;
-        public FixedUnorderedList<ushort> PlayerHeartsOnTarget;
-
-        public PlayerSpaceshipStateS2C(int maxTalents)
+        public readonly FixedUnorderedList<ushort> TargetedEnemyIds;
+        
+        public PlayerSpaceshipStateS2C(int maxTalents, int maxEnemiesAmount)
         {
             TalentsState = new PlayerTalentsStateS2C(maxTalents);
-            PlayerHeartsOnTarget = new FixedUnorderedList<ushort>(10);
-        }
-
-        public void PushAndSpin(Vector2 pushForce, float spinAmount, bool shouldTurnOffEngine = true)
-        {
-            Transform.Velocity += pushForce;
-            Transform.AngularVelocity += spinAmount;
-            Transform.Direction = pushForce.Normalize();
-
-            if (shouldTurnOffEngine)
-            {
-                IsEngineOn = false;
-            }
+            TargetedEnemyIds = new FixedUnorderedList<ushort>(maxEnemiesAmount);
         }
         
         public PlayerSpaceshipStateS2C GetClone()
         {
-            var clone = new PlayerSpaceshipStateS2C(TalentsState.Talents.Capacity)
+            var clone = new PlayerSpaceshipStateS2C(TalentsState.Talents.Capacity, TargetedEnemyIds.Capacity)
             {
+                Transform = this.Transform,
+                Shoot = this.Shoot,
+                Health = this.Health,
                 IsEngineOn = this.IsEngineOn,
                 IsAlive = this.IsAlive,
-                Shoot = this.Shoot,
-                Transform = this.Transform,
-                Health = this.Health,
+                IsSpinned = this.IsSpinned,
+                AssistArrowType = this.AssistArrowType,
             };
 
-            clone.TalentsState.CopyFrom(this.TalentsState);
-            var count = this.PlayerHeartsOnTarget.Count;
-            for (var i = 0; i < count; i++)
+            clone.TargetedEnemyIds.Clear();
+            for (int i = 0; i < TargetedEnemyIds.Count; i++)
             {
-                ref var target = ref clone.PlayerHeartsOnTarget.AddAndGet();
-                target = this.PlayerHeartsOnTarget[i];
+                ref var targetedEnemyId = ref clone.TargetedEnemyIds.AddAndGet();
+                targetedEnemyId = this.TargetedEnemyIds[i];
             }
-
+            
+            clone.TalentsState.CopyFrom(this.TalentsState);
             return clone;
         }
         
@@ -69,12 +58,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put(IsEngineOn);
             writer.Put(IsAlive);
             writer.Put((ushort)AssistArrowType);
-            writer.Put((byte)PlayerHeartsOnTarget.Count);
-            foreach (var target in PlayerHeartsOnTarget.AsSpan())
+            writer.Put(IsSpinned);
+            
+            var targetedEnemyIdsAmount = TargetedEnemyIds.Count;
+            writer.Put((byte) targetedEnemyIdsAmount);
+            for (int i = 0; i < targetedEnemyIdsAmount; i++)
             {
-                writer.Put(target);
+                writer.Put((byte)TargetedEnemyIds[i]);
             }
-
         }
 
         public void Deserialize(NetDataReader reader)
@@ -86,14 +77,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             IsEngineOn = reader.GetBool();
             IsAlive = reader.GetBool();
             AssistArrowType = (PlayerAssistArrowType)reader.GetUShort();
-            PlayerHeartsOnTarget.Clear();
-            var count = reader.GetByte();
-            for (var i = 0; i < count; i++)
-            {
-                ref var target = ref PlayerHeartsOnTarget.AddAndGet();
-                target = reader.GetUShort();
-            }
+            IsSpinned = reader.GetBool();
 
+            var targetedEnemyIdsAmount = reader.GetByte();
+            TargetedEnemyIds.Clear();
+            for (int i = 0; i < targetedEnemyIdsAmount; i++)
+            {
+                ref var enemyId = ref TargetedEnemyIds.AddAndGet();
+                enemyId = reader.GetByte();
+            }
         }
 
         public void SerializeDeltas(NetDataWriter writer)
@@ -102,12 +94,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Shoot.SerializeDeltas(writer);
             TalentsState.SerializeDeltas(writer);
             writer.Put((ushort)AssistArrowType);
-            writer.Put((byte)PlayerHeartsOnTarget.Count);
-            foreach (var target in PlayerHeartsOnTarget.AsSpan())
-            {
-                writer.Put(target);
-            }
-
         }
 
         public void DeserializeDeltas(NetDataReader reader)
@@ -116,14 +102,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Shoot.DeserializeDeltas(reader);
             TalentsState.DeserializeDeltas(reader);
             AssistArrowType = (PlayerAssistArrowType)reader.GetUShort();
-            PlayerHeartsOnTarget.Clear();
-            var count = reader.GetByte();
-            for (var i = 0; i < count; i++)
-            {
-                ref var target = ref PlayerHeartsOnTarget.AddAndGet();
-                target = reader.GetUShort();
-            }
-
         }
     }
 }

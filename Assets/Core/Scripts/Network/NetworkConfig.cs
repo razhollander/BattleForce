@@ -102,6 +102,7 @@ namespace Core.Scripts.Network
         public int LayChickenEggNetEvents = 128;
         public int ChickenEggHitNetEvents = 128;
         public int ActivateYearsOfPainTalentNetEvents = 128;
+        public int PlayerLockOnHeartTargetsChangedNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel
@@ -111,6 +112,5 @@ namespace Core.Scripts.Network
             public int MaxSprings = 8;
             public int MaxTeleportGatePairs = 4;
         }
-
     }
 }

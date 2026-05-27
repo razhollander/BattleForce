@@ -674,12 +674,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var netEvent in playerLockOnHeartTargetsChangedNetEvents)
             {
                 var player = _matchDataService.GetPlayer(netEvent.PlayerId);
-                player.Spaceship.PlayerHeartsOnTarget.Clear();
+                player.Spaceship.TargetedEnemyIds.Clear();
                 
-                for (int i = 0; i < netEvent.PlayersHeartsLockOnTargets.Count; i++)
+                for (int i = 0; i < netEvent.PlayerIdsLockedOnTarget.Count; i++)
                 {
-                    ref var playerId = ref player.Spaceship.PlayerHeartsOnTarget.AddAndGet();
-                    playerId = netEvent.PlayersHeartsLockOnTargets[i];
+                    ref var playerId = ref player.Spaceship.TargetedEnemyIds.AddAndGet();
+                    playerId = netEvent.PlayerIdsLockedOnTarget[i];
                 }
                 
                 _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);

@@ -974,7 +974,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         }
 
 
-        private void ProcessPlayerLockOnHeartTargetsChangedNetEvents(FixedUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> events)
+        private void ProcessPlayerLockOnHeartTargetsChangedNetEvents(FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> events)
         {
             _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Clear();
 

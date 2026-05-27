@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents)
             {
-                var isLockOnHeartSightShown = netEvent.PlayersHeartsLockOnTargets.Count > 0;
+                var isLockOnHeartSightShown = netEvent.PlayerIdsLockedOnTarget.Count > 0;
                 _matchPlayerControllers.SetPlayerIsLockOnHeartSightShown(netEvent.PlayerId, isLockOnHeartSightShown);
             }
 

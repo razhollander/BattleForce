@@ -4,25 +4,25 @@ using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public struct PlayerLockOnHeartTargetsChangedNetEventS2C : INetSerializable, IComparable<PlayerLockOnHeartTargetsChangedNetEventS2C>
+    public class PlayerLockOnHeartTargetsChangedNetEventS2C : INetSerializable, IComparable<PlayerLockOnHeartTargetsChangedNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort PlayerId;
-        public FixedUnorderedList<ushort> PlayersHeartsLockOnTargets;
+        public FixedUnorderedList<ushort> PlayerIdsLockedOnTarget;
 
         public PlayerLockOnHeartTargetsChangedNetEventS2C(int maxTargets)
         {
             OccuredOnTick = 0;
             PlayerId = 0;
-            PlayersHeartsLockOnTargets = new FixedUnorderedList<ushort>(maxTargets);
+            PlayerIdsLockedOnTarget = new FixedUnorderedList<ushort>(maxTargets);
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put(PlayerId);
-            writer.Put((byte)PlayersHeartsLockOnTargets.Count);
-            foreach (var target in PlayersHeartsLockOnTargets.AsSpan())
+            writer.Put((byte)PlayerId);
+            writer.Put((byte)PlayerIdsLockedOnTarget.Count);
+            foreach (var target in PlayerIdsLockedOnTarget.AsSpan())
             {
                 writer.Put((byte)target);
             }
@@ -31,12 +31,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            PlayerId = reader.GetUShort();
-            PlayersHeartsLockOnTargets.Clear();
+            PlayerId = reader.GetByte();
+            PlayerIdsLockedOnTarget.Clear();
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var target = ref PlayersHeartsLockOnTargets.AddAndGet();
+                ref var target = ref PlayerIdsLockedOnTarget.AddAndGet();
                 target = reader.GetByte();
             }
         }

@@ -17,6 +17,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
             Spaceship = spaceship.GetClone();
         }
 
-        public bool IsPlayerLockOnTargetSightShown => Spaceship.PlayerHeartsOnTarget.Count > 0;
+        public bool IsPlayerLockOnTargetSightShown => Spaceship.TargetedEnemyIds.Count > 0;
     }
 }

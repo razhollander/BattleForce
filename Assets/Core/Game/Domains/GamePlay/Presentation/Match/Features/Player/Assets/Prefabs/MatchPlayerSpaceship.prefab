@@ -1776,6 +1776,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LockOnHeartSight
       objectReference: {fileID: 0}
+    - target: {fileID: 352588385464499130, guid: 68038430ca2e3484eaf6007de0c22c59, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7721639568857208960, guid: 68038430ca2e3484eaf6007de0c22c59, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.943

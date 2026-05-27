@@ -13,10 +13,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IMatchDataService _matchDataService;
 
-        public HammerTalentController(ushort casterPlayerId, INetEventsDataService iNetEventsDataService, IMatchDataService matchDataService)
+        public HammerTalentController(ushort casterPlayerId, INetEventsDataService netEventsDataService, IMatchDataService matchDataService)
         {
             _casterPlayerId = casterPlayerId;
-            _netEventsDataService = iNetEventsDataService;
+            _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
         }
 
