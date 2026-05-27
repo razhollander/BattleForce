@@ -5,33 +5,36 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 {
     public class PlayerLockOnHeartTargetsChangedNetEventS2C : INetSerializable
     {
+        public int OccuredOnTick;
         public ushort PlayerId;
-        public FixedUnorderedList<ushort> LockedOnHeartIds;
+        public FixedUnorderedList<ushort> PlayerIdsLockedOnTarget;
 
         public PlayerLockOnHeartTargetsChangedNetEventS2C(int maxHeartsIdsOnTarget)
         {
             PlayerId = 0;
-            LockedOnHeartIds = new FixedUnorderedList<ushort>(maxHeartsIdsOnTarget);
+            PlayerIdsLockedOnTarget = new FixedUnorderedList<ushort>(maxHeartsIdsOnTarget);
         }
 
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put(OccuredOnTick);
             writer.Put(PlayerId);
-            writer.Put((byte)LockedOnHeartIds.Count);
-            for (int i = 0; i < LockedOnHeartIds.Count; i++)
+            writer.Put((byte)PlayerIdsLockedOnTarget.Count);
+            for (int i = 0; i < PlayerIdsLockedOnTarget.Count; i++)
             {
-                writer.Put(LockedOnHeartIds[i]);
+                writer.Put(PlayerIdsLockedOnTarget[i]);
             }
         }
 
         public void Deserialize(NetDataReader reader)
         {
+            OccuredOnTick = reader.GetInt();
             PlayerId = reader.GetUShort();
-            LockedOnHeartIds.Clear();
+            PlayerIdsLockedOnTarget.Clear();
             var count = reader.GetByte();
             for (int i = 0; i < count; i++)
             {
-                ref var lockOnHeartId = ref LockedOnHeartIds.AddAndGet();
+                ref var lockOnHeartId = ref PlayerIdsLockedOnTarget.AddAndGet();
                 lockOnHeartId = reader.GetUShort();
             }
         }

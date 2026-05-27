@@ -206,19 +206,6 @@ namespace Core.Scripts.Extensions.Linq
 
             return result;
         }
-        
-        public static bool Contains<T>(this T[] source, T target)
-        {
-            for (var i = 0; i < source.Length; i++)
-            {
-                if (EqualityComparer<T>.Default.Equals(source[i], target))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
 
         public static int IndexOf<T>(this T[] source, Func<T, bool> condition)
         {

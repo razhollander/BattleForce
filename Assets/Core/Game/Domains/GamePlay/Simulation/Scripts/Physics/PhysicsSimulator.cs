@@ -1129,31 +1129,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             RemoveBody(body);
         }
 
-        public bool RayCast(Vector2 point1, Vector2 point2, out PhysicsBodyData hitBodyData)
+        public bool RayCast(Vector2 point1, Vector2 point2, out PhysicsBodyData hitBodyData, PhysicsBodyType[] bodyTypesRayCastCanHit = null)
         {
-            bool hit = false;
-            PhysicsBodyData bestHitData = default;
-            float closestFraction = 1f;
+            var didHit = false;
+            PhysicsBodyData bodyHitData = default;
+            var closestFraction = 1f;
+            _world.RayCast(OnRayCastHit, point1, point2);
 
-            float RayCastCallback(Box2D.NetStandard.Dynamics.Fixtures.Fixture fixture, Vector2 point, Vector2 normal, float fraction)
+            void OnRayCastHit(Fixture fixture, Vector2 point, Vector2 normal, float fraction)
             {
                 var body = fixture.Body;
-                if (body != null && body.UserData is PhysicsBodyData data)
+                var bodyData = (PhysicsBodyData) body.UserData;
+                var didRayHitClosetBody = fraction <= closestFraction && (bodyTypesRayCastCanHit == null || bodyTypesRayCastCanHit.Contains(bodyData.PhysicsBodyType));
+                if (didRayHitClosetBody)
                 {
-                    if (fraction <= closestFraction)
-                    {
-                        hit = true;
-                        closestFraction = fraction;
-                        bestHitData = data;
-                    }
+                    didHit = true;
+                    closestFraction = fraction;
+                    bodyHitData = bodyData;
                 }
-                return closestFraction;
             }
 
-            _world.RayCast(RayCastCallback, point1, point2);
-
-            hitBodyData = bestHitData;
-            return hit;
+            hitBodyData = bodyHitData;
+            return didHit;
         }
     }
 }
