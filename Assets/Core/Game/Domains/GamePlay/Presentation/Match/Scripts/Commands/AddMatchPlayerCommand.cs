@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -42,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             _matchDataService.AddPlayer(_playerState);
             _playerControllers.AddPlayer(playerId);
             _playerUIControllers.AddPlayer(playerId, _currentServerTick);
-            _worldCameraController.AddTarget(_playerControllers.GetPlayerSpaceshipTransform(playerId));
+            _worldCameraController.AddFollowTarget(_playerControllers.GetPlayerSpaceshipTransform(playerId));
         }
     }
 }

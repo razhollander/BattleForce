@@ -124,6 +124,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetIsDeadAuraEnabled(isEnabled);
         }
 
+        public void SetPlayerIsLockOnHeartSightShown(ushort playerId, bool isShown)
+        {
+            GetPlayer(playerId).SetIsLockOnHeartSightShown(isShown);
+        }
+
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)
         {
             GetPlayer(playerId).SetHealth(currentHealth, maxHealth);
@@ -151,17 +156,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public Transform GetPlayerHeartTransform(ushort playerId)
         {
-            var controller = GetPlayer(playerId);
-            return controller?.GetHeartTransform();
+            return GetPlayer(playerId).GetHeartTransform();
         }
-
-
+        
         public void HidePlayerHealthBar(ushort playerId)
         {
             GetPlayer(playerId).SetIsHealthBarShown(false);
         }
-
-
+        
         public void DestroyAll()
         {
             foreach (var controller in _playerControllers)
@@ -170,15 +172,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
             _playerControllers.Clear();
         }
-
-        public void ManagedUpdate()
-        {
-            foreach (var controller in _playerControllers)
-            {
-                controller.ManagedUpdate();
-            }
-        }
-
 
         public void SetPlayerTalentSelected(ushort playerId, int talentIndex)
         {

@@ -1,5 +1,7 @@
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
@@ -10,6 +12,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.S
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
@@ -38,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ITalentCardControllers _talentCardControllers;
         private IMatchPlayerControllers _playerControllers;
         private IMatchBulletControllers _bulletControllers;
-        private Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.IMatchChickenEggsControllers _chickenEggsControllers;
+        private IMatchChickenEggsControllers _chickenEggsControllers;
         private ITickProcessor _tickProcessor;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
@@ -55,7 +58,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IKOProjectilesControllers _koProjectilesControllers;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
         private IDashPulseGustEffectController _dashPulseGustEffectController;
-        private Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts.IMagneticPullEffectController _magneticPullEffectController;
+        private IMagneticPullEffectController _magneticPullEffectController;
+        private IBackgroundParallaxController _backgroundParallaxController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -72,7 +76,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
-            _chickenEggsControllers = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.IMatchChickenEggsControllers>();
+            _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
@@ -89,9 +93,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _koProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
-            _magneticPullEffectController = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts.IMagneticPullEffectController>();
-            _lockOnHeartSightsEffectController = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts.ILockOnHeartSightsEffectController>();
-
+            _magneticPullEffectController = _diContainer.Resolve<IMagneticPullEffectController>();
+            _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
         }
 
         public void Execute()
@@ -114,6 +117,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentSpringControllers.InitEntryPoint();
             _playerTeleportEffectController.InitEntryPoint();
             _environmentTeleportGateControllers.InitEntryPoint();
+            _backgroundParallaxController.InitEntryPoint();
             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
                  .SetSimulationState(_enterData.InitialState)
                  .Execute();
@@ -121,7 +125,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _gainBoltEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();
-            _lockOnHeartSightsEffectController.InitEntryPoint();
 
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();

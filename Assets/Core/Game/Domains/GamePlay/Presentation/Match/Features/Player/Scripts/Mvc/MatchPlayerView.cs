@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Scripts.Extensions;
 using Core.Scripts.Helpers;
@@ -31,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private GameObject _deadAura;
         [SerializeField] private PlayerEyesView _playerEyesView;
         [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
+        [SerializeField] private LockOnHeartSightView _lockOnHeartSightView;
         public Action Despawn { get; set; }
         
         public PlayerView Base => _playerView;
@@ -153,6 +155,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerEyesView.OnDespawned();
             _playerChickenView.SetChickenState(false);
             DisableUmbrellaState();
+            SetIsLockOnHeartSightShown(false);
             Base.OnDespawned();
         }
 
@@ -213,6 +216,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             SetIsHealthBarShown(true);
             Base.OnSpawned();
+        }
+
+        public void SetIsLockOnHeartSightShown(bool isShown)
+        {
+            _lockOnHeartSightView.SetIsShown(isShown);
         }
     }
 }

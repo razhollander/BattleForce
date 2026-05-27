@@ -988,20 +988,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             if (!_cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.IsNullOrEmpty())
             {
-                _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Sort((x, y) => x.OccuredOnTick.CompareTo(y.OccuredOnTick));
-                foreach (var evt in _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents)
-                {
-                    var player = _matchDataService.GetPlayer(evt.PlayerId);
-                    if (player != null)
-                    {
-                        player.Spaceship.PlayerHeartsOnTarget.Clear();
-                        for (int i = 0; i < evt.PlayersHeartsLockOnTargets.Count; i++)
-                        {
-                            ref var target = ref player.Spaceship.PlayerHeartsOnTarget.AddAndGet();
-                            target = evt.PlayersHeartsLockOnTargets[i];
-                        }
-                    }
-                }
+                _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerLockOnHeartTargetsChangedEvents(_cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents);
             }
         }
         private void ProcessActivateYearsOfPainTalentEvents(FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C> events)

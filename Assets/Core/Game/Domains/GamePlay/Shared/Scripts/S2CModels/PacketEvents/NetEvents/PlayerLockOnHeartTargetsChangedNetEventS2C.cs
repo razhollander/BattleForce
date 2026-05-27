@@ -1,9 +1,10 @@
+using System;
 using LiteNetLib.Utils;
 using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public struct PlayerLockOnHeartTargetsChangedNetEventS2C : INetSerializable
+    public struct PlayerLockOnHeartTargetsChangedNetEventS2C : INetSerializable, IComparable<PlayerLockOnHeartTargetsChangedNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort PlayerId;
@@ -23,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             writer.Put((byte)PlayersHeartsLockOnTargets.Count);
             foreach (var target in PlayersHeartsLockOnTargets.AsSpan())
             {
-                writer.Put(target);
+                writer.Put((byte)target);
             }
         }
 
@@ -36,8 +37,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             for (var i = 0; i < count; i++)
             {
                 ref var target = ref PlayersHeartsLockOnTargets.AddAndGet();
-                target = reader.GetUShort();
+                target = reader.GetByte();
             }
+        }
+
+        public int CompareTo(PlayerLockOnHeartTargetsChangedNetEventS2C other)
+        {
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }

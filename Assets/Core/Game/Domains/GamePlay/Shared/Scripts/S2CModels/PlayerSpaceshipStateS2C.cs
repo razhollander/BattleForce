@@ -20,12 +20,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public PlayerAssistArrowType AssistArrowType;
         public FixedUnorderedList<ushort> PlayerHeartsOnTarget;
 
-
         public PlayerSpaceshipStateS2C(int maxTalents)
         {
             TalentsState = new PlayerTalentsStateS2C(maxTalents);
             PlayerHeartsOnTarget = new FixedUnorderedList<ushort>(10);
-
         }
 
         public void PushAndSpin(Vector2 pushForce, float spinAmount, bool shouldTurnOffEngine = true)

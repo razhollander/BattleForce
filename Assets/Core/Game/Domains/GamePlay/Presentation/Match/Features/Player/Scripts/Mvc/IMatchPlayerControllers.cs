@@ -6,7 +6,7 @@ using CoreDomain.Scripts.Services.UpdateService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
 {
-    public interface IMatchPlayerControllers : IGUIUpdatable
+    public interface IMatchPlayerControllers
     {
         void InitEntryPoint();
         void AddPlayer(ushort playerId);
@@ -22,7 +22,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         Transform GetPlayerHeartTransform(ushort playerId);
         void HidePlayerHealthBar(ushort playerId);
         void DestroyAll();
-        void ManagedUpdate();
         void SetPlayerTalentSelected(ushort playerId, int talentIndex);
         void UpdatePlayerTalents(ushort playerId, Core.Scripts.Utils.CustomCollections.FixedOrderedList<Core.Game.Domains.GamePlay.Shared.S2CModels.TalentStateS2C> talents, int currentServerTick);
         void SetIsTailWaving(ushort playerId, bool isWaving);
@@ -33,5 +32,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void PlayLayEggAnimation(ushort playerId);
         void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction);
         void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled);
+        void SetPlayerIsLockOnHeartSightShown(ushort playerId, bool isShown);
     }
 }
