@@ -1,6 +1,8 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
+using CoreDomain.Scripts.Services.UpdateService;
+
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
 {
@@ -17,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         UnityEngine.Vector2 GetPlayerPosition(ushort playerId);
         Transform GetPlayerSpaceshipTransform(ushort playerId);
         Transform GetPlayerTransform(ushort playerId);
+        Transform GetPlayerHeartTransform(ushort playerId);
         void HidePlayerHealthBar(ushort playerId);
         void DestroyAll();
         void SetPlayerTalentSelected(ushort playerId, int talentIndex);
@@ -29,5 +32,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void PlayLayEggAnimation(ushort playerId);
         void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction);
         void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled);
+        void SetPlayerIsLockOnHeartSightShown(ushort playerId, bool isShown);
     }
 }

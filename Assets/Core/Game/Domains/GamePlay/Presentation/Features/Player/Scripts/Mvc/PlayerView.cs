@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private Transform _heart;
+
         
         private Transform _transform;
         
@@ -100,6 +101,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             return _transform;
         }
+
+        public Transform GetHeartTransform()
+        {
+            return _heart;
+        }
+
 
         public void SetIsTailWaving(bool isWaving)
         {

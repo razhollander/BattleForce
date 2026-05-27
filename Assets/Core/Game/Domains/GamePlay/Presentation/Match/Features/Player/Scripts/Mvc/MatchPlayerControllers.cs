@@ -11,6 +11,8 @@ using Sirenix.Utilities;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
+using CoreDomain.Scripts.Services.UpdateService;
+
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
 {
@@ -122,6 +124,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetIsDeadAuraEnabled(isEnabled);
         }
 
+        public void SetPlayerIsLockOnHeartSightShown(ushort playerId, bool isShown)
+        {
+            GetPlayer(playerId).SetIsLockOnHeartSightShown(isShown);
+        }
+
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)
         {
             GetPlayer(playerId).SetHealth(currentHealth, maxHealth);
@@ -147,11 +154,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return GetPlayer(playerId).GetTransform();
         }
 
+        public Transform GetPlayerHeartTransform(ushort playerId)
+        {
+            return GetPlayer(playerId).GetHeartTransform();
+        }
+        
         public void HidePlayerHealthBar(ushort playerId)
         {
             GetPlayer(playerId).SetIsHealthBarShown(false);
         }
-
+        
         public void DestroyAll()
         {
             foreach (var controller in _playerControllers)
