@@ -18,24 +18,24 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put(PlayerId);
+            writer.Put((byte)PlayerId);
             writer.Put((byte)PlayerIdsLockedOnTarget.Count);
             for (int i = 0; i < PlayerIdsLockedOnTarget.Count; i++)
             {
-                writer.Put(PlayerIdsLockedOnTarget[i]);
+                writer.Put((byte)PlayerIdsLockedOnTarget[i]);
             }
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            PlayerId = reader.GetUShort();
+            PlayerId = reader.GetByte();
             PlayerIdsLockedOnTarget.Clear();
             var count = reader.GetByte();
             for (int i = 0; i < count; i++)
             {
                 ref var lockOnHeartId = ref PlayerIdsLockedOnTarget.AddAndGet();
-                lockOnHeartId = reader.GetUShort();
+                lockOnHeartId = reader.GetByte();
             }
         }
     }

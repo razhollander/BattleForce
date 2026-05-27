@@ -64,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((byte) targetedEnemyIdsAmount);
             for (int i = 0; i < targetedEnemyIdsAmount; i++)
             {
-                writer.Put(TargetedEnemyIds[i]);
+                writer.Put((byte)TargetedEnemyIds[i]);
             }
         }
 
@@ -78,6 +78,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             IsAlive = reader.GetBool();
             AssistArrowType = (PlayerAssistArrowType)reader.GetUShort();
             IsSpinned = reader.GetBool();
+
+            var targetedEnemyIdsAmount = reader.GetByte();
+            TargetedEnemyIds.Clear();
+            for (int i = 0; i < targetedEnemyIdsAmount; i++)
+            {
+                ref var enemyId = ref TargetedEnemyIds.AddAndGet();
+                enemyId = reader.GetByte();
+            }
         }
 
         public void SerializeDeltas(NetDataWriter writer)

@@ -10,9 +10,9 @@ using CoreDomain.Scripts.Utils;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
 
-namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.LockOnHeartTargetService
+namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.LockOnHeartTarget
 {
-    public class LockOnHeartTargetService : ILockOnHeartTargetService // move to a command, and make this a timer service that has the timer of each player targets
+    public class LockOnHeartTargetService : ILockOnHeartTargetService
     {
         private readonly IMatchDataService _matchDataService;
         private readonly IPhysicsSimulator _physicsSimulator;
