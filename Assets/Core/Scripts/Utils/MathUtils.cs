@@ -69,7 +69,7 @@ namespace CoreDomain.Scripts.Utils
             float targetRad = GetAngle(target);
 
             // Calculate the shortest signed difference between angles
-            float deltaRad = DeltaAngleRadians(currentRad, targetRad);
+            float deltaRad = DeltaSignedAngleRadians(currentRad, targetRad);
 
             // Convert max delta to radians and clamp the rotation
             float maxRadDelta = maxDegreesDelta * (MathF.PI / 180f);
@@ -90,7 +90,7 @@ namespace CoreDomain.Scripts.Utils
         /// Calculates the shortest difference between two radian angles, 
         /// wrapping correctly around the 2PI boundary.
         /// </summary>
-        public static float DeltaAngleRadians(float current, float target)
+        public static float DeltaSignedAngleRadians(float current, float target)
         {
             float diff = target - current;
 
@@ -99,6 +99,17 @@ namespace CoreDomain.Scripts.Utils
             while (diff < -MathF.PI) diff += MathF.PI * 2;
 
             return diff;
+        }
+        
+        public static float DeltaAbsoluteAngleRadians(float current, float target)
+        {
+            float diff = target - current;
+
+            // Wrap the angle to -PI to PI range
+            while (diff > MathF.PI) diff -= MathF.PI * 2;
+            while (diff < -MathF.PI) diff += MathF.PI * 2;
+
+            return Mathf.Abs(diff);
         }
 
         /// <summary>

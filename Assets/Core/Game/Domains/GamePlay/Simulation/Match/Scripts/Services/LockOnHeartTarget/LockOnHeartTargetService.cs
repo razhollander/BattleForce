@@ -87,7 +87,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.LockOnHea
                 }
 
                 var directionToEnemy = enemyHeartPos - rayOriginPosition;
-                var deltaAngleRadians = MathUtils.DeltaAngleRadians(MathUtils.GetAngle(rayDirection), MathUtils.GetAngle(directionToEnemy));
+                var deltaAngleRadians = MathUtils.DeltaSignedAngleRadians(MathUtils.GetAngle(rayDirection), MathUtils.GetAngle(directionToEnemy));
                 var deltaAngleDegrees = deltaAngleRadians * Mathf.Rad2Deg;
                 // var directionToEnemy = Vector2.Normalize(enemyHeartPos - rayOriginPosition);
                 // var dot = Vector2.Dot(rayDirection, directionToEnemy);

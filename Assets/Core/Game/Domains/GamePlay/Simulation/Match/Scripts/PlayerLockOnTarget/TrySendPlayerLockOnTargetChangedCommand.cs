@@ -104,15 +104,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
                 var directionToEnemy = enemyHeartPos - rayOriginPosition;
                 var playerCasterDirection = casterPlayerState.Spaceship.Transform.Direction;
-                var deltaAngleRadians = MathUtils.DeltaAngleRadians(MathUtils.GetAngle(playerCasterDirection), MathUtils.GetAngle(directionToEnemy));
-                var deltaAngleDegrees = deltaAngleRadians * Mathf.Rad2Deg;
+                 var deltaAngleRadians = MathUtils.DeltaAbsoluteAngleRadians(MathUtils.GetAngle(playerCasterDirection), MathUtils.GetAngle(directionToEnemy));
+                 var deltaAngleDegrees = deltaAngleRadians * Mathf.Rad2Deg;
                 // var directionToEnemy = Vector2.Normalize(enemyHeartPos - rayOriginPosition);
                 // var dot = Vector2.Dot(rayDirection, directionToEnemy);
                 // dot = Math.Clamp(dot, -1f, 1f);
                 // var angleRad = Math.Acos(dot);
                 // var angleDeg = angleRad * (180.0 / Math.PI);
-                var maxLockOnHeartAngle = _gamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees;
-                var isInAngleRange = deltaAngleDegrees <= maxLockOnHeartAngle;
+                //
+                 var maxLockOnHeartAngle = _gamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees;
+                 var isInAngleRange = deltaAngleDegrees <= maxLockOnHeartAngle;
 
                 if (!isInAngleRange)
                 {
