@@ -112,7 +112,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 // var angleRad = Math.Acos(dot);
                 // var angleDeg = angleRad * (180.0 / Math.PI);
                 var maxLockOnHeartAngle = _gamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees;
-                var isInAngleRange = deltaAngleDegrees <= maxLockOnHeartAngle;
+                var isInAngleRange = Mathf.Abs(deltaAngleDegrees) <= maxLockOnHeartAngle;
 
                 if (!isInAngleRange)
                 {
