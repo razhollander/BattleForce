@@ -13,7 +13,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         // Maps casterId -> targetId -> timer
         private readonly Dictionary<ushort, Dictionary<ushort, float>> _lockOnTimers;
 
-        private readonly List<(ushort CasterId, ushort TargetId)> _playersToDamage;
+        private readonly List<(ushort CasterId, ushort TargetId)> _cachedPlayersToDamage;
 
         public LockOnTargetTimerService(IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
         {
@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _gamePlayConfig = gamePlayConfig;
 
             _lockOnTimers = new Dictionary<ushort, Dictionary<ushort, float>>(networkConfig.MaxCap.ConcurrentPlayers);
-            _playersToDamage = new List<(ushort CasterId, ushort TargetId)>(networkConfig.MaxCap.ConcurrentPlayers);
+            _cachedPlayersToDamage = new List<(ushort CasterId, ushort TargetId)>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void StepTimers(float deltaTime)
@@ -72,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
         public List<(ushort CasterId, ushort TargetId)> GetPlayersToDamage()
         {
-            _playersToDamage.Clear();
+            _cachedPlayersToDamage.Clear();
             var limit = _gamePlayConfig.LockOnTargetHitDurationInSeconds;
 
             foreach (var casterKvp in _lockOnTimers)
@@ -82,12 +82,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 {
                     if (targetKvp.Value >= limit)
                     {
-                        _playersToDamage.Add((casterId, targetKvp.Key));
+                        _cachedPlayersToDamage.Add((casterId, targetKvp.Key));
                     }
                 }
             }
 
-            return _playersToDamage;
+            return _cachedPlayersToDamage;
         }
 
         public void ResetTimer(ushort casterId, ushort targetId)
