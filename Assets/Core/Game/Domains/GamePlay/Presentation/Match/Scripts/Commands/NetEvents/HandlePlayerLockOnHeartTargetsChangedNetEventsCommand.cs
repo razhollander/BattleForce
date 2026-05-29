@@ -4,15 +4,19 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
+    using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
+
     public class HandlePlayerLockOnHeartTargetsChangedNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchPlayerControllers _matchPlayerControllers;
+        private ILockOnTargetEffectController _lockOnTargetEffectController;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+            _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
         }
 
         public void Execute()
@@ -27,6 +31,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var isLockOnHeartSightShown = netEvent.PlayerIdsLockedOnTarget.Count > 0;
                 _matchPlayerControllers.SetPlayerIsLockOnHeartSightShown(netEvent.PlayerId, isLockOnHeartSightShown);
             }
+
+            _lockOnTargetEffectController.UpdateEffects();
 
             _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Clear();
         }

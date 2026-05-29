@@ -117,6 +117,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands = commandFactory.CreateCommandVoid<HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands>();
             _handleActivateYearsOfPainTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateYearsOfPainTalentNetEventsCommand>();
             _handlePlayerLockOnHeartTargetsChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockOnHeartTargetsChangedNetEventsCommand>();
+            _lockOnTargetEffectController = diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts.ILockOnTargetEffectController>();
+            _lockOnTargetEffectController = diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts.ILockOnTargetEffectController>();
         }
         
         public void InitEntryPoint()
@@ -180,7 +182,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateObjectTransformInsideRotatingWheelsCommand.Execute();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands.Execute();
             _handlePlayerLockOnHeartTargetsChangedNetEventsCommand.Execute();
-            _handleTalentCardObtainedNetEventsCommand.SetCurrentServerTick(lastProcessedTickFromServer).Execute();
+                {
         }
     }
 }

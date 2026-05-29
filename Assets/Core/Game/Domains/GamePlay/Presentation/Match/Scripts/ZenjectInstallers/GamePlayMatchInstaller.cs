@@ -63,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private MagneticPullFieldView _magneticPullFieldViewPrefab;
         [SerializeField] private MagneticPullHitEffectView _magneticPullHitEffectViewPrefab;
         [SerializeField] private LockOnHeartSightView lockOnHeartSightViewPrefab;
+        [SerializeField] private LockOnTargetEffectView lockOnTargetEffectViewPrefab;
 
         [SerializeField] private ChickenEggView _chickenEggViewPrefab;
         [SerializeField] private BackgroundParallaxView _backgroundParallaxView;
@@ -109,6 +110,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<MagneticPullEffectController>().AsSingle().WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<BackgroundParallaxController>().AsSingle().WithArguments(_backgroundParallaxView).NonLazy();
+            Container.BindInterfacesTo<LockOnTargetEffectController>().AsSingle().WithArguments(lockOnTargetEffectViewPrefab).NonLazy();
         }
     }
 }
