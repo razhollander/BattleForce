@@ -354,7 +354,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetIsLockOnHeartSightShown(bool isShown)
         {
-            LogService.LogError($"[Presentation isShown {isShown}, player id: {PlayerId}");
             _playerView.SetIsLockOnHeartSightShown(isShown);
         }
     }

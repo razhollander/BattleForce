@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
+using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Utils;
@@ -80,9 +81,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
          private void GetTargetedEnemyIds(PlayerStateS2C casterPlayerState, FixedUnorderedList<ushort> outputTargetedEnemyIds)
         {
             var rayOriginPosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
-
-            var maxLockOnHeartRangeSquare = _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange * _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange;
-
+            var radius = _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange;
+            var maxLockOnHeartRangeSquare = radius * radius;
+            DebugDrawUtils.DrawArc2D(rayOriginPosition, casterPlayerState.Spaceship.Transform.Direction, radius,
+                _gamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees);
             var players = _matchDataService.SimulationState.Players;
             for (int i = 0; i < players.Count; i++)
             {
@@ -97,6 +99,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 var rayOriginToEnemyHeartDistanceSquared = System.Numerics.Vector2.DistanceSquared(rayOriginPosition, enemyHeartPos);
                 var isEnemyHeartInRange = rayOriginToEnemyHeartDistanceSquared <= maxLockOnHeartRangeSquare;
 
+                
                 if (!isEnemyHeartInRange)
                 {
                     continue;
