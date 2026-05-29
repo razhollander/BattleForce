@@ -3,26 +3,29 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
 {
-    public struct PlayerLockedOnTargetHitNetEventS2C : INetSerializable, IEquatable<PlayerLockedOnTargetHitNetEventS2C>
+    public struct PlayerLockedOnTargetHitNetEventS2C : INetSerializable, IComparable<PlayerLockedOnTargetHitNetEventS2C>
     {
         public int OccuredOnTick;
-        public ushort PlayerIdHit;
+        public ushort CasterPlayerId;
+        public ushort HitPlayerId;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put(PlayerIdHit);
+            writer.Put((byte)CasterPlayerId);
+            writer.Put((byte)HitPlayerId);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            PlayerIdHit = reader.GetUShort();
+            CasterPlayerId = reader.GetByte();
+            HitPlayerId = reader.GetByte();
         }
 
-        public bool Equals(PlayerLockedOnTargetHitNetEventS2C other)
+        public int CompareTo(PlayerLockedOnTargetHitNetEventS2C other)
         {
-            return OccuredOnTick == other.OccuredOnTick && PlayerIdHit == other.PlayerIdHit;
+            return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }
     }
 }

@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -38,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var targetId = pair.TargetId;
 
                 _lockOnTargetTimerService.ResetTimer(casterId, targetId);
-
+                LogService.LogError("hitting player: " + targetId + " by player: " + casterId + "");
                 _playerHitCommand
                     .SetPlayerIdGotHit(targetId)
                     .SetWasHitByAnotherPlayer(true, casterId)
@@ -46,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     .SetHitDamage(1)
                     .Execute();
 
-                _netEventsDataService.AddPlayerLockedOnTargetHitNetEvent(_processedTick, targetId);
+                _netEventsDataService.AddPlayerLockedOnTargetHitNetEvent(_processedTick, casterId, targetId);
             }
         }
     }

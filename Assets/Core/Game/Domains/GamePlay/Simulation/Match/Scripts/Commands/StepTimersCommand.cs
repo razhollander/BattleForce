@@ -41,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersInLavaTrackerService.StepTimePassedSinceLastDamageTaken(_deltaTime);
             _headLessQuitterController.StepTimer(_deltaTime);
             StepPreperationPhaseTimer(_deltaTime);
+            _lockOnTargetTimerService.StepTimers(_deltaTime);
         }
 
         private void StepPreperationPhaseTimer(float deltaTime)

@@ -103,6 +103,7 @@ namespace Core.Scripts.Network
         public int ChickenEggHitNetEvents = 128;
         public int ActivateYearsOfPainTalentNetEvents = 128;
         public int PlayerLockOnHeartTargetsChangedNetEvents = 128;
+        public int PlayerLockOnHeartTargetHitNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel
