@@ -8,7 +8,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
         protected override string ParentGameObjectName => "LockOnTargetEffectParent";
 
         public LockOnTargetEffectPool(LockOnTargetEffectView view, DiContainer diContainer) : base(
-            new PoolData(10, 5), diContainer, view)
+            new PoolData(5, 3), diContainer, view)
         {
         }
     }

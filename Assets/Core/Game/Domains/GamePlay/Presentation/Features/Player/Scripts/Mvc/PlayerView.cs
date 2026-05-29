@@ -14,10 +14,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private SpriteRenderer _availableBulletSpriteRenderer;
         [SerializeField] private PlayerLoadingRingView _loadingRingView;
         [SerializeField] private Transform _spaceShipTransform;
+        [SerializeField] private Transform _headTransform;
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private Transform _heart;
-
         
         private Transform _transform;
         
@@ -111,6 +111,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetIsTailWaving(bool isWaving)
         {
             _tailView.SetIsTailWaving(isWaving);
+        }
+
+        public Transform GetHeadTransform()
+        {
+            return _headTransform;
         }
     }
 }

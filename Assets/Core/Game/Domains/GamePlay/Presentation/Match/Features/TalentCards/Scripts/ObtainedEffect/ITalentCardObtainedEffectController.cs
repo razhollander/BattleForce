@@ -6,5 +6,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scr
     {
         void PlayEffect(Vector2 from, Vector2 to);
         void InitEntryPoint();
+        void InitExitPoint();
     }
 }

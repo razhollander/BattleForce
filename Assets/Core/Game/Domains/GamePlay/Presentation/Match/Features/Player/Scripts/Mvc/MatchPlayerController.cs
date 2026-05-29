@@ -61,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             UpdateTalents(playerModel.Spaceship.TalentsState.Talents, playerModel.Spaceship.TalentsState.SelectedTalentIndex, 0);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
-            SetIsLockOnHeartSightShown(playerModel.IsPlayerLockOnTargetSightShown);
+            SetIsLockOnHeartSightShown(playerModel.Spaceship.IsPlayerLockOnTargetSightShown);
         }
 
         private void SetupPlayerAccordingToHisSelectedTalent(MatchPlayerModel playerModel)
@@ -355,6 +355,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsLockOnHeartSightShown(bool isShown)
         {
             _playerView.SetIsLockOnHeartSightShown(isShown);
+        }
+
+        public Transform GetHeadTransform()
+        {
+            return _playerView.Base.GetHeadTransform();
         }
     }
 }

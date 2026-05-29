@@ -62,7 +62,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private DashPulseGustEffectView _dashPulseGustEffectViewPrefab;
         [SerializeField] private MagneticPullFieldView _magneticPullFieldViewPrefab;
         [SerializeField] private MagneticPullHitEffectView _magneticPullHitEffectViewPrefab;
-        [SerializeField] private LockOnHeartSightView lockOnHeartSightViewPrefab;
         [SerializeField] private LockOnTargetEffectView lockOnTargetEffectViewPrefab;
 
         [SerializeField] private ChickenEggView _chickenEggViewPrefab;

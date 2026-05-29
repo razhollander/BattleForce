@@ -128,7 +128,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();
             _lockOnTargetEffectController.InitEntryPoint();
-
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }

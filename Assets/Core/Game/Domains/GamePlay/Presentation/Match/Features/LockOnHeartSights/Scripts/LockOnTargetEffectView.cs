@@ -6,8 +6,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
 {
     public class LockOnTargetEffectView : MonoBehaviour, IPoolable
     {
+        private const string LOCK_ON_TARGET_ANIMATION_NAME = "LockOnTarget";
+        
         [SerializeField] private LineRenderer _lineRenderer;
-
+        [SerializeField] private Animation _animation;
+        
         public Action Despawn { get; set; }
 
         public void OnCreated()
@@ -17,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
         public void OnSpawned()
         {
             gameObject.SetActive(true);
+            _animation.Play(LOCK_ON_TARGET_ANIMATION_NAME);
         }
 
         public void OnDespawned()
@@ -24,13 +28,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
             gameObject.SetActive(false);
         }
 
-        public void UpdatePositions(Vector3 headPosition, Vector3 heartPosition)
+        public void Setup(float lockOnTargetDurationInSeconds)
         {
-            if (_lineRenderer != null)
-            {
-                _lineRenderer.SetPosition(0, headPosition);
-                _lineRenderer.SetPosition(1, heartPosition);
-            }
+            _animation[LOCK_ON_TARGET_ANIMATION_NAME].speed = 1f/lockOnTargetDurationInSeconds;
+        }
+        
+        public void UpdatePosition(Vector2 lineStartPoint, Vector2 lineEndPoint, Vector2 targetPosition)
+        {
+            transform.position = targetPosition;
+            _lineRenderer.SetPosition(0, lineStartPoint);
+            _lineRenderer.SetPosition(1, lineEndPoint);
         }
     }
 }

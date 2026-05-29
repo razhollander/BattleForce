@@ -1,141 +1,88 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
 using Zenject;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts
 {
-    public class LockOnTargetEffectController : ILockOnTargetEffectController, IGUIUpdatable
+    public class LockOnTargetEffectController : ILockOnTargetEffectController
     {
-        private readonly IMatchDataService _matchDataService;
-        private readonly IMatchPlayerControllers _matchPlayerControllers;
-        private readonly IUpdateSubscriptionService _updateSubscriptionService;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
+        private readonly NetworkConfig _networkConfig;
         private readonly LockOnTargetEffectPool _pool;
 
-        private readonly Dictionary<ushort, Dictionary<ushort, LockOnTargetEffectView>> _activeEffects = new Dictionary<ushort, Dictionary<ushort, LockOnTargetEffectView>>();
+        private readonly Dictionary<ushort, Dictionary<ushort, LockOnTargetEffectView>> _activeEffectsPerCaster = new Dictionary<ushort, Dictionary<ushort, LockOnTargetEffectView>>();
 
         public LockOnTargetEffectController(
-            IMatchDataService matchDataService,
-            IMatchPlayerControllers matchPlayerControllers,
-            IUpdateSubscriptionService updateSubscriptionService,
-            LockOnTargetEffectView prefab,
-            DiContainer diContainer)
+            LockOnTargetEffectView prefab, DiContainer diContainer, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig)
         {
-            _matchDataService = matchDataService;
-            _matchPlayerControllers = matchPlayerControllers;
-            _updateSubscriptionService = updateSubscriptionService;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
+            _networkConfig = networkConfig;
             _pool = new LockOnTargetEffectPool(prefab, diContainer);
         }
 
         public void InitEntryPoint()
         {
             _pool.InitPool();
-            _updateSubscriptionService.RegisterUpdatable(this);
         }
 
-        public void InitExitPoint()
+        public void RefreshTargetEffectsOfCaster(ushort casterPlayerId, FixedUnorderedList<ushort> playerIdsLockedOnTarget)
         {
-            foreach (var casterEffects in _activeEffects.Values)
+            if (!_activeEffectsPerCaster.ContainsKey(casterPlayerId))
             {
-                foreach (var effectView in casterEffects.Values)
+                _activeEffectsPerCaster[casterPlayerId] = new Dictionary<ushort, LockOnTargetEffectView>(_networkConfig.MaxCap.ConcurrentPlayers - 1);
+            }
+
+            var casterActiveEffects = _activeEffectsPerCaster[casterPlayerId];
+
+            var enemieIdsToRemove = new List<ushort>();
+            foreach (var enemyId in casterActiveEffects.Keys)
+            {
+                if (!playerIdsLockedOnTarget.Contains(enemyId))
                 {
-                    effectView.Despawn();
+                    enemieIdsToRemove.Add(enemyId);
                 }
             }
-            _activeEffects.Clear();
 
-            _updateSubscriptionService.UnregisterUpdatable(this);
+            foreach (var enemyId in enemieIdsToRemove)
+            {
+                casterActiveEffects[enemyId].Despawn();
+                casterActiveEffects.Remove(enemyId);
+            }
+
+            foreach (var enemyId in playerIdsLockedOnTarget.AsSpan())
+            {
+                if (casterActiveEffects.ContainsKey(enemyId))
+                {
+                    continue;
+                }
+
+                var newTargetEffectView = _pool.Spawn();
+                newTargetEffectView.Setup(_sharedGamePlayConfig.LockOnTargetDurationInSeconds);
+                casterActiveEffects[enemyId] = newTargetEffectView;
+            }
         }
 
-        public void UpdateEffects()
+        public void UpdateTargetsPositionOnPlayer(ushort casterPlayerId, ushort targetPlayerId, Vector2 startPoint, Vector2 endPoint)
         {
-            foreach (var playerModel in _matchDataService.Players)
+            if (!_activeEffectsPerCaster.TryGetValue(casterPlayerId, out var casterActiveEffects))
             {
-                var casterId = playerModel.PlayerId;
-
-                if (!_activeEffects.ContainsKey(casterId))
-                {
-                    _activeEffects[casterId] = new Dictionary<ushort, LockOnTargetEffectView>();
-                }
-
-                var casterActiveEffects = _activeEffects[casterId];
-                var targetedEnemyIds = playerModel.Spaceship.TargetedEnemyIds;
-
-                var toRemove = new List<ushort>();
-                foreach (var enemyId in casterActiveEffects.Keys)
-                {
-                    if (!targetedEnemyIds.Contains(enemyId))
-                    {
-                        toRemove.Add(enemyId);
-                    }
-                }
-
-                foreach (var enemyId in toRemove)
-                {
-                    casterActiveEffects[enemyId].Despawn();
-                    casterActiveEffects.Remove(enemyId);
-                }
-
-                foreach (var enemyId in targetedEnemyIds)
-                {
-                    if (!casterActiveEffects.ContainsKey(enemyId))
-                    {
-                        casterActiveEffects[enemyId] = _pool.Spawn();
-                    }
-                }
+                LogService.LogError($"No effects for caster player id: {casterPlayerId}");
+                return;
             }
 
-            var disconnectedPlayers = new List<ushort>();
-            foreach (var casterId in _activeEffects.Keys)
+            if (!casterActiveEffects.TryGetValue(targetPlayerId, out var effectView))
             {
-                if (_matchDataService.GetPlayer(casterId) == null)
-                {
-                    disconnectedPlayers.Add(casterId);
-                }
+                LogService.LogError($"No effect for caster player id: {casterPlayerId} on target player id: {targetPlayerId}");
+                return;
             }
-
-            foreach (var casterId in disconnectedPlayers)
-            {
-                foreach (var effectView in _activeEffects[casterId].Values)
-                {
-                    effectView.Despawn();
-                }
-                _activeEffects.Remove(casterId);
-            }
+            
+            effectView.UpdatePosition(startPoint, endPoint, endPoint);
         }
-
-        public void UpdateTargetsPositionOnPlayer(UnityEngine.Vector3 playerHeartPosition)
-        {
-            // Functionally handled via ManagedUpdate looping through _activeEffects
-            // Implemented as per request
-        }
-
-        public void ManagedUpdate()
-        {
-            foreach (var kvp in _activeEffects)
-            {
-                var casterId = kvp.Key;
-                var casterTransform = _matchPlayerControllers.GetPlayerHeadTransform(casterId);
-                if (casterTransform == null) continue;
-
-                var casterPosition = casterTransform.position;
-
-                foreach (var innerKvp in kvp.Value)
-                {
-                    var enemyId = innerKvp.Key;
-                    var effectView = innerKvp.Value;
-
-                    var enemyHeartTransform = _matchPlayerControllers.GetPlayerHeartTransform(enemyId);
-                    if (enemyHeartTransform != null)
-                    {
-                        var enemyHeartPosition = enemyHeartTransform.position;
-                        effectView.UpdatePositions(casterPosition, enemyHeartPosition);
-                    }
-                }
-            }
-        }
-
     }
 }
