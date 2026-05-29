@@ -914,8 +914,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         
         public void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<ushort> playerIdsLockedOnTarget)
         {
-            LogService.LogError($"[Server] playerIdsLockedOnTarget: {playerIdsLockedOnTarget.ToJson()}, player id: {playerId}");
-
             foreach (var kvp in PlayerLockOnHeartTargetsChangedNetEventsPerPlayer)
             {
                 var packet = kvp.Value.AddAndGet();
