@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using CoreDomain.Scripts.Services.CommandFactory;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IHeadLessQuitterController _headLessQuitterController;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
+        private ILockOnTargetTimerService _lockOnTargetTimerService;
         
         private float _deltaTime;
    
@@ -29,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
+            _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
         }
 
         public void Execute()

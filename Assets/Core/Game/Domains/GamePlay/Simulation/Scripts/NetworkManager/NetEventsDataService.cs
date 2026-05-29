@@ -729,6 +729,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             StopMatchCountdownNetEventsPerPlayer.Remove(playerId);
             StageEndNetEventsPerPlayer.Remove(playerId);
             PlayerLockOnHeartTargetsChangedNetEventsPerPlayer.Remove(playerId);
+            PlayerLockedOnTargetHitNetEventsPerPlayer.Remove(playerId);
             TeamLostNetEventsPerPlayer.Remove(playerId);
             TalentSwitchNetEventsPerPlayer.Remove(playerId);
             StartMatchEligibleChangedNetEventsPerPlayer.Remove(playerId);
@@ -928,6 +929,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     playerlockOnId = playerLockedOnTarget;
                 }
             }
+        }
+
+        public void AddPlayerLockedOnTargetHitNetEvent(int onTick, ushort playerIdHit)
+        {
+            if (!PlayerLockedOnTargetHitNetEventsPerPlayer.ContainsKey(playerIdHit))
+            {
+                PlayerLockedOnTargetHitNetEventsPerPlayer.Add(playerIdHit, _playerLockedOnTargetHitNetEventsListPool.Get());
+            }
+
+            var list = PlayerLockedOnTargetHitNetEventsPerPlayer[playerIdHit];
+            ref var netEvent = ref list.AddAndGet();
+
+            netEvent.OccuredOnTick = onTick;
+            netEvent.PlayerIdHit = playerIdHit;
         }
 
         public void RemoveAllEventsOlderThanTick(ushort playerId, int tick)
@@ -1170,6 +1185,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     {
                         environmentSpringPlayerCollisionNetEvents.RemoveAt(i);
                     }
+                }
+            }
+
+            if (PlayerLockedOnTargetHitNetEventsPerPlayer.TryGetValue(playerId, out var playerLockedOnTargetHitNetEvents))
+            {
+                for (int i = playerLockedOnTargetHitNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerLockedOnTargetHitNetEvents[i].OccuredOnTick > tick) continue;
+
+                    playerLockedOnTargetHitNetEvents.RemoveAt(i);
                 }
             }
 

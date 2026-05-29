@@ -33,5 +33,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public bool ShouldAddTalentEveryXStages = false;
         [ConditionalField(nameof(ShouldAddTalentEveryXStages), true)]
         public int EveryXStages = 2;
+        public float LockOnTargetHitDurationInSeconds = 2f;
     }
 }
