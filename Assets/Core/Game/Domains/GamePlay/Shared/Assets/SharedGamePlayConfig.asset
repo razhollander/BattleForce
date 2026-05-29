@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b97d19c0864d45838733a884dd52ea9, type: 3}
   m_Name: SharedGamePlayConfig
   m_EditorClassIdentifier: 
-  DefaultMatchEnterDataConfig: {fileID: 11400000, guid: 1e385c71b341148f1a886bde85eacecd, type: 2}
+  DefaultMatchEnterDataConfig: {fileID: 11400000, guid: 5dfa3e6aacc604fef8e276345990f64b, type: 2}
   MaxConcurrentTalentsForPlayer: 3
   MaxTeamsAmount: 4
   Environment: {fileID: 11400000, guid: c491afc827cee4afbac25f4ed3b7c5b8, type: 2}
@@ -31,3 +31,4 @@ MonoBehaviour:
   GrapplingHookProjectileSize: 1
   GrapplingHookProjectileMaxDistance: 30
   MagneticPullFieldRadius: 10
+  LockOnTargetDurationInSeconds: 2
