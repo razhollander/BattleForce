@@ -617,10 +617,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             stageEndList.Clear();
             _stageEndNetEventsListPool.Return(stageEndList);
             var playerLockOnHeartTargetsChangedList = PlayerLockOnHeartTargetsChangedNetEventsPerPlayer[playerId];
-            stageEndList.Clear();
+            playerLockOnHeartTargetsChangedList.Clear();
             _playerLockOnHeartTargetsChangedNetEventsListPool.Return(playerLockOnHeartTargetsChangedList);
             var playerLockOnTargetHitList = PlayerLockedOnTargetHitNetEventsPerPlayer[playerId];
-            stageEndList.Clear();
+            playerLockOnTargetHitList.Clear();
             _playerLockOnHeartTargetHitNetEventsListPool.Return(playerLockOnTargetHitList);
             var teamLostList = TeamLostNetEventsPerPlayer[playerId];
             teamLostList.Clear();
