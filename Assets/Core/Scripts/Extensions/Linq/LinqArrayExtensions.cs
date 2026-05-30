@@ -206,19 +206,6 @@ namespace Core.Scripts.Extensions.Linq
 
             return result;
         }
-        
-        public static bool Contains<T>(this T[] source, T target)
-        {
-            for (var i = 0; i < source.Length; i++)
-            {
-                if (EqualityComparer<T>.Default.Equals(source[i], target))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
 
         public static int IndexOf<T>(this T[] source, Func<T, bool> condition)
         {
@@ -260,6 +247,26 @@ namespace Core.Scripts.Extensions.Linq
             }
 
             return result;
+        }
+        
+        
+        public static bool IsIdentical(this FixedUnorderedList<ushort> ListA, FixedUnorderedList<ushort> ListB)
+        {
+            if (ListA.Count != ListB.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < ListA.Count; i++)
+            {
+                var isDifferent = ListA[i] != ListB[i];
+                if (isDifferent)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

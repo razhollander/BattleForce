@@ -25,3 +25,6 @@ MonoBehaviour:
   MinSpin: 2
   MinVelocity: 0.01
   TurnEngineOnWhenReachVelocity: 0.25
+  DefaultHeartRadius: 0.64
+  LockOnHeartMaxRange: 13
+  LockOnHeartHalfArcAngleDegrees: 45

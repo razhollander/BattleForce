@@ -663,5 +663,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 }
             }
         }
+
+        public void ProcessPlayerLockOnHeartTargetsChangedEvents(CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C> playerLockOnHeartTargetsChangedNetEvents)
+        {
+            if (playerLockOnHeartTargetsChangedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+            
+            foreach (var netEvent in playerLockOnHeartTargetsChangedNetEvents)
+            {
+                var player = _matchDataService.GetPlayer(netEvent.PlayerId);
+                player.Spaceship.TargetedEnemyIds.Clear();
+                
+                for (int i = 0; i < netEvent.PlayerIdsLockedOnTarget.Count; i++)
+                {
+                    ref var playerId = ref player.Spaceship.TargetedEnemyIds.AddAndGet();
+                    playerId = netEvent.PlayerIdsLockedOnTarget[i];
+                }
+                
+                _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);
+            }
+        }
     }
 }

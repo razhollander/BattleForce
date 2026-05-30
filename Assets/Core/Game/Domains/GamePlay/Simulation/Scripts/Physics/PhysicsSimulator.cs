@@ -1128,5 +1128,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var body = GetBody(PhysicsBodyType.ChickenEgg, eggId);
             RemoveBody(body);
         }
+
+        public bool RayCast(Vector2 point1, Vector2 point2, out PhysicsBodyData hitBodyData, PhysicsBodyType[] bodyTypesRayCastCanHit = null)
+        {
+            var didHit = false;
+            PhysicsBodyData bodyHitData = default;
+            var closestFraction = 1f;
+            _world.RayCast(OnRayCastHit, point1, point2);
+
+            void OnRayCastHit(Fixture fixture, Vector2 point, Vector2 normal, float fraction)
+            {
+                var body = fixture.Body;
+                var bodyData = (PhysicsBodyData) body.UserData;
+                var didRayHitClosetBody = fraction <= closestFraction && (bodyTypesRayCastCanHit == null || bodyTypesRayCastCanHit.Contains(bodyData.PhysicsBodyType));
+                if (didRayHitClosetBody)
+                {
+                    didHit = true;
+                    closestFraction = fraction;
+                    bodyHitData = bodyData;
+                }
+            }
+            
+            _unityMainThreadDispatcher.EnqueueDraw(() => DebugDrawUtils.DrawLine(point1.ToUnityVector2(), point2.ToUnityVector2(), didHit ? UnityEngine.Color.green : UnityEngine.Color.red));
+
+            hitBodyData = bodyHitData;
+            return didHit;
+        }
     }
 }

@@ -20,5 +20,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float MinVelocity = 0.01f;
         public float TurnEngineOnWhenReachVelocity = 0.25f;
         public float DefaultHeartRadius = 0.64f;
+        public float LockOnHeartMaxRange = 5f;
+        public float LockOnHeartHalfArcAngleDegrees = 45;
+        public ushort LockOnHeartHitDamage = 1;
     }
 }

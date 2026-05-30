@@ -1,13 +1,9 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
-using Sirenix.Utilities;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
@@ -23,12 +19,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly IInputBeingUsedService _inputBeingUsedService;
         private readonly List<MatchPlayerController> _playerControllers = new ();
-        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private Transform _playersParent;
 
 
         public MatchPlayerControllers(IMatchDataService matchDataService, MatchPlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService, SharedGamePlayConfig sharedGamePlayConfig)
+            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService)
         {
             _matchDataService = matchDataService;
             _playerPool = new MatchPlayerViewPool(playerViewPrefab, diContainer);
@@ -36,7 +31,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _inputBeingUsedService = inputBeingUsedService;
-            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -122,6 +116,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetIsDeadAuraEnabled(isEnabled);
         }
 
+        public void SetPlayerIsLockOnHeartSightShown(ushort playerId, bool isShown)
+        {
+            GetPlayer(playerId).SetIsLockOnHeartSightShown(isShown);
+        }
+
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)
         {
             GetPlayer(playerId).SetHealth(currentHealth, maxHealth);
@@ -147,11 +146,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return GetPlayer(playerId).GetTransform();
         }
 
+        public Transform GetPlayerHeartTransform(ushort playerId)
+        {
+            return GetPlayer(playerId).GetHeartTransform();
+        }
+        
+        public Transform GetPlayerHeadTransform(ushort playerId)
+        {
+            return GetPlayer(playerId).GetHeadTransform();
+        }
+        
         public void HidePlayerHealthBar(ushort playerId)
         {
             GetPlayer(playerId).SetIsHealthBarShown(false);
         }
-
+        
         public void DestroyAll()
         {
             foreach (var controller in _playerControllers)

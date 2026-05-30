@@ -118,6 +118,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4845709276333870003}
   - component: {fileID: 1089922233196285840}
+  - component: {fileID: 4035038513791559054}
   m_Layer: 5
   m_Name: MatchPlayerTalentsHUD
   m_TagString: Untagged
@@ -171,6 +172,18 @@ MonoBehaviour:
   - {fileID: 8340895797382347895}
   - {fileID: 8717432588767631125}
   - {fileID: 4277936420672314679}
+--- !u!225 &4035038513791559054
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6084997679020814226}
+  m_Enabled: 1
+  m_Alpha: 0.5
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1001 &687142219858554939
 PrefabInstance:
   m_ObjectHideFlags: 0
