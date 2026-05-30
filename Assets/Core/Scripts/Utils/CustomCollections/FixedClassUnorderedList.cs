@@ -122,10 +122,14 @@ namespace Core.Scripts.Utils.CustomCollections
 
             _count--;
             if (index != _count)
-                _items[index] = _items[_count];
+            {
+                (_items[index], _items[_count]) = (_items[_count], _items[index]);
+            }
 
-            // if (clearReferences && RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-            //     _items[_count] = default;
+            // If you need to clear references so GC can collect them, you would do it here:
+            // if (clearReferences ...) _items[_count] = null; 
+            // BUT NOTE: If you null it out, AddAndGet() will eventually return null 
+            // instead of a pooled object, which breaks your factory pattern!
         }
 
         /// <summary>
