@@ -26,13 +26,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
-            foreach (var netEvent in _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents)
+            var matchDataService = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService.IMatchDataService>();
+            foreach (var playerId in _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents)
             {
-                var isLockOnHeartSightShown = netEvent.PlayerIdsLockedOnTarget.Count > 0;
-                _matchPlayerControllers.SetPlayerIsLockOnHeartSightShown(netEvent.PlayerId, isLockOnHeartSightShown);
-                _lockOnTargetEffectController.RefreshTargetEffectsOfCaster(netEvent.PlayerId, netEvent.PlayerIdsLockedOnTarget);
+                var player = matchDataService.GetPlayer(playerId);
+                var targetedEnemyIds = player.Spaceship.TargetedEnemyIds;
+                var isLockOnHeartSightShown = targetedEnemyIds.Count > 0;
+                _matchPlayerControllers.SetPlayerIsLockOnHeartSightShown(playerId, isLockOnHeartSightShown);
+                _lockOnTargetEffectController.RefreshTargetEffectsOfCaster(playerId, targetedEnemyIds);
             }
-
 
             _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Clear();
         }

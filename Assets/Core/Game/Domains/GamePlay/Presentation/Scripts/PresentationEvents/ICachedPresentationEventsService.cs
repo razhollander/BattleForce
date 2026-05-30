@@ -47,6 +47,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<LayChickenEggNetEventS2C> LayChickenEggNetEvents { get; }
         List<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents { get; }
         List<ActivateYearsOfPainTalentNetEventS2C> ActivateYearsOfPainTalentNetEvents { get; }
-        List<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents { get; }
+        List<ushort> PlayerLockOnHeartTargetsChangedNetEvents { get; }
     }
 }

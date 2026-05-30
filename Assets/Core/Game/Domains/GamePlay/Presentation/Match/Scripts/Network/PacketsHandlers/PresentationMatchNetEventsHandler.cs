@@ -682,7 +682,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     playerId = netEvent.PlayerIdsLockedOnTarget[i];
                 }
                 
-                _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);
+                _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent.PlayerId);
             }
         }
     }

@@ -989,7 +989,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                var netEvent = PlayerLockOnHeartTargetsChangedNetEvents.AddAndGet();
+                ref var netEvent = ref PlayerLockOnHeartTargetsChangedNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }
