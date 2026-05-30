@@ -985,6 +985,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         private void DeserializedPlayerLockOnHeartTargetsChangedNetEvents(NetDataReader reader)
         {
+            for (int i = 0; i < PlayerLockOnHeartTargetsChangedNetEvents.Count; i++)
+            {
+                PlayerLockOnHeartTargetsChangedNetEvents[i].PlayerIdsLockedOnTarget.Clear();
+            }
+            
             PlayerLockOnHeartTargetsChangedNetEvents.Clear();
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)

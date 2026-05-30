@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 {
-    public class TrySendPlayerLockOnTargetChangedCommand : BaseCommand, ICommandVoid
+    public class TrySendPlayersLockOnTargetChangedCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
         private IPhysicsSimulator _physicsSimulator;
@@ -23,17 +23,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         private FixedUnorderedList<ushort> _cachedLockedOnHeartIds;
         private readonly PhysicsBodyType[] _cachedBodyTypesRayCastCanHit = {PhysicsBodyType.PlayerHeart, PhysicsBodyType.Wall, PhysicsBodyType.PlayerSpaceship, PhysicsBodyType.StartMatchWall};
         private int _processedTick;
-        private ushort _playerId;
 
-        public TrySendPlayerLockOnTargetChangedCommand SetProcessedTick(int processedTick)
+        public TrySendPlayersLockOnTargetChangedCommand SetProcessedTick(int processedTick)
         {
             _processedTick = processedTick;
-            return this;
-        }
-        
-        public TrySendPlayerLockOnTargetChangedCommand SetPlayerId(ushort playerId)
-        {
-            _playerId = playerId;
             return this;
         }
         
@@ -49,31 +42,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
         public void Execute()
         {
-            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_playerId);
-            _cachedLockedOnHeartIds.Clear();
-            GetTargetedEnemyIdsOfCaster(casterPlayerState, _cachedLockedOnHeartIds);
-            _cachedLockedOnHeartIds.Sort();
-
-            var casterTargetedEnemyIds = casterPlayerState.Spaceship.TargetedEnemyIds;
-            var areIdentical = _cachedLockedOnHeartIds.IsIdentical(casterTargetedEnemyIds);
-
-            if (areIdentical)
+            foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
-                return;
-            }
+                _cachedLockedOnHeartIds.Clear();
+                FindTargetedEnemyIdsOfCaster(playerState, _cachedLockedOnHeartIds);
+                _cachedLockedOnHeartIds.Sort();
 
-            casterTargetedEnemyIds.Clear();
+                var casterTargetedEnemyIds = playerState.Spaceship.TargetedEnemyIds;
+                var areIdentical = _cachedLockedOnHeartIds.IsIdentical(casterTargetedEnemyIds);
 
-            for (int i = 0; i < _cachedLockedOnHeartIds.Count; i++)
-            {
-                ref var targetedEnemyId = ref casterTargetedEnemyIds.AddAndGet();
-                targetedEnemyId = _cachedLockedOnHeartIds[i];
+                if (areIdentical)
+                {
+                    continue;
+                }
+
+                casterTargetedEnemyIds.Clear();
+
+                for (int i = 0; i < _cachedLockedOnHeartIds.Count; i++)
+                {
+                    ref var targetedEnemyId = ref casterTargetedEnemyIds.AddAndGet();
+                    targetedEnemyId = _cachedLockedOnHeartIds[i];
+                }
+
+                _netEventsDataService.AddPlayerLockOnHeartTargetsChangedNetEvent(_processedTick, playerState.Id, casterTargetedEnemyIds);
             }
-            
-            _netEventsDataService.AddPlayerLockOnHeartTargetsChangedNetEvent(_processedTick, casterPlayerState.Id, casterTargetedEnemyIds);
         }
 
-        private void GetTargetedEnemyIdsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<ushort> outputTargetedEnemyIds)
+        private void FindTargetedEnemyIdsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<ushort> outputTargetedEnemyIds)
         {
             if (casterPlayerState.Spaceship.IsSpinned)
             {

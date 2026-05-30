@@ -47,7 +47,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IPlayersTalentsManager _playersTalentsManager;
         private readonly IPlaybackRecorderService _playerbackRecorderService;
         private readonly TryPerformShootForPlayerIfNotOnCooldownCommand _tryPerformShootForPlayerIfNotOnCooldownCommand;
-        private readonly TrySendPlayerLockOnTargetChangedCommand _trySendPlayerLockOnTargetChangedCommand;
 
         public bool DidReceiveAnyInputFromPlayer(ushort playerId)
         {
@@ -77,7 +76,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _playerInputPacketsPool = new ConcurrentPool<MatchPlayerInputPacketC2S>(() => new MatchPlayerInputPacketC2S(), networkConfig.MaxCap.ConcurrentInputsProcessed);
             _heighestProcessedTickPerPlayer = new CapacityDict<ushort, int>(networkConfig.MaxCap.ConcurrentPlayers);
             _tryPerformShootForPlayerIfNotOnCooldownCommand = _commandFactory.CreateCommandVoid<TryPerformShootForPlayerIfNotOnCooldownCommand>();
-            _trySendPlayerLockOnTargetChangedCommand =_commandFactory.CreateCommandVoid<TrySendPlayerLockOnTargetChangedCommand>();
         }
 
         public void InitEntryPoint()
@@ -291,7 +289,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         {
             var playerId = playerModel.Id;
             _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, isShootInputPressed);
-            _trySendPlayerLockOnTargetChangedCommand.SetProcessedTick(processedTick).SetPlayerId(playerId).Execute();
             var shootState = playerModel.Spaceship.Shoot;
             var isReadyToShoot = false;//shootState.CooldownSecondsLeft == shootState.MaxCooldown;
 

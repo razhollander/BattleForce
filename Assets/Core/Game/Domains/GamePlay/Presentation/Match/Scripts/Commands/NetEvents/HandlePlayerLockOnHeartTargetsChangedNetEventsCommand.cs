@@ -31,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var isLockOnHeartSightShown = netEvent.PlayerIdsLockedOnTarget.Count > 0;
                 _matchPlayerControllers.SetPlayerIsLockOnHeartSightShown(netEvent.PlayerId, isLockOnHeartSightShown);
                 _lockOnTargetEffectController.RefreshTargetEffectsOfCaster(netEvent.PlayerId, netEvent.PlayerIdsLockedOnTarget);
+                netEvent.PlayerIdsLockedOnTarget.Clear();
             }
 
 
