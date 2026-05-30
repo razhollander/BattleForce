@@ -232,11 +232,11 @@ namespace Core.Scripts.Utils.CustomCollections
             }
         }
 
-        public bool Contains(ushort enemyId)
+        public bool Contains(ushort number)
         {
             for (int i = 0; i < Count; i++)
             {
-                if (RawArray[i].Equals(enemyId))
+                if(RawArray[i].Equals(number))
                 {
                     return true;
                 }
