@@ -42,6 +42,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
         public void Execute()
         {
+            if (_matchDataService.SimulationState.IsInPreparationPhase)
+            {
+                return;
+            }
+            
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
                 _cachedLockedOnHeartIds.Clear();
@@ -97,8 +102,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 var enemyHeartPos = targetedPlayerState.Spaceship.Transform.GetHeartPosition();
                 var rayOriginToEnemyHeartDistanceSquared = System.Numerics.Vector2.DistanceSquared(rayOriginPosition, enemyHeartPos);
                 var isEnemyHeartInRange = rayOriginToEnemyHeartDistanceSquared <= maxLockOnHeartRangeSquare;
-
-
+                
                 if (!isEnemyHeartInRange)
                 {
                     continue;

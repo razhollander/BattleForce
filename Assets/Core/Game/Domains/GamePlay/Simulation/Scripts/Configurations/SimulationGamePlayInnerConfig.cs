@@ -1,18 +1,14 @@
-using ASoliman.Utils.EditableRefs;
 using ConditionalField;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
-    [CreateAssetMenu(fileName = "SimulationGamePlayConfig", menuName = "BF/Simulation/GamePlay Config")]
     [System.Serializable]
-    public class SimulationGamePlayConfig : ScriptableObject
+    public class SimulationGamePlayInnerConfig
     {
-        public SimulationGamePlayInnerConfig InnerConfig;
         public PlayerSpaceshipConfig PlayerSpaceship;
         public PlayerBulletConfig PlayerBullet;
-        [EditableRef] public TalentsConfig Talents; // this
+        public TalentsInnerConfig Talents; // this
         public LavaConfig Lava;
         public PowerUpsConfig PowerUps;
         public EnvironmentSpringsConfig EnvironmentSprings;

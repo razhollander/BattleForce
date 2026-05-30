@@ -7,6 +7,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Playback
     {
         List<string> GetAllPlaybackNames();
         bool TryGetPlayback(string playbackName, out PlaybackFile playbackFile);
-        void SavePlayback(int initialTick, int seed, Dictionary<int, PlaybackTickData> ticks, EnterMatchPlayerData[] players);
+        void SavePlayback(int initialTick, int seed, Dictionary<int, PlaybackTickData> ticks, EnterMatchPlayerData[] players, string simulationConfigJson);
     }
 }

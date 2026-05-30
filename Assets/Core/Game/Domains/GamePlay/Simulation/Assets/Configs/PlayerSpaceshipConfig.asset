@@ -28,3 +28,4 @@ MonoBehaviour:
   DefaultHeartRadius: 0.64
   LockOnHeartMaxRange: 13
   LockOnHeartHalfArcAngleDegrees: 45
+  LockOnHeartHitDamage: 1
