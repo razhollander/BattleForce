@@ -75,10 +75,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
         private void GetTargetedEnemyIdsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<ushort> outputTargetedEnemyIds)
         {
+            if (casterPlayerState.Spaceship.IsSpinned)
+            {
+                return;
+            }
+            
             var rayOriginPosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
             var radius = _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange;
             var maxLockOnHeartRangeSquare = radius * radius;
-
+            
             DebugDrawUtils.DrawArc2D(rayOriginPosition, casterPlayerState.Spaceship.Transform.Direction, radius,
                 _gamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees);
 
