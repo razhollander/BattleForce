@@ -40,8 +40,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var casterId = pair.CasterId;
                 var targetId = pair.TargetId;
 
+                LogService.Log("hitting player: " + targetId + " by player: " + casterId + "");
+                
                 _lockOnTargetTimerService.ResetTimer(casterId, targetId);
-                LogService.LogError("hitting player: " + targetId + " by player: " + casterId + "");
                 _playerHitCommand
                     .SetPlayerIdGotHit(targetId)
                     .SetWasHitByAnotherPlayer(true, casterId)

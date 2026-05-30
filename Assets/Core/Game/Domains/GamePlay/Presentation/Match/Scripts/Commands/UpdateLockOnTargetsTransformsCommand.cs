@@ -23,11 +23,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         {
             foreach (var playerModel in _matchDataService.Players)
             {
+                var casterPlayerHeadPosition = _playerControllers.GetPlayerHeadTransform(playerModel.PlayerId).position.ToVector2XY();
+                
                 foreach (var targetedEnemyId in playerModel.Spaceship.TargetedEnemyIds.AsSpan())
                 {
-                    var casterPlayerHeadPosition = _playerControllers.GetPlayerHeadTransform(playerModel.PlayerId).position;
-                    var targetPlayerHeartPosition = _playerControllers.GetPlayerHeartTransform(targetedEnemyId).position;
-                    _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedEnemyId, casterPlayerHeadPosition.ToVector2XY(), targetPlayerHeartPosition.ToVector2XY());
+                    var targetPlayerHeartPosition = _playerControllers.GetPlayerHeartTransform(targetedEnemyId).position.ToVector2XY();
+                    _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedEnemyId, casterPlayerHeadPosition, targetPlayerHeartPosition);
                 }
             }
         }

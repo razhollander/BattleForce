@@ -116,7 +116,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
             ChickenEggHitNetEvents = new FixedUnorderedList<ChickenEggHitNetEventS2C>(maxCap.ChickenEggHitNetEvents);
-            PlayerLockOnHeartTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(maxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxCap.ConcurrentPlayers-1));
+            PlayerLockOnHeartTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(maxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxCap.ConcurrentEnemyPlayers));
             PlayerLockedOnTargetHitNetEvents = new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(maxCap.ConcurrentPlayers);
         }
 

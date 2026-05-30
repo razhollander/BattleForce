@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
             gameObject.SetActive(true);
         }
 
-        public async Awaitable PlayLockOnTargetAnimation(CancellationToken cancellationToken)
+        public async Awaitable PlayLockOnTargetAnimationLooped(CancellationToken cancellationToken)
         {
             _lineRenderer.startWidth = _idleLineWidth;
             _lineRenderer.endWidth = _idleLineWidth;

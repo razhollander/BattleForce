@@ -23,6 +23,7 @@ namespace Core.Scripts.Network
     public class MaxCap
     {
         public int ConcurrentPlayers = 8;
+        public int ConcurrentEnemyPlayers => ConcurrentPlayers - 1;
         public int ConcurrentBullets = 256;
         public int ConcurrentTalentCards = 128;
         public int ConcurrentEvironmentWalls = 256;

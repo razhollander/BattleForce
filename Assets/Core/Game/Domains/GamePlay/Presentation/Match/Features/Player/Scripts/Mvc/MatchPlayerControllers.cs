@@ -1,18 +1,12 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
-using Sirenix.Utilities;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
-using CoreDomain.Scripts.Services.UpdateService;
-
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
 {
@@ -25,12 +19,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly IInputBeingUsedService _inputBeingUsedService;
         private readonly List<MatchPlayerController> _playerControllers = new ();
-        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private Transform _playersParent;
 
 
         public MatchPlayerControllers(IMatchDataService matchDataService, MatchPlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService, SharedGamePlayConfig sharedGamePlayConfig)
+            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService)
         {
             _matchDataService = matchDataService;
             _playerPool = new MatchPlayerViewPool(playerViewPrefab, diContainer);
@@ -38,7 +31,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _inputBeingUsedService = inputBeingUsedService;
-            _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
         public void InitEntryPoint()

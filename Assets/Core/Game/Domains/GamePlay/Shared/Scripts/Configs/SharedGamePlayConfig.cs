@@ -14,12 +14,12 @@ public class SharedGamePlayConfig : ScriptableObject
     public MatchMakingEnvironmentLayoutConfig MatchMakingEnvironment;
     [EditableRef] public PowerUpsSharedConfig PowerUps;
     [EditableRef] public EnvironmentTeleportConfig EnvironmentTeleport;
-    public int MaxSavedPlaybacks = 10;
+    public int MaxSavedPlaybacks = 40;
     public ushort NoTeamId = 5;
     public List<ushort> TeamIds = new List<ushort>() {1, 2, 3, 4};
     public ushort MinEntityId = 1; // 1 and not 0 because Box2D entites start from 1
     public float GrapplingHookProjectileSize = 1f;
     public float GrapplingHookProjectileMaxDistance = 30f;
-    public float MagneticPullFieldRadius = 5f;
-    public float LockOnTargetDurationInSeconds = 2f;
+    public float MagneticPullFieldRadius = 10f;
+    public float LockOnTargetDurationInSeconds = 1.5f;
 }

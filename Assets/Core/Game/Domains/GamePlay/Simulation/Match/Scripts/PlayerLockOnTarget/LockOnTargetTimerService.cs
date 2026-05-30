@@ -10,8 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         private readonly IMatchDataService _matchDataService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
-
-        // Maps casterId -> targetId -> timer
+        
         private readonly Dictionary<ushort, Dictionary<ushort, float>> _lockOnTimers;
 
         private readonly List<(ushort CasterId, ushort TargetId)> _cachedPlayersToDamage;

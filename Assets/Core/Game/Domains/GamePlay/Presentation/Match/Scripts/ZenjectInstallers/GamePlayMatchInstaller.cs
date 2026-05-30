@@ -110,7 +110,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<MagneticPullEffectController>().AsSingle().WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<BackgroundParallaxController>().AsSingle().WithArguments(_backgroundParallaxView).NonLazy();
-            Container.BindInterfacesTo<LockOnTargetEffectController>().AsSingle().WithArguments(lockOnTargetEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<PlayersLockOnTargetEffectControllers>().AsSingle().WithArguments(lockOnTargetEffectViewPrefab).NonLazy();
         }
     }
 }
