@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
     public class LockOnTargetTimerService : ILockOnTargetTimerService
     {
         private readonly IMatchDataService _matchDataService;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
 
         // Maps casterId -> targetId -> timer
@@ -15,10 +16,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
         private readonly List<(ushort CasterId, ushort TargetId)> _cachedPlayersToDamage;
 
-        public LockOnTargetTimerService(IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
+        public LockOnTargetTimerService(IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig)
         {
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
 
             _lockOnTimers = new Dictionary<ushort, Dictionary<ushort, float>>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedPlayersToDamage = new List<(ushort CasterId, ushort TargetId)>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -73,7 +74,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         public List<(ushort CasterId, ushort TargetId)> GetPlayersToDamage()
         {
             _cachedPlayersToDamage.Clear();
-            var limit = _gamePlayConfig.LockOnTargetHitDurationInSeconds;
+            var limit = _sharedGamePlayConfig.LockOnTargetDurationInSeconds;
 
             foreach (var casterKvp in _lockOnTimers)
             {

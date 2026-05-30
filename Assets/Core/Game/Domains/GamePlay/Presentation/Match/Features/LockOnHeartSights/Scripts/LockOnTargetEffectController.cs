@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Scripts.Network;
+using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
@@ -14,15 +16,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
     {
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly NetworkConfig _networkConfig;
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly LockOnTargetEffectPool _pool;
 
         private readonly Dictionary<ushort, Dictionary<ushort, LockOnTargetEffectView>> _activeEffectsPerCaster = new Dictionary<ushort, Dictionary<ushort, LockOnTargetEffectView>>();
 
         public LockOnTargetEffectController(
-            LockOnTargetEffectView prefab, DiContainer diContainer, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig)
+            LockOnTargetEffectView prefab, DiContainer diContainer, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkConfig = networkConfig;
+            _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _pool = new LockOnTargetEffectPool(prefab, diContainer);
         }
 
@@ -64,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
 
                 var newTargetEffectView = _pool.Spawn();
                 newTargetEffectView.Setup(_sharedGamePlayConfig.LockOnTargetDurationInSeconds);
+                newTargetEffectView.PlayLockOnTargetAnimation(_stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
                 casterActiveEffects[enemyId] = newTargetEffectView;
             }
         }
