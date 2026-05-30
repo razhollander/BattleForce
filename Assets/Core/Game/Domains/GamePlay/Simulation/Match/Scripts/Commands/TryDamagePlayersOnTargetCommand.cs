@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ICommandFactory _commandFactory;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
         private INetEventsDataService _netEventsDataService;
+        private SimulationGamePlayConfig _simulationGamePlayConfig;
 
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
@@ -26,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
+            _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
         }
 
@@ -44,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     .SetPlayerIdGotHit(targetId)
                     .SetWasHitByAnotherPlayer(true, casterId)
                     .SetProcessedTick(_processedTick)
-                    .SetHitDamage(1)
+                    .SetHitDamage(_simulationGamePlayConfig.PlayerSpaceship.LockOnHeartHitDamage)
                     .Execute();
 
                 _netEventsDataService.AddPlayerLockedOnTargetHitNetEvent(_processedTick, casterId, targetId);

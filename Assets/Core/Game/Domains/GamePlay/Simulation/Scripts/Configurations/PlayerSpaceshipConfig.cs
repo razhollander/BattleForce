@@ -22,5 +22,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float DefaultHeartRadius = 0.64f;
         public float LockOnHeartMaxRange = 5f;
         public float LockOnHeartHalfArcAngleDegrees = 45;
+        public ushort LockOnHeartHitDamage = 1;
     }
 }
