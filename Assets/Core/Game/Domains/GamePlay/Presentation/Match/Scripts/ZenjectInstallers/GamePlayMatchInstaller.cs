@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Sc
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
@@ -95,7 +96,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<PowerUpBallObtainedEffectController>().AsSingle().WithArguments(_powerUpBallObtainedEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchPlayerUIControllers>().AsSingle().WithArguments(_matchPlayerUIControllersView).NonLazy();
             Container.BindInterfacesTo<MatchBulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
-            Container.BindInterfacesTo<Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.MatchChickenEggsControllers>().AsSingle().WithArguments(_chickenEggViewPrefab).NonLazy();
+            Container.BindInterfacesTo<MatchChickenEggsControllers>().AsSingle().WithArguments(_chickenEggViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpringControllers>().AsSingle().WithArguments(_environmentSpringViewPrefab).NonLazy();
             Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();

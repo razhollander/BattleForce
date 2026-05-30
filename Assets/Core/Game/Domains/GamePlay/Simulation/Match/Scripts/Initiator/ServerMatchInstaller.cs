@@ -5,7 +5,6 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.LockOnHeartTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
@@ -40,7 +39,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<IMatchPlayerInputsPacketsHandler>().To<MatchPlayerInputsPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersDecelerationLogic>().To<PlayersDecelerationLogic>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersEngineLogic>().To<PlayersEngineLogic>().AsSingle().NonLazy();
-            _diContainer.Bind<ILockOnHeartTargetService>().To<LockOnHeartTargetService>().AsSingle().NonLazy();
             _diContainer.Bind<ILockOnTargetTimerService>().To<LockOnTargetTimerService>().AsSingle().NonLazy();
             _diContainer.Bind<ITeleportGateService>().To<TeleportGateCooldownService>().AsSingle();
             _diContainer.Bind<IMatchEnvironmentConfigDataService>().To<MatchEnvironmentConfigDataService>().AsSingle();

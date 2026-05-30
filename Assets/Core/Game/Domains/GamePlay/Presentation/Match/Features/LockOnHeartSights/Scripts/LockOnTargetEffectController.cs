@@ -1,12 +1,9 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
-using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
 using Zenject;
 
@@ -17,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
-        private readonly LockOnTargetEffectPool _pool;
+        private readonly LockOnTargetEffectPool _effectsPool;
 
         private readonly Dictionary<ushort, Dictionary<ushort, LockOnTargetEffectView>> _activeEffectsPerCaster = new Dictionary<ushort, Dictionary<ushort, LockOnTargetEffectView>>();
 
@@ -27,21 +24,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
-            _pool = new LockOnTargetEffectPool(prefab, diContainer);
+            _effectsPool = new LockOnTargetEffectPool(prefab, diContainer);
         }
 
         public void InitEntryPoint()
         {
-            _pool.InitPool();
+            _effectsPool.InitPool();
+        }
+
+        public void AddPlayer(ushort casterPlayerId, FixedUnorderedList<ushort> casterTargetedEnemyIds)
+        {
+            _activeEffectsPerCaster[casterPlayerId] = new Dictionary<ushort, LockOnTargetEffectView>(_networkConfig.MaxCap.ConcurrentPlayers - 1);
+            RefreshTargetEffectsOfCaster(casterPlayerId, casterTargetedEnemyIds);
         }
 
         public void RefreshTargetEffectsOfCaster(ushort casterPlayerId, FixedUnorderedList<ushort> playerIdsLockedOnTarget)
         {
-            if (!_activeEffectsPerCaster.ContainsKey(casterPlayerId))
-            {
-                _activeEffectsPerCaster[casterPlayerId] = new Dictionary<ushort, LockOnTargetEffectView>(_networkConfig.MaxCap.ConcurrentPlayers - 1);
-            }
-
             var casterActiveEffects = _activeEffectsPerCaster[casterPlayerId];
 
             var enemieIdsToRemove = new List<ushort>();
@@ -66,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
                     continue;
                 }
 
-                var newTargetEffectView = _pool.Spawn();
+                var newTargetEffectView = _effectsPool.Spawn();
                 newTargetEffectView.Setup(_sharedGamePlayConfig.LockOnTargetDurationInSeconds);
                 newTargetEffectView.PlayLockOnTargetAnimation(_stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
                 casterActiveEffects[enemyId] = newTargetEffectView;
@@ -88,6 +86,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
             }
             
             effectView.UpdatePosition(startPoint, endPoint, endPoint);
+        }
+
+        public void DestroyAll()
+        {
+            foreach (var casterActiveEffects in _activeEffectsPerCaster.Values)
+            {
+                foreach (var effectView in casterActiveEffects.Values)
+                {
+                    effectView.Despawn();
+                }
+            }
+            
+            _activeEffectsPerCaster.Clear();
         }
     }
 }
