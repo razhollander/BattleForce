@@ -120,6 +120,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _playerTeleportEffectController.InitEntryPoint();
             _environmentTeleportGateControllers.InitEntryPoint();
             _backgroundParallaxController.InitEntryPoint();
+            _lockOnTargetEffectController.InitEntryPoint();
             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
                  .SetSimulationState(_enterData.InitialState)
                  .Execute();
@@ -127,7 +128,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _gainBoltEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();
-            _lockOnTargetEffectController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }
