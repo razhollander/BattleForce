@@ -159,6 +159,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return GetPlayer(playerId).GetHeartTransform();
         }
         
+        public Transform GetPlayerHeadTransform(ushort playerId)
+        {
+            return GetPlayer(playerId).GetHeadTransform();
+        }
+        
         public void HidePlayerHealthBar(ushort playerId)
         {
             GetPlayer(playerId).SetIsHealthBarShown(false);

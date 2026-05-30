@@ -24,6 +24,12 @@ namespace CoreDomain.Scripts.Helpers.Pools
             base.InitPool();
         }
 
+        public override void DisposePool()
+        {
+            Object.Destroy(_parentTransform);
+            base.DisposePool();
+        }
+        
         protected override List<TPoolable> CreatePoolableInstances(int instancesAmount)
         {
             var poolables = new List<TPoolable>();
@@ -40,6 +46,14 @@ namespace CoreDomain.Scripts.Helpers.Pools
             return poolables;
         }
 
+        protected override void DestroyPoolableInstances(Queue<TPoolable> poolables)
+        {
+            while (poolables.TryDequeue(out var poolable))
+            {
+                Object.Destroy(poolable);
+            }
+        }
+        
         protected override void Despawn(TPoolable obj)
         {
             if (obj == null)

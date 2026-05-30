@@ -23,6 +23,12 @@ namespace CoreDomain.Scripts.Helpers.Pools
             AddInstancesToQueue(_initialAmount);
         }
 
+        public virtual void DisposePool()
+        {
+            _initialized = false;
+            DestroyPoolableInstances(_pool);
+        }
+        
         private void AddInstancesToQueue(int instancesAmount)
         {
             var poolableInstances = CreatePoolableInstances(instancesAmount);
@@ -30,6 +36,7 @@ namespace CoreDomain.Scripts.Helpers.Pools
         }
         
         protected abstract List<TPoolable> CreatePoolableInstances(int instancesAmount);
+        protected abstract void DestroyPoolableInstances(Queue<TPoolable> instances);
         
         public TPoolable Spawn()
         {

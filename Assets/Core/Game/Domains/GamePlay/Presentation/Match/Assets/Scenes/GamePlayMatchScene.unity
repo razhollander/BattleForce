@@ -974,6 +974,7 @@ MonoBehaviour:
   _dashPulseGustEffectViewPrefab: {fileID: 2651892565007212038, guid: 26b876fb431b54fffa58daf61e4d5811, type: 3}
   _magneticPullFieldViewPrefab: {fileID: 4847719626318205942, guid: 7cd482f6bf67d433481abe04296c2986, type: 3}
   _magneticPullHitEffectViewPrefab: {fileID: 6034426605437557338, guid: 7297de5ffddd34a6da8a721a6d79795c, type: 3}
+  lockOnTargetEffectViewPrefab: {fileID: 7351513350059897862, guid: a6f337b7b848c4597bcb15c7faead624, type: 3}
   _chickenEggViewPrefab: {fileID: 8334673388257318348, guid: 76fd7cd9194ac401cbae9285ed1554de, type: 3}
   _backgroundParallaxView: {fileID: 620390907}
 --- !u!1660057539 &9223372036854775807

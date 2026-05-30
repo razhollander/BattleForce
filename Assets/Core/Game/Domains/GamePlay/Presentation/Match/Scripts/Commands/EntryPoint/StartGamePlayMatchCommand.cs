@@ -60,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IDashPulseGustEffectController _dashPulseGustEffectController;
         private IMagneticPullEffectController _magneticPullEffectController;
         private IBackgroundParallaxController _backgroundParallaxController;
+        private Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts.ILockOnTargetEffectController _lockOnTargetEffectController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -95,6 +96,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
             _magneticPullEffectController = _diContainer.Resolve<IMagneticPullEffectController>();
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
+            _lockOnTargetEffectController = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts.ILockOnTargetEffectController>();
         }
 
         public void Execute()
@@ -125,7 +127,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _gainBoltEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();
-
+            _lockOnTargetEffectController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }

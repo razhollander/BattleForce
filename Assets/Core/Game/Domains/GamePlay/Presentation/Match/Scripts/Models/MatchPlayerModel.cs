@@ -16,7 +16,5 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
             TeamId = teamId;
             Spaceship = spaceship.GetClone();
         }
-
-        public bool IsPlayerLockOnTargetSightShown => Spaceship.TargetedEnemyIds.Count > 0;
     }
 }

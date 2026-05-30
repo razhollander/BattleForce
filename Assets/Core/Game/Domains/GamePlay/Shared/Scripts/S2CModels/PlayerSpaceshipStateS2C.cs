@@ -18,13 +18,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsSpinned;
         public PlayerAssistArrowType AssistArrowType;
         public readonly FixedUnorderedList<ushort> TargetedEnemyIds;
-        
+
+        public bool IsPlayerLockOnTargetSightShown => TargetedEnemyIds.Count > 0;
+
         public PlayerSpaceshipStateS2C(int maxTalents, int maxEnemiesAmount)
         {
             TalentsState = new PlayerTalentsStateS2C(maxTalents);
             TargetedEnemyIds = new FixedUnorderedList<ushort>(maxEnemiesAmount);
         }
-        
+
         public PlayerSpaceshipStateS2C GetClone()
         {
             var clone = new PlayerSpaceshipStateS2C(TalentsState.Talents.Capacity, TargetedEnemyIds.Capacity)

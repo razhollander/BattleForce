@@ -231,5 +231,18 @@ namespace Core.Scripts.Utils.CustomCollections
                 _count = value.Length;
             }
         }
+
+        public bool Contains(ushort enemyId)
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                if (RawArray[i].Equals(enemyId))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
