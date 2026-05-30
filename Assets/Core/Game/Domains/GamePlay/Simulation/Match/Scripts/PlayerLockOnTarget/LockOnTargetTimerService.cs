@@ -10,9 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         private readonly IMatchDataService _matchDataService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly SimulationGamePlayConfig _gamePlayConfig;
-        
-        private readonly Dictionary<ushort, Dictionary<ushort, float>> _lockOnTimers;
-
+        private readonly Dictionary<ushort, PlayerLockOnTargetTimers> _playerTimers;
         private readonly List<(ushort CasterId, ushort TargetId)> _cachedPlayersToDamage;
 
         public LockOnTargetTimerService(IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig)
@@ -20,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
 
-            _lockOnTimers = new Dictionary<ushort, Dictionary<ushort, float>>(networkConfig.MaxCap.ConcurrentPlayers);
+            _playerTimers = new Dictionary<ushort, PlayerLockOnTargetTimers>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedPlayersToDamage = new List<(ushort CasterId, ushort TargetId)>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
@@ -32,41 +30,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 var casterState = players[i];
                 var casterId = casterState.Id;
 
-                if (!_lockOnTimers.TryGetValue(casterId, out var casterTimers))
+                if (!_playerTimers.TryGetValue(casterId, out var playerTimer))
                 {
-                    casterTimers = new Dictionary<ushort, float>();
-                    _lockOnTimers[casterId] = casterTimers;
+                    playerTimer = new PlayerLockOnTargetTimers(casterId);
+                    _playerTimers[casterId] = playerTimer;
                 }
 
                 var targetedIds = casterState.Spaceship.TargetedEnemyIds;
-
-                // Remove targets that are no longer targeted
-                var targetsToRemove = new List<ushort>();
-                foreach (var targetId in casterTimers.Keys)
-                {
-                    if (!targetedIds.Contains(targetId))
-                    {
-                        targetsToRemove.Add(targetId);
-                    }
-                }
-                foreach (var targetId in targetsToRemove)
-                {
-                    casterTimers.Remove(targetId);
-                }
-
-                // Step timers for current targets
-                for (int j = 0; j < targetedIds.Count; j++)
-                {
-                    var targetId = targetedIds[j];
-                    if (casterTimers.TryGetValue(targetId, out var timer))
-                    {
-                        casterTimers[targetId] = timer + deltaTime;
-                    }
-                    else
-                    {
-                        casterTimers[targetId] = deltaTime;
-                    }
-                }
+                playerTimer.StepTimers(targetedIds, deltaTime);
             }
         }
 
@@ -75,16 +46,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _cachedPlayersToDamage.Clear();
             var limit = _sharedGamePlayConfig.LockOnTargetDurationInSeconds;
 
-            foreach (var casterKvp in _lockOnTimers)
+            foreach (var playerTimer in _playerTimers.Values)
             {
-                var casterId = casterKvp.Key;
-                foreach (var targetKvp in casterKvp.Value)
-                {
-                    if (targetKvp.Value >= limit)
-                    {
-                        _cachedPlayersToDamage.Add((casterId, targetKvp.Key));
-                    }
-                }
+                playerTimer.CollectPlayersToDamage(limit, _cachedPlayersToDamage);
             }
 
             return _cachedPlayersToDamage;
@@ -92,12 +56,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
         public void ResetTimer(ushort casterId, ushort targetId)
         {
-            if (_lockOnTimers.TryGetValue(casterId, out var casterTimers))
+            if (_playerTimers.TryGetValue(casterId, out var playerTimer))
             {
-                if (casterTimers.ContainsKey(targetId))
-                {
-                    casterTimers[targetId] = 0f;
-                }
+                playerTimer.ResetTimer(targetId);
             }
         }
     }

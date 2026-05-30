@@ -51,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         {
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_playerId);
             _cachedLockedOnHeartIds.Clear();
-            GetTargetedEnemyIds(casterPlayerState, _cachedLockedOnHeartIds);
+            GetTargetedEnemyIdsOfCaster(casterPlayerState, _cachedLockedOnHeartIds);
             _cachedLockedOnHeartIds.Sort();
 
             var casterTargetedEnemyIds = casterPlayerState.Spaceship.TargetedEnemyIds;
@@ -73,7 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _netEventsDataService.AddPlayerLockOnHeartTargetsChangedNetEvent(_processedTick, casterPlayerState.Id, casterTargetedEnemyIds);
         }
 
-        private void GetTargetedEnemyIds(PlayerStateS2C casterPlayerState, FixedUnorderedList<ushort> outputTargetedEnemyIds)
+        private void GetTargetedEnemyIdsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<ushort> outputTargetedEnemyIds)
         {
             var rayOriginPosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
             var radius = _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange;
@@ -116,14 +116,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                     continue;
                 }
 
-                var didHit = _physicsSimulator.RayCast(rayOriginPosition, enemyHeartPos, out var hitBodyData, _cachedBodyTypesRayCastCanHit);
-                var didHitEnemyHeart = didHit && hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerHeart && hitBodyData.Id == targetedPlayerState.Id;
-
-                if (!didHitEnemyHeart)
+                var isTargetSpinned = targetedPlayerState.Spaceship.IsSpinned;
+                if (!isTargetSpinned)
                 {
-                    continue;
+                    var didRayTowardEnemyHeartHitAnything =_physicsSimulator.RayCast(rayOriginPosition, enemyHeartPos, out var hitBodyData, _cachedBodyTypesRayCastCanHit);
+                    var didHitEnemyHeart = didRayTowardEnemyHeartHitAnything && hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerHeart && hitBodyData.Id == targetedPlayerState.Id;
+                    if (!didHitEnemyHeart)
+                    {
+                        continue;
+                    }
                 }
-
+                
                 ref var targetedPlayerId = ref outputTargetedEnemyIds.AddAndGet();
                 targetedPlayerId = targetedPlayerState.Id;
             }

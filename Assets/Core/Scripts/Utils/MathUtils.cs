@@ -8,6 +8,7 @@ namespace CoreDomain.Scripts.Utils
     {
         // Threshold in radians (e.g., 45 degrees is ~0.785 radians)
         private const float TurnThresholdRad = 0.1f;
+        private const float TwoPI = MathF.PI * 2f;
 
         public static Vector3 GetPerpendicularDirection(Vector2 startPoint, Vector2 endPoint)
         {
@@ -103,15 +104,10 @@ namespace CoreDomain.Scripts.Utils
         
         public static float DeltaAbsoluteAngleRadians(float current, float target)
         {
-            float diff = target - current;
-
-            // Wrap the angle to -PI to PI range
-            while (diff > MathF.PI) diff -= MathF.PI * 2;
-            while (diff < -MathF.PI) diff += MathF.PI * 2;
-
-            return Mathf.Abs(diff);
+            var diff = MathF.Abs(target - current) % TwoPI;
+            return diff > MathF.PI ? TwoPI - diff : diff;
         }
-
+        
         /// <summary>
         /// Rotates a vector by a specific radian amount.
         /// </summary>
