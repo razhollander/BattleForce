@@ -30,6 +30,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
                 return;
             }
 
+            var isPlayerInUmbrella = selectedTalent is {TalentType: TalentType.Umbrella, IsCurrentlyActive: true};
+            if (isPlayerInUmbrella)
+            {
+                return;
+            }
+            
             var isPlayerIdle = playerSpaceshipState.Transform.Velocity.Length() < _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TurnEngineOnWhenReachVelocity;
             if (isPlayerIdle)
             {
