@@ -124,46 +124,230 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         {
             writer.Put(Tick);
             CurrentSimulationState.SerializeDeltas(writer);
-            SerializedPlayerJoinedEvents(writer);
-            SerializedBulletSpawnedEvents(writer);
-            SerializedPlayerTakeDamageEvents(writer);
-            SerializedPlayerDiedEvents(writer);
-            SerializedPlayerLockOnHeartTargetsChangedNetEvents(writer);
-            SerializedPlayerLockedOnTargetHitNetEvents(writer);
-            SerializedBulletDestroyedEvents(writer);
-            SerializedPlayerSwapEvents(writer);
-            SerializedTalentCardObtainedEvents(writer);
-            SerializedTalentCardHitEvents(writer);
-            SerializedPowerUpSpawnedEvents(writer);
-            SerializedPowerUpObtainedEvents(writer);
-            SerializedStageEndEvents(writer);
-            SerializedTeamLostEvents(writer);
-            SerializedTalentSwitchEvents(writer);
-            SerializedEnvironmentSpringPlayerCollisionEvents(writer);
-            SerializedGainBoltsEvents(writer);
-            SerializedPlayerToEnvironmentTeleportGateCollisionEvents(writer);
-            SerializedPreparationPhaseEndedEvents(writer);
-            SerializedCreateSwapFieldNetEvents(writer);
-            SerializedCreateKOProjectileNetEvents(writer);
-            SerializedKOProjectHitPlayerNetEvents(writer);
-            SerializedDeactivateKOTalentNetEvents(writer);
-            SerializedPerformDashPulseNetEvents(writer);
-            SerializedActivateSentryGunTalentNetEvents(writer);
-            SerializedDeactivateSentryGunTalentNetEvents(writer);
-            SerializedUpdatePlayerTalentStocksNetEvents(writer);
-            SerializedPlayerSpinnedStartedEvents(writer);
-            SerializedPlayerSpinnedEndedEvents(writer);
-            SerializedDestroySwapFieldNetEvents(writer);
-            SerializedPlayerMaxShootCooldownChangedNetEvents(writer);
-            SerializedCreateGrapplingHookProjectileNetEvents(writer);
-            SerializedGrapplingHookHitWallNetEvents(writer);
-            SerializedDeactivateGrapplingHookTalentNetEvents(writer);
-            SerializedCreateMagneticPullFieldNetEvents(writer);
-            SerializedActivateUmbrellaTalentNetEvents(writer);
-            SerializedDeactivateUmbrellaTalentNetEvents(writer);
-            SerializedLayChickenEggNetEvents(writer);
-            SerializedChickenEggHitNetEvents(writer);
-            SerializedActivateYearsOfPainTalentNetEvents(writer);
+            
+            var eventMask = CalculateEventMask();
+            writer.Put(eventMask);
+            
+            if ((eventMask & (1UL << 0)) != 0) SerializedPlayerJoinedEvents(writer);
+            if ((eventMask & (1UL << 1)) != 0) SerializedBulletSpawnedEvents(writer);
+            if ((eventMask & (1UL << 2)) != 0) SerializedPlayerTakeDamageEvents(writer);
+            if ((eventMask & (1UL << 3)) != 0) SerializedPlayerDiedEvents(writer);
+            if ((eventMask & (1UL << 4)) != 0) SerializedPlayerLockOnHeartTargetsChangedNetEvents(writer);
+            if ((eventMask & (1UL << 5)) != 0) SerializedPlayerLockedOnTargetHitNetEvents(writer);
+            if ((eventMask & (1UL << 6)) != 0) SerializedBulletDestroyedEvents(writer);
+            if ((eventMask & (1UL << 7)) != 0) SerializedPlayerSwapEvents(writer);
+            if ((eventMask & (1UL << 8)) != 0) SerializedTalentCardObtainedEvents(writer);
+            if ((eventMask & (1UL << 9)) != 0) SerializedTalentCardHitEvents(writer);
+            if ((eventMask & (1UL << 10)) != 0) SerializedPowerUpSpawnedEvents(writer);
+            if ((eventMask & (1UL << 11)) != 0) SerializedPowerUpObtainedEvents(writer);
+            if ((eventMask & (1UL << 12)) != 0) SerializedStageEndEvents(writer);
+            if ((eventMask & (1UL << 13)) != 0) SerializedTeamLostEvents(writer);
+            if ((eventMask & (1UL << 14)) != 0) SerializedTalentSwitchEvents(writer);
+            if ((eventMask & (1UL << 15)) != 0) SerializedEnvironmentSpringPlayerCollisionEvents(writer);
+            if ((eventMask & (1UL << 16)) != 0) SerializedGainBoltsEvents(writer);
+            if ((eventMask & (1UL << 17)) != 0) SerializedPlayerToEnvironmentTeleportGateCollisionEvents(writer);
+            if ((eventMask & (1UL << 18)) != 0) SerializedPreparationPhaseEndedEvents(writer);
+            if ((eventMask & (1UL << 19)) != 0) SerializedCreateSwapFieldNetEvents(writer);
+            if ((eventMask & (1UL << 20)) != 0) SerializedCreateKOProjectileNetEvents(writer);
+            if ((eventMask & (1UL << 21)) != 0) SerializedKOProjectHitPlayerNetEvents(writer);
+            if ((eventMask & (1UL << 22)) != 0) SerializedDeactivateKOTalentNetEvents(writer);
+            if ((eventMask & (1UL << 23)) != 0) SerializedPerformDashPulseNetEvents(writer);
+            if ((eventMask & (1UL << 24)) != 0) SerializedActivateSentryGunTalentNetEvents(writer);
+            if ((eventMask & (1UL << 25)) != 0) SerializedDeactivateSentryGunTalentNetEvents(writer);
+            if ((eventMask & (1UL << 26)) != 0) SerializedUpdatePlayerTalentStocksNetEvents(writer);
+            if ((eventMask & (1UL << 27)) != 0) SerializedPlayerSpinnedStartedEvents(writer);
+            if ((eventMask & (1UL << 28)) != 0) SerializedPlayerSpinnedEndedEvents(writer);
+            if ((eventMask & (1UL << 29)) != 0) SerializedDestroySwapFieldNetEvents(writer);
+            if ((eventMask & (1UL << 30)) != 0) SerializedPlayerMaxShootCooldownChangedNetEvents(writer);
+            if ((eventMask & (1UL << 31)) != 0) SerializedCreateGrapplingHookProjectileNetEvents(writer);
+            if ((eventMask & (1UL << 32)) != 0) SerializedGrapplingHookHitWallNetEvents(writer);
+            if ((eventMask & (1UL << 33)) != 0) SerializedDeactivateGrapplingHookTalentNetEvents(writer);
+            if ((eventMask & (1UL << 34)) != 0) SerializedCreateMagneticPullFieldNetEvents(writer);
+            if ((eventMask & (1UL << 35)) != 0) SerializedActivateUmbrellaTalentNetEvents(writer);
+            if ((eventMask & (1UL << 36)) != 0) SerializedDeactivateUmbrellaTalentNetEvents(writer);
+            if ((eventMask & (1UL << 37)) != 0) SerializedLayChickenEggNetEvents(writer);
+            if ((eventMask & (1UL << 38)) != 0) SerializedChickenEggHitNetEvents(writer);
+            if ((eventMask & (1UL << 39)) != 0) SerializedActivateYearsOfPainTalentNetEvents(writer);
+        }
+
+        private ulong CalculateEventMask()
+        {
+            ulong eventMask = 0;
+            if (PlayerJoinAcceptNetEvents.Count > 0) eventMask |= 1UL << 0;
+            if (BulletSpawnNetEvents.Count > 0) eventMask |= 1UL << 1;
+            if (PlayerTakeDamageNetEvents.Count > 0) eventMask |= 1UL << 2;
+            if (PlayerDiedNetEvents.Count > 0) eventMask |= 1UL << 3;
+            if (PlayerLockOnHeartTargetsChangedNetEvents.Count > 0) eventMask |= 1UL << 4;
+            if (PlayerLockedOnTargetHitNetEvents.Count > 0) eventMask |= 1UL << 5;
+            if (BulletDestroyedNetEvents.Count > 0) eventMask |= 1UL << 6;
+            if (PlayerSwapNetEvents.Count > 0) eventMask |= 1UL << 7;
+            if (TalentCardObtainedNetEvents.Count > 0) eventMask |= 1UL << 8;
+            if (TalentCardHitNetEvents.Count > 0) eventMask |= 1UL << 9;
+            if (PowerUpSpawnedNetEvents.Count > 0) eventMask |= 1UL << 10;
+            if (PowerUpObtainedNetEvents.Count > 0) eventMask |= 1UL << 11;
+            if (StageEndNetEvents.Count > 0) eventMask |= 1UL << 12;
+            if (TeamLostNetEvents.Count > 0) eventMask |= 1UL << 13;
+            if (TalentSwitchNetEvents.Count > 0) eventMask |= 1UL << 14;
+            if (EnvironmentSpringPlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 15;
+            if (GainBoltsNetEvents.Count > 0) eventMask |= 1UL << 16;
+            if (PlayerToEnvironmentTeleportGateCollisionNetEvents.Count > 0) eventMask |= 1UL << 17;
+            if (PreparationPhaseEndedNetEvents.Count > 0) eventMask |= 1UL << 18;
+            if (CreateSwapFieldNetEvents.Count > 0) eventMask |= 1UL << 19;
+            if (CreateKOProjectileNetEvents.Count > 0) eventMask |= 1UL << 20;
+            if (KOProjectHitPlayerNetEvents.Count > 0) eventMask |= 1UL << 21;
+            if (DeactivateKOTalentNetEvents.Count > 0) eventMask |= 1UL << 22;
+            if (PerformDashPulseNetEvents.Count > 0) eventMask |= 1UL << 23;
+            if (ActivateSentryGunTalentNetEvents.Count > 0) eventMask |= 1UL << 24;
+            if (DeactivateSentryGunTalentNetEvents.Count > 0) eventMask |= 1UL << 25;
+            if (UpdatePlayerTalentStocksNetEvents.Count > 0) eventMask |= 1UL << 26;
+            if (PlayerSpinnedStartedNetEvents.Count > 0) eventMask |= 1UL << 27;
+            if (PlayerSpinnedEndedNetEvents.Count > 0) eventMask |= 1UL << 28;
+            if (DestroySwapFieldNetEvents.Count > 0) eventMask |= 1UL << 29;
+            if (PlayerMaxShootCooldownChangedNetEvents.Count > 0) eventMask |= 1UL << 30;
+            if (CreateGrapplingHookProjectileNetEvents.Count > 0) eventMask |= 1UL << 31;
+            if (GrapplingHookHitWallNetEvents.Count > 0) eventMask |= 1UL << 32;
+            if (DeactivateGrapplingHookTalentNetEvents.Count > 0) eventMask |= 1UL << 33;
+            if (CreateMagneticPullFieldNetEvents.Count > 0) eventMask |= 1UL << 34;
+            if (ActivateUmbrellaTalentNetEvents.Count > 0) eventMask |= 1UL << 35;
+            if (DeactivateUmbrellaTalentNetEvents.Count > 0) eventMask |= 1UL << 36;
+            if (LayChickenEggNetEvents.Count > 0) eventMask |= 1UL << 37;
+            if (ChickenEggHitNetEvents.Count > 0) eventMask |= 1UL << 38;
+            if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 39;
+
+            return eventMask;
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            Tick = reader.GetInt();
+            CurrentSimulationState.DeserializeTransforms(reader);
+            
+            ulong eventMask = reader.GetULong();
+            
+            if ((eventMask & (1UL << 0)) != 0) DeserializedPlayerJoinedEvents(reader);
+            else PlayerJoinAcceptNetEvents.Clear();
+
+            if ((eventMask & (1UL << 1)) != 0) DeserializedBulletSpawnedEvents(reader);
+            else BulletSpawnNetEvents.Clear();
+
+            if ((eventMask & (1UL << 2)) != 0) DeserializedPlayerTakeDamageEvents(reader);
+            else PlayerTakeDamageNetEvents.Clear();
+
+            if ((eventMask & (1UL << 3)) != 0) DeserializedPlayerDiedEvents(reader);
+            else PlayerDiedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 4)) != 0) DeserializedPlayerLockOnHeartTargetsChangedNetEvents(reader);
+            else
+            {
+                for (int i = 0; i < PlayerLockOnHeartTargetsChangedNetEvents.Count; i++)
+                    PlayerLockOnHeartTargetsChangedNetEvents[i].PlayerIdsLockedOnTarget.Clear();
+                PlayerLockOnHeartTargetsChangedNetEvents.Clear();
+            }
+            
+            if ((eventMask & (1UL << 5)) != 0) DeserializedPlayerLockedOnTargetHitNetEvents(reader);
+            else PlayerLockedOnTargetHitNetEvents.Clear();
+
+            if ((eventMask & (1UL << 6)) != 0) DeserializedBulletDestroyedEvents(reader);
+            else BulletDestroyedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 7)) != 0) DeserializedPlayerSwapEvents(reader);
+            else PlayerSwapNetEvents.Clear();
+
+            if ((eventMask & (1UL << 8)) != 0) DeserializedTalentCardObtainedEvents(reader);
+            else TalentCardObtainedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 9)) != 0) DeserializedTalentCardHitEvents(reader);
+            else TalentCardHitNetEvents.Clear();
+
+            if ((eventMask & (1UL << 10)) != 0) DeserializedPowerUpSpawnedEvents(reader);
+            else PowerUpSpawnedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 11)) != 0) DeserializedPowerUpObtainedEvents(reader);
+            else PowerUpObtainedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 12)) != 0) DeserializedStageEndEvents(reader);
+            else StageEndNetEvents.Clear();
+
+            if ((eventMask & (1UL << 13)) != 0) DeserializedTeamLostEvents(reader);
+            else TeamLostNetEvents.Clear();
+
+            if ((eventMask & (1UL << 14)) != 0) DeserializedTalentSwitchEvents(reader);
+            else TalentSwitchNetEvents.Clear();
+
+            if ((eventMask & (1UL << 15)) != 0) DeserializedEnvironmentSpringPlayerCollisionEvents(reader);
+            else EnvironmentSpringPlayerCollisionNetEvents.Clear();
+
+            if ((eventMask & (1UL << 16)) != 0) DeserializedGainBoltsEvents(reader);
+            else GainBoltsNetEvents.Clear();
+
+            if ((eventMask & (1UL << 17)) != 0) DeserializedPlayerToEnvironmentTeleportGateCollisionEvents(reader);
+            else PlayerToEnvironmentTeleportGateCollisionNetEvents.Clear();
+
+            if ((eventMask & (1UL << 18)) != 0) DeserializedPreparationPhaseEndedEvents(reader);
+            else PreparationPhaseEndedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 19)) != 0) DeserializedCreateSwapFieldNetEvents(reader);
+            else CreateSwapFieldNetEvents.Clear();
+
+            if ((eventMask & (1UL << 20)) != 0) DeserializedCreateKOProjectileNetEvents(reader);
+            else CreateKOProjectileNetEvents.Clear();
+
+            if ((eventMask & (1UL << 21)) != 0) DeserializedKOProjectHitPlayerNetEvents(reader);
+            else KOProjectHitPlayerNetEvents.Clear();
+
+            if ((eventMask & (1UL << 22)) != 0) DeserializedDeactivateKOTalentNetEvents(reader);
+            else DeactivateKOTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 23)) != 0) DeserializedPerformDashPulseNetEvents(reader);
+            else PerformDashPulseNetEvents.Clear();
+
+            if ((eventMask & (1UL << 24)) != 0) DeserializedActivateSentryGunTalentNetEvents(reader);
+            else ActivateSentryGunTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 25)) != 0) DeserializedDeactivateSentryGunTalentNetEvents(reader);
+            else DeactivateSentryGunTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 26)) != 0) DeserializedUpdatePlayerTalentStocksNetEvents(reader);
+            else UpdatePlayerTalentStocksNetEvents.Clear();
+
+            if ((eventMask & (1UL << 27)) != 0) DeserializedPlayerSpinnedStartedEvents(reader);
+            else PlayerSpinnedStartedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 28)) != 0) DeserializedPlayerSpinnedEndedEvents(reader);
+            else PlayerSpinnedEndedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 29)) != 0) DeserializedDestroySwapFieldNetEvents(reader);
+            else DestroySwapFieldNetEvents.Clear();
+
+            if ((eventMask & (1UL << 30)) != 0) DeserializedPlayerMaxShootCooldownChangedNetEvents(reader);
+            else PlayerMaxShootCooldownChangedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 31)) != 0) DeserializedCreateGrapplingHookProjectileNetEvents(reader);
+            else CreateGrapplingHookProjectileNetEvents.Clear();
+
+            if ((eventMask & (1UL << 32)) != 0) DeserializedGrapplingHookHitWallNetEvents(reader);
+            else GrapplingHookHitWallNetEvents.Clear();
+
+            if ((eventMask & (1UL << 33)) != 0) DeserializedDeactivateGrapplingHookTalentNetEvents(reader);
+            else DeactivateGrapplingHookTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 34)) != 0) DeserializedCreateMagneticPullFieldNetEvents(reader);
+            else CreateMagneticPullFieldNetEvents.Clear();
+
+            if ((eventMask & (1UL << 35)) != 0) DeserializedActivateUmbrellaTalentNetEvents(reader);
+            else ActivateUmbrellaTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 36)) != 0) DeserializedDeactivateUmbrellaTalentNetEvents(reader);
+            else DeactivateUmbrellaTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 37)) != 0) DeserializedLayChickenEggNetEvents(reader);
+            else LayChickenEggNetEvents.Clear();
+
+            if ((eventMask & (1UL << 38)) != 0) DeserializedChickenEggHitNetEvents(reader);
+            else ChickenEggHitNetEvents.Clear();
+
+            if ((eventMask & (1UL << 39)) != 0) DeserializedActivateYearsOfPainTalentNetEvents(reader);
+            else ActivateYearsOfPainTalentNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -319,7 +503,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
-        public void Deserialize(NetDataReader reader)
+        /*public void Deserialize(NetDataReader reader)
         {
             Tick = reader.GetInt();
             CurrentSimulationState.DeserializeTransforms(reader);
@@ -363,7 +547,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedLayChickenEggNetEvents(reader);
             DeserializedChickenEggHitNetEvents(reader);
             DeserializedActivateYearsOfPainTalentNetEvents(reader);
-        }
+        }*/
 
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
         {

@@ -97,7 +97,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _networkManager.PollEvents();
                 var stepDeltaTime = _networkConfig.DeltaTime;
 
-                TryHandleStageEnded(currentTick, stepDeltaTime);
+                if (TryHandleStageEnded(currentTick, stepDeltaTime))
+                {
+                    return;
+                }
+                
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 _stepAllPlayersTalentsCooldownsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick, stepDeltaTime);
@@ -121,22 +125,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
         }
 
-        private void TryHandleStageEnded(int currentTick, float stepDeltaTime)
+        private bool TryHandleStageEnded(int currentTick, float stepDeltaTime)
         {
             if (!_stageDataService.IsStageEnded)
             {
-                return;
+                return false;
             }
 
             _stageDataService.StageRestartTimer -= stepDeltaTime;
             var didRestartTimerEnded = _stageDataService.StageRestartTimer <= 0;
             if (!didRestartTimerEnded)
             {
-                return;
+                return false;
             }
 
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
             SendStartStageToAllPlayers(currentTick);
+            return true;
         }
 
         private void SendStartStageToAllPlayers(int processedTick)

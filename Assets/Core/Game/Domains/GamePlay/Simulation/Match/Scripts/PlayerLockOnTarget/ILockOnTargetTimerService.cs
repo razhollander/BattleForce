@@ -7,5 +7,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         void StepTimers(float deltaTime);
         List<(ushort CasterId, ushort TargetId)> GetPlayersToDamage();
         void ResetTimer(ushort casterId, ushort targetId);
+        void ResetAllTimers();
     }
 }
