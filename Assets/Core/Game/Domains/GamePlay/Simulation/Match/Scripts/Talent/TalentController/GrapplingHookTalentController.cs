@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
@@ -25,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IMatchDataService _matchDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedConfig;
@@ -57,12 +58,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
         }
 
-        public GrapplingHookTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
+        public GrapplingHookTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
             IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedConfig)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _sharedConfig = sharedConfig;
@@ -119,7 +120,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             IsCurrentlyActive = true;
             _isInReturnPhase = false;
 
-            var config = _gamePlayConfig.Talents.GrapplingHookTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.GrapplingHookTalentConfig;
             var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
             var velocity = aimDirection * config.ProjectileSpeed;
             var size = _sharedConfig.GrapplingHookProjectileSize;
@@ -149,7 +150,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             ref var projectile = ref _matchDataService.SimulationState.GetGrapplingHookProjectileById(_projectileId);
-            var config = _gamePlayConfig.Talents.GrapplingHookTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.GrapplingHookTalentConfig;
             var arriveDistance = config.ArriveDistance;
 
             if (_isInReturnPhase)

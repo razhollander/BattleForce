@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Network;
@@ -9,14 +10,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
 {
     public class PlayersInLavaTrackerService : IPlayersInLavaTrackerService
     {
-        private readonly SimulationGamePlayConfig _gamePlayerConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly CapacityDict<ushort, PlayerInLavaData> _playersInLava;
         private readonly ConcurrentPool<PlayerInLavaData> _playerInLavaDataPool;
         private readonly List<ushort> _cachedPlayersToDamage;
 
-        public PlayersInLavaTrackerService(SimulationGamePlayConfig gamePlayerConfig, NetworkConfig networkConfig)
+        public PlayersInLavaTrackerService(ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig)
         {
-            _gamePlayerConfig = gamePlayerConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _playersInLava = new CapacityDict<ushort, PlayerInLavaData>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedPlayersToDamage = new List<ushort>(networkConfig.MaxCap.ConcurrentPlayers);
             _playerInLavaDataPool = new ConcurrentPool<PlayerInLavaData>(() => new PlayerInLavaData(), networkConfig.MaxCap.ConcurrentPlayers);
@@ -67,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
 
             foreach (var playerId in _playersInLava.Keys)
             {
-                var didPassDamageInterval = _playersInLava[playerId].TimePassSinceLastDamageTaken >= _gamePlayerConfig.Lava.DamageIntervalInSeconds;
+                var didPassDamageInterval = _playersInLava[playerId].TimePassSinceLastDamageTaken >= _gamePlayConfigService.GamePlayConfig.Lava.DamageIntervalInSeconds;
                 if (didPassDamageInterval)
                 {
                     _cachedPlayersToDamage.Add(playerId);

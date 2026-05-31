@@ -1,18 +1,14 @@
-using System;
-using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
-    [CreateAssetMenu(fileName = "TalentsConfig", menuName = "BF/Simulation/Talents Config")]
     [System.Serializable]
-    public class TalentsConfig : ScriptableObject
+    public class TalentsInnerConfig
     {
         public ushort TalentCardHealth = 2;
         [BF_SubclassList.SubclassList(typeof(BaseTalentCooldownConfig)), SerializeField]
-        public TalentsCooldownsConfigs TalentsCooldownsConfigs; // this
+        public TalentsCooldownsConfigs TalentsCooldownsConfigs;
         public TalentsArrowConfigs TalentsArrowConfigs;
         public HammerTalentConfig HammerTalentConfig;
         public SwapTalentConfig SwapTalentConfig;
@@ -26,25 +22,5 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public YearsOfPainTalentConfig YearsOfPainTalentConfig;
         public float TalentCardWidth = 1.602175f;
         public float TalentCardHeight = 2.382844f;
-    }
-
-    [Serializable]
-    public class TalentsCooldownsConfigs
-    {
-        [SerializeReference]
-        public List<BaseTalentCooldownConfig> TalentCooldownConfigs;
-    }
-    
-    [Serializable]
-    public class TalentsArrowConfigs
-    {
-        public List<TalentArrowConfig> TalentCooldownConfigs;
-    }
-    
-    [Serializable]
-    public class TalentArrowConfig
-    {
-        public TalentType TalentType;
-        public bool IsArrowShownOnlyWhilePressed;
     }
 }

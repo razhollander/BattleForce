@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -11,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ICommandFactory _commandFactory;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
         private INetEventsDataService _netEventsDataService;
-        private SimulationGamePlayConfig _simulationGamePlayConfig;
+        private ISimulationGamePlayConfigService _gamePlayConfigService;
 
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
@@ -27,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
-            _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
         }
 
@@ -47,7 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     .SetPlayerIdGotHit(targetId)
                     .SetWasHitByAnotherPlayer(true, casterId)
                     .SetProcessedTick(_processedTick)
-                    .SetHitDamage(_simulationGamePlayConfig.PlayerSpaceship.LockOnHeartHitDamage)
+                    .SetHitDamage(_gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartHitDamage)
                     .Execute();
 
                 _netEventsDataService.AddPlayerLockedOnTargetHitNetEvent(_processedTick, casterId, targetId);

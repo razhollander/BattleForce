@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -9,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
     {
         private readonly IMatchDataService _matchDataService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly Dictionary<ushort, PlayerLockOnTargetTimers> _playerTimers;
         private readonly List<(ushort CasterId, ushort TargetId)> _cachedPlayersToDamage;
 

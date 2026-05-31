@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
@@ -13,14 +14,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IOverrideableNetEventsService _overrideableNetEventsService;
         private readonly IMatchDataService _matchDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
 
-        public DashPulseTalentController(INetEventsDataService netEventsDataService, IOverrideableNetEventsService overrideableNetEventsService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig)
+        public DashPulseTalentController(INetEventsDataService netEventsDataService, IOverrideableNetEventsService overrideableNetEventsService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService)
         {
             _netEventsDataService = netEventsDataService;
             _overrideableNetEventsService = overrideableNetEventsService;
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -57,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var remainingStocksAmount = --dashPulseTalentModel.StocksCooldown.CurrentStocksAmount;
 
             var direction = casterPlayerState.Spaceship.Transform.Direction;
-            var pushForce = direction * _gamePlayConfig.Talents.PulseDashConfig.DashVelocity;
+            var pushForce = direction * _gamePlayConfigService.GamePlayConfig.Talents.PulseDashConfig.DashVelocity;
             casterPlayerState.Spaceship.Transform.Velocity += pushForce;
 
             _netEventsDataService.AddPerformDashPulseNetEvent(tick, _casterPlayerId);

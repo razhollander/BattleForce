@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Contacts;
@@ -24,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPhysicsSimulator _physicsSimulator;
         private IMatchDataService _matchDataService;
         private ICommandFactory _commandFactory;
-        private SimulationGamePlayConfig _gamePlayConfig;
+        private ISimulationGamePlayConfigService _gamePlayConfigService;
         private INetEventsDataService _netEventsDataService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IPlayersTalentsManager _playersTalentsManager;
@@ -46,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
-            _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
             _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
@@ -184,7 +185,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
-            var config = _gamePlayConfig.Talents.ChickenTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.ChickenTalentConfig;
             _spinPlayerCommand.SetPlayer(player.Id).SetSpinAmount(config.SpinAmount).SetTick(_processedTick).Execute();
             
             _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId);
@@ -359,9 +360,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             var springAngle = _matchDataService.EnvironmentData.GetSpring(springId).WorldDirectionDegrees.ToRadians();
             var pushDirection = springAngle.FromAngleRadians();
-            var forceMagnitude = _gamePlayConfig.EnvironmentSprings.Force;
+            var forceMagnitude = _gamePlayConfigService.GamePlayConfig.EnvironmentSprings.Force;
             var force = pushDirection * forceMagnitude;
-            var randomSpin = RNG.NextFloat(_gamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfig.EnvironmentSprings.MaxSpin);
+            var randomSpin = RNG.NextFloat(_gamePlayConfigService.GamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfigService.GamePlayConfig.EnvironmentSprings.MaxSpin);
 
             playerState.Spaceship.Transform.Velocity += force;
             playerState.Spaceship.Transform.Direction = force.Normalize();
@@ -529,7 +530,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playerHitCommand
                 .SetPlayerIdGotHit(playerId)
                 .SetWasHitByAnotherPlayer(true, bulletModel.BelongToPlayerId)
-                .SetHitDamage(_gamePlayConfig.PlayerBullet.HitDamage)
+                .SetHitDamage(_gamePlayConfigService.GamePlayConfig.PlayerBullet.HitDamage)
                 .SetProcessedTick(_processedTick)
                 .Execute();
         }
@@ -560,7 +561,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             DestroyBullet(bulletModel, bulletBody);
             ref var talentCard = ref _matchDataService.SimulationState.TalentCards.GetByIndex(talentCardIndex);
-            talentCard.Health -= _gamePlayConfig.PlayerBullet.HitDamage;
+            talentCard.Health -= _gamePlayConfigService.GamePlayConfig.PlayerBullet.HitDamage;
             var isTalentCardAlive = talentCard.Health > 0;
 
             if (isTalentCardAlive)

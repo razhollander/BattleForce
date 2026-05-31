@@ -1,14 +1,15 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts
 {
     public class PreparationPhaseTimerService : IPreparationPhaseTimerService
     {
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
 
-        public PreparationPhaseTimerService(SimulationGamePlayConfig gamePlayConfig)
+        public PreparationPhaseTimerService(ISimulationGamePlayConfigService gamePlayConfigService)
         {
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
         }
 
         public float PreparationPhaseTimer { get; set; }
@@ -25,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts
 
         public void RestartTimer()
         {
-            PreparationPhaseTimer = _gamePlayConfig.PreparationPhaseDuration;
+            PreparationPhaseTimer = _gamePlayConfigService.GamePlayConfig.PreparationPhaseDuration;
         }
     }
 }
