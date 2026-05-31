@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
 
         public ServerMatchMakingNetworkTickProcessor(NetworkConfig networkConfig, IServerNetworkManager networkManager,
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchMakingDataService matchMakingDataService,
-            IPlayerJoinPacketsHandler playerJoinPacketsHandler, INetEventsDataService iNetEventsDataService,
+            IPlayerJoinPacketsHandler playerJoinPacketsHandler, INetEventsDataService netEventsDataService,
             ICommandFactory commandFactory, ITickService tickService, IStartMatchWallController startMatchWallController, ISimulationStateMachine simulationStateMachine,
             IHeadLessQuitterController headLessQuitterController)
         {
@@ -55,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _playerInputsPacketsHandler = playerInputsPacketsHandler;
             _matchMakingDataService = matchMakingDataService;
             _playerJoinPacketsHandler = playerJoinPacketsHandler;
-            _netEventsDataService = iNetEventsDataService;
+            _netEventsDataService = netEventsDataService;
             _commandFactory = commandFactory;
             _tickService = tickService;
             _startMatchWallController = startMatchWallController;

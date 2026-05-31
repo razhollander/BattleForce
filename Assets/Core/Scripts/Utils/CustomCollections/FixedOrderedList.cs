@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Scripts.Utils.CustomCollections
 {

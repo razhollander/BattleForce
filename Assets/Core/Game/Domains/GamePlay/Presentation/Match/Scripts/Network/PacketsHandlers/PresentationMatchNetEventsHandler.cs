@@ -642,7 +642,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 ref var talent = ref talents.Get(i);
                 if (talent.TalentType == talentType)
                 {
-                    talent.IsActive = true;
+                    talent.IsCurrentlyActive = true;
                     break;
                 }
             }
@@ -658,9 +658,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 if (talent.TalentType == talentType)
                 {
                     talent.NormalCooldown.CooldownEndTick = talentCooldownEndTick;
-                    talent.IsActive = false;
+                    talent.IsCurrentlyActive = false;
                     break;
                 }
+            }
+        }
+
+        public void ProcessPlayerLockOnHeartTargetsChangedEvents(CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C> playerLockOnHeartTargetsChangedNetEvents)
+        {
+            if (playerLockOnHeartTargetsChangedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+            
+            foreach (var netEvent in playerLockOnHeartTargetsChangedNetEvents)
+            {
+                var player = _matchDataService.GetPlayer(netEvent.PlayerId);
+                player.Spaceship.TargetedEnemyIds.Clear();
+                
+                for (int i = 0; i < netEvent.PlayerIdsLockedOnTarget.Count; i++)
+                {
+                    ref var playerId = ref player.Spaceship.TargetedEnemyIds.AddAndGet();
+                    playerId = netEvent.PlayerIdsLockedOnTarget[i];
+                }
+                
+                _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);
             }
         }
     }

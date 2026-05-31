@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Utils.CustomCollections;
 using Core.Scripts.Network;
@@ -7,12 +8,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportG
     public class TeleportGateCooldownService : ITeleportGateService
     {
         private readonly CapacityDict<ushort, int> _lastTeleportTickPerPlayer;
-        private readonly SimulationGamePlayConfig _config;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly NetworkConfig _networkConfig;
 
-        public TeleportGateCooldownService(SimulationGamePlayConfig config, NetworkConfig networkConfig)
+        public TeleportGateCooldownService(ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig)
         {
-            _config = config;
+            _gamePlayConfigService = gamePlayConfigService;
             _networkConfig = networkConfig;
             _lastTeleportTickPerPlayer = new CapacityDict<ushort, int>(_networkConfig.MaxCap.ConcurrentPlayers);
         }
@@ -26,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportG
         {
             if (_lastTeleportTickPerPlayer.TryGetValue(playerId, out var lastTick))
             {
-                var cooldownTicks = (int)(_config.TeleportGateCooldownInSeconds * _networkConfig.TicksPerSeconds);
+                var cooldownTicks = (int)(_gamePlayConfigService.GamePlayConfig.TeleportGateCooldownInSeconds * _networkConfig.TicksPerSeconds);
                 return (currentTick - lastTick) < cooldownTicks;
             }
             return false;

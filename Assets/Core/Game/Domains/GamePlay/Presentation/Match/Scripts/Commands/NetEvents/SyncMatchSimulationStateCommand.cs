@@ -10,6 +10,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Telepor
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
@@ -24,6 +25,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Scripts.Extensions;
+using Core.Scripts.Mvc.WorldCamera;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -57,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IKOProjectilesControllers _kOProjectilesControllers;
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
-        private IMagneticPullEffectController _magneticPullEffectController;
+        private ILockOnTargetEffectController _lockOnTargetEffectController;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -90,8 +92,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
-            _magneticPullEffectController = _diContainer.Resolve<IMagneticPullEffectController>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
+            _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
         }
 
         public void Execute()
@@ -122,6 +124,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers.DestroyAll();
             _grapplingHookProjectilesControllers.DestroyAll();
             _chickenEggsControllers.DestroyAll();
+            _lockOnTargetEffectController.DestroyAll();
         }
 
         private void CreateAll()

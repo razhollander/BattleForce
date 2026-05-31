@@ -137,7 +137,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 return;
             }
             
-            LogService.LogError("Remove power up ball: " + powerUpBallModel.Id);
             PowerUpBalls.Remove(powerUpBallModel);
         }
 

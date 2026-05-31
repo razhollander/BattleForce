@@ -1,8 +1,10 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.ChickenEggs.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
@@ -19,6 +21,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
+
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
@@ -37,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
 {
     public class GamePlayMatchInstaller : MonoInstaller
     {
-        [SerializeField] private PlayerView _playerViewPrefab;
+        [SerializeField] private MatchPlayerView _playerViewPrefab;
         [SerializeField] private EnvironmentLavaWallView _environmentLavaWallViewPrefab;
         [SerializeField] private TalentCardView _talentCardViewPrefab;
         [SerializeField] private TalentCardObtainedEffectView _talentCardObtainedEffectView;
@@ -59,7 +63,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private DashPulseGustEffectView _dashPulseGustEffectViewPrefab;
         [SerializeField] private MagneticPullFieldView _magneticPullFieldViewPrefab;
         [SerializeField] private MagneticPullHitEffectView _magneticPullHitEffectViewPrefab;
+        [SerializeField] private LockOnTargetEffectView lockOnTargetEffectViewPrefab;
+
         [SerializeField] private ChickenEggView _chickenEggViewPrefab;
+        [SerializeField] private BackgroundParallaxView _backgroundParallaxView;
 
         public override void InstallBindings()
         {
@@ -89,7 +96,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<PowerUpBallObtainedEffectController>().AsSingle().WithArguments(_powerUpBallObtainedEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchPlayerUIControllers>().AsSingle().WithArguments(_matchPlayerUIControllersView).NonLazy();
             Container.BindInterfacesTo<MatchBulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
-            Container.BindInterfacesTo<Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc.MatchChickenEggsControllers>().AsSingle().WithArguments(_chickenEggViewPrefab).NonLazy();
+            Container.BindInterfacesTo<MatchChickenEggsControllers>().AsSingle().WithArguments(_chickenEggViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpringControllers>().AsSingle().WithArguments(_environmentSpringViewPrefab).NonLazy();
             Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();
@@ -102,6 +109,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<GrapplingHookProjectilesControllers>().AsSingle().WithArguments(_grapplingHookProjectileViewPrefab).NonLazy();
             Container.BindInterfacesTo<DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<MagneticPullEffectController>().AsSingle().WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<BackgroundParallaxController>().AsSingle().WithArguments(_backgroundParallaxView).NonLazy();
+            Container.BindInterfacesTo<PlayersLockOnTargetEffectControllers>().AsSingle().WithArguments(lockOnTargetEffectViewPrefab).NonLazy();
         }
     }
 }

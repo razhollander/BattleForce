@@ -18,5 +18,13 @@ namespace Core.Scripts.Extensions
         {
             return angleDegrees * Mathf.Deg2Rad;    
         }
+        
+        public static bool IsAlmostEqual(this float a, float b)
+        {
+            var tolerance = 0.001f;
+            return Mathf.Abs(a - b) < tolerance;
+
+            //return Mathf.Approximately(a, b);
+        }
     }
 }

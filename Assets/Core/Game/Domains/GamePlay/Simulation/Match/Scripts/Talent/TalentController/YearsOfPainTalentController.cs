@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -19,19 +20,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IMatchDataService _matchDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SpinPlayerCommand _spinPlayerCommand;
 
         public TalentType TalentType => TalentType.YearsOfPain;
 
-        public YearsOfPainTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
+        private bool IsCurrentlyAiming
+        {
+            get
+            {
+                return _matchDataService.SimulationState.GetIsTalentAimingForPlayer(_casterPlayerId, TalentType);
+            }
+            set
+            {
+                _matchDataService.SimulationState.SetIsTalentCurrentlyAimingForPlayer(_casterPlayerId, TalentType, value);
+            }
+        }
+        
+        public YearsOfPainTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
             IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _spinPlayerCommand = commandFactory.CreateCommandVoid<SpinPlayerCommand>();
@@ -42,13 +55,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick, int tick, float deltaTime)
         {
-            if (!wasTalentInputDownThisTick)
-            {
-                return;
-            }
-
+            var isCurrentlyAiming = IsCurrentlyAiming;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
             var isCurrentSelectedTalentOnCooldown = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown();
@@ -56,6 +65,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             {
                 return;
             }
+
+            if (wasTalentInputDownThisTick)
+            {
+                if (!isCurrentlyAiming)
+                {
+                    IsCurrentlyAiming = true;
+                    casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.AimArrow;
+                }
+            }
+
+            if (!wasTalentInputReleasedThisTick || !isCurrentlyAiming)
+            {
+                return;
+            }
+
+            casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.Hidden;
+            IsCurrentlyAiming = false;
 
             if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType, out int talentIndex))
             {
@@ -65,7 +91,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
             var offset = casterPlayerState.Spaceship.Transform.Radius;
-            var config = _gamePlayConfig.Talents.YearsOfPainTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.YearsOfPainTalentConfig;
             var colliderSize = config.RectangleColliderSize.ToNumericsVector2();
             var center = casterPlayerState.Spaceship.Transform.Position + (direction * (offset + colliderSize.Y * 0.5f));
             var angleRadians = direction.ToAngleRadians();
@@ -87,7 +113,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private void ApplyEffectToEnemyPhysics(int tick, ushort enemyId, PlayerStateS2C casterPlayerState)
         {
-            var config = _gamePlayConfig.Talents.YearsOfPainTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.YearsOfPainTalentConfig;
             var hitEnemyPlayer = _matchDataService.SimulationState.GetPlayerById(enemyId);
             var pushForce = config.PushForce;
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;

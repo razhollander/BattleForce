@@ -74,6 +74,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<ChickenEggHitNetEventS2C> _cachedUnprocessedChickenEggHitEvents;
 
         private readonly CapacityList<ActivateYearsOfPainTalentNetEventS2C> _cachedUnprocessedActivateYearsOfPainTalentEvents;
+        private readonly CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C> _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
 
         private int _largestPacketSizeInLast5Seconds;
@@ -136,6 +137,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedChickenEggHitEvents = new CapacityList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents);
 
             _cachedUnprocessedActivateYearsOfPainTalentEvents = new CapacityList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents);
+            _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents = new CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -202,6 +204,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessLayChickenEggEvents(latestFullTickPacket.LayChickenEggNetEvents, ignoreEventsNotAboveTick);
             ProcessChickenEggHitEvents(latestFullTickPacket.ChickenEggHitNetEvents, ignoreEventsNotAboveTick);
             ProcessActivateYearsOfPainTalentEvents(latestFullTickPacket.ActivateYearsOfPainTalentNetEvents, ignoreEventsNotAboveTick);
+            ProcessPlayerLockOnHeartTargetsChangedNetEvents(latestFullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform(simulationState);
@@ -974,7 +977,30 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _presentationNetEventsHandler.ProcessGainBoltsNetEvents(_cachedUnprocessedGainBoltsEvents);
             }
         }
+        
+        private void ProcessPlayerLockOnHeartTargetsChangedNetEvents(FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            for (int i = 0; i < _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Count; i++)
+            {
+                _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents[i].PlayerIdsLockedOnTarget.Clear();   
+            }
+            _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Clear();
 
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerLockOnHeartTargetsChangedEvents(_cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents);
+            }
+        }
+        
         private void ProcessActivateYearsOfPainTalentEvents(FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C> events, int ignoreEventsNotAboveTick)
         {
             _cachedUnprocessedActivateYearsOfPainTalentEvents.Clear();
@@ -1003,6 +1029,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 playerModel.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
                 playerModel.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
                 playerModel.Spaceship.TalentsState.AimDirection = playerState.Spaceship.TalentsState.AimDirection;
+                playerModel.Spaceship.AssistArrowType = playerState.Spaceship.AssistArrowType;
             }
         }
 

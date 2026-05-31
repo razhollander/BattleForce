@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -36,12 +37,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IOverrideableNetEventsService _overrideableNetEventsService;
 
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
+        private TryDamagePlayersOnTargetCommand _tryDamagePlayersOnTargetCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private StepTimersCommand _stepTimersCommand;
         private TryEndPlayersSpinCommand _tryEndPlayersSpinCommand;
         private TryEndStagePreparationPhaseCommand _tryEndStagePreparationPhaseCommand;
         private StepAllPlayersTalentsCooldownsCommand _stepAllPlayersTalentsCooldownsCommand;
+        private TrySendPlayersLockOnTargetChangedCommand _trySendPlayersLockOnTargetChangedCommand;
         
         private readonly MatchFullTickPacketS2C _fullTickPacket;
         private readonly StartMatchPacketS2C _cachedStartMatchPacket;
@@ -49,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IServerNetworkManager networkManager,
             IMatchPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
-            IMatchPlayerJoinPacketsHandler iIMatchPlayerJoinPacketsHandler, INetEventsDataService iNetEventsDataService,
+            IMatchPlayerJoinPacketsHandler iIMatchPlayerJoinPacketsHandler, INetEventsDataService netEventsDataService,
             ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController, IStageDataService stageDataService, IOverrideableNetEventsService overrideableNetEventsService)
         {
             _networkConfig = networkConfig;
@@ -57,7 +60,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _playerInputsPacketsHandler = playerInputsPacketsHandler;
             _matchDataService = matchDataService;
             _matchPlayerJoinPacketsHandler = iIMatchPlayerJoinPacketsHandler;
-            _netEventsDataService = iNetEventsDataService;
+            _netEventsDataService = netEventsDataService;
             _commandFactory = commandFactory;
             _tickService = tickService;
             _headLessQuitterController = headLessQuitterController;
@@ -72,11 +75,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         {
             _tryEndPlayersSpinCommand = _commandFactory.CreateCommandVoid<TryEndPlayersSpinCommand>();
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
+            _tryDamagePlayersOnTargetCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersOnTargetCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
             _tryEndStagePreparationPhaseCommand = _commandFactory.CreateCommandVoid<TryEndStagePreparationPhaseCommand>();
             _stepAllPlayersTalentsCooldownsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCooldownsCommand>();
+            _trySendPlayersLockOnTargetChangedCommand = _commandFactory.CreateCommandVoid<TrySendPlayersLockOnTargetChangedCommand>();
             _tickService.RegisterObserver(this);
         }
 
@@ -101,6 +106,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
                 _tryEndPlayersSpinCommand.SetTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
+                _trySendPlayersLockOnTargetChangedCommand.SetProcessedTick(currentTick).Execute();
+                _tryDamagePlayersOnTargetCommand.SetProcessedTick(currentTick).Execute();
                 _overrideableNetEventsService.RegisterAllOverridableNetEvents();
                 RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
                 SendCurrentTickStateToAllClients(currentTick);
@@ -247,6 +254,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.LayChickenEggNetEvents = _netEventsDataService.LayChickenEggNetEventsPerPlayer[playerId];
                 _fullTickPacket.ChickenEggHitNetEvents = _netEventsDataService.ChickenEggHitNetEventsPerPlayer[playerId];
                 _fullTickPacket.ActivateYearsOfPainTalentNetEvents = _netEventsDataService.ActivateYearsOfPainTalentNetEventsPerPlayer[playerId];
+                _fullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents = _netEventsDataService.PlayerLockOnHeartTargetsChangedNetEventsPerPlayer[playerId];
+                _fullTickPacket.PlayerLockedOnTargetHitNetEvents = _netEventsDataService.PlayerLockedOnTargetHitNetEventsPerPlayer[playerId];
                 _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

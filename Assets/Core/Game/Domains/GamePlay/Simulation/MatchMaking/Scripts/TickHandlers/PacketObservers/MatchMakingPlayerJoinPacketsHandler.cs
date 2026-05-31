@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
@@ -25,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
     {
         private readonly IServerNetworkManager _networkManager;
         private readonly IMatchMakingDataService _matchDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
@@ -37,14 +38,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
         public PacketTypeC2S PacketType => PacketTypeC2S.JoinRequest;
 
         public MatchMakingPlayerJoinPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
-            SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
-            INetEventsDataService iNetEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ISimulationInputService simulationInputService)
+            ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator,
+            INetEventsDataService netEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ISimulationInputService simulationInputService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
-            _netEventsDataService = iNetEventsDataService;
+            _netEventsDataService = netEventsDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _simulationInputService = simulationInputService;
             _networkConfig = networkConfig;
@@ -62,8 +63,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
         {
             var startingDirection = Vector2.One;
             var velocity = startingDirection * 0.01f;
-            var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
-            var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
+            var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
+            var heartRadius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.DefaultHeartRadius;
+            var shootCooldown = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.ShootCooldown;
 
             foreach (var kvp in _playerJoinedPacketsPerPeer)
             {
@@ -94,7 +96,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                     peer.Tag = playerId;
                     
                     _simulationInputService.AddPlayer(playerId);
-                    _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius);
+                    _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius, heartRadius);
                     _networkManager.AddPlayerPeer(playerId, peer);
                     _netEventsDataService.StartSavingPlayerEvents(playerId);
                     _netEventsDataService.AddMatchMakingPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);

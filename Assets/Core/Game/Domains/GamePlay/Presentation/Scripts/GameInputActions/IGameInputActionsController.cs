@@ -16,7 +16,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         Vector2 GetAimDirection();
         Vector2 GetMoveDirection();
         Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui);
-        bool IsTalentInputPressed();
-        bool IsSwitchTalentInputPressed();
+        bool IsTalentAInputPressed();
+        bool IsTalentBInputPressed();
+        bool IsTalentCInputPressed();
     }
 }

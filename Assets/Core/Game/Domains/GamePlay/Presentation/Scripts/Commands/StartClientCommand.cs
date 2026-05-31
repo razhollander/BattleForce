@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
         private string _ipAddress;
         private int _port;
         private string _playerName;
+        private bool _isGamePadEnabled;
         
         private IClientNetworkManager _networkManager;
         private IJoinResponsePacketHandler _joinResponsePacketHandler;
@@ -46,6 +47,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
             return this;
         }
 
+        public StartClientCommand SetIsGamePadEnabled(bool isGamePadEnabled)
+        {
+            _isGamePadEnabled = isGamePadEnabled;
+            return this;
+        }
+
         public override void ResolveDependencies()
         {
             _networkManager = _diContainer.Resolve<IClientNetworkManager>();
@@ -65,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
                 await Awaitable.FixedUpdateAsync(cancellationTokenSource.Token);
             }
 
-            var joinRequest = new JoinRequestPacketC2S(_playerName);
+            var joinRequest = new JoinRequestPacketC2S(_playerName, _isGamePadEnabled);
             _networkManager.SendPacketSerialized(PacketTypeC2S.JoinRequest, joinRequest, DeliveryMethod.ReliableOrdered);
             
             while (!_joinResponsePacketHandler.DidReceiveJoinResponse)
@@ -96,25 +103,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
                 await LoadMatchScene(enterData, cancellationTokenSource);
             }
         }
-        
+
         private void SyncTickToServer(int serverTick)
         {
             var ticksPassedSinceServerSendPacket = (_networkManager.Ping / 1000f) / _networkConfig.DeltaTime;
             var tickWouldBeOnServerWhenReceiveMyPackets = (int)(ticksPassedSinceServerSendPacket * 2) + serverTick;
             _tickCounterService.SetTick(tickWouldBeOnServerWhenReceiveMyPackets);
         }
-        
+
         private async Awaitable LoadMatchMakingScene(GamePlayMatchMakingInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
         {
             await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
-        }  
-        
+        }
+
         private async Awaitable LoadMatchScene(GamePlayMatchInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
         {
             await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.GamePlayMatchScene, enterData, cancellationTokenSource);
         }
-
     }
 }

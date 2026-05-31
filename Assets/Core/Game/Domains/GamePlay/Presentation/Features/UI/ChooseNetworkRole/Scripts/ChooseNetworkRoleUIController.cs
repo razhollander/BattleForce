@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private const string PREFS_PLAYER_NAME_KEY = "NetworkRole_PlayerName";
         private const string PREFS_IP_ADDRESS_KEY = "NetworkRole_IpAddress";
         private const string PREFS_IS_LOCAL_HOST_KEY = "NetworkRole_IsLocalHost";
+        private const string PREFS_IS_GAME_PAD_KEY = "NetworkRole_IsGamePad";
         private const string PREFS_PORT_HOST_KEY = "NetworkRole_Port";
         
         private readonly ChooseNetworkRoleUIView _uiView;
@@ -52,8 +53,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             var ipAddress = _dataPersistence.Load(PREFS_IP_ADDRESS_KEY, _networkConfig.IpAddress);
             var isLocalHost = _dataPersistence.Load(PREFS_IS_LOCAL_HOST_KEY, _networkConfig.OnlyLocal);
             var port = _dataPersistence.Load(PREFS_PORT_HOST_KEY, _networkConfig.DefaultHostPort);
+            var isGamePad = _dataPersistence.Load(PREFS_IS_GAME_PAD_KEY, false);
             
-            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, isLocalHost, ipAddress, port, playerName);
+            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, isLocalHost, ipAddress, port, playerName, isGamePad);
             PopulatePlaybacksDropdown();
 
             if (PlayerPrefsSettings.ShouldSkipMatchMaking)
@@ -165,6 +167,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
                 .SetIsHost(isHost)
                 .SetServerAddress(ip,port)
                 .SetPlayerName(playerName)
+                .SetIsGamePadEnabled(_uiView.IsGamePad)
                 .Execute(cancellationTokenSource).Forget();
             
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
@@ -193,6 +196,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
                 PREFS_PLAYER_NAME_KEY, _uiView.PlayerName,
                 PREFS_IP_ADDRESS_KEY, _uiView.IpAddress, 
                 PREFS_IS_LOCAL_HOST_KEY, _uiView.IsLocalHost,
+                PREFS_IS_GAME_PAD_KEY, _uiView.IsGamePad,
                 PREFS_PORT_HOST_KEY, _uiView.Port);
         }
 

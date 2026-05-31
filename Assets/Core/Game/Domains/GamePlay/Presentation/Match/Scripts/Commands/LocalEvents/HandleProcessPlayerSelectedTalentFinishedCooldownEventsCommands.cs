@@ -28,14 +28,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.LocalEv
             {
                 return;
             }
-
-            foreach (var localEvent in localEvents)
-            {
-                if (_matchDataService.GetPlayer(localEvent.PlayerId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentForCaster))
-                {
-                    _playerControllers.UpdateIsPlayerArrowShownAccordingToTalentState(localEvent.PlayerId, currentSelectedTalentForCaster);
-                }
-            }
             
             _cachedPresentationEventsService.PlayerSelectedTalentFinishedCooldownLocalEvents.Clear();
         }

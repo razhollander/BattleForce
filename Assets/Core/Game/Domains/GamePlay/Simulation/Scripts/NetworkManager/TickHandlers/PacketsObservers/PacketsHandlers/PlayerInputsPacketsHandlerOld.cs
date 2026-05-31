@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 // using System.Collections.Generic;
 // using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 // using Core.Game.Domains.GamePlay.Shared.NetworkManager;
@@ -15,16 +16,16 @@
 //     {
 //         private readonly IServerNetworkManager _networkManager;
 //         private readonly IMatchDataService _matchDataService;
-//         private readonly SimulationGamePlayConfig _gamePlayConfig;
+//         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
 //         private readonly NetworkConfig _networkConfig;
 //         private readonly Dictionary<int, Dictionary<int, PlayerInputPacketC2S>> _inputsByTick = new ();
 //         private readonly Dictionary<int,PlayerInputPacketC2S> _cachedLastProcessedInput = new ();
 //
-//         public PlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
+//         public PlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig)
 //         {
 //             _networkManager = networkManager;
 //             _matchDataService = matchDataService;
-//             _gamePlayConfig = gamePlayConfig;
+//             _gamePlayConfigService = gamePlayConfigService;
 //             _networkConfig = networkConfig;
 //         }
 //
@@ -68,7 +69,7 @@
 //                 }
 //
 //                 var playerModel = _matchDataService.GetPlayer(playerId);
-//                 var rotationDelta = _gamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
+//                 var rotationDelta = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
 //                 var rotationAngle =
 //                     (playerInputPacket.IsMoveLeftInputPressed.ToInt() -
 //                      playerInputPacket.IsMoveRightInputPressed.ToInt()) * rotationDelta;
@@ -76,7 +77,7 @@
 //                 LogService.LogTopic($"rotatedVector {rotatedVector} rotationAngle {rotationAngle} playerInputPacket.IsMoveLeftInputPressed {playerInputPacket.IsMoveLeftInputPressed} playerInputPacket.IsMoveRightInputPressed.ToInt() {playerInputPacket.IsMoveRightInputPressed} rotationDelta {rotationDelta}");
 //                 playerModel.Spaceship.Transform.RotationVector = rotatedVector;
 //                 playerModel.Spaceship.Transform.Position += playerModel.Spaceship.Transform.RotationVector *
-//                                                             _gamePlayConfig.PlayerSpaceship.MovementSpeed *
+//                                                             _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.MovementSpeed *
 //                                                             _networkConfig.DeltaTime;
 //                 _matchDataService.SetPlayer(playerId, playerModel);
 //                 _cachedLastProcessedInput[playerId] = playerInputPacket;

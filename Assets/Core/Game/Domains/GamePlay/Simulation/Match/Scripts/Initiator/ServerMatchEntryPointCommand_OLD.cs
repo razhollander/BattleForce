@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 // using System;
 // using Core.Game.Domains.GamePlay.Shared.NetworkManager;
 // using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -20,7 +21,7 @@
 //         private ITickProcessor _tickProcessor;
 //         private IPlayerInputsPacketsHandler _playerInputsPacketsHandler;
 //         private IPhysicsSimulator _physicsSimulator;
-//         private SimulationGamePlayConfig _simulationGamePlayConfig;
+//         private ISimulationGamePlayConfigService _gamePlayConfigService;
 //         private IMatchDataService _matchDataService;
 //         private IPlaybackRecorderService _playbackRecorderService;
 //
@@ -31,7 +32,7 @@
 //             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
 //             _playerInputsPacketsHandler = _diContainer.Resolve<IPlayerInputsPacketsHandler>();
 //             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
-//             _simulationGamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+//             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
 //             _matchDataService = _diContainer.Resolve<IMatchDataService>();
 //             _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
 //         }
@@ -109,8 +110,8 @@
 //             {
 //                 var talentCardPosition = talentCard.Position;
 //                 var talentCardId = talentCard.Id;
-//                 _matchDataService.AddTalentCard(talentCardId, talentCardPosition, talentCard.TalentType, _simulationGamePlayConfig.Talents.TalentCardHealth);
-//                 _physicsSimulator.AddTalentCard(talentCardId, talentCardPosition, _simulationGamePlayConfig.Talents.TalentCardWidth, _simulationGamePlayConfig.Talents.TalentCardHeight);
+//                 _matchDataService.AddTalentCard(talentCardId, talentCardPosition, talentCard.TalentType, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardHealth);
+//                 _physicsSimulator.AddTalentCard(talentCardId, talentCardPosition, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardWidth, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardHeight);
 //             }
 //         }
 //     }

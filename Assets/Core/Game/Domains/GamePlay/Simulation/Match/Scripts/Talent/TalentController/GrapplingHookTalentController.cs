@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
@@ -25,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IMatchDataService _matchDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedConfig;
@@ -44,13 +45,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 _matchDataService.SimulationState.SetIsTalentCurrentlyActiveForPlayer(_casterPlayerId, TalentType, value);
             }
         }
+        
+        private bool IsCurrentlyAiming
+        {
+            get
+            {
+                return _matchDataService.SimulationState.GetIsTalentAimingForPlayer(_casterPlayerId, TalentType);
+            }
+            set
+            {
+                _matchDataService.SimulationState.SetIsTalentCurrentlyAimingForPlayer(_casterPlayerId, TalentType, value);
+            }
+        }
 
-        public GrapplingHookTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
+        public GrapplingHookTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
             IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedConfig)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _sharedConfig = sharedConfig;
@@ -61,8 +74,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick, int tick, float deltaTime)
         {
+            var isCurrentlyAiming = IsCurrentlyAiming;
+            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
+            if (casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown())
+            {
+                return;
+            }
+
+            if (wasTalentInputDownThisTick)
+            {
+                if (!IsCurrentlyActive && !isCurrentlyAiming)
+                {
+                    IsCurrentlyAiming = true;
+                    casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.AimArrow;
+                }
+            }
+
             if (IsCurrentlyActive)
             {
                 if (wasTalentInputDownThisTick)
@@ -76,17 +105,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            if (!wasTalentInputDownThisTick)
+            if (!wasTalentInputReleasedThisTick || !isCurrentlyAiming)
             {
                 return;
             }
 
-            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            if (casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown())
-            {
-                return;
-            }
-
+            casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.Hidden;
+            IsCurrentlyAiming = false;
             ActivateTalent(tick, casterPlayerState);
         }
 
@@ -95,7 +120,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             IsCurrentlyActive = true;
             _isInReturnPhase = false;
 
-            var config = _gamePlayConfig.Talents.GrapplingHookTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.GrapplingHookTalentConfig;
             var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
             var velocity = aimDirection * config.ProjectileSpeed;
             var size = _sharedConfig.GrapplingHookProjectileSize;
@@ -125,7 +150,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             ref var projectile = ref _matchDataService.SimulationState.GetGrapplingHookProjectileById(_projectileId);
-            var config = _gamePlayConfig.Talents.GrapplingHookTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.GrapplingHookTalentConfig;
             var arriveDistance = config.ArriveDistance;
 
             if (_isInReturnPhase)

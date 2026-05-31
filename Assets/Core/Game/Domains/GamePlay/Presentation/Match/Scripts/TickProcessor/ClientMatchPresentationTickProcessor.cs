@@ -6,7 +6,9 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.LocalEvents;
+using Core.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.UpdateService;
@@ -22,6 +24,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly IMatchPlayerUIControllers _matchPlayerUIControllers;
         private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
         private readonly IWorldCameraController _worldCameraController;
+        private readonly ILockOnTargetEffectController _lockOnTargetEffectController;
+
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
         private readonly HandlePlayerDiedNetEventsCommand _handlePlayerDiedNetEventsCommand;
@@ -63,9 +67,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands;
         private readonly HandleCreateMagenticPullFieldNetEventsCommand _handleCreateMagenticPullFieldNetEventsCommand;
         private readonly HandleActivateYearsOfPainTalentNetEventsCommand _handleActivateYearsOfPainTalentNetEventsCommand;
+        private readonly HandlePlayerLockOnHeartTargetsChangedNetEventsCommand _handlePlayerLockOnHeartTargetsChangedNetEventsCommand;
+        private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
+            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler, ILockOnTargetEffectController lockOnTargetEffectController)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
@@ -114,6 +120,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleCreateMagenticPullFieldNetEventsCommand = commandFactory.CreateCommandVoid<HandleCreateMagenticPullFieldNetEventsCommand>();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands = commandFactory.CreateCommandVoid<HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands>();
             _handleActivateYearsOfPainTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateYearsOfPainTalentNetEventsCommand>();
+            _handlePlayerLockOnHeartTargetsChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockOnHeartTargetsChangedNetEventsCommand>();
+            _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
+            _lockOnTargetEffectController = lockOnTargetEffectController;
         }
         
         public void InitEntryPoint()
@@ -152,8 +161,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _playerControllers.UpdatePlayersTickDeltas();
             _handleSwapFieldCreatedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleDeactivateSwapTalentNetEventsCommand.Execute();
-            _updateSwapFieldsTransformCommand.SetTick(lastProcessedTickFromServer).Execute();// must be after _playerControllers.UpdatePlayersTransform();
-            _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTransform();
+            _updateSwapFieldsTransformCommand.SetTick(lastProcessedTickFromServer).Execute();// must be after _playerControllers.UpdatePlayersTickDeltas();
+            _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTickDeltas();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();
             _handleDeactivateKOTalentNetEventsCommand.Execute();
             _handleCreateGrapplingHookProjecitleNetEventsCommand.Execute();
@@ -176,7 +185,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
             _updateObjectTransformInsideRotatingWheelsCommand.Execute();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands.Execute();
-            _handleTalentCardObtainedNetEventsCommand.SetCurrentServerTick(lastProcessedTickFromServer).Execute();
+            _handlePlayerLockOnHeartTargetsChangedNetEventsCommand.Execute();
+            _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnHeartTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
         }
     }
 }

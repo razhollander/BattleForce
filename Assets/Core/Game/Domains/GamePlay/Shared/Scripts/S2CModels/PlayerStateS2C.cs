@@ -12,9 +12,9 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public ushort TeamId;
         public bool IsConnected;
         
-        public PlayerStateS2C(int maxTalents)
+        public PlayerStateS2C(int maxTalents, int maxEnemiesAmount)
         {
-            Spaceship = new PlayerSpaceshipStateS2C(maxTalents);
+            Spaceship = new PlayerSpaceshipStateS2C(maxTalents, maxEnemiesAmount);
         }
         
         public void Serialize(NetDataWriter writer)
