@@ -156,14 +156,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             var latestTickReceivedFromServer = _fullTickPackets.Keys.Max();
             var latestFullTickPacket = _fullTickPackets[latestTickReceivedFromServer];
+            var ignoreEventsNotAboveTick = Mathf.Max(LastProcessedTickFromServer, _lastFullSyncTickDataService.LastFullSyncTick);
 
-            if (latestTickReceivedFromServer <= LastProcessedTickFromServer)
+            if (latestTickReceivedFromServer <= ignoreEventsNotAboveTick)
             {
                 LogService.LogTopic("Didn't receive any state since last tick", LogTopicType.ClientNetwork);
                 return;
             }
             
-            var ignoreEventsNotAboveTick = UnityEngine.Mathf.Max(LastProcessedTickFromServer, _lastFullSyncTickDataService.LastFullSyncTick);
 
             ProcessPlayerRejoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents, latestTickReceivedFromServer, ignoreEventsNotAboveTick);
             ProcessPlayersTalentsNormalCooldownsTimersIfEnded(latestTickReceivedFromServer);
