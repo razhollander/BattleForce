@@ -163,10 +163,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80e7fd3ff009046f6a60ad3b702514e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gamePlayConfig: {fileID: 11400000, guid: 322d4f0f32b31486db5e8892412642a8, type: 2}
+  _gamePlayConfig: {fileID: 11400000, guid: ba749d9a7d225476f8d7a6f65dc05315, type: 2}
   _sharedGamePlayConfig: {fileID: 11400000, guid: de964e16c50a04c0a970e0eca290cdfa, type: 2}
-  _powerUpsConfig: {fileID: 11400000, guid: f3f1e9d59a8914447bcbb1a5299d3b37, type: 2}
-  _defaultMatchEnterDataConfig: {fileID: 11400000, guid: 1e385c71b341148f1a886bde85eacecd, type: 2}
+  _powerUpsConfig:
+    SpawnMinSecondsInterval: 5
+    SpawnMaxSecondsInterval: 10
+    MaxConcurrentPowerUpBalls: 5
+    MoveSpeed: 5
+    Radius: 1.269
 --- !u!1 &1631379501
 GameObject:
   m_ObjectHideFlags: 0

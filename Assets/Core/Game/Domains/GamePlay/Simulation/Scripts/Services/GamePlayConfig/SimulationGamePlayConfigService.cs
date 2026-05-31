@@ -1,6 +1,6 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Helpers.JsonConverters;
 using Newtonsoft.Json;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig
 {
@@ -16,8 +16,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig
         
         public void OverrideGamePlayConfig(string configJson)
         {
-            _simulationGamePlayConfig = JsonConvert.DeserializeObject<SimulationGamePlayInnerConfig>(configJson);
-            int a = 0;
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(new TalentCooldownConfigConverter());
+            _simulationGamePlayConfig = JsonConvert.DeserializeObject<SimulationGamePlayInnerConfig>(configJson, settings);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
     {
         public PlayerSpaceshipConfig PlayerSpaceship;
         public PlayerBulletConfig PlayerBullet;
-        public TalentsInnerConfig Talents; // this
+        public TalentsInnerConfig Talents;
         public LavaConfig Lava;
         public PowerUpsConfig PowerUps;
         public EnvironmentSpringsConfig EnvironmentSprings;

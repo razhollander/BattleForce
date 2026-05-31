@@ -185,7 +185,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
-            var config = _config.GamePlayConfig.Talents.ChickenTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.ChickenTalentConfig;
             _spinPlayerCommand.SetPlayer(player.Id).SetSpinAmount(config.SpinAmount).SetTick(_processedTick).Execute();
             
             _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId);
@@ -360,9 +360,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             var springAngle = _matchDataService.EnvironmentData.GetSpring(springId).WorldDirectionDegrees.ToRadians();
             var pushDirection = springAngle.FromAngleRadians();
-            var forceMagnitude = _config.GamePlayConfig.EnvironmentSprings.Force;
+            var forceMagnitude = _gamePlayConfigService.GamePlayConfig.EnvironmentSprings.Force;
             var force = pushDirection * forceMagnitude;
-            var randomSpin = RNG.NextFloat(_config.GamePlayConfig.EnvironmentSprings.MinSpin, _config.GamePlayConfig.EnvironmentSprings.MaxSpin);
+            var randomSpin = RNG.NextFloat(_gamePlayConfigService.GamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfigService.GamePlayConfig.EnvironmentSprings.MaxSpin);
 
             playerState.Spaceship.Transform.Velocity += force;
             playerState.Spaceship.Transform.Direction = force.Normalize();
@@ -530,7 +530,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playerHitCommand
                 .SetPlayerIdGotHit(playerId)
                 .SetWasHitByAnotherPlayer(true, bulletModel.BelongToPlayerId)
-                .SetHitDamage(_config.GamePlayConfig.PlayerBullet.HitDamage)
+                .SetHitDamage(_gamePlayConfigService.GamePlayConfig.PlayerBullet.HitDamage)
                 .SetProcessedTick(_processedTick)
                 .Execute();
         }
@@ -561,7 +561,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             DestroyBullet(bulletModel, bulletBody);
             ref var talentCard = ref _matchDataService.SimulationState.TalentCards.GetByIndex(talentCardIndex);
-            talentCard.Health -= _config.GamePlayConfig.PlayerBullet.HitDamage;
+            talentCard.Health -= _gamePlayConfigService.GamePlayConfig.PlayerBullet.HitDamage;
             var isTalentCardAlive = talentCard.Health > 0;
 
             if (isTalentCardAlive)

@@ -91,7 +91,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
             var offset = casterPlayerState.Spaceship.Transform.Radius;
-            var config = _config.GamePlayConfig.Talents.YearsOfPainTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.YearsOfPainTalentConfig;
             var colliderSize = config.RectangleColliderSize.ToNumericsVector2();
             var center = casterPlayerState.Spaceship.Transform.Position + (direction * (offset + colliderSize.Y * 0.5f));
             var angleRadians = direction.ToAngleRadians();
@@ -113,7 +113,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private void ApplyEffectToEnemyPhysics(int tick, ushort enemyId, PlayerStateS2C casterPlayerState)
         {
-            var config = _config.GamePlayConfig.Talents.YearsOfPainTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.YearsOfPainTalentConfig;
             var hitEnemyPlayer = _matchDataService.SimulationState.GetPlayerById(enemyId);
             var pushForce = config.PushForce;
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;

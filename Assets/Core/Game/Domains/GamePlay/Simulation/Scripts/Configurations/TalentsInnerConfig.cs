@@ -8,7 +8,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
     {
         public ushort TalentCardHealth = 2;
         [BF_SubclassList.SubclassList(typeof(BaseTalentCooldownConfig)), SerializeField]
-        public TalentsCooldownsConfigs TalentsCooldownsConfigs; // this
+        public TalentsCooldownsConfigs TalentsCooldownsConfigs;
         public TalentsArrowConfigs TalentsArrowConfigs;
         public HammerTalentConfig HammerTalentConfig;
         public SwapTalentConfig SwapTalentConfig;

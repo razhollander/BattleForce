@@ -120,7 +120,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             IsCurrentlyActive = true;
             _isInReturnPhase = false;
 
-            var config = _config.GamePlayConfig.Talents.GrapplingHookTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.GrapplingHookTalentConfig;
             var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
             var velocity = aimDirection * config.ProjectileSpeed;
             var size = _sharedConfig.GrapplingHookProjectileSize;
@@ -150,7 +150,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             ref var projectile = ref _matchDataService.SimulationState.GetGrapplingHookProjectileById(_projectileId);
-            var config = _config.GamePlayConfig.Talents.GrapplingHookTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.GrapplingHookTalentConfig;
             var arriveDistance = config.ArriveDistance;
 
             if (_isInReturnPhase)

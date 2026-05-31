@@ -67,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            var config = _config.GamePlayConfig.Talents.ChickenTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.ChickenTalentConfig;
 
             var movementDirection = casterPlayerState.Spaceship.Transform.Direction;
             casterPlayerState.Spaceship.Transform.Velocity += movementDirection * config.PushForce;

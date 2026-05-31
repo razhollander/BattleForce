@@ -98,7 +98,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             ushort hitEnemyId = 0;
 
             var didHitEnemy = _physicsSimulator.ArcCastOnPlayers(center, _sharedGamePlayConfig.MagneticPullFieldRadius, direction,
-                _config.GamePlayConfig.Talents.MagneticPullTalentConfig.FieldArcAngle, (short) casterPlayerState.TeamId, out var hitBodyData);
+                _gamePlayConfigService.GamePlayConfig.Talents.MagneticPullTalentConfig.FieldArcAngle, (short) casterPlayerState.TeamId, out var hitBodyData);
             if (didHitEnemy)
             {
                 hitEnemyId = hitBodyData.Id;
@@ -114,7 +114,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private void ApplyPullToEnemyPhysics(int tick, ushort enemyId, PlayerStateS2C casterPlayerState)
         {
-            var config = _config.GamePlayConfig.Talents.MagneticPullTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.MagneticPullTalentConfig;
             var hitEnemyPlayer = _matchDataService.SimulationState.GetPlayerById(enemyId);
             var pullForce = config.PushForce;
             var directionToEnemy = Vector2.Normalize(hitEnemyPlayer.Spaceship.Transform.Position - casterPlayerState.Spaceship.Transform.Position);
