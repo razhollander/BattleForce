@@ -67,5 +67,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 _targetTimers[targetId] = 0f;
             }
         }
+
+        public void ResetAllTimers()
+        {
+            _targetTimers.Clear();
+        }
     }
 }

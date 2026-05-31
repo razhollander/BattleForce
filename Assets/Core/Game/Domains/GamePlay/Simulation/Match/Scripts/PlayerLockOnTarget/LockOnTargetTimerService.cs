@@ -62,5 +62,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 playerTimer.ResetTimer(targetId);
             }
         }
+
+        public void ResetAllTimers()
+        {
+            foreach (var playerTimer in _playerTimers)
+            {
+                playerTimer.Value.ResetAllTimers();
+            }
+        }
     }
 }

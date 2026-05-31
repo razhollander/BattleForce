@@ -27,7 +27,6 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Scripts.Extensions;
 using Core.Scripts.Mvc.WorldCamera;
 using Core.Scripts.Network;
-using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents

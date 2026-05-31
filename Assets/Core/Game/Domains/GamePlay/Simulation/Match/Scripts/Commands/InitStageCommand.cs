@@ -14,6 +14,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 
@@ -37,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
         private TryAddARandomTalentForPlayerCommand _tryAddARandomTalentForPlayerCommand;
         private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
+        private ILockOnTargetTimerService _lockOnTargetTimerService;
 
         public override void ResolveDependencies()
         {
@@ -55,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
             _tryAddARandomTalentForPlayerCommand = _commandFactory.CreateCommandVoid<TryAddARandomTalentForPlayerCommand>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
+            _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
         }
 
         public void Execute()
@@ -124,6 +127,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersTalentsManager.ResetAllTalentsData();
             _preparationPhaseTimerService.RestartTimer();
             _playersOutsideStageTrackerService.ClearAllData();
+            _lockOnTargetTimerService.ResetAllTimers();
             _stageDataService.ClearData();
         }
 
@@ -173,7 +177,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.Transform.Radius = radius;
                 player.Spaceship.IsEngineOn = true;
                 player.Spaceship.IsAlive = true;
-
+                player.Spaceship.IsSpinned = false;
+                player.Spaceship.TargetedEnemyIds.Clear();
+                
                 if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                 {
                     _setRandomTalentsForPlayerCommand.SetPlayerId(player.Id).SetTalentsAmount(_gamePlayConfigService.GamePlayConfig.RandomTalentsForPlayersAmount).Execute();
@@ -181,7 +187,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 else if (_gamePlayConfigService.GamePlayConfig.ShouldAddTalentEveryXStages)
                 {
                     var didReachStage = _stageNumber % _gamePlayConfigService.GamePlayConfig.EveryXStages == 0;
-                    if (didReachStage /*&& _stageNumber<5*/)
+                    if (didReachStage)
                     {
                         _tryAddARandomTalentForPlayerCommand.SetPlayerId(player.Id).Execute();
                     }
@@ -198,7 +204,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
         }
 
-        private Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel.MatchEnvironmentFieldBarrierModel GetBarrierForTeam(ushort teamId)
+        private MatchEnvironmentFieldBarrierModel GetBarrierForTeam(ushort teamId)
         {
             foreach (var barrier in _matchDataService.EnvironmentData.FieldBarriers.AsSpan())
             {
