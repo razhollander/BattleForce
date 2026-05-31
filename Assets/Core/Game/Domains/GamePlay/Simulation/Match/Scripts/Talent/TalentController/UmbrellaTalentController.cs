@@ -96,6 +96,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             casterPlayerState.Spaceship.AssistArrowType = PlayerAssistArrowType.Hidden;
             IsCurrentlyAiming = false;
             IsCurrentlyActive = true;
+            casterPlayerState.Spaceship.IsEngineOn = false;
             _startTick = tick;
             _netEventsDataService.AddActivateUmbrellaTalentNetEvent(tick, _casterPlayerId);
         }
