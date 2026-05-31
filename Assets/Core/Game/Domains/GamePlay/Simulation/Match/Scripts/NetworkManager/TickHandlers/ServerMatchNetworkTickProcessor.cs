@@ -136,7 +136,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
 
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
-            SendStartStageToAllPlayers(currentTick);// why do we send this and not add it as a NetEvent???
+            SendStartStageToAllPlayers(currentTick);
         }
 
         private void SendStartStageToAllPlayers(int processedTick)
@@ -148,7 +148,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     return;
                 }
                 
-                SendStartStagePacketToClient(playerState.Id, processedTick, DeliveryMethod.ReliableUnordered);
+                SendStartStagePacketToClient(playerState.Id, processedTick, DeliveryMethod.ReliableUnordered); // we don't send in a net event cause it can fill quickly our packet buffer
             }
         }
         
