@@ -503,52 +503,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
-        /*public void Deserialize(NetDataReader reader)
-        {
-            Tick = reader.GetInt();
-            CurrentSimulationState.DeserializeTransforms(reader);
-            DeserializedPlayerJoinedEvents(reader);
-            DeserializedBulletSpawnedEvents(reader);
-            DeserializedPlayerTakeDamageEvents(reader);
-            DeserializedPlayerDiedEvents(reader);
-            DeserializedPlayerLockOnHeartTargetsChangedNetEvents(reader);
-            DeserializedPlayerLockedOnTargetHitNetEvents(reader);
-            DeserializedBulletDestroyedEvents(reader);
-            DeserializedPlayerSwapEvents(reader);
-            DeserializedTalentCardObtainedEvents(reader);
-            DeserializedTalentCardHitEvents(reader);
-            DeserializedPowerUpSpawnedEvents(reader);
-            DeserializedPowerUpObtainedEvents(reader);
-            DeserializedStageEndEvents(reader);
-            DeserializedTeamLostEvents(reader);
-            DeserializedTalentSwitchEvents(reader);
-            DeserializedEnvironmentSpringPlayerCollisionEvents(reader);
-            DeserializedGainBoltsEvents(reader);
-            DeserializedPlayerToEnvironmentTeleportGateCollisionEvents(reader);
-            DeserializedPreparationPhaseEndedEvents(reader);
-            DeserializedCreateSwapFieldNetEvents(reader);
-            DeserializedCreateKOProjectileNetEvents(reader);
-            DeserializedKOProjectHitPlayerNetEvents(reader);
-            DeserializedDeactivateKOTalentNetEvents(reader);
-            DeserializedPerformDashPulseNetEvents(reader);
-            DeserializedActivateSentryGunTalentNetEvents(reader);
-            DeserializedDeactivateSentryGunTalentNetEvents(reader);
-            DeserializedUpdatePlayerTalentStocksNetEvents(reader);
-            DeserializedPlayerSpinnedStartedEvents(reader);
-            DeserializedPlayerSpinnedEndedEvents(reader);
-            DeserializedDestroySwapFieldNetEvents(reader);
-            DeserializedPlayerMaxShootCooldownChangedNetEvents(reader);
-            DeserializedCreateGrapplingHookProjectileNetEvents(reader);
-            DeserializedGrapplingHookHitWallNetEvents(reader);
-            DeserializedDeactivateGrapplingHookTalentNetEvents(reader);
-            DeserializedCreateMagneticPullFieldNetEvents(reader);
-            DeserializedActivateUmbrellaTalentNetEvents(reader);
-            DeserializedDeactivateUmbrellaTalentNetEvents(reader);
-            DeserializedLayChickenEggNetEvents(reader);
-            DeserializedChickenEggHitNetEvents(reader);
-            DeserializedActivateYearsOfPainTalentNetEvents(reader);
-        }*/
-
         private void DeserializedCreateKOProjectileNetEvents(NetDataReader reader)
         {
             CreateKOProjectileNetEvents.Clear();
