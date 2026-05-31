@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ebb89e21ce374e298e4791dc8fe6462e, type: 3}
   m_Name: SimulationGamePlayConfig
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: SimulationAssembly::Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig
   InnerConfig:
     PlayerSpaceship:
       StartHealth: 5
@@ -39,15 +39,15 @@ MonoBehaviour:
       TalentCardHealth: 2
       TalentsCooldownsConfigs:
         TalentCooldownConfigs:
-        - rid: 2200602851054190708
-        - rid: 2200602851054190709
-        - rid: 2200602851054190710
-        - rid: 2200602851054190711
-        - rid: 2200602851054190712
-        - rid: 2200602851054190713
-        - rid: 2200602851054190714
-        - rid: 2200602851054190715
-        - rid: 2200602851054190716
+        - rid: 2200602851054190747
+        - rid: 2200602851054190748
+        - rid: 2200602851054190749
+        - rid: 2200602851054190750
+        - rid: 2200602851054190751
+        - rid: 2200602851054190752
+        - rid: 2200602851054190753
+        - rid: 2200602851054190754
+        - rid: 2200602851054190755
       TalentsArrowConfigs:
         TalentCooldownConfigs:
         - TalentType: 1
@@ -149,47 +149,47 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2200602851054190708
+    - rid: 2200602851054190747
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 1
         CooldownInSeconds: 1
-    - rid: 2200602851054190709
+    - rid: 2200602851054190748
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 6
         CooldownInSeconds: 7
-    - rid: 2200602851054190710
+    - rid: 2200602851054190749
       type: {class: TalentStocksCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 5
         MaxStocks: 3
         SingleStockCooldownInSeconds: 5
-    - rid: 2200602851054190711
+    - rid: 2200602851054190750
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 4
         CooldownInSeconds: 9
-    - rid: 2200602851054190712
+    - rid: 2200602851054190751
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 7
         CooldownInSeconds: 6
-    - rid: 2200602851054190713
+    - rid: 2200602851054190752
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 8
         CooldownInSeconds: 8
-    - rid: 2200602851054190714
+    - rid: 2200602851054190753
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 9
         CooldownInSeconds: 5
-    - rid: 2200602851054190715
+    - rid: 2200602851054190754
       type: {class: TalentAlwaysActiveCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 10
-    - rid: 2200602851054190716
+    - rid: 2200602851054190755
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 2
