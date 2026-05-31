@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
@@ -16,19 +17,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
     {
         private readonly IMatchDataService _matchDataService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly Dictionary<int, PlayerTalentControllers> _talentControllersPerPlayer;
         private readonly ConcurrentPool<PlayerTalentControllers> _talentControllersPool;
 
         public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig,
-            INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
+            INetEventsDataService netEventsDataService, ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator,
             IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory)
         {
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _talentControllersPerPlayer = new Dictionary<int, PlayerTalentControllers>(networkConfig.MaxCap.ConcurrentPlayers);
-            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, overrideableNetEventsService, commandFactory, sharedGamePlayConfig),networkConfig.MaxCap.ConcurrentPlayers);
+            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, overrideableNetEventsService, commandFactory, sharedGamePlayConfig),networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)
@@ -209,7 +210,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private void SetupTalentCooldown(ref TalentStateS2C newTalent)
         {
             var talentType = newTalent.TalentType;
-            var cooldownConfig = _gamePlayConfig.Talents.TalentsCooldownsConfigs.TalentCooldownConfigs.Find(x => x.TalentType == talentType);
+            var cooldownConfig = _gamePlayConfigService.GamePlayConfig.Talents.TalentsCooldownsConfigs.TalentCooldownConfigs.Find(x => x.TalentType == talentType);
 
             switch (cooldownConfig.CooldownType)
             {

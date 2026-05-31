@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
@@ -23,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private static int _stageNumber = 1;
         private IMatchDataService _matchDataService;
         private IPhysicsSimulator _physicsSimulator;
-        private SimulationGamePlayConfig _gamePlayConfig;
+        private ISimulationGamePlayConfigService _gamePlayConfigService;
         private IStageDataService _stageDataService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private ITeleportGateService _teleportGateService;
@@ -41,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
-            _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
@@ -84,8 +85,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         
         private int GenerateNextStageEnvironmentLayoutId()
         {
-            var environmentLayoutId = _gamePlayConfig.DeafultEnvironmentId;
-            if (_gamePlayConfig.ShouldChooseRandomStage)
+            var environmentLayoutId = _gamePlayConfigService.GamePlayConfig.DeafultEnvironmentId;
+            if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomStage)
             {
                 environmentLayoutId = GenerateRandomStageId();
             }
@@ -141,10 +142,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 var player = players.GetByIndex(i);
 
-                var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
-                var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
-                var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
-                var heartRadius = _gamePlayConfig.PlayerSpaceship.DefaultHeartRadius;
+                var health = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.StartHealth;
+                var shootCooldown = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.ShootCooldown;
+                var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
+                var heartRadius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.DefaultHeartRadius;
 
                 var teamId = player.TeamId;
                 Vector2 position;
@@ -160,7 +161,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
 
                 var direction = RNG.NextFloat(0, 360).AngleToVector();
-                var velocity = direction * _gamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
+                var velocity = direction * _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
 
                 player.Spaceship.Health.CurrentHealth = health;
                 player.Spaceship.Health.MaxHealth = health;
@@ -173,13 +174,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.IsEngineOn = true;
                 player.Spaceship.IsAlive = true;
 
-                if (_gamePlayConfig.ShouldChooseRandomTalentsForPlayer)
+                if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                 {
-                    _setRandomTalentsForPlayerCommand.SetPlayerId(player.Id).SetTalentsAmount(_gamePlayConfig.RandomTalentsForPlayersAmount).Execute();
+                    _setRandomTalentsForPlayerCommand.SetPlayerId(player.Id).SetTalentsAmount(_gamePlayConfigService.GamePlayConfig.RandomTalentsForPlayersAmount).Execute();
                 }
-                else if (_gamePlayConfig.ShouldAddTalentEveryXStages)
+                else if (_gamePlayConfigService.GamePlayConfig.ShouldAddTalentEveryXStages)
                 {
-                    var didReachStage = _stageNumber % _gamePlayConfig.EveryXStages == 0;
+                    var didReachStage = _stageNumber % _gamePlayConfigService.GamePlayConfig.EveryXStages == 0;
                     if (didReachStage /*&& _stageNumber<5*/)
                     {
                         _tryAddARandomTalentForPlayerCommand.SetPlayerId(player.Id).Execute();
@@ -228,8 +229,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     break;
                 }
 
-                var config = barrierConfigs[barrierIndex];
-                _matchDataService.EnvironmentData.AddFieldBarrier((ushort)barrierIndex, teamId, config.Position, config.Size, config.Shape);
+                var barrierConfig = barrierConfigs[barrierIndex];
+                _matchDataService.EnvironmentData.AddFieldBarrier((ushort)barrierIndex, teamId, barrierConfig.Position, barrierConfig.Size, barrierConfig.Shape);
                 barrierIndex++;
             }
         }
@@ -319,8 +320,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 var talentCardPosition = talentCard.Position;
                 var talentCardId = talentCard.Id;
-                _matchDataService.AddTalentCard(talentCardId, talentCardPosition, talentCard.TalentType, _gamePlayConfig.Talents.TalentCardHealth);
-                _physicsSimulator.AddTalentCard(talentCardId, talentCardPosition, _gamePlayConfig.Talents.TalentCardWidth, _gamePlayConfig.Talents.TalentCardHeight);
+                _matchDataService.AddTalentCard(talentCardId, talentCardPosition, talentCard.TalentType, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardHealth);
+                _physicsSimulator.AddTalentCard(talentCardId, talentCardPosition, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardWidth, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardHeight);
             }
         }
 
@@ -340,7 +341,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void AddSpringToEnvironment(ushort springId, Vector2 springLocalPosition, Vector2 springWorldPosition, float springLocalRotationAngle, float springWorldRotationAngle)
         {
-            var springSize = _gamePlayConfig.EnvironmentSprings.Size.ToNumericsVector2();
+            var springSize = _gamePlayConfigService.GamePlayConfig.EnvironmentSprings.Size.ToNumericsVector2();
             _matchDataService.EnvironmentData.AddSpring(springId, springLocalPosition, springWorldPosition, springLocalRotationAngle, springWorldRotationAngle);
             _physicsSimulator.AddEnvironmentSpring(springId, springWorldPosition, springWorldRotationAngle, springSize);
         }

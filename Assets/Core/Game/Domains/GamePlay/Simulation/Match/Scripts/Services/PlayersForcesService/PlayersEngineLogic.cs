@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -7,11 +8,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
 {
     public class PlayersEngineLogic : IPlayersEngineLogic
     {
-        private readonly SimulationGamePlayConfig _simulationGamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
 
-        public PlayersEngineLogic(SimulationGamePlayConfig simulationGamePlayConfig)
+        public PlayersEngineLogic(ISimulationGamePlayConfigService gamePlayConfigService)
         {
-            _simulationGamePlayConfig = simulationGamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
         }
 
         public void TurnOnEngineForPlayerIfPossible(PlayerSpaceshipStateS2C playerSpaceshipState)
@@ -29,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
                 return;
             }
 
-            var isPlayerIdle = playerSpaceshipState.Transform.Velocity.Length() < _simulationGamePlayConfig.PlayerSpaceship.TurnEngineOnWhenReachVelocity;
+            var isPlayerIdle = playerSpaceshipState.Transform.Velocity.Length() < _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TurnEngineOnWhenReachVelocity;
             if (isPlayerIdle)
             {
                 playerSpaceshipState.IsEngineOn = true;
@@ -45,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
 
             var transformState = playerSpaceshipState.Transform;
             var playerMovementSpeed = transformState.Velocity.Length();
-            var targetMovementSpeed = _simulationGamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
+            var targetMovementSpeed = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
             var isBelowTargetMovementSpeed = playerMovementSpeed < targetMovementSpeed;
 
             if (!isBelowTargetMovementSpeed)
@@ -53,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
                 return;
             }
             
-            var engineForce = _simulationGamePlayConfig.PlayerSpaceship.EngineAcceleration * deltaTIme * transformState.Direction;
+            var engineForce = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.EngineAcceleration * deltaTIme * transformState.Direction;
             transformState.Velocity += engineForce;
             var velocityLength = transformState.Velocity.Length();
             var newSpeed = Mathf.Clamp(velocityLength, 0, targetMovementSpeed);
@@ -61,7 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
             playerSpaceshipState.Transform = transformState;
             
             // var transformState = playerSpaceshipState.Transform;
-            // var targetMovementSpeed = _simulationGamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
+            // var targetMovementSpeed = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
             // var lookDirection = transformState.Direction;
             // var currentForwardSpeed = System.Numerics.Vector2.Dot(transformState.Velocity, lookDirection);
             // var isBelowTargetMovementSpeed = currentForwardSpeed < targetMovementSpeed;
@@ -70,7 +71,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
             //     return;
             // }
             //
-            // var engineForce = _simulationGamePlayConfig.PlayerSpaceship.EngineAcceleration * deltaTIme * lookDirection;
+            // var engineForce = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.EngineAcceleration * deltaTIme * lookDirection;
             // transformState.Velocity += engineForce;
             // playerSpaceshipState.Transform = transformState;
         }

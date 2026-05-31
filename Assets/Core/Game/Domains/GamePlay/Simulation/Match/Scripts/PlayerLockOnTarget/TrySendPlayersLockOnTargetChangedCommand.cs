@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -17,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
     {
         private IMatchDataService _matchDataService;
         private IPhysicsSimulator _physicsSimulator;
-        private SimulationGamePlayConfig _gamePlayConfig;
+        private ISimulationGamePlayConfigService _gamePlayConfigService;
         private INetEventsDataService _netEventsDataService;
         
         private FixedUnorderedList<ushort> _cachedLockedOnHeartIds;
@@ -34,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
-            _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             var networkConfig = _diContainer.Resolve<NetworkConfig>();
             _cachedLockedOnHeartIds = new FixedUnorderedList<ushort>(networkConfig.MaxCap.ConcurrentPlayers - 1);
@@ -81,11 +82,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             }
             
             var rayOriginPosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
-            var radius = _gamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange;
+            var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange;
             var maxLockOnHeartRangeSquare = radius * radius;
             
             DebugDrawUtils.DrawArc2D(rayOriginPosition, casterPlayerState.Spaceship.Transform.Direction, radius,
-                _gamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees);
+                _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees);
 
             var players = _matchDataService.SimulationState.Players;
 
@@ -112,7 +113,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 var playerCasterDirection = casterPlayerState.Spaceship.Transform.Direction;
                 var deltaAngleRadians = MathUtils.DeltaAbsoluteAngleRadians(MathUtils.GetAngle(playerCasterDirection), MathUtils.GetAngle(directionToEnemy));
                 var deltaAngleDegrees = deltaAngleRadians * Mathf.Rad2Deg;
-                var maxLockOnHeartAngle = _gamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees;
+                var maxLockOnHeartAngle = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees;
                 var isInAngleRange = deltaAngleDegrees <= maxLockOnHeartAngle;
 
                 if (!isInAngleRange)

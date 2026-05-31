@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -16,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private NetworkConfig _networkConfig;
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
-        private SimulationGamePlayConfig _gamePlayConfig;
+        private ISimulationGamePlayConfigService _gamePlayConfigService;
         
         private ushort _playerId;
         private int _processedTick;
@@ -39,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
-            _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
         }
 
         public void Execute()
@@ -64,12 +65,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             if (isSentryGunActive)
             {
-                var sentryOffset = _gamePlayConfig.Talents.SentryGunTalentConfig.BulletsSpawnOffsetFromPlayerHead;
+                var sentryOffset = _gamePlayConfigService.GamePlayConfig.Talents.SentryGunTalentConfig.BulletsSpawnOffsetFromPlayerHead;
                 spawnPosition += playerModel.Spaceship.Transform.Direction * sentryOffset;
             }
 
             var bullet = _matchDataService.AddBullet(playerModel.Id, spawnPosition,
-                playerModel.Spaceship.Transform.Direction, _gamePlayConfig.PlayerBullet.MoveSpeed, _gamePlayConfig.PlayerBullet.Radius);
+                playerModel.Spaceship.Transform.Direction, _gamePlayConfigService.GamePlayConfig.PlayerBullet.MoveSpeed, _gamePlayConfigService.GamePlayConfig.PlayerBullet.Radius);
             _netEventsDataService.AddBulletSpawnNetEvent(processedTick, bullet.Id, bullet.BelongToPlayerId, bullet.Position, bullet.Radius);
             _physicsSimulator.AddPlayerBullet(bullet.Id, playerModel.TeamId, bullet.Position, bullet.Velocity, bullet.Radius);
             LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);

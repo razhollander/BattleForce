@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Extensions;
 using Core.Scripts.Extensions.Linq;
@@ -13,14 +14,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
         private readonly CapacityDict<ushort, FixedUnorderedList<ushort>> _playerTeamContacts;
         private readonly ConcurrentPool<FixedUnorderedList<ushort>> _contactsPool;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
 
-        public PlayersOnTeamFloorTrackerService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, SimulationGamePlayConfig gamePlayConfig)
+        public PlayersOnTeamFloorTrackerService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ISimulationGamePlayConfigService gamePlayConfigService)
         {
             var maxPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             _playerTeamContacts = new CapacityDict<ushort, FixedUnorderedList<ushort>>(maxPlayers);
-            _gamePlayConfig = gamePlayConfig;
-            _contactsPool = new ConcurrentPool<FixedUnorderedList<ushort>>(() => new FixedUnorderedList<ushort>(gamePlayConfig.MaxOverllapingFloors), maxPlayers);
+            _gamePlayConfigService = gamePlayConfigService;
+            _contactsPool = new ConcurrentPool<FixedUnorderedList<ushort>>(() => new FixedUnorderedList<ushort>(gamePlayConfigService.GamePlayConfig.MaxOverllapingFloors), maxPlayers);
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
@@ -40,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloorTra
             }
             else
             {
-                LogService.LogError($"Contact is full! Player is touching above: {_gamePlayConfig.MaxOverllapingFloors} floor");
+                LogService.LogError($"Contact is full! Player is touching above: {_gamePlayConfigService.GamePlayConfig.MaxOverllapingFloors} floor");
             }
         }
 

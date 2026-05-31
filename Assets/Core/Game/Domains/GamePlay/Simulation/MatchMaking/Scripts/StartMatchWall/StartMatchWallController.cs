@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -10,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
     {
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly INetEventsDataService _netEventsDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
 
         private bool _isCountingDown;
@@ -18,11 +19,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
         private int _lastTickGotHitByBullet = -1;
         
         public bool DidFinishCountingDown => _isCountingDown && _countdownTimer <= 0;
-        public StartMatchWallController(IPhysicsSimulator physicsSimulator, INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public StartMatchWallController(IPhysicsSimulator physicsSimulator, INetEventsDataService netEventsDataService, ISimulationGamePlayConfigService gamePlayConfigService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _physicsSimulator = physicsSimulator;
             _netEventsDataService = netEventsDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
         }
 
@@ -54,8 +55,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWa
         private void StartCountdown(int tick)
         {
             _isCountingDown = true;
-            _countdownTimer = _gamePlayConfig.StartMatchCountdownDuration;
-            _netEventsDataService.AddStartMatchCountdownNetEvent(tick, _gamePlayConfig.StartMatchCountdownDuration);
+            _countdownTimer = _gamePlayConfigService.GamePlayConfig.StartMatchCountdownDuration;
+            _netEventsDataService.AddStartMatchCountdownNetEvent(tick, _gamePlayConfigService.GamePlayConfig.StartMatchCountdownDuration);
             LogService.LogTopic($"Start Match Countdown started: {_countdownTimer}s", LogTopicType.ServerNetwork);
         }
 

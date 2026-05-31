@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
@@ -16,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
         private IStageDataService _stageDataService;
-        private SimulationGamePlayConfig _config;
+        private ISimulationGamePlayConfigService _gamePlayConfigService;
 
         public StageEndedCommand SetWinningTeamId(ushort winningTeamId)
         {
@@ -35,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
-            _config = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
         }
 
         public void Execute()
@@ -44,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _stageDataService.AddWinnerTeam(_winningTeamId);
             _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, _stageDataService.GemsCollectedPerTeam, _matchDataService.SimulationState.GemsPerTeamId);
             _stageDataService.IsStageEnded = true;
-            _stageDataService.StageRestartTimer = _config.StageRestartDelaySeconds;
+            _stageDataService.StageRestartTimer = _gamePlayConfigService.GamePlayConfig.StageRestartDelaySeconds;
         }
     }
 }

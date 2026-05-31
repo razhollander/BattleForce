@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
         private readonly ITickService _tickService;
         private readonly IServerNetworkManager _networkManager;
         private readonly IPlaybackIOService _playbackIOService;
-        private readonly SimulationGamePlayConfig _simulationGamePlayConfig;
+
         private readonly ISimulationGamePlayConfigService _simulationGamePlayConfigService;
         private Dictionary<int, PlaybackTickData> _ticks = new Dictionary<int, PlaybackTickData>();
         private int _seed;
@@ -34,12 +34,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
         public bool IsPlaybackEnabled { get; private set; }
 
         public PlaybackRecorderService(ITickService tickService, IServerNetworkManager networkManager, IPlaybackIOService playbackIOService,
-            SimulationGamePlayConfig simulationGamePlayConfig, ISimulationGamePlayConfigService simulationGamePlayConfigService)
+            ISimulationGamePlayConfigService simulationGamePlayConfigService)
         {
             _tickService = tickService;
             _networkManager = networkManager;
             _playbackIOService = playbackIOService;
-            _simulationGamePlayConfig = simulationGamePlayConfig;
+
             _simulationGamePlayConfigService = simulationGamePlayConfigService;
         }
 

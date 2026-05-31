@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 // using System.Numerics;
 // using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 // using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
@@ -14,7 +15,7 @@
 //     {
 //         private IServerNetworkManager _networkManager;
 //         private IMatchDataService _matchDataService;
-//         private SimulationGamePlayConfig _gamePlayConfig;
+//         private ISimulationGamePlayConfigService _gamePlayConfigService;
 //         private IPhysicsSimulator _physicsSimulator;
 //         private IPlayersTalentsManager _playersTalentsManager;
 //         private INetEventsDataService _netEventsDataService;
@@ -44,7 +45,7 @@
 //         {
 //             _networkManager = _diContainer.Resolve<IServerNetworkManager>();
 //             _matchDataService = _diContainer.Resolve<IMatchDataService>();
-//             _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+//             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
 //             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
 //             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
 //             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
@@ -53,13 +54,13 @@
 //         public void Execute()
 //         {
 //             var startingDirection = Simulation.Scripts.RNG.RNG.NextFloat(0, 360).AngleToVector();
-//             var velocity = startingDirection * _gamePlayConfig.PlayerSpaceship.MovementSpeed;
-//             var radius = _gamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
-//             var health = _gamePlayConfig.PlayerSpaceship.StartHealth;
-//             var shootCooldown = _gamePlayConfig.PlayerSpaceship.ShootCooldown;
+//             var velocity = startingDirection * _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.MovementSpeed;
+//             var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
+//             var health = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.StartHealth;
+//             var shootCooldown = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.ShootCooldown;
 //             var position = Vector2.One;
 //             var playersAmount = _matchDataService.SimulationState.Players.Count;
-//             var playerColor = _gamePlayConfig.PlayerSpaceship.PlayerColors[playersAmount % _gamePlayConfig.PlayerSpaceship.PlayerColors.Length];
+//             var playerColor = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.PlayerColors[playersAmount % _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.PlayerColors.Length];
 //             var playerState = _matchDataService.AddPlayer(_playerId, _playerTeamId, _playerName, position, startingDirection, velocity, radius, health, shootCooldown, playerColor);
 //             var peer = kvp.Key;
 //             peer.Tag = playerId;
