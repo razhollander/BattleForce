@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -82,11 +83,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return false;
             }
 
-            var directionAngle = Simulation.Scripts.RNG.RNG.NextFloat(0f, 360f);
+            var directionAngle = RNG.NextFloat(0f, 360f);
             var direction = directionAngle.FromAngleRadians();
             velocity = direction * _gamePlayConfigService.GamePlayConfig.PowerUps.MoveSpeed;
             var values = (PowerUpType[]) Enum.GetValues(typeof(PowerUpType));
-            powerUpType = values[Simulation.Scripts.RNG.RNG.NextInt(values.Length)];
+            powerUpType = values[RNG.NextInt(values.Length)];
 
             return true;
         }
@@ -100,8 +101,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             for (var i = 0; i < maxAttempts; i++)
             {
-                var randomCandidatePosition = new Vector2(Simulation.Scripts.RNG.RNG.NextFloat(-environmentHalfSize.X, environmentHalfSize.X),
-                    Simulation.Scripts.RNG.RNG.NextFloat(-environmentHalfSize.Y, environmentHalfSize.Y));
+                var randomCandidatePosition = new Vector2(RNG.NextFloat(-environmentHalfSize.X, environmentHalfSize.X),
+                    RNG.NextFloat(-environmentHalfSize.Y, environmentHalfSize.Y));
 
                 if (!_physicsSimulator.IsSquareHitAnyBodyTypes(randomCandidatePosition, powerUpsRadius, PhysicsBodyType.Wall, PhysicsBodyType.PlayerBullet))
                 {

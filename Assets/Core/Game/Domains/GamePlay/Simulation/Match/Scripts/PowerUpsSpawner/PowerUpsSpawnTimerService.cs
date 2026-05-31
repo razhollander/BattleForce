@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner
 {
@@ -26,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner
 
         public void RestartSpawnTimer()
         {
-            var randomSeconds = Simulation.Scripts.RNG.RNG.NextFloat(_gamePlayConfigService.GamePlayConfig.PowerUps.SpawnMinSecondsInterval, _gamePlayConfigService.GamePlayConfig.PowerUps.SpawnMaxSecondsInterval);
+            var randomSeconds = RNG.NextFloat(_gamePlayConfigService.GamePlayConfig.PowerUps.SpawnMinSecondsInterval, _gamePlayConfigService.GamePlayConfig.PowerUps.SpawnMaxSecondsInterval);
             _secondsLeftUntilSpawn = randomSeconds;
         }
     }
