@@ -56,9 +56,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _talentsHudView.SelectTalent(selectedTalentIndex, cancellationToken);
         }
         
-        public void MakeAngryForShortDuration(CancellationToken cancellationToken)
+        public void SetAngryState(bool isAngry)
         {
-            _playerEyesView.MakeAngryForShortDuration(cancellationToken);
+            _playerEyesView.SetAngryState(isAngry);
         }
 
         public void SetSentryGunState(bool isOn, CancellationTokenSource cancellationTokenSource)

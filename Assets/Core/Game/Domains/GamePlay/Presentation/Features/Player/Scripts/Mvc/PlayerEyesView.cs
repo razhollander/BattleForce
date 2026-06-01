@@ -18,40 +18,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private float _eyeMovementRadius = 0.1f;
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
-        [SerializeField] private float _angryDurationInSeconds = 0.5f;
         
         private SpriteRenderer _leftEyeRenderer;
         private SpriteRenderer _rightEyeRenderer;
         private Sprite _defaultLeftEyeSprite;
         private Sprite _defaultRightEyeSprite;
-        private CancellationTokenSource _angryEyesCancellationTokenSource;
 
-        public void MakeAngryForShortDuration(CancellationToken cancellationToken)
-        {
-            DisableSpinned();
-            _angryEyesCancellationTokenSource?.Cancel();
-            _angryEyesCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            SetAngryForShortDurationAsync(_angryEyesCancellationTokenSource.Token).Forget();
-        }
+        private bool _isAngry;
+        private bool _isSpinned;
 
-        private async Awaitable SetAngryForShortDurationAsync(CancellationToken cancellationToken)
+        private CancellationTokenSource _spinnedAnimationCts;
+
+        public void SetAngryState(bool isAngry)
         {
-            _angryLeftEye.TrySetActive(true);
-            _angryRightEye.TrySetActive(true);
-            _leftEye.gameObject.TrySetActive(false);
-            _rightEye.gameObject.TrySetActive(false);
-            
-            try
-            {
-                await Awaitable.WaitForSecondsAsync(_angryDurationInSeconds, cancellationToken);
-            }
-            finally
-            {
-                _angryLeftEye.TrySetActive(false);
-                _angryRightEye.TrySetActive(false);
-                _leftEye.gameObject.TrySetActive(true);
-                _rightEye.gameObject.TrySetActive(true);
-            }
+            _isAngry = isAngry;
+            UpdateVisuals();
         }
 
         public void OnCreated()
@@ -64,30 +45,45 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         public void SetIsSpinned(bool isSpinned, CancellationTokenSource cancellationTokenSource)
         {
-            _leftEyeRenderer.sprite = isSpinned ? null : _defaultLeftEyeSprite;
-            _rightEyeRenderer.sprite = isSpinned ? null : _defaultRightEyeSprite;
+            _isSpinned = isSpinned;
+            _spinnedAnimationCts?.Cancel();
 
-            if (isSpinned)
+            if (_isSpinned)
             {
-                _angryEyesCancellationTokenSource?.Cancel();
+                _spinnedAnimationCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
                 _spinnedEyesCanvas.enabled = true;
-                _spinnedEyesAnimator.PlayAnimation(cancellationTokenSource).Forget();   
+                _spinnedEyesAnimator.PlayAnimation(_spinnedAnimationCts).Forget();
             }
             else
             {
-                DisableSpinned();
+                _spinnedEyesAnimator.StopAnimation();
+                _spinnedEyesCanvas.enabled = false;
             }
+
+            UpdateVisuals();
         }
-        
-        private void DisableSpinned()
+
+        private void UpdateVisuals()
         {
-            _spinnedEyesAnimator.StopAnimation();
-            _spinnedEyesCanvas.enabled = false;
+            _leftEyeRenderer.sprite = _isSpinned ? null : _defaultLeftEyeSprite;
+            _rightEyeRenderer.sprite = _isSpinned ? null : _defaultRightEyeSprite;
+
+            var showAngry = _isAngry && !_isSpinned;
+            _angryLeftEye.TrySetActive(showAngry);
+            _angryRightEye.TrySetActive(showAngry);
+            _leftEye.gameObject.TrySetActive(!showAngry);
+            _rightEye.gameObject.TrySetActive(!showAngry);
         }
 
         public void OnDespawned()
         {
-            DisableSpinned();
+            _spinnedAnimationCts?.Cancel();
+            _spinnedEyesAnimator.StopAnimation();
+            _spinnedEyesCanvas.enabled = false;
+
+            _isAngry = false;
+            _isSpinned = false;
+            UpdateVisuals();
         }
 
         public void UpdateEyesToLookAtDirection(System.Numerics.Vector2 direction)

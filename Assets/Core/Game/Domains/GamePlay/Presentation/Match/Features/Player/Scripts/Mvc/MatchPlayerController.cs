@@ -28,6 +28,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public readonly ushort PlayerId;
         private MatchPlayerView _playerView;
         private readonly MatchPlayerViewPool _playerPool;
+        private bool _isSentryGunOn;
+        private bool _isLockOnHeartSightOn;
 
         public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
             NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService) 
@@ -89,7 +91,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetSentryGunState(bool isSentryGun, CancellationTokenSource cancellationTokenSource)
         {
+            _isSentryGunOn = isSentryGun;
             _playerView.SetSentryGunState(isSentryGun, cancellationTokenSource);
+            UpdateAngryState();
         }
 
         public void PlayLayEggAnimation(CancellationTokenSource cancellationTokenSource)
@@ -241,7 +245,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void DoShootEffect()
         {
             _playerView.Base.ShowIsBulletAvailable(false);
-            _playerView.MakeAngryForShortDuration(_stageCancellationTokenProvider.CancellationTokenSource.Token);
         }
 
         public void SetHealth(ushort currentHealth, ushort maxHealth)
@@ -354,7 +357,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetIsLockOnHeartSightShown(bool isShown)
         {
+            _isLockOnHeartSightOn = isShown;
             _playerView.SetIsLockOnHeartSightShown(isShown);
+            UpdateAngryState();
+        }
+
+        private void UpdateAngryState()
+        {
+            if (_playerView != null)
+            {
+                _playerView.SetAngryState(_isSentryGunOn || _isLockOnHeartSightOn);
+            }
         }
 
         public Transform GetHeadTransform()
