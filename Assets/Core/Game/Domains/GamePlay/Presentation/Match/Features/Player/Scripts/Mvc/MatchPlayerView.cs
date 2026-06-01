@@ -221,6 +221,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsLockOnHeartSightShown(bool isShown)
         {
             _lockOnHeartSightView.SetIsShown(isShown);
+            _playerEyesView.SetIsLockOnAngry(isShown);
         }
     }
 }

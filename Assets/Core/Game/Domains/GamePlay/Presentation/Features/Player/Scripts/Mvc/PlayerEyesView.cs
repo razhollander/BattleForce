@@ -25,6 +25,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         private Sprite _defaultLeftEyeSprite;
         private Sprite _defaultRightEyeSprite;
         private CancellationTokenSource _angryEyesCancellationTokenSource;
+        private bool _isLockOnAngry;
+        private bool _isShortDurationAngry;
+
+        public void SetIsLockOnAngry(bool isLockOnAngry)
+        {
+            _isLockOnAngry = isLockOnAngry;
+            UpdateEyeState();
+        }
+
+        private void UpdateEyeState()
+        {
+            var isAngry = _isLockOnAngry || _isShortDurationAngry;
+            _angryLeftEye.TrySetActive(isAngry);
+            _angryRightEye.TrySetActive(isAngry);
+            _leftEye.gameObject.TrySetActive(!isAngry);
+            _rightEye.gameObject.TrySetActive(!isAngry);
+        }
 
         public void MakeAngryForShortDuration(CancellationToken cancellationToken)
         {
@@ -36,10 +53,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 
         private async Awaitable SetAngryForShortDurationAsync(CancellationToken cancellationToken)
         {
-            _angryLeftEye.TrySetActive(true);
-            _angryRightEye.TrySetActive(true);
-            _leftEye.gameObject.TrySetActive(false);
-            _rightEye.gameObject.TrySetActive(false);
+            _isShortDurationAngry = true;
+            UpdateEyeState();
             
             try
             {
@@ -47,10 +62,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             }
             finally
             {
-                _angryLeftEye.TrySetActive(false);
-                _angryRightEye.TrySetActive(false);
-                _leftEye.gameObject.TrySetActive(true);
-                _rightEye.gameObject.TrySetActive(true);
+                _isShortDurationAngry = false;
+                UpdateEyeState();
             }
         }
 
@@ -88,6 +101,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnDespawned()
         {
             DisableSpinned();
+            _isLockOnAngry = false;
+            _isShortDurationAngry = false;
+            UpdateEyeState();
         }
 
         public void UpdateEyesToLookAtDirection(System.Numerics.Vector2 direction)
