@@ -1,6 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Helpers.JsonConverters;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
