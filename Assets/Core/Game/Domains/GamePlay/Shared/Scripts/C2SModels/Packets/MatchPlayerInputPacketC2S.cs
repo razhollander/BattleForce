@@ -24,7 +24,6 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
             writer.Put(HeighestProcessedTickFromServer);
             writer.Put(ConvertInputsToByte(IsMoveRightInputPressed, IsMoveLeftInputPressed, IsShootInputPressed, IsTalentAInputPressed, IsTalentBInputPressed, IsTalentCInputPressed));
             writer.PutVector2AsAngle16(AimDirection);
-            writer.Put(Tick);
         }
         
         public void Deserialize(NetDataReader reader)
@@ -39,7 +38,6 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
             IsTalentBInputPressed = isTalentBInputPressed;
             IsTalentCInputPressed = isTalentCInputPressed;
             AimDirection = reader.GetVector2FromAngle16();
-            Tick = reader.GetInt();
         }
         
         private byte ConvertInputsToByte(bool isMoveRightInputPressed, bool isMoveLeftInputPressed, bool isShootInputPressed, bool isTalentAInputPressed, bool isTalentBInputPressed, bool isTalentCInputPressed)
