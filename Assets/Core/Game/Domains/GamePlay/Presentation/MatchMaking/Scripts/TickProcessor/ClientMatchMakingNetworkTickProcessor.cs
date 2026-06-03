@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor
 {
-    public class ClientMatchMakingNetworkTickProcessor : ITickProcessor, IFixedUpdatable, IGUIUpdatable
+    public class ClientMatchMakingNetworkTickProcessor : ITickProcessor, IFixedUpdatable
     {
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ICommandFactory _commandFactory;
@@ -27,9 +27,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
 
         private SendMatchMakingInputsToServerCommand _sendInputsToServerCommand;
         private TimerFixedThreaded2 _fixedTimer;
-        private DateTime _lastSendTime;
-        private int _deltaMS;
-        private int _highestMs;
 
         public ClientMatchMakingNetworkTickProcessor(IClientNetworkManager networkManager,
             IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
@@ -53,14 +50,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         private void StartTick()
         {
             _updateSubscriptionService.RegisterFixedUpdatable(this);
-            _updateSubscriptionService.RegisterGuiUpdatable(this);
-            _lastSendTime = DateTime.Now;
         }
         
         public void StopTick()
         {
             _updateSubscriptionService.UnregisterFixedUpdatable(this);
-            _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
 
         public void ManagedFixedUpdate()
@@ -70,9 +64,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
             _fullTickPacketsHandler.ProcessStateLatestTick();
 
             SendCurrentTickInputsToServer();
-            _deltaMS = DateTime.Now.Millisecond - _lastSendTime.Millisecond;
-            _highestMs = Mathf.Max(_deltaMS, _highestMs);
-            _lastSendTime = DateTime.Now;
 
             _startMatchPacketHandler.ProcessStartMatchPacket();
         }
@@ -80,16 +71,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         private void SendCurrentTickInputsToServer()
         {
             _sendInputsToServerCommand.SetPlayerId(_matchMakingDataService.LocalPlayer.PlayerId).Execute();
-        }
-        
-        public void ManagedOnGUI()
-        {
-            GUILayout.Label($"delta from last send to server: {_deltaMS} ms, highest: {_highestMs}");
-        }
-
-        public void ManagedOnDrawGizmos()
-        {
-            
         }
     }
 }

@@ -28,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private DateTime _lastSendTime;
         private int _deltaMS;
         private int _highestMs;
+        private GUIStyle _highVisStyle;
 
         public ClientMatchNetworkTickProcessor(IClientNetworkManager networkManager,
             //ClientSimulationStateHandler clientSimulationStateHandler,
@@ -79,9 +80,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         
         public void ManagedOnGUI()
         {
-            GUILayout.Label($"delta from last send to server: {_deltaMS} ms, highest: {_highestMs}");
+            InitStyles();
+            GUILayout.Box($"delta from last send to server: {_deltaMS} ms, highest: {_highestMs}",_highVisStyle);
         }
-
+        
+        private void InitStyles()
+        {
+            if (_highVisStyle == null)
+            {
+                _highVisStyle = new GUIStyle(GUI.skin.box); 
+                _highVisStyle.normal.background = Texture2D.whiteTexture;
+                _highVisStyle.fontSize = 16; 
+                _highVisStyle.fontStyle = FontStyle.Bold;
+                _highVisStyle.normal.textColor = Color.black;
+            }
+        }
+        
         public void ManagedOnDrawGizmos()
         {
             
