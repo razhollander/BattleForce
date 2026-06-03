@@ -44,6 +44,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     _stageEndedUiController.Show(winningTeamId, stageEndEvent.JemsWonPerTeam);
                     SetPlayersInTeamKinged();
                     _worldCameraController.ShakeCamera(10,0.5f);
+                    _worldCameraController.ClearTargets();
+                    _worldCameraController.AddFollowTarget(_matchPlayerControllers.GetPlayerTransform(1/*stageEndEvent.PlayerIdDoingWinningBlow*/));
                 }
             }
 
