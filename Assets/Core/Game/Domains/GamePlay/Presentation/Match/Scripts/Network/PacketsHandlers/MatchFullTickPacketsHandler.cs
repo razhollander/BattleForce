@@ -1070,11 +1070,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _totalBytesReceived += packetSize;
             _lastPacketSize = packetSize;
             _averagePacketSizeReceived = (int)(_totalBytesReceived / _totalPacketsReceived);
-
-            if (packetSize > 400)
-            {
-                LogService.LogError(packetSize.ToString());
-            }
+            
             if (Time.realtimeSinceStartup - _lastLargestPacketResetTime > 5f)
             {
                 _largestPacketSizeInLast5Seconds = packetSize;
