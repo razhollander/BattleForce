@@ -1,1 +1,0 @@
-sed -i 's/void UpdateEffects();/void UpdateEffects();\n        void UpdateTargetsPositionOnPlayer(UnityEngine.Vector3 playerHeartPosition);/' Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/LockOnHeartSights/Scripts/ILockOnTargetEffectController.cs
