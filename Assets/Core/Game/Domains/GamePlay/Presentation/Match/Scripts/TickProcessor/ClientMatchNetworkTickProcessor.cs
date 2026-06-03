@@ -1,4 +1,3 @@
-using System;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
@@ -8,11 +7,10 @@ using Core.Game.Domains.GamePlay.Shared;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.StateMachineService;
 using CoreDomain.Scripts.Services.UpdateService;
-using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
 {
-    public class ClientMatchNetworkTickProcessor : ITickProcessor, IFixedUpdatable, IGUIUpdatable
+    public class ClientMatchNetworkTickProcessor : ITickProcessor, IFixedUpdatable
     {
         //private readonly ClientSimulationStateHandler _clientSimulationStateHandler;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
@@ -25,10 +23,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly IClientNetworkManager _networkManager;
 
         private TimerFixedThreaded2 _fixedTimer;
-        private DateTime _lastSendTime;
-        private int _deltaMS;
-        private int _highestMs;
-        private GUIStyle _highVisStyle;
 
         public ClientMatchNetworkTickProcessor(IClientNetworkManager networkManager,
             //ClientSimulationStateHandler clientSimulationStateHandler,
@@ -53,14 +47,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private void StartTick()
         {
             _updateSubscriptionService.RegisterFixedUpdatable(this);
-            _updateSubscriptionService.RegisterGuiUpdatable(this);
-            _lastSendTime = DateTime.Now;
         }
         
         public void StopTick()
         {
             _updateSubscriptionService.UnregisterFixedUpdatable(this);
-            _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
 
         public void ManagedFixedUpdate()
@@ -72,33 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             if (_matchDataService.IsPlayerJoined)
             {
                 _sendMatchInputsToServerCommand.SetPlayerId(_matchDataService.LocalPlayer.PlayerId).Execute();
-                _deltaMS = DateTime.Now.Millisecond - _lastSendTime.Millisecond;
-                _highestMs = Mathf.Max(_deltaMS, _highestMs);
-                _lastSendTime = DateTime.Now;
             }
-        }
-        
-        public void ManagedOnGUI()
-        {
-            InitStyles();
-            GUILayout.Box($"delta from last send to server: {_deltaMS} ms, highest: {_highestMs}",_highVisStyle);
-        }
-        
-        private void InitStyles()
-        {
-            if (_highVisStyle == null)
-            {
-                _highVisStyle = new GUIStyle(GUI.skin.box); 
-                _highVisStyle.normal.background = Texture2D.whiteTexture;
-                _highVisStyle.fontSize = 16; 
-                _highVisStyle.fontStyle = FontStyle.Bold;
-                _highVisStyle.normal.textColor = Color.black;
-            }
-        }
-        
-        public void ManagedOnDrawGizmos()
-        {
-            
         }
     }
 }
