@@ -80,6 +80,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         public void ManagedOnGUI()
         {
             GUILayout.Label($"delta from last send to server: {_deltaMS} ms, highest: {_highestMs}");
+            GUILayout.Label($"ping: {_networkManager.Ping} ms");
         }
 
         public void ManagedOnDrawGizmos()

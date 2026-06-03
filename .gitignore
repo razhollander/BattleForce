@@ -102,3 +102,4 @@ obj/
 bin/
 CompTest/
 CompTest/
+temp_compile_project/
