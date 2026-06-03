@@ -10,16 +10,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator
         public readonly bool IsHost;
         public readonly int PlayerId;
         public MatchMakingSimulationStateS2C SimulationState;
-        public int ServerTick;
+        public int StateOccuredOnTick;
         
-        public GamePlayMatchMakingInitiatorEnterData(MatchMakingSimulationStateS2C simulationState,string ipAddress, int port, bool isHost, int serverTick, int playerId)
+        public GamePlayMatchMakingInitiatorEnterData(MatchMakingSimulationStateS2C simulationState,string ipAddress, int port, bool isHost, int stateOccuredOnTick, int playerId)
         {
             SimulationState = simulationState;
             IPAddress = ipAddress;
             Port = port;
             IsHost = isHost;
             PlayerId = playerId;
-            ServerTick = serverTick;
+            StateOccuredOnTick = stateOccuredOnTick;
         }
     }
 }

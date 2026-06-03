@@ -25,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
         private readonly StartMatchPacketS2C _startMatchPacket;
         private bool _didReceiveStartMatchPacket;
-        private bool _didSwitcToMatch;
+        private bool _didSwitchToMatch;
 
         public PacketTypeS2C PacketType => PacketTypeS2C.StartMatch;
 
@@ -51,19 +51,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         
         public void ProcessStartMatchPacket()
         {
-            if (!_didReceiveStartMatchPacket || _didSwitcToMatch)
+            if (!_didReceiveStartMatchPacket || _didSwitchToMatch)
             {
                 return;
             }
 
             var state = _startMatchPacket.InitialState;
-            var enterData = new GamePlayMatchInitiatorEnterData(state, _matchMakingDataService.LocalPlayer.PlayerId);
+            var enterData = new GamePlayMatchInitiatorEnterData(state, _matchMakingDataService.LocalPlayer.PlayerId, _startMatchPacket.OccuredOnTick);
             SwitchToMatch(enterData).Forget();
         }
 
         private async Awaitable SwitchToMatch(GamePlayMatchInitiatorEnterData enterData)
         {
-            _didSwitcToMatch = true;
+            _didSwitchToMatch = true;
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             await _sceneLoaderService.TryUnloadScene(SceneType.GamePlayMatchMakingScene, cancellationTokenSource);
             await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchScene, enterData, cancellationTokenSource);

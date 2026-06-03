@@ -33,7 +33,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 {
     public class SyncMatchSimulationStateCommand : BaseCommand, ICommandVoid
     {
-        private MatchSimulationStateS2C _simulationState;
         private IMatchDataService _matchDataService;
         private IMatchBulletControllers _bulletControllers;
         private IMatchChickenEggsControllers _chickenEggsControllers;
@@ -59,10 +58,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
+        
+        private MatchSimulationStateS2C _simulationState;
+        private int _stateOccouredOnTick;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
             _simulationState = simulationState;
+            return this;
+        }
+        
+        public SyncMatchSimulationStateCommand SetOccuredOnTick(int stateOccouredOnTick)
+        {
+            _stateOccouredOnTick = stateOccouredOnTick;
             return this;
         }
         
@@ -239,7 +247,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             foreach (var bulletState in _simulationState.Bullets.AsSpan())
             {
-                _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Position, bulletState.Radius);
+                _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Position, bulletState.Velocity, bulletState.Radius, _stateOccouredOnTick);
                 var bulletColor = _gameplayConfig.ColorPerTeamId[_matchDataService.GetPlayer(bulletState.BelongToPlayerId).TeamId];
                 _bulletControllers.CreateBullet(bulletState.Id, bulletState.Radius, bulletState.Position, bulletColor);
             }

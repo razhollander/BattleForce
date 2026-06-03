@@ -12,6 +12,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.S
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
@@ -60,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IDashPulseGustEffectController _dashPulseGustEffectController;
         private IMagneticPullEffectController _magneticPullEffectController;
         private IBackgroundParallaxController _backgroundParallaxController;
-        private Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts.ILockOnTargetEffectController _lockOnTargetEffectController;
+        private ILockOnTargetEffectController _lockOnTargetEffectController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -96,7 +97,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
             _magneticPullEffectController = _diContainer.Resolve<IMagneticPullEffectController>();
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
-            _lockOnTargetEffectController = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts.ILockOnTargetEffectController>();
+            _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
         }
 
         public void Execute()
@@ -123,6 +124,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _lockOnTargetEffectController.InitEntryPoint();
             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
                  .SetSimulationState(_enterData.InitialState)
+                 .SetOccuredOnTick(_enterData.StateOccouredOnTick)
                  .Execute();
              _matchDataService.SetLocalPlayer(_enterData.LocalPlayerId);
             _gainBoltEffectController.InitEntryPoint();

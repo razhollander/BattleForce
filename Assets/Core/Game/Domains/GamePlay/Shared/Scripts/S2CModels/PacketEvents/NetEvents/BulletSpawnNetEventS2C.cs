@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             writer.Put((byte)BelongToPlayerId);
             writer.PutVector2Quantized(Position);
             writer.PutFloat16(BulletRadius);
-            writer.PutVector2(Velocity);
+            writer.PutVector2Quantized(Velocity);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             BelongToPlayerId = reader.GetByte();
             Position = reader.GetVector2Quantized();
             BulletRadius = reader.GetFloat16();
-            Velocity = reader.GetVector2();
+            Velocity = reader.GetVector2Quantized();
         }
         
         public int CompareTo(BulletSpawnNetEventS2C other)

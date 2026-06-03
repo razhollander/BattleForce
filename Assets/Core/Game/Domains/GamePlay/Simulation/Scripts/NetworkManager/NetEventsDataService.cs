@@ -830,6 +830,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 packet.BelongToPlayerId = belongToPlayerId;
                 packet.Position = position;
                 packet.BulletRadius = bulletRadius;
+                packet.Velocity = velocity;
             }
         }
 

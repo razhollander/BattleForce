@@ -20,11 +20,13 @@ using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.PacketsHandlers
 {
     public class MatchMakingFullTickPacketsHandler : IFullTickPacketsHandler
     {
+        private readonly NetworkConfig _networkConfig;
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchMakingDataService _matchDataService;
         private readonly PresentationMatchMakingNetEventsHandler _presentationNetEventsHandler;
@@ -45,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory,
             IStartMatchButtonController startMatchButtonController, ILastFullSyncTickDataService lastFullSyncTickDataService)
         {
+            _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _lastFullSyncTickDataService = lastFullSyncTickDataService;
@@ -249,9 +252,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
         private void UpdateBulletsTransform()
         {
+            var deltaTime = _networkConfig.DeltaTime;
+
             foreach (var bullet in _matchDataService.Bullets)
             {
-                bullet.Position = TickUtils.GetPositionInTick(bullet.SpawnTick, LastProcessedTickFromServer, bullet.InitialPosition, bullet.Velocity);
+                bullet.Position = TickUtils.GetPositionInTick(bullet.SpawnTick, LastProcessedTickFromServer, bullet.PoisitionInSpawnTick, bullet.Velocity, deltaTime);
             }
         }
 

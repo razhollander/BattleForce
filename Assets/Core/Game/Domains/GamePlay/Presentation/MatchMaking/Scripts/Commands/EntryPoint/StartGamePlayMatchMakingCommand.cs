@@ -80,7 +80,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _backgroundParallaxController.InitEntryPoint();
             
             _commandFactory.CreateCommandVoid<SyncMatchMakingSimulationStateCommand>()
-                .SetSimulationState(_enterData.SimulationState).Execute();
+                .SetSimulationState(_enterData.SimulationState)
+                .SetStateOccuredOnTick(_enterData.StateOccuredOnTick)
+                .Execute();
             _matchMakingDataService.SetLocalPlayer(_enterData.PlayerId);
             _clientPresentationTickProcessor.StartTick();
         }
