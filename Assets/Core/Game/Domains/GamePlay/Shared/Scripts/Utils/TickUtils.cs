@@ -13,5 +13,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Utils
         {
             return Mathf.Max(0, goalTick - currentTick) * deltaTime;
         }
+
+        public static System.Numerics.Vector2 GetPositionInTick(int initialTick, int currentTick, System.Numerics.Vector2 initialPosition, System.Numerics.Vector2 velocity)
+        {
+            return initialPosition + velocity * ((currentTick - initialTick) * (1f / 60f));
+        }
     }
 }

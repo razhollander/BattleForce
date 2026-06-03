@@ -207,7 +207,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPlayerLockOnHeartTargetsChangedNetEvents(latestFullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
-            UpdateBulletsTransform(simulationState);
+            UpdateBulletsTransform();
             UpdatePowerUpBallsTransform(simulationState);
             UpdateRotatingWheels(latestTickReceivedFromServer);
             UpdateKOProjectilesTransform(simulationState);
@@ -1033,12 +1033,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void UpdateBulletsTransform(MatchSimulationStateS2C simulationState)
+        private void UpdateBulletsTransform()
         {
             foreach (var bullet in _matchDataService.Bullets)
             {
-                var bulletState = simulationState.GetBulletById(bullet.Id);
-                bullet.Position = bulletState.Position;
+                bullet.Position = TickUtils.GetPositionInTick(bullet.SpawnTick, LastProcessedTickFromServer, bullet.InitialPosition, bullet.Velocity);
             }
         }
 

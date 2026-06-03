@@ -161,12 +161,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
                 player.SerializeDeltas(writer);
             }
 
-            var bulletsCount = Bullets.Count;
-            writer.Put((byte) bulletsCount);
-            foreach (var bullet in Bullets.AsSpan())
-            {
-                bullet.SerializeTransforms(writer);
-            }
+            // var bulletsCount = Bullets.Count;
+            // writer.Put((byte) bulletsCount);
+            // foreach (var bullet in Bullets.AsSpan())
+            // {
+            //     bullet.SerializeTransforms(writer);
+            // }
         }
 
         public void DeserializeTransforms(NetDataReader reader)
@@ -179,13 +179,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
                 player.DeserializeDeltas(reader);
             }
 
-            var bulletsCount = reader.GetByte();
-            Bullets.Clear();
-            for (int i = 0; i < bulletsCount; i++)
-            {
-                ref var bullet = ref Bullets.AddAndGet();
-                bullet.DeserializeTransforms(reader);
-            }
+            // var bulletsCount = reader.GetByte();
+            // Bullets.Clear();
+            // for (int i = 0; i < bulletsCount; i++)
+            // {
+            //     ref var bullet = ref Bullets.AddAndGet();
+            //     bullet.DeserializeTransforms(reader);
+            // }
         }
     }
 }

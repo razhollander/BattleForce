@@ -482,7 +482,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 player.SerializeDeltas(writer);
             }
 
-            PutBulletTransformsBatched(writer);
+            // PutBulletTransformsBatched(writer);
 
             var powerUpsCount = PowerUpBalls.Count;
             writer.Put((byte) powerUpsCount);
@@ -582,7 +582,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 player.DeserializeDeltas(reader);
             }
             
-            GetBulletTransformsBatched(reader);
+            // GetBulletTransformsBatched(reader);
 
             var powerUpsCount = reader.GetByte();
             PowerUpBalls.Clear();

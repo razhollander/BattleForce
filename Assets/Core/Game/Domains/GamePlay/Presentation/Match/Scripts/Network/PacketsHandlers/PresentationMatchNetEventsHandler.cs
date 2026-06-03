@@ -58,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var bulletSpawnNetEvent in bulletSpawnNetEvents)
             {
                 _matchDataService.AddBullet(bulletSpawnNetEvent.BulletId, bulletSpawnNetEvent.BelongToPlayerId,
-                    bulletSpawnNetEvent.Position, bulletSpawnNetEvent.BulletRadius);
+                    bulletSpawnNetEvent.Position, bulletSpawnNetEvent.Velocity, bulletSpawnNetEvent.BulletRadius, bulletSpawnNetEvent.OccuredOnTick);
                 _cachedPresentationEventsService.BulletSpawnNetEvents.Add(bulletSpawnNetEvent);
             }
         }

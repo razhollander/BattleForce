@@ -200,9 +200,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newWheel;
         }
 
-        public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius)
+        public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 initialPosition, System.Numerics.Vector2 velocity, float radius, int spawnTick)
         {
-            var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, position, radius);
+            var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, initialPosition, velocity, radius, spawnTick);
             Bullets.Add(newBullet);
             return newBullet;
         }
