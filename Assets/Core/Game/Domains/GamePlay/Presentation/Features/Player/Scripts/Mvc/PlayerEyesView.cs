@@ -25,18 +25,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         private Sprite _defaultLeftEyeSprite;
         private Sprite _defaultRightEyeSprite;
         private CancellationTokenSource _angryEyesCancellationTokenSource;
-        private bool _isLockOnAngry;
+        private bool _isSightShown;
         private bool _isShortDurationAngry;
 
-        public void SetIsLockOnAngry(bool isLockOnAngry)
+        public void UpdateEyesAccordingToIsSightShown(bool isSightShown)
         {
-            _isLockOnAngry = isLockOnAngry;
+            _isSightShown = isSightShown;
             UpdateEyeState();
         }
 
         private void UpdateEyeState()
         {
-            var isAngry = _isLockOnAngry || _isShortDurationAngry;
+            var isAngry = _isSightShown || _isShortDurationAngry;
             _angryLeftEye.TrySetActive(isAngry);
             _angryRightEye.TrySetActive(isAngry);
             _leftEye.gameObject.TrySetActive(!isAngry);
@@ -101,7 +101,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void OnDespawned()
         {
             DisableSpinned();
-            _isLockOnAngry = false;
+            _isSightShown = false;
             _isShortDurationAngry = false;
             UpdateEyeState();
         }
