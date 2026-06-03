@@ -482,8 +482,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 player.SerializeDeltas(writer);
             }
 
-            // PutBulletTransformsBatched(writer);
-
             var powerUpsCount = PowerUpBalls.Count;
             writer.Put((byte) powerUpsCount);
             foreach (var powerUp in PowerUpBalls.AsSpan())
@@ -506,7 +504,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
         }
         
-        private void PutBulletTransformsBatched(NetDataWriter writer)
+        private void PutBulletTransformsBatched(NetDataWriter writer) // maybe one day this will be used
         {
             var bulletsCount = Bullets.Count;
             writer.Put((byte) bulletsCount);
@@ -514,7 +512,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 return;
             }
-
 
             ushort prevBulletId = 0; 
             var isFirstBullet = true;
@@ -581,8 +578,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 var player = Players.AddAndGet();
                 player.DeserializeDeltas(reader);
             }
-            
-            // GetBulletTransformsBatched(reader);
 
             var powerUpsCount = reader.GetByte();
             PowerUpBalls.Clear();
