@@ -83,6 +83,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private int _totalPacketsReceived;
         private float _lastLargestPacketResetTime;
         private GUIStyle _highVisStyle;
+        private int _lastPacketSize;
 
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchFullTick;
         public int LastProcessedTickFromServer { get; private set; }
@@ -207,7 +208,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPlayerLockOnHeartTargetsChangedNetEvents(latestFullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
-            UpdateBulletsTransform(simulationState);
+            UpdateBulletsTransform();
             UpdatePowerUpBallsTransform(simulationState);
             UpdateRotatingWheels(latestTickReceivedFromServer);
             UpdateKOProjectilesTransform(simulationState);
@@ -1033,12 +1034,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void UpdateBulletsTransform(MatchSimulationStateS2C simulationState)
+        private void UpdateBulletsTransform()
         {
             foreach (var bullet in _matchDataService.Bullets)
             {
-                var bulletState = simulationState.GetBulletById(bullet.Id);
-                bullet.Position = bulletState.Position;
+                bullet.Position = TickUtils.GetPositionInTick(bullet.SpawnTick, LastProcessedTickFromServer, bullet.PoisitionInSpawnTick, bullet.Velocity, _networkConfig.DeltaTime);
             }
         }
 
@@ -1068,8 +1068,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             var packetSize = reader.RawDataSize;
             _totalPacketsReceived++;
             _totalBytesReceived += packetSize;
+            _lastPacketSize = packetSize;
             _averagePacketSizeReceived = (int)(_totalBytesReceived / _totalPacketsReceived);
 
+            if (packetSize > 400)
+            {
+                LogService.LogError(packetSize.ToString());
+            }
             if (Time.realtimeSinceStartup - _lastLargestPacketResetTime > 5f)
             {
                 _largestPacketSizeInLast5Seconds = packetSize;
@@ -1142,7 +1147,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public void ManagedOnGUI()
         {
             InitStyles();
-            GUILayout.Box($"Average packet size received: {_averagePacketSizeReceived} bytes, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds} bytes", _highVisStyle);
+            GUILayout.Box($"Last packet: {_lastPacketSize}b, Average: {_averagePacketSizeReceived}b, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds}b", _highVisStyle);
         }
         
         private void InitStyles()

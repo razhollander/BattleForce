@@ -820,7 +820,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius)
+        public void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius, Vector2 velocity)
         {
             foreach (var kvp in BulletSpawnNetEventsPerPlayer)
             {
@@ -830,6 +830,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 packet.BelongToPlayerId = belongToPlayerId;
                 packet.Position = position;
                 packet.BulletRadius = bulletRadius;
+                packet.Velocity = velocity;
             }
         }
 

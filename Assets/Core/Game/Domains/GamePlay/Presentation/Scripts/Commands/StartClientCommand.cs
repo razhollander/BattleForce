@@ -99,7 +99,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
             else
             {
                 var InitialState = joinResponse.MatchSimulationState;
-                var enterData = new GamePlayMatchInitiatorEnterData(InitialState, joinResponse.LocalPlayerId);
+                var enterData = new GamePlayMatchInitiatorEnterData(InitialState, joinResponse.LocalPlayerId, joinResponse.OccuredOnTick);
                 await LoadMatchScene(enterData, cancellationTokenSource);
             }
         }

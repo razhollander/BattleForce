@@ -40,6 +40,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         {
             LogService.LogTopic("DisableInputs", LogTopicType.Inputs);
             _gameInputActions.Disable();
+            _gameInputActions.GamePlay.Disable();
+            _gameInputActions.UI.Disable();
         }
         
         public void RegisterAllInputListeners()

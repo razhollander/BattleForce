@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatchButton.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor;
@@ -19,11 +20,13 @@ using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.PacketsHandlers
 {
     public class MatchMakingFullTickPacketsHandler : IFullTickPacketsHandler
     {
+        private readonly NetworkConfig _networkConfig;
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchMakingDataService _matchDataService;
         private readonly PresentationMatchMakingNetEventsHandler _presentationNetEventsHandler;
@@ -44,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory,
             IStartMatchButtonController startMatchButtonController, ILastFullSyncTickDataService lastFullSyncTickDataService)
         {
+            _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _lastFullSyncTickDataService = lastFullSyncTickDataService;
@@ -96,7 +100,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             ProcessStartMatchEligibleChangedEvents(latestFullTickPacket.StartMatchEligibleChangedNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
-            UpdateBulletsTransform(simulationState);
+            UpdateBulletsTransform();
 
             LastProcessedTickFromServer = latestTickReceivedFromServer;
 
@@ -246,12 +250,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             }
         }
 
-        private void UpdateBulletsTransform(MatchMakingSimulationStateS2C simulationState)
+        private void UpdateBulletsTransform()
         {
+            var deltaTime = _networkConfig.DeltaTime;
+
             foreach (var bullet in _matchDataService.Bullets)
             {
-                var bulletState = simulationState.GetBulletById(bullet.Id);
-                bullet.Position = bulletState.Position;
+                bullet.Position = TickUtils.GetPositionInTick(bullet.SpawnTick, LastProcessedTickFromServer, bullet.PoisitionInSpawnTick, bullet.Velocity, deltaTime);
             }
         }
 
