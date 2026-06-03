@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Edi
 		AnimBool ImageFilledWarning;
 		SerializedProperty barImage;
 		SerializedProperty barImageBG;
+		SerializedProperty backgroundLerpDuration;
 		// ----->>> COLOR //
 		AnimBool ImageColorWarning;
 		SerializedProperty colorMode, barColor, barGradient;
@@ -129,6 +130,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Edi
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField( barImage, new GUIContent( "Bar Image", "The image component to be used for this bar." ) );
 			EditorGUILayout.PropertyField(barImageBG, new GUIContent("Bar Image BackGround", "The BackGround image component to be used for this bar."));
+			EditorGUILayout.PropertyField(backgroundLerpDuration, new GUIContent("Background Lerp Duration", ""));
 
 			if ( EditorGUI.EndChangeCheck() )
 			{
@@ -364,6 +366,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Edi
 			ImageFilledWarning = new AnimBool( GetBarImageWarning() );
 			barImage = serializedObject.FindProperty( "barImage" );
 			barImageBG = serializedObject.FindProperty("barImageBG");
+			backgroundLerpDuration = serializedObject.FindProperty("lerpTime");
 
 			// ----->>> COLOR //
 			ImageColorWarning = new AnimBool( GetColorWarning() );

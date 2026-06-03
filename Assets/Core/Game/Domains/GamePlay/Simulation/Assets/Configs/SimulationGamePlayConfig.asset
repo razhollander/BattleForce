@@ -131,8 +131,8 @@ MonoBehaviour:
       MinSpin: 50
       Size: {x: 2, y: 1}
     DeafultEnvironmentId: 6
-    ShouldChooseRandomStage: 1
-    ShouldChooseRandomTalentsForPlayer: 1
+    ShouldChooseRandomStage: 0
+    ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 1
     ShootCooldownMultiplierWhenDead: 2
