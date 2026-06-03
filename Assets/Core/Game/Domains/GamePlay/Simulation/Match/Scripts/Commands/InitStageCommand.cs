@@ -124,6 +124,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ClearStageObjectsInSimulationState();
             _matchDataService.SimulationState.IsInPreparationPhase = true;
             _matchDataService.SimulationState.StartPhaseInitialTick = 0;
+            _matchDataService.SimulationState.IsInShowoffWinners = false;
+            _matchDataService.SimulationState.CurrentStageWinnerTeamId = 0;
             _playersTalentsManager.ResetAllTalentsData();
             _preparationPhaseTimerService.RestartTimer();
             _playersOutsideStageTrackerService.ClearAllData();

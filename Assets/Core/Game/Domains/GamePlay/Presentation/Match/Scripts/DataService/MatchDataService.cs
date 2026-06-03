@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; private set; }
         public List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; private set; }
         public List<MatchSwapFieldModel> SwapFields { get; private set; }
+        public ushort CurrentStageWinnerTeamId { get; set; }
         public List<MatchKOProjectileModel> KOProjectiles { get; private set; }
         public List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
@@ -34,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public HashSet<ushort> TeamIds  {get; private set; }
         public int StartPhaseInitialTick { get; set; }
         public bool IsInPreparationPhase { get; set; }
+        public bool IsInShowoffWinners { get; set; }
         public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }
         public Dictionary<ushort, int> GemsPerTeam  {get; private set; }
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
@@ -389,6 +391,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             }
 
             ChickenEggs.Remove(model);
+        }
+
+        public bool TryGetKingedPlayers(out List<MatchPlayerModel> kingedPlayers)
+        {
+            if (!IsInShowoffWinners)
+            {
+                kingedPlayers = default;
+                return false;
+            }
+
+            kingedPlayers = Players.FindAll(x => x.TeamId == CurrentStageWinnerTeamId);
+            return true;
         }
     }
 }
