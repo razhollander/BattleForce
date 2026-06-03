@@ -5,19 +5,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 {
     public interface IGameInputActionsController
     {
+        void AddPlayer(ushort playerId, UnityEngine.InputSystem.InputDevice device);
         void EnableInputs();
         void DisableInputs();
         void RegisterAllInputListeners();
         void UnregisterAllInputListeners();
-        bool IsMoveLeftInputPressed();
-        bool IsMoveRightInputPressed();
-        bool IsShootInputPressed();
-        bool IsMoveForwardInputPressed();
-        Vector2 GetAimDirection();
-        Vector2 GetMoveDirection();
+        bool IsMoveLeftInputPressed(ushort playerId = 0);
+        bool IsMoveRightInputPressed(ushort playerId = 0);
+        bool IsShootInputPressed(ushort playerId = 0);
+        bool IsMoveForwardInputPressed(ushort playerId = 0);
+        Vector2 GetAimDirection(ushort playerId = 0);
+        Vector2 GetMoveDirection(ushort playerId = 0);
         Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui);
-        bool IsTalentAInputPressed();
-        bool IsTalentBInputPressed();
-        bool IsTalentCInputPressed();
+        bool IsTalentAInputPressed(ushort playerId = 0);
+        bool IsTalentBInputPressed(ushort playerId = 0);
+        bool IsTalentCInputPressed(ushort playerId = 0);
     }
 }

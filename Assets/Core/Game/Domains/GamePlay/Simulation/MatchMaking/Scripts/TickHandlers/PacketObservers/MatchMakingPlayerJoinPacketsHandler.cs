@@ -31,7 +31,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
         private readonly INetEventsDataService _netEventsDataService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly ISimulationInputService _simulationInputService;
-        private readonly CapacityDict<NetPeer, JoinRequestPacketC2S> _playerJoinedPacketsPerPeer;
+        private readonly CapacityDict<NetPeer, FixedClassUnorderedList<JoinRequestPacketC2S>> _playerJoinedPacketsPerPeer;
+        private readonly ConcurrentPool<FixedClassUnorderedList<JoinRequestPacketC2S>> _playerJoinedPacketsListPool;
         private readonly ConcurrentPool<JoinRequestPacketC2S> _joinedRequestPacketsPool;
         private readonly ConcurrentPool<JoinResponsePacketS2C> _joinedResponsePacketsPool;
         private readonly NetworkConfig _networkConfig;
@@ -49,7 +50,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _simulationInputService = simulationInputService;
             _networkConfig = networkConfig;
-            _playerJoinedPacketsPerPeer = new CapacityDict<NetPeer, JoinRequestPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
+            _playerJoinedPacketsPerPeer = new CapacityDict<NetPeer, FixedClassUnorderedList<JoinRequestPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
+            _playerJoinedPacketsListPool = new ConcurrentPool<FixedClassUnorderedList<JoinRequestPacketC2S>>(() => new FixedClassUnorderedList<JoinRequestPacketC2S>(networkConfig.MaxCap.JoinRequestPackets, () => new JoinRequestPacketC2S()), networkConfig.MaxCap.ConcurrentPlayers);
             _joinedRequestPacketsPool = new ConcurrentPool<JoinRequestPacketC2S>(() => new JoinRequestPacketC2S(), networkConfig.MaxCap.JoinRequestPackets);
             _joinedResponsePacketsPool = new ConcurrentPool<JoinResponsePacketS2C>(() => new JoinResponsePacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount), networkConfig.MaxCap.JoinRequestPackets);
         }
@@ -69,47 +71,51 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
 
             foreach (var kvp in _playerJoinedPacketsPerPeer)
             {
-                var playerName = kvp.Value.PlayerName;
                 var peer = kvp.Key;
-
-                var isPlayerAlreadyInMatch = _matchDataService.SimulationState.TryGetPlayerByName(playerName, out _);
-                var isMaxPlayers = _matchDataService.SimulationState.Players.Count == _networkConfig.MaxCap.ConcurrentPlayers;
-
-                var joinResponse = _joinedResponsePacketsPool.Get();
-                joinResponse.Clear();
-                if (isPlayerAlreadyInMatch || isMaxPlayers)
+                foreach (var packet in kvp.Value.AsSpan())
                 {
-                    LogService.LogError($"Cant join player because: isMaxPlayers: {isMaxPlayers}, isPlayerAlreadyInMatch: {isPlayerAlreadyInMatch}");
-                    joinResponse.IsSuccess = false;
-                }
-                else
-                {
-                    joinResponse.IsSuccess = true;
-                    joinResponse.IsMatchMaking = true;
-                    var playerTeamId = (ushort) (_matchDataService.SimulationState.Players.Count % _sharedGamePlayConfig.MaxTeamsAmount + 1);
-                    var position = DonutQuadrantWalls.GetTeamFloorCenter(_sharedGamePlayConfig.TeamIds, playerTeamId, _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius);
-                    var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerTeamId);
-                    var playerId = playerState.Id;
-                    joinResponse.LocalPlayerId = playerId;
-                    joinResponse.MatchMakingSimulationState = _matchDataService.SimulationState;
-                    joinResponse.OccuredOnTick = processedTick;
-                    peer.Tag = playerId;
+                    var playerName = packet.PlayerName;
+
+                    var isPlayerAlreadyInMatch = _matchDataService.SimulationState.TryGetPlayerByName(playerName, out _);
+                    var isMaxPlayers = _matchDataService.SimulationState.Players.Count == _networkConfig.MaxCap.ConcurrentPlayers;
+
+                    var joinResponse = _joinedResponsePacketsPool.Get();
+                    joinResponse.Clear();
+                    if (isPlayerAlreadyInMatch || isMaxPlayers)
+                    {
+                        LogService.LogError($"Cant join player because: isMaxPlayers: {isMaxPlayers}, isPlayerAlreadyInMatch: {isPlayerAlreadyInMatch}");
+                        joinResponse.IsSuccess = false;
+                    }
+                    else
+                    {
+                        joinResponse.IsSuccess = true;
+                        joinResponse.IsMatchMaking = true;
+                        var playerTeamId = (ushort) (_matchDataService.SimulationState.Players.Count % _sharedGamePlayConfig.MaxTeamsAmount + 1);
+                        var position = DonutQuadrantWalls.GetTeamFloorCenter(_sharedGamePlayConfig.TeamIds, playerTeamId, _sharedGamePlayConfig.MatchMakingEnvironment.TeamFloorsRadius);
+                        var playerState = _matchDataService.AddPlayer(playerName, position, startingDirection, velocity, radius, shootCooldown, playerTeamId);
+                        var playerId = playerState.Id;
+                        joinResponse.LocalPlayerId = playerId;
+                        joinResponse.MatchMakingSimulationState = _matchDataService.SimulationState;
+                        joinResponse.OccuredOnTick = processedTick;
+                        peer.Tag = playerId;
+
+                        _simulationInputService.AddPlayer(playerId);
+                        _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius, heartRadius);
+                        _networkManager.AddPlayerPeer(playerId, peer);
+                        _netEventsDataService.StartSavingPlayerEvents(playerId);
+                        _netEventsDataService.AddMatchMakingPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);
+                    }
                     
-                    _simulationInputService.AddPlayer(playerId);
-                    _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius, heartRadius);
-                    _networkManager.AddPlayerPeer(playerId, peer);
-                    _netEventsDataService.StartSavingPlayerEvents(playerId);
-                    _netEventsDataService.AddMatchMakingPlayerJoinAcceptedEvent(processedTick, playerState, _matchDataService.SimulationState);
+                    _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);
+
+                    LogService.LogTopic("Processed player joined: "+playerName, LogTopicType.ServerNetwork);
                 }
-                
-                _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);
-                
-                LogService.LogTopic("Processed player joined: "+playerName, LogTopicType.ServerNetwork);
             }
 
             foreach (var kvp in _playerJoinedPacketsPerPeer)
             {
-                _joinedRequestPacketsPool.Return(kvp.Value);
+                kvp.Value.Clear();
+                _playerJoinedPacketsListPool.Return(kvp.Value);
             }
 
             _playerJoinedPacketsPerPeer.Clear();
@@ -125,7 +131,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
         private void OnJoinReceived(JoinRequestPacketC2S joinRequestPacket, NetPeer peer)
         {
             LogService.LogTopic("Join packet received: " + joinRequestPacket.PlayerName, LogTopicType.ServerNetwork);
-            _playerJoinedPacketsPerPeer.Add(peer, joinRequestPacket);
+            if (!_playerJoinedPacketsPerPeer.TryGetValue(peer, out var list))
+            {
+                list = _playerJoinedPacketsListPool.Get();
+                _playerJoinedPacketsPerPeer.Add(peer, list);
+            }
+
+            var packet = list.AddAndGet();
+            packet.Deserialize(new NetDataReader(new NetDataWriter().Put(joinRequestPacket.PlayerName).Put(joinRequestPacket.IsGamePadEnabled).Data));
+            // Return original since we cloned it conceptually into the class list
+            _joinedRequestPacketsPool.Return(joinRequestPacket);
         }
 
         public void InitExitPoint()

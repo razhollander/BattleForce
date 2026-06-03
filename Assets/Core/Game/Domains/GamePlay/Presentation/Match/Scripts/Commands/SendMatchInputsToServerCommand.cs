@@ -45,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
           var playerPosition = _matchPlayerControllers.GetPlayerPosition(_playerId);
             var playerDirection = _matchDataService.GetPlayer(_playerId).Spaceship.Transform.Direction;
             var calculatedInputs = _getCalculatedPlayerInputsCommand
+                .SetPlayerId(_playerId)
                 .SetPlayerDirection(playerDirection)
                 .SetPlayerPosition(playerPosition)
                 .Execute();

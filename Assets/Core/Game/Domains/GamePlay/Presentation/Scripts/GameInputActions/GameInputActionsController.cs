@@ -16,100 +16,168 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
     public class GameInputActionsController : IGameInputActionsController
     {
         private const float MIN_AIM_THRESHOLD = 0.1f;
-        
-        private readonly global::GameInputActions _gameInputActions;
+
+        private readonly Dictionary<ushort, global::GameInputActions> _gameInputActionsByPlayer = new Dictionary<ushort, global::GameInputActions>();
+        private global::GameInputActions _defaultGameInputActions;
         private readonly ICommandFactory _commandFactory;
-        private Vector2 _lastAimDirection;
+        private Dictionary<ushort, Vector2> _lastAimDirectionByPlayer = new Dictionary<ushort, Vector2>();
 
         public GameInputActionsController(
             global::GameInputActions gameInputActions,
             ICommandFactory commandFactory)
         {
-            _gameInputActions = gameInputActions;
+            _defaultGameInputActions = gameInputActions;
+            _gameInputActionsByPlayer[0] = gameInputActions;
             _commandFactory = commandFactory;
+        }
+
+
+        public void AddPlayer(ushort playerId, InputDevice device)
+        {
+            if (!_gameInputActionsByPlayer.ContainsKey(playerId))
+            {
+                var inputActions = new global::GameInputActions();
+                if (device != null)
+                {
+                    inputActions.devices = new UnityEngine.InputSystem.Utilities.ReadOnlyArray<InputDevice>(new[] { device });
+                }
+                inputActions.Enable();
+                inputActions.GamePlay.MoveRight.performed += OnShootInput;
+                _gameInputActionsByPlayer[playerId] = inputActions;
+            }
         }
 
         public void EnableInputs()
         {
             LogService.LogTopic("EnableInputs", LogTopicType.Inputs);
-            _gameInputActions.Enable();
+            foreach (var actions in _gameInputActionsByPlayer.Values)
+            {
+                actions.Enable();
+            }
             RegisterAllInputListeners();
         }
 
         public void DisableInputs()
         {
             LogService.LogTopic("DisableInputs", LogTopicType.Inputs);
-            _gameInputActions.Disable();
-            _gameInputActions.GamePlay.Disable();
-            _gameInputActions.UI.Disable();
+            foreach (var actions in _gameInputActionsByPlayer.Values)
+            {
+                actions.Disable();
+                actions.GamePlay.Disable();
+                actions.UI.Disable();
+            }
         }
-        
+
         public void RegisterAllInputListeners()
         {
             LogService.LogTopic("Register all input listeners", LogTopicType.Inputs);
-             _gameInputActions.GamePlay.MoveRight.performed += OnShootInput;
+             foreach (var actions in _gameInputActionsByPlayer.Values)
+            {
+                actions.GamePlay.MoveRight.performed += OnShootInput;
+            }
         }
 
         public void UnregisterAllInputListeners()
         {
             LogService.LogTopic("Unregister all input listeners", LogTopicType.Inputs);
-             _gameInputActions.GamePlay.MoveRight.performed -= OnShootInput;
+             foreach (var actions in _gameInputActionsByPlayer.Values)
+            {
+                actions.GamePlay.MoveRight.performed -= OnShootInput;
+            }
         }
-        
+
         private void OnShootInput(InputAction.CallbackContext obj)
         {
             LogService.LogTopic("Shoot input was triggered", LogTopicType.Inputs);
             _commandFactory.CreateCommandVoid<ShootInputInvokedCommand>().Execute();
         }
 
-        public bool IsMoveLeftInputPressed()
+        public bool IsMoveLeftInputPressed(ushort playerId = 0)
         {
-            return _gameInputActions.GamePlay.MoveLeft.IsPressed();
-        }
-        
-        public bool IsMoveRightInputPressed()
-        {
-            return _gameInputActions.GamePlay.MoveRight.IsPressed();
-        } 
-        
-        public bool IsMoveForwardInputPressed()
-        {
-            return _gameInputActions.GamePlay.MoveForward.IsPressed();
+            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            {
+                return actions.GamePlay.MoveLeft.IsPressed();
+            }
+            return false;
         }
 
-        public Vector2 GetAimDirection()
+        public bool IsMoveRightInputPressed(ushort playerId = 0)
         {
-            var currentAim =  _gameInputActions.GamePlay.Aim.ReadValue<Vector2>();
+            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            {
+                return actions.GamePlay.MoveRight.IsPressed();
+            }
+            return false;
+        }
+
+        public bool IsMoveForwardInputPressed(ushort playerId = 0)
+        {
+            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            {
+                return actions.GamePlay.MoveForward.IsPressed();
+            }
+            return false;
+        }
+
+        public Vector2 GetAimDirection(ushort playerId = 0)
+        {
+            if (!_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            {
+                return Vector2.zero;
+            }
+
+            var currentAim = actions.GamePlay.Aim.ReadValue<Vector2>();
             var isAimNotZero = currentAim.sqrMagnitude > MIN_AIM_THRESHOLD;
             if (isAimNotZero)
             {
-                _lastAimDirection = currentAim;
+                _lastAimDirectionByPlayer[playerId] = currentAim;
             }
 
-            return _lastAimDirection;
+            _lastAimDirectionByPlayer.TryGetValue(playerId, out var lastAim);
+            return lastAim;
         }
 
-        public Vector2 GetMoveDirection()
+        public Vector2 GetMoveDirection(ushort playerId = 0)
         {
-            return _gameInputActions.GamePlay.MoveDirection.ReadValue<Vector2>();
+            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            {
+                return actions.GamePlay.MoveDirection.ReadValue<Vector2>();
+            }
+            return Vector2.zero;
         }
 
-        public bool IsShootInputPressed()
+        public bool IsShootInputPressed(ushort playerId = 0)
         {
-            return _gameInputActions.GamePlay.Shoot.IsPressed();
+            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            {
+                return actions.GamePlay.Shoot.IsPressed();
+            }
+            return false;
         }
 
-        public bool IsTalentAInputPressed()
+        public bool IsTalentAInputPressed(ushort playerId = 0)
         {
-            return _gameInputActions.GamePlay.TalentA.IsPressed();
+            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            {
+                return actions.GamePlay.TalentA.IsPressed();
+            }
+            return false;
         }
-        public bool IsTalentBInputPressed()
+        public bool IsTalentBInputPressed(ushort playerId = 0)
         {
-            return _gameInputActions.GamePlay.TalentB.IsPressed();
+            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            {
+                return actions.GamePlay.TalentB.IsPressed();
+            }
+            return false;
         }
-        public bool IsTalentCInputPressed()
+        public bool IsTalentCInputPressed(ushort playerId = 0)
         {
-            return _gameInputActions.GamePlay.TalentC.IsPressed();
+            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            {
+                return actions.GamePlay.TalentC.IsPressed();
+            }
+            return false;
         }
 
         public async Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui = false)
@@ -126,7 +194,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
                 (Mouse.current?.rightButton.wasPressedThisFrame == true) ||
                 (Touchscreen.current?.primaryTouch.press.wasPressedThisFrame == true);
         }
-        
+
         private bool IsOverUiOnMobile()
         {
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
@@ -135,7 +203,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             {
                 return false;
             }
-            
+
             Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
             var eventDataCurrentPosition = new PointerEventData(EventSystem.current);
             eventDataCurrentPosition.position = new Vector2(touchPosition.x, touchPosition.y);

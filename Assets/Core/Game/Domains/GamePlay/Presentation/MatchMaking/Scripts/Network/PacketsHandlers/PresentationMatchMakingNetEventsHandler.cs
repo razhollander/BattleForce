@@ -19,15 +19,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly ICommandFactory _commandFactory;
         private readonly IStartMatchButtonController _startMatchButtonController;
         private readonly AddMatchMakingPlayerCommand _addMatchMakingPlayerCommand;
+        private readonly Core.Game.Domains.GamePlay.Presentation.Scripts.DataService.ILocalPlayersDataService _localPlayersDataService;
+        private readonly Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions.IGameInputActionsController _gameInputActionsController;
 
         public PresentationMatchMakingNetEventsHandler(IMatchMakingDataService matchDataService,
-            ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory, IStartMatchButtonController startMatchButtonController)
+            ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory, IStartMatchButtonController startMatchButtonController,
+            Core.Game.Domains.GamePlay.Presentation.Scripts.DataService.ILocalPlayersDataService localPlayersDataService, Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions.IGameInputActionsController gameInputActionsController)
         {
             _matchDataService = matchDataService;
             _cachedPresentationEventsService = cachedPresentationEventsService;
             _commandFactory = commandFactory;
             _startMatchButtonController = startMatchButtonController;
             _addMatchMakingPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchMakingPlayerCommand>();
+            _localPlayersDataService = localPlayersDataService;
+            _gameInputActionsController = gameInputActionsController;
         }
 
         public void ProcessPlayerJoinedEvents(CapacityList<MatchMakingPlayerJoinAcceptPacketS2C> playerJoinAcceptNetEvents)
@@ -42,6 +47,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 
                 if (!isLocalPlayer)
                 {
+                    _addMatchMakingPlayerCommand.SetPlayerState(playerJoinAcceptNetEvent.PlayerState).Execute();
+                }
+                else
+                {
+                    UnityEngine.InputSystem.InputDevice device = null;
+                    if (playerJoinAcceptNetEvent.PlayerState.Name.StartsWith("Player "))
+                    {
+                        var deviceIdStr = playerJoinAcceptNetEvent.PlayerState.Name.Substring("Player ".Length);
+                        if (int.TryParse(deviceIdStr, out var deviceId))
+                        {
+                            device = UnityEngine.InputSystem.InputSystem.GetDeviceById(deviceId);
+                        }
+                    }
+
+                    _localPlayersDataService.AddLocalPlayer(playerId, device);
+                    _gameInputActionsController.AddPlayer(playerId, device);
                     _addMatchMakingPlayerCommand.SetPlayerState(playerJoinAcceptNetEvent.PlayerState).Execute();
                 }
             }
