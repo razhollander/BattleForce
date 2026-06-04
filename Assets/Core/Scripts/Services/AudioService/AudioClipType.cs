@@ -10,5 +10,8 @@ namespace CoreDomain.Scripts.Services.AudioService
         Hit = 5,
         Spin = 6,
         UiClick = 7,
+        PlayerShoot = 8,
+        PlayerTakeDamage = 9,
+        TalentCast = 10,
     }
 }

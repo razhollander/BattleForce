@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using CoreDomain.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Sirenix.Utilities;
 
@@ -16,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private PresentationGamePlayConfig _gameplayConfig;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _gameplayConfig =_diContainer.Resolve<PresentationGamePlayConfig>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -40,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var bulletColor = _gameplayConfig.ColorPerTeamId[_matchDataService.GetPlayer(bulletsSpawnEvent.BelongToPlayerId).TeamId];
                 _bulletControllers.CreateBullet(bulletId, bulletsSpawnEvent.BulletRadius, bulletsSpawnEvent.Position, bulletColor);
                 _playerControllers.ShootBulletEffectForPlayer(bulletsSpawnEvent.BelongToPlayerId);
+                _audioService.PlayAudio(AudioClipType.PlayerShoot, AudioChannelType.Fx);
             }
             
             bulletsSpawnEvents.Clear();

@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
+using CoreDomain.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.DataPersistence;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -31,10 +32,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly ICommandFactory _commandFactory;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly IDataPersistence _dataPersistence;
+        private readonly IAudioService _audioService;
 
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
             IStateMachineService stateMachineService, NetworkConfig networkConfig, IPlaybackIOService playbackIOService,
-            ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig, IDataPersistence dataPersistence)
+            ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig, IDataPersistence dataPersistence,
+            IAudioService audioService)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
@@ -44,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _commandFactory = commandFactory;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _dataPersistence = dataPersistence;
+            _audioService = audioService;
         }
 
         public void InitEntryPoint()
@@ -76,6 +80,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnPlayPlaybackClicked()
         {
+            _audioService.PlayAudio(AudioClipType.UiClick, AudioChannelType.Fx);
             _ = OnPlayPlaybackClickedAsync();
         }
 
@@ -98,6 +103,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnServerClicked()
         {
+            _audioService.PlayAudio(AudioClipType.UiClick, AudioChannelType.Fx);
             _ = OnServerClickedAsync();
         }
 
@@ -122,6 +128,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnHostClicked()
         {
+            _audioService.PlayAudio(AudioClipType.UiClick, AudioChannelType.Fx);
             _ = OnHostClickedAsync();
         }
 
@@ -202,6 +209,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnClientClicked()
         {
+            _audioService.PlayAudio(AudioClipType.UiClick, AudioChannelType.Fx);
             SaveLocallyChosenParameters();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;

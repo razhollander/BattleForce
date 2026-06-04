@@ -51,7 +51,7 @@ namespace CoreDomain.Scripts.CoreInitiator
                 // _loadingScreenController.Show();
                 InitializeServices();
                 InitializeControllers();
-                // _audioService.AddAudioClips(_coreAudioClipsScriptableObject);
+                _audioService.AddAudioClips(_coreAudioClipsScriptableObject);
                 await LoadGameScene(cancellationTokenSource);
                 //await _loadingScreenController.SetLoadingSlider(1, cancellationTokenSource);
                 int i = 0;
