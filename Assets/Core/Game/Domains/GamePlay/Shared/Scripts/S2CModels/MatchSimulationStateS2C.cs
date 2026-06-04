@@ -26,6 +26,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public StageType StageType;
         public int StartPhaseInitialTick;
         public bool IsInPreparationPhase;
+        public bool IsInShowoffWinners;
+        public ushort CurrentStageWinnerTeamId;
 
         public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs)
         {
@@ -117,6 +119,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((byte)StageType);
             writer.Put(StartPhaseInitialTick);
             writer.Put(IsInPreparationPhase);
+            writer.Put(IsInShowoffWinners);
+            writer.Put((byte)CurrentStageWinnerTeamId);
         }
         
         public void Deserialize(NetDataReader reader)
@@ -207,6 +211,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             StageType = (StageType)reader.GetByte();
             StartPhaseInitialTick = reader.GetInt();
             IsInPreparationPhase = reader.GetBool();
+            IsInShowoffWinners = reader.GetBool();
+            CurrentStageWinnerTeamId = reader.GetByte();
         }
 
         public PlayerStateS2C GetPlayerById(ushort playerId)

@@ -34,5 +34,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction);
         void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled);
         void SetPlayerIsLockOnHeartSightShown(ushort playerId, bool isShown);
+        void SetIsPlayerKinged(ushort playerId, bool isKinged);
     }
 }

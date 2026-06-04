@@ -243,6 +243,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var stageEndNetEvent in stageEndNetEvents)
             {
+                _matchDataService.CurrentStageWinnerTeamId = stageEndNetEvent.WinningTeamId;
+                _matchDataService.IsInShowoffWinners = true;
                 _cachedPresentationEventsService.StageEndNetEvents.Add(stageEndNetEvent);
             }
         }

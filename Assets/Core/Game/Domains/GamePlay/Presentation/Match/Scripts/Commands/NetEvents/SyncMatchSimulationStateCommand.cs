@@ -107,6 +107,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             _matchDataService.StartPhaseInitialTick = _simulationState.StartPhaseInitialTick;
             _matchDataService.IsInPreparationPhase = _simulationState.IsInPreparationPhase;
+            _matchDataService.IsInShowoffWinners = _simulationState.IsInShowoffWinners;
+            _matchDataService.CurrentStageWinnerTeamId = _simulationState.CurrentStageWinnerTeamId;
             _stageCancellationTokenProvider.CancelAndRegenarateStageToken();
             DestroyAll();
             CreateAll();

@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private PlayerEyesView _playerEyesView;
         [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
         [SerializeField] private LockOnHeartSightView _lockOnHeartSightView;
+        [SerializeField] private GameObject _crownGameObject;
         public Action Despawn { get; set; }
         
         public PlayerView Base => _playerView;
@@ -222,6 +223,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _lockOnHeartSightView.SetIsShown(isShown);
             _playerEyesView.UpdateEyesAccordingToIsSightShown(isShown);
+        }
+
+        public void SetIsKinged(bool isKinged)
+        {
+            _crownGameObject.SetActive(isKinged);
         }
     }
 }

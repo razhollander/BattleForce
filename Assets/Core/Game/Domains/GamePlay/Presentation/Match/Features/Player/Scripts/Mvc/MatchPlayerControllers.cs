@@ -121,6 +121,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetIsLockOnHeartSightShown(isShown);
         }
 
+        public void SetIsPlayerKinged(ushort playerId, bool isKinged)
+        {
+            GetPlayer(playerId).SetIsKinged(isKinged);
+        }
+
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)
         {
             GetPlayer(playerId).SetHealth(currentHealth, maxHealth);

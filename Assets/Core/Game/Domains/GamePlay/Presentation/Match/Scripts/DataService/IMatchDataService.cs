@@ -20,6 +20,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         HashSet<ushort> TeamIds {get; }
         int StartPhaseInitialTick { get; set; }
         bool IsInPreparationPhase { get; set; }
+        public bool IsInShowoffWinners { get; set; }
+        public ushort CurrentStageWinnerTeamId { get; set; }
         List<MatchKOProjectileModel> KOProjectiles { get; }
         List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
         MatchPlayerModel LocalPlayer { get; }
@@ -64,5 +66,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchChickenEggModel GetChickenEgg(ushort id);
         MatchChickenEggModel AddChickenEgg(ushort id, ushort casterPlayerId, UnityEngine.Vector2 position);
         void RemoveChickenEgg(ushort id);
+        bool TryGetKingedPlayers(out List<MatchPlayerModel> kingedPlayers);
     }
 }
