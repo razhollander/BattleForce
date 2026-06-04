@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: CoreAudioClips
   m_EditorClassIdentifier: 
   AudioClips:
-    m_keys: 07000000
+    m_keys: 0700000008000000090000000a000000
     m_values:
     - {fileID: 8300000, guid: b9b4b42690e5c435db1bae322291b8aa, type: 3}
+    - {fileID: 8300000, guid: 28866a3e2835445718bf70932b4f93bd, type: 3}
+    - {fileID: 8300000, guid: dc8383b4fc46e4cd6b1ec801ce107e2e, type: 3}
+    - {fileID: 8300000, guid: 43f138c228a24456c83576773ff06536, type: 3}
