@@ -1,6 +1,8 @@
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatchButton.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
@@ -19,12 +21,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly ICommandFactory _commandFactory;
         private readonly IStartMatchButtonController _startMatchButtonController;
         private readonly AddMatchMakingPlayerCommand _addMatchMakingPlayerCommand;
-        private readonly Core.Game.Domains.GamePlay.Presentation.Scripts.DataService.ILocalPlayersDataService _localPlayersDataService;
-        private readonly Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions.IGameInputActionsController _gameInputActionsController;
+        private readonly ILocalPlayersDataService _localPlayersDataService;
+        private readonly IGameInputActionsController _gameInputActionsController;
 
         public PresentationMatchMakingNetEventsHandler(IMatchMakingDataService matchDataService,
             ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory, IStartMatchButtonController startMatchButtonController,
-            Core.Game.Domains.GamePlay.Presentation.Scripts.DataService.ILocalPlayersDataService localPlayersDataService, Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions.IGameInputActionsController gameInputActionsController)
+            ILocalPlayersDataService localPlayersDataService, IGameInputActionsController gameInputActionsController)
         {
             _matchDataService = matchDataService;
             _cachedPresentationEventsService = cachedPresentationEventsService;

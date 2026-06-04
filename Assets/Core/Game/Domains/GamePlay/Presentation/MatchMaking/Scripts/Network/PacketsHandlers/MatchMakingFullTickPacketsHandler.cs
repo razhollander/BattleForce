@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatchBut
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
@@ -45,14 +46,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
         public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
             IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory,
-            IStartMatchButtonController startMatchButtonController, ILastFullSyncTickDataService lastFullSyncTickDataService)
+            IStartMatchButtonController startMatchButtonController, ILastFullSyncTickDataService lastFullSyncTickDataService, ILocalPlayersDataService localPlayersDataService, IGameInputActionsController gameInputActionsController)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _lastFullSyncTickDataService = lastFullSyncTickDataService;
 
-            _presentationNetEventsHandler = new PresentationMatchMakingNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory, startMatchButtonController);
+            _presentationNetEventsHandler = new PresentationMatchMakingNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory, startMatchButtonController, localPlayersDataService, gameInputActionsController);
 
             _fullTickPackets = new CapacityDict<int, MatchMakingFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerJoinedEvents = new CapacityList<MatchMakingPlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);

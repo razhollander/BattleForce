@@ -138,7 +138,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             }
 
             var packet = list.AddAndGet();
-            packet.Deserialize(new NetDataReader(new NetDataWriter().Put(joinRequestPacket.PlayerName).Put(joinRequestPacket.IsGamePadEnabled).Data));
+            var dataWriter = new NetDataWriter();
+            dataWriter.Put(joinRequestPacket.PlayerName);
+            dataWriter.Put(joinRequestPacket.IsGamePadEnabled);
+            packet.Deserialize(new NetDataReader(dataWriter.Data));
             // Return original since we cloned it conceptually into the class list
             _joinedRequestPacketsPool.Return(joinRequestPacket);
         }
