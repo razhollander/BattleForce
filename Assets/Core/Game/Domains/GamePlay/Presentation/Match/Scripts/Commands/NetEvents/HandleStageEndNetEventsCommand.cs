@@ -42,10 +42,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 if(!isThereOnlyOneTeam)
                 {
                     _stageEndedUiController.Show(winningTeamId, stageEndEvent.JemsWonPerTeam);
-                    SetPlayersInTeamKinged();
                     _worldCameraController.ShakeCamera(10,0.5f);
                     _worldCameraController.ClearTargets();
-                    _worldCameraController.AddFollowTarget(_matchPlayerControllers.GetPlayerTransform(1/*stageEndEvent.PlayerIdDoingWinningBlow*/));
+                    SetPlayersInTeamKinged();
                 }
             }
 
@@ -61,8 +60,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var playerModel in kingedPlayers)
             {
-                _matchPlayerControllers.SetIsPlayerKinged(playerModel.PlayerId, true);
-
+                var kinggedPlayerId = playerModel.PlayerId;
+                _worldCameraController.AddFollowTarget(_matchPlayerControllers.GetPlayerTransform(kinggedPlayerId));
+                _matchPlayerControllers.SetIsPlayerKinged(kinggedPlayerId, true);
             }
         }
     }

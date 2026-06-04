@@ -16,7 +16,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private INetEventsDataService _netEventsDataService;
         private IStageDataService _stageDataService;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
+        
+        private ushort _playerIdDoingWinningBlow;
 
+        public StageEndedCommand PlayerIdDoingWinningBlow(ushort playerId)
+        {
+            _playerIdDoingWinningBlow = playerId;
+            return this;
+        }
+        
         public StageEndedCommand SetWinningTeamId(ushort winningTeamId)
         {
             _winningTeamId = winningTeamId;
@@ -42,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             LogService.LogTopic($"Match Ended! Winning Team: {_winningTeamId}", LogTopicType.ServerNetwork);
             _matchDataService.SimulationState.CurrentStageWinnerTeamId = _winningTeamId;
             _matchDataService.SimulationState.IsInShowoffWinners = true;
-            _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, _stageDataService.GemsCollectedPerTeam, _matchDataService.SimulationState.GemsPerTeamId);
+            _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, _stageDataService.GemsCollectedPerTeam, _matchDataService.SimulationState.GemsPerTeamId, _playerIdDoingWinningBlow);
             _stageDataService.IsStageEnded = true;
             _stageDataService.StageRestartTimer = _gamePlayConfigService.GamePlayConfig.StageRestartDelaySeconds;
         }

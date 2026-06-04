@@ -1475,13 +1475,14 @@ if (DeactivateKOTalentNetEventsPerPlayer.TryGetValue(playerId, out var deactivat
             }
         }
 
-        public void AddStageEndNetEvent(int onTick, ushort winningTeamId, Dictionary<ushort, int> jemsWon, Dictionary<ushort, int> totalJems)
+        public void AddStageEndNetEvent(int onTick, ushort winningTeamId, Dictionary<ushort, int> jemsWon, Dictionary<ushort, int> totalJems, ushort playerIdDoingWinningBlow)
         {
             foreach (var kvp in StageEndNetEventsPerPlayer)
             {
                 var packet = kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.WinningTeamId = winningTeamId;
+                packet.PlayerIdDoingWinningBlow = playerIdDoingWinningBlow;
                 packet.JemsWonPerTeam.Clear();
                 foreach (var jems in jemsWon)
                 {

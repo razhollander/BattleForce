@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LiteNetLib.Utils;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
 {
@@ -8,6 +9,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     {
         public int OccuredOnTick;
         public ushort WinningTeamId;
+        public ushort PlayerIdDoingWinningBlow; 
+
         public Dictionary<ushort, int> JemsWonPerTeam;
         public Dictionary<ushort, int> TotalJemsPerTeam;
 
@@ -21,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)WinningTeamId);
+            writer.Put((byte)PlayerIdDoingWinningBlow);
 
             writer.Put((byte)JemsWonPerTeam.Count);
             foreach (var kvp in JemsWonPerTeam)
@@ -41,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             OccuredOnTick = reader.GetInt();
             WinningTeamId = reader.GetByte();
+            PlayerIdDoingWinningBlow = reader.GetByte();
 
             JemsWonPerTeam.Clear();
             var jemsWonCount = reader.GetByte();
