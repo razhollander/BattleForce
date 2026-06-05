@@ -527,6 +527,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             DestroyBullet(bulletModel, bulletBody);
+
+            var wasBulletCreatedOnTopOfPlayerHeart = bulletModel.CreatedOnTick == _processedTick;
+            if (wasBulletCreatedOnTopOfPlayerHeart)
+            {
+                return;
+            }
+            
             _playerHitCommand
                 .SetPlayerIdGotHit(playerId)
                 .SetWasHitByAnotherPlayer(true, bulletModel.BelongToPlayerId)

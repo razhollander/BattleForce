@@ -74,7 +74,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 if (!isCurrentlyAiming)
                 {
                     IsCurrentlyAiming = true;
-                    casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.AimArrow;
+                    casterPlayerState.Spaceship.AssistArrowType = Shared.Scripts.Enums.PlayerAssistArrowType.AimArrow;
                 }
             }
 
@@ -83,7 +83,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.Hidden;
+            casterPlayerState.Spaceship.AssistArrowType = Shared.Scripts.Enums.PlayerAssistArrowType.Hidden;
             IsCurrentlyAiming = false;
 
             if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType, out int talentIndex))
@@ -120,9 +120,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var directionToEnemy = Vector2.Normalize(hitEnemyPlayer.Spaceship.Transform.Position - casterPlayerState.Spaceship.Transform.Position);
 
             var forceToEnemy = -directionToEnemy * pullForce;
-            var forceToPlayer = directionToEnemy * pullForce;
             hitEnemyPlayer.Spaceship.Transform.Velocity += forceToEnemy;
-            casterPlayerState.Spaceship.Transform.Velocity += forceToPlayer;
+            
+            //var forceToPlayer = directionToEnemy * pullForce;
+            //casterPlayerState.Spaceship.Transform.Velocity += forceToPlayer;
                 
             var randomSpin = RNG.NextFloat(config.MinSpin, config.MaxSpin);
             _spinPlayerCommand.SetPlayer(hitEnemyPlayer.Id).SetSpinAmount(randomSpin).SetTick(tick).Execute();
