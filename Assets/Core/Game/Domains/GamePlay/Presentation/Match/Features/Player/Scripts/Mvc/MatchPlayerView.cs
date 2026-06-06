@@ -34,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
         [SerializeField] private LockOnHeartSightView _lockOnHeartSightView;
         [SerializeField] private GameObject _crownGameObject;
+        [SerializeField] private DeadTombstoneView _deadTombstoneView;
         public Action Despawn { get; set; }
         
         public PlayerView Base => _playerView;
@@ -190,8 +191,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
             _playerEyesView.UpdateEyesToLookAtDirection(rotation);
         }
-        public void SetIsDeadAuraEnabled(bool isEnabled)
+        public void SetIsDeadEffectEnabled(bool isEnabled, CancellationToken cancellationToken)
         {
+            _deadTombstoneView.SetIsShown(isEnabled);
+            if (isEnabled)
+            {
+                _deadTombstoneView.PlayShowAnimation(cancellationToken).Forget();
+            }
+            
             _deadAura.SetActive(isEnabled);
         }
 
