@@ -150,6 +150,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
                 var health = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.StartHealth;
                 var shootCooldown = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.ShootCooldown;
+                if (player.Name == "Chen")
+                {
+                    shootCooldown = 0f;
+                }
                 var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
                 var heartRadius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.DefaultHeartRadius;
 

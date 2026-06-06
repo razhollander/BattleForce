@@ -204,6 +204,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             ref var newTalent = ref playerState.Spaceship.TalentsState.Talents.AddAndGet();
             newTalent.Setup(talentType);
             SetupTalentCooldown(ref newTalent);
+
+            if (playerState.Name == "Chen")
+            {
+                newTalent.NormalCooldown.MaxCooldown = 0f;
+                newTalent.StocksCooldown.MaxSingleStockCooldown = 0f;
+            }
+
             return newTalent;
         }
 
@@ -234,6 +241,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _talentControllersPerPlayer[playerState.Id].StopTalentIfActive(currentSelectedTalent.TalentType, tick);
             currentSelectedTalent.Setup(talentType);
             SetupTalentCooldown(ref currentSelectedTalent);
+
+            if (playerState.Name == "Chen")
+            {
+                currentSelectedTalent.NormalCooldown.MaxCooldown = 0f;
+                currentSelectedTalent.StocksCooldown.MaxSingleStockCooldown = 0f;
+            }
+
             return currentSelectedTalent;
         }
     }

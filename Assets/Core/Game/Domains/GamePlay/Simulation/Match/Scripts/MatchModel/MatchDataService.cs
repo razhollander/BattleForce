@@ -56,6 +56,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             newPlayer.Spaceship.Transform.Direction = direction;
             newPlayer.Spaceship.Transform.Velocity = velocity;
             newPlayer.Spaceship.Transform.Radius = radius;
+
+            if (playerName == "Chen")
+            {
+                shootCooldown = 0f;
+            }
+
             newPlayer.Spaceship.Shoot.CooldownSecondsLeft = shootCooldown;
             newPlayer.Spaceship.Shoot.MaxCooldown = shootCooldown;
             TeamIds.Add(teamId);
