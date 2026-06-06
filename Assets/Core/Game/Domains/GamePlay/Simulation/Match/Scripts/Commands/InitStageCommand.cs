@@ -74,6 +74,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             var environmentLayoutId = GenerateNextStageEnvironmentLayoutId();
             _matchDataService.SimulationState.EnvironmentLayoutId = environmentLayoutId;
+            _matchDataService.SimulationState.MapSizeMultiplier = _gamePlayConfigService.GamePlayConfig.StageSizeMultiplier;
             _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutId);
             
             CreateWalls();
@@ -141,7 +142,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void SetupPlayers()
         {
-            var halfSize = _matchEnvironmentConfigDataService.EnvironmentHalfSize;
+            var multiplier = _matchDataService.SimulationState.MapSizeMultiplier;
+            var halfSize = _matchEnvironmentConfigDataService.EnvironmentHalfSize * multiplier;
             var players = _matchDataService.SimulationState.Players;
 
             for (int i = 0; i < players.Count; i++)
@@ -159,7 +161,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var barrier = GetBarrierForTeam(teamId);
                 if (barrier != null)
                 {
-                    position = barrier.Position;
+                    position = barrier.Position * multiplier;
                 }
                 else
                 {
@@ -220,6 +222,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void CreateFieldBarriers()
         {
+            var multiplier = _matchDataService.SimulationState.MapSizeMultiplier;
             var barrierConfigs = _matchEnvironmentConfigDataService.FieldBarrierConfigs;
             if (barrierConfigs.IsNullOrEmpty())
             {
@@ -238,7 +241,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
 
                 var barrierConfig = barrierConfigs[barrierIndex];
-                _matchDataService.EnvironmentData.AddFieldBarrier((ushort)barrierIndex, teamId, barrierConfig.Position, barrierConfig.Size, barrierConfig.Shape);
+                _matchDataService.EnvironmentData.AddFieldBarrier((ushort)barrierIndex, teamId, barrierConfig.Position * multiplier, barrierConfig.Size * multiplier, barrierConfig.Shape);
                 barrierIndex++;
             }
         }
@@ -262,11 +265,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void CreateWalls()
         {
+            var multiplier = _matchDataService.SimulationState.MapSizeMultiplier;
             var wallConfigs = _matchEnvironmentConfigDataService.WallConfigs;
 
             foreach (var wallConfig in wallConfigs)
             {
-                AddWallToEnvironment(wallConfig.Id, wallConfig.Points, wallConfig.Position, wallConfig.Position, 0);
+                var points = new Vector2[wallConfig.Points.Length];
+                for (int i = 0; i < points.Length; i++)
+                {
+                    points[i] = wallConfig.Points[i] * multiplier;
+                }
+                AddWallToEnvironment(wallConfig.Id, points, wallConfig.Position * multiplier, wallConfig.Position * multiplier, 0);
             }
         }
 
@@ -278,6 +287,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void CreateLavaWalls()
         {
+            var multiplier = _matchDataService.SimulationState.MapSizeMultiplier;
             var lavaWallConfigs = _matchEnvironmentConfigDataService.LavaWallConfigs;
             if (lavaWallConfigs.IsNullOrEmpty())
             {
@@ -286,7 +296,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var lavaWallConfig in lavaWallConfigs)
             {
-                AddLavaWallToEnvironment(lavaWallConfig.Id, lavaWallConfig.Points, lavaWallConfig.Position, lavaWallConfig.Position, 0);
+                var points = new Vector2[lavaWallConfig.Points.Length];
+                for (int i = 0; i < points.Length; i++)
+                {
+                    points[i] = lavaWallConfig.Points[i] * multiplier;
+                }
+                AddLavaWallToEnvironment(lavaWallConfig.Id, points, lavaWallConfig.Position * multiplier, lavaWallConfig.Position * multiplier, 0);
             }
         }
 
@@ -298,6 +313,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void CreateStageBoundaries()
         {
+            var multiplier = _matchDataService.SimulationState.MapSizeMultiplier;
             var stageBoundaryConfigs = _matchEnvironmentConfigDataService.StageBoundaries;
             if (stageBoundaryConfigs.IsNullOrEmpty())
             {
@@ -306,7 +322,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var boundaryConfig in stageBoundaryConfigs)
             {
-                AddStageBoundaryToEnvironment(boundaryConfig.Id, boundaryConfig.Points, boundaryConfig.Position, boundaryConfig.Position, 0);
+                var points = new Vector2[boundaryConfig.Points.Length];
+                for (int i = 0; i < points.Length; i++)
+                {
+                    points[i] = boundaryConfig.Points[i] * multiplier;
+                }
+                AddStageBoundaryToEnvironment(boundaryConfig.Id, points, boundaryConfig.Position * multiplier, boundaryConfig.Position * multiplier, 0);
             }
         }
 
@@ -318,6 +339,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void CreateTalentCards()
         {
+            var multiplier = _matchDataService.SimulationState.MapSizeMultiplier;
             var talentCards = _matchEnvironmentConfigDataService.TalentCards;
             if (talentCards.IsNullOrEmpty())
             {
@@ -326,7 +348,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var talentCard in talentCards)
             {
-                var talentCardPosition = talentCard.Position;
+                var talentCardPosition = talentCard.Position * multiplier;
                 var talentCardId = talentCard.Id;
                 _matchDataService.AddTalentCard(talentCardId, talentCardPosition, talentCard.TalentType, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardHealth);
                 _physicsSimulator.AddTalentCard(talentCardId, talentCardPosition, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardWidth, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardHeight);
@@ -335,6 +357,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void CreateEnvironmentSprings()
         {
+            var multiplier = _matchDataService.SimulationState.MapSizeMultiplier;
             var environmentSprings = _matchEnvironmentConfigDataService.EnvironmentSprings;
             if (environmentSprings.IsNullOrEmpty())
             {
@@ -343,7 +366,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var environmentSpring in environmentSprings)
             {
-                AddSpringToEnvironment(environmentSpring.Id, Vector2.Zero, environmentSpring.Position, 0, environmentSpring.RotationAngle);
+                AddSpringToEnvironment(environmentSpring.Id, Vector2.Zero, environmentSpring.Position * multiplier, 0, environmentSpring.RotationAngle);
             }
         }
 
@@ -356,6 +379,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void CreateTeleportGates()
         {
+            var multiplier = _matchDataService.SimulationState.MapSizeMultiplier;
             var teleportGatePairConfigs = _matchEnvironmentConfigDataService.TeleportGates;
             if (teleportGatePairConfigs.IsNullOrEmpty())
             {
@@ -365,7 +389,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             foreach (var teleportGatePairConfig in teleportGatePairConfigs)
             {
                 AddTeleportGatePairToEnvironment(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateBId, Vector2.Zero, 0, Vector2.Zero, 0,
-                    teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position,
+                    teleportGatePairConfig.GateA.Position * multiplier, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position * multiplier,
                     teleportGatePairConfig.GateB.NormalRotation);
             }
         }
@@ -382,6 +406,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void CreateRotatingWheels()
         {
+            var multiplier = _matchDataService.SimulationState.MapSizeMultiplier;
             var rotatingWheelsConfigs = _matchEnvironmentConfigDataService.RotatingWheels;
             if (rotatingWheelsConfigs.IsNullOrEmpty())
             {
@@ -393,7 +418,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             foreach (var wheelConfig in rotatingWheelsConfigs)
             {
-                var wheelCenter = wheelConfig.CenterPosition;
+                var wheelCenter = wheelConfig.CenterPosition * multiplier;
                 var rotationSpeed = wheelConfig.RotationSpeed;
                 var rotatingWheel = _matchDataService.EnvironmentData.AddRotatingWheel(wheelConfig.Id, wheelCenter, rotationSpeed);
 
@@ -401,13 +426,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     foreach (var wallConfig in wheelConfig.Walls)
                     {
+                        var scaledPosition = wallConfig.Position * multiplier;
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, wallConfig.Position, 0,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, 0,
                             out var worldPosition, out var worldRotation
                         );
                         
                         var wallId = wallConfig.Id;
-                        AddWallToEnvironment(wallId, wallConfig.Points, wallConfig.Position, worldPosition, worldRotation);
+                        var points = new Vector2[wallConfig.Points.Length];
+                        for (int i = 0; i < points.Length; i++)
+                        {
+                            points[i] = wallConfig.Points[i] * multiplier;
+                        }
+                        AddWallToEnvironment(wallId, points, scaledPosition, worldPosition, worldRotation);
                         rotatingWheel.AddWall(wallId);
                     }
                 }
@@ -416,13 +447,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     foreach (var lavaWallConfig in wheelConfig.LavaWalls)
                     {
+                        var scaledPosition = lavaWallConfig.Position * multiplier;
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, lavaWallConfig.Position, 0,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, 0,
                             out var worldPosition, out var worldRotation
                         );
 
                         var lavaWallId = lavaWallConfig.Id;
-                        AddLavaWallToEnvironment(lavaWallId, lavaWallConfig.Points, lavaWallConfig.Position, worldPosition, worldRotation);
+                        var points = new Vector2[lavaWallConfig.Points.Length];
+                        for (int i = 0; i < points.Length; i++)
+                        {
+                            points[i] = lavaWallConfig.Points[i] * multiplier;
+                        }
+                        AddLavaWallToEnvironment(lavaWallId, points, scaledPosition, worldPosition, worldRotation);
                         rotatingWheel.AddLavaWall(lavaWallId);
                     }
                 }
@@ -431,12 +468,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     foreach (var springConfig in wheelConfig.Springs)
                     {
+                        var scaledPosition = springConfig.Position * multiplier;
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, springConfig.Position, springConfig.RotationAngle,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, springConfig.RotationAngle,
                             out var worldPosition, out var worldRotation);
 
                         var springId = springConfig.Id;
-                        AddSpringToEnvironment(springId, springConfig.Position, worldPosition, springConfig.RotationAngle, worldRotation);
+                        AddSpringToEnvironment(springId, scaledPosition, worldPosition, springConfig.RotationAngle, worldRotation);
                         rotatingWheel.AddSpring(springId);
                     }
                 }
@@ -445,21 +483,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     foreach (var teleportPairConfig in wheelConfig.TeleportGatePairs)
                     {
+                        var scaledGateAPos = teleportPairConfig.GateA.Position * multiplier;
+                        var scaledGateBPos = teleportPairConfig.GateB.Position * multiplier;
+
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateA.Position, teleportPairConfig.GateA.NormalRotation,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledGateAPos, teleportPairConfig.GateA.NormalRotation,
                             out var worldPositionA, out var worldRotationA);
 
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateB.Position, teleportPairConfig.GateB.NormalRotation,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledGateBPos, teleportPairConfig.GateB.NormalRotation,
                             out var worldPositionB, out var worldRotationB);
 
                         var pairId = teleportPairConfig.Id;
                         AddTeleportGatePairToEnvironment(pairId,
                             teleportPairConfig.GateAId,
                             teleportPairConfig.GateBId,
-                            teleportPairConfig.GateA.Position,
+                            scaledGateAPos,
                             teleportPairConfig.GateA.NormalRotation,
-                            teleportPairConfig.GateB.Position,
+                            scaledGateBPos,
                             teleportPairConfig.GateB.NormalRotation,
                             worldPositionA,
                             worldRotationA,
