@@ -113,7 +113,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled)
         {
-            GetPlayer(playerId).SetIsDeadAuraEnabled(isEnabled);
+            GetPlayer(playerId).SetIsDeadEffectEnabled(isEnabled);
         }
 
         public void SetPlayerIsLockOnHeartSightShown(ushort playerId, bool isShown)
