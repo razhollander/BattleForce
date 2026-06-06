@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public Vector2 Velocity;
         public Vector2 Direction;
         public float Radius;
+        public int CreatedOnTick; // only server
 
         public void Serialize(NetDataWriter writer)
         {

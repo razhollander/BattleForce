@@ -198,8 +198,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                             var directionToHook = Vector2.Normalize(projectile.Position - casterPlayerState.Spaceship.Transform.Position);
                             casterPlayerState.Spaceship.Transform.Velocity += directionToHook * config.PlayerPullForceWhileHooked * deltaTime;
 
-                            casterPlayerState.Spaceship.Transform.Direction = MathUtils.RotateTowards(casterPlayerState.Spaceship.Transform.Direction,
-                                casterPlayerState.Spaceship.Transform.Velocity, config.PlayerRotateSpeedWhileHooked * deltaTime);
+                            // casterPlayerState.Spaceship.Transform.Direction = MathUtils.RotateTowards(casterPlayerState.Spaceship.Transform.Direction,
+                            //     casterPlayerState.Spaceship.Transform.Velocity, config.PlayerRotateSpeedWhileHooked * deltaTime);
 
                         }
                     }

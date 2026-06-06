@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SimulationAssembly::Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig
   InnerConfig:
     PlayerSpaceship:
-      StartHealth: 5
+      StartHealth: 2
       TargetMovementSpeed: 5
       RotationSpeed: 150
       ShootCooldown: 0.35
@@ -102,7 +102,7 @@ MonoBehaviour:
         VelocityGainPerTick: 80
       MagneticPullTalentConfig:
         FieldArcAngle: 90
-        PushForce: 30
+        PushForce: 50
         MaxSpin: 55
         MinSpin: 50
       ChickenTalentConfig:
@@ -130,9 +130,9 @@ MonoBehaviour:
       MaxSpin: 65
       MinSpin: 50
       Size: {x: 2, y: 1}
-    DeafultEnvironmentId: 6
-    ShouldChooseRandomStage: 0
-    ShouldChooseRandomTalentsForPlayer: 0
+    DeafultEnvironmentId: 7
+    ShouldChooseRandomStage: 1
+    ShouldChooseRandomTalentsForPlayer: 1
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 1
     ShootCooldownMultiplierWhenDead: 2
@@ -153,7 +153,7 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 1
-        CooldownInSeconds: 1
+        CooldownInSeconds: 7
     - rid: 2200602851054190748
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:

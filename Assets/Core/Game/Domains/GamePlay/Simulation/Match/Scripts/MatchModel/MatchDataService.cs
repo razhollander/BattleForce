@@ -64,10 +64,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             return newPlayer;
         }
 
-        public PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed, float radius)
+        public PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed, float radius, int createdOnTick)
         {
             ref var playerBullet = ref _simulationState.Bullets.AddAndGet();
             var bulletId =(ushort) (++_lastBulletCreatedId % ushort.MaxValue);
+            playerBullet.CreatedOnTick = createdOnTick;
             playerBullet.Id = bulletId;
             playerBullet.BelongToPlayerId = belongToPlayerId;
             playerBullet.Position = position;
