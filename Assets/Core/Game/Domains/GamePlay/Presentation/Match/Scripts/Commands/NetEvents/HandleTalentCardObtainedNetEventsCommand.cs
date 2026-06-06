@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -17,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchPlayerControllers _playerControllers;
         private IMatchPlayerUIControllers _matchPlayerUIControllers;
         private IMatchDataService _matchDataService;
+        private IAudioService _audioService;
         private int _currentServerTick;
 
         public HandleTalentCardObtainedNetEventsCommand SetCurrentServerTick(int currentServerTick)
@@ -33,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _matchPlayerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -52,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _talentCardControllers.DestroyTalentCard(talentCardObtainedNetEvent.TalentCardId);
                 _matchPlayerUIControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.PlayerTalents, _currentServerTick);
                 _playerControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.PlayerTalents, _currentServerTick);
+                _audioService.PlayAudio(AudioClipType.TalentCardObtained, AudioChannelType.Fx);
                 
                 var isFirstTalentObtained = talentCardObtainedNetEvent.PlayerTalents.Count == 1;
                 if (isFirstTalentObtained || talentCardObtainedNetEvent.DidReplaceTalent)

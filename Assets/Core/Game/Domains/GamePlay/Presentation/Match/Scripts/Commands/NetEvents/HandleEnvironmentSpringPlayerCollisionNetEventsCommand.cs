@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Sirenix.Utilities;
+using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -9,11 +10,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private IEnvironmentSpringControllers _environmentSpringControllers;
         private ICachedPresentationEventsService _cachedPresentationEventsService;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -27,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var collisionEvent in environmentSpringPlayerCollisionNetEvents)
             {
                 _environmentSpringControllers.PlaySpringBounceAnimation(collisionEvent.SpringId);
+                _audioService.PlayAudio(AudioClipType.EnvironmentSpringCollision, AudioChannelType.Fx);
             }
 
             environmentSpringPlayerCollisionNetEvents.Clear();

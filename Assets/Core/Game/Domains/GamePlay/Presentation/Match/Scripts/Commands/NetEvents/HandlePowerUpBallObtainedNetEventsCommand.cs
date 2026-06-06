@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Ob
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IPowerUpBallObtainedEffectController _powerUpBallObtainedEffectController;
         private IMatchPlayerControllers _playerControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
@@ -20,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _powerUpBallObtainedEffectController = _diContainer.Resolve<IPowerUpBallObtainedEffectController>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -37,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var playerPosition = _playerControllers.GetPlayerPosition(powerUpBallObtainedEvent.ObtainedByPlayerId);
                 _powerUpBallObtainedEffectController.PlayEffect(powerUpBallPosition, playerPosition);
                 _powerUpBallControllers.DestroyPowerUpBall(powerUpBallId);
+                _audioService.PlayAudio(AudioClipType.PowerUpBallObtained, AudioChannelType.Fx);
             }
             
             powerUpBallObtainedNetEvents.Clear();

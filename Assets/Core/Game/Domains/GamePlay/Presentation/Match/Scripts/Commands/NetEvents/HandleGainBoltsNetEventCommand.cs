@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
+using CoreDomain.Scripts.Services.AudioService;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -17,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IGainBoltEffectController _gainBoltEffectController;
         private IMatchDataService _matchDataService;
         private IMatchPlayerControllers _matchPlayerControllers;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
@@ -25,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _gainBoltEffectController = _diContainer.Resolve<IGainBoltEffectController>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -43,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var playerTransform = _matchPlayerControllers.GetPlayerTransform(gainBoltsEvent.PlayerId);
                 var effectSpawnPosition = playerTransform.position.ToVector2XY() + player.Spaceship.Transform.Radius * Vector2.up;
                 _gainBoltEffectController.PlayEffect(gainBoltsEvent.GainedAmount, effectSpawnPosition, playerTransform);
+                _audioService.PlayAudio(AudioClipType.GainBolts, AudioChannelType.Fx);
             }
 
             gainBoltsNetEvents.Clear();
