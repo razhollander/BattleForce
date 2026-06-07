@@ -30,5 +30,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public bool ShouldAddTalentEveryXStages = false;
         [ConditionalField(nameof(ShouldAddTalentEveryXStages), true)]
         public int EveryXStages = 2;
+        public float StageSizeMultiplier = 1.0f;
     }
 }

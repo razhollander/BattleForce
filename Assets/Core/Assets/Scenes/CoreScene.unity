@@ -196,6 +196,10 @@ PrefabInstance:
       propertyPath: _baseCamera
       value: 
       objectReference: {fileID: 1004989242}
+    - target: {fileID: 2269534722950037217, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
+      propertyPath: _cinemachineCamera
+      value: 
+      objectReference: {fileID: 1783941739}
     - target: {fileID: 2752942936510871120, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
       propertyPath: m_Name
       value: WorldCamera
@@ -580,6 +584,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8101176250634575614, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
   m_PrefabInstance: {fileID: 483504589}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1783941739 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4126886619047320635, guid: 669fddb2705324012b36863fafd0ccd2, type: 3}
+  m_PrefabInstance: {fileID: 483504589}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9dfa5b682dcd46bda6128250e975f58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1909928553
 PrefabInstance:
   m_ObjectHideFlags: 0

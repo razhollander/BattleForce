@@ -360,7 +360,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             var springAngle = _matchDataService.EnvironmentData.GetSpring(springId).WorldDirectionDegrees.ToRadians();
             var pushDirection = springAngle.FromAngleRadians();
-            var forceMagnitude = _gamePlayConfigService.GamePlayConfig.EnvironmentSprings.Force;
+            var forceMagnitude = _gamePlayConfigService.GamePlayConfig.EnvironmentSprings.Force * _matchDataService.SimulationState.MapSizeMultiplier;
             var force = pushDirection * forceMagnitude;
             var randomSpin = RNG.NextFloat(_gamePlayConfigService.GamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfigService.GamePlayConfig.EnvironmentSprings.MaxSpin);
 

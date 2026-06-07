@@ -28,7 +28,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsInPreparationPhase;
         public bool IsInShowoffWinners;
         public ushort CurrentStageWinnerTeamId;
-
+        public float MapSizeMultiplier;
+        
         public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs)
         {
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer, maxPlayers-1));
@@ -121,6 +122,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put(IsInPreparationPhase);
             writer.Put(IsInShowoffWinners);
             writer.Put((byte)CurrentStageWinnerTeamId);
+            writer.PutFloat16(MapSizeMultiplier);
         }
         
         public void Deserialize(NetDataReader reader)
@@ -213,6 +215,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             IsInPreparationPhase = reader.GetBool();
             IsInShowoffWinners = reader.GetBool();
             CurrentStageWinnerTeamId = reader.GetByte();
+            MapSizeMultiplier = reader.GetFloat16();
         }
 
         public PlayerStateS2C GetPlayerById(ushort playerId)

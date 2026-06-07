@@ -47,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle);
         MatchEnvironmentSpringModel GetEnvironmentSpring(ushort springId);
         MatchEnvironmentFieldBarrierModel GetFieldBarrier(ushort id);
-        MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(EnvironmentRotatingWheelConfig config);
+        MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> teleportGatePairIds);
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);
         void SetTeamGems(ushort teamId, int totalTeamGems);
