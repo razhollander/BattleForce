@@ -834,7 +834,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddPlayerJoinAcceptedEvent(int onTick, PlayerStateS2C playerState, MatchSimulationStateS2C simulationState)
+        public void AddPlayerJoinAcceptedEvent(int onTick, List<PlayerStateS2C> playerStates, MatchSimulationStateS2C simulationState, ushort playerId)
         {
             foreach (var kvp in PlayerRejoinAcceptNetEventsPerPlayer)
             {
@@ -846,7 +846,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddMatchMakingPlayerJoinAcceptedEvent(int onTick, MatchMakingPlayerStateS2C playerState, MatchMakingSimulationStateS2C simulationState)
+        public void AddMatchMakingPlayerJoinAcceptedEvent(int onTick, List<MatchMakingPlayerStateS2C> playerStates, MatchMakingSimulationStateS2C simulationState, ushort playerId)
         {
             foreach (var kvp in MatchMakingPlayerJoinAcceptNetEventsPerPlayer)
             {

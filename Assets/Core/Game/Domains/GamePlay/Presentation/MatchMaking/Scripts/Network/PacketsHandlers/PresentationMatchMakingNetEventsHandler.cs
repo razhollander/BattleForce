@@ -34,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         {
             foreach (var playerJoinAcceptNetEvent in playerJoinAcceptNetEvents)
             {
-                var playerId = playerJoinAcceptNetEvent.PlayerState.Id;
+                var playerId = playerJoinAcceptNetEvent.PlayerStates[0].Id;
                 var isLocalPlayer = playerJoinAcceptNetEvent.IsLocal;
                 LogService.LogTopic(
                     $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerId,
@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 
                 if (!isLocalPlayer)
                 {
-                    _addMatchMakingPlayerCommand.SetPlayerState(playerJoinAcceptNetEvent.PlayerState).Execute();
+                    foreach (var state in playerJoinAcceptNetEvent.PlayerStates) { _addMatchMakingPlayerCommand.SetPlayerState(state).Execute(); }
                 }
             }
         }
