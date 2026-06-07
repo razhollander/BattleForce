@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
         private bool _isHost;
         private string _ipAddress;
         private int _port;
-        private string _clientId;
+        private long _clientId;
         
         private IClientNetworkManager _networkManager;
         private IJoinResponsePacketHandler _joinResponsePacketHandler;
@@ -44,7 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
             return this;
         }
 
-        public StartClientCommand SetClientId(string clientId)
+        public StartClientCommand SetClientId(long clientId)
         {
             _clientId = clientId;
             return this;

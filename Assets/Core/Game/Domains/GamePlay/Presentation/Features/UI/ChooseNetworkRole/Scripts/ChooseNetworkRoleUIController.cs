@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
@@ -204,7 +205,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             var port = _uiView.Port;
             var playersJoinedModels = GetPlayersJoined();
-            var clientId = Guid.NewGuid().ToString();
+            var clientId = GetSecureRandomLong();
             _commandFactory.CreateCommandAsync<StartClientCommand>()
                 .SetIsHost(isHost)
                 .SetServerAddress(ip,port)
@@ -215,6 +216,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
 
+        private long GetSecureRandomLong()
+        {
+            byte[] buffer = new byte[8];
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(buffer);
+            }
+    
+            return BitConverter.ToInt64(buffer, 0);
+        }
+        
         private List<PlayerJoinedModel> GetPlayersJoined()
         {
             if (PlayerPrefsSettings.ShouldSkipMatchMaking)
