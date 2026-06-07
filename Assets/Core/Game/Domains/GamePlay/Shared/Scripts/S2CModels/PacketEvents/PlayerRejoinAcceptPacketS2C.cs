@@ -4,7 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
 using LiteNetLib.Utils;
 
-namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
+namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents
 {
     public class PlayerRejoinAcceptPacketS2C : INetSerializable, IComparable<PlayerRejoinAcceptPacketS2C>
     {
