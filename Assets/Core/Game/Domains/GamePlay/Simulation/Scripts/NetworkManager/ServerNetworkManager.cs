@@ -90,7 +90,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet,
             DeliveryMethod deliveryMethod) where T : INetSerializable
         {
-            _packetsSender.SendPacketToPlayerSerialized(playerId, type, packet, deliveryMethod);
+            _packetsSender.SendPacketToClientSerialized(playerId, type, packet, deliveryMethod);
         }
 
         public void SendPacketToPeerSerialized<T>(NetPeer peer, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
@@ -100,12 +100,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public void AddPlayerPeer(ushort playerId, NetPeer peer)
         {
-            _packetsSender.AddPlayerPeer(playerId, peer);
+            _packetsSender.AddClientPeer(playerId, peer);
         }
 
         public void RemovePlayerPeer(ushort playerId)
         {
-            _packetsSender.RemovePlayerPeer(playerId);
+            _packetsSender.RemoveClientPeer(playerId);
         }
 
         public void PollEvents()
@@ -113,14 +113,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _netManager.PollEvents();
         }
 
-        public int GetPlayerPeerId(ushort playerId)
+        public bool TryGetClientPeerId(long clientId, out int peerId)
         {
-            return _packetsSender.GetPlayerPeerId(playerId);
+            return _packetsSender.TryGetClientPeerId(clientId, out peerId);
         }  
         
         public bool IsPlayerPeerConencted(ushort playerId)
         {
-            return _packetsSender.IsPlayerConnected(playerId);
+            return _packetsSender.IsClientConnected(playerId);
         }
 
         public void RegisterPacketsObserver(IPacketsObserver packetsObserver)

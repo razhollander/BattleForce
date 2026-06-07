@@ -113,7 +113,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _trySendPlayersLockOnTargetChangedCommand.SetProcessedTick(currentTick).Execute();
                 _tryDamagePlayersOnTargetCommand.SetProcessedTick(currentTick).Execute();
                 _overrideableNetEventsService.RegisterAllOverridableNetEvents();
-                RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
+                RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerClient);
                 SendCurrentTickStateToAllClients(currentTick);
                 SendStartMatchToNotAcknowledgedPlayers(currentTick);
                 _headLessQuitterController.QuitIfTimeOut();
@@ -140,11 +140,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
 
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
-            SendStartStageToAllPlayers(currentTick);
+            SendStartStageToAllClients(currentTick);
             return true;
         }
 
-        private void SendStartStageToAllPlayers(int processedTick)
+        private void SendStartStageToAllClients(int processedTick)
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {

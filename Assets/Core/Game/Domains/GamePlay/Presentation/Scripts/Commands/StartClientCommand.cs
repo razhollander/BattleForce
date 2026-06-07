@@ -75,7 +75,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
                 await Awaitable.FixedUpdateAsync(cancellationTokenSource.Token);
             }
 
-            var joinRequest = new JoinRequestPacketC2S(_networkConfig.MaxCap.ConcurrentPlayers);
+            var joinRequest = new JoinRequestPacketC2S(_clientId, _networkConfig.MaxCap.ConcurrentPlayers);
             foreach (var playersJoinedModel in _playersJoinedModels)
             {
                 joinRequest.AddPlayer(playersJoinedModel.PlayerName, playersJoinedModel.PlayerInputType == SupportedInputType.Gamepad, playersJoinedModel.InputDeviceId);

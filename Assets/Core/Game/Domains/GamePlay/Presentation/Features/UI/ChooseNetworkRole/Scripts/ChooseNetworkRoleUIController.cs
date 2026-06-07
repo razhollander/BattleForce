@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
@@ -205,7 +206,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             var port = _uiView.Port;
             var playersJoinedModels = GetPlayersJoined();
-            var clientId = GetSecureRandomLong();
+            var clientId = DeviceUtils.GetDeviceUniqueId();
             _commandFactory.CreateCommandAsync<StartClientCommand>()
                 .SetIsHost(isHost)
                 .SetServerAddress(ip,port)
@@ -214,17 +215,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
                 .Execute(cancellationTokenSource).Forget();
             
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
-        }
-
-        private long GetSecureRandomLong()
-        {
-            byte[] buffer = new byte[8];
-            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(buffer);
-            }
-    
-            return BitConverter.ToInt64(buffer, 0);
         }
         
         private List<PlayerJoinedModel> GetPlayersJoined()

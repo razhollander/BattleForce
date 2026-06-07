@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddPlayerPeer(ushort playerId, NetPeer peer);
         void RemovePlayerPeer(ushort playerId);
         void PollEvents();
-        int GetPlayerPeerId(ushort playerId);
+        bool TryGetClientPeerId(long clientId, out int peerId);
         void RegisterPacketsObserver(IPacketsObserver packetsObserver);
         void RegisterPacketsObserver(IRawPacketsObserver packetsObserver);
         void UnregisterPacketsObserver(IPacketsObserver packetsObserver);

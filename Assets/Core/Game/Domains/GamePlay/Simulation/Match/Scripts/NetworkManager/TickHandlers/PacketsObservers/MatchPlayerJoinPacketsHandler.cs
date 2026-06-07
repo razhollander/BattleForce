@@ -51,44 +51,54 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public void ProcessPlayersJoined(int processedTick)
         {
             foreach (var kvp in _playerRejoinedPacketsPerPeer)
-            { 
-                var playerName = kvp.Value.PlayerName;
-                var isPlayerAlreadyInMatch = _matchDataService.SimulationState.TryGetPlayerByName(playerName, out var existingPlayerState);
+            {
                 var joinResponse = _joinedResponsePacketsPool.Get();
-                var peer = kvp.Key;
-
                 joinResponse.Clear();
-                if (isPlayerAlreadyInMatch && !existingPlayerState.IsConnected)
-                {
-                    existingPlayerState.IsConnected = true;
-                    joinResponse.IsSuccess = true;
-                    joinResponse.IsMatchMaking = false;
-                    var playerId = existingPlayerState.Id;
-                    joinResponse.LocalPlayerId = playerId;
-                    joinResponse.MatchSimulationState = _matchDataService.SimulationState;
-                    joinResponse.OccuredOnTick = processedTick;
-                    peer.Tag = playerId;
-                    
-                    _simulationInputService.AddPlayer(playerId);
-                    _networkManager.AddPlayerPeer(playerId, peer);
-                    _netEventsDataService.StartSavingPlayerEvents(playerId);
-                    var nw = new NetDataWriter(true);
-                    var nr = new NetDataReader();
-                    existingPlayerState.Serialize(nw);
-                    nr.SetSource(nw);
-                    var playerStateCopy = new PlayerStateS2C(_sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, _networkConfig.MaxCap.ConcurrentPlayers - 1);
-                    playerStateCopy.Deserialize(nr);
-                    _netEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, playerStateCopy, _matchDataService.SimulationState);
-                }
-                else
-                {
-                    var isAlreadyConnected = isPlayerAlreadyInMatch && existingPlayerState.IsConnected;
-                    LogService.LogError($"Can't join server isPlayerAlreadyInMatch {isPlayerAlreadyInMatch}, IsConnected {isAlreadyConnected}, playerName {playerName}");
-                    joinResponse.IsSuccess = false;
-                }
-                _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);
+                var isClientAlreadyInMatch = _networkManager.TryGetClientPeerId(out var peerId);
+                
+                var isReconnect = isClientAlreadyInMatch && !existingPlayerState.IsConnected;
 
-                LogService.LogTopic("Processed player rejoined: " + playerName, LogTopicType.ServerNetwork);
+                foreach (var playerJoined in kvp.Value.PlayerJoinedList.AsSpan())
+                {
+                    var playerName = playerJoined.PlayerName;
+                    var isPlayerAlreadyInMatch = _matchDataService.SimulationState.TryGetPlayerByName(playerName, out var existingPlayerState);
+                    var peer = kvp.Key;
+
+
+                    var isReconnect = isPlayerAlreadyInMatch && !existingPlayerState.IsConnected;
+                    if (isReconnect)
+                    {
+                        existingPlayerState.IsConnected = true;
+                        joinResponse.IsSuccess = true;
+                        joinResponse.IsMatchMaking = false;
+                        var playerId = existingPlayerState.Id;
+                        joinResponse.PlayerIdToDeviceIdDictionary = playerId;
+                        joinResponse.MatchSimulationState = _matchDataService.SimulationState;
+                        joinResponse.OccuredOnTick = processedTick;
+                        peer.Tag = playerId;
+
+                        _simulationInputService.AddPlayer(playerId);
+                        _networkManager.AddPlayerPeer(playerId, peer);
+                        _netEventsDataService.StartSavingPlayerEvents(playerId);
+                        var nw = new NetDataWriter(true);
+                        var nr = new NetDataReader();
+                        existingPlayerState.Serialize(nw);
+                        nr.SetSource(nw);
+                        var playerStateCopy = new PlayerStateS2C(_sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, _networkConfig.MaxCap.ConcurrentPlayers - 1);
+                        playerStateCopy.Deserialize(nr);
+                        _netEventsDataService.AddPlayerJoinAcceptedEvent(processedTick, playerStateCopy, _matchDataService.SimulationState);
+                    }
+                    else
+                    {
+                        var isAlreadyConnected = isPlayerAlreadyInMatch && existingPlayerState.IsConnected;
+                        LogService.LogError($"Can't join server isPlayerAlreadyInMatch {isPlayerAlreadyInMatch}, IsConnected {isAlreadyConnected}, playerName {playerName}");
+                        joinResponse.IsSuccess = false;
+                    }
+
+                    _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);
+
+                    LogService.LogTopic("Processed player rejoined: " + playerName, LogTopicType.ServerNetwork);
+                }
             }
 
             foreach (var kvp in _playerRejoinedPacketsPerPeer)
@@ -107,7 +117,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         
         private void OnJoinReceived(JoinRequestPacketC2S joinRequestPacket, NetPeer peer)
         {
-            LogService.LogTopic("Join packet received: " + joinRequestPacket.PlayerName, LogTopicType.ServerNetwork);
+            LogService.LogTopic("Join packet received, peer.Id: " + peer.Id, LogTopicType.ServerNetwork);
             _playerRejoinedPacketsPerPeer.Add(peer, joinRequestPacket);
         }
 

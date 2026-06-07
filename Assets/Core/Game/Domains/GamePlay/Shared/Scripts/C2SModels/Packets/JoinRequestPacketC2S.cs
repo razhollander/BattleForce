@@ -6,10 +6,12 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 {
     public class JoinRequestPacketC2S : INetSerializable
     {
+        public long ClientId; // needed?
         public FixedUnorderedList<PlayerJoinedDataC2S> PlayerJoinedList;
         
-        public JoinRequestPacketC2S(int maxPlayers)
+        public JoinRequestPacketC2S(long clientId, int maxPlayers)
         {
+            ClientId = clientId;
             PlayerJoinedList = new FixedUnorderedList<PlayerJoinedDataC2S>(maxPlayers);
         }
 
@@ -23,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
         
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put(ClientId);
             writer.Put((byte)PlayerJoinedList.Count);
 
             foreach (var playerJoined in PlayerJoinedList.AsSpan())
@@ -35,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 
         public void Deserialize(NetDataReader reader)
         {
+            ClientId = reader.GetLong();
             byte playersCount = reader.GetByte();
             PlayerJoinedList.Clear();
 
