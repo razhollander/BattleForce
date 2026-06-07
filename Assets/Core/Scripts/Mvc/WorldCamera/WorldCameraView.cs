@@ -13,10 +13,20 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         [SerializeField] private CinemachineBasicMultiChannelPerlin _perlin;
         [SerializeField] private Camera _camera;
         [SerializeField] private Camera _baseCamera;
+        [SerializeField] private CinemachineCamera _cinemachineCamera;
+        [SerializeField] private CinemachineGroupFraming _cinemachineGroupFraming;
+        [SerializeField] private float _deafultOrthographicSize = 30f;
 
         private CancellationTokenSource _shakeCancellationTokenSource;
         public Camera Camera => _camera;
         public Camera BaseCamera => _baseCamera;
+
+        public void MultiplyOthographicSize(float multiplier)
+        {
+            var orthoSize = _deafultOrthographicSize * multiplier;
+            _cinemachineCamera.Lens.OrthographicSize = orthoSize;
+            _cinemachineGroupFraming.OrthoSizeRange.y = orthoSize;
+        }
         
         public void AddFollowTarget(Transform target, float weight, float radius)
         {

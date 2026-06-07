@@ -146,6 +146,7 @@ MonoBehaviour:
     PreparationPhaseDuration: 4
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
+    StageSizeMultiplier: 1.5
   references:
     version: 2
     RefIds:

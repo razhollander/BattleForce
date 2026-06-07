@@ -299,6 +299,9 @@ MonoBehaviour:
   _perlin: {fileID: 3842843542390826818}
   _camera: {fileID: 5516514484391682885}
   _baseCamera: {fileID: 0}
+  _cinemachineCamera: {fileID: 4126886619047320635}
+  _cinemachineGroupFraming: {fileID: 8382190760005103441}
+  _deafultOrthographicSize: 30
 --- !u!114 &8865977086233092433
 MonoBehaviour:
   m_ObjectHideFlags: 0

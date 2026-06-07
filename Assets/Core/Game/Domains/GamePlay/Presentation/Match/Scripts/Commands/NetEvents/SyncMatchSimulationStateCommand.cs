@@ -109,6 +109,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService.IsInPreparationPhase = _simulationState.IsInPreparationPhase;
             _matchDataService.IsInShowoffWinners = _simulationState.IsInShowoffWinners;
             _matchDataService.CurrentStageWinnerTeamId = _simulationState.CurrentStageWinnerTeamId;
+            _worldCameraController.MultiplyOthographicSize(_simulationState.MapSizeMultiplier * 1.3f / 1.5f);
             _stageCancellationTokenProvider.CancelAndRegenarateStageToken();
             DestroyAll();
             CreateAll();
@@ -169,7 +170,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var teamId in teamIds)
             {
                 var barrierConfig = barrierConfigs[barrierIndex];
-                _matchDataService.AddFieldBarrier(barrierIndex, teamId, barrierConfig.Position, barrierConfig.Size, barrierConfig.Shape);
+                _matchDataService.AddFieldBarrier(barrierIndex, teamId, barrierConfig.Position*_simulationState.MapSizeMultiplier, barrierConfig.Size*_simulationState.MapSizeMultiplier, barrierConfig.Shape);
                 _environmentFieldBarrierControllers.CreateFieldBarrier(barrierIndex);
                 barrierIndex++;
             }

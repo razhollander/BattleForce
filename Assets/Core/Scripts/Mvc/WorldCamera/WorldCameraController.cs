@@ -32,6 +32,11 @@ namespace Core.Scripts.Mvc.WorldCamera
         {
             _updateSubscriptionService.UnregisterLateUpdatable(this);
         }
+
+        public void MultiplyOthographicSize(float multiplier)
+        {
+            _worldCameraView.MultiplyOthographicSize(multiplier);
+        }
         
         public void AddFollowTarget(Transform target)
         {
