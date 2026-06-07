@@ -1,11 +1,9 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
-using System;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
@@ -13,7 +11,6 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
@@ -64,26 +61,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             LogService.LogError("init stage on server side");
             ClearStageData();
-            
-            CreateEnvironmentLayout();
-            SetupPlayers();
+            var mapSizeMultiplier = _matchDataService.SimulationState.MapSizeMultiplier = _gamePlayConfigService.GamePlayConfig.StageSizeMultiplier;
+            CreateEnvironmentLayout(mapSizeMultiplier);
+            SetupPlayers(mapSizeMultiplier);
             _stageNumber++;
         }
 
-        private void CreateEnvironmentLayout()
+        private void CreateEnvironmentLayout(float mapSizeMultiplier)
         {
             var environmentLayoutId = GenerateNextStageEnvironmentLayoutId();
             _matchDataService.SimulationState.EnvironmentLayoutId = environmentLayoutId;
             _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutId);
             
-            CreateWalls();
-            CreateLavaWalls();
-            CreateStageBoundaries();
-            CreateTalentCards();
-            CreateEnvironmentSprings();
-            CreateTeleportGates();
-            CreateRotatingWheels();
-            CreateFieldBarriers();
+            CreateWalls(mapSizeMultiplier);
+            CreateLavaWalls(mapSizeMultiplier);
+            CreateStageBoundaries(mapSizeMultiplier);
+            CreateTalentCards(mapSizeMultiplier);
+            CreateEnvironmentSprings(mapSizeMultiplier);
+            CreateTeleportGates(mapSizeMultiplier);
+            CreateRotatingWheels(mapSizeMultiplier);
+            CreateFieldBarriers(mapSizeMultiplier);
         }
         
         private int GenerateNextStageEnvironmentLayoutId()
@@ -139,9 +136,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.EnvironmentData.ClearData();
         }
 
-        private void SetupPlayers()
+        private void SetupPlayers(float mapSizeMultiplier)
         {
-            var halfSize = _matchEnvironmentConfigDataService.EnvironmentHalfSize;
             var players = _matchDataService.SimulationState.Players;
 
             for (int i = 0; i < players.Count; i++)
@@ -154,17 +150,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var heartRadius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.DefaultHeartRadius;
 
                 var teamId = player.TeamId;
-                Vector2 position;
 
                 var barrier = GetBarrierForTeam(teamId);
-                if (barrier != null)
-                {
-                    position = barrier.Position;
-                }
-                else
-                {
-                    position = GetRandomFreePosition(radius, halfSize);
-                }
+                var position = barrier.Position * mapSizeMultiplier;
 
                 var direction = RNG.NextFloat(0, 360).AngleToVector();
                 var velocity = direction * _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
@@ -218,7 +206,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             return null;
         }
 
-        private void CreateFieldBarriers()
+        private void CreateFieldBarriers(float mapSizeMultiplier)
         {
             var barrierConfigs = _matchEnvironmentConfigDataService.FieldBarrierConfigs;
             if (barrierConfigs.IsNullOrEmpty())
@@ -238,7 +226,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
 
                 var barrierConfig = barrierConfigs[barrierIndex];
-                _matchDataService.EnvironmentData.AddFieldBarrier((ushort)barrierIndex, teamId, barrierConfig.Position, barrierConfig.Size, barrierConfig.Shape);
+                _matchDataService.EnvironmentData.AddFieldBarrier((ushort)barrierIndex, teamId, barrierConfig.Position * mapSizeMultiplier, barrierConfig.Size * mapSizeMultiplier, barrierConfig.Shape);
                 barrierIndex++;
             }
         }
@@ -260,13 +248,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
              return Vector2.Zero;
         }
 
-        private void CreateWalls()
+        private void CreateWalls(float mapSizeMultiplier)
         {
             var wallConfigs = _matchEnvironmentConfigDataService.WallConfigs;
 
             foreach (var wallConfig in wallConfigs)
             {
-                AddWallToEnvironment(wallConfig.Id, wallConfig.Points, wallConfig.Position, wallConfig.Position, 0);
+                var points = new Vector2[wallConfig.Points.Length];
+                for (int i = 0; i < points.Length; i++)
+                {
+                    points[i] = wallConfig.Points[i] * mapSizeMultiplier;
+                }
+                AddWallToEnvironment(wallConfig.Id, points, wallConfig.Position * mapSizeMultiplier, wallConfig.Position * mapSizeMultiplier, 0);
             }
         }
 
@@ -276,7 +269,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator.AddWall(wallId, wallPoints, lavaWallWorldPosition);
         }
 
-        private void CreateLavaWalls()
+        private void CreateLavaWalls(float mapSizeMultiplier)
         {
             var lavaWallConfigs = _matchEnvironmentConfigDataService.LavaWallConfigs;
             if (lavaWallConfigs.IsNullOrEmpty())
@@ -286,7 +279,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var lavaWallConfig in lavaWallConfigs)
             {
-                AddLavaWallToEnvironment(lavaWallConfig.Id, lavaWallConfig.Points, lavaWallConfig.Position, lavaWallConfig.Position, 0);
+                var points = new Vector2[lavaWallConfig.Points.Length];
+                for (int i = 0; i < points.Length; i++)
+                {
+                    points[i] = lavaWallConfig.Points[i] * mapSizeMultiplier;
+                }
+                AddLavaWallToEnvironment(lavaWallConfig.Id, points, lavaWallConfig.Position * mapSizeMultiplier, lavaWallConfig.Position * mapSizeMultiplier, 0);
             }
         }
 
@@ -296,7 +294,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator.AddLavaWall(lavaWallId, lavaWallPoints, lavaWallWorldPosition);
         }
 
-        private void CreateStageBoundaries()
+        private void CreateStageBoundaries(float mapSizeMultiplier)
         {
             var stageBoundaryConfigs = _matchEnvironmentConfigDataService.StageBoundaries;
             if (stageBoundaryConfigs.IsNullOrEmpty())
@@ -306,7 +304,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var boundaryConfig in stageBoundaryConfigs)
             {
-                AddStageBoundaryToEnvironment(boundaryConfig.Id, boundaryConfig.Points, boundaryConfig.Position, boundaryConfig.Position, 0);
+                var points = new Vector2[boundaryConfig.Points.Length];
+                for (int i = 0; i < points.Length; i++)
+                {
+                    points[i] = boundaryConfig.Points[i] * mapSizeMultiplier;
+                }
+                AddStageBoundaryToEnvironment(boundaryConfig.Id, points, boundaryConfig.Position * mapSizeMultiplier, boundaryConfig.Position * mapSizeMultiplier, 0);
             }
         }
 
@@ -316,7 +319,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator.AddStageBoundary(stageBoundaryId, stageBoundaryPoints, worldPosition);
         }
 
-        private void CreateTalentCards()
+        private void CreateTalentCards(float mapSizeMultiplier)
         {
             var talentCards = _matchEnvironmentConfigDataService.TalentCards;
             if (talentCards.IsNullOrEmpty())
@@ -326,14 +329,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var talentCard in talentCards)
             {
-                var talentCardPosition = talentCard.Position;
+                var talentCardPosition = talentCard.Position * mapSizeMultiplier;
                 var talentCardId = talentCard.Id;
                 _matchDataService.AddTalentCard(talentCardId, talentCardPosition, talentCard.TalentType, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardHealth);
                 _physicsSimulator.AddTalentCard(talentCardId, talentCardPosition, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardWidth, _gamePlayConfigService.GamePlayConfig.Talents.TalentCardHeight);
             }
         }
 
-        private void CreateEnvironmentSprings()
+        private void CreateEnvironmentSprings(float mapSizeMultiplier)
         {
             var environmentSprings = _matchEnvironmentConfigDataService.EnvironmentSprings;
             if (environmentSprings.IsNullOrEmpty())
@@ -343,7 +346,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var environmentSpring in environmentSprings)
             {
-                AddSpringToEnvironment(environmentSpring.Id, Vector2.Zero, environmentSpring.Position, 0, environmentSpring.RotationAngle);
+                AddSpringToEnvironment(environmentSpring.Id, Vector2.Zero, environmentSpring.Position * mapSizeMultiplier, 0, environmentSpring.RotationAngle);
             }
         }
 
@@ -354,7 +357,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator.AddEnvironmentSpring(springId, springWorldPosition, springWorldRotationAngle, springSize);
         }
 
-        private void CreateTeleportGates()
+        private void CreateTeleportGates(float mapSizeMultiplier)
         {
             var teleportGatePairConfigs = _matchEnvironmentConfigDataService.TeleportGates;
             if (teleportGatePairConfigs.IsNullOrEmpty())
@@ -365,22 +368,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             foreach (var teleportGatePairConfig in teleportGatePairConfigs)
             {
                 AddTeleportGatePairToEnvironment(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateBId, Vector2.Zero, 0, Vector2.Zero, 0,
-                    teleportGatePairConfig.GateA.Position, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position,
-                    teleportGatePairConfig.GateB.NormalRotation);
+                    teleportGatePairConfig.GateA.Position * mapSizeMultiplier, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position * mapSizeMultiplier,
+                    teleportGatePairConfig.GateB.NormalRotation, mapSizeMultiplier);
             }
         }
         
         private void AddTeleportGatePairToEnvironment(ushort teleportPairId, ushort gateAId, ushort gateBId, Vector2 gateAPosition, float gateANormalRotation, Vector2 gateBPosition,
-            float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation)
+            float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation, float mapSizeMultiplier)
         {
-            var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size.ToNumericsVector2();
+            var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size.ToNumericsVector2() * mapSizeMultiplier;
             _matchDataService.EnvironmentData.AddTeleportGatePair(teleportPairId, gateAId, gateBId, gateAPosition, gateANormalRotation, gateBPosition, gateBNormalRotation,
                 gateAWorldPosition, gateAWorldRotation, gateBWorldPosition, gateBWorldRotation);
             _physicsSimulator.AddTeleportGate(gateAId, gateAWorldPosition, gateAWorldRotation, gateSize);
             _physicsSimulator.AddTeleportGate(gateBId, gateBWorldPosition, gateBWorldRotation, gateSize);
         }
 
-        private void CreateRotatingWheels()
+        private void CreateRotatingWheels(float mapSizeMultiplier)
         {
             var rotatingWheelsConfigs = _matchEnvironmentConfigDataService.RotatingWheels;
             if (rotatingWheelsConfigs.IsNullOrEmpty())
@@ -393,7 +396,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             foreach (var wheelConfig in rotatingWheelsConfigs)
             {
-                var wheelCenter = wheelConfig.CenterPosition;
+                var wheelCenter = wheelConfig.CenterPosition * mapSizeMultiplier;
                 var rotationSpeed = wheelConfig.RotationSpeed;
                 var rotatingWheel = _matchDataService.EnvironmentData.AddRotatingWheel(wheelConfig.Id, wheelCenter, rotationSpeed);
 
@@ -401,13 +404,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     foreach (var wallConfig in wheelConfig.Walls)
                     {
+                        var scaledPosition = wallConfig.Position * mapSizeMultiplier;
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, wallConfig.Position, 0,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, 0,
                             out var worldPosition, out var worldRotation
                         );
                         
                         var wallId = wallConfig.Id;
-                        AddWallToEnvironment(wallId, wallConfig.Points, wallConfig.Position, worldPosition, worldRotation);
+                        var points = new Vector2[wallConfig.Points.Length];
+                        for (int i = 0; i < points.Length; i++)
+                        {
+                            points[i] = wallConfig.Points[i] * mapSizeMultiplier;
+                        }
+                        AddWallToEnvironment(wallId, points, scaledPosition, worldPosition, worldRotation);
                         rotatingWheel.AddWall(wallId);
                     }
                 }
@@ -416,13 +425,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     foreach (var lavaWallConfig in wheelConfig.LavaWalls)
                     {
+                        var scaledPosition = lavaWallConfig.Position * mapSizeMultiplier;
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, lavaWallConfig.Position, 0,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, 0,
                             out var worldPosition, out var worldRotation
                         );
 
                         var lavaWallId = lavaWallConfig.Id;
-                        AddLavaWallToEnvironment(lavaWallId, lavaWallConfig.Points, lavaWallConfig.Position, worldPosition, worldRotation);
+                        var points = new Vector2[lavaWallConfig.Points.Length];
+                        for (int i = 0; i < points.Length; i++)
+                        {
+                            points[i] = lavaWallConfig.Points[i] * mapSizeMultiplier;
+                        }
+                        AddLavaWallToEnvironment(lavaWallId, points, scaledPosition, worldPosition, worldRotation);
                         rotatingWheel.AddLavaWall(lavaWallId);
                     }
                 }
@@ -431,12 +446,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     foreach (var springConfig in wheelConfig.Springs)
                     {
+                        var scaledPosition = springConfig.Position * mapSizeMultiplier;
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, springConfig.Position, springConfig.RotationAngle,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, springConfig.RotationAngle,
                             out var worldPosition, out var worldRotation);
 
                         var springId = springConfig.Id;
-                        AddSpringToEnvironment(springId, springConfig.Position, worldPosition, springConfig.RotationAngle, worldRotation);
+                        AddSpringToEnvironment(springId, scaledPosition, worldPosition, springConfig.RotationAngle, worldRotation);
                         rotatingWheel.AddSpring(springId);
                     }
                 }
@@ -445,26 +461,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     foreach (var teleportPairConfig in wheelConfig.TeleportGatePairs)
                     {
+                        var scaledGateAPos = teleportPairConfig.GateA.Position * mapSizeMultiplier;
+                        var scaledGateBPos = teleportPairConfig.GateB.Position * mapSizeMultiplier;
+
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateA.Position, teleportPairConfig.GateA.NormalRotation,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledGateAPos, teleportPairConfig.GateA.NormalRotation,
                             out var worldPositionA, out var worldRotationA);
 
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairConfig.GateB.Position, teleportPairConfig.GateB.NormalRotation,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledGateBPos, teleportPairConfig.GateB.NormalRotation,
                             out var worldPositionB, out var worldRotationB);
 
                         var pairId = teleportPairConfig.Id;
                         AddTeleportGatePairToEnvironment(pairId,
                             teleportPairConfig.GateAId,
                             teleportPairConfig.GateBId,
-                            teleportPairConfig.GateA.Position,
+                            scaledGateAPos,
                             teleportPairConfig.GateA.NormalRotation,
-                            teleportPairConfig.GateB.Position,
+                            scaledGateBPos,
                             teleportPairConfig.GateB.NormalRotation,
                             worldPositionA,
                             worldRotationA,
                             worldPositionB,
-                            worldRotationB);
+                            worldRotationB,
+                            mapSizeMultiplier);
                         rotatingWheel.AddTeleportGatePair(pairId);
                     }
                 }

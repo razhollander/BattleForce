@@ -191,13 +191,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newSpring;
         }
 
-        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(EnvironmentRotatingWheelConfig config)
+        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> teleportGatePairIds)
         {
-            var newWheel = new MatchEnvironmentRotatingWheelModel(config.Id, config.CenterPosition, config.RotationSpeed, 
-                config.Walls.IsNullOrEmpty() ? new List<ushort>() : config.Walls.Select(x=>x.Id).ToList(), 
-                config.LavaWalls.IsNullOrEmpty() ? new List<ushort>() : config.LavaWalls.Select(x=>x.Id).ToList(), 
-                config.Springs.IsNullOrEmpty() ? new List<ushort>() : config.Springs.Select(x=>x.Id).ToList(),
-                config.TeleportGatePairs.IsNullOrEmpty() ? new List<ushort>() : config.TeleportGatePairs.Select(x=>x.Id).ToList());
+            var newWheel = new MatchEnvironmentRotatingWheelModel(id, centerPosition, rotationSpeed, wallIds, lavaWallIds, springIds, teleportGatePairIds);
             RotatingWheels.Add(newWheel);
             return newWheel;
         }

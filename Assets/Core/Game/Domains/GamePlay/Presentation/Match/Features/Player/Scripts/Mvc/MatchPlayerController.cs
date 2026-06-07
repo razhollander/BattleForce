@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
             var isDead = playerModel.Spaceship.Health.CurrentHealth == 0;
-            SetIsDeadAuraEnabled(isDead);
+            SetIsDeadEffectEnabled(isDead);
             UpdateTalents(playerModel.Spaceship.TalentsState.Talents, playerModel.Spaceship.TalentsState.SelectedTalentIndex, 0);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
@@ -301,9 +301,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.PlayYearsOfPainAnimation(direction.ToUnityVector2(), _stageCancellationTokenProvider.CancellationTokenSource);
         }
 
-        public void SetIsDeadAuraEnabled(bool isEnabled)
+        public void SetIsDeadEffectEnabled(bool isEnabled)
         {
-            _playerView.SetIsDeadAuraEnabled(isEnabled);
+            _playerView.SetIsDeadEffectEnabled(isEnabled, _stageCancellationTokenProvider.CancellationTokenSource.Token);
         }
 
         private TalentVisualData[] ConvertTalentsToVisualData(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)

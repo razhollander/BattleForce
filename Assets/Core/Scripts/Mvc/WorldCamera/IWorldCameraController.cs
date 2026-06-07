@@ -8,7 +8,7 @@ namespace Core.Scripts.Mvc.WorldCamera
         void RemoveFollowTarget(Transform target);
         void ClearTargets();
         void ShakeCamera(float intensity, float durationInSeconds);
-
+        void MultiplyOthographicSize(float multiplier);
         void InitEntryPoint();
 
         void InitExitPoint();
