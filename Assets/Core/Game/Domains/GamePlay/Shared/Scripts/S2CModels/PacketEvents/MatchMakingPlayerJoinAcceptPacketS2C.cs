@@ -1,6 +1,7 @@
 using System;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
@@ -9,12 +10,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
     {
         public int OccuredOnTick;
         public bool IsLocal;
-        public MatchMakingPlayerStateS2C PlayerState;
+        public FixedClassUnorderedList<MatchMakingPlayerStateS2C> Players;
         public MatchMakingSimulationStateS2C SimulationState;
 
         public MatchMakingPlayerJoinAcceptPacketS2C(MaxCap maxCap)
         {
-            PlayerState = new MatchMakingPlayerStateS2C();
+            Players = new FixedClassUnorderedList<MatchMakingPlayerStateS2C>(maxCap.ConcurrentPlayers, () => new MatchMakingPlayerStateS2C());
             SimulationState = new MatchMakingSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets);
         }
 
@@ -22,8 +23,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
         {
             writer.Put(OccuredOnTick);
             writer.Put(IsLocal);
-            PlayerState.Serialize(writer);
-
+            
+            writer.Put((byte)Players.Count);
+            foreach (var player in Players.AsSpan())
+            {
+                player.Serialize(writer);
+            }
+            
             if (IsLocal)
             {
                 SimulationState.Serialize(writer);
@@ -34,7 +40,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents
         {
             OccuredOnTick = reader.GetInt();
             IsLocal = reader.GetBool();
-            PlayerState.Deserialize(reader);
+            
+            var playersCount = reader.GetByte();
+            Players.Clear();
+            for (var i = 0; i < playersCount; i++)
+            {
+                var player = Players.AddAndGet();
+                player.Deserialize(reader);;
+            }
+            
             if (IsLocal)
             {
                 SimulationState.Deserialize(reader);

@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
@@ -19,14 +22,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
         private bool _isHost;
         private string _ipAddress;
         private int _port;
-        private string _playerName;
-        private bool _isGamePadEnabled;
+        private string _clientId;
         
         private IClientNetworkManager _networkManager;
         private IJoinResponsePacketHandler _joinResponsePacketHandler;
         private ISceneLoaderService _sceneLoaderService;
         private ITickCounterService _tickCounterService;
         private NetworkConfig _networkConfig;
+        private List<PlayerJoinedModel> _playersJoinedModels;
 
         public StartClientCommand SetIsHost(bool isHost)
         {
@@ -41,15 +44,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
             return this;
         }
 
-        public StartClientCommand SetPlayerName(string playerName)
+        public StartClientCommand SetClientId(string clientId)
         {
-            _playerName = playerName;
+            _clientId = clientId;
             return this;
         }
 
-        public StartClientCommand SetIsGamePadEnabled(bool isGamePadEnabled)
+        public StartClientCommand SetPlayersJoined(List<PlayerJoinedModel> playersJoinedModels)
         {
-            _isGamePadEnabled = isGamePadEnabled;
+            _playersJoinedModels = playersJoinedModels;
             return this;
         }
 
@@ -64,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
-            _networkManager.ConenctToServerPeer(_ipAddress, _port, _playerName);
+            _networkManager.ConenctToServerPeer(_ipAddress, _port, _clientId);
             
             while (!_networkManager.IsPeerConnected)
             {
@@ -72,7 +75,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
                 await Awaitable.FixedUpdateAsync(cancellationTokenSource.Token);
             }
 
-            var joinRequest = new JoinRequestPacketC2S(_playerName, _isGamePadEnabled);
+            var joinRequest = new JoinRequestPacketC2S(_networkConfig.MaxCap.ConcurrentPlayers);
+            foreach (var playersJoinedModel in _playersJoinedModels)
+            {
+                joinRequest.AddPlayer(playersJoinedModel.PlayerName, playersJoinedModel.PlayerInputType == SupportedInputType.Gamepad, playersJoinedModel.InputDeviceId);
+            }
+            
             _networkManager.SendPacketSerialized(PacketTypeC2S.JoinRequest, joinRequest, DeliveryMethod.ReliableOrdered);
             
             while (!_joinResponsePacketHandler.DidReceiveJoinResponse)
@@ -93,13 +101,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
             
             if (joinResponse.IsMatchMaking)
             {
-                var enterData = new GamePlayMatchMakingInitiatorEnterData(joinResponse.MatchMakingSimulationState ,_ipAddress, _port, _isHost, joinResponse.OccuredOnTick, joinResponse.LocalPlayerId);
+                var enterData = new GamePlayMatchMakingInitiatorEnterData(joinResponse.MatchMakingSimulationState ,_ipAddress, _port, _isHost, joinResponse.OccuredOnTick, joinResponse.PlayerIdToDeviceIdDictionary);
                 await LoadMatchMakingScene(enterData, cancellationTokenSource);
             }
             else
             {
                 var InitialState = joinResponse.MatchSimulationState;
-                var enterData = new GamePlayMatchInitiatorEnterData(InitialState, joinResponse.LocalPlayerId, joinResponse.OccuredOnTick);
+                var enterData = new GamePlayMatchInitiatorEnterData(InitialState, joinResponse.OccuredOnTick, joinResponse.PlayerIdToDeviceIdDictionary);
                 await LoadMatchScene(enterData, cancellationTokenSource);
             }
         }

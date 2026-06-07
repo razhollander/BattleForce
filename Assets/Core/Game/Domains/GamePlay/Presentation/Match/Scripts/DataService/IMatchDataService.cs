@@ -24,15 +24,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public ushort CurrentStageWinnerTeamId { get; set; }
         List<MatchKOProjectileModel> KOProjectiles { get; }
         List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
-        MatchPlayerModel LocalPlayer { get; }
-        bool IsPlayerJoined { get; }
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
         MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
         MatchEnvironmentLavaWallModel AddLavalWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
         MatchEnvironmentFieldBarrierModel AddFieldBarrier(ushort id, ushort teamId, Vector2 position, Vector2 size, FieldBarrierShape shape);
-        void SetLocalPlayer(int playerId);
         MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 initialPosition, System.Numerics.Vector2 velocity, float radius, int spawnTick);
         MatchPlayerBulletModel GetBullet(ushort bulletId);
         MatchEnvironmentWallModel GetEnvironmentWall(ushort wallId);

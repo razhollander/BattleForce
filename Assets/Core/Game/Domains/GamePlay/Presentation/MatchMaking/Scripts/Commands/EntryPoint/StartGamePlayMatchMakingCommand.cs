@@ -12,6 +12,7 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Packet
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Scripts.Network;
@@ -39,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
         private IClientMatchMakingPresentationTickProcessor _clientPresentationTickProcessor;
         private IMatchMakingDataService _matchMakingDataService;
         private IBackgroundParallaxController _backgroundParallaxController;
+        private ILocalPlayersDataService _localPlayersDataService;
 
         public StartGamePlayMatchMakingCommand SetEnterData(GamePlayMatchMakingInitiatorEnterData enterData)
         {
@@ -64,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _clientPresentationTickProcessor = _diContainer.Resolve<IClientMatchMakingPresentationTickProcessor>();
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
+            _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -83,7 +86,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
                 .SetSimulationState(_enterData.SimulationState)
                 .SetStateOccuredOnTick(_enterData.StateOccuredOnTick)
                 .Execute();
-            _matchMakingDataService.SetLocalPlayer(_enterData.PlayerId);
+            _localPlayersDataService.SetLocalPlayers(_enterData.PlayerIdToDeviceIdDictionary);
             _clientPresentationTickProcessor.StartTick();
         }
     }

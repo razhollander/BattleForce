@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents
@@ -10,12 +11,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents
     {
         public int OccuredOnTick;
         public bool IsLocal;
-        public List<PlayerStateS2C> PlayerStates;
+        public FixedClassUnorderedList<PlayerStateS2C> Players;
         public MatchSimulationStateS2C SimulationState;
 
         public PlayerRejoinAcceptPacketS2C(MaxCap maxCap, int maxTalentsPerPlayer, int maxTeams)
         {
-            PlayerStates = new List<PlayerStateS2C>(maxCap.ConcurrentPlayers);
+            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxCap.ConcurrentPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer, maxCap.ConcurrentPlayers-1));
             SimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, maxTeams, maxCap.ConcurrentChickenEggs);
         }
 
@@ -24,10 +25,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents
             writer.Put(OccuredOnTick);
             writer.Put(IsLocal);
 
-            writer.Put((byte)PlayerStates.Count);
-            foreach(var s in PlayerStates)
+            writer.Put((byte)Players.Count);
+            foreach (var player in Players.AsSpan())
             {
-                s.Serialize(writer);
+                player.Serialize(writer);
             }
 
             if (IsLocal)
@@ -41,13 +42,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents
             OccuredOnTick = reader.GetInt();
             IsLocal = reader.GetBool();
 
-            var count = reader.GetByte();
-            PlayerStates.Clear();
-            for(int i = 0; i < count; i++)
+            var playersCount = reader.GetByte();
+            Players.Clear();
+            for (var i = 0; i < playersCount; i++)
             {
-                var state = new PlayerStateS2C(3, 10); // Using typical default values since MaxCap might not be available here, alternatively a wrapper can be used
-                state.Deserialize(reader);
-                PlayerStates.Add(state);
+                var player = Players.AddAndGet();
+                player.Deserialize(reader);;
             }
 
             if (IsLocal)
@@ -65,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents
         {
             OccuredOnTick = 0;
             IsLocal = false;
-            PlayerStates.Clear();
+            Players.Clear();
         }
     }
 }

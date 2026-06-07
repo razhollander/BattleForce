@@ -45,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
         public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
             IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory,
-            IStartMatchButtonController startMatchButtonController, ILastFullSyncTickDataService lastFullSyncTickDataService)
+            IStartMatchButtonController startMatchButtonController, ILastFullSyncTickDataService lastFullSyncTickDataService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;

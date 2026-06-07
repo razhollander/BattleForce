@@ -841,8 +841,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 var packet = kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
-                packet.IsLocal = playerState.Id == kvp.Key;
-                packet.PlayerState = playerState;
+                packet.IsLocal = playerId == kvp.Key;
+                packet.PlayerStates = playerStates;
                 packet.SimulationState = simulationState;
             }
         }
@@ -854,7 +854,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 var packet = kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.IsLocal = playerState.Id == kvp.Key;
-                packet.PlayerState = playerState;
+                packet.PlayerState = playerStates;
                 packet.SimulationState = simulationState;
             }
         }

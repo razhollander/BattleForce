@@ -33,16 +33,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly ISimulationInputService _simulationInputService;
         private readonly PlayersTalentsManager _playersTalentsManager;
 
-        private readonly CapacityDict<ushort, FixedUnorderedList<MatchPlayerInputPacketC2S>> _inputsPerPlayer;
-        private readonly CapacityDict<ushort, MatchPlayerInputPacketC2S> _lastProcessedInputPerPlayer;
-        private readonly ConcurrentPool<MatchPlayerInputPacketC2S> _playerInputPacketsPool;
-        private readonly ConcurrentPool<FixedUnorderedList<MatchPlayerInputPacketC2S>> _inputsListsPool;
+        private readonly CapacityDict<ushort, FixedUnorderedList<MatchPlayersInputPacketC2S>> _inputsPerPlayer;
+        private readonly CapacityDict<ushort, MatchPlayersInputPacketC2S> _lastProcessedInputPerPlayer;
+        private readonly ConcurrentPool<MatchPlayersInputPacketC2S> _playerInputPacketsPool;
+        private readonly ConcurrentPool<FixedUnorderedList<MatchPlayersInputPacketC2S>> _inputsListsPool;
         private readonly CapacityDict<ushort, int> _heighestProcessedTickPerPlayer;
 
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         private readonly TryPerformShootForPlayerIfNotOnCooldownCommand _tryPerformShootForPlayerIfNotOnCooldownCommand;
 
-        public PacketTypeC2S PacketType => PacketTypeC2S.MatchPlayerInput;
+        public PacketTypeC2S PacketType => PacketTypeC2S.MatchPlayersInput;
 
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator, INetEventsDataService netEventsDataService,
@@ -59,11 +59,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _simulationInputService = simulationInputService;
             _playersTalentsManager = playersTalentsManager;
 
-            _lastProcessedInputPerPlayer = new CapacityDict<ushort, MatchPlayerInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
-            _inputsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<MatchPlayerInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
+            _lastProcessedInputPerPlayer = new CapacityDict<ushort, MatchPlayersInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
+            _inputsPerPlayer = new CapacityDict<ushort, FixedUnorderedList<MatchPlayersInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
             _heighestProcessedTickPerPlayer = new CapacityDict<ushort, int>(networkConfig.MaxCap.ConcurrentPlayers);
-            _inputsListsPool = new ConcurrentPool<FixedUnorderedList<MatchPlayerInputPacketC2S>>(() => new FixedUnorderedList<MatchPlayerInputPacketC2S>(inputPacketsSavedPerPlayer), networkConfig.MaxCap.ConcurrentPlayers);
-            _playerInputPacketsPool = new ConcurrentPool<MatchPlayerInputPacketC2S>(() => new MatchPlayerInputPacketC2S(), networkConfig.MaxCap.ConcurrentInputsProcessed);
+            _inputsListsPool = new ConcurrentPool<FixedUnorderedList<MatchPlayersInputPacketC2S>>(() => new FixedUnorderedList<MatchPlayersInputPacketC2S>(inputPacketsSavedPerPlayer), networkConfig.MaxCap.ConcurrentPlayers);
+            _playerInputPacketsPool = new ConcurrentPool<MatchPlayersInputPacketC2S>(() => new MatchPlayersInputPacketC2S(), networkConfig.MaxCap.ConcurrentInputsProcessed);
 
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _tryPerformShootForPlayerIfNotOnCooldownCommand = commandFactory.CreateCommandVoid<TryPerformShootForPlayerIfNotOnCooldownCommand>();
@@ -179,7 +179,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _playersTalentsManager.TryPerformCurrentSelectedTalentForPlayer(playerState.Id, processedTick, deltaTime);
         }
 
-        private void UpdatePlayerDirection(MatchPlayerInputPacketC2S playerInputPacket, PlayerStateS2C playerState)
+        private void UpdatePlayerDirection(MatchPlayersInputPacketC2S playersInputPacket, PlayerStateS2C playerState)
         {
             if (playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) && selectedTalent.IsCurrentlyAiming)
             {
@@ -188,13 +188,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
             var rotationDelta = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
             var rotationAngle =
-                (GetInputForPlayer(playerInputPacket, playerState.Id).IsMoveLeftInputPressed.ToInt() -
-                 GetInputForPlayer(playerInputPacket, playerState.Id).IsMoveRightInputPressed.ToInt()) * rotationDelta;
+                (GetInputForPlayer(playersInputPacket, playerState.Id).IsMoveLeftInputPressed.ToInt() -
+                 GetInputForPlayer(playersInputPacket, playerState.Id).IsMoveRightInputPressed.ToInt()) * rotationDelta;
             var rotatedVector = playerState.Spaceship.Transform.Direction.Rotate(rotationAngle);
             playerState.Spaceship.Transform.Direction = rotatedVector;
         }
 
-        private int GetIndexOfEarliestInput(FixedUnorderedList<MatchPlayerInputPacketC2S> inputs)
+        private int GetIndexOfEarliestInput(FixedUnorderedList<MatchPlayersInputPacketC2S> inputs)
         {
             var span = inputs.AsSpan();
             int min = span[0].Tick;
@@ -213,37 +213,37 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             return indexOfMin;
         }
         
-        private CapacityDict<ushort, MatchPlayerInputPacketC2S> PopEarliestInputsOfEachPlayer()
+        private CapacityDict<ushort, MatchPlayersInputPacketC2S> PopEarliestInputsOfEachPlayer()
         {
             for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
             {
                 var playerState = _matchDataService.SimulationState.Players[i];
                 var playerId = playerState.Id;
-                MatchPlayerInputPacketC2S earliestPlayerInput;
+                MatchPlayersInputPacketC2S earliestPlayersInput;
                 if (_inputsPerPlayer.TryGetValue(playerId, out var playerInputs) && playerInputs.Count > 0)
                 {
                     if (playerInputs.Count == 0) continue;
 var indexOfEarliestInput = GetIndexOfEarliestInput(playerInputs);
-                    earliestPlayerInput = playerInputs[indexOfEarliestInput];
+                    earliestPlayersInput = playerInputs[indexOfEarliestInput];
                     playerInputs.RemoveAt(indexOfEarliestInput);
                 }
                 else
                 {
-                    if (!TryGetCachedInputForPlayer(playerId, out earliestPlayerInput))
+                    if (!TryGetCachedInputForPlayer(playerId, out earliestPlayersInput))
                     {
                         continue;
                     }
                 }
                 
-                _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Add(playerId, earliestPlayerInput);
+                _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer.Add(playerId, earliestPlayersInput);
             }
 
             return _cachedProcessPlayersInputsResult.EarliestInputsPerPlayer;
         }
 
-        private bool TryGetCachedInputForPlayer(ushort playerId, out MatchPlayerInputPacketC2S playerInputPacket)
+        private bool TryGetCachedInputForPlayer(ushort playerId, out MatchPlayersInputPacketC2S playersInputPacket)
         {
-            return _lastProcessedInputPerPlayer.TryGetValue(playerId, out playerInputPacket);
+            return _lastProcessedInputPerPlayer.TryGetValue(playerId, out playersInputPacket);
         }
         
         public void OnPacketReceived(NetDataReader reader, NetPeer peer, bool isReceivedFromPlayback)
@@ -253,12 +253,12 @@ var indexOfEarliestInput = GetIndexOfEarliestInput(playerInputs);
             OnPlayerInputReceived(newPacket, peer);
         }
 
-        private void OnPlayerInputReceived(MatchPlayerInputPacketC2S playerInputPacket, NetPeer peer)
+        private void OnPlayerInputReceived(MatchPlayersInputPacketC2S playersInputPacket, NetPeer peer)
         {
-            if (playerInputPacket.Inputs == null) return;
-            for(int _i=0; _i<playerInputPacket.Inputs.Length; _i++)
+            if (playersInputPacket.Inputs == null) return;
+            for(int _i=0; _i<playersInputPacket.Inputs.Length; _i++)
             {
-                var inputData = playerInputPacket.Inputs[_i];
+                var inputData = playersInputPacket.Inputs[_i];
                 var playerId = inputData.PlayerId;
 
                 if (!_inputsPerPlayer.ContainsKey(playerId))
@@ -266,12 +266,12 @@ var indexOfEarliestInput = GetIndexOfEarliestInput(playerInputs);
                     _inputsPerPlayer.Add(playerId, _inputsListsPool.Get());
                 }
                 ref var input = ref _inputsPerPlayer[playerId].AddAndGet();
-                input = new MatchPlayerInputPacketC2S { Tick = playerInputPacket.Tick, HeighestProcessedTickFromServer = playerInputPacket.HeighestProcessedTickFromServer, Inputs = new PlayerInputData[] { inputData } };
+                input = new MatchPlayersInputPacketC2S { Tick = playersInputPacket.Tick, HeighestProcessedTickFromServer = playersInputPacket.HeighestProcessedTickFromServer, Inputs = new PlayerInputData[] { inputData } };
             }
         }
 
 
-        private PlayerInputData GetInputForPlayer(MatchPlayerInputPacketC2S packet, ushort playerId)
+        private PlayerInputData GetInputForPlayer(MatchPlayersInputPacketC2S packet, ushort playerId)
         {
             if (packet.Inputs != null)
             {

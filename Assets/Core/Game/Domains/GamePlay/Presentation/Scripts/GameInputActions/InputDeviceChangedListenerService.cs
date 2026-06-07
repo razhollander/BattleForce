@@ -1,0 +1,64 @@
+using System;
+using System.Collections.Generic;
+using CoreDomain.Scripts.Services.Logger.Base;
+using UnityEngine.InputSystem;
+
+namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
+{
+    public class InputDeviceChangedListenerService : IInputDeviceChangedListenerService
+    {
+        public event Action<Gamepad> GamepadAddedEvent;
+        public event Action<Gamepad> GamepadRemovedEvent;
+        
+        public void InitEntryPoint()
+        {
+            InputSystem.onDeviceChange += OnDeviceChange;
+        }
+
+        private void OnDeviceChange(InputDevice device, InputDeviceChange change)
+        {
+            LogService.LogError("Device change: " + change + " | Device: " + device.name + " | ID: " + device.deviceId + "");
+            if (device is not Gamepad gamepad)
+            {
+                return;
+            }
+
+            LogService.LogError("Device got gamepad!");
+
+            switch (change)
+            {
+                case InputDeviceChange.Added:
+                case InputDeviceChange.Reconnected:
+                case InputDeviceChange.Enabled:
+                    GamepadAddedEvent?.Invoke(gamepad);
+                    break;
+                case InputDeviceChange.Disabled:
+                case InputDeviceChange.Removed:
+                case InputDeviceChange.Disconnected:
+                    GamepadRemovedEvent?.Invoke(gamepad); 
+                    break;
+            }
+        }
+
+        public List<Gamepad> GetAllConnectedGamepads()
+        {
+            var connectedGamepads = new List<Gamepad>();
+            
+            foreach (InputDevice device in InputSystem.devices)
+            {
+                if (device is Gamepad gamepad)
+                {
+                    connectedGamepads.Add(gamepad);
+                    LogService.LogError("Gamepad found: " + device.name + " | ID: " + device.deviceId + "");
+                }
+            }
+
+            return connectedGamepads;
+        }
+
+        public void InitExitPoint()
+        {
+            InputSystem.onDeviceChange -= OnDeviceChange;
+        }
+    }
+}

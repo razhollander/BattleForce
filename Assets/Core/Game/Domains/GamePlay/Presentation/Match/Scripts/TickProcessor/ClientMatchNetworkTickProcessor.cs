@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -21,13 +22,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly IStateMachineService _stateMachineService;
         private SendMatchInputsToServerCommand _sendMatchInputsToServerCommand;
         private readonly IClientNetworkManager _networkManager;
+        private readonly ILocalPlayersDataService _localPlayersDataService;
 
         private TimerFixedThreaded2 _fixedTimer;
 
         public ClientMatchNetworkTickProcessor(IClientNetworkManager networkManager,
             //ClientSimulationStateHandler clientSimulationStateHandler,
             IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IFullTickPacketsHandler fullTickPacketsHandler, IMatchDataService matchDataService, ITickCounterService tickCounterService)
+            IFullTickPacketsHandler fullTickPacketsHandler, IMatchDataService matchDataService, ITickCounterService tickCounterService, ILocalPlayersDataService localPlayersDataService)
         {
             _networkManager = networkManager;
             //_clientSimulationStateHandler = clientSimulationStateHandler;
@@ -36,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _fullTickPacketsHandler = fullTickPacketsHandler;
             _matchDataService = matchDataService;
             _tickCounterService = tickCounterService;
+            _localPlayersDataService = localPlayersDataService;
         }
 
         public void InitEntryPoint()
@@ -60,9 +63,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _tickCounterService.IncrementTick();
             _fullTickPacketsHandler.ProcessStateLatestTick();
             
-            if (_matchDataService.IsPlayerJoined)
+            if (_localPlayersDataService.IsClientJoined)
             {
-                _sendMatchInputsToServerCommand.SetPlayerId(_matchDataService.LocalPlayer.PlayerId).Execute();
+                _sendMatchInputsToServerCommand.Execute();
             }
         }
     }
