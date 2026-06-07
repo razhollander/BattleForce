@@ -33,6 +33,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 {
     public class SyncMatchSimulationStateCommand : BaseCommand, ICommandVoid
     {
+        private const float CAMERA_ORTHOGRAPHIC_SIZE_TO_MAP_SIZE_RATIO = 0.8666666667f; //1.3f / 1.5f;
+        
         private IMatchDataService _matchDataService;
         private IMatchBulletControllers _bulletControllers;
         private IMatchChickenEggsControllers _chickenEggsControllers;
@@ -139,7 +141,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private void CreateAll()
         {
             var mapSizeMultiplier = _simulationState.MapSizeMultiplier;
-            _worldCameraController.MultiplyOthographicSize(mapSizeMultiplier * 1.3f / 1.5f);
+            _worldCameraController.MultiplyOthographicSize(mapSizeMultiplier * CAMERA_ORTHOGRAPHIC_SIZE_TO_MAP_SIZE_RATIO);
             CreatePlayers();
             CreateBullets();
             CreateWalls(mapSizeMultiplier);
