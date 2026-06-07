@@ -96,7 +96,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             position = Vector2.Zero;
             var maxAttempts = MAX_ATTEMPTS_TO_FIND_FREE_SPAWN_POSITION;
-            var environmentHalfSize = _matchEnvironmentConfigDataService.EnvironmentHalfSize*_matchDataService.SimulationState.MapSizeMultiplier;
+            var environmentHalfSize = _matchEnvironmentConfigDataService.EnvironmentHalfSize * _matchDataService.SimulationState.MapSizeMultiplier;
             var powerUpsRadius = _gamePlayConfigService.GamePlayConfig.PowerUps.Radius;
 
             for (var i = 0; i < maxAttempts; i++)

@@ -109,7 +109,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService.IsInPreparationPhase = _simulationState.IsInPreparationPhase;
             _matchDataService.IsInShowoffWinners = _simulationState.IsInShowoffWinners;
             _matchDataService.CurrentStageWinnerTeamId = _simulationState.CurrentStageWinnerTeamId;
-            _worldCameraController.MultiplyOthographicSize(_simulationState.MapSizeMultiplier * 1.3f / 1.5f);
             _stageCancellationTokenProvider.CancelAndRegenarateStageToken();
             DestroyAll();
             CreateAll();
@@ -139,24 +138,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         private void CreateAll()
         {
+            var mapSizeMultiplier = _simulationState.MapSizeMultiplier;
+            _worldCameraController.MultiplyOthographicSize(mapSizeMultiplier * 1.3f / 1.5f);
             CreatePlayers();
             CreateBullets();
-            CreateWalls();
-            CreateSprings();
-            CreateLavaWalls();
-            CreateRotatingWheels();
-            CreateTalentCards();
+            CreateWalls(mapSizeMultiplier);
+            CreateSprings(mapSizeMultiplier);
+            CreateLavaWalls(mapSizeMultiplier);
+            CreateRotatingWheels(mapSizeMultiplier);
+            CreateTalentCards(mapSizeMultiplier);
             CreatePowerUpBalls();
             CreateTeamBoards();
-            CreateTeleportGates();
-            CreateFieldBarriers();
+            CreateTeleportGates(mapSizeMultiplier);
+            CreateFieldBarriers(mapSizeMultiplier);
             CreateSwapField();
             CreateKOPRojectiles();
             CreateGrapplingHookPRojectiles();
             CreateChickenEggs();
         }
 
-        private void CreateFieldBarriers()
+        private void CreateFieldBarriers(float mapSizeMultiplier)
         {
             var barrierConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetFieldBarriers();
             if (barrierConfigs.IsNullOrEmpty())
@@ -170,7 +171,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var teamId in teamIds)
             {
                 var barrierConfig = barrierConfigs[barrierIndex];
-                _matchDataService.AddFieldBarrier(barrierIndex, teamId, barrierConfig.Position*_simulationState.MapSizeMultiplier, barrierConfig.Size*_simulationState.MapSizeMultiplier, barrierConfig.Shape);
+                _matchDataService.AddFieldBarrier(barrierIndex, teamId, barrierConfig.Position * mapSizeMultiplier, barrierConfig.Size * mapSizeMultiplier, barrierConfig.Shape);
                 _environmentFieldBarrierControllers.CreateFieldBarrier(barrierIndex);
                 barrierIndex++;
             }
@@ -188,9 +189,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
 
-        private void CreateSprings()
+        private void CreateSprings(float mapSizeMultiplier)
         {
-            var multiplier = _simulationState.MapSizeMultiplier;
             var springs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetEnvironmentSprings();
             if (springs.IsNullOrEmpty())
             {
@@ -199,14 +199,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             
             foreach (var spring in springs)
             {
-                _matchDataService.AddSpring(spring.Id, Vector2.Zero, spring.Position * multiplier, 0, spring.RotationAngle);
+                _matchDataService.AddSpring(spring.Id, Vector2.Zero, spring.Position * mapSizeMultiplier, 0, spring.RotationAngle);
                 _environmentSpringControllers.CreateSpring(spring.Id);
             }
         }
 
-        private void CreateTeleportGates()
+        private void CreateTeleportGates(float mapSizeMultiplier)
         {
-            var multiplier = _simulationState.MapSizeMultiplier;
             var teleportGatePairConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetTeleportGates();
             if (teleportGatePairConfigs.IsNullOrEmpty())
             {
@@ -216,7 +215,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var teleportGatePairConfig in teleportGatePairConfigs)
             {
                 var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size;
-                _matchDataService.AddTeleportPair(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateA.Position * multiplier, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateBId, teleportGatePairConfig.GateB.Position * multiplier, teleportGatePairConfig.GateB.NormalRotation, teleportGatePairConfig.GateA.Position * multiplier, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position * multiplier, teleportGatePairConfig.GateB.NormalRotation, gateSize.ToNumericsVector2());
+                _matchDataService.AddTeleportPair(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateA.Position * mapSizeMultiplier, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateBId, teleportGatePairConfig.GateB.Position * mapSizeMultiplier, teleportGatePairConfig.GateB.NormalRotation, teleportGatePairConfig.GateA.Position * mapSizeMultiplier, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position * mapSizeMultiplier, teleportGatePairConfig.GateB.NormalRotation, gateSize.ToNumericsVector2()* mapSizeMultiplier);
                 _teleportGateControllers.CreateGatePair(teleportGatePairConfig.Id);
             }
         }
@@ -231,7 +230,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
         
-        private void CreateTalentCards()
+        private void CreateTalentCards(float mapSizeMultiplier)
         {
             foreach (var talentCard in _simulationState.TalentCards.AsSpan())
             {
@@ -258,9 +257,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
 
-        private void CreateWalls()
+        private void CreateWalls(float mapSizeMultiplier)
         {
-            var multiplier = _simulationState.MapSizeMultiplier;
             var walls = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetWalls();
             if (walls.IsNullOrEmpty())
             {
@@ -272,16 +270,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var points = new Vector2[wall.Points.Length];
                 for (int i = 0; i < points.Length; i++)
                 {
-                    points[i] = wall.Points[i] * multiplier;
+                    points[i] = wall.Points[i] * mapSizeMultiplier;
                 }
-                var wallModel = _matchDataService.AddWall(wall.Id, points, Vector2.Zero, wall.Position * multiplier, 0);
+                var wallModel = _matchDataService.AddWall(wall.Id, points, Vector2.Zero, wall.Position * mapSizeMultiplier, 0);
                 _environmentWallsControllers.CreateWall(wallModel.Id);
             }
         }
         
-        private void CreateLavaWalls()
+        private void CreateLavaWalls(float mapSizeMultiplier)
         {
-            var multiplier = _simulationState.MapSizeMultiplier;
             var lavaWalls = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetLavaWalls();
             if (lavaWalls.IsNullOrEmpty())
             {
@@ -293,16 +290,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var points = new Vector2[lavaWall.Points.Length];
                 for (int i = 0; i < points.Length; i++)
                 {
-                    points[i] = lavaWall.Points[i] * multiplier;
+                    points[i] = lavaWall.Points[i] * mapSizeMultiplier;
                 }
-                var lavaWallModel = _matchDataService.AddLavalWall(lavaWall.Id, points, Vector2.Zero, lavaWall.Position * multiplier, 0);
+                var lavaWallModel = _matchDataService.AddLavalWall(lavaWall.Id, points, Vector2.Zero, lavaWall.Position * mapSizeMultiplier, 0);
                 _environmentLavaWallsControllers.CreateLavaWall(lavaWallModel.Id);
             }
         }
 
-        private void CreateRotatingWheels()
+        private void CreateRotatingWheels(float mapSizeMultiplier)
         {
-            var multiplier = _simulationState.MapSizeMultiplier;
             var wheels = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetRotatingWheels();
             if (wheels.IsNullOrEmpty())
             {
@@ -314,7 +310,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var wheelConfig in wheels)
             {
-                var wheelCenter = wheelConfig.CenterPosition * multiplier;
+                var wheelCenter = wheelConfig.CenterPosition * mapSizeMultiplier;
                 var wallIds = wheelConfig.Walls.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.Walls.Select(x => x.Id).ToList();
                 var lavaWallIds = wheelConfig.LavaWalls.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.LavaWalls.Select(x => x.Id).ToList();
                 var springIds = wheelConfig.Springs.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.Springs.Select(x => x.Id).ToList();
@@ -326,7 +322,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 {
                     foreach (var wallConfig in wheelConfig.Walls)
                     {
-                        var scaledPosition = wallConfig.Position * multiplier;
+                        var scaledPosition = wallConfig.Position * mapSizeMultiplier;
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
                             calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, 0,
                             out var worldPosition, out var worldRotation
@@ -335,7 +331,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                         var points = new Vector2[wallConfig.Points.Length];
                         for (int i = 0; i < points.Length; i++)
                         {
-                            points[i] = wallConfig.Points[i] * multiplier;
+                            points[i] = wallConfig.Points[i] * mapSizeMultiplier;
                         }
                         _matchDataService.AddWall(wallConfig.Id, points, scaledPosition, worldPosition, worldRotation);
                         _environmentWallsControllers.CreateWall(wallConfig.Id);
@@ -346,7 +342,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 {
                     foreach (var lavaWallConfig in wheelConfig.LavaWalls)
                     {
-                        var scaledPosition = lavaWallConfig.Position * multiplier;
+                        var scaledPosition = lavaWallConfig.Position * mapSizeMultiplier;
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
                             calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, 0,
                             out var worldPosition, out var worldRotation
@@ -355,7 +351,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                         var points = new Vector2[lavaWallConfig.Points.Length];
                         for (int i = 0; i < points.Length; i++)
                         {
-                            points[i] = lavaWallConfig.Points[i] * multiplier;
+                            points[i] = lavaWallConfig.Points[i] * mapSizeMultiplier;
                         }
                         _matchDataService.AddLavalWall(lavaWallConfig.Id, points, scaledPosition, worldPosition, worldRotation);
                         _environmentLavaWallsControllers.CreateLavaWall(lavaWallConfig.Id);
@@ -366,7 +362,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 {
                     foreach (var springConfig in wheelConfig.Springs)
                     {
-                        var scaledPosition = springConfig.Position * multiplier;
+                        var scaledPosition = springConfig.Position * mapSizeMultiplier;
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
                             calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, springConfig.RotationAngle,
                             out var worldPosition, out var worldRotation
@@ -383,8 +379,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     {
                         var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size;
 
-                        var scaledGateAPos = teleportPairConfig.GateA.Position * multiplier;
-                        var scaledGateBPos = teleportPairConfig.GateB.Position * multiplier;
+                        var scaledGateAPos = teleportPairConfig.GateA.Position * mapSizeMultiplier;
+                        var scaledGateBPos = teleportPairConfig.GateB.Position * mapSizeMultiplier;
 
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
                             calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledGateAPos, teleportPairConfig.GateA.NormalRotation,
