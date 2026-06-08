@@ -110,7 +110,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _handleIfAnyPlayerChangedTeamFloorCommand.SetTick(currentTick).Execute();
                 _handleIfStartMatchEligiblityChangedCommand.SetTick(currentTick).Execute();
                 MoveToMatchStateIfCountdownEnded();
-                RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
+                RemoveOlderThanTickEventsPerClient(processPlayersInputsResult.HeighestProcessedTickPerClient);
                 SendCurrentTickStateToAllClients(currentTick);
                 _headLessQuitterController.QuitIfTimeOut();
             }
@@ -146,15 +146,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             return _playerInputsPacketsHandler.ProcessInputs(processedTick);
         }
 
-        private void RemoveOlderThanTickEventsPerPlayer(CapacityDict<ushort, int> heighestProcessedTickPerPlayer)
+        private void RemoveOlderThanTickEventsPerClient(CapacityDict<long, int> heighestProcessedTickPerClient)
         {
-            foreach (var playerState in _matchMakingDataService.SimulationState.Players.AsSpan())        
+            foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
-                var playerId = playerState.Id;
+                var clientId = kvp.Key;
 
-                if (heighestProcessedTickPerPlayer.TryGetValue(playerId, out int heighestProcessedTick))
+                if (heighestProcessedTickPerClient.TryGetValue(clientId, out int heighestProcessedTick))
                 {
-                    _netEventsDataService.RemoveAllEventsOlderThanTick(playerId, heighestProcessedTick);
+                    _netEventsDataService.RemoveAllEventsOlderThanTick(clientId, heighestProcessedTick);
                 }
             }
         }

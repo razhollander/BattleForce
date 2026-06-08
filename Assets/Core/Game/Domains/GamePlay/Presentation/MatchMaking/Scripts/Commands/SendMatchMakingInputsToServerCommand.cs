@@ -64,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
                     LogTopicType.ClientNetwork);
                 
                 ref var playerInputData = ref _cachedLocalPlayersInputs.AddAndGet();
-                playerInputData.LocalPlayerId = playerId;
+                playerInputData.PlayerId = playerId;
                 playerInputData.IsMoveLeftInputPressed = calculatedInputs.IsMoveLeftInputPressed;
                 playerInputData.IsMoveRightInputPressed = calculatedInputs.IsMoveRightInputPressed;
                 playerInputData.IsShootInputPressed = calculatedInputs.IsShootInputPressed;

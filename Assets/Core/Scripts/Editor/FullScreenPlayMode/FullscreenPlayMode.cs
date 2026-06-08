@@ -38,7 +38,7 @@ public static class FullscreenPlayMode
     }
 
     // You can also toggle this manually using Ctrl+F11 (or Cmd+F11 on Mac)
-    [MenuItem("Window/General/Toggle Fullscreen Play Mode %F11", priority = 2)]
+    [MenuItem("PracticAPI/Toggle Fullscreen Play Mode %F11", priority = 2)]
     public static void Toggle()
     {
         if (fullscreenInstance != null)

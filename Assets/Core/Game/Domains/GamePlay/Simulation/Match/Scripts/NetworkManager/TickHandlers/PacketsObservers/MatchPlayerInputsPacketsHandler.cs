@@ -99,7 +99,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _cachedProcessPlayersInputsResult.Clear();
             LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient = GetHeighestProcessedTickFromServerPerClient();
-            _cachedProcessPlayersInputsResult.EarliestInputsPerClient = ProcessEarliestInputsPerClient(processedTick, deltaTime); // todo move to a new command?
+            _cachedProcessPlayersInputsResult.EarliestInputsPerClient = ProcessEarliestInputsPacketPerClient(processedTick, deltaTime); // todo move to a new command?
 
             return _cachedProcessPlayersInputsResult;
         }
@@ -130,7 +130,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
         }
 
-        private CapacityDict<long, MatchPlayersInputPacketC2S> ProcessEarliestInputsPerClient(int processedTick, float deltaTime)
+        private CapacityDict<long, MatchPlayersInputPacketC2S> ProcessEarliestInputsPacketPerClient(int processedTick, float deltaTime)
         {
             var earliestInputsPerClient = PopEarliestInputsOfEachClient();
 
