@@ -9,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
     /// </summary>
     public struct MatchLocalPlayerInputDataC2S : INetSerializable
     {
-        public ushort LocalPlayerId;
+        public ushort PlayerId;
         public bool IsMoveRightInputPressed;
         public bool IsMoveLeftInputPressed;
         public bool IsShootInputPressed;
@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)LocalPlayerId);
+            writer.Put((byte)PlayerId);
             
             byte inputByte = (byte)(
                 (IsMoveRightInputPressed ? 1 << 0 : 0) |
@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 
         public void Deserialize(NetDataReader reader)
         {
-            LocalPlayerId = reader.GetByte();
+            PlayerId = reader.GetByte();
             
             byte data = reader.GetByte();
             IsMoveRightInputPressed = (data & (1 << 0)) != 0;

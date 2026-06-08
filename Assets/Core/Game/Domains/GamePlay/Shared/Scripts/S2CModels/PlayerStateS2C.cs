@@ -10,7 +10,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public string Name;
         public PlayerSpaceshipStateS2C Spaceship;
         public ushort TeamId;
-        public bool IsConnected;
         
         public PlayerStateS2C(int maxTalents, int maxEnemiesAmount)
         {
@@ -22,7 +21,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((byte)Id);
             writer.Put(Name);
             writer.Put((byte)TeamId);
-            writer.Put(IsConnected);
             Spaceship.Serialize(writer);
         }
         
@@ -31,7 +29,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Id = reader.GetByte();
             Name = reader.GetString();
             TeamId = reader.GetByte();
-            IsConnected = reader.GetBool();
             Spaceship.Deserialize(reader);
         }
 

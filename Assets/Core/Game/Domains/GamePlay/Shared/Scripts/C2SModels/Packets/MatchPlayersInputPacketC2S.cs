@@ -21,6 +21,19 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
             PlayerInputs = new FixedUnorderedList<MatchLocalPlayerInputDataC2S>(maxPlayersInputs);
         }
 
+        public void CopyFrom(MatchPlayersInputPacketC2S other)
+        {
+            Tick = other.Tick;
+            HeighestProcessedTickFromServer = other.HeighestProcessedTickFromServer;
+            PlayerInputs.Clear();
+
+            foreach (var otherPlayerInput in other.PlayerInputs.AsSpan())
+            {
+                ref var playerInput = ref PlayerInputs.AddAndGet();
+                playerInput = otherPlayerInput;
+            }
+        }
+        
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(Tick);

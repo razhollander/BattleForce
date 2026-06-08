@@ -47,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         {
             _cachedLocalPlayersInputs.Clear();
 
-            foreach (var playerId in _localPlayersDataService.LocalPlayerIds)
+            foreach (var playerId in _localPlayersDataService.LocalPlayersIds)
             {
                 var playerPosition = _matchPlayerControllers.GetPlayerPosition(playerId);
                 var playerDirection = _matchDataService.GetPlayer(playerId).Spaceship.Transform.Direction;
@@ -63,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                     LogTopicType.ClientNetwork);
 
                 ref var playerInputDataC2S = ref _cachedLocalPlayersInputs.AddAndGet();
-                playerInputDataC2S.LocalPlayerId = playerId;
+                playerInputDataC2S.PlayerId = playerId;
                 playerInputDataC2S.IsMoveLeftInputPressed = calculatedInputs.IsMoveLeftInputPressed;
                 playerInputDataC2S.IsMoveRightInputPressed = calculatedInputs.IsMoveRightInputPressed;
                 playerInputDataC2S.IsShootInputPressed = calculatedInputs.IsShootInputPressed;

@@ -14,10 +14,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void InitEntryPoint(int port);
         void InitExitPoint();
         //void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
-        public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
+        public void SendPacketToClientSerialized<T>(long clientId, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
         public void SendPacketToPeerSerialized<T>(NetPeer peer, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable;
-        void AddPlayerPeer(ushort playerId, NetPeer peer);
-        void RemovePlayerPeer(ushort playerId);
+        void AddClientPeer(long clientId, NetPeer peer);
+        void RemoveClientPeer(long clientId);
         void PollEvents();
         bool TryGetClientPeerId(long clientId, out int peerId);
         void RegisterPacketsObserver(IPacketsObserver packetsObserver);
@@ -25,6 +25,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void UnregisterPacketsObserver(IPacketsObserver packetsObserver);
         void UnregisterPacketsObserver(IRawPacketsObserver packetsObserver);
         void SwitchToNetManager(INetManagerWrapper netManagerWrapper);
-        bool IsPlayerPeerConencted(ushort playerId);
+        bool IsClientPeerConencted(long clientId);
     }
 }

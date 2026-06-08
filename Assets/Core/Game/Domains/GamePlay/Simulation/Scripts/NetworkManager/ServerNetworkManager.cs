@@ -87,10 +87,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         //     _packetsSender.SendPacketToAllPlayersSerialized(type, packet, deliveryMethod);
         // }
 
-        public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet,
+        public void SendPacketToClientSerialized<T>(long clientId, PacketTypeS2C type, T packet,
             DeliveryMethod deliveryMethod) where T : INetSerializable
         {
-            _packetsSender.SendPacketToClientSerialized(playerId, type, packet, deliveryMethod);
+            _packetsSender.SendPacketToClientSerialized(clientId, type, packet, deliveryMethod);
         }
 
         public void SendPacketToPeerSerialized<T>(NetPeer peer, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
@@ -98,14 +98,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _packetsSender.SendPacketToPeerSerialized(peer, type, packet, deliveryMethod);
         }
 
-        public void AddPlayerPeer(ushort playerId, NetPeer peer)
+        public void AddClientPeer(long clientId, NetPeer peer)
         {
-            _packetsSender.AddClientPeer(playerId, peer);
+            _packetsSender.AddClientPeer(clientId, peer);
         }
 
-        public void RemovePlayerPeer(ushort playerId)
+        public void RemoveClientPeer(long clientId)
         {
-            _packetsSender.RemoveClientPeer(playerId);
+            _packetsSender.RemoveClientPeer(clientId);
         }
 
         public void PollEvents()
@@ -118,9 +118,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             return _packetsSender.TryGetClientPeerId(clientId, out peerId);
         }  
         
-        public bool IsPlayerPeerConencted(ushort playerId)
+        public bool IsClientPeerConencted(long clientId)
         {
-            return _packetsSender.IsClientConnected(playerId);
+            return _packetsSender.IsClientConnected(clientId);
         }
 
         public void RegisterPacketsObserver(IPacketsObserver packetsObserver)

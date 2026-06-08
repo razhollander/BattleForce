@@ -48,7 +48,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         {
             _cachedLocalPlayersInputs.Clear();
 
-            foreach (var playerId in _localPlayersDataService.LocalPlayerIds)
+            foreach (var playerId in _localPlayersDataService.LocalPlayersIds)
             {
                 var playerPosition = _matchMakingPlayerControllers.GetPlayerPosition(playerId);
                 var playerDirection = _matchMakingDataService.GetPlayer(playerId).Spaceship.Transform.Direction;

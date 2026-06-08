@@ -6,7 +6,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService
     public interface ILocalPlayersDataService
     {
         bool IsClientJoined { get; }
-        List<ushort> LocalPlayerIds { get; }
+        List<ushort> LocalPlayersIds { get; }
         Dictionary<ushort, int> GetPlayerIdToDeviceIdDictionary();
         void AddLocalPlayer(ushort playerId, InputDevice device);
         void RemoveLocalPlayer(ushort playerId);

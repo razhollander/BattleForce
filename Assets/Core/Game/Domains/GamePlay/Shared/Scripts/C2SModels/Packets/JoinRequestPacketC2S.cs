@@ -6,12 +6,11 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 {
     public class JoinRequestPacketC2S : INetSerializable
     {
-        public long ClientId; // needed?
+        public long ClientId;
         public FixedUnorderedList<PlayerJoinedDataC2S> PlayerJoinedList;
         
-        public JoinRequestPacketC2S(long clientId, int maxPlayers)
+        public JoinRequestPacketC2S(int maxPlayers)
         {
-            ClientId = clientId;
             PlayerJoinedList = new FixedUnorderedList<PlayerJoinedDataC2S>(maxPlayers);
         }
 

@@ -9,8 +9,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService
         private readonly Dictionary<ushort, InputDevice> _deviceByPlayerId = new Dictionary<ushort, InputDevice>();
         private readonly Dictionary<ushort, int> _deviceIdByPlayerId = new Dictionary<ushort, int>();
 
-        public List<ushort> LocalPlayerIds => _localPlayerIds;
-        public bool IsClientJoined => LocalPlayerIds.Count > 0;
+        public List<ushort> LocalPlayersIds => _localPlayerIds;
+        public bool IsClientJoined => LocalPlayersIds.Count > 0;
 
         public Dictionary<ushort, int> GetPlayerIdToDeviceIdDictionary()
         {
