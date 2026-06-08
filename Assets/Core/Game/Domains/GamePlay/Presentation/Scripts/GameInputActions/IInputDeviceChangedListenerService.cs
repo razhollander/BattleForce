@@ -10,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         event Action<Gamepad> GamepadRemovedEvent;
         void InitEntryPoint();
         void InitExitPoint();
+        List<Keyboard> GetAllConnectedKeyboards();
         List<Gamepad> GetAllConnectedGamepads();
     }
 }

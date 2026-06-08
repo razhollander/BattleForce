@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         [SerializeField] private TMP_InputField _ipInputField;
         [SerializeField] private TMP_InputField _portInputField;
         [SerializeField] private TMP_Dropdown _playbacksDropdown;
+        [SerializeField] private Transform _playersJoinedPanelsParent;
 
         private List<PlayerJoinedPanelView> _playerJoinedPanelViews = new List<PlayerJoinedPanelView>();
         private Action _onClientClicked;
@@ -37,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             return PlaybacksDropdown.options[selectedOptionIndex].text;
         }
         
-        public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked, Action onPlayPlaybackClicked, Action<int, string> onPlayerNameChanged, Action<int> onRemovePlayerButtonClicked, bool defaultOnlyLocal, string defaultIp, int defaultPort, string playerName, SupportedInputType playerInputType)
+        public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked, Action onPlayPlaybackClicked, Action<int, string> onPlayerNameChanged, Action<int> onRemovePlayerButtonClicked, bool defaultOnlyLocal, string defaultIp, int defaultPort,List<PlayerJoinedModel> playerJoinedModels)
         {
             _onClientClicked = onClientClicked;
             _onHostClicked = onHostClicked;
@@ -53,14 +54,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _localHostToggle.isOn = defaultOnlyLocal;
             _ipInputField.text = defaultIp;
             _portInputField.text = defaultPort.ToString();
-            AddPlayerJoinedPanel(playerName, playerInputType);
+
+            foreach (var playerJoinedModel in playerJoinedModels)
+            {
+                AddPlayerJoinedPanel(playerJoinedModel.PlayerName, playerJoinedModel.PlayerInputType);
+            }
+            
             _localHostToggle.onValueChanged.AddListener(OnLocalHostToggleChanged);
             OnLocalHostToggleChanged(_localHostToggle.isOn);
         }
 
         public void AddPlayerJoinedPanel(string playerName, SupportedInputType supportedInputType)
         {
-            var playerJoinedPanelView = Instantiate(_playerJoinedPanelViewPrefab, transform);
+            var playerJoinedPanelView = Instantiate(_playerJoinedPanelViewPrefab, _playersJoinedPanelsParent);
             _playerJoinedPanelViews.Add(playerJoinedPanelView);
             playerJoinedPanelView.Setup(_playerJoinedPanelViews.Count-1, playerName, supportedInputType, OnPlayerNameChanged, OnPlayerRemoveButtonClicked);
         }

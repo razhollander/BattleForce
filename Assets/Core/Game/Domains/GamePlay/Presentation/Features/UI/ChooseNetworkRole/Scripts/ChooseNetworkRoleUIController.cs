@@ -27,7 +27,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private const string PREFS_IP_ADDRESS_KEY = "NetworkRole_IpAddress";
         private const string PREFS_IS_LOCAL_HOST_KEY = "NetworkRole_IsLocalHost";
         private const string PREFS_PORT_HOST_KEY = "NetworkRole_Port";
-        private const int DEFAULT_MOUSE_INPUT_DEVICE_ID = -1;
         
         private readonly ChooseNetworkRoleUIView _uiView;
         private readonly ISceneLoaderService _sceneLoaderService;
@@ -58,12 +57,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         public void InitEntryPoint()
         {
-            var firstPlayerJoinedModel = GetSavedPlayerJoinedModelOrDefault(0);
+            var currentPlayersJoinedModels = GetAllPlayerJoinedModels();
             var ipAddress = _dataPersistence.Load(PREFS_IP_ADDRESS_KEY, _networkConfig.IpAddress);
             var isLocalHost = _dataPersistence.Load(PREFS_IS_LOCAL_HOST_KEY, _networkConfig.OnlyLocal);
             var port = _dataPersistence.Load(PREFS_PORT_HOST_KEY, _networkConfig.DefaultHostPort);
             
-            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, OnPlayerNameChanged, OnRemovePlayerButtonClicked,isLocalHost, ipAddress, port, firstPlayerJoinedModel.PlayerName, firstPlayerJoinedModel.PlayerInputType);
+            _uiView.Setup(OnClientClicked, OnHostClicked, OnServerClicked, OnPlayPlaybackClicked, OnPlayerNameChanged, OnRemovePlayerButtonClicked,isLocalHost, ipAddress, port, currentPlayersJoinedModels);
             PopulatePlaybacksDropdown();
             if (PlayerPrefsSettings.ShouldSkipMatchMaking)
             {
@@ -83,6 +82,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private void OnGamepadRemoved(Gamepad gamepad)
         {
             var playerJoinedIndex = _playerJoinedModels.FindIndex(p => p.InputDeviceId == gamepad.deviceId);
+
+            if (playerJoinedIndex == -1)
+            {
+                LogService.LogError("Index is -1");
+                return;
+            }
+            LogService.LogError($"Remove index {playerJoinedIndex} for device id {gamepad.deviceId}");
             _uiView.RemovePlayerJoined(playerJoinedIndex);
             _playerJoinedModels.RemoveAt(playerJoinedIndex);
         }
@@ -93,27 +99,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _inputDeviceChangedListenerService.GamepadRemovedEvent -= OnGamepadRemoved;
         }
 
-        private PlayerJoinedModel GetSavedPlayerJoinedModelOrDefault(int playerIndex)
+        private List<PlayerJoinedModel> GetAllPlayerJoinedModels()
         {
-            var defaultPlayerName = "Player_" + UnityEngine.Random.Range(10000, 99999);
-            var defaultPlayerJoinedModels = new List<PlayerJoinedModel> {new PlayerJoinedModel(defaultPlayerName, SupportedInputType.Mouse, DEFAULT_MOUSE_INPUT_DEVICE_ID)};
-            var playerJoinedModels = _dataPersistence.Load(PREFS_PLAYERS_JOINED_KEY, defaultPlayerJoinedModels);
-
-            var isPlayerBeingSaved = playerIndex < playerJoinedModels.Count;
-            if (!isPlayerBeingSaved)
+            var playerJoinedModels = new List<PlayerJoinedModel>();
+            var currentlyConnectedKeyboards = _inputDeviceChangedListenerService.GetAllConnectedKeyboards();
+            for (var i = 0; i < currentlyConnectedKeyboards.Count; i++)
             {
-                return playerJoinedModels[0];
+                playerJoinedModels.Add(GetSavedPlayerJoinedModelByDeviceOrDefault(currentlyConnectedKeyboards[i].deviceId, SupportedInputType.Mouse));
             }
             
-            return playerJoinedModels[playerIndex];
+            var currentlyConnectedGamepads = _inputDeviceChangedListenerService.GetAllConnectedGamepads();
+            for (var i = 0; i < currentlyConnectedGamepads.Count; i++)
+            {
+                playerJoinedModels.Add(GetSavedPlayerJoinedModelByDeviceOrDefault(currentlyConnectedGamepads[i].deviceId, SupportedInputType.Gamepad));
+            }
+            return playerJoinedModels;
+        }
+        
+        private PlayerJoinedModel GetSavedPlayerJoinedModelByDeviceOrDefault(int deviceId, SupportedInputType playerInputType)
+        {
+            var defaultPlayerName = "Player_" + UnityEngine.Random.Range(10000, 99999);
+            var defaultPlayerJoined = new PlayerJoinedModel(defaultPlayerName, playerInputType, deviceId); 
+            var defaultPlayerJoinedModels = new List<PlayerJoinedModel> {defaultPlayerJoined};
+            var playerJoinedModels = _dataPersistence.Load(PREFS_PLAYERS_JOINED_KEY, defaultPlayerJoinedModels);
+            var playerJoinedWithDevice = playerJoinedModels.Find(x => x.InputDeviceId == deviceId);
+
+            if (playerJoinedWithDevice != null)
+            {
+                return playerJoinedWithDevice;
+            }
+
+            return defaultPlayerJoined;
         }
         
         private void OnGamepadAdded(Gamepad gamepad)
         {
-            var playerIndex = _playerJoinedModels.Count - 1;
-            var playerJoinedModel = GetSavedPlayerJoinedModelOrDefault(playerIndex);
-            playerJoinedModel.PlayerInputType = SupportedInputType.Gamepad;
-            playerJoinedModel.InputDeviceId = gamepad.deviceId;
+            var playerJoinedModel = GetSavedPlayerJoinedModelByDeviceOrDefault(gamepad.deviceId,SupportedInputType.Gamepad);
             _playerJoinedModels.Add(playerJoinedModel);
             _uiView.AddPlayerJoinedPanel(playerJoinedModel.PlayerName, playerJoinedModel.PlayerInputType);
         }

@@ -55,6 +55,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 
             return connectedGamepads;
         }
+        
+        public List<Keyboard> GetAllConnectedKeyboards()
+        {
+            var connectedKeyboards = new List<Keyboard>();
+            
+            foreach (InputDevice device in InputSystem.devices)
+            {
+                if (device is Keyboard keyboard)
+                {
+                    connectedKeyboards.Add(keyboard);
+                    LogService.LogError("Keyboard found: " + device.name + " | ID: " + device.deviceId + "");
+                }
+            }
+
+            return connectedKeyboards;
+        }
 
         public void InitExitPoint()
         {

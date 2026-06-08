@@ -18,6 +18,10 @@ public static class FullscreenPlayMode
     
     private static EditorWindow fullscreenInstance;
 
+    // EditorPrefs key to save the user's toggle preference
+    private const string AutoFullscreenPrefKey = "PracticAPI_AutoFullscreenPlayMode";
+    private const string AutoFullscreenMenuName = "PracticAPI/FullScreen Play Mode/Auto Fullscreen On Play";
+
     // Register to the play mode state change event on load
     static FullscreenPlayMode()
     {
@@ -29,7 +33,11 @@ public static class FullscreenPlayMode
     {
         if (state == PlayModeStateChange.EnteredPlayMode)
         {
-            EnterFullscreen();
+            // Only enter fullscreen automatically if the setting is turned on
+            if (EditorPrefs.GetBool(AutoFullscreenPrefKey, true))
+            {
+                EnterFullscreen();
+            }
         }
         else if (state == PlayModeStateChange.ExitingPlayMode || state == PlayModeStateChange.EnteredEditMode)
         {
@@ -37,8 +45,28 @@ public static class FullscreenPlayMode
         }
     }
 
+    // --- NEW: Toggle for Auto-Fullscreen on Play ---
+
+    [MenuItem(AutoFullscreenMenuName, priority = 1)]
+    public static void ToggleAutoFullscreen()
+    {
+        // Get the current state, flip it, and save it
+        bool currentState = EditorPrefs.GetBool(AutoFullscreenPrefKey, true);
+        EditorPrefs.SetBool(AutoFullscreenPrefKey, !currentState);
+    }
+
+    [MenuItem(AutoFullscreenMenuName, true)]
+    public static bool ToggleAutoFullscreenValidate()
+    {
+        // Visually update the menu with a checkmark if the feature is enabled
+        Menu.SetChecked(AutoFullscreenMenuName, EditorPrefs.GetBool(AutoFullscreenPrefKey, true));
+        return true;
+    }
+
+    // -----------------------------------------------
+
     // You can also toggle this manually using Ctrl+F11 (or Cmd+F11 on Mac)
-    [MenuItem("PracticAPI/Toggle Fullscreen Play Mode %F11", priority = 2)]
+    [MenuItem("PracticAPI/FullScreen Play Mode/ Toggle Now %F11", priority = 2)]
     public static void Toggle()
     {
         if (fullscreenInstance != null)

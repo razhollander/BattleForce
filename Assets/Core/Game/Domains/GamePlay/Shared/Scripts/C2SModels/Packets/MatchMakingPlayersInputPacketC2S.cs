@@ -10,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
         public int Tick;
         public int HeighestProcessedTickFromServer;
         public FixedUnorderedList<MatchMakingLocalPlayerInputDataC2S> PlayerInputs;
-
+        
         public MatchMakingPlayersInputPacketC2S(int maxPlayersInputs)
         {
             Tick = 0;

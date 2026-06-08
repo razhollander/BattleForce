@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _gameInputActionsController.DisableInputs();
             _joinResponsePacketHandler.InitExitPoint();
             _inputDeviceChangedListenerService.InitExitPoint();
-            _chooseNetworkRoleUIController.InitEntryPoint();
+            _chooseNetworkRoleUIController.InitExitPoint();
         }
     }
 }
