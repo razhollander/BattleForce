@@ -77,7 +77,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _inputsPerClient = new CapacityDict<long, FixedUnorderedList<MatchPlayersInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
             var inputPacketsSavedPerPlayer = networkConfig.MaxCap.PlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
             _inputsListsPool = new ConcurrentPool<FixedUnorderedList<MatchPlayersInputPacketC2S>>(() => new FixedUnorderedList<MatchPlayersInputPacketC2S>(inputPacketsSavedPerPlayer), networkConfig.MaxCap.ConcurrentPlayers);
-            _playerInputPacketsPool = new ConcurrentPool<MatchPlayersInputPacketC2S>(() => new MatchPlayersInputPacketC2S(), networkConfig.MaxCap.ConcurrentInputsProcessed);
+            _playerInputPacketsPool = new ConcurrentPool<MatchPlayersInputPacketC2S>(() => new MatchPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers), networkConfig.MaxCap.ConcurrentInputsProcessed);
             _heighestProcessedTickPerClient = new CapacityDict<long, int>(networkConfig.MaxCap.ConcurrentPlayers);
             _tryPerformShootForPlayerIfNotOnCooldownCommand = _commandFactory.CreateCommandVoid<TryPerformShootForPlayerIfNotOnCooldownCommand>();
         }
@@ -97,14 +97,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public ProcessPlayersInputsResult ProcessInputs(int processedTick, float deltaTime)
         {
             _cachedProcessPlayersInputsResult.Clear();
-            LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
+            KeepLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient = GetHeighestProcessedTickFromServerPerClient();
             _cachedProcessPlayersInputsResult.EarliestInputsPerClient = ProcessEarliestInputsPacketPerClient(processedTick, deltaTime); // todo move to a new command?
 
             return _cachedProcessPlayersInputsResult;
         }
 
-        private void LeaveLatestPacketsForBuffer(int bufferAmount)
+        private void KeepLatestPacketsForBuffer(int bufferAmount)
         {
             foreach (var kvp in _inputsPerClient)
             {
