@@ -41,11 +41,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly ISimulationInputService _simulationInputService;
         private readonly IClientsNetworkDataService _clientsNetworkDataService;
 
-        private readonly CapacityDict<long, FixedUnorderedList<MatchPlayersInputPacketC2S>> _inputsPerClient;
+        private readonly CapacityDict<long, FixedClassUnorderedList<MatchPlayersInputPacketC2S>> _inputsPerClient;
         private readonly CapacityDict<long, int> _heighestProcessedTickPerClient;
         private readonly CapacityDict<long, MatchPlayersInputPacketC2S> _lastProcessedInputPerClient;
         private readonly ConcurrentPool<MatchPlayersInputPacketC2S> _playerInputPacketsPool;
-        private readonly ConcurrentPool<FixedUnorderedList<MatchPlayersInputPacketC2S>> _inputsListsPool;
+        private readonly ConcurrentPool<FixedClassUnorderedList<MatchPlayersInputPacketC2S>> _inputsListsPool;
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         private readonly IPlayersTalentsManager _playersTalentsManager;
         private readonly IPlaybackRecorderService _playerbackRecorderService;
@@ -74,10 +74,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _clientsNetworkDataService = clientsNetworkDataService;
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerClient = new CapacityDict<long, MatchPlayersInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
-            _inputsPerClient = new CapacityDict<long, FixedUnorderedList<MatchPlayersInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
+            _inputsPerClient = new CapacityDict<long, FixedClassUnorderedList<MatchPlayersInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
             var inputPacketsSavedPerPlayer = networkConfig.MaxCap.PlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
-            _inputsListsPool = new ConcurrentPool<FixedUnorderedList<MatchPlayersInputPacketC2S>>(() => new FixedUnorderedList<MatchPlayersInputPacketC2S>(inputPacketsSavedPerPlayer), networkConfig.MaxCap.ConcurrentPlayers);
-            _playerInputPacketsPool = new ConcurrentPool<MatchPlayersInputPacketC2S>(() => new MatchPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers), networkConfig.MaxCap.ConcurrentInputsProcessed);
+            _inputsListsPool = new ConcurrentPool<FixedClassUnorderedList<MatchPlayersInputPacketC2S>>(() => new FixedClassUnorderedList<MatchPlayersInputPacketC2S>(inputPacketsSavedPerPlayer, () => new MatchPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers)), networkConfig.MaxCap.ConcurrentPlayers);
+            var maxAmountOfInputPacketsPlusMaxClientsAmount = networkConfig.MaxCap.ConcurrentInputsProcessed + networkConfig.MaxCap.ConcurrentPlayers; // we use the pool in to two places, so for good order, combined their max caps
+            _playerInputPacketsPool = new ConcurrentPool<MatchPlayersInputPacketC2S>(() => new MatchPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers), maxAmountOfInputPacketsPlusMaxClientsAmount);
             _heighestProcessedTickPerClient = new CapacityDict<long, int>(networkConfig.MaxCap.ConcurrentPlayers);
             _tryPerformShootForPlayerIfNotOnCooldownCommand = _commandFactory.CreateCommandVoid<TryPerformShootForPlayerIfNotOnCooldownCommand>();
         }
@@ -120,12 +121,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
         }
 
-        private void RemoveAmountOfEarliestInputs(FixedUnorderedList<MatchPlayersInputPacketC2S> inputsOfPlayer, int amountOfPacketsToRemove)
+        private void RemoveAmountOfEarliestInputs(FixedClassUnorderedList<MatchPlayersInputPacketC2S> inputsOfPlayer, int amountOfPacketsToRemove)
         {
             inputsOfPlayer.Sort();
             for (int i = amountOfPacketsToRemove - 1; i >= 0; i--)
             {
-                _playerInputPacketsPool.Return(inputsOfPlayer[i]);
                 inputsOfPlayer.RemoveAt(i);
             }
         }
@@ -137,15 +137,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             foreach (var kvp in earliestInputsPerClient)
             {
                 var clientId = kvp.Key;
+                var currentPacket = kvp.Value;
                 var clientNetworkData = _clientsNetworkDataService.ClientsNetworkDataDictionary[clientId];
 
-                foreach (var playerInput in kvp.Value.PlayerInputs.AsSpan())
+                if (!_lastProcessedInputPerClient.TryGetValue(clientId, out var lastProcessedClientInsputs))
+                {
+                    lastProcessedClientInsputs = _playerInputPacketsPool.Get();
+                    _lastProcessedInputPerClient[clientId] = lastProcessedClientInsputs;
+                }
+
+                lastProcessedClientInsputs.CopyFrom(currentPacket);
+
+                foreach (var playerInput in currentPacket.PlayerInputs.AsSpan())
                 {
                     var playerId = playerInput.PlayerId;
 
                     if (!clientNetworkData.PlayerIds.Contains(playerId))
                     {
                         LogService.LogError("Player try to cheat and send inputs of different player! ClientId: " + clientId + " PlayerId: " + playerId + "");
+
                         continue;
                     }
 
@@ -158,14 +168,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     bool isTalentBInputPressed = playerInput.IsTalentBInputPressed;
                     bool isTalentCInputPressed = playerInput.IsTalentCInputPressed;
 
-                    if (_lastProcessedInputPerClient.TryGetValue(playerId, out var lastPlayerInput))
-                    {
-                        _playerInputPacketsPool.Return(lastPlayerInput);
-                    }
-
-                    _lastProcessedInputPerClient[playerId] = kvp.Value;
-
-
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentAInput, isTalentAInputPressed);
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentBInput, isTalentBInputPressed);
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentCInput, isTalentCInputPressed);
@@ -173,11 +175,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     TrySwitchTalent(processedTick, playerState);
                     ProcessPlayerTalentInput(processedTick, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, playerState, deltaTime);
                 }
-
-            }
-            for (var i = 0; i < _matchDataService.SimulationState.Players.Count; i++)
-            {
-              
             }
 
             return earliestInputsPerClient;
@@ -285,7 +282,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             return _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient;
         }
 
-        private int GetIndexOfEarliestInput(FixedUnorderedList<MatchPlayersInputPacketC2S> inputs)
+        private int GetIndexOfEarliestInput(FixedClassUnorderedList<MatchPlayersInputPacketC2S> inputs)
         {
             var span = inputs.AsSpan();
             int min = span[0].Tick;
@@ -394,21 +391,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         {
             var newPacket = _playerInputPacketsPool.Get();
             newPacket.Deserialize(reader);
-            
+    
             var shouldIgnorePacket = !isReceivedFromPlayback && _playerbackRecorderService.IsPlaybackEnabled;
-            if (shouldIgnorePacket)
+            if (!shouldIgnorePacket)
             {
-                _playerInputPacketsPool.Return(newPacket);
-                return;
+                var clientId = (long)peer.Tag;
+                var heighestProcessedTickOfClient = _heighestProcessedTickPerClient.TryGetValue(clientId, out int value) ? value : -1;
+                if (newPacket.HeighestProcessedTickFromServer > heighestProcessedTickOfClient)
+                {
+                    _heighestProcessedTickPerClient[clientId] = newPacket.HeighestProcessedTickFromServer;
+                }
+    
+                OnClientInputsReceived(newPacket, clientId);
             }
             
-            var clientId = (long)peer.Tag;
-            var heighestProcessedTickOfClient = _heighestProcessedTickPerClient.TryGetValue(clientId, out int value) ? value : -1;
-            if (newPacket.HeighestProcessedTickFromServer > heighestProcessedTickOfClient)
-            {
-                _heighestProcessedTickPerClient[clientId] = newPacket.HeighestProcessedTickFromServer;
-            }
-            OnClientInputsReceived(newPacket, clientId);
+            _playerInputPacketsPool.Return(newPacket);
         }
 
         private void OnClientInputsReceived(MatchPlayersInputPacketC2S playersInputPacket, long clientId)
@@ -419,7 +416,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
     
             var inputsList = _inputsPerClient[clientId];
-            ref var input = ref inputsList.AddAndGet();
+            var input = inputsList.AddAndGet();
             input.CopyFrom(playersInputPacket);
             LogService.LogTopic($"Input packet received from player id {clientId}, input: {playersInputPacket.ToJson()}, inputs per player: {_inputsPerClient.ToJson()}", LogTopicType.ServerNetwork);
         }

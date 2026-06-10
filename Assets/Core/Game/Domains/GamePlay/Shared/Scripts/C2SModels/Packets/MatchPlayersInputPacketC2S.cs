@@ -7,7 +7,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
     /// <summary>
     /// The main packet sent to the server, containing inputs for all local players.
     /// </summary>
-    public struct MatchPlayersInputPacketC2S : INetSerializable, IComparable<MatchPlayersInputPacketC2S> // todo change to class
+    public class MatchPlayersInputPacketC2S : INetSerializable, IComparable<MatchPlayersInputPacketC2S>
     {
         // todo: add inputs from client unprocessed ticks
         public int Tick;

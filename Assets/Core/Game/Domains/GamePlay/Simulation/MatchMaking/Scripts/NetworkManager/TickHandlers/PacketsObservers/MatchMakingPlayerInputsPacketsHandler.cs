@@ -32,11 +32,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly IClientsNetworkDataService _clientsNetworkDataService;
 
-        private readonly CapacityDict<long, FixedUnorderedList<MatchMakingPlayersInputPacketC2S>> _inputsPerClient;
+        private readonly CapacityDict<long, FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>> _inputsPerClient;
         private readonly CapacityDict<long, int> _heighestProcessedTickPerClient;
         private readonly CapacityDict<long, MatchMakingPlayersInputPacketC2S> _lastProcessedInputPerClient;
         private readonly ConcurrentPool<MatchMakingPlayersInputPacketC2S> _playerInputPacketsPool;
-        private readonly ConcurrentPool<FixedUnorderedList<MatchMakingPlayersInputPacketC2S>> _inputsListsPool;
+        private readonly ConcurrentPool<FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>> _inputsListsPool;
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
 
         public bool DidReceiveAnyInputFromClient(long clientId)
@@ -57,9 +57,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _clientsNetworkDataService = clientsNetworkDataService;
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerClient = new CapacityDict<long, MatchMakingPlayersInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
-            _inputsPerClient = new CapacityDict<long, FixedUnorderedList<MatchMakingPlayersInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
+            _inputsPerClient = new CapacityDict<long, FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
             var inputPacketsSavedPerPlayer = networkConfig.MaxCap.PlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
-            _inputsListsPool = new ConcurrentPool<FixedUnorderedList<MatchMakingPlayersInputPacketC2S>>(() => new FixedUnorderedList<MatchMakingPlayersInputPacketC2S>(inputPacketsSavedPerPlayer), networkConfig.MaxCap.ConcurrentPlayers);
+            _inputsListsPool = new ConcurrentPool<FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>>(() => new FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>(inputPacketsSavedPerPlayer, () => new MatchMakingPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers)), networkConfig.MaxCap.ConcurrentPlayers);
             _playerInputPacketsPool = new ConcurrentPool<MatchMakingPlayersInputPacketC2S>(() => new MatchMakingPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers), networkConfig.MaxCap.ConcurrentInputsProcessed);
             _heighestProcessedTickPerClient = new CapacityDict<long, int>(networkConfig.MaxCap.ConcurrentPlayers);
         }
@@ -101,7 +101,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             }
         }
 
-        private void RemoveAmountOfEarliestInputs(FixedUnorderedList<MatchMakingPlayersInputPacketC2S> inputsOfPlayer, int amountOfPacketsToRemove)
+        private void RemoveAmountOfEarliestInputs(FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S> inputsOfPlayer, int amountOfPacketsToRemove)
         {
             inputsOfPlayer.Sort();
             for (int i = amountOfPacketsToRemove - 1; i >= 0; i--)
@@ -162,7 +162,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             return _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient;
         }
 
-        private int GetIndexOfEarliestInput(FixedUnorderedList<MatchMakingPlayersInputPacketC2S> inputs)
+        private int GetIndexOfEarliestInput(FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S> inputs)
         {
             var span = inputs.AsSpan();
             int min = span[0].Tick;
@@ -277,8 +277,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             }
             
             var inputsList = _inputsPerClient[clientId];
-            ref var input = ref inputsList.AddAndGet();
-            input = playersInputPacket;
+            var input = inputsList.AddAndGet();
+            input.CopyFrom(playersInputPacket);
             
             LogService.LogTopic($"Input packet received from client id {clientId}, input: {playersInputPacket.ToJson()}, inputs per client: {_inputsPerClient.ToJson()}", LogTopicType.ServerNetwork);
         }

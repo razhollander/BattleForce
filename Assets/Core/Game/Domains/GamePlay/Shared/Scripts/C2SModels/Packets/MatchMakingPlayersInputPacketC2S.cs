@@ -4,7 +4,7 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 {
-    public struct MatchMakingPlayersInputPacketC2S : INetSerializable, IComparable<MatchMakingPlayersInputPacketC2S> // todo change to class
+    public class MatchMakingPlayersInputPacketC2S : INetSerializable, IComparable<MatchMakingPlayersInputPacketC2S>
     {
         // todo: add inputs from client unprocessed ticks
         public int Tick;
@@ -50,6 +50,19 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
         public int CompareTo(MatchMakingPlayersInputPacketC2S other)
         {
             return Tick.CompareTo(other.Tick);
+        }
+        
+        public void CopyFrom(MatchMakingPlayersInputPacketC2S other)
+        {
+            Tick = other.Tick;
+            HeighestProcessedTickFromServer = other.HeighestProcessedTickFromServer;
+            PlayerInputs.Clear();
+
+            foreach (var otherPlayerInput in other.PlayerInputs.AsSpan())
+            {
+                ref var playerInput = ref PlayerInputs.AddAndGet();
+                playerInput = otherPlayerInput;
+            }
         }
     }
 }

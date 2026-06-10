@@ -209,5 +209,13 @@ namespace Core.Scripts.Utils.CustomCollections
                 _count = value.Length;
             }
         }
+        
+        public void Sort()
+        {
+            if (_count <= 1)
+                return;
+
+            Array.Sort(_items, 0, _count);
+        }
     }
 }
