@@ -106,7 +106,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             inputsOfPlayer.Sort();
             for (int i = amountOfPacketsToRemove - 1; i >= 0; i--)
             {
-                _playerInputPacketsPool.Return(inputsOfPlayer[i]);
                 inputsOfPlayer.RemoveAt(i);
             }
         }
@@ -118,9 +117,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             foreach (var kvp in earliestInputsPerClient)
             {
                 var clientId = kvp.Key;
+                var currentPacket = kvp.Value;
                 var clientNetworkData = _clientsNetworkDataService.ClientsNetworkDataDictionary[clientId];
 
-                foreach (var playerInput in kvp.Value.PlayerInputs.AsSpan())
+                if (!_lastProcessedInputPerClient.TryGetValue(clientId, out var cachedPacket))
+                {
+                    cachedPacket = _playerInputPacketsPool.Get();
+                    _lastProcessedInputPerClient[clientId] = cachedPacket;
+                }
+                cachedPacket.CopyFrom(currentPacket);
+
+                foreach (var playerInput in currentPacket.PlayerInputs.AsSpan())
                 {
                     var playerId = playerInput.PlayerId;
 
@@ -140,13 +147,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                     UpdatePlayerDirection(playerInput, playerState);
                     UpdatePlayerShoot(processedTick, playerInput.IsShootInputPressed, playerState);
                 }
-
-                // Cache the processed input packet at the client level, returning any previous one to the pool
-                if (_lastProcessedInputPerClient.TryGetValue(clientId, out var lastClientInput))
-                {
-                    _playerInputPacketsPool.Return(lastClientInput);
-                }
-                _lastProcessedInputPerClient[clientId] = kvp.Value;
             }
 
             return earliestInputsPerClient;
@@ -267,8 +267,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             }
             
             OnClientInputsReceived(newPacket, clientId);
-        }
 
+            _playerInputPacketsPool.Return(newPacket);
+        }
         private void OnClientInputsReceived(MatchMakingPlayersInputPacketC2S playersInputPacket, long clientId)
         {
             if (!_inputsPerClient.ContainsKey(clientId))
