@@ -92,6 +92,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                     joinResponse.IsMatchMaking = true;
                     joinResponse.MatchMakingSimulationState = _matchDataService.SimulationState;
                     joinResponse.OccuredOnTick = processedTick;
+                    _clientsNetworkDataService.AddClient(clientId, true);
                     peer.Tag = clientId;
                     var playersConnected = new List<MatchMakingPlayerStateS2C>(kvp.Value.PlayerJoinedList.Count);
 
@@ -104,11 +105,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                         joinResponse.PlayerIdToDeviceIdDictionary.Add(playerId, playerJoined.InputDeviceId);
                         _simulationInputService.AddPlayer(playerId);
                         _physicsSimulator.AddPlayer(playerId, playerState.TeamId, position, startingDirection, radius, heartRadius);
+                        _clientsNetworkDataService.AssignPlayerToClient(clientId, playerId);
                         playersConnected.Add(playerState);
                     }
                     
                     _networkManager.AddClientPeer(clientId, peer);
-                    _clientsNetworkDataService.AddClient(clientId, true);
                     _netEventsDataService.StartSavingClientEvents(clientId);
                     _netEventsDataService.AddMatchMakingClientJoinAcceptedEvent(processedTick, playersConnected, _matchDataService.SimulationState, clientId);
                 }

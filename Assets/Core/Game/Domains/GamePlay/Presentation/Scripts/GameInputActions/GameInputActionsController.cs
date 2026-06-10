@@ -33,13 +33,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         
         public void AddPlayer(ushort playerId, InputDevice device)
         {
-            if (!_gameInputActionsByPlayer.ContainsKey(playerId))
+            if (_gameInputActionsByPlayer.ContainsKey(playerId))
+            {
+                LogService.LogError("Player with id " + playerId + " already exists in GameInputActionsController");
+            }
+            else
             {
                 var inputActions = new global::GameInputActions();
+
                 if (device != null)
                 {
-                    inputActions.devices = new UnityEngine.InputSystem.Utilities.ReadOnlyArray<InputDevice>(new[] { device });
+                    inputActions.devices = new UnityEngine.InputSystem.Utilities.ReadOnlyArray<InputDevice>(new[] {device});
                 }
+
                 inputActions.Enable();
                 inputActions.GamePlay.MoveRight.performed += OnShootInput;
                 _gameInputActionsByPlayer[playerId] = inputActions;
@@ -93,34 +99,37 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 
         public bool IsMoveLeftInputPressed(ushort playerId = 0)
         {
-            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            if (!TryGetPlayerInputActions(playerId, out var actions))
             {
-                return actions.GamePlay.MoveLeft.IsPressed();
+                return false; 
             }
-            return false;
+            
+            return actions.GamePlay.MoveLeft.IsPressed();
         }
 
         public bool IsMoveRightInputPressed(ushort playerId)
         {
-            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            if (!TryGetPlayerInputActions(playerId, out var actions))
             {
-                return actions.GamePlay.MoveRight.IsPressed();
+                return false; 
             }
-            return false;
+                
+            return actions.GamePlay.MoveRight.IsPressed();
         }
 
         public bool IsMoveForwardInputPressed(ushort playerId)
         {
-            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            if (!TryGetPlayerInputActions(playerId, out var actions))
             {
-                return actions.GamePlay.MoveForward.IsPressed();
+                return false; 
             }
-            return false;
+            
+            return actions.GamePlay.MoveForward.IsPressed();
         }
 
         public Vector2 GetAimDirection(ushort playerId)
         {
-            if (!_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            if (!TryGetPlayerInputActions(playerId, out var actions))
             {
                 return Vector2.zero;
             }
@@ -138,45 +147,62 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 
         public Vector2 GetMoveDirection(ushort playerId)
         {
-            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            if (!TryGetPlayerInputActions(playerId, out var actions))
             {
-                return actions.GamePlay.MoveDirection.ReadValue<Vector2>();
+                return Vector2.zero;
             }
-            return Vector2.zero;
+            
+            return actions.GamePlay.MoveDirection.ReadValue<Vector2>();
         }
 
+        private bool TryGetPlayerInputActions(ushort playerId, out global::GameInputActions inputActions)
+        {
+            if (!_gameInputActionsByPlayer.TryGetValue(playerId, out inputActions))
+            {
+                LogService.LogError($"Player with id {playerId} is not registered in GameInputActionsController");
+
+                return false;
+            }
+
+            return true;
+        }
+        
         public bool IsShootInputPressed(ushort playerId)
         {
-            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            if (!TryGetPlayerInputActions(playerId, out var actions))
             {
-                return actions.GamePlay.Shoot.IsPressed();
+                return false;
             }
-            return false;
+            
+            return actions.GamePlay.Shoot.IsPressed();
         }
 
         public bool IsTalentAInputPressed(ushort playerId)
         {
-            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            if (!TryGetPlayerInputActions(playerId, out var actions))
             {
-                return actions.GamePlay.TalentA.IsPressed();
+                return false;
             }
-            return false;
+            
+            return actions.GamePlay.TalentA.IsPressed();
         }
         public bool IsTalentBInputPressed(ushort playerId)
         {
-            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            if (!TryGetPlayerInputActions(playerId, out var actions))
             {
-                return actions.GamePlay.TalentB.IsPressed();
+                return false;
             }
-            return false;
+            
+            return actions.GamePlay.TalentB.IsPressed();
         }
         public bool IsTalentCInputPressed(ushort playerId)
         {
-            if (_gameInputActionsByPlayer.TryGetValue(playerId, out var actions))
+            if (!TryGetPlayerInputActions(playerId, out var actions))
             {
-                return actions.GamePlay.TalentC.IsPressed();
+                return false;
             }
-            return false;
+            
+            return actions.GamePlay.TalentC.IsPressed();
         }
 
         public async Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui = false)

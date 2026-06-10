@@ -3,6 +3,7 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
@@ -29,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
         private ISceneLoaderService _sceneLoaderService;
         private ITickCounterService _tickCounterService;
         private NetworkConfig _networkConfig;
+        
         private List<PlayerJoinedModel> _playersJoinedModels;
 
         public StartClientCommand SetIsHost(bool isHost)
@@ -67,6 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
+            LogService.LogError("Connecting to server1: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId);
             _networkManager.ConenctToServerPeer(_ipAddress, _port, _clientId);
             
             while (!_networkManager.IsPeerConnected)
@@ -74,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
                 _networkManager.PollEvents();
                 await Awaitable.FixedUpdateAsync(cancellationTokenSource.Token);
             }
+            LogService.LogError("Send join request to server2: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId);
 
             var joinRequest = new JoinRequestPacketC2S(_networkConfig.MaxCap.ConcurrentPlayers);
             joinRequest.ClientId = _clientId;
@@ -89,14 +93,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
                 _networkManager.PollEvents();
                 await Awaitable.FixedUpdateAsync(cancellationTokenSource.Token);
             }
+            LogService.LogError("Got join response to server3: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId);
 
             var joinResponse = _joinResponsePacketHandler.JoinResponse;
             if (!joinResponse.IsSuccess)
             {
+                LogService.LogError("Got join response false server2: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId);
+
                 _joinResponsePacketHandler.Reset();
                 LogService.LogError("Can't join server!");
                 return;
             }
+            LogService.LogError("Sync tick to server server4: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId);
 
             SyncTickToServer(joinResponse.OccuredOnTick);
             

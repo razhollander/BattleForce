@@ -6,12 +6,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.ClientsNetworkD
     {
         public long ClientId;
         public bool IsConnected;
-        public readonly FixedUnorderedList<int> PlayerIds;
+        public readonly FixedUnorderedList<ushort> PlayerIds;
 
         public ClientNetworkData(int maxConcurrentPlayers)
         {
             IsConnected = true;
-            PlayerIds = new FixedUnorderedList<int>(maxConcurrentPlayers);
+            PlayerIds = new FixedUnorderedList<ushort>(maxConcurrentPlayers);
         }
     }
 }

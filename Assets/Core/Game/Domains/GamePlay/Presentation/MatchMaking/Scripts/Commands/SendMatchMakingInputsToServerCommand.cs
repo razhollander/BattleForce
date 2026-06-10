@@ -47,7 +47,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         public void Execute()
         {
             _cachedLocalPlayersInputs.Clear();
-
             foreach (var playerId in _localPlayersDataService.LocalPlayersIds)
             {
                 var playerPosition = _matchMakingPlayerControllers.GetPlayerPosition(playerId);
