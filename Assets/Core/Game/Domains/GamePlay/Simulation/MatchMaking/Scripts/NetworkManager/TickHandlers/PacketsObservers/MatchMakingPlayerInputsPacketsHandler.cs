@@ -38,11 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly ConcurrentPool<MatchMakingPlayersInputPacketC2S> _playerInputPacketsPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>> _inputsListsPool;
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
-
-        public bool DidReceiveAnyInputFromClient(long clientId)
-        {
-            return _inputsPerClient.ContainsKey(clientId);
-        }
+        private readonly ConcurrentPool<MatchMakingPlayersInputPacketC2S> _earliestInputPacketsPool;
 
         public MatchMakingPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
             ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, INetEventsDataService netEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, IClientsNetworkDataService clientsNetworkDataService)
@@ -60,7 +56,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _inputsPerClient = new CapacityDict<long, FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
             var inputPacketsSavedPerPlayer = networkConfig.MaxCap.PlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
             _inputsListsPool = new ConcurrentPool<FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>>(() => new FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>(inputPacketsSavedPerPlayer, () => new MatchMakingPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers)), networkConfig.MaxCap.ConcurrentPlayers);
-            _playerInputPacketsPool = new ConcurrentPool<MatchMakingPlayersInputPacketC2S>(() => new MatchMakingPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers), networkConfig.MaxCap.ConcurrentInputsProcessed);
+            var maxAmountOfInputPacketsPlusMaxClientsAmount = networkConfig.MaxCap.ConcurrentInputsProcessed + networkConfig.MaxCap.ConcurrentPlayers; // we use the pool in to two places, so for good order, combined their max caps
+            _playerInputPacketsPool = new ConcurrentPool<MatchMakingPlayersInputPacketC2S>(() => new MatchMakingPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers), maxAmountOfInputPacketsPlusMaxClientsAmount);
+            _earliestInputPacketsPool = new ConcurrentPool<MatchMakingPlayersInputPacketC2S>(() => new MatchMakingPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers), networkConfig.MaxCap.ConcurrentPlayers);
             _heighestProcessedTickPerClient = new CapacityDict<long, int>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
@@ -78,7 +76,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         
         public ProcessPlayersInputsResult ProcessInputs(int processedTick)
         {
-            _cachedProcessPlayersInputsResult.Clear();
             LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient = GetHeighestProcessedTickFromServerPerClient();
             _cachedProcessPlayersInputsResult.EarliestInputsPerClient = ProcessEarliestInputsPacketPerClient(processedTick);
@@ -104,10 +101,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private void RemoveAmountOfEarliestInputs(FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S> inputsOfPlayer, int amountOfPacketsToRemove)
         {
             inputsOfPlayer.Sort();
-            for (int i = amountOfPacketsToRemove - 1; i >= 0; i--)
-            {
-                inputsOfPlayer.RemoveAt(i);
-            }
+            inputsOfPlayer.RemoveRange(0, amountOfPacketsToRemove);
         }
 
         private CapacityDict<long, MatchMakingPlayersInputPacketC2S> ProcessEarliestInputsPacketPerClient(int processedTick)
@@ -117,16 +111,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             foreach (var kvp in earliestInputsPerClient)
             {
                 var clientId = kvp.Key;
-                var currentPacket = kvp.Value;
+                var currentPacket = kvp.Value; 
                 var clientNetworkData = _clientsNetworkDataService.ClientsNetworkDataDictionary[clientId];
-
-                if (!_lastProcessedInputPerClient.TryGetValue(clientId, out var cachedPacket))
+                if (!_lastProcessedInputPerClient.TryGetValue(clientId, out var lastProcessedClientInsputs))
                 {
-                    cachedPacket = _playerInputPacketsPool.Get();
-                    _lastProcessedInputPerClient[clientId] = cachedPacket;
+                    _lastProcessedInputPerClient[clientId] = lastProcessedClientInsputs = _playerInputPacketsPool.Get();
                 }
-                cachedPacket.CopyFrom(currentPacket);
-
+                
+                lastProcessedClientInsputs.CopyFrom(currentPacket);
+                
                 foreach (var playerInput in currentPacket.PlayerInputs.AsSpan())
                 {
                     var playerId = playerInput.PlayerId;
@@ -150,10 +143,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             }
 
             return earliestInputsPerClient;
-        }
-        
+        }        
         private CapacityDict<long, int> GetHeighestProcessedTickFromServerPerClient()
         {
+            _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient.Clear();
+            
             foreach (var kvp in _heighestProcessedTickPerClient)
             {
                 _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient.TryAdd(kvp.Key, kvp.Value);
@@ -224,31 +218,41 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         
         private CapacityDict<long, MatchMakingPlayersInputPacketC2S> PopEarliestInputsOfEachClient()
         {
-            foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
+            foreach (var kvp in _cachedProcessPlayersInputsResult.EarliestInputsPerClient)
             {
-                var clientId = kvp.Key;
-                MatchMakingPlayersInputPacketC2S earliestPlayersInput;
+                _earliestInputPacketsPool.Return(kvp.Value);
+            }
+            
+            _cachedProcessPlayersInputsResult.EarliestInputsPerClient.Clear();
+            
+            foreach (var clientId in _clientsNetworkDataService.ClientsNetworkDataDictionary.Keys)
+            {
+                MatchMakingPlayersInputPacketC2S earliestClientInput;
+
                 if (_inputsPerClient.TryGetValue(clientId, out var playersInputs) && playersInputs.Count > 0)
                 {
+                    earliestClientInput = _earliestInputPacketsPool.Get();
                     var indexOfEarliestInput = GetIndexOfEarliestInput(playersInputs);
-                    earliestPlayersInput = playersInputs[indexOfEarliestInput];
+                    earliestClientInput.CopyFrom(playersInputs[indexOfEarliestInput]);
                     playersInputs.RemoveAt(indexOfEarliestInput);
                 }
                 else
                 {
-                    if (!TryGetCachedInputForClient(clientId, out earliestPlayersInput))
+                    if (!TryGetLastProcessedInputForClient(clientId, out var lastProcessedClientInput))
                     {
                         continue;
                     }
+                    
+                    earliestClientInput = _earliestInputPacketsPool.Get();
+                    earliestClientInput.CopyFrom(lastProcessedClientInput);
                 }
                 
-                _cachedProcessPlayersInputsResult.EarliestInputsPerClient.Add(clientId, earliestPlayersInput);
+                _cachedProcessPlayersInputsResult.EarliestInputsPerClient.Add(clientId, earliestClientInput);
             }
 
             return _cachedProcessPlayersInputsResult.EarliestInputsPerClient;
         }
-
-        private bool TryGetCachedInputForClient(long clientId, out MatchMakingPlayersInputPacketC2S playersInputPacket)
+        private bool TryGetLastProcessedInputForClient(long clientId, out MatchMakingPlayersInputPacketC2S playersInputPacket)
         {
             return _lastProcessedInputPerClient.TryGetValue(clientId, out playersInputPacket);
         }
@@ -312,12 +316,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         {
             HeighestProcessedTickPerClient = new CapacityDict<long, int>(maxConcurrentPlayers);
             EarliestInputsPerClient = new CapacityDict<long, MatchMakingPlayersInputPacketC2S>(maxConcurrentPlayers);
-        }
-
-        public void Clear()
-        {
-            HeighestProcessedTickPerClient.Clear();
-            EarliestInputsPerClient.Clear();
         }
     }
 }

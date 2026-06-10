@@ -138,6 +138,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         
         private void OnGamepadAdded(Gamepad gamepad)
         {
+            var isDeviceAlreadyJoinedDueToReconnect = _playerJoinedModels.Exists(p => p.InputDeviceId == gamepad.deviceId);
+            if (isDeviceAlreadyJoinedDueToReconnect)) 
+            {
+                return; 
+            }
+            
             var playerJoinedModel = GetSavedPlayerJoinedModelByDeviceOrDefault(gamepad.deviceId,SupportedInputType.Gamepad);
             _playerJoinedModels.Add(playerJoinedModel);
             _uiView.AddPlayerJoinedPanel(playerJoinedModel.PlayerName, playerJoinedModel.PlayerInputType);
