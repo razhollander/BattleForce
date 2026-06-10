@@ -77,13 +77,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
             {
                 var clientId = kvp.Value.ClientId;
                 var peer = kvp.Key;
-                var isClientConnected = _clientsNetworkDataService.IsClientConnected(clientId);
                 var isMaxPlayers = _matchDataService.SimulationState.Players.Count == _networkConfig.MaxCap.ConcurrentPlayers;
                 var joinResponse = _joinedResponsePacketsPool.Get();
                 joinResponse.Clear();
-                if (isClientConnected || isMaxPlayers)
+                if (isMaxPlayers)
                 {
-                    LogService.LogError($"Cant join player because: isMaxPlayers: {isMaxPlayers}, isClientConnected: {isClientConnected}");
+                    LogService.LogError($"Cant join player because: isMaxPlayers: {isMaxPlayers}");
                     joinResponse.IsSuccess = false;
                 }
                 else
@@ -109,12 +108,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers
                     
                     _networkManager.AddClientPeer(clientId, peer);
                     _clientsNetworkDataService.AddClient(clientId, true);
+                    foreach (var p in playersConnected)
+                    {
+                        _clientsNetworkDataService.AssignPlayerToClient(clientId, p.Id);
+                    }
                     _netEventsDataService.StartSavingClientEvents(clientId);
                     _netEventsDataService.AddMatchMakingClientJoinAcceptedEvent(processedTick, playersConnected, _matchDataService.SimulationState, clientId);
                 }
                 
                 _networkManager.SendPacketToPeerSerialized(peer, PacketTypeS2C.JoinResponse, joinResponse, DeliveryMethod.ReliableOrdered);
                 LogService.LogTopic("Processed player joined: "+clientId, LogTopicType.ServerNetwork);
+                _joinedResponsePacketsPool.Return(joinResponse);
             }
 
             foreach (var kvp in _playerJoinedPacketsPerPeer)
