@@ -1,0 +1,15 @@
+{
+    "asset": "d8fa69457b0e4478ca018f3332ec3063",
+    "fileName": "019eafd7-a646-7ce3-a9f4-e53480027684.wav",
+    "prompt": "Soft funny cartoon bonk hit, light comedic thwack, gentle low volume, game sound effect",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

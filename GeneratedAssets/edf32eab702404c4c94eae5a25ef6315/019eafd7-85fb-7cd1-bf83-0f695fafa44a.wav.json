@@ -1,0 +1,15 @@
+{
+    "asset": "edf32eab702404c4c94eae5a25ef6315",
+    "fileName": "019eafd7-85fb-7cd1-bf83-0f695fafa44a.wav",
+    "prompt": "Soft funny cartoon jump boing, light springy hop, gentle low volume, comedic game sound effect",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

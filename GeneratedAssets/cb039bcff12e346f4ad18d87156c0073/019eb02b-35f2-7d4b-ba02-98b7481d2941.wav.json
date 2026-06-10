@@ -1,0 +1,15 @@
+{
+    "asset": "cb039bcff12e346f4ad18d87156c0073",
+    "fileName": "019eb02b-35f2-7d4b-ba02-98b7481d2941.wav",
+    "prompt": "Whimsical cartoon teleport warp zap, magical shimmering portal whoosh, playful, soft gentle volume",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 2.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

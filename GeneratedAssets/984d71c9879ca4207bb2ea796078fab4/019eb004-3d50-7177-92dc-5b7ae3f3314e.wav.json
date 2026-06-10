@@ -1,0 +1,15 @@
+{
+    "asset": "984d71c9879ca4207bb2ea796078fab4",
+    "fileName": "019eb004-3d50-7177-92dc-5b7ae3f3314e.wav",
+    "prompt": "Cheerful upbeat comedic cartoon background music loop, light and bouncy, playful xylophone and pizzicato strings, whimsical funny game tune, soft gentle volume, not loud",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 10.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}
