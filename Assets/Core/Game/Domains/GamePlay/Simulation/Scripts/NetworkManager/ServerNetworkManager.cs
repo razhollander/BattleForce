@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public int ConnectedPeersCount => _netManager.ConnectedPeersCount;
         public event Action OnPacketReceivedEvent;
-        public event Action<ushort> OnPeerDisconnectedEvent;
+        public event Action<long> OnClientPeerDisconnectedEvent;
 
         public ServerNetworkManager(NetworkConfig networkConfig)
         {
@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private void AddListeners()
         {
             _packetsListener.OnPacketReceivedEvent += OnPacketReceived;
-            _packetsListener.OnPeerDisconnectedEvent += OnPeerDisconnected;
+            _packetsListener.OnClientPeerDisconnectedEvent += OnClientPeerDisconnected;
         }
         
         private void OnPacketReceived()
@@ -48,9 +48,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             OnPacketReceivedEvent?.Invoke();
         }
 
-        private void OnPeerDisconnected(ushort playerId)
+        private void OnClientPeerDisconnected(long clientId)
         {
-            OnPeerDisconnectedEvent?.Invoke(playerId);
+            OnClientPeerDisconnectedEvent?.Invoke(clientId);
         }
 
         
@@ -79,7 +79,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private void RemoveListeners()
         {
             _packetsListener.OnPacketReceivedEvent -= OnPacketReceived;
-            _packetsListener.OnPeerDisconnectedEvent -= OnPeerDisconnected;
+            _packetsListener.OnClientPeerDisconnectedEvent -= OnClientPeerDisconnected;
         }
 
         // public void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
