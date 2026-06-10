@@ -6,6 +6,7 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using Core.Scripts.Network;
@@ -37,12 +38,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly IDataPersistence _dataPersistence;
         private readonly IInputDeviceChangedListenerService _inputDeviceChangedListenerService;
+        private readonly PresentationGamePlayConfig _gamePlayConfig;
 
         private List<PlayerJoinedModel> _playerJoinedModels = new List<PlayerJoinedModel>();
         
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
             IStateMachineService stateMachineService, NetworkConfig networkConfig, IPlaybackIOService playbackIOService,
-            ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig, IDataPersistence dataPersistence, IInputDeviceChangedListenerService inputDeviceChangedListenerService)
+            ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig, IDataPersistence dataPersistence, IInputDeviceChangedListenerService inputDeviceChangedListenerService, PresentationGamePlayConfig gamePlayConfig)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
@@ -53,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _dataPersistence = dataPersistence;
             _inputDeviceChangedListenerService = inputDeviceChangedListenerService;
+            _gamePlayConfig = gamePlayConfig;
         }
 
         public void InitEntryPoint()
@@ -228,7 +231,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             LogService.LogTopic("Starting Client", LogTopicType.ClientNetwork);
             var port = _uiView.Port;
             var playersJoinedModels = GetPlayersJoined();
-            var clientId = DeviceUtils.GetDeviceUniqueId();
+            var clientId = _gamePlayConfig.ShouldOverrideClientId ? _gamePlayConfig.ClientIdOverride : DeviceUtils.GetDeviceUniqueId();
+            
             _commandFactory.CreateCommandAsync<StartClientCommand>()
                 .SetIsHost(isHost)
                 .SetServerAddress(ip,port)
