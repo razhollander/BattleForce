@@ -139,7 +139,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private void OnGamepadAdded(Gamepad gamepad)
         {
             var isDeviceAlreadyJoinedDueToReconnect = _playerJoinedModels.Exists(p => p.InputDeviceId == gamepad.deviceId);
-            if (isDeviceAlreadyJoinedDueToReconnect)) 
+            if (isDeviceAlreadyJoinedDueToReconnect)
             {
                 return; 
             }
