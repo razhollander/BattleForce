@@ -30,8 +30,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
         public List<MatchChickenEggModel> ChickenEggs { get; private set; }
 
-        public MatchPlayerModel LocalPlayer { get; private set; }
-        public bool IsPlayerJoined => LocalPlayer != null;
         public HashSet<ushort> TeamIds  {get; private set; }
         public int StartPhaseInitialTick { get; set; }
         public bool IsInPreparationPhase { get; set; }
@@ -184,6 +182,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newBarrier;
         }
 
+        public void SetLocalPlayer(int playerId)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle)
         {
             var newSpring = new MatchEnvironmentSpringModel(id, localPosition, worldPosition, localRotationAngle, worldRotationAngle);
@@ -203,11 +206,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, initialPosition, velocity, radius, spawnTick);
             Bullets.Add(newBullet);
             return newBullet;
-        }
-
-        public void SetLocalPlayer(int playerId)
-        {
-            LocalPlayer = Players.Find(x => x.PlayerId == playerId);
         }
 
         public void ClearAll()

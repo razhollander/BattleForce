@@ -21,8 +21,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkC2SPacketsSender _packetsSender;
         private GUIStyle _guiStyle;
+        private long _clientId;
 
-        private string _playerName;
         public bool IsPeerConnected { get; private set; }
         public int Ping => _packetsSender.Peer.Ping;
         public int LocalPeerId => _packetsSender.Peer.Id;
@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
             };
         }
 
-        public void ConenctToServerPeer(string ipAddress, int port, string playerName)
+        public void ConenctToServerPeer(string ipAddress, int port, long clientId)
         {
             if (_netManager.IsRunning)
             {
@@ -49,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 return;
             }
             
-            _playerName = playerName;
+            _clientId = clientId;
             _updateSubscriptionService.RegisterGuiUpdatable(this);
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Start();

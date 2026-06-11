@@ -26,6 +26,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
@@ -62,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IMagneticPullEffectController _magneticPullEffectController;
         private IBackgroundParallaxController _backgroundParallaxController;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
+        private ILocalPlayersDataService _localPlayersDataService;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -98,6 +100,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _magneticPullEffectController = _diContainer.Resolve<IMagneticPullEffectController>();
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
+            _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
         }
 
         public void Execute()
@@ -126,7 +129,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
                  .SetSimulationState(_enterData.InitialState)
                  .SetOccuredOnTick(_enterData.StateOccouredOnTick)
                  .Execute();
-             _matchDataService.SetLocalPlayer(_enterData.LocalPlayerId);
+            _localPlayersDataService.SetLocalPlayers(_enterData.PlayerIdToDeviceIdDictionary);
             _gainBoltEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();

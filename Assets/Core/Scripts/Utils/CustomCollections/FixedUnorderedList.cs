@@ -232,7 +232,7 @@ namespace Core.Scripts.Utils.CustomCollections
             }
         }
 
-        public bool Contains(ushort number)
+        public bool Contains(T number)
         {
             for (int i = 0; i < Count; i++)
             {

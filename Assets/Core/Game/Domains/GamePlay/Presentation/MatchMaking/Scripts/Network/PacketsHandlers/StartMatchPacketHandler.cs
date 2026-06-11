@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Network;
@@ -23,19 +24,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly ISceneLoaderService _sceneLoaderService;
         private readonly IStateMachineService _stateMachineService;
         private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
+        private readonly ILocalPlayersDataService _localPlayersDataService;
         private readonly StartMatchPacketS2C _startMatchPacket;
         private bool _didReceiveStartMatchPacket;
         private bool _didSwitchToMatch;
 
         public PacketTypeS2C PacketType => PacketTypeS2C.StartMatch;
 
-        public StartMatchPacketHandler(IClientNetworkManager networkManager, IMatchMakingDataService matchMakingDataService, ISceneLoaderService sceneLoaderService, IStateMachineService stateMachineService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ILastFullSyncTickDataService lastFullSyncTickDataService)
+        public StartMatchPacketHandler(IClientNetworkManager networkManager, IMatchMakingDataService matchMakingDataService, ISceneLoaderService sceneLoaderService, IStateMachineService stateMachineService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ILastFullSyncTickDataService lastFullSyncTickDataService, ILocalPlayersDataService localPlayersDataService)
         {
             _networkManager = networkManager;
             _matchMakingDataService = matchMakingDataService;
             _sceneLoaderService = sceneLoaderService;
             _stateMachineService = stateMachineService;
             _lastFullSyncTickDataService = lastFullSyncTickDataService;
+            _localPlayersDataService = localPlayersDataService;
             _startMatchPacket = new StartMatchPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount);
         }
 
@@ -57,7 +60,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             }
 
             var state = _startMatchPacket.InitialState;
-            var enterData = new GamePlayMatchInitiatorEnterData(state, _matchMakingDataService.LocalPlayer.PlayerId, _startMatchPacket.OccuredOnTick);
+            var enterData = new GamePlayMatchInitiatorEnterData(state, _startMatchPacket.OccuredOnTick, _localPlayersDataService.GetPlayerIdToDeviceIdDictionary());
             SwitchToMatch(enterData).Forget();
         }
 

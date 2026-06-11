@@ -34,15 +34,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         {
             foreach (var playerJoinAcceptNetEvent in playerJoinAcceptNetEvents)
             {
-                var playerId = playerJoinAcceptNetEvent.PlayerState.Id;
-                var isLocalPlayer = playerJoinAcceptNetEvent.IsLocal;
-                LogService.LogTopic(
-                    $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerId,
-                    LogTopicType.ClientNetwork);
-                
-                if (!isLocalPlayer)
+                foreach (var playerState in playerJoinAcceptNetEvent.Players.AsSpan())
                 {
-                    _addMatchMakingPlayerCommand.SetPlayerState(playerJoinAcceptNetEvent.PlayerState).Execute();
+                    var isLocalPlayer = playerJoinAcceptNetEvent.IsLocal;
+                    LogService.LogTopic(
+                        $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " +  playerState.Id,
+                        LogTopicType.ClientNetwork);
+                
+                    if (!isLocalPlayer)
+                    {
+                        _addMatchMakingPlayerCommand.SetPlayerState(playerState).Execute();
+                    }
                 }
             }
         }

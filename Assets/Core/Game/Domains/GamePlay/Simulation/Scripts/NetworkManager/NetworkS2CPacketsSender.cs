@@ -10,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
     public class NetworkS2CPacketsSender
     {
         private readonly NetDataWriter _writer;
-        private Dictionary<ushort, NetPeer> _peerPerPlayerId = new();
+        private Dictionary<long, NetPeer> _peerPerClientId = new();
         private readonly NetPacketProcessor _packetProcessor;
         
         public NetworkS2CPacketsSender(NetPacketProcessor packetProcessor)
@@ -19,11 +19,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _packetProcessor = packetProcessor;
         }
 
-        public void AddPlayerPeer(ushort playerId, NetPeer peer)
+        public void AddClientPeer(long clientId, NetPeer peer)
         {
-            if (!_peerPerPlayerId.TryAdd(playerId, peer))
+            if (!_peerPerClientId.TryAdd(clientId, peer))
             {
-                LogService.LogError($"Peer with player id {playerId} is already added!");
+                LogService.LogError($"Peer with player id {clientId} is already added!");
             }
         }
         
@@ -71,9 +71,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         //     _peerPerPlayerId.ForEach(x => _packetProcessor.SendNetSerializable(x.Value, packet, deliveryMethod));
         // }
         
-        public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C packetType, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
+        public void SendPacketToClientSerialized<T>(long clientId, PacketTypeS2C packetType, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
         {
-            if (_peerPerPlayerId == null || !_peerPerPlayerId.TryGetValue(playerId, out var peer))
+            if (_peerPerClientId == null || !_peerPerClientId.TryGetValue(clientId, out var peer))
             {
                 LogService.LogError("NetPeer is null! Must have a peer to send packets to!");
                 return;
@@ -83,7 +83,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _writer.Put((byte)packetType);
             packet.Serialize(_writer);
             peer.Send(_writer, deliveryMethod);
-            LogService.LogTopic($"Send packet type {packetType} to player {playerId}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
+            LogService.LogTopic($"Send packet type {packetType} to player {clientId}, json: {packet.ToJson()}", LogTopicType.ServerNetwork);
         }
 
         public void SendPacketToPeerSerialized<T>(NetPeer peer, PacketTypeS2C packetType, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
@@ -119,19 +119,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         //     _peerPerPlayerId.ForEach(x => x.Value.Send(_writer, deliveryMethod));
 
         // }
-        public void RemovePlayerPeer(ushort playerId)
+        public void RemoveClientPeer(long clientId)
         {
-            _peerPerPlayerId.Remove(playerId);
+            _peerPerClientId.Remove(clientId);
         }
         
-        public bool IsPlayerConnected(ushort playerId)
+        public bool IsClientConnected(long clientId)
         {
-            return _peerPerPlayerId.ContainsKey(playerId);
+            return _peerPerClientId.ContainsKey(clientId);
         }
         
-        public int GetPlayerPeerId(ushort playerId)
+        public bool TryGetClientPeerId(long clientId, out int peerId)
         {
-            return _peerPerPlayerId[playerId].Id;
+            if (_peerPerClientId.TryGetValue(clientId, out var peer))
+            {
+                peerId = peer.Id;
+                return true;
+            }
+
+            peerId = default;
+            return false;
         }
     }
 }
