@@ -1,12 +1,7 @@
-using System.Numerics;
-using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 {
-    /// <summary>
-    /// Holds the specific input data for a single local player.
-    /// </summary>
     public struct MatchMakingLocalPlayerInputDataC2S : INetSerializable
     {
         public ushort PlayerId;

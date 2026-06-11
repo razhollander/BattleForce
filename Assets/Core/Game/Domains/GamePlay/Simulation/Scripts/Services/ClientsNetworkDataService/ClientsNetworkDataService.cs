@@ -8,7 +8,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.ClientsNetworkD
     public class ClientsNetworkDataService : IClientsNetworkDataService
     {
         public Dictionary<long, ClientNetworkData> ClientsNetworkDataDictionary { get;private set; }
-        private ConcurrentPool<ClientNetworkData> _clientNetworkDataPool;
+        private readonly ConcurrentPool<ClientNetworkData> _clientNetworkDataPool;
         public ClientsNetworkDataService(NetworkConfig networkConfig)
         {
             _clientNetworkDataPool= new ConcurrentPool<ClientNetworkData>(() => new ClientNetworkData(networkConfig.MaxCap.ConcurrentPlayers), networkConfig.MaxCap.ConcurrentPlayers);

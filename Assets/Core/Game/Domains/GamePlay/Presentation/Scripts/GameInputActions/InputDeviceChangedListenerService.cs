@@ -17,14 +17,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 
         private void OnDeviceChange(InputDevice device, InputDeviceChange change)
         {
-            LogService.LogError("Device change: " + change + " | Device: " + device.name + " | ID: " + device.deviceId + "");
             if (device is not Gamepad gamepad)
             {
                 return;
             }
-
-            LogService.LogError("Device got gamepad!");
-
+            
             switch (change)
             {
                 case InputDeviceChange.Added:
@@ -49,7 +46,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
                 if (device is Gamepad gamepad)
                 {
                     connectedGamepads.Add(gamepad);
-                    LogService.LogError("Gamepad found: " + device.name + " | ID: " + device.deviceId + "");
                 }
             }
 
@@ -65,7 +61,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
                 if (device is Keyboard keyboard)
                 {
                     connectedKeyboards.Add(keyboard);
-                    LogService.LogError("Keyboard found: " + device.name + " | ID: " + device.deviceId + "");
                 }
             }
 

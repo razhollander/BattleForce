@@ -10,15 +10,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         void DisableInputs();
         void RegisterAllInputListeners();
         void UnregisterAllInputListeners();
-        bool IsMoveLeftInputPressed(ushort playerId);
-        bool IsMoveRightInputPressed(ushort playerId);
-        bool IsShootInputPressed(ushort playerId);
-        bool IsMoveForwardInputPressed(ushort playerId);
-        Vector2 GetAimDirection(ushort playerId);
-        Vector2 GetMoveDirection(ushort playerId);
+        bool IsPlayerMoveLeftInputPressed(ushort playerId);
+        bool IsPlayerMoveRightInputPressed(ushort playerId);
+        bool IsPlayerShootInputPressed(ushort playerId);
+        bool IsPlayerMoveForwardInputPressed(ushort playerId);
+        Vector2 GetPlayerAimDirection(ushort playerId);
+        Vector2 GetPlayerMoveDirection(ushort playerId);
         Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui);
-        bool IsTalentAInputPressed(ushort playerId);
-        bool IsTalentBInputPressed(ushort playerId);
-        bool IsTalentCInputPressed(ushort playerId);
+        bool IsPlayerTalentAInputPressed(ushort playerId);
+        bool IsPlayerTalentBInputPressed(ushort playerId);
+        bool IsPlayerTalentCInputPressed(ushort playerId);
     }
 }

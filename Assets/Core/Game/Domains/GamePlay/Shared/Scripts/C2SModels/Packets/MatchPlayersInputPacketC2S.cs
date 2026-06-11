@@ -4,9 +4,6 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
 {
-    /// <summary>
-    /// The main packet sent to the server, containing inputs for all local players.
-    /// </summary>
     public class MatchPlayersInputPacketC2S : INetSerializable, IComparable<MatchPlayersInputPacketC2S>
     {
         // todo: add inputs from client unprocessed ticks

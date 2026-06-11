@@ -69,7 +69,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
-            LogService.LogError("Connecting to server1: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId);
             _networkManager.ConenctToServerPeer(_ipAddress, _port, _clientId);
             
             while (!_networkManager.IsPeerConnected)
@@ -77,7 +76,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
                 _networkManager.PollEvents();
                 await Awaitable.FixedUpdateAsync(cancellationTokenSource.Token);
             }
-            LogService.LogError("Send join request to server2: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId);
 
             var joinRequest = new JoinRequestPacketC2S(_networkConfig.MaxCap.ConcurrentPlayers);
             joinRequest.ClientId = _clientId;
@@ -93,18 +91,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
                 _networkManager.PollEvents();
                 await Awaitable.FixedUpdateAsync(cancellationTokenSource.Token);
             }
-            LogService.LogError("Got join response to server3: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId);
 
             var joinResponse = _joinResponsePacketHandler.JoinResponse;
             if (!joinResponse.IsSuccess)
             {
-                LogService.LogError("Got join response false server2: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId);
-
                 _joinResponsePacketHandler.Reset();
                 LogService.LogError("Can't join server!");
                 return;
             }
-            LogService.LogError("Sync tick to server server4: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId);
+            LogService.LogTopic("Sync tick to server server4: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId, LogTopicType.ClientNetwork);
 
             SyncTickToServer(joinResponse.OccuredOnTick);
             

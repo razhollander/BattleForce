@@ -18,7 +18,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         private const float MIN_AIM_THRESHOLD = 0.1f;
 
         private readonly Dictionary<ushort, global::GameInputActions> _gameInputActionsByPlayer = new Dictionary<ushort, global::GameInputActions>();
-        private global::GameInputActions _defaultGameInputActions;
         private readonly ICommandFactory _commandFactory;
         private Dictionary<ushort, Vector2> _lastAimDirectionByPlayer = new Dictionary<ushort, Vector2>();
 
@@ -26,7 +25,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             global::GameInputActions gameInputActions,
             ICommandFactory commandFactory)
         {
-            _defaultGameInputActions = gameInputActions;
             _gameInputActionsByPlayer[0] = gameInputActions;
             _commandFactory = commandFactory;
         }
@@ -97,7 +95,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             _commandFactory.CreateCommandVoid<ShootInputInvokedCommand>().Execute();
         }
 
-        public bool IsMoveLeftInputPressed(ushort playerId = 0)
+        public bool IsPlayerMoveLeftInputPressed(ushort playerId = 0)
         {
             if (!TryGetPlayerInputActions(playerId, out var actions))
             {
@@ -107,7 +105,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             return actions.GamePlay.MoveLeft.IsPressed();
         }
 
-        public bool IsMoveRightInputPressed(ushort playerId)
+        public bool IsPlayerMoveRightInputPressed(ushort playerId)
         {
             if (!TryGetPlayerInputActions(playerId, out var actions))
             {
@@ -117,7 +115,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             return actions.GamePlay.MoveRight.IsPressed();
         }
 
-        public bool IsMoveForwardInputPressed(ushort playerId)
+        public bool IsPlayerMoveForwardInputPressed(ushort playerId)
         {
             if (!TryGetPlayerInputActions(playerId, out var actions))
             {
@@ -127,7 +125,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             return actions.GamePlay.MoveForward.IsPressed();
         }
 
-        public Vector2 GetAimDirection(ushort playerId)
+        public Vector2 GetPlayerAimDirection(ushort playerId)
         {
             if (!TryGetPlayerInputActions(playerId, out var actions))
             {
@@ -145,7 +143,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             return lastAim;
         }
 
-        public Vector2 GetMoveDirection(ushort playerId)
+        public Vector2 GetPlayerMoveDirection(ushort playerId)
         {
             if (!TryGetPlayerInputActions(playerId, out var actions))
             {
@@ -167,7 +165,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             return true;
         }
         
-        public bool IsShootInputPressed(ushort playerId)
+        public bool IsPlayerShootInputPressed(ushort playerId)
         {
             if (!TryGetPlayerInputActions(playerId, out var actions))
             {
@@ -177,7 +175,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             return actions.GamePlay.Shoot.IsPressed();
         }
 
-        public bool IsTalentAInputPressed(ushort playerId)
+        public bool IsPlayerTalentAInputPressed(ushort playerId)
         {
             if (!TryGetPlayerInputActions(playerId, out var actions))
             {
@@ -186,7 +184,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             
             return actions.GamePlay.TalentA.IsPressed();
         }
-        public bool IsTalentBInputPressed(ushort playerId)
+        public bool IsPlayerTalentBInputPressed(ushort playerId)
         {
             if (!TryGetPlayerInputActions(playerId, out var actions))
             {
@@ -195,7 +193,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             
             return actions.GamePlay.TalentB.IsPressed();
         }
-        public bool IsTalentCInputPressed(ushort playerId)
+        public bool IsPlayerTalentCInputPressed(ushort playerId)
         {
             if (!TryGetPlayerInputActions(playerId, out var actions))
             {

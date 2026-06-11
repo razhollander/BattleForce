@@ -47,11 +47,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
 
         public Result Execute()
         {
-            var isShootInputPressed = _gameInputActionsController.IsShootInputPressed(_playerId);
-            var isTalentAInputPressed = _gameInputActionsController.IsTalentAInputPressed(_playerId);
-            var isTalentBInputPressed = _gameInputActionsController.IsTalentBInputPressed(_playerId);
-            var isTalentCInputPressed = _gameInputActionsController.IsTalentCInputPressed(_playerId);
-            var isMoveForawrdInputPressed = _gameInputActionsController.IsMoveForwardInputPressed(_playerId);
+            var isShootInputPressed = _gameInputActionsController.IsPlayerShootInputPressed(_playerId);
+            var isTalentAInputPressed = _gameInputActionsController.IsPlayerTalentAInputPressed(_playerId);
+            var isTalentBInputPressed = _gameInputActionsController.IsPlayerTalentBInputPressed(_playerId);
+            var isTalentCInputPressed = _gameInputActionsController.IsPlayerTalentCInputPressed(_playerId);
+            var isMoveForawrdInputPressed = _gameInputActionsController.IsPlayerMoveForwardInputPressed(_playerId);
             
             CalculateRightAndLeftInputs(_playerDirection, out var isMoveRightInputPressed, out var isMoveLeftInputPressed);
             var aimDirection = CalculateAimDirection();
@@ -63,12 +63,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             var device = _localPlayersDataService.GetInputDeviceForPlayer(_playerId);
             if (device == null || device is Keyboard || device is Mouse)
             {
-                isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed(_playerId);
-                isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed(_playerId);
+                isMoveRightInputPressed = _gameInputActionsController.IsPlayerMoveRightInputPressed(_playerId);
+                isMoveLeftInputPressed = _gameInputActionsController.IsPlayerMoveLeftInputPressed(_playerId);
             }
             else
             {
-                var gamePadMoveDirection = _gameInputActionsController.GetMoveDirection(_playerId).ToNumericsVector2();
+                var gamePadMoveDirection = _gameInputActionsController.GetPlayerMoveDirection(_playerId).ToNumericsVector2();
                 (isMoveRightInputPressed, isMoveLeftInputPressed) = MathUtils.GetDirectionChangeInputs(playerDirection, gamePadMoveDirection);
             }
         }
@@ -80,7 +80,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             var mousePos = Input.mousePosition; 
             var mouseWorldPos = _worldCameraController.ScreenToWorldPoint(mousePos).ToVector2XY();
             var mouseDirection = (mouseWorldPos - _playerPosition).normalized;
-            var gamePadAimDirection = _gameInputActionsController.GetAimDirection(_playerId);
+            var gamePadAimDirection = _gameInputActionsController.GetPlayerAimDirection(_playerId);
             var aimDirection = isGamepad ? gamePadAimDirection.ToNumericsVector2() : mouseDirection.ToNumericsVector2();
             return aimDirection;
         }
