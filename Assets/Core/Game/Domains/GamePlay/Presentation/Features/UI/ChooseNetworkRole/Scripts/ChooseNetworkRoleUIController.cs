@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
@@ -86,10 +84,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private void OnGamepadRemoved(Gamepad gamepad)
         {
             var playerJoinedIndex = _playerJoinedModels.FindIndex(p => p.InputDeviceId == gamepad.deviceId);
+            var didFindPlayer = playerJoinedIndex != -1;
 
-            if (playerJoinedIndex == -1)
+            if (!didFindPlayer)
             {
-                LogService.LogError("Index is -1");
+                LogService.LogError("Didn't find player for device id " + gamepad.deviceId + " when removing gamepad.");
                 return;
             }
             LogService.LogError($"Remove index {playerJoinedIndex} for device id {gamepad.deviceId}");

@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         [SerializeField] private TMP_Dropdown _playbacksDropdown;
         [SerializeField] private Transform _playersJoinedPanelsParent;
 
-        private List<PlayerJoinedPanelView> _playerJoinedPanelViews = new List<PlayerJoinedPanelView>();
+        private readonly List<PlayerJoinedPanelView> _playerJoinedPanelViews = new List<PlayerJoinedPanelView>();
         private Action _onClientClicked;
         private Action _onHostClicked;
         private Action _onServerClicked;
