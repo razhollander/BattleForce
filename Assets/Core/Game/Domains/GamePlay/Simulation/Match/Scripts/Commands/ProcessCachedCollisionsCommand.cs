@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System;
 using Box2D.NetStandard.Dynamics.Bodies;
 using Box2D.NetStandard.Dynamics.Contacts;
@@ -24,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPhysicsSimulator _physicsSimulator;
         private IMatchDataService _matchDataService;
         private ICommandFactory _commandFactory;
-        private SimulationGamePlayConfig _gamePlayConfig;
+        private ISimulationGamePlayConfigService _gamePlayConfigService;
         private INetEventsDataService _netEventsDataService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IPlayersTalentsManager _playersTalentsManager;
@@ -46,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
-            _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
             _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
@@ -185,7 +186,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
-            var config = _gamePlayConfig.Talents.ChickenTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.ChickenTalentConfig;
             _spinPlayerCommand.SetPlayer(player.Id).SetSpinAmount(config.SpinAmount).SetTick(_processedTick).Execute();
             
             _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId);
@@ -360,9 +361,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             var springAngle = _matchDataService.EnvironmentData.GetSpring(springId).WorldDirectionDegrees.ToRadians();
             var pushDirection = springAngle.FromAngleRadians();
-            var forceMagnitude = _gamePlayConfig.EnvironmentSprings.Force;
+            var environmentSpringsConfig = _gamePlayConfigService.GamePlayConfig.EnvironmentSprings;
+            var forceMagnitude = environmentSpringsConfig.Force * _matchDataService.SimulationState.MapSizeMultiplier;
             var force = pushDirection * forceMagnitude;
-            var randomSpin = RNG.NextFloat(_gamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfig.EnvironmentSprings.MaxSpin);
+            var randomSpin = RNG.NextFloat(environmentSpringsConfig.MinSpin, environmentSpringsConfig.MaxSpin);
 
             playerState.Spaceship.Transform.Velocity += force;
             playerState.Spaceship.Transform.Direction = force.Normalize();
@@ -401,7 +403,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 spikeId = objectA.Id;
             }
 
-            var damage = _gamePlayConfig.EnvironmentSpikes.Damage;
+            var damage = _gamePlayConfigService.GamePlayConfig.EnvironmentSpikes.Damage;
             _playerHitCommand
                 .SetPlayerIdGotHit(playerId)
                 .SetHitDamage(damage)
@@ -561,10 +563,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             DestroyBullet(bulletModel, bulletBody);
+
+            var wasBulletCreatedOnTopOfPlayerHeart = bulletModel.CreatedOnTick == _processedTick;
+            if (wasBulletCreatedOnTopOfPlayerHeart)
+            {
+                return;
+            }
+            
             _playerHitCommand
                 .SetPlayerIdGotHit(playerId)
                 .SetWasHitByAnotherPlayer(true, bulletModel.BelongToPlayerId)
-                .SetHitDamage(_gamePlayConfig.PlayerBullet.HitDamage)
+                .SetHitDamage(_gamePlayConfigService.GamePlayConfig.PlayerBullet.HitDamage)
                 .SetProcessedTick(_processedTick)
                 .Execute();
         }
@@ -595,7 +604,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             DestroyBullet(bulletModel, bulletBody);
             ref var talentCard = ref _matchDataService.SimulationState.TalentCards.GetByIndex(talentCardIndex);
-            talentCard.Health -= _gamePlayConfig.PlayerBullet.HitDamage;
+            talentCard.Health -= _gamePlayConfigService.GamePlayConfig.PlayerBullet.HitDamage;
             var isTalentCardAlive = talentCard.Health > 0;
 
             if (isTalentCardAlive)
@@ -739,7 +748,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var powerUpBallId = powerUpBall.Id;
             DestroyBullet(bulletModel, bulletBody);
             DestroyPowerUpBall(powerUpBallId, powerUpBody);
-            LogService.LogError($"Server: HandlePlayerBulletPowerUpCollision: power up id: {powerUpBallId}, bullet id: {bulletModel.Id}");
             _netEventsDataService.AddPowerUpObtainedNetEvent(_processedTick, powerUpBallId, bulletModel.BelongToPlayerId);
         }
 

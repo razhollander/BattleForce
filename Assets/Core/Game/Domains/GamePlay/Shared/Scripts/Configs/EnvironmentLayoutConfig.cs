@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [TextArea(1, 5)] [SerializeField] private string _lavaWallsJson;
         [TextArea(1, 5)] [SerializeField] private string _talentCardsJson;
         [TextArea(1, 5)] [SerializeField] private string _environmentSpringsJson;
+        [TextArea(1, 5)] [SerializeField] private string _environmentSpikesJson;
         [TextArea(1, 5)] [SerializeField] private string _teleportGatesJson;
         [TextArea(1, 5)] [SerializeField] private string _rotatingWheelsJson;
         [TextArea(1, 5)] [SerializeField] private string _fieldBarriersJson;

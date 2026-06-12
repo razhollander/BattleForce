@@ -3,7 +3,6 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
@@ -24,13 +23,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly NetworkConfig _networkConfig;
         private readonly Transform _parent;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
-        private readonly IInputBeingUsedService _inputBeingUsedService;
         public readonly ushort PlayerId;
         private MatchPlayerView _playerView;
         private readonly MatchPlayerViewPool _playerPool;
 
         public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService) 
+            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider) 
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
@@ -38,7 +36,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _networkConfig = networkConfig;
             _parent = parent;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
-            _inputBeingUsedService = inputBeingUsedService;
             PlayerId = playerId;
         }
 
@@ -57,10 +54,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
             SetHealth(playerModel.Spaceship.Health.CurrentHealth, playerModel.Spaceship.Health.MaxHealth);
             var isDead = playerModel.Spaceship.Health.CurrentHealth == 0;
-            SetIsDeadAuraEnabled(isDead);
+            SetIsDeadEffectEnabled(isDead);
             UpdateTalents(playerModel.Spaceship.TalentsState.Talents, playerModel.Spaceship.TalentsState.SelectedTalentIndex, 0);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
+            SetIsLockOnHeartSightShown(playerModel.Spaceship.IsPlayerLockOnTargetSightShown);
+            var isKinged = _matchDataService.TryGetKingedPlayers(out var kingedPlayers) && kingedPlayers.Exists(x => x.PlayerId == PlayerId);
+            SetIsKinged(isKinged);
         }
 
         private void SetupPlayerAccordingToHisSelectedTalent(MatchPlayerModel playerModel)
@@ -278,6 +278,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return _playerView.Base.GetTransform();
         }
 
+        public Transform GetHeartTransform()
+        {
+            return _playerView.Base.GetHeartTransform();
+        }
+
         public void SetIsTailWaving(bool isMoving)
         {
             _playerView.Base.SetIsTailWaving(isMoving);
@@ -293,9 +298,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.PlayYearsOfPainAnimation(direction.ToUnityVector2(), _stageCancellationTokenProvider.CancellationTokenSource);
         }
 
-        public void SetIsDeadAuraEnabled(bool isEnabled)
+        public void SetIsDeadEffectEnabled(bool isEnabled)
         {
-            _playerView.SetIsDeadAuraEnabled(isEnabled);
+            _playerView.SetIsDeadEffectEnabled(isEnabled, _stageCancellationTokenProvider.CancellationTokenSource.Token);
         }
 
         private TalentVisualData[] ConvertTalentsToVisualData(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
@@ -346,5 +351,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetSelectedTalent(selectedTalentIndex, _stageCancellationTokenProvider.CancellationTokenSource.Token);
         }
 
+        public void SetIsLockOnHeartSightShown(bool isShown)
+        {
+            _playerView.SetIsLockOnHeartSightShown(isShown);
+        }
+
+        public Transform GetHeadTransform()
+        {
+            return _playerView.Base.GetHeadTransform();
+        }
+
+        public void SetIsKinged(bool isKinged)
+        {
+            _playerView.SetIsKinged(isKinged);
+        }
     }
 }

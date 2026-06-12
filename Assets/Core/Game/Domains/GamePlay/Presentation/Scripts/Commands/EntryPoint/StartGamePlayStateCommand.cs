@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
         private IChooseNetworkRoleUIController _chooseNetworkRoleUIController;
         private IDataPersistence _dataPersistence;
         private IJoinResponsePacketHandler _joinResponsePacketHandler;
-        private IInputBeingUsedService _inputBeingUsedService;
+        private IInputDeviceChangedListenerService _inputDeviceChangedListenerService;
 
         private GamePlayInitiatorEnterData _enterData; // kept this for future use
 
@@ -34,13 +34,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.EntryPoint
             _chooseNetworkRoleUIController = _diContainer.Resolve<IChooseNetworkRoleUIController>();
             _joinResponsePacketHandler = _diContainer.Resolve<IJoinResponsePacketHandler>();
             _dataPersistence = _diContainer.Resolve<IDataPersistence>();
-            _inputBeingUsedService = _diContainer.Resolve<IInputBeingUsedService>();
+            _inputDeviceChangedListenerService = _diContainer.Resolve<IInputDeviceChangedListenerService>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
             _gameInputActionsController.EnableInputs();
-            _inputBeingUsedService.InitEntryPoint();
+            _inputDeviceChangedListenerService.InitEntryPoint();
             _chooseNetworkRoleUIController.InitEntryPoint();
             _joinResponsePacketHandler.InitEntryPoint();
         }

@@ -6,7 +6,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
     {
         HashSet<ushort> LosingTeamIds { get; }
         void AddLosingTeam(ushort teamId);
-        void AddWinnerTeam(ushort teamId);
         bool IsStageEnded { get; set; }
         float StageRestartTimer { get; set; }
         void ClearData();

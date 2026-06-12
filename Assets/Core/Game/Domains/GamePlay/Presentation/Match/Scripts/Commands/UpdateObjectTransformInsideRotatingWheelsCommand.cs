@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
@@ -13,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
-        private Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc.IEnvironmentSpikeControllers _environmentSpikeControllers;
+        private IEnvironmentSpikeControllers _environmentSpikeControllers;
         private IEnvironmentTeleportGateControllers _environmentTeleportGateControllers;
 
         public override void ResolveDependencies()

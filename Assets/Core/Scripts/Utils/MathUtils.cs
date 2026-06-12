@@ -8,6 +8,7 @@ namespace CoreDomain.Scripts.Utils
     {
         // Threshold in radians (e.g., 45 degrees is ~0.785 radians)
         private const float TurnThresholdRad = 0.1f;
+        private const float TwoPI = MathF.PI * 2f;
 
         public static Vector3 GetPerpendicularDirection(Vector2 startPoint, Vector2 endPoint)
         {
@@ -69,7 +70,7 @@ namespace CoreDomain.Scripts.Utils
             float targetRad = GetAngle(target);
 
             // Calculate the shortest signed difference between angles
-            float deltaRad = DeltaAngleRadians(currentRad, targetRad);
+            float deltaRad = DeltaSignedAngleRadians(currentRad, targetRad);
 
             // Convert max delta to radians and clamp the rotation
             float maxRadDelta = maxDegreesDelta * (MathF.PI / 180f);
@@ -90,7 +91,7 @@ namespace CoreDomain.Scripts.Utils
         /// Calculates the shortest difference between two radian angles, 
         /// wrapping correctly around the 2PI boundary.
         /// </summary>
-        public static float DeltaAngleRadians(float current, float target)
+        public static float DeltaSignedAngleRadians(float current, float target)
         {
             float diff = target - current;
 
@@ -100,7 +101,13 @@ namespace CoreDomain.Scripts.Utils
 
             return diff;
         }
-
+        
+        public static float DeltaAbsoluteAngleRadians(float current, float target)
+        {
+            var diff = MathF.Abs(target - current) % TwoPI;
+            return diff > MathF.PI ? TwoPI - diff : diff;
+        }
+        
         /// <summary>
         /// Rotates a vector by a specific radian amount.
         /// </summary>

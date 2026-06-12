@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
@@ -6,6 +7,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -16,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     {
         private const int MAX_ATTEMPTS_TO_FIND_FREE_SPAWN_POSITION = 1000;
 
-        private SimulationGamePlayConfig _gamePlayConfig;
+        private ISimulationGamePlayConfigService _gamePlayConfigService;
         private IPowerUpsSpawnerService _iPowerUpsSpawnerService;
         private IPhysicsSimulator _physicsSimulator;
         private IMatchDataService _matchDataService;
@@ -33,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public override void ResolveDependencies()
         {
-            _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _iPowerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerService>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
@@ -49,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 _iPowerUpsSpawnerService.RestartSpawnTimer();
             }
             
-            var areCurrentlyMaxPowerUpBalls = _matchDataService.SimulationState.PowerUpBalls.Count >= _gamePlayConfig.PowerUps.MaxConcurrentPowerUpBalls;
+            var areCurrentlyMaxPowerUpBalls = _matchDataService.SimulationState.PowerUpBalls.Count >= _gamePlayConfigService.GamePlayConfig.PowerUps.MaxConcurrentPowerUpBalls;
             var shouldSpawnPowerUpBall = isSpawnTimerEnded && !areCurrentlyMaxPowerUpBalls;
 
             if (shouldSpawnPowerUpBall)
@@ -66,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var powerUpBall = _matchDataService.AddPowerUpBall(position, velocity, powerUpType);
-            _physicsSimulator.AddPowerUpBall(powerUpBall.Id, position, velocity, _gamePlayConfig.PowerUps.Radius);
+            _physicsSimulator.AddPowerUpBall(powerUpBall.Id, position, velocity, _gamePlayConfigService.GamePlayConfig.PowerUps.Radius);
             _netEventsDataService.AddPowerUpSpawnedNetEvent(_processedTick, powerUpBall.Id, position);
         }
 
@@ -81,11 +83,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return false;
             }
 
-            var directionAngle = Simulation.Scripts.RNG.RNG.NextFloat(0f, 360f);
+            var directionAngle = RNG.NextFloat(0f, 360f);
             var direction = directionAngle.FromAngleRadians();
-            velocity = direction * _gamePlayConfig.PowerUps.MoveSpeed;
+            velocity = direction * _gamePlayConfigService.GamePlayConfig.PowerUps.MoveSpeed;
             var values = (PowerUpType[]) Enum.GetValues(typeof(PowerUpType));
-            powerUpType = values[Simulation.Scripts.RNG.RNG.NextInt(values.Length)];
+            powerUpType = values[RNG.NextInt(values.Length)];
 
             return true;
         }
@@ -94,13 +96,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             position = Vector2.Zero;
             var maxAttempts = MAX_ATTEMPTS_TO_FIND_FREE_SPAWN_POSITION;
-            var environmentHalfSize = _matchEnvironmentConfigDataService.EnvironmentHalfSize;
-            var powerUpsRadius = _gamePlayConfig.PowerUps.Radius;
+            var environmentHalfSize = _matchEnvironmentConfigDataService.EnvironmentHalfSize * _matchDataService.SimulationState.MapSizeMultiplier;
+            var powerUpsRadius = _gamePlayConfigService.GamePlayConfig.PowerUps.Radius;
 
             for (var i = 0; i < maxAttempts; i++)
             {
-                var randomCandidatePosition = new Vector2(Simulation.Scripts.RNG.RNG.NextFloat(-environmentHalfSize.X, environmentHalfSize.X),
-                    Simulation.Scripts.RNG.RNG.NextFloat(-environmentHalfSize.Y, environmentHalfSize.Y));
+                var randomCandidatePosition = new Vector2(RNG.NextFloat(-environmentHalfSize.X, environmentHalfSize.X),
+                    RNG.NextFloat(-environmentHalfSize.Y, environmentHalfSize.Y));
 
                 if (!_physicsSimulator.IsSquareHitAnyBodyTypes(randomCandidatePosition, powerUpsRadius, PhysicsBodyType.Wall, PhysicsBodyType.PlayerBullet))
                 {

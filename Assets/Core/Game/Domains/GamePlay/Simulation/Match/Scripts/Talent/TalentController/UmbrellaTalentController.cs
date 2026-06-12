@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
@@ -13,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
     {
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IMatchDataService _matchDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly NetworkConfig _networkConfig;
         
         private ushort _casterPlayerId;
@@ -44,11 +45,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
         }
 
-        public UmbrellaTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig)
+        public UmbrellaTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _networkConfig = networkConfig;
         }
 
@@ -96,6 +97,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             casterPlayerState.Spaceship.AssistArrowType = PlayerAssistArrowType.Hidden;
             IsCurrentlyAiming = false;
             IsCurrentlyActive = true;
+            casterPlayerState.Spaceship.IsEngineOn = false;
             _startTick = tick;
             _netEventsDataService.AddActivateUmbrellaTalentNetEvent(tick, _casterPlayerId);
         }
@@ -120,7 +122,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             var isSpinned = casterPlayerState.Spaceship.IsSpinned;
             var elapsedSeconds = (tick - _startTick) * deltaTime;
-            var didTimeEnded = elapsedSeconds >= _gamePlayConfig.Talents.UmbrellaTalentConfig.DurationInSeconds;
+            var didTimeEnded = elapsedSeconds >= _gamePlayConfigService.GamePlayConfig.Talents.UmbrellaTalentConfig.DurationInSeconds;
 
             if (isSpinned || didTimeEnded)
             {
@@ -130,7 +132,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            casterPlayerState.Spaceship.Transform.Velocity += aimDirection * _gamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick * deltaTime;
+            casterPlayerState.Spaceship.Transform.Velocity += aimDirection * _gamePlayConfigService.GamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick * deltaTime;
         }
 
         private void DeactivateTalent(int tick)

@@ -1,11 +1,14 @@
+using Core.Scripts.Helpers;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {
-    [CreateAssetMenu(fileName = "EnvironmentSpikeConfig", menuName = "BF/Shared/Environment Spikes Config")]
-    public class EnvironmentSpikesConfig : ScriptableObject
+    [System.Serializable]
+    public class EnvironmentSpikesConfig
     {
-        public ushort Damage = 10;
-        public Vector2 Size = new Vector2(0.5f, 1f);
+        public ushort Damage = 1;
+        [JsonConverter(typeof(Vector2Converter))]
+        public Vector2 Size = new Vector2(2f, 1f);
     }
 }

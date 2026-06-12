@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
@@ -15,7 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private readonly IMatchDataService _matchDataService;
         private readonly INetEventsDataService _netEventsDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly NetworkConfig _networkConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
 
@@ -24,12 +25,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public ChickenTalentController(IMatchDataService matchDataService,
             INetEventsDataService netEventsDataService,
-            SimulationGamePlayConfig gamePlayConfig,
+            ISimulationGamePlayConfigService gamePlayConfigService,
             NetworkConfig networkConfig, IPhysicsSimulator physicsSimulator)
         {
             _matchDataService = matchDataService;
             _netEventsDataService = netEventsDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
         }
@@ -66,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            var config = _gamePlayConfig.Talents.ChickenTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.ChickenTalentConfig;
 
             var movementDirection = casterPlayerState.Spaceship.Transform.Direction;
             casterPlayerState.Spaceship.Transform.Velocity += movementDirection * config.PushForce;

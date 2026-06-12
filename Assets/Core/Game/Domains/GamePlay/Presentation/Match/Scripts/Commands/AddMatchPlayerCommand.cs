@@ -1,7 +1,9 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -13,6 +15,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         private IMatchPlayerUIControllers _playerUIControllers;
         private IWorldCameraController _worldCameraController;
         private IMatchDataService _matchDataService;
+        private ILockOnTargetEffectController _lockOnTargetEffectController;
+        
         private PlayerStateS2C _playerState;
         private int _currentServerTick;
 
@@ -34,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
         }
 
         public void Execute()
@@ -42,7 +47,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             _matchDataService.AddPlayer(_playerState);
             _playerControllers.AddPlayer(playerId);
             _playerUIControllers.AddPlayer(playerId, _currentServerTick);
-            _worldCameraController.AddTarget(_playerControllers.GetPlayerSpaceshipTransform(playerId));
+            _worldCameraController.AddFollowTarget(_playerControllers.GetPlayerSpaceshipTransform(playerId));
+            _lockOnTargetEffectController.AddPlayer(playerId, _playerState.Spaceship.TargetedEnemyIds);
         }
     }
 }

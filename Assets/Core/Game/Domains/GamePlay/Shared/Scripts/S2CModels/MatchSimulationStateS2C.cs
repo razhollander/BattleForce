@@ -26,10 +26,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public StageType StageType;
         public int StartPhaseInitialTick;
         public bool IsInPreparationPhase;
-
+        public bool IsInShowoffWinners;
+        public ushort CurrentStageWinnerTeamId;
+        public float MapSizeMultiplier;
+        
         public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs)
         {
-            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer));
+            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer, maxPlayers-1));
             Bullets = new FixedOrderedList<PlayerBulletS2C>(maxBullets);
             TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
             PowerUpBalls = new FixedUnorderedList<PowerUpBallS2C>(maxPowerUpBalls);
@@ -117,6 +120,9 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((byte)StageType);
             writer.Put(StartPhaseInitialTick);
             writer.Put(IsInPreparationPhase);
+            writer.Put(IsInShowoffWinners);
+            writer.Put((byte)CurrentStageWinnerTeamId);
+            writer.PutFloat16(MapSizeMultiplier);
         }
         
         public void Deserialize(NetDataReader reader)
@@ -207,6 +213,9 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             StageType = (StageType)reader.GetByte();
             StartPhaseInitialTick = reader.GetInt();
             IsInPreparationPhase = reader.GetBool();
+            IsInShowoffWinners = reader.GetBool();
+            CurrentStageWinnerTeamId = reader.GetByte();
+            MapSizeMultiplier = reader.GetFloat16();
         }
 
         public PlayerStateS2C GetPlayerById(ushort playerId)
@@ -482,8 +491,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 player.SerializeDeltas(writer);
             }
 
-            PutBulletTransformsBatched(writer);
-
             var powerUpsCount = PowerUpBalls.Count;
             writer.Put((byte) powerUpsCount);
             foreach (var powerUp in PowerUpBalls.AsSpan())
@@ -506,7 +513,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
         }
         
-        private void PutBulletTransformsBatched(NetDataWriter writer)
+        private void PutBulletTransformsBatched(NetDataWriter writer) // maybe one day this will be used
         {
             var bulletsCount = Bullets.Count;
             writer.Put((byte) bulletsCount);
@@ -514,7 +521,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 return;
             }
-
 
             ushort prevBulletId = 0; 
             var isFirstBullet = true;
@@ -581,8 +587,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 var player = Players.AddAndGet();
                 player.DeserializeDeltas(reader);
             }
-            
-            GetBulletTransformsBatched(reader);
 
             var powerUpsCount = reader.GetByte();
             PowerUpBalls.Clear();

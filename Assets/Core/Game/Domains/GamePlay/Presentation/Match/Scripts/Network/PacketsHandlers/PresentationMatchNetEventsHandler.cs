@@ -8,6 +8,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.LocalEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -35,15 +36,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         {
             foreach (var playerRejoinAcceptNetEvent in playerRejoinAcceptNetEvents)
             {
-                var playerId = playerRejoinAcceptNetEvent.PlayerState.Id;
-                var isLocalPlayer = playerRejoinAcceptNetEvent.IsLocal;
-                LogService.LogTopic(
-                    $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerId,
-                    LogTopicType.ClientNetwork);
-
-                if (!isLocalPlayer)
+                foreach (var playerState in playerRejoinAcceptNetEvent.Players.AsSpan())       
                 {
-                    _addMatchPlayerCommand.SetPlayerState(playerRejoinAcceptNetEvent.PlayerState).SetCurrentServerTick(currentServerTick).Execute();
+                    var isLocalPlayer = playerRejoinAcceptNetEvent.IsLocal;
+                    LogService.LogTopic(
+                        $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerState.Id,
+                        LogTopicType.ClientNetwork);
+
+                    if (!isLocalPlayer)
+                    {
+                        _addMatchPlayerCommand.SetPlayerState(playerState).SetCurrentServerTick(currentServerTick).Execute();
+                    }
                 }
             }
         }
@@ -58,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var bulletSpawnNetEvent in bulletSpawnNetEvents)
             {
                 _matchDataService.AddBullet(bulletSpawnNetEvent.BulletId, bulletSpawnNetEvent.BelongToPlayerId,
-                    bulletSpawnNetEvent.Position, bulletSpawnNetEvent.BulletRadius);
+                    bulletSpawnNetEvent.Position, bulletSpawnNetEvent.Velocity, bulletSpawnNetEvent.BulletRadius, bulletSpawnNetEvent.OccuredOnTick);
                 _cachedPresentationEventsService.BulletSpawnNetEvents.Add(bulletSpawnNetEvent);
             }
         }
@@ -243,6 +246,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var stageEndNetEvent in stageEndNetEvents)
             {
+                _matchDataService.CurrentStageWinnerTeamId = stageEndNetEvent.WinningTeamId;
+                _matchDataService.IsInShowoffWinners = true;
                 _cachedPresentationEventsService.StageEndNetEvents.Add(stageEndNetEvent);
             }
         }
@@ -674,6 +679,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     talent.IsCurrentlyActive = false;
                     break;
                 }
+            }
+        }
+
+        public void ProcessPlayerLockOnHeartTargetsChangedEvents(CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C> playerLockOnHeartTargetsChangedNetEvents)
+        {
+            if (playerLockOnHeartTargetsChangedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+            
+            foreach (var netEvent in playerLockOnHeartTargetsChangedNetEvents)
+            {
+                var player = _matchDataService.GetPlayer(netEvent.PlayerId);
+                player.Spaceship.TargetedEnemyIds.Clear();
+                
+                for (int i = 0; i < netEvent.PlayerIdsLockedOnTarget.Count; i++)
+                {
+                    ref var playerId = ref player.Spaceship.TargetedEnemyIds.AddAndGet();
+                    playerId = netEvent.PlayerIdsLockedOnTarget[i];
+                }
+                
+                _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);
             }
         }
     }

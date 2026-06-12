@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnvironmentConfig2
   m_EditorClassIdentifier: 
   _environmentLayoutConfigs:
-    m_keys: 0200000063000000010000000000000003000000040000000500000006000000
+    m_keys: 020000006300000001000000000000000300000004000000050000000600000007000000
     m_values:
     - _environmentName: Default
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -784,6 +784,30 @@ MonoBehaviour:
         2,\n    \"Position\": {\n      \"X\": 2,\n      \"Y\": 0\n    },\n    \"TalentType\":
         \"Swap\"\n  },\n    {\n    \"Id\": 3,\n    \"Position\": {\n      \"X\":
         4,\n      \"Y\": 0\n    },\n    \"TalentType\": \"DashPulse\"\n  }\n]"
+      _environmentSpringsJson: 
+      _teleportGatesJson: 
+      _rotatingWheelsJson: 
+      _fieldBarriersJson: 
+      _stageBoundriesWallsJson: 
+    - _environmentName: Big Empty
+      _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
+      _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
+        "Y": -28.16       },       {         "X": -43.804464,         "Y": -28.16      
+        },       {         "X": -43.804464,         "Y": 28.16       },       {        
+        "X": -47.324464,         "Y": 28.16       }     ]   },   {     "Id": 7,    
+        "Points": [       {         "X": 43.804464,         "Y": -28.16       },      
+        {         "X": 47.324464,         "Y": -28.16       },       {         "X":
+        47.324464,         "Y": 28.16       },       {         "X": 43.804464,        
+        "Y": 28.16       }     ]   },   {     "Id": 8,     "Points": [       {        
+        "X": -47.324464,         "Y": 24.64       },       {         "X": 47.324464,        
+        "Y": 24.64       },       {         "X": 47.324464,         "Y": 28.16      
+        },       {         "X": -47.324464,         "Y": 28.16       }     ]   },  
+        {     "Id": 9,     "Points": [       {         "X": -47.324464,         "Y":
+        -28.16       },       {         "X": 47.324464,         "Y": -28.16      
+        },       {         "X": 47.324464,         "Y": -24.64       },       {        
+        "X": -47.324464,         "Y": -24.64       }     ]   }]'
+      _lavaWallsJson: 
+      _talentCardsJson: 
       _environmentSpringsJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: 

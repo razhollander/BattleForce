@@ -72,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 
         public void SetEnvironmentSprings(S2CModels.EnvironmentSpringConfig[] environmentSprings, int index)
         {
-             if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
             {
                 environmentLayout.SetEnvironmentSpringsJson(environmentSprings.ToJson());
             }
@@ -89,7 +89,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 
         public void SetEnvironmentSpikes(S2CModels.EnvironmentSpikeConfig[] environmentSpikes, int index)
         {
-             if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
             {
                 environmentLayout.SetEnvironmentSpikesJson(environmentSpikes.ToJson());
             }
@@ -104,7 +104,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 #endif
         }
 
-        public void SetTeleportGates(Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.EnvironmentTeleportGatePairS2C[] teleportGates, int index)
+        public void SetTeleportGates(S2CModels.EnvironmentTeleportGatePairS2C[] teleportGates, int index)
         {
             if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
             {

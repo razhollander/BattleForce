@@ -8,19 +8,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
 {
     public class SyncMatchMakingSimulationStateCommand : BaseCommand, ICommandVoid
     {
-        private MatchMakingSimulationStateS2C _simulationState;
         private IMatchMakingDataService _matchDataService;
         private IMatchMakingBulletControllers _bulletControllers;
         private AddMatchMakingPlayerCommand _addMatchMakingPlayerCommand;
         private ICommandFactory _commandFactory;
         private IStartMatchButtonController _startMatchButtonController;
+        
+        private MatchMakingSimulationStateS2C _simulationState;
+        private int _stateOccuredOnTick;
 
         public SyncMatchMakingSimulationStateCommand SetSimulationState(MatchMakingSimulationStateS2C simulationState)
         {
             _simulationState = simulationState;
             return this;
         }
-        
+
+        public SyncMatchMakingSimulationStateCommand SetStateOccuredOnTick(int stateOccuredOnTick)
+        {
+            _stateOccuredOnTick = stateOccuredOnTick;
+            return this;
+        }
+
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchMakingDataService>();
@@ -49,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         {
             foreach (var bulletState in _simulationState.Bullets.AsSpan())
             {
-                _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Position, bulletState.Radius);
+                _matchDataService.AddBullet(bulletState.Id, bulletState.BelongToPlayerId, bulletState.Position, bulletState.Velocity, bulletState.Radius, _stateOccuredOnTick);
                 _bulletControllers.CreateBullet(bulletState.Id, bulletState.Radius, bulletState.Position, bulletState.BelongToPlayerId);
             }
         }

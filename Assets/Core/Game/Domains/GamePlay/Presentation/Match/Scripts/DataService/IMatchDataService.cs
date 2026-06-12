@@ -24,18 +24,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         HashSet<ushort> TeamIds {get; }
         int StartPhaseInitialTick { get; set; }
         bool IsInPreparationPhase { get; set; }
+        public bool IsInShowoffWinners { get; set; }
+        public ushort CurrentStageWinnerTeamId { get; set; }
         List<MatchKOProjectileModel> KOProjectiles { get; }
         List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
-        MatchPlayerModel LocalPlayer { get; }
-        bool IsPlayerJoined { get; }
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
         MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
         MatchEnvironmentLavaWallModel AddLavalWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
         MatchEnvironmentFieldBarrierModel AddFieldBarrier(ushort id, ushort teamId, Vector2 position, Vector2 size, FieldBarrierShape shape);
-        void SetLocalPlayer(int playerId);
-        MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius);
+        MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 initialPosition, System.Numerics.Vector2 velocity, float radius, int spawnTick);
         MatchPlayerBulletModel GetBullet(ushort bulletId);
         MatchEnvironmentWallModel GetEnvironmentWall(ushort wallId);
         void RemoveBullet(ushort bulletId);
@@ -51,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchEnvironmentSpikeModel AddSpike(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle);
         MatchEnvironmentSpikeModel GetEnvironmentSpike(ushort spikeId);
         MatchEnvironmentFieldBarrierModel GetFieldBarrier(ushort id);
-        MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(EnvironmentRotatingWheelConfig config);
+        MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<ushort> teleportGatePairIds);
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);
         void SetTeamGems(ushort teamId, int totalTeamGems);
@@ -70,5 +69,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchChickenEggModel GetChickenEgg(ushort id);
         MatchChickenEggModel AddChickenEgg(ushort id, ushort casterPlayerId, UnityEngine.Vector2 position);
         void RemoveChickenEgg(ushort id);
+        bool TryGetKingedPlayers(out List<MatchPlayerModel> kingedPlayers);
     }
 }

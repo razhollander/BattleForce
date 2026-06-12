@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Scripts.Network;
@@ -9,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
     {
         public int OccuredOnTick;
         public bool IsMatchMaking;
-        public ushort LocalPlayerId;
+        public Dictionary<ushort, int> PlayerIdToDeviceIdDictionary;
         public bool IsSuccess;
         public MatchMakingSimulationStateS2C MatchMakingSimulationState;
         public MatchSimulationStateS2C MatchSimulationState;
@@ -18,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         {
             MatchMakingSimulationState = new MatchMakingSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets);
             MatchSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, maxTeams, maxCap.ConcurrentChickenEggs);
+            PlayerIdToDeviceIdDictionary = new Dictionary<ushort, int>(maxCap.ConcurrentPlayers);
         }
         
         public JoinResponsePacketS2C()
@@ -34,7 +36,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
 
             writer.Put(IsMatchMaking);
-            writer.Put(LocalPlayerId);
+            writer.Put((byte)PlayerIdToDeviceIdDictionary.Count);
+            foreach (var kvp in PlayerIdToDeviceIdDictionary)
+            {
+                writer.Put((byte)kvp.Key);
+                writer.Put(kvp.Value);
+            }
 
             if (IsMatchMaking)
             {
@@ -56,7 +63,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
             
             IsMatchMaking = reader.GetBool();
-            LocalPlayerId = reader.GetUShort();
+            
+            PlayerIdToDeviceIdDictionary.Clear();
+            var playersCount = (int)reader.GetByte();
+            for (int i = 0; i < playersCount; i++)
+            {
+                var playerId = reader.GetByte();
+                var deviceId = reader.GetInt();
+                PlayerIdToDeviceIdDictionary.Add(playerId, deviceId);
+            }
             
             if (IsMatchMaking)
             {
@@ -72,7 +87,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         {
             OccuredOnTick = default;
             IsMatchMaking = default;
-            LocalPlayerId = default;
+            PlayerIdToDeviceIdDictionary.Clear();
             IsSuccess = default;
             MatchMakingSimulationState = default;
             MatchSimulationState = default;

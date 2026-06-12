@@ -1,14 +1,17 @@
-using System.Threading;
 using UnityEngine;
 
-namespace CoreDomain.Scripts.Mvc.WorldCamera
+namespace Core.Scripts.Mvc.WorldCamera
 {
     public interface IWorldCameraController
     {
-        void AddTarget(Transform target);
-        void RemoveTarget(Transform target);
+        void AddFollowTarget(Transform target);
+        void RemoveFollowTarget(Transform target);
         void ClearTargets();
         void ShakeCamera(float intensity, float durationInSeconds);
+        void MultiplyOthographicSize(float multiplier);
+        void InitEntryPoint();
+
+        void InitExitPoint();
         // void StopFollowTarget();
         // void StartFollowTarget(Transform targetTransform);
         // Awaitable DoLockOnTargetAnimation(Transform targetTransform, CancellationTokenSource cancellationTokenSource);

@@ -10,11 +10,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataServic
         List<MatchMakingPlayerModel> Players { get; }
         List<MatchPlayerBulletModel> Bullets { get; }
         MatchMakingPlayerModel GetPlayer(ushort playerId);
-        MatchMakingPlayerModel LocalPlayer { get; }
         MatchMakingPlayerModel AddPlayer(MatchMakingPlayerStateS2C playerState);
         MatchEnvironmentWallModel AddWall(WallConfig wallConfig);
-        void SetLocalPlayer(int playerId);
-        MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, System.Numerics.Vector2 position, float radius);
+        MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, System.Numerics.Vector2 initialPosition, System.Numerics.Vector2 velocity, float radius, int spawnTick);
         MatchPlayerBulletModel GetBullet(ushort bulletId);
         MatchEnvironmentWallModel GetEnvironmentWall(ushort wallId);
         void RemoveBullet(ushort bulletId);

@@ -20,8 +20,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
         private readonly ICommandFactory _commandFactory;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkC2SPacketsSender _packetsSender;
-        private readonly GUIStyle _guiStyle;
-        private string _playerName;
+        private GUIStyle _guiStyle;
+        private long _clientId;
+
         public bool IsPeerConnected { get; private set; }
         public int Ping => _packetsSender.Peer.Ping;
         public int LocalPeerId => _packetsSender.Peer.Id;
@@ -38,13 +39,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 AutoRecycle = true,
                 IPv6Enabled = false
             };
-            
-            _guiStyle = new GUIStyle();
-            _guiStyle.fontSize = 10;
-            _guiStyle.normal.textColor = Color.white;
         }
 
-        public void ConenctToServerPeer(string ipAddress, int port, string playerName)
+        public void ConenctToServerPeer(string ipAddress, int port, long clientId)
         {
             if (_netManager.IsRunning)
             {
@@ -52,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
                 return;
             }
             
-            _playerName = playerName;
+            _clientId = clientId;
             _updateSubscriptionService.RegisterGuiUpdatable(this);
             _packetsListener.OnPeerConnected += OnServerPeerReceived;
             _netManager.Start();
@@ -134,7 +131,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network
 
         public void ManagedOnGUI()
         {
-//            GUI.Label(new Rect(10, 10, 400, 30), "Local Host Ping: "+_packetsListener.PingToLocalHost, _guiStyle);
+            TryInitGuiStyle(); // ugly, but must be called inside ManagedOnGUI
+            GUILayout.Box("Local Host Ping: "+_packetsListener.PingToLocalHost+$", another way: {Ping}", _guiStyle);
+            
+        }
+
+        private void TryInitGuiStyle()
+        {
+            if (_guiStyle != null)
+            {
+                return;
+            }
+            
+            _guiStyle = new GUIStyle(GUI.skin.box); 
+            _guiStyle.normal.background = Texture2D.whiteTexture;
+            _guiStyle.fontSize = 16; 
+            _guiStyle.fontStyle = FontStyle.Bold;
+            _guiStyle.normal.textColor = Color.black;
         }
 
         public void ManagedOnDrawGizmos()

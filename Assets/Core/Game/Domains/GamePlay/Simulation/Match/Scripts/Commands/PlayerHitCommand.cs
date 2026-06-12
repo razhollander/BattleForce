@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -23,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private INetEventsDataService _netEventsDataService;
         private ICommandFactory _commandFactory;
         private IStageDataService _stageDataService;
-        private SimulationGamePlayConfig _gamePlayConfig;
+        private ISimulationGamePlayConfigService _gamePlayConfigService;
         private int _processedTick;
         private HashSet<ushort> _chachedTeamsCurrentlyAlive;
         private SharedGamePlayConfig _sharedGamePlayConfig;
@@ -67,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _overrideableNetEventsService = _diContainer.Resolve<IOverrideableNetEventsService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
-            _gamePlayConfig = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _playerGainedBoltsCommand = _commandFactory.CreateCommandVoid<PlayerGainedBoltsCommand>();
@@ -103,12 +104,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             LogService.LogTopic($"Player Hit! Id {_playerIdGotHit} hit with damage {_hitDamage}, new health: {newHealth}, is alive: {isKillingBlow}", LogTopicType.ServerNetwork);
             _netEventsDataService.AddPlayerTakeDamageNetEvent(_processedTick, _playerIdGotHit, newHealth, _hitDamage, isKillingBlow);
-            var boltsGained = _gamePlayConfig.BoltsGainedPerHit;
+            var boltsGained = _gamePlayConfigService.GamePlayConfig.BoltsGainedPerHit;
             
             if (!isKillingBlow)
             {
                 KillPlayer(playerState);
-                boltsGained += _gamePlayConfig.BoltsGainedPerKill;
+                boltsGained += _gamePlayConfigService.GamePlayConfig.BoltsGainedPerKill;
             }
             
             if(_wasHitByAnotherPlayer)
@@ -126,7 +127,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             playerState.Spaceship.IsAlive = false;
             var shootState = playerState.Spaceship.Shoot;
             var isShootOnCooldown = shootState.MaxCooldown > shootState.CooldownSecondsLeft; 
-            shootState.MaxCooldown *= _gamePlayConfig.ShootCooldownMultiplierWhenDead;
+            shootState.MaxCooldown *= _gamePlayConfigService.GamePlayConfig.ShootCooldownMultiplierWhenDead;
 
             if (!isShootOnCooldown)
             {
@@ -161,7 +162,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             totalGemsPerTeam.Clear();
             var teamsCurrentlyAlive = GetTeamsCurrentlyAlive();
             
-            var gemsCollectedForTeamAlive = _gamePlayConfig.GemsCollectedForTeamAlive;
+            var gemsCollectedForTeamAlive = _gamePlayConfigService.GamePlayConfig.GemsCollectedForTeamAlive;
             foreach (ushort teamAlive in teamsCurrentlyAlive)
             {
                 gemsGainedPerTeam.Add(teamAlive, gemsCollectedForTeamAlive);

@@ -7,11 +7,12 @@ using UnityEngine;
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
     [CreateAssetMenu(fileName = "TalentsConfig", menuName = "BF/Simulation/Talents Config")]
+    [System.Serializable]
     public class TalentsConfig : ScriptableObject
     {
         public ushort TalentCardHealth = 2;
         [BF_SubclassList.SubclassList(typeof(BaseTalentCooldownConfig)), SerializeField]
-        public TalentsCooldownsConfigs TalentsCooldownsConfigs;
+        public TalentsCooldownsConfigs TalentsCooldownsConfigs; // this
         public TalentsArrowConfigs TalentsArrowConfigs;
         public HammerTalentConfig HammerTalentConfig;
         public SwapTalentConfig SwapTalentConfig;
@@ -44,9 +45,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
     public class TalentArrowConfig
     {
         public TalentType TalentType;
-        // public bool IsArrowShownWhileSelected;
-        // public bool IsArrowShownWhileActive;
         public bool IsArrowShownOnlyWhilePressed;
-        // public bool IsFrontArrow;
     }
 }

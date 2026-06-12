@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
@@ -24,18 +25,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         
         private ushort _casterPlayerId;
 
-        public PlayerTalentControllers(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
+        public PlayerTalentControllers(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
             IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig)
         {
-            _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig);
-            _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, commandFactory);
-            _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig);
-            _sentryGunTalentController = new SentryGunTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfig, networkConfig, commandFactory);
-            _grapplingHookTalentController = new GrapplingHookTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig);
-            _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfig, networkConfig);
-            _magneticPullTalentController = new MagneticPullTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
-            _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfig, networkConfig, physicsSimulator);
-            _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, commandFactory);
+            _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig);
+            _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
+            _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfigService);
+            _sentryGunTalentController = new SentryGunTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfigService, networkConfig, commandFactory);
+            _grapplingHookTalentController = new GrapplingHookTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig);
+            _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfigService, networkConfig);
+            _magneticPullTalentController = new MagneticPullTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
+            _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfigService, networkConfig, physicsSimulator);
+            _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
         }
 
         public void SetCasterId(ushort casterPlayerId)

@@ -11,27 +11,187 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ebb89e21ce374e298e4791dc8fe6462e, type: 3}
   m_Name: SimulationGamePlayConfig
-  m_EditorClassIdentifier: 
-  PlayerSpaceship: {fileID: 11400000, guid: c964300775f8143bf8b7d9a0c7273e68, type: 2}
-  PlayerBullet: {fileID: 11400000, guid: f6bddc38f7ff94ca4ba008329fdc7743, type: 2}
-  Talents: {fileID: 11400000, guid: 08bd0956437f34e4d857566956653f2e, type: 2}
-  Lava: {fileID: 11400000, guid: 7c1289f5735214c4b89bd8c0ea511f75, type: 2}
-  PowerUps: {fileID: 11400000, guid: f3f1e9d59a8914447bcbb1a5299d3b37, type: 2}
-  EnvironmentSprings: {fileID: 11400000, guid: f5e079ad119bc4e0faccf5c96bb9a9b7, type: 2}
-  Physics: {fileID: 0}
-  DeafultEnvironmentId: 6
-  ShouldChooseRandomStage: 0
-  ShouldChooseRandomTalentsForPlayer: 0
-  RandomTalentsForPlayersAmount: 1
-  StartMatchCountdownDuration: 1
-  ShootCooldownMultiplierWhenDead: 2
-  StageRestartDelaySeconds: 3
-  GemsCollectedForTeamAlive: 1
-  MaxOverllapingFloors: 32
-  StartingBoltsPerTeam: 0
-  BoltsGainedPerHit: 50
-  BoltsGainedPerKill: 50
-  TeleportGateCooldownInSeconds: 0.5
-  PreparationPhaseDuration: 4
-  ShouldAddTalentEveryXStages: 0
-  EveryXStages: 2
+  m_EditorClassIdentifier: SimulationAssembly::Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig
+  InnerConfig:
+    PlayerSpaceship:
+      StartHealth: 2
+      TargetMovementSpeed: 5
+      RotationSpeed: 150
+      ShootCooldown: 0.35
+      AutoShootRange: 12
+      AutoShootAngleDegrees: 30
+      DefaultPlayerRadius: 0.8
+      EngineAcceleration: 70
+      VelocityDecelerationPerSecond: 50
+      SpinDecelerationPerSecond: 0.05
+      MinSpin: 2
+      MinVelocity: 0.01
+      TurnEngineOnWhenReachVelocity: 0.25
+      DefaultHeartRadius: 0.64
+      LockOnHeartMaxRange: 13
+      LockOnHeartHalfArcAngleDegrees: 45
+      LockOnHeartHitDamage: 1
+    PlayerBullet:
+      MoveSpeed: 10
+      Radius: 0.14154
+      HitDamage: 1
+    Talents:
+      TalentCardHealth: 2
+      TalentsCooldownsConfigs:
+        TalentCooldownConfigs:
+        - rid: 2200602851054190747
+        - rid: 2200602851054190748
+        - rid: 2200602851054190749
+        - rid: 2200602851054190750
+        - rid: 2200602851054190751
+        - rid: 2200602851054190752
+        - rid: 2200602851054190753
+        - rid: 2200602851054190754
+        - rid: 2200602851054190755
+      TalentsArrowConfigs:
+        TalentCooldownConfigs:
+        - TalentType: 1
+          IsArrowShownOnlyWhilePressed: 0
+        - TalentType: 2
+          IsArrowShownOnlyWhilePressed: 1
+        - TalentType: 4
+          IsArrowShownOnlyWhilePressed: 0
+        - TalentType: 5
+          IsArrowShownOnlyWhilePressed: 0
+        - TalentType: 6
+          IsArrowShownOnlyWhilePressed: 1
+        - TalentType: 7
+          IsArrowShownOnlyWhilePressed: 1
+        - TalentType: 8
+          IsArrowShownOnlyWhilePressed: 1
+        - TalentType: 9
+          IsArrowShownOnlyWhilePressed: 1
+        - TalentType: 10
+          IsArrowShownOnlyWhilePressed: 0
+      HammerTalentConfig:
+        HammerSpeed: 10
+        HammerSize: 1
+        HammerMass: 10
+      SwapTalentConfig:
+        MaxRadius: 30
+        GrowDurationSeconds: 3
+      PulseDashConfig:
+        DashVelocity: 30
+      KOTalentConfig:
+        ProjectileSpeed: 50
+        ProjectileSize: 1
+        ReturnSpeedMultiplier: 2
+        MaxFirstPhaseDuration: 0.3
+        PushForce: 50
+        MaxSpin: 55
+        MinSpin: 50
+      SentryGunTalentConfig:
+        DurationInSeconds: 3
+        ShootCooldownMultiplier: 0.5
+        BulletsSpawnOffsetFromPlayerHead: 1.1
+      GrapplingHookTalentConfig:
+        ProjectileSpeed: 40
+        ReturnProjectileSpeedMultiplier: 2
+        ArriveDistance: 2
+        PlayerPullForceWhileHooked: 200
+        PlayerVelocitySquaredThresholdToDeactivateHook: 0.1
+        GraceTicksUntilCheckIfVelocityIsBelowThreshold: 5
+        PlayerRotateSpeedWhileHooked: 500
+      UmbrellaTalentConfig:
+        DurationInSeconds: 4
+        VelocityGainPerTick: 80
+      MagneticPullTalentConfig:
+        FieldArcAngle: 90
+        PushForce: 50
+        MaxSpin: 55
+        MinSpin: 50
+      ChickenTalentConfig:
+        CountdownDuration: 4
+        PushForce: 15
+        SpinAmount: 50
+      YearsOfPainTalentConfig:
+        RectangleColliderSize: {x: 3, y: 1.5}
+        PushForce: 100
+        MaxSpin: 200
+        MinSpin: 180
+      TalentCardWidth: 1.602175
+      TalentCardHeight: 2.382844
+    Lava:
+      DamageAmount: 1
+      DamageIntervalInSeconds: 1
+    PowerUps:
+      SpawnMinSecondsInterval: 5
+      SpawnMaxSecondsInterval: 10
+      MaxConcurrentPowerUpBalls: 5
+      MoveSpeed: 5
+      Radius: 1.269
+    EnvironmentSprings:
+      Force: 40
+      MaxSpin: 65
+      MinSpin: 50
+      Size: {x: 2, y: 1}
+    DeafultEnvironmentId: 7
+    ShouldChooseRandomStage: 1
+    ShouldChooseRandomTalentsForPlayer: 1
+    RandomTalentsForPlayersAmount: 3
+    StartMatchCountdownDuration: 1
+    ShootCooldownMultiplierWhenDead: 2
+    StageRestartDelaySeconds: 3
+    GemsCollectedForTeamAlive: 1
+    MaxOverllapingFloors: 32
+    StartingBoltsPerTeam: 0
+    BoltsGainedPerHit: 50
+    BoltsGainedPerKill: 50
+    TeleportGateCooldownInSeconds: 0.5
+    PreparationPhaseDuration: 4
+    ShouldAddTalentEveryXStages: 0
+    EveryXStages: 2
+    StageSizeMultiplier: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 2200602851054190747
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 1
+        CooldownInSeconds: 7
+    - rid: 2200602851054190748
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 6
+        CooldownInSeconds: 7
+    - rid: 2200602851054190749
+      type: {class: TalentStocksCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 5
+        MaxStocks: 3
+        SingleStockCooldownInSeconds: 5
+    - rid: 2200602851054190750
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 4
+        CooldownInSeconds: 9
+    - rid: 2200602851054190751
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 7
+        CooldownInSeconds: 6
+    - rid: 2200602851054190752
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 8
+        CooldownInSeconds: 8
+    - rid: 2200602851054190753
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 9
+        CooldownInSeconds: 5
+    - rid: 2200602851054190754
+      type: {class: TalentAlwaysActiveCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 10
+    - rid: 2200602851054190755
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 2
+        CooldownInSeconds: 6

@@ -1,16 +1,18 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner
 {
     public class PowerUpsSpawnTimerService : IPowerUpsSpawnerService
     {
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private float _secondsLeftUntilSpawn = 1;
 
         public PowerUpsSpawnTimerService(
-            SimulationGamePlayConfig gamePlayConfig)
+            ISimulationGamePlayConfigService gamePlayConfigService)
         {
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
         }
 
         public void StepTimer(float deltaTime)
@@ -25,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner
 
         public void RestartSpawnTimer()
         {
-            var randomSeconds = Simulation.Scripts.RNG.RNG.NextFloat(_gamePlayConfig.PowerUps.SpawnMinSecondsInterval, _gamePlayConfig.PowerUps.SpawnMaxSecondsInterval);
+            var randomSeconds = RNG.NextFloat(_gamePlayConfigService.GamePlayConfig.PowerUps.SpawnMinSecondsInterval, _gamePlayConfigService.GamePlayConfig.PowerUps.SpawnMaxSecondsInterval);
             _secondsLeftUntilSpawn = randomSeconds;
         }
     }
