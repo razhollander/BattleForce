@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68fb1a1fd85d14d1899bf55e73a85cf7, type: 3}
+  m_Name: EnvironmentSpikeConfig
+  m_EditorClassIdentifier:
+  Force: 40
+  MaxSpin: 65
+  MinSpin: 50
+  Size: {x: 2, y: 1}

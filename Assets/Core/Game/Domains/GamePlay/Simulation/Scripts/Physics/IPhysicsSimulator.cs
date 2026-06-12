@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public FixedUnorderedList<PhysicsCollisionEvent> GetCachedCollisions();
         public void ClearCachedCollisions();
         void InitExitPoint();
-        void CopyDataToSimulation(MatchSimulationStateS2C simulationState, FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls, FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls, FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings, FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> environmentTeleportGates);
+        void CopyDataToSimulation(MatchSimulationStateS2C simulationState, FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls, FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls, FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings, FixedClassUnorderedList<EnvironmentSpikeS2C> environmentSpikes, FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> environmentTeleportGates);
         void CopyDataToSimulation(MatchMakingSimulationStateS2C simulationState);
         Body GetPlayer(ushort playerId);
         Body GetKOProjectile(ushort koProjectileId);
@@ -37,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         bool RectangleCast(Vector2 center, Vector2 size, float angleRadians, params PhysicsBodyType[] bodyTypes);
         void AddStartMatchWall(ushort id, Vector2 position, float radius);
         void AddEnvironmentSpring(ushort id, Vector2 position, float rotationDegrees, Vector2 size);
+        void AddEnvironmentSpike(ushort id, Vector2 position, float rotationDegrees, Vector2 size);
         void AddTeleportGate(ushort id, Vector2 position, float rotation, Vector2 size);
         void AddSwapField(ushort id, ushort teamId, Vector2 position);
         void RemoveSwapField(ushort id);

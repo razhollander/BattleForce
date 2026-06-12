@@ -9,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public Vector2 EnvironmentHalfSize { get; private set; }
         public TalentCardConfig[] TalentCards { get; private set; }
         public EnvironmentSpringConfig[] EnvironmentSprings { get; private set; }
+        public EnvironmentSpikeConfig[] EnvironmentSpikes { get; private set; }
         public EnvironmentTeleportGatePairConfig[] TeleportGates { get; private set; }
         public WallConfig[] LavaWallConfigs { get; private set; }
         public WallConfig[] StageBoundaries { get; private set; }
@@ -30,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             StageBoundaries = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetStageBoundaries();
             TalentCards = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetTalentCards();
             EnvironmentSprings = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetEnvironmentSprings();
+            EnvironmentSpikes = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetEnvironmentSpikes();
             TeleportGates = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetTeleportGates();
             RotatingWheels = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetRotatingWheels();
             EnvironmentHalfSize = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(environmentLayoutId).GetEnvironmentHalfSize();

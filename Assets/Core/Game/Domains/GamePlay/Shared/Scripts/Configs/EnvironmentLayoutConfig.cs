@@ -65,6 +65,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             _environmentSpringsJson = environmentSpringsJson;
         }
 
+        public void SetEnvironmentSpikesJson(string environmentSpikesJson)
+        {
+            _environmentSpikesJson = environmentSpikesJson;
+        }
+
         public void SetTeleportGatesJson(string teleportGatesJson)
         {
             _teleportGatesJson = teleportGatesJson;
@@ -88,6 +93,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public EnvironmentSpringConfig[] GetEnvironmentSprings()
         {
             return _environmentSpringsJson.FromJson<EnvironmentSpringConfig[]>();
+        }
+
+        public EnvironmentSpikeConfig[] GetEnvironmentSpikes()
+        {
+            return _environmentSpikesJson.FromJson<EnvironmentSpikeConfig[]>();
         }
 
         public EnvironmentTeleportGatePairConfig[] GetTeleportGates()

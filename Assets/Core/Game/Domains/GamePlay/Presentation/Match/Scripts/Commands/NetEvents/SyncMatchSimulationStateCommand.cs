@@ -38,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchChickenEggsControllers _chickenEggsControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
+        private Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc.IEnvironmentSpikeControllers _environmentSpikeControllers;
         private ITalentCardControllers _talentCardControllers;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
@@ -71,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
+            _environmentSpikeControllers = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc.IEnvironmentSpikeControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
@@ -130,6 +132,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateBullets();
             CreateWalls();
             CreateSprings();
+            CreateSpikes();
             CreateLavaWalls();
             CreateRotatingWheels();
             CreateTalentCards();
@@ -187,6 +190,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 _matchDataService.AddSpring(spring.Id, Vector2.Zero, spring.Position, 0, spring.RotationAngle);
                 _environmentSpringControllers.CreateSpring(spring.Id);
+            }
+        }
+
+        private void CreateSpikes()
+        {
+            var spikes = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetEnvironmentSpikes();
+            if (spikes.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var spike in spikes)
+            {
+                _matchDataService.AddSpike(spike.Id, Vector2.Zero, spike.Position, 0, spike.RotationAngle);
+                _environmentSpikeControllers.CreateSpike(spike.Id);
             }
         }
 
@@ -328,6 +346,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                         _matchDataService.AddSpring(springConfig.Id, springConfig.Position, worldPosition, springConfig.RotationAngle, worldRotation);
                         _environmentSpringControllers.CreateSpring(springConfig.Id);
+                    }
+                }
+
+                if (wheelConfig.Spikes != null)
+                {
+                    foreach (var spikeConfig in wheelConfig.Spikes)
+                    {
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            calculationTick, rotationSpeed, deltaTime, wheelConfig.CenterPosition, spikeConfig.Position, spikeConfig.RotationAngle,
+                            out var worldPosition, out var worldRotation
+                        );
+
+                        _matchDataService.AddSpike(spikeConfig.Id, spikeConfig.Position, worldPosition, spikeConfig.RotationAngle, worldRotation);
+                        _environmentSpikeControllers.CreateSpike(spikeConfig.Id);
                     }
                 }
 

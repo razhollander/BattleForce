@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedClassUnorderedList<StageEndNetEventS2C> StageEndNetEvents;
         public FixedUnorderedList<TeamLostNetEventS2C> TeamLostNetEvents;
         public FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C> EnvironmentSpringPlayerCollisionNetEvents;
+        public FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C> EnvironmentSpikePlayerCollisionNetEvents;
         public FixedUnorderedList<TalentSwitchNetEventS2C> TalentSwitchNetEvents;
         public FixedUnorderedList<GainBoltsNetEventS2C> GainBoltsNetEvents;
         public FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> PlayerToEnvironmentTeleportGateCollisionNetEvents;
@@ -85,6 +86,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             TeamLostNetEvents = new FixedUnorderedList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
             TalentSwitchNetEvents = new FixedUnorderedList<TalentSwitchNetEventS2C>(maxCap.TalentSwitchNetEvents);
             EnvironmentSpringPlayerCollisionNetEvents = new FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>(maxCap.EnvironmentSpringPlayerCollisionNetEvents);
+            EnvironmentSpikePlayerCollisionNetEvents = new FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C>(maxCap.EnvironmentSpikePlayerCollisionNetEvents);
             GainBoltsNetEvents = new FixedUnorderedList<GainBoltsNetEventS2C>(maxCap.GainBoltsNetEvents);
 
             PlayerToEnvironmentTeleportGateCollisionNetEvents =
@@ -133,6 +135,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             SerializedTeamLostEvents(writer);
             SerializedTalentSwitchEvents(writer);
             SerializedEnvironmentSpringPlayerCollisionEvents(writer);
+            SerializedEnvironmentSpikePlayerCollisionEvents(writer);
             SerializedGainBoltsEvents(writer);
             SerializedPlayerToEnvironmentTeleportGateCollisionEvents(writer);
             SerializedPreparationPhaseEndedEvents(writer);
@@ -250,6 +253,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
+        private void SerializedEnvironmentSpikePlayerCollisionEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)EnvironmentSpikePlayerCollisionNetEvents.Count);
+            foreach (var netEvent in EnvironmentSpikePlayerCollisionNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
         private void SerializedTeamLostEvents(NetDataWriter writer)
         {
             writer.Put((byte) TeamLostNetEvents.Count);
@@ -331,6 +343,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeserializedTeamLostEvents(reader);
             DeserializedTalentSwitchEvents(reader);
             DeserializedEnvironmentSpringPlayerCollisionEvents(reader);
+            DeserializedEnvironmentSpikePlayerCollisionEvents(reader);
             DeserializedGainBoltsEvents(reader);
             DeserializedPlayerToEnvironmentTeleportGateCollisionEvents(reader);
             DeserializedPreparationPhaseEndedEvents(reader);
@@ -474,6 +487,17 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (var i = 0; i < count; i++)
             {
                 ref var netEvent = ref EnvironmentSpringPlayerCollisionNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedEnvironmentSpikePlayerCollisionEvents(NetDataReader reader)
+        {
+            EnvironmentSpikePlayerCollisionNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref EnvironmentSpikePlayerCollisionNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

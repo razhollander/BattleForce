@@ -50,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<GainBoltsNetEventS2C> _cachedUnprocessedGainBoltsEvents;
         private readonly CapacityList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> _cachedUnprocessedPlayerToEnvironmentTeleportCollisionEvents;
         private readonly CapacityList<EnvironmentSpringPlayerCollisionNetEventS2C> _cachedUnprocessedEnvironmentSpringPlayerCollisionEvents;
+        private readonly CapacityList<EnvironmentSpikePlayerCollisionNetEventS2C> _cachedUnprocessedEnvironmentSpikePlayerCollisionEvents;
         private readonly CapacityList<PreparationPhaseEndedNetEventS2C> _cachedUnprocessedPreparationPhaseEndedEvents;
         private readonly CapacityList<CreateSwapFieldNetEventS2C> _cachedUnprocessedCreateSwapFieldEvents;
         private readonly CapacityList<DeactivateSwapTalentNetEventS2C> _cachedUnprocessedDeactivateSwapTalentEvents;
@@ -109,6 +110,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedTeamLostEvents = new CapacityList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
             _cachedUnprocessedTalentSwitchEvents = new CapacityList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents);
             _cachedUnprocessedEnvironmentSpringPlayerCollisionEvents = new CapacityList<EnvironmentSpringPlayerCollisionNetEventS2C>(networkConfig.MaxCap.EnvironmentSpringPlayerCollisionNetEvents);
+            _cachedUnprocessedEnvironmentSpikePlayerCollisionEvents = new CapacityList<EnvironmentSpikePlayerCollisionNetEventS2C>(networkConfig.MaxCap.EnvironmentSpikePlayerCollisionNetEvents);
             _cachedUnprocessedGainBoltsEvents = new CapacityList<GainBoltsNetEventS2C>(networkConfig.MaxCap.GainBoltsNetEvents);
             _cachedUnprocessedPlayerToEnvironmentTeleportCollisionEvents = new CapacityList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(networkConfig.MaxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents);
             _cachedUnprocessedPreparationPhaseEndedEvents = new CapacityList<PreparationPhaseEndedNetEventS2C>(networkConfig.MaxCap.PreparationPhaseEndedNetEvents);
@@ -176,6 +178,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessTalentSwitchEvents(latestFullTickPacket.TalentSwitchNetEvents);
             ProcessGainBoltsEvents(latestFullTickPacket.GainBoltsNetEvents);
             ProcessEnvironmentSpringPlayerCollisionEvents(latestFullTickPacket.EnvironmentSpringPlayerCollisionNetEvents);
+            ProcessEnvironmentSpikePlayerCollisionEvents(latestFullTickPacket.EnvironmentSpikePlayerCollisionNetEvents);
             ProcessEnvironmentTeleportPlayerCollisionEvents(latestFullTickPacket.PlayerToEnvironmentTeleportGateCollisionNetEvents);
             ProcessPreparationPhaseEndedEvents(latestFullTickPacket.PreparationPhaseEndedNetEvents);
             ProcessCreateSwapFieldEvents(latestFullTickPacket.CreateSwapFieldNetEvents);
@@ -253,6 +256,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             if (!_cachedPlayerSelectedTalentFinishedCooldownLocalEvents.IsNullOrEmpty())
             {
                 _presentationNetEventsHandler.ProcessPlayerSelectedTalentFinishedCooldownEvents(_cachedPlayerSelectedTalentFinishedCooldownLocalEvents);
+            }
+        }
+
+        private void ProcessEnvironmentSpikePlayerCollisionEvents(FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C> environmentSpikePlayerCollisionNetEvents)
+        {
+            _cachedUnprocessedEnvironmentSpikePlayerCollisionEvents.Clear();
+
+            foreach (var netEvent in environmentSpikePlayerCollisionNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > LastProcessedTickFromServer)
+                {
+                    _cachedUnprocessedEnvironmentSpikePlayerCollisionEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedEnvironmentSpikePlayerCollisionEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedEnvironmentSpikePlayerCollisionEvents.Sort();
+                _presentationNetEventsHandler.ProcessEnvironmentSpikePlayerCollisionEvents(_cachedUnprocessedEnvironmentSpikePlayerCollisionEvents);
             }
         }
 
@@ -613,6 +635,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     springModel.WorldRotationAngle = worldRot;
                 }
 
+                foreach (var spikeId in wheelModel.SpikeIds)
+                {
+                    var spikeModel = _matchDataService.GetEnvironmentSpike(spikeId);
+
+                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                        calculationTick, rotationSpeed, deltaTime, wheelCenter, spikeModel.LocalPosition, spikeModel.LocalRotationAngle,
+                        out var worldPos, out var worldRot
+                    );
+
+                    spikeModel.WorldPosition = worldPos;
+                    spikeModel.WorldRotationAngle = worldRot;
+                }
 
                 foreach (var pairId in wheelModel.TeleportGatePairIds)
                 {

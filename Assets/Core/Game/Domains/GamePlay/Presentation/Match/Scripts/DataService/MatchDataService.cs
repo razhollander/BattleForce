@@ -196,6 +196,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 config.Walls.IsNullOrEmpty() ? new List<ushort>() : config.Walls.Select(x=>x.Id).ToList(), 
                 config.LavaWalls.IsNullOrEmpty() ? new List<ushort>() : config.LavaWalls.Select(x=>x.Id).ToList(), 
                 config.Springs.IsNullOrEmpty() ? new List<ushort>() : config.Springs.Select(x=>x.Id).ToList(),
+                config.Spikes.IsNullOrEmpty() ? new List<ushort>() : config.Spikes.Select(x=>x.Id).ToList(),
                 config.TeleportGatePairs.IsNullOrEmpty() ? new List<ushort>() : config.TeleportGatePairs.Select(x=>x.Id).ToList());
             RotatingWheels.Add(newWheel);
             return newWheel;

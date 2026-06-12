@@ -77,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateStageBoundaries();
             CreateTalentCards();
             CreateEnvironmentSprings();
+            CreateEnvironmentSpikes();
             CreateTeleportGates();
             CreateRotatingWheels();
             CreateFieldBarriers();
@@ -343,6 +344,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var springSize = _gamePlayConfig.EnvironmentSprings.Size.ToNumericsVector2();
             _matchDataService.EnvironmentData.AddSpring(springId, springLocalPosition, springWorldPosition, springLocalRotationAngle, springWorldRotationAngle);
             _physicsSimulator.AddEnvironmentSpring(springId, springWorldPosition, springWorldRotationAngle, springSize);
+        }
+
+        private void CreateEnvironmentSpikes()
+        {
+            var environmentSpikes = _matchEnvironmentConfigDataService.EnvironmentSpikes;
+            if (environmentSpikes.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var environmentSpike in environmentSpikes)
+            {
+                AddSpikeToEnvironment(environmentSpike.Id, Vector2.Zero, environmentSpike.Position, 0, environmentSpike.RotationAngle);
+            }
+        }
+
+        private void AddSpikeToEnvironment(ushort spikeId, Vector2 spikeLocalPosition, Vector2 spikeWorldPosition, float spikeLocalRotationAngle, float spikeWorldRotationAngle)
+        {
+            var spikeSize = _gamePlayConfig.EnvironmentSpikes.Size.ToNumericsVector2();
+            _matchDataService.EnvironmentData.AddSpike(spikeId, spikeLocalPosition, spikeWorldPosition, spikeLocalRotationAngle, spikeWorldRotationAngle);
+            _physicsSimulator.AddEnvironmentSpike(spikeId, spikeWorldPosition, spikeWorldRotationAngle, spikeSize);
         }
 
         private void CreateTeleportGates()

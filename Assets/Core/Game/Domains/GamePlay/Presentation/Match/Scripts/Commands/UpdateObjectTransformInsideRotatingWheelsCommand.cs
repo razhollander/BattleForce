@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
+        private Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc.IEnvironmentSpikeControllers _environmentSpikeControllers;
         private IEnvironmentTeleportGateControllers _environmentTeleportGateControllers;
 
         public override void ResolveDependencies()
@@ -21,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
+            _environmentSpikeControllers = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc.IEnvironmentSpikeControllers>();
             _environmentTeleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
         }
 
@@ -41,6 +43,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 foreach (var springId in rotatingWheelModel.SpringIds)
                 {
                     _environmentSpringControllers.UpdateSpringTransform(springId);
+                }
+
+                foreach (var spikeId in rotatingWheelModel.SpikeIds)
+                {
+                    _environmentSpikeControllers.UpdateSpikeTransform(spikeId);
                 }
 
                 foreach (var pairId in rotatingWheelModel.TeleportGatePairIds)

@@ -88,6 +88,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerEnvironmentSpringCollision(objectA, objectB);
+                HandlePlayerEnvironmentSpikeCollision(objectA, objectB);
                 HandlePlayerTeleportGateCollision(objectA, objectB);
                 HandleSwapFieldPlayerCollision(objectA, objectB);
                 HandleKOProjectilePlayerCollision(objectA, objectB);
@@ -374,6 +375,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 .Execute();
 
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
+        }
+
+        private void HandlePlayerEnvironmentSpikeCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isPlayerToSpike = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.EnvironmentSpike;
+            var isSpikeToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.EnvironmentSpike && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerToSpike && !isSpikeToPlayer)
+            {
+                return;
+            }
+
+            ushort playerId;
+            ushort spikeId;
+
+            if (isPlayerToSpike)
+            {
+                playerId = objectA.Id;
+                spikeId = objectB.Id;
+            }
+            else
+            {
+                playerId = objectB.Id;
+                spikeId = objectA.Id;
+            }
+
+            var damage = _gamePlayConfig.EnvironmentSpikes.Damage;
+            _playerHitCommand
+                .SetPlayerIdGotHit(playerId)
+                .SetHitDamage(damage)
+                .SetProcessedTick(_processedTick)
+                .Execute();
+
+            _netEventsDataService.AddEnvironmentSpikePlayerCollisionNetEvent(_processedTick, spikeId, playerId);
         }
 
         private void HandleBulletWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

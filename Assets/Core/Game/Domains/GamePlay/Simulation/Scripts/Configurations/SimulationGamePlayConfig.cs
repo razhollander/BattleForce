@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         [EditableRef] public LavaConfig Lava;
         [EditableRef] public PowerUpsConfig PowerUps;
         [EditableRef] public EnvironmentSpringsConfig EnvironmentSprings;
+        [EditableRef] public EnvironmentSpikesConfig EnvironmentSpikes;
         [EditableRef] public PhysicsConfig Physics;
         public int DeafultEnvironmentId = 0;
         public bool ShouldChooseRandomStage = true;

@@ -67,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             FixedClassUnorderedList<EnvironmentWallS2C> environmentWalls,
             FixedClassUnorderedList<EnvironmentWallS2C> environmentLavaWalls, 
             FixedClassUnorderedList<EnvironmentSpringS2C> environmentSprings,
+            FixedClassUnorderedList<EnvironmentSpikeS2C> environmentSpikes,
             FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> environmentTeleportGates)
         {
             var currentBody = _world.GetBodyList();
@@ -84,6 +85,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     case PhysicsBodyType.Wall: CopyWallStateToBody(currentBody, bodyData.Id, environmentWalls); break;
                     case PhysicsBodyType.Lava: CopyLavaStateToBody(currentBody, bodyData.Id, environmentLavaWalls); break;
                     case PhysicsBodyType.EnvironmentSpring: CopySpringStateToBody(currentBody, bodyData.Id, environmentSprings); break;
+                    case PhysicsBodyType.EnvironmentSpike: CopySpikeStateToBody(currentBody, bodyData.Id, environmentSpikes); break;
                     case PhysicsBodyType.EnvironmentTeleportGate: CopyTeleportGateStateToBody(currentBody, bodyData.Id, environmentTeleportGates); break;
                     case PhysicsBodyType.SwapField: CopySwapFieldToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.KOProjectile: CopyKOProjectileToBody(currentBody, bodyData.Id, simulationState); break;
@@ -136,6 +138,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var environmentSpring = environmentSprings.FindWithId(springId);
             springBody.SetTransform(environmentSpring.Transform.WorldPosition, environmentSpring.Transform.WorldRotationDegrees.ToRadians());       
+        }
+
+        private void CopySpikeStateToBody(Body spikeBody, ushort spikeId, FixedClassUnorderedList<EnvironmentSpikeS2C> environmentSpikes)
+        {
+            var environmentSpike = environmentSpikes.FindWithId(spikeId);
+            spikeBody.SetTransform(environmentSpike.Transform.WorldPosition, environmentSpike.Transform.WorldRotationDegrees.ToRadians());
         }
 
         private void CopyTeleportGateStateToBody(Body teleportGateBody, ushort teleportGateId, FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> environmentTeleportGates)
@@ -891,6 +899,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.isSensor = true;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentSpring.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(shape);
+        }
+
+        public void AddEnvironmentSpike(ushort id, Vector2 position, float rotationDegrees, Vector2 size)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = position;
+            bodyDef.angle = rotationDegrees.ToRadians();
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.EnvironmentSpike);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var shape = GetPolygonShape();
+            shape.SetAsBox(size.X * 0.5f, size.Y * 0.5f);
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+
+            fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentSpike.GetCollisionsCategory();
             fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);

@@ -291,6 +291,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessEnvironmentSpikePlayerCollisionEvents(CapacityList<EnvironmentSpikePlayerCollisionNetEventS2C> environmentSpikePlayerCollisionNetEvents)
+        {
+            if (environmentSpikePlayerCollisionNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var environmentSpikePlayerCollisionNetEvent in environmentSpikePlayerCollisionNetEvents)
+            {
+                _cachedPresentationEventsService.EnvironmentSpikePlayerCollisionNetEvents.Add(environmentSpikePlayerCollisionNetEvent);
+            }
+        }
+
         public void ProcessGainBoltsNetEvents(CapacityList<GainBoltsNetEventS2C> gainBoltsNetEvents)
         {
             if (gainBoltsNetEvents.IsNullOrEmpty())
