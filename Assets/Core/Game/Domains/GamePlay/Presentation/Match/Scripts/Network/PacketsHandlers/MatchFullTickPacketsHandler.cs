@@ -1144,7 +1144,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public void ManagedOnGUI()
         {
             InitStyles();
-            GUILayout.Box($"Last packet: {_lastPacketSize}b, Average: {_averagePacketSizeReceived}b, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds}b", _highVisStyle);
+            GUILayout.Box($"Ping: {_networkManager.Ping}, Last packet: {_lastPacketSize}b, Average: {_averagePacketSizeReceived}b, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds}b", _highVisStyle);
         }
         
         private void InitStyles()
