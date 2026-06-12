@@ -122,10 +122,14 @@ namespace Core.Scripts.Utils.CustomCollections
 
             _count--;
             if (index != _count)
-                _items[index] = _items[_count];
+            {
+                (_items[index], _items[_count]) = (_items[_count], _items[index]);
+            }
 
-            // if (clearReferences && RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-            //     _items[_count] = default;
+            // If you need to clear references so GC can collect them, you would do it here:
+            // if (clearReferences ...) _items[_count] = null; 
+            // BUT NOTE: If you null it out, AddAndGet() will eventually return null 
+            // instead of a pooled object, which breaks your factory pattern!
         }
 
         /// <summary>
@@ -204,6 +208,37 @@ namespace Core.Scripts.Utils.CustomCollections
                 Array.Copy(value, 0, _items, 0, value.Length);
                 _count = value.Length;
             }
+        }
+        
+        public void Sort()
+        {
+            if (_count <= 1)
+                return;
+
+            Array.Sort(_items, 0, _count);
+        }
+
+        public void RemoveRange(int index, int count)
+        {
+            if (count <= 0)
+                return;
+
+            if ((uint)index >= (uint)_count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            if (count < 0 || index + count > _count)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
+            int end = index + count;
+
+            // Move items from the back to fill the removed range
+            int itemsToMove = Math.Min(count, _count - end);
+            for (int i = 0; i < itemsToMove; i++)
+            {
+                _items[index + i] = _items[_count - 1 - i];
+            }
+
+            _count -= count;
         }
     }
 }

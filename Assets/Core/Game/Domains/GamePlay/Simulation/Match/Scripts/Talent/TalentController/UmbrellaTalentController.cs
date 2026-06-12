@@ -1,8 +1,9 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -14,12 +15,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
     {
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IMatchDataService _matchDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly NetworkConfig _networkConfig;
-        private readonly ICommandFactory _commandFactory;
         
         private ushort _casterPlayerId;
         private int _startTick;
+        private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
 
         public TalentType TalentType => TalentType.Umbrella;
         private bool IsCurrentlyActive
@@ -33,14 +34,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 _matchDataService.SimulationState.SetIsTalentCurrentlyActiveForPlayer(_casterPlayerId, TalentType, value);
             }
         }
+        
+        private bool IsCurrentlyAiming
+        {
+            get
+            {
+                return _matchDataService.SimulationState.GetIsTalentAimingForPlayer(_casterPlayerId, TalentType);
+            }
+            set
+            {
+                _matchDataService.SimulationState.SetIsTalentCurrentlyAimingForPlayer(_casterPlayerId, TalentType, value);
+            }
+        }
 
-        public UmbrellaTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, ICommandFactory commandFactory)
+        public UmbrellaTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _networkConfig = networkConfig;
-            _commandFactory = commandFactory;
+            _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -48,30 +61,47 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick, int tick, float deltaTime)
         {
-            if (!wasTalentInputDownThisTick)
-            {
-                return;
-            }
-
-            if (IsCurrentlyActive)
-            {
-                DeactivateTalent(tick);
-                return;
-            }
-
+            var isCurrentlyAiming = IsCurrentlyAiming;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            var isOnCooldown = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown();
-
+            var isOnCooldown = !casterPlayerState.Spaceship.TalentsState.TryGetTalentByType(TalentType, out var talentState) || talentState.IsOnCooldown();
             if (isOnCooldown)
             {
                 return;
             }
+            
+            if (wasTalentInputDownThisTick)
+            {
+                if (IsCurrentlyActive)
+                {
+                    DeactivateTalent(tick);
+                    return;
+                }
 
+                if (!isCurrentlyAiming)
+                {
+                    IsCurrentlyAiming = true;
+                    casterPlayerState.Spaceship.AssistArrowType = PlayerAssistArrowType.AimArrow;
+                }
+            }
+
+
+            if (IsCurrentlyActive)
+            {
+                return;
+            }
+            
+            if (!wasTalentInputReleasedThisTick || !isCurrentlyAiming)
+            {
+                return;
+            }
+            
+            casterPlayerState.Spaceship.AssistArrowType = PlayerAssistArrowType.Hidden;
+            IsCurrentlyAiming = false;
             IsCurrentlyActive = true;
+            casterPlayerState.Spaceship.IsEngineOn = false;
             _startTick = tick;
-
             _netEventsDataService.AddActivateUmbrellaTalentNetEvent(tick, _casterPlayerId);
         }
         
@@ -95,7 +125,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             var isSpinned = casterPlayerState.Spaceship.IsSpinned;
             var elapsedSeconds = (tick - _startTick) * deltaTime;
-            var didTimeEnded = elapsedSeconds >= _gamePlayConfig.Talents.UmbrellaTalentConfig.DurationInSeconds;
+            var didTimeEnded = elapsedSeconds >= _gamePlayConfigService.GamePlayConfig.Talents.UmbrellaTalentConfig.DurationInSeconds;
 
             if (isSpinned || didTimeEnded)
             {
@@ -105,7 +135,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>().SetPlayerId(_casterPlayerId).SetForce(aimDirection * _gamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick * deltaTime).ShouldTurnOffEngine(false).Execute();
+            var force = aimDirection * _gamePlayConfigService.GamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick * deltaTime;
+            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(aimDirection * force).ShouldTurnOffEngine(false).Execute();
         }
 
         private void DeactivateTalent(int tick)

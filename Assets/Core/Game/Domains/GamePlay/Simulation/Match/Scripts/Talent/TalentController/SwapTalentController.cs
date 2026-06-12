@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
@@ -16,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IMatchDataService _matchDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
 
@@ -36,11 +37,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private ushort _currentActiveSwapFieldId;
 
-        public SwapTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig)
+        public SwapTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
         }
@@ -50,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick, int tick, float deltaTime)
         {
             if (IsCurrentlyActive || !wasTalentInputDownThisTick)
             {
@@ -64,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             IsCurrentlyActive = true;
-            var talentsSwapTalentConfig = _gamePlayConfig.Talents.SwapTalentConfig;
+            var talentsSwapTalentConfig = _gamePlayConfigService.GamePlayConfig.Talents.SwapTalentConfig;
             var fieldEndTick = TickUtils.GetTickPassedAfterDuration(tick,talentsSwapTalentConfig.GrowDurationSeconds, _networkConfig.DeltaTime);
             var swapFieldModel = _matchDataService.AddSwapField(_casterPlayerId, tick, fieldEndTick);
             _currentActiveSwapFieldId = swapFieldModel.Id;
@@ -110,7 +111,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private void UpdateSwapFieldSize(int tick, ref TalentSwapFieldS2C swapFieldModel)
         {
-            swapFieldModel.UpdateRadiusForTick(tick, _gamePlayConfig.Talents.SwapTalentConfig.MaxRadius);
+            swapFieldModel.UpdateRadiusForTick(tick, _gamePlayConfigService.GamePlayConfig.Talents.SwapTalentConfig.MaxRadius);
         }
 
         public void PerformTalentWithEnemy(ushort enemyPlayerId, int tick)

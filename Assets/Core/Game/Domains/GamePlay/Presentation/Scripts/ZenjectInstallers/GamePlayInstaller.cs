@@ -5,8 +5,10 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using UnityEngine;
@@ -36,13 +38,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
 
         private void BindServices()
         {
+            Container.Bind<ILastFullSyncTickDataService>().To<LastFullSyncTickDataService>().AsSingle().NonLazy();
             Container.Bind<IGamePlayInitiator>().To<GamePlayInitiator>().AsSingle().NonLazy();
             Container.Bind<IClientNetworkManager>().To<ClientNetworkManager>().AsSingle().NonLazy();
             Container.Bind<ICachedPresentationEventsService>().To<CachedPresentationEventsService>().AsSingle().NonLazy();
             Container.Bind<ITickCounterService>().To<TickCounterService>().AsSingle().NonLazy();
             Container.Bind<IPlaybackIOService>().To<PlaybackIOService>().AsSingle().NonLazy();
             Container.Bind<IJoinResponsePacketHandler>().To<JoinResponsePacketHandler>().AsSingle().NonLazy();
-            Container.Bind<IInputBeingUsedService>().To<InputBeingUsedService>().AsSingle().NonLazy();
+            Container.Bind<IInputDeviceChangedListenerService>().To<InputDeviceChangedListenerService>().AsSingle().NonLazy();
+            Container.Bind<ILocalPlayersDataService>().To<LocalPlayersDataService>().AsSingle().NonLazy();
         }
 
         private void BindControllers()

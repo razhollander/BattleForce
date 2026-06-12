@@ -24,13 +24,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
             
-            foreach (var playersSwapEvent in playersSwapEvents)
-            {
-                _playerControllers.SetPlayerTransform(playersSwapEvent.CasterPlayerId, playersSwapEvent.CasterPosition, playersSwapEvent.CasterDirection);
-                _playerControllers.SetPlayerTransform(playersSwapEvent.OtherPlayerId, playersSwapEvent.OtherPosition, playersSwapEvent.OtherDirection);
-            }
+            //BlinkPlayersWithoutSwapEffect(playersSwapEvents);
             
             playersSwapEvents.Clear();
         }
+
+        // private void BlinkPlayersWithoutSwapEffect(List<PlayersSwapNetEventS2C> playersSwapEvents)
+        // {
+        //     foreach (var playersSwapEvent in playersSwapEvents)
+        //     {
+        //         _playerControllers.SetPlayerTransform(playersSwapEvent.CasterPlayerId, playersSwapEvent.CasterPosition, playersSwapEvent.CasterDirection);
+        //         _playerControllers.SetPlayerTransform(playersSwapEvent.OtherPlayerId, playersSwapEvent.OtherPosition, playersSwapEvent.OtherDirection);
+        //     }
+        // }
     }
 }

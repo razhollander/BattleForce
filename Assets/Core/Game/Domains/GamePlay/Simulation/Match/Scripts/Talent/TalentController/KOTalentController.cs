@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
@@ -22,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IMatchDataService _matchDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SpinPlayerCommand _spinPlayerCommand;
@@ -41,14 +42,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
         }
         
+        private bool IsCurrentlyAiming
+        {
+            get
+            {
+                return _matchDataService.SimulationState.GetIsTalentAimingForPlayer(_casterPlayerId, TalentType);
+            }
+            set
+            {
+                _matchDataService.SimulationState.SetIsTalentCurrentlyAimingForPlayer(_casterPlayerId, TalentType, value);
+            }
+        }
+        
         private bool _isInReturnPhase;
 
-        public KOTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig,
+        public KOTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
             IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _spinPlayerCommand = commandFactory.CreateCommandVoid<SpinPlayerCommand>();
@@ -60,23 +73,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick, int tick, float deltaTime)
         {
-            if (IsCurrentlyActive || !wasTalentInputDownThisTick)
-            {
-                return;
-            }
-
+            var isCurrentlyAiming = IsCurrentlyAiming;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             if (casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown())
             {
                 return;
             }
 
+            if (wasTalentInputDownThisTick)
+            {
+                if (!IsCurrentlyActive && !isCurrentlyAiming)
+                {
+                    IsCurrentlyAiming = true;
+                    casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.AimArrow;
+                }
+            }
+
+            if (IsCurrentlyActive)
+            {
+                return;
+            }
+
+            if (!wasTalentInputReleasedThisTick || !isCurrentlyAiming)
+            {
+                return;
+            }
+
+            casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.Hidden;
+            IsCurrentlyAiming = false;
             IsCurrentlyActive = true;
             _isInReturnPhase = false;
 
-            var koConfig = _gamePlayConfig.Talents.KOTalentConfig;
+            var koConfig = _gamePlayConfigService.GamePlayConfig.Talents.KOTalentConfig;
             var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
             var velocity = aimDirection * koConfig.ProjectileSpeed;
             var koProjectile = _matchDataService.AddKOProjectile(tick, _casterPlayerId, casterPlayerState.Spaceship.Transform.Position, aimDirection, velocity, koConfig.ProjectileSize);
@@ -104,7 +134,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             ref var projectile = ref _matchDataService.SimulationState.GetKOProjectileById(_projectileId);
-            var koConfig = _gamePlayConfig.Talents.KOTalentConfig;
+            var koConfig = _gamePlayConfigService.GamePlayConfig.Talents.KOTalentConfig;
 
             if (_isInReturnPhase)
             {
@@ -147,7 +177,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            var koConfig = _gamePlayConfig.Talents.KOTalentConfig;
+            var koConfig = _gamePlayConfigService.GamePlayConfig.Talents.KOTalentConfig;
             ref var projectile = ref _matchDataService.SimulationState.GetKOProjectileById(_projectileId);
             var enemyPlayerState = _matchDataService.SimulationState.GetPlayerById(enemyPlayerId);
             var pushDirection = projectile.Velocity.Normalize();

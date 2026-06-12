@@ -1,4 +1,5 @@
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.TeamFloor.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs;
@@ -9,8 +10,10 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Scripts.Network;
@@ -37,6 +40,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
         private NetworkConfig _networkConfig;
         private IClientMatchMakingPresentationTickProcessor _clientPresentationTickProcessor;
         private IMatchMakingDataService _matchMakingDataService;
+        private IBackgroundParallaxController _backgroundParallaxController;
+        private ILocalPlayersDataService _localPlayersDataService;
+        private IGameInputActionsController _gameInputActionsController;
 
         public StartGamePlayMatchMakingCommand SetEnterData(GamePlayMatchMakingInitiatorEnterData enterData)
         {
@@ -61,6 +67,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _clientPresentationTickProcessor = _diContainer.Resolve<IClientMatchMakingPresentationTickProcessor>();
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
+            _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
+            _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
+            _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
@@ -74,11 +83,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _startMatchButtonController.InitEntryPoint();
             _matchMakingUiController.InitEntryPoint(_enterData.IPAddress, _enterData.Port, _enterData.IsHost);
             _tickProcessor.InitEntryPoint();
+            _backgroundParallaxController.InitEntryPoint();
+            AddPlayersDevices();
             
             _commandFactory.CreateCommandVoid<SyncMatchMakingSimulationStateCommand>()
-                .SetSimulationState(_enterData.SimulationState).Execute();
-            _matchMakingDataService.SetLocalPlayer(_enterData.PlayerId);
+                .SetSimulationState(_enterData.SimulationState)
+                .SetStateOccuredOnTick(_enterData.StateOccuredOnTick)
+                .Execute();
             _clientPresentationTickProcessor.StartTick();
+        }
+
+        private void AddPlayersDevices()
+        {
+            _localPlayersDataService.SetLocalPlayers(_enterData.PlayerIdToDeviceIdDictionary);
+
+            foreach (var kvp in _localPlayersDataService.GetPlayerIdToDeviceIdDictionary())
+            {
+                _gameInputActionsController.AddPlayer(kvp.Key,_localPlayersDataService.GetInputDeviceForPlayer(kvp.Key));
+            }
         }
     }
 }

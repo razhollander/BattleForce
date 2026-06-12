@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
@@ -17,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private readonly IMatchDataService _matchDataService;
         private readonly INetEventsDataService _netEventsDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly NetworkConfig _networkConfig;
         private readonly ICommandFactory _commandFactory;
         private readonly IPhysicsSimulator _physicsSimulator;
@@ -27,19 +28,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public ChickenTalentController(IMatchDataService matchDataService,
             INetEventsDataService netEventsDataService,
-            SimulationGamePlayConfig gamePlayConfig,
+            ISimulationGamePlayConfigService gamePlayConfigService,
             NetworkConfig networkConfig, IPhysicsSimulator physicsSimulator)
         {
             _matchDataService = matchDataService;
             _netEventsDataService = netEventsDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
         }
 
         public void SetCasterId(ushort id) { _casterPlayerId = id; }
         
-        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick, int tick, float deltaTime)
         {
         }
 
@@ -69,14 +70,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            var config = _gamePlayConfig.Talents.ChickenTalentConfig;
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.ChickenTalentConfig;
 
             var movementDirection = casterPlayerState.Spaceship.Transform.Direction;
             _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>().SetPlayerId(_casterPlayerId).SetForce(movementDirection * config.PushForce).ShouldTurnOffEngine(false).Execute();
 
             var egg = _matchDataService.AddChickenEgg(_casterPlayerId, casterPlayerState.Spaceship.Transform.Position);
             _physicsSimulator.AddChickenEgg(egg.Id, casterPlayerState.TeamId, egg.Position, casterPlayerState.Spaceship.Transform.Radius);
-            LogService.LogError($"SERVER lay egg {egg.Id}");
             _netEventsDataService.AddLayChickenEggNetEventS2C(tick, _casterPlayerId, egg.Id, egg.Position);
             
             _countdownEndTick = TickUtils.GetTickPassedAfterDuration(tick, config.CountdownDuration, _networkConfig.DeltaTime);

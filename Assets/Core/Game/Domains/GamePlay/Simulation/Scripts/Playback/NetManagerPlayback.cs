@@ -57,9 +57,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
             {
                 var dummyPeer = (NetPeer) System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(NetPeer));
 
-                if (packet.PlayerId != ushort.MaxValue) // todo dont send a peer but instead send player id
+                if (packet.ClientId != ushort.MaxValue) // todo dont send a peer but instead send player id
                 {
-                    dummyPeer.Tag = packet.PlayerId;
+                    dummyPeer.Tag = packet.ClientId;
                 }
                     
                 var reader = new NetDataReader(packet.Data);

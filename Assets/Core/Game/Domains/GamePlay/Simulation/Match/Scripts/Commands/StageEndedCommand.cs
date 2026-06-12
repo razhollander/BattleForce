@@ -1,7 +1,6 @@
-using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -16,8 +15,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
         private IStageDataService _stageDataService;
-        private SimulationGamePlayConfig _config;
+        private ISimulationGamePlayConfigService _gamePlayConfigService;
+        
+        private ushort _playerIdDoingWinningBlow;
 
+        public StageEndedCommand PlayerIdDoingWinningBlow(ushort playerId)
+        {
+            _playerIdDoingWinningBlow = playerId;
+            return this;
+        }
+        
         public StageEndedCommand SetWinningTeamId(ushort winningTeamId)
         {
             _winningTeamId = winningTeamId;
@@ -35,16 +42,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
-            _config = _diContainer.Resolve<SimulationGamePlayConfig>();
+            _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
         }
 
         public void Execute()
         {
             LogService.LogTopic($"Match Ended! Winning Team: {_winningTeamId}", LogTopicType.ServerNetwork);
-            _stageDataService.AddWinnerTeam(_winningTeamId);
-            _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, _stageDataService.GemsCollectedPerTeam, _matchDataService.SimulationState.GemsPerTeamId);
+            _matchDataService.SimulationState.CurrentStageWinnerTeamId = _winningTeamId;
+            _matchDataService.SimulationState.IsInShowoffWinners = true;
+            _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, _stageDataService.GemsCollectedPerTeam, _matchDataService.SimulationState.GemsPerTeamId, _playerIdDoingWinningBlow);
             _stageDataService.IsStageEnded = true;
-            _stageDataService.StageRestartTimer = _config.StageRestartDelaySeconds;
+            _stageDataService.StageRestartTimer = _gamePlayConfigService.GamePlayConfig.StageRestartDelaySeconds;
         }
     }
 }

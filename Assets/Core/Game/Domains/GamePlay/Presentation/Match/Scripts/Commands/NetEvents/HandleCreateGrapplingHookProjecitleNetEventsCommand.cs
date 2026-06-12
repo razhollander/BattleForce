@@ -38,12 +38,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var casterPosition = _playerControllers.GetPlayerPosition(casterPlayerId);
                 var rotation = hookModel.Position - casterPosition.ToNumericsVector2();
 
-                _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, casterPlayerId, hookModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, hookModel.IsHookAttached);
-
-                if (_matchDataService.GetPlayer(casterPlayerId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentForCaster))
-                {
-                    _playerControllers.UpdateIsPlayerArrowShownAccordingToTalentState(casterPlayerId, currentSelectedTalentForCaster);
-                }
+                _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, casterPlayerId, hookModel.Position.ToUnityVector2(), rotation.ToUnityVector2(),
+                    casterPosition, hookModel.IsHookAttached);
             }
 
             _cachedPresentationEventsService.CreateGrapplingHookProjectileNetEvents.Clear();

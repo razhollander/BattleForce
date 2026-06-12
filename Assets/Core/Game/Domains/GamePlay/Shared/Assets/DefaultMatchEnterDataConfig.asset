@@ -17,3 +17,6 @@ MonoBehaviour:
     - Id: 1
       Name: Raz
       TeamId: 1
+    - Id: 2
+      Name: Liron
+      TeamId: 2

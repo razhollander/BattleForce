@@ -24,7 +24,8 @@ namespace Core.Scripts.Extensions
             }
             
             animation.Play(clipName);
-            var waitForClipDuration = Awaitable.WaitForSecondsAsync(clip.length, cancellationToken: cancellationToken);
+            var clipSpeed = animation[clipName].speed;
+            var waitForClipDuration = Awaitable.WaitForSecondsAsync(clip.length/clipSpeed, cancellationToken: cancellationToken);
             var waitForClipChanged = AwaitableUtils.WaitUntil(() => GetAnimationStateName(animation) != clipName, cancellationToken);
             await new []{waitForClipDuration, waitForClipChanged}.WhenAny(cancellationToken);
             completionSource?.TrySetResult();

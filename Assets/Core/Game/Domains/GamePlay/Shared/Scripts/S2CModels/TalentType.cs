@@ -4,6 +4,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     {
         None = 0,
         Swap = 1,
+        YearsOfPain = 2,
+        Rock = 3,
         SentryGun = 4,
         DashPulse = 5,
         KO = 6,
@@ -11,6 +13,5 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         Umbrella = 8,
         MagneticPull = 9,
         Chicken = 10,
-        Rock = 11
     }
 }

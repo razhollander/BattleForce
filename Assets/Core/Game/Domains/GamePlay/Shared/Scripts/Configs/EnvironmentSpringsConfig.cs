@@ -1,14 +1,16 @@
+using Core.Scripts.Helpers;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 {
-    [CreateAssetMenu(fileName = "EnvironmentSpringConfig", menuName = "BF/Shared/Environment Springs Config")]
-    public class EnvironmentSpringsConfig : ScriptableObject
+    [System.Serializable]
+    public class EnvironmentSpringsConfig
     {
-        public float Force = 20f;
-        public float MaxSpin = 55f;
+        public float Force = 40f;
+        public float MaxSpin = 65f;
         public float MinSpin = 50f;
-        public float SpinDuration = 2f;
-        public Vector2 Size = new Vector2(0.5f, 1f);
+        [JsonConverter(typeof(Vector2Converter))]
+        public Vector2 Size = new Vector2(2f, 1f);
     }
 }

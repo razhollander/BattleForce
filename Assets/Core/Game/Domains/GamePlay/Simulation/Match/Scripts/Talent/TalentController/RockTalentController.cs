@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -18,9 +19,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IMatchDataService _matchDataService;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
 
         public TalentType TalentType => TalentType.Rock;
 
@@ -30,11 +31,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             set => _matchDataService.SimulationState.SetIsTalentCurrentlyActiveForPlayer(_casterPlayerId, TalentType, value);
         }
 
-        public RockTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, SimulationGamePlayConfig gamePlayConfig, NetworkConfig networkConfig, IPhysicsSimulator physicsSimulator)
+        public RockTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, IPhysicsSimulator physicsSimulator)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _networkConfig = networkConfig;
             _physicsSimulator = physicsSimulator;
         }
@@ -44,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _casterPlayerId = casterPlayerId;
         }
 
-        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, int tick, float deltaTime)
+        public void ProcessTalentInput(bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick, int tick, float deltaTime)
         {
             if (IsCurrentlyActive || !wasTalentInputDownThisTick)
             {
@@ -67,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _startTick = tick;
 
             _originalRadius = casterPlayerState.Spaceship.Transform.Radius;
-            casterPlayerState.Spaceship.Transform.Radius *= _gamePlayConfig.Talents.RockTalentConfig.SizeMultiplier;
+            casterPlayerState.Spaceship.Transform.Radius *= _gamePlayConfigService.GamePlayConfig.Talents.RockTalentConfig.SizeMultiplier;
             casterPlayerState.Spaceship.IsEngineOn = false;
             casterPlayerState.Spaceship.Transform.StopMotion();
 
@@ -79,7 +80,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             _netEventsDataService.AddActivateRockTalentNetEvent(tick, _casterPlayerId);
         }
-
+        
         public void StopIfActive(int tick)
         {
             if (!IsCurrentlyActive) return;
@@ -91,7 +92,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             if (!IsCurrentlyActive) return;
 
             var elapsedSeconds = (tick - _startTick) * deltaTime;
-            var didTimeEnd = elapsedSeconds >= _gamePlayConfig.Talents.RockTalentConfig.DurationInSeconds;
+            var didTimeEnd = elapsedSeconds >= _gamePlayConfigService.GamePlayConfig.Talents.RockTalentConfig.DurationInSeconds;
 
             if (didTimeEnd)
             {

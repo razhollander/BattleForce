@@ -1,6 +1,10 @@
+using System.Collections.Generic;
 using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Initiator;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
@@ -19,13 +23,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
         private bool _isHost;
         private string _ipAddress;
         private int _port;
-        private string _playerName;
+        private long _clientId;
         
         private IClientNetworkManager _networkManager;
         private IJoinResponsePacketHandler _joinResponsePacketHandler;
         private ISceneLoaderService _sceneLoaderService;
         private ITickCounterService _tickCounterService;
         private NetworkConfig _networkConfig;
+        
+        private List<PlayerJoinedModel> _playersJoinedModels;
 
         public StartClientCommand SetIsHost(bool isHost)
         {
@@ -40,9 +46,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
             return this;
         }
 
-        public StartClientCommand SetPlayerName(string playerName)
+        public StartClientCommand SetClientId(long clientId)
         {
-            _playerName = playerName;
+            _clientId = clientId;
+            return this;
+        }
+
+        public StartClientCommand SetPlayersJoined(List<PlayerJoinedModel> playersJoinedModels)
+        {
+            _playersJoinedModels = playersJoinedModels;
             return this;
         }
 
@@ -57,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
-            _networkManager.ConenctToServerPeer(_ipAddress, _port, _playerName);
+            _networkManager.ConenctToServerPeer(_ipAddress, _port, _clientId);
             
             while (!_networkManager.IsPeerConnected)
             {
@@ -65,7 +77,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
                 await Awaitable.FixedUpdateAsync(cancellationTokenSource.Token);
             }
 
-            var joinRequest = new JoinRequestPacketC2S(_playerName);
+            var joinRequest = new JoinRequestPacketC2S(_networkConfig.MaxCap.ConcurrentPlayers);
+            joinRequest.ClientId = _clientId;
+            foreach (var playersJoinedModel in _playersJoinedModels)
+            {
+                joinRequest.AddPlayer(playersJoinedModel.PlayerName, playersJoinedModel.PlayerInputType == SupportedInputType.Gamepad, playersJoinedModel.InputDeviceId);
+            }
+            
             _networkManager.SendPacketSerialized(PacketTypeC2S.JoinRequest, joinRequest, DeliveryMethod.ReliableOrdered);
             
             while (!_joinResponsePacketHandler.DidReceiveJoinResponse)
@@ -81,40 +99,40 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
                 LogService.LogError("Can't join server!");
                 return;
             }
+            LogService.LogTopic("Sync tick to server server4: " + _ipAddress + ":" + _port + ", _clientId:"+_clientId, LogTopicType.ClientNetwork);
 
             SyncTickToServer(joinResponse.OccuredOnTick);
             
             if (joinResponse.IsMatchMaking)
             {
-                var enterData = new GamePlayMatchMakingInitiatorEnterData(joinResponse.MatchMakingSimulationState ,_ipAddress, _port, _isHost, joinResponse.OccuredOnTick, joinResponse.LocalPlayerId);
+                var enterData = new GamePlayMatchMakingInitiatorEnterData(joinResponse.MatchMakingSimulationState ,_ipAddress, _port, _isHost, joinResponse.OccuredOnTick, joinResponse.PlayerIdToDeviceIdDictionary);
                 await LoadMatchMakingScene(enterData, cancellationTokenSource);
             }
             else
             {
                 var InitialState = joinResponse.MatchSimulationState;
-                var enterData = new GamePlayMatchInitiatorEnterData(InitialState, joinResponse.LocalPlayerId);
+                var enterData = new GamePlayMatchInitiatorEnterData(InitialState, joinResponse.OccuredOnTick, joinResponse.PlayerIdToDeviceIdDictionary);
                 await LoadMatchScene(enterData, cancellationTokenSource);
             }
         }
-        
+
         private void SyncTickToServer(int serverTick)
         {
             var ticksPassedSinceServerSendPacket = (_networkManager.Ping / 1000f) / _networkConfig.DeltaTime;
             var tickWouldBeOnServerWhenReceiveMyPackets = (int)(ticksPassedSinceServerSendPacket * 2) + serverTick;
             _tickCounterService.SetTick(tickWouldBeOnServerWhenReceiveMyPackets);
         }
-        
+
         private async Awaitable LoadMatchMakingScene(GamePlayMatchMakingInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
         {
             await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.GamePlayMatchMakingScene, enterData, cancellationTokenSource);
-        }  
-        
+        }
+
         private async Awaitable LoadMatchScene(GamePlayMatchInitiatorEnterData enterData, CancellationTokenSource cancellationTokenSource)
         {
             await _sceneLoaderService.TryLoadScene(SceneType.GamePlayMatchScene, enterData, cancellationTokenSource);
             await _sceneLoaderService.StartScene(SceneType.GamePlayMatchScene, enterData, cancellationTokenSource);
         }
-
     }
 }

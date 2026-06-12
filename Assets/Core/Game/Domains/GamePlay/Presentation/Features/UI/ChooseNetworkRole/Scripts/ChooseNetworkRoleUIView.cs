@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,6 +9,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 {
     public class ChooseNetworkRoleUIView : MonoBehaviour
     {
+        [SerializeField] private PlayerJoinedPanelView _playerJoinedPanelViewPrefab;
+        
         [SerializeField] private Button _clientButton;
         [SerializeField] private Button _hostButton;
         [SerializeField] private Button _serverButton;
@@ -16,12 +20,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         [SerializeField] private TMP_InputField _ipInputField;
         [SerializeField] private TMP_InputField _portInputField;
         [SerializeField] private TMP_Dropdown _playbacksDropdown;
-        [SerializeField] private TMP_InputField _playerNameInputField;
+        [SerializeField] private Transform _playersJoinedPanelsParent;
 
+        private readonly List<PlayerJoinedPanelView> _playerJoinedPanelViews = new List<PlayerJoinedPanelView>();
         private Action _onClientClicked;
         private Action _onHostClicked;
         private Action _onServerClicked;
         private Action _onPlayPlaybackClicked;
+        private Action<int, string> _onPlayerNameChanged;
+        private Action<int> _onRemovePlayerButtonClicked;
 
         public TMP_Dropdown PlaybacksDropdown => _playbacksDropdown;
 
@@ -31,12 +38,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             return PlaybacksDropdown.options[selectedOptionIndex].text;
         }
         
-        public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked, Action onPlayPlaybackClicked, bool defaultOnlyLocal, string defaultIp, int defaultPort, string playerName)
+        public void Setup(Action onClientClicked, Action onHostClicked, Action onServerClicked, Action onPlayPlaybackClicked, Action<int, string> onPlayerNameChanged, Action<int> onRemovePlayerButtonClicked, bool defaultOnlyLocal, string defaultIp, int defaultPort,List<PlayerJoinedModel> playerJoinedModels)
         {
             _onClientClicked = onClientClicked;
             _onHostClicked = onHostClicked;
             _onServerClicked = onServerClicked;
             _onPlayPlaybackClicked = onPlayPlaybackClicked;
+            _onPlayerNameChanged = onPlayerNameChanged;
+            _onRemovePlayerButtonClicked = onRemovePlayerButtonClicked;
             _clientButton.onClick.AddListener(OnClientClicked);
             _hostButton.onClick.AddListener(OnHostClicked);
             _serverButton.onClick.AddListener(OnServerClicked);
@@ -45,10 +54,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _localHostToggle.isOn = defaultOnlyLocal;
             _ipInputField.text = defaultIp;
             _portInputField.text = defaultPort.ToString();
-            _playerNameInputField.text = playerName;
 
+            foreach (var playerJoinedModel in playerJoinedModels)
+            {
+                AddPlayerJoinedPanel(playerJoinedModel.PlayerName, playerJoinedModel.PlayerInputType);
+            }
+            
             _localHostToggle.onValueChanged.AddListener(OnLocalHostToggleChanged);
             OnLocalHostToggleChanged(_localHostToggle.isOn);
+        }
+
+        public void AddPlayerJoinedPanel(string playerName, SupportedInputType supportedInputType)
+        {
+            var playerJoinedPanelView = Instantiate(_playerJoinedPanelViewPrefab, _playersJoinedPanelsParent);
+            _playerJoinedPanelViews.Add(playerJoinedPanelView);
+            playerJoinedPanelView.Setup(_playerJoinedPanelViews.Count-1, playerName, supportedInputType, OnPlayerNameChanged, OnPlayerRemoveButtonClicked);
+        }
+
+        private void OnPlayerRemoveButtonClicked(int playerIndex)
+        {
+            _onRemovePlayerButtonClicked?.Invoke(playerIndex);
+        }
+
+        private void OnPlayerNameChanged(int playerIndex, string playerName)
+        {
+            _onPlayerNameChanged?.Invoke(playerIndex, playerName);
         }
 
         private void OnLocalHostToggleChanged(bool isLocalHost)
@@ -58,7 +88,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         public bool IsLocalHost => _localHostToggle.isOn;
         public string IpAddress => _ipInputField.text;
-        public string PlayerName => _playerNameInputField.text;
 
         public int Port
         {
@@ -95,6 +124,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         public void Hide()
         {
             gameObject.SetActive(false);
+        }
+
+        public void RemovePlayerJoined(int playerIndex)
+        {
+            var playerRemoved = _playerJoinedPanelViews[playerIndex];
+            _playerJoinedPanelViews.Remove(playerRemoved);
+            Destroy(playerRemoved.gameObject);
         }
     }
 }

@@ -10,7 +10,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Playback
     {
         public int Seed;
         public int InitialTick;
-        public EnterMatchPlayerData[] Players; 
+        public string SimulationConfigJson;
+        public EnterMatchPlayerData[] Players;
         public Dictionary<int, PlaybackTickData> Ticks;
     }
 }

@@ -4,6 +4,8 @@ namespace Core.Scripts.Extensions
 {
     public static class UnityVectorExtensions
     {
+        private static readonly double DEGREES_TO_RAD_MULTIPLIER = System.Math.PI / 180.0f;
+        
         public static Vector2 ToUnityVector2(this System.Numerics.Vector2 vec)
         {
             return new Vector2(vec.X, vec.Y);
@@ -43,7 +45,7 @@ namespace Core.Scripts.Extensions
         /// <returns></returns>
         public static System.Numerics.Vector2 Rotate(this System.Numerics.Vector2 direction, float degrees)
         {
-            var rad = degrees * (System.Math.PI / 180.0);
+            var rad = degrees * DEGREES_TO_RAD_MULTIPLIER;
             var sin = System.Math.Sin(rad);
             var cos = System.Math.Cos(rad);
 
@@ -58,6 +60,13 @@ namespace Core.Scripts.Extensions
         {
             // note: in math the angle of (1,0) is 0, then going anti-clockwise
             return Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
+        }
+
+        public static bool IsAlmostEqual(this Vector2 a, Vector2 b)
+        {
+            // var tolerance = 0.001f;
+            // return Mathf.Abs(a.x - b.x)<tolerance;
+            return Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y);
         }
     }
 }

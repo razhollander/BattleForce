@@ -1,5 +1,6 @@
 using ASoliman.Utils.EditableRefs;
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
@@ -14,6 +15,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
         [EditableRef] public TeamFloorConfig TeamFloor;
         [EditableRef] public EnvironmentTeleportConfig Teleports;
         [EditableRef] public EnvironmentFieldBarriersConfig FieldBarriers;
+        public bool ShouldOverrideClientId = false;
+        [EnableIf(nameof(ShouldOverrideClientId))]
+        public long ClientIdOverride = 1;
         public SerializableDictionary<int, Color> ColorPerTeamId;
     }
 }

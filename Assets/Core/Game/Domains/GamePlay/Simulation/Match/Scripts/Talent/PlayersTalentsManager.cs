@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
@@ -16,19 +17,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
     {
         private readonly IMatchDataService _matchDataService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private readonly SimulationGamePlayConfig _gamePlayConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly Dictionary<int, PlayerTalentControllers> _talentControllersPerPlayer;
         private readonly ConcurrentPool<PlayerTalentControllers> _talentControllersPool;
 
         public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig,
-            INetEventsDataService netEventsDataService, SimulationGamePlayConfig gamePlayConfig, IPhysicsSimulator physicsSimulator,
+            INetEventsDataService netEventsDataService, ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator,
             IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory)
         {
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
-            _gamePlayConfig = gamePlayConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _talentControllersPerPlayer = new Dictionary<int, PlayerTalentControllers>(networkConfig.MaxCap.ConcurrentPlayers);
-            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfig, physicsSimulator, networkConfig, overrideableNetEventsService, commandFactory, sharedGamePlayConfig),networkConfig.MaxCap.ConcurrentPlayers);
+            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, overrideableNetEventsService, commandFactory, sharedGamePlayConfig),networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)
@@ -92,7 +93,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 return false;
             }
 
-            if (selectedTalent.IsActive)
+            if (selectedTalent.IsCurrentlyActive)
             {
                 return false;
             }
@@ -106,9 +107,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             return true;
         }
 
-        public void ProcessPlayerTalentInput(ushort playerId, TalentType talentType, int tick, bool wasTalentInputDownThisTick, bool isTalentInputPressed, float deltaTime)
+        public bool TrySwitchToTalent(ushort playerId, int talentIndex)
         {
-            _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, wasTalentInputDownThisTick, isTalentInputPressed, tick, deltaTime);
+            var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+            var talents = playerState.Spaceship.TalentsState;
+
+            if (!talents.TryGetCurrentSelectedTalent(out var selectedTalent))
+            {
+                return false;
+            }
+
+            if (selectedTalent.IsCurrentlyActive)
+            {
+                return false;
+            }
+
+            if (talentIndex >= talents.Talents.Count)
+            {
+                LogService.LogError($"Tryed to switch to talent index {talentIndex} which is out of range of {talents.Talents.Count} talents");
+                return false;
+            }
+
+            talents.SelectedTalentIndex = talentIndex;
+            return true;
+        }
+
+        public void ProcessPlayerTalentInput(ushort playerId, TalentType talentType, int tick, bool wasTalentInputDownThisTick, bool isTalentInputPressed, bool wasTalentInputReleasedThisTick,
+            float deltaTime)
+        {
+            _talentControllersPerPlayer[playerId].ProcessTalentInput(talentType, wasTalentInputDownThisTick, isTalentInputPressed, wasTalentInputReleasedThisTick, tick, deltaTime);
         }
 
         public void ProcessAllTalentsTickOfPlayer(ushort playerId, int tick, float deltaTime)
@@ -183,7 +210,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private void SetupTalentCooldown(ref TalentStateS2C newTalent)
         {
             var talentType = newTalent.TalentType;
-            var cooldownConfig = _gamePlayConfig.Talents.TalentsCooldownsConfigs.TalentCooldownConfigs.Find(x => x.TalentType == talentType);
+            var cooldownConfig = _gamePlayConfigService.GamePlayConfig.Talents.TalentsCooldownsConfigs.TalentCooldownConfigs.Find(x => x.TalentType == talentType);
 
             switch (cooldownConfig.CooldownType)
             {

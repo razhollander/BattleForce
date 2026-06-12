@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
@@ -26,7 +27,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.ZenjectIns
         [SerializeField] private EnvironmentTeamFloorsView _environmentTeamFloorsViewPrefab;
         [SerializeField] private StartMatchButtonView _startMatchButtonViewPrefab;
         [SerializeField] private MatchMakingUiView _matchMakingUiViewPrefab;
-        
+        [SerializeField] private BackgroundParallaxView _backgroundParallaxView;
+
         public override void InstallBindings()
         {
             BindServices();
@@ -51,6 +53,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.ZenjectIns
             Container.BindInterfacesTo<MatchMakingEnvironmentTeamFloorControllers>().AsSingle().WithArguments(_environmentTeamFloorsViewPrefab).NonLazy();
             Container.BindInterfacesTo<StartMatchButtonController>().AsSingle().WithArguments(_startMatchButtonViewPrefab).NonLazy();
             Container.Bind<IMatchMakingUiController>().To<MatchMakingUiController>().AsSingle().WithArguments(_matchMakingUiViewPrefab).NonLazy();
+            Container.BindInterfacesTo<BackgroundParallaxController>().AsSingle().WithArguments(_backgroundParallaxView).NonLazy();
         }
     }
 }

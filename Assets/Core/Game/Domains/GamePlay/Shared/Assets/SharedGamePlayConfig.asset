@@ -31,3 +31,4 @@ MonoBehaviour:
   GrapplingHookProjectileSize: 1
   GrapplingHookProjectileMaxDistance: 30
   MagneticPullFieldRadius: 10
+  LockOnTargetDurationInSeconds: 1

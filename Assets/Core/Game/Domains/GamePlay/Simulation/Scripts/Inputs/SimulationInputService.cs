@@ -73,8 +73,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
         {
             public Dictionary<PlayerInputType, TickInputState> InputStates = new Dictionary<PlayerInputType, TickInputState>
             {
-                {PlayerInputType.SwitchTalent, new TickInputState()},
-                {PlayerInputType.TalentInput, new TickInputState()},
+                {PlayerInputType.TalentAInput, new TickInputState()},
+                {PlayerInputType.TalentBInput, new TickInputState()},
+                {PlayerInputType.TalentCInput, new TickInputState()},
                 {PlayerInputType.Shoot, new TickInputState()}
             };
         }

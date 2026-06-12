@@ -4,9 +4,7 @@ using System.Threading;
 using Core.Scripts.Extensions;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Helpers.Pools;
-using CoreDomain.Scripts.Services.Logger.Base;
 using DG.Tweening;
-using NUnit.Framework;
 using TMPro;
 using UnityEngine;
 
@@ -16,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.
     {
         [SerializeField] private TextMeshPro _text;
         [SerializeField] private float _moveDistance = 1.0f;
-        [SerializeField] private float _showDuration = 1.0f;
+        [SerializeField] private float _showDurationInSeconds = 1.0f;
         [SerializeField] private float _textFadeInDuration = 0.2f;
         [SerializeField] private float _textFadeOutDuration = 0.2f;
         
@@ -32,12 +30,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.
             color.a = 0;
             _text.color = color;
             var endYValue = transform.localPosition.y + _moveDistance;
-            _showDuration = 10;
             _animationTasks.Clear();
-            _animationTasks.Add(transform.DOLocalMoveY(endYValue, _showDuration).SetEase(Ease.OutQuad).WithCancellationSafe(cancellationTokenSource.Token));
+            _animationTasks.Add(transform.DOLocalMoveY(endYValue, _showDurationInSeconds).SetEase(Ease.OutQuad).WithCancellationSafe(cancellationTokenSource.Token));
             _animationTasks.Add(_text.DOFade(1, _textFadeInDuration).OnComplete(() =>
             {
-                _text.DOFade(0, _textFadeOutDuration).SetDelay(_showDuration - _textFadeInDuration - _textFadeOutDuration);
+                _text.DOFade(0, _textFadeOutDuration).SetDelay(_showDurationInSeconds - _textFadeInDuration - _textFadeOutDuration);
             }).WithCancellationSafe(cancellationTokenSource.Token));
 
             try

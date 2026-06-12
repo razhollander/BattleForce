@@ -3,5 +3,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
     public interface IChooseNetworkRoleUIController
     {
         void InitEntryPoint();
+        void InitExitPoint();
     }
 }

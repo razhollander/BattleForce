@@ -23,17 +23,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; private set; }
         public List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; private set; }
         public List<MatchSwapFieldModel> SwapFields { get; private set; }
+        public ushort CurrentStageWinnerTeamId { get; set; }
         public List<MatchKOProjectileModel> KOProjectiles { get; private set; }
         public List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
         public List<MatchChickenEggModel> ChickenEggs { get; private set; }
 
-        public MatchPlayerModel LocalPlayer { get; private set; }
-        public bool IsPlayerJoined => LocalPlayer != null;
         public HashSet<ushort> TeamIds  {get; private set; }
         public int StartPhaseInitialTick { get; set; }
         public bool IsInPreparationPhase { get; set; }
+        public bool IsInShowoffWinners { get; set; }
         public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }
         public Dictionary<ushort, int> GemsPerTeam  {get; private set; }
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
@@ -137,7 +137,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 return;
             }
             
-            LogService.LogError("Remove power up ball: " + powerUpBallModel.Id);
             PowerUpBalls.Remove(powerUpBallModel);
         }
 
@@ -183,6 +182,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newBarrier;
         }
 
+        public void SetLocalPlayer(int playerId)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle)
         {
             var newSpring = new MatchEnvironmentSpringModel(id, localPosition, worldPosition, localRotationAngle, worldRotationAngle);
@@ -190,27 +194,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newSpring;
         }
 
-        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(EnvironmentRotatingWheelConfig config)
+        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> teleportGatePairIds)
         {
-            var newWheel = new MatchEnvironmentRotatingWheelModel(config.Id, config.CenterPosition, config.RotationSpeed, 
-                config.Walls.IsNullOrEmpty() ? new List<ushort>() : config.Walls.Select(x=>x.Id).ToList(), 
-                config.LavaWalls.IsNullOrEmpty() ? new List<ushort>() : config.LavaWalls.Select(x=>x.Id).ToList(), 
-                config.Springs.IsNullOrEmpty() ? new List<ushort>() : config.Springs.Select(x=>x.Id).ToList(),
-                config.TeleportGatePairs.IsNullOrEmpty() ? new List<ushort>() : config.TeleportGatePairs.Select(x=>x.Id).ToList());
+            var newWheel = new MatchEnvironmentRotatingWheelModel(id, centerPosition, rotationSpeed, wallIds, lavaWallIds, springIds, teleportGatePairIds);
             RotatingWheels.Add(newWheel);
             return newWheel;
         }
 
-        public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 position, float radius)
+        public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 initialPosition, System.Numerics.Vector2 velocity, float radius, int spawnTick)
         {
-            var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, position, radius);
+            var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, initialPosition, velocity, radius, spawnTick);
             Bullets.Add(newBullet);
             return newBullet;
-        }
-
-        public void SetLocalPlayer(int playerId)
-        {
-            LocalPlayer = Players.Find(x => x.PlayerId == playerId);
         }
 
         public void ClearAll()
@@ -390,6 +385,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             }
 
             ChickenEggs.Remove(model);
+        }
+
+        public bool TryGetKingedPlayers(out List<MatchPlayerModel> kingedPlayers)
+        {
+            if (!IsInShowoffWinners)
+            {
+                kingedPlayers = default;
+                return false;
+            }
+
+            kingedPlayers = Players.FindAll(x => x.TeamId == CurrentStageWinnerTeamId);
+            return true;
         }
     }
 }

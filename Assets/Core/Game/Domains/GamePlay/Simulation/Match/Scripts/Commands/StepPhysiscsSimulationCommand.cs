@@ -92,7 +92,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             for (int i = 0; i < _matchDataService.SimulationState.Bullets.Count; i++)
             {
-                ref var bulletState = ref _matchDataService.SimulationState.Bullets.GetByIndex(i);
+                ref var bulletState = ref _matchDataService.SimulationState.Bullets.Get(i);
                 bulletState.Position = _physicsSimulator.GetBullet(bulletState.Id).Position;
             }
 

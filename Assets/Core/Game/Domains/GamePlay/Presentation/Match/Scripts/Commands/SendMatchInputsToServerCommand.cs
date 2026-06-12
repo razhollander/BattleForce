@@ -1,5 +1,4 @@
-using System;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
@@ -7,89 +6,78 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
-using Core.Scripts.Extensions;
-using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
-using UnityEngine;
-using Vector2 = System.Numerics.Vector2;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
+using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 {
     public class SendMatchInputsToServerCommand : BaseCommand, ICommandVoid
     {
         private IClientNetworkManager _clientNetworkManager;
-        private IGameInputActionsController _gameInputActionsController;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
         private ITickCounterService _tickCounterService;
         private IMatchPlayerControllers _matchPlayerControllers;
         private IMatchDataService _matchDataService;
-        private IWorldCameraController _worldCameraController;
-        private IInputBeingUsedService _inputBeingUsedService;
+        private ILocalPlayersDataService _localPlayersDataService;
+        private GetCalculatedPlayerInputsCommand _getCalculatedPlayerInputsCommand;
+        private FixedUnorderedList<MatchLocalPlayerInputDataC2S> _cachedLocalPlayersInputs;
+        private MatchPlayersInputPacketC2S _cachedPlayerInputPacket;
 
         public override void ResolveDependencies()
         {
              _clientNetworkManager = _diContainer.Resolve<IClientNetworkManager>();
-             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
              _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
              _tickCounterService = _diContainer.Resolve<ITickCounterService>();
              _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
              _matchDataService = _diContainer.Resolve<IMatchDataService>();
-             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
-             _inputBeingUsedService = _diContainer.Resolve<IInputBeingUsedService>();
+             _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
+             var commandFactory = _diContainer.Resolve<ICommandFactory>();
+             var networkConfig = _diContainer.Resolve<NetworkConfig>();
+             _getCalculatedPlayerInputsCommand = commandFactory.CreateCommandWithResult<GetCalculatedPlayerInputsCommand, GetCalculatedPlayerInputsCommand.Result>();
+             _cachedLocalPlayersInputs = new FixedUnorderedList<MatchLocalPlayerInputDataC2S>(networkConfig.MaxCap.ConcurrentPlayers);
+             _cachedPlayerInputPacket = new MatchPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void Execute()
         {
-            var isShootInputPressed = _gameInputActionsController.IsShootInputPressed();
-            var isTalentInputPressed = _gameInputActionsController.IsTalentInputPressed();
-            var isSwitchTalentInputPressed = _gameInputActionsController.IsSwitchTalentInputPressed();
-            
-            CalculateRightAndLeftInputs(_matchDataService.LocalPlayer.Spaceship.Transform.Direction, out var isMoveRightInputPressed, out var isMoveLeftInputPressed);
-            LogService.LogTopic(
-                $"Sending: isMoveRightInputPressed:{isMoveRightInputPressed},isMoveLeftInputPressed:{isMoveLeftInputPressed},isShootInputPressed:{isShootInputPressed}",
-                LogTopicType.ClientNetwork);
-            var playerInputPacket = new MatchPlayerInputPacketC2S
-            {
-                Tick = _tickCounterService.CurrentClientTick,
-                HeighestProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer,
-                IsMoveLeftInputPressed = isMoveLeftInputPressed,
-                IsMoveRightInputPressed = isMoveRightInputPressed,
-                IsShootInputPressed = isShootInputPressed,
-                IsTalentInputPressed = isTalentInputPressed,
-                IsSwitchTalentInputPressed = isSwitchTalentInputPressed,
-                AimDirection = CalculateAimDirection()
-            };
-            
-            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchPlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
-        }
+            _cachedLocalPlayersInputs.Clear();
 
-        private void CalculateRightAndLeftInputs(Vector2 playerDirection, out bool isMoveRightInputPressed, out bool isMoveLeftInputPressed)
-        {
-            //if (_inputBeingUsedService.AimInputType == AimInputType.Mouse)
-            //{
-                isMoveRightInputPressed = _gameInputActionsController.IsMoveRightInputPressed();
-                isMoveLeftInputPressed = _gameInputActionsController.IsMoveLeftInputPressed();
-            //}
-            // else
-            // {
-            //     var gamePadMoveDirection = _gameInputActionsController.GetMoveDirection().ToNumericsVector2();
-            //     (isMoveRightInputPressed, isMoveLeftInputPressed) = MathUtils.GetDirectionChangeInputs(playerDirection, gamePadMoveDirection);
-            // }
-        }
-        
-        private Vector2 CalculateAimDirection()
-        {
-            var localPlayerId = _matchDataService.LocalPlayer.PlayerId;
-            var playerPos = _matchPlayerControllers.GetPlayerPosition(localPlayerId);
-            var mousePos = Input.mousePosition;
-            var mouseWorldPos = _worldCameraController.ScreenToWorldPoint(mousePos).ToVector2XY();
-            var mouseDirection = (mouseWorldPos - playerPos).normalized;
-            var gamePadAimDirection = _gameInputActionsController.GetAimDirection();
-            var aimDirection = _inputBeingUsedService.InputTypeBeingUsed == SupportedInputType.GamePad ? gamePadAimDirection.ToNumericsVector2() : mouseDirection.ToNumericsVector2();
-            return aimDirection;
+            foreach (var playerId in _localPlayersDataService.LocalPlayersIds)
+            {
+                var playerPosition = _matchPlayerControllers.GetPlayerPosition(playerId);
+                var playerDirection = _matchDataService.GetPlayer(playerId).Spaceship.Transform.Direction;
+
+                var calculatedInputs = _getCalculatedPlayerInputsCommand
+                    .SetPlayerDirection(playerDirection)
+                    .SetPlayerId(playerId)
+                    .SetPlayerPosition(playerPosition)
+                    .Execute();
+
+                LogService.LogTopic(
+                    $"Sending: isMoveRightInputPressed:{calculatedInputs.IsMoveRightInputPressed},isMoveLeftInputPressed:{calculatedInputs.IsMoveLeftInputPressed},isShootInputPressed:{calculatedInputs.IsShootInputPressed}",
+                    LogTopicType.ClientNetwork);
+
+                ref var playerInputDataC2S = ref _cachedLocalPlayersInputs.AddAndGet();
+                playerInputDataC2S.PlayerId = playerId;
+                playerInputDataC2S.IsMoveLeftInputPressed = calculatedInputs.IsMoveLeftInputPressed;
+                playerInputDataC2S.IsMoveRightInputPressed = calculatedInputs.IsMoveRightInputPressed;
+                playerInputDataC2S.IsShootInputPressed = calculatedInputs.IsShootInputPressed;
+                playerInputDataC2S.IsTalentAInputPressed = calculatedInputs.IsTalentAInputPressed;
+                playerInputDataC2S.IsTalentBInputPressed = calculatedInputs.IsTalentBInputPressed;
+                playerInputDataC2S.IsTalentCInputPressed = calculatedInputs.IsTalentCInputPressed;
+                playerInputDataC2S.AimDirection = calculatedInputs.AimDirection;
+            }
+
+            _cachedPlayerInputPacket.Tick = _tickCounterService.CurrentClientTick;
+            _cachedPlayerInputPacket.HeighestProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer;
+            _cachedPlayerInputPacket.PlayerInputs = _cachedLocalPlayersInputs;
+
+            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchPlayersInput, _cachedPlayerInputPacket, DeliveryMethod.Unreliable);
         }
     }
 }

@@ -79,6 +79,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 switch (bodyData.PhysicsBodyType)
                 {
                     case PhysicsBodyType.PlayerSpaceship: CopyPlayerStateToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.PlayerHeart: CopyPlayerHeartStateToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.PlayerBullet: CopyBulletStateToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.PowerUpBall: CopyPowerUpStateToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.Wall: CopyWallStateToBody(currentBody, bodyData.Id, environmentWalls); break;
@@ -176,6 +177,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             playerBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
             playerBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
         }
+        
+        private void CopyPlayerHeartStateToBody(Body playerHeartBody, ushort playerId, MatchSimulationStateS2C simulationState)
+        {
+            var playerState = simulationState.Players.FindWithId(playerId);
+            playerHeartBody.SetTransform(playerState.Spaceship.Transform.GetHeartPosition(), 0);
+        }
 
         public void CopyDataToSimulation(MatchMakingSimulationStateS2C simulationState)
         {
@@ -188,6 +195,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 switch (bodyData.PhysicsBodyType)
                 {
                     case PhysicsBodyType.PlayerSpaceship: CopyPlayerStateToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.PlayerHeart: CopyPlayerHeartStateToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.PlayerBullet: CopyBulletStateToBody(currentBody, bodyData.Id, simulationState); break;
                 }
 
@@ -200,6 +208,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var playerState = simulationState.Players.FindWithId(playerId);
             playerBody.SetTransform(playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction.ToAngleRadians());
             playerBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
+        }
+        
+        private void CopyPlayerHeartStateToBody(Body playerHeartBody, ushort playerId, MatchMakingSimulationStateS2C simulationState)
+        {
+            var playerState = simulationState.Players.FindWithId(playerId);
+            playerHeartBody.SetTransform(playerState.Spaceship.Transform.Position, 0);
+            playerHeartBody.SetLinearVelocity(playerState.Spaceship.Transform.Velocity);
         }
         
         private void CopyBulletStateToBody(Body bulletBody, ushort bulletId, MatchMakingSimulationStateS2C simulationState)
@@ -290,7 +305,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.density = 0;
             fixtureDef.friction = 0;
             fixtureDef.filter.categoryBits = PhysicsBodyType.Wall.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.Wall.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.Wall.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -316,7 +331,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = PhysicsBodyType.Lava.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.Lava.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -342,7 +357,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = PhysicsBodyType.StageBoundary.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.StageBoundary.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -368,14 +383,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = PhysicsBodyType.TeamFloor.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.TeamFloor.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
             _polygonShapePool.Return(shape);
         }
 
-        public void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius)
+        public void AddPlayer(ushort id, ushort teamId, Vector2 position, Vector2 velocity, float radius, float heartRadius)
         {
             var bodyDef = GetBodyDef();
             bodyDef.position = position;
@@ -394,12 +409,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.density = 1.0f;
             fixtureDef.friction = 0;
             fixtureDef.filter.categoryBits = PhysicsBodyType.PlayerSpaceship.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.PlayerSpaceship.GetCollisionMask();
-            fixtureDef.filter.groupIndex = (short)-teamId;
+            fixtureDef.filter.maskBits = PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
+            var playerGroupIndex = (short)-teamId;
+            fixtureDef.filter.groupIndex = playerGroupIndex;
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
             _circleShapePool.Return(circleShape);
+            
+            AddPlayerHeart(id, position, heartRadius, playerGroupIndex);
+        }
+
+        private void AddPlayerHeart(ushort id, Vector2 position, float heartRadius, short groupIndex)
+        {
+            var heartBodyDef = GetBodyDef();
+            heartBodyDef.position = position;
+            heartBodyDef.type = BodyType.Static;
+            heartBodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PlayerHeart);
+            heartBodyDef.allowSleep = false;
+            var heartBody = _world.CreateBody(heartBodyDef);
+            _bodyDefPool.Return(heartBodyDef);
+
+            var heartShape = GetCircleShape();
+            heartShape.Radius = heartRadius;
+
+            var heartFixtureDef = GetFixtureDef();
+            heartFixtureDef.shape = heartShape;
+            heartFixtureDef.isSensor = true;
+            heartFixtureDef.filter.categoryBits = PhysicsBodyType.PlayerHeart.GetCollisionsCategory();
+            heartFixtureDef.filter.maskBits = PhysicsCollisionType.PlayerHeart.GetCollisionMask();
+            heartFixtureDef.filter.groupIndex = groupIndex;
+
+            heartBody.CreateFixture(heartFixtureDef);
+            _fixtureDefPool.Return(heartFixtureDef);
+            _circleShapePool.Return(heartShape);
         }
 
         public void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius)
@@ -423,7 +466,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.density = 0.3f;
             fixtureDef.friction = 0.0f;
             fixtureDef.filter.categoryBits = PhysicsBodyType.PlayerBullet.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.PlayerBullet.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.PlayerBullet.GetCollisionMask();
             fixtureDef.filter.groupIndex = (short)-teamId;
             
             bulletBody.CreateFixture(fixtureDef);
@@ -449,7 +492,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.density = 0;
             fixtureDef.friction = 0;
             fixtureDef.filter.categoryBits = PhysicsBodyType.TalentCard.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.TalentCard.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.TalentCard.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -476,7 +519,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.restitution = 1f; // Bounciness
             fixtureDef.filter.categoryBits = PhysicsBodyType.PowerUpBall.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.PowerUpBall.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.PowerUpBall.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -617,6 +660,62 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
                 return true;
             }, aabb);
+
+            return hasCollision;
+        }
+
+        public bool RectangleCastOnPlayers(Vector2 center, Vector2 size, float angleRadians, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        {
+            _unityMainThreadDispatcher.EnqueueDraw(()=>DebugDrawUtils.DrawRotatedRect(center, size, angleRadians));
+            var hasCollision = false;
+            hitBodyData = default;
+
+            var hx = size.X * 0.5f;
+            var hy = size.Y * 0.5f;
+
+            var rot = Matrix3x2.CreateRotation(angleRadians);
+            var v1 = Vector2.Transform(new Vector2(-hx, -hy), rot) + center;
+            var v2 = Vector2.Transform(new Vector2(hx, -hy), rot) + center;
+            var v3 = Vector2.Transform(new Vector2(hx, hy), rot) + center;
+            var v4 = Vector2.Transform(new Vector2(-hx, hy), rot) + center;
+
+            var min = Vector2.Min(Vector2.Min(v1, v2), Vector2.Min(v3, v4));
+            var max = Vector2.Max(Vector2.Max(v1, v2), Vector2.Max(v3, v4));
+
+            var aabb = new AABB(min, max);
+            PhysicsBodyData hitBody = default;
+
+            _world.QueryAABB(fixture =>
+            {
+                var currentBodyData = (PhysicsBodyData) fixture.Body.UserData;
+                var shouldContinueQuery = true;
+                var isPlayerFromNotIgnoredTeam = currentBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && fixture.FilterData.groupIndex != -ignoreTeamId;
+                if (isPlayerFromNotIgnoredTeam)
+                {
+                    var polygonShape = GetPolygonShape();
+                    polygonShape.SetAsBox(hx, hy);
+
+                    var input = new ShapeCastInput();
+                    input.proxyA.Set(polygonShape, 0);
+                    input.proxyB.Set(fixture.Shape, 0);
+                    input.transformA = new Transform(center, rot);
+                    input.transformB = fixture.Body.GetTransform();
+                    input.translationB = Vector2.Zero;
+
+                    if (Contact.ShapeCast(out _, input))
+                    {
+                        hasCollision = true;
+                        hitBody = currentBodyData;
+                    }
+
+                    _polygonShapePool.Return(polygonShape);
+                    shouldContinueQuery = !hasCollision;
+                }
+
+                return shouldContinueQuery;
+            }, aabb);
+
+            hitBodyData = hitBody;
 
             return hasCollision;
         }
@@ -764,8 +863,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.shape = wallShape;
             fixtureDef.density = 0;
             fixtureDef.friction = 0;
-            fixtureDef.filter.categoryBits = PhysicsBodyType.Wall.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.Wall.GetCollisionMask();
+            fixtureDef.filter.categoryBits = PhysicsBodyType.RockWall.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.Wall.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -796,7 +895,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.density = 0f;
             fixtureDef.friction = 0;
             fixtureDef.filter.categoryBits = PhysicsBodyType.StartMatchWall.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.StartMatchWall.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.StartMatchWall.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -824,7 +923,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.isSensor = true;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentSpring.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.EnvironmentSpring.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -852,7 +951,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.isSensor = true;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentTeleportGate.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.EnvironmentTeleportGate.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -881,7 +980,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.isSensor = true;
             fixtureDef.filter.groupIndex = (short)-teamId;
             fixtureDef.filter.categoryBits = PhysicsBodyType.KOProjectile.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.KOProjectile.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.KOProjectile.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -921,7 +1020,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = PhysicsBodyType.GrapplingHookProjectile.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.GrapplingHookProjectile.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.GrapplingHookProjectile.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -962,7 +1061,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.filter.groupIndex = (short)-teamId;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.SwapField.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.SwapField.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
 
@@ -1033,7 +1132,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.filter.groupIndex = (short)-teamId;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.ChickenEgg.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsBodyType.ChickenEgg.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.ChickenEgg.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
 
@@ -1060,6 +1159,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var body = GetBody(PhysicsBodyType.ChickenEgg, eggId);
             RemoveBody(body);
+        }
+
+        public bool RayCast(Vector2 point1, Vector2 point2, out PhysicsBodyData hitBodyData, PhysicsBodyType[] bodyTypesRayCastCanHit = null)
+        {
+            var didHit = false;
+            PhysicsBodyData bodyHitData = default;
+            var closestFraction = 1f;
+            _world.RayCast(OnRayCastHit, point1, point2);
+
+            void OnRayCastHit(Fixture fixture, Vector2 point, Vector2 normal, float fraction)
+            {
+                var body = fixture.Body;
+                var bodyData = (PhysicsBodyData) body.UserData;
+                var didRayHitClosetBody = fraction <= closestFraction && (bodyTypesRayCastCanHit == null || bodyTypesRayCastCanHit.Contains(bodyData.PhysicsBodyType));
+                if (didRayHitClosetBody)
+                {
+                    didHit = true;
+                    closestFraction = fraction;
+                    bodyHitData = bodyData;
+                }
+            }
+            
+            _unityMainThreadDispatcher.EnqueueDraw(() => DebugDrawUtils.DrawLine(point1.ToUnityVector2(), point2.ToUnityVector2(), didHit ? UnityEngine.Color.green : UnityEngine.Color.red));
+
+            hitBodyData = bodyHitData;
+            return didHit;
         }
     }
 }

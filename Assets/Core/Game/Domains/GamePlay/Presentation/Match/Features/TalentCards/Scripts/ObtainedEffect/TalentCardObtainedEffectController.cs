@@ -26,6 +26,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scr
             _effectsPool.InitPool();
         }
 
+        public void InitExitPoint()
+        {
+            _effectsPool.DisposePool();
+        }
+
         public void PlayEffect(Vector2 from, Vector2 to)
         {
             PlayEffectAsync(from, to).Forget();

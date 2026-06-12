@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
 using UnityEngine;
 using Zenject;
@@ -15,18 +13,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
     public class MatchPlayerControllers : IMatchPlayerControllers
     {
         private readonly IMatchDataService _matchDataService;
-        private readonly PlayerViewPool _playerPool;
+        private readonly MatchPlayerViewPool _playerPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly List<MatchPlayerController> _playerControllers = new ();
         private Transform _playersParent;
 
-        public MatchPlayerControllers(IMatchDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
+
+        public MatchPlayerControllers(IMatchDataService matchDataService, MatchPlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
             NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _matchDataService = matchDataService;
-            _playerPool = new PlayerViewPool(playerViewPrefab, diContainer);
+            _playerPool = new MatchPlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
@@ -40,7 +39,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void AddPlayer(ushort playerId)
         {
-            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform, _stageCancellationTokenProvider);
+            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform,
+                _stageCancellationTokenProvider);
             playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
         }
@@ -103,10 +103,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             GetPlayer(playerId).PlayLayEggAnimation(_stageCancellationTokenProvider.CancellationTokenSource);
         }
-        
-        public void UpdateIsPlayerArrowShownAccordingToTalentState(ushort playerId, TalentStateS2C talentStateS2C)
+
+        public void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction)
         {
-            GetPlayer(playerId).UpdateIsArrowShownAccordingToTalentState(talentStateS2C);
+            GetPlayer(playerId).PlayerYearsOfPain(direction);
+        }
+
+        public void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled)
+        {
+            GetPlayer(playerId).SetIsDeadEffectEnabled(isEnabled);
+        }
+
+        public void SetPlayerIsLockOnHeartSightShown(ushort playerId, bool isShown)
+        {
+            GetPlayer(playerId).SetIsLockOnHeartSightShown(isShown);
+        }
+
+        public void SetIsPlayerKinged(ushort playerId, bool isKinged)
+        {
+            GetPlayer(playerId).SetIsKinged(isKinged);
         }
 
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)
@@ -134,11 +149,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             return GetPlayer(playerId).GetTransform();
         }
 
+        public Transform GetPlayerHeartTransform(ushort playerId)
+        {
+            return GetPlayer(playerId).GetHeartTransform();
+        }
+        
+        public Transform GetPlayerHeadTransform(ushort playerId)
+        {
+            return GetPlayer(playerId).GetHeadTransform();
+        }
+        
         public void HidePlayerHealthBar(ushort playerId)
         {
             GetPlayer(playerId).SetIsHealthBarShown(false);
         }
-
+        
         public void DestroyAll()
         {
             foreach (var controller in _playerControllers)
@@ -151,6 +176,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetPlayerTalentSelected(ushort playerId, int talentIndex)
         {
             GetPlayer(playerId).SetSelectedTalent(talentIndex);
+        }
+
+        public void UpdatePlayerTalents(ushort playerId, Core.Scripts.Utils.CustomCollections.FixedOrderedList<Core.Game.Domains.GamePlay.Shared.S2CModels.TalentStateS2C> talents, int currentServerTick)
+        {
+            var selectedTalentIndex = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.SelectedTalentIndex;
+            GetPlayer(playerId).UpdateTalents(talents, selectedTalentIndex, currentServerTick);
         }
 
         public void SetIsTailWaving(ushort playerId, bool isWaving)

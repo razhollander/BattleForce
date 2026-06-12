@@ -23,6 +23,7 @@ namespace Core.Scripts.Network
     public class MaxCap
     {
         public int ConcurrentPlayers = 8;
+        public int ConcurrentEnemyPlayers => ConcurrentPlayers - 1;
         public int ConcurrentBullets = 256;
         public int ConcurrentTalentCards = 128;
         public int ConcurrentEvironmentWalls = 256;
@@ -103,6 +104,9 @@ namespace Core.Scripts.Network
         public int CreateMagneticPullFieldNetEvents = 128;
         public int LayChickenEggNetEvents = 128;
         public int ChickenEggHitNetEvents = 128;
+        public int ActivateYearsOfPainTalentNetEvents = 128;
+        public int PlayerLockOnHeartTargetsChangedNetEvents = 128;
+        public int PlayerLockOnHeartTargetHitNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel
@@ -112,6 +116,5 @@ namespace Core.Scripts.Network
             public int MaxSprings = 8;
             public int MaxTeleportGatePairs = 4;
         }
-
     }
 }
