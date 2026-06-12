@@ -11,6 +11,10 @@ namespace Core.Scripts.Extensions
         
         public static T FromJson<T>(this string json)
         {
+            if (string.IsNullOrEmpty(json))
+            {
+                return default;
+            }
             return JsonConvert.DeserializeObject<T>(json);
         }
         
