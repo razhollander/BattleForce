@@ -126,6 +126,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _bulletControllers.DestroyAll();
             _environmentWallsControllers.DestroyAll();
             _environmentSpringControllers.DestroyAll();
+            _environmentSpikeControllers.DestroyAll();
             _environmentLavaWallsControllers.DestroyAll();
             _talentCardControllers.DestroyAll();
             _powerUpBallControllers.DestroyAll();

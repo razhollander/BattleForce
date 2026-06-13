@@ -187,8 +187,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessTalentSwitchEvents(latestFullTickPacket.TalentSwitchNetEvents, ignoreEventsNotAboveTick);
             ProcessGainBoltsEvents(latestFullTickPacket.GainBoltsNetEvents, ignoreEventsNotAboveTick);
             ProcessEnvironmentSpringPlayerCollisionEvents(latestFullTickPacket.EnvironmentSpringPlayerCollisionNetEvents, ignoreEventsNotAboveTick);
-            ProcessEnvironmentTeleportPlayerCollisionEvents(latestFullTickPacket.PlayerToEnvironmentTeleportGateCollisionNetEvents, ignoreEventsNotAboveTick);
             ProcessEnvironmentSpikePlayerCollisionEvents(latestFullTickPacket.EnvironmentSpikePlayerCollisionNetEvents, ignoreEventsNotAboveTick);
+            ProcessEnvironmentTeleportPlayerCollisionEvents(latestFullTickPacket.PlayerToEnvironmentTeleportGateCollisionNetEvents, ignoreEventsNotAboveTick);
             ProcessPreparationPhaseEndedEvents(latestFullTickPacket.PreparationPhaseEndedNetEvents, ignoreEventsNotAboveTick);
             ProcessCreateSwapFieldEvents(latestFullTickPacket.CreateSwapFieldNetEvents, ignoreEventsNotAboveTick);
             ProcessDeactivateSwapTalentEvents(latestFullTickPacket.DestroySwapFieldNetEvents, ignoreEventsNotAboveTick);

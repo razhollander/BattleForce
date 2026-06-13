@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var collisionEvent in environmentSpikePlayerCollisionNetEvents)
             {
-                _environmentSpikeControllers.PlaySpikeBounceAnimation(collisionEvent.SpikeId);
+                _environmentSpikeControllers.PlaySpikeHitAnimation(collisionEvent.SpikeId);
             }
 
             environmentSpikePlayerCollisionNetEvents.Clear();

@@ -51,6 +51,7 @@ MonoBehaviour:
         \"DashPulse\"\n  }\n]"
       _environmentSpringsJson: '[   { "Id": 1, "Position": { "X": 8.0, "Y": 5.0 },
         "DirectionAngle": "135" }]'
+      _environmentSpikesJson: 
       _teleportGatesJson: '[   {     "Id": 1,     "GateA": {       "Position": {        
         "X": -4.5,         "Y": 7       },       "NormalRotation": 270     },    
         "GateB": {       "Position": {         "X": 3.25,         "Y": -3       },      
@@ -138,6 +139,7 @@ MonoBehaviour:
       _lavaWallsJson: 
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: 
       _fieldBarriersJson: 
@@ -250,6 +252,7 @@ MonoBehaviour:
       _lavaWallsJson: 
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: "[\n  {\n    \"Id\": 100,\n    \"CenterPosition\": {\n     
         \"X\": 20.0,\n      \"Y\": 0.0\n    },\n    \"RotationSpeed\": 10,\n    \"Walls\":
@@ -569,6 +572,7 @@ MonoBehaviour:
         \"X\": 0,\n      \"Y\": 1.1\n    },\n    \"DirectionAngle\": \"90\"\n  },\n 
         {\n    \"Id\": 1,\n    \"Position\": {\n      \"X\": 0,\n      \"Y\": -1.1\n   
         },\n    \"DirectionAngle\": \"270\"\n  }\n]"
+      _environmentSpikesJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: "[\n  {\n    \"Id\": 200,\n    \"CenterPosition\": {\n     
         \"X\": -30,\n      \"Y\": 0\n    },\n    \"RotationSpeed\": 60,\n    \"Walls\":
@@ -631,6 +635,7 @@ MonoBehaviour:
         }\n]"
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: "[\n  {\n    \"Id\": 101,\n    \"CenterPosition\": {\n     
         \"X\": 0.0,\n      \"Y\": 0.0\n    },\n    \"RotationSpeed\": 10,\n    \"Springs\":
@@ -673,6 +678,7 @@ MonoBehaviour:
         \"X\": -28.16, \"Y\": 4 }\n    ]\n  }\n]"
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: 
       _teleportGatesJson: "[\n  {\n    \"Id\": 1,\n    \"GateA\": { \"Position\":
         { \"X\": -20, \"Y\": 24.64 }, \"NormalRotation\": 270 },\n    \"GateB\":
         { \"Position\": { \"X\": -20, \"Y\": -24.64 }, \"NormalRotation\": 90 }\n 
@@ -731,6 +737,7 @@ MonoBehaviour:
       _lavaWallsJson: 
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: 
       _teleportGatesJson: "[\n  {\n    \"Id\": 1,\n    \"GateA\": { \"Position\":
         { \"X\": -4, \"Y\": 15.08 }, \"NormalRotation\": 180 },\n    \"GateB\": {
         \"Position\": { \"X\": 4, \"Y\": 15.08 }, \"NormalRotation\": 0 }\n  },\n 
@@ -785,6 +792,10 @@ MonoBehaviour:
         \"Swap\"\n  },\n    {\n    \"Id\": 3,\n    \"Position\": {\n      \"X\":
         4,\n      \"Y\": 0\n    },\n    \"TalentType\": \"DashPulse\"\n  }\n]"
       _environmentSpringsJson: 
+      _environmentSpikesJson: "[\n  {\n    \"Id\": 2,\n    \"Position\": {\n     
+        \"X\": 0,\n      \"Y\": 10.1\n    },\n    \"DirectionAngle\": \"90\"\n  },\n 
+        {\n    \"Id\": 1,\n    \"Position\": {\n      \"X\": 0,\n      \"Y\": -10.1\n   
+        },\n    \"DirectionAngle\": \"270\"\n  }\n]"
       _teleportGatesJson: 
       _rotatingWheelsJson: 
       _fieldBarriersJson: "[\n  {\n    \"Position\": {\n      \"x\": 15.08,\n     
@@ -818,6 +829,7 @@ MonoBehaviour:
       _lavaWallsJson: 
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: 
       _fieldBarriersJson: 

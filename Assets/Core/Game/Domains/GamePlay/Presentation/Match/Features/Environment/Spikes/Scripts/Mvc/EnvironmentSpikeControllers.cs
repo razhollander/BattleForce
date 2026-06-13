@@ -54,9 +54,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spi
             _spikeControllers.Clear();
         }
 
-        public void PlaySpikeBounceAnimation(ushort spikeId)
+        public void PlaySpikeHitAnimation(ushort spikeId)
         {
-            _spikeControllers[spikeId].PlayBounceAnimation(_stageCancellationTokenProvider.CancellationTokenSource);
+            _spikeControllers[spikeId].PlayHitAnimation(_stageCancellationTokenProvider.CancellationTokenSource);
         }
     }
 }

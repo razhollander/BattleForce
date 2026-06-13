@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5463023890547498949}
   - component: {fileID: 8406296878929635163}
+  - component: {fileID: 5867113783857601449}
+  - component: {fileID: 552185073309178289}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: Untagged
@@ -26,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 1908033412640195627}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -1, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -1.66, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -91,6 +93,30 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &5867113783857601449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1908033412640195627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CoreAssembly::Core.URPRenderFeatures.SpriteRendererSilhouetteRenderFeature.Scripts.SpriteRendererShadowEffectView
+--- !u!114 &552185073309178289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1908033412640195627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CoreAssembly::Core.URPRenderFeatures.SpriteRendererSilhouetteRenderFeature.Scripts.SpriteRendererOutlineEffectView
 --- !u!1 &5527940745075647473
 GameObject:
   m_ObjectHideFlags: 0
@@ -100,7 +126,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7535138444067971163}
-  - component: {fileID: 93229460892055424}
+  - component: {fileID: 2005978350268547127}
   m_Layer: 0
   m_Name: EnvironmentSpike
   m_TagString: Untagged
@@ -124,7 +150,7 @@ Transform:
   - {fileID: 5463023890547498949}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &93229460892055424
+--- !u!114 &2005978350268547127
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -133,9 +159,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 5527940745075647473}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd5be4819921b4200bf7b806e3a501f5, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ae7b502eda5a437995daec8f890c6a7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: PresentationMatchAssembly::Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.EnvironmentSpikeView
   _renderer: {fileID: 8406296878929635163}
   _strechedSprite: {fileID: 21300000, guid: 13670224626b1432a81beccd03b56eec, type: 3}
   _pressedSprite: {fileID: 21300000, guid: d3dd7a1eed9ec45319c92c83722881a8, type: 3}

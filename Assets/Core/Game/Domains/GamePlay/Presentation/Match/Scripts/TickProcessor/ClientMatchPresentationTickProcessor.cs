@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleTalentSwitchNetEventsCommand _handleTalentSwitchNetEventsCommand;
         private readonly HandleGainBoltsNetEventCommand _handleGainBoltsNetEventCommand;
         private readonly HandleEnvironmentSpringPlayerCollisionNetEventsCommand _handleEnvironmentSpringPlayerCollisionNetEventsCommand;
-        private readonly Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents.HandleEnvironmentSpikePlayerCollisionNetEventsCommand _handleEnvironmentSpikePlayerCollisionNetEventsCommand;
+        private readonly HandleEnvironmentSpikePlayerCollisionNetEventsCommand _handleEnvironmentSpikePlayerCollisionNetEventsCommand;
         private readonly HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand;
         private readonly UpdateObjectTransformInsideRotatingWheelsCommand _updateObjectTransformInsideRotatingWheelsCommand;
         private readonly HandlePreparationPhaseEndedNetEventsCommand _handlePreparationPhaseEndedNetEventsCommand;

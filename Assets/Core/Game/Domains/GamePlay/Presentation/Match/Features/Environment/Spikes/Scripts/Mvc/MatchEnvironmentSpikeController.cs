@@ -49,9 +49,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spi
             _viewTransform.rotation = rotation;
         }
 
-        public void PlayBounceAnimation(CancellationTokenSource cancellationTokenSource)
+        public void PlayHitAnimation(CancellationTokenSource cancellationTokenSource)
         {
-            _view.PlayBounceAnimation(cancellationTokenSource).Forget();
+            _view.PlayHitAnimation(cancellationTokenSource).Forget();
         }
 
         public void Destroy()

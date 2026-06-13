@@ -5,7 +5,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spi
         void InitEntryPoint();
         void CreateSpike(ushort spikeId);
         void DestroyAll();
-        void PlaySpikeBounceAnimation(ushort spikeId);
+        void PlaySpikeHitAnimation(ushort spikeId);
         void UpdateSpikeTransform(ushort spikeId);
     }
 }

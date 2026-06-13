@@ -217,6 +217,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (LayChickenEggNetEvents.Count > 0) eventMask |= 1UL << 37;
             if (ChickenEggHitNetEvents.Count > 0) eventMask |= 1UL << 38;
             if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 39;
+            if (EnvironmentSpikePlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 42;
 
             return eventMask;
         }
