@@ -25,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<TalentSwitchNetEventS2C> TalentSwitchNetEvents { get; } = new();
         public List<GainBoltsNetEventS2C> GainBoltsNetEvents { get; } = new();
         public List<EnvironmentSpringPlayerCollisionNetEventS2C> EnvironmentSpringPlayerCollisionNetEvents { get; } = new();
+        public List<Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents.EnvironmentSpikePlayerCollisionNetEventS2C> EnvironmentSpikePlayerCollisionNetEvents { get; } = new();
         public List<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> PlayerToEnvironmentTeleportGateCollisionNetEvents { get; } = new();
         public List<PreparationPhaseEndedNetEventS2C> PreparationPhaseEndedNetEvents { get; } = new();
         public List<CreateSwapFieldNetEventS2C> CreateSwapFieldNetEvents { get; } = new();

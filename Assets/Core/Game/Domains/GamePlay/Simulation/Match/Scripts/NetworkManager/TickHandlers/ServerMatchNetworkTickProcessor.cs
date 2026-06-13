@@ -245,6 +245,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.TeamLostNetEvents = _netEventsDataService.TeamLostNetEventsPerClient[clientId];
                 _fullTickPacket.TalentSwitchNetEvents = _netEventsDataService.TalentSwitchNetEventsPerClient[clientId];
                 _fullTickPacket.EnvironmentSpringPlayerCollisionNetEvents = _netEventsDataService.EnvironmentSpringPlayerCollisionNetEventsPerClient[clientId];
+                _fullTickPacket.EnvironmentSpikePlayerCollisionNetEvents = _netEventsDataService.EnvironmentSpikePlayerCollisionNetEventsPerClient[clientId];
                 _fullTickPacket.GainBoltsNetEvents = _netEventsDataService.GainBoltsNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerToEnvironmentTeleportGateCollisionNetEvents = _netEventsDataService.PlayerToEnvironmentTeleportGateCollisionNetEventsPerClient[clientId];
                 _fullTickPacket.PreparationPhaseEndedNetEvents = _netEventsDataService.PreparationPhaseEndedNetEventsPerClient[clientId];

@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Core.Scripts.Editor.AssetSelector
+namespace Core.Game.Domains.GamePlay.Shared.Scripts.Editor
 {
     public class AssetSelectorMenu
     {
@@ -13,40 +13,52 @@ namespace Core.Scripts.Editor.AssetSelector
         [MenuItem("PracticAPI/Select Asset/Network Config", false, 1)]
         private static void SelectNetworkConfig()
         {
-            SelectAsset(NETWORK_CONFIG_ASSET_PATH);
+            SelectAssetAtPath(NETWORK_CONFIG_ASSET_PATH);
         }
 
         [MenuItem("PracticAPI/Select Asset/Simulation GamePlay Config", false, 2)]
         private static void SelectGamePlayConfig()
         {
-            SelectAsset(SIMULATION_GAMEPLAY_CONFIG_ASSET_PATH);
+            SelectAssetAtPath(SIMULATION_GAMEPLAY_CONFIG_ASSET_PATH);
         }
 
         [MenuItem("PracticAPI/Select Asset/Presentation GamePlay Config", false, 3)]
         private static void SelectPresentationGamePlayConfig()
         {
-            SelectAsset(PRESENTATION_GAMEPLAY_CONFIG_ASSET_PATH);
+            SelectAssetAtPath(PRESENTATION_GAMEPLAY_CONFIG_ASSET_PATH);
         }
         
-        [MenuItem("PracticAPI/Select Asset/Shared GamePlay Config", false, 3)]
+        [MenuItem("PracticAPI/Select Asset/Shared GamePlay Config", false, 4)]
         private static void SelectSharedGamePlayConfig()
         {
-            SelectAsset(SHARED_GAMEPLAY_CONFIG_ASSET_PATH);
+            SelectAssetAtPath(SHARED_GAMEPLAY_CONFIG_ASSET_PATH);
         }
         
-        private static void SelectAsset(string assetPath)
+        [MenuItem("PracticAPI/Select Asset/Environment Config", false, 5)]
+        private static void SelectEnvironmentConfig()
+        {
+            var sharedGamePlayConfig = AssetDatabase.LoadAssetAtPath<SharedGamePlayConfig>(SHARED_GAMEPLAY_CONFIG_ASSET_PATH);
+            SelectAsset(sharedGamePlayConfig.Environment);
+        }
+        
+        private static void SelectAssetAtPath(string assetPath)
         {
             ScriptableObject asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(assetPath);
 
             if (asset != null)
             {
-                Selection.activeObject = asset;
-                EditorGUIUtility.PingObject(asset);
+                SelectAsset(asset);
             }
             else
             {
                 Debug.LogError($"Asset not found at path: {assetPath}");
             }
+        }
+
+        private static void SelectAsset(ScriptableObject asset)
+        {
+            Selection.activeObject = asset;
+            EditorGUIUtility.PingObject(asset);
         }
     }
 }

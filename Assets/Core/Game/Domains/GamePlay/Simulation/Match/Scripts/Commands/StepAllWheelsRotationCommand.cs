@@ -104,6 +104,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     spring.Transform.WorldPosition = worldPosition;
                 }
             }
+            
+            if (!rotatingWheel.SpikeIds.IsEmpty)
+            {
+                foreach (var spikeId in rotatingWheel.SpikeIds.AsSpan()) // todo for ai, create new SpringState/WallState and use them instead of using and updating the configs
+                {
+                    var spike = _matchDataService.EnvironmentData.GetSpike(spikeId);
+                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                        tick,
+                        rotationSpeed,
+                        deltaTime,
+                        wheelCenter,
+                        spike.Transform.LocalPosition,
+                        spike.Transform.LocalRotationDegrees,
+                        out var worldPosition,
+                        out var newRotation
+                    );
+
+                    spike.Transform.WorldRotationDegrees = newRotation;
+                    spike.Transform.WorldPosition = worldPosition;
+                }
+            }
 
             if (!rotatingWheel.TeleportGatePairIds.IsEmpty)
             {

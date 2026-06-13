@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public WallConfig[] Walls;
         public WallConfig[] LavaWalls;
         public EnvironmentSpringConfig[] Springs;
+        public EnvironmentSpikeConfig[] Spikes;
         public EnvironmentTeleportGatePairConfig[] TeleportGatePairs;
     }
 }

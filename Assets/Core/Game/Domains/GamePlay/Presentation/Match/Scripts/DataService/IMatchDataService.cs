@@ -15,6 +15,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchPowerUpBallModel> PowerUpBalls { get; }
         List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; }
         List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; }
+        List<MatchEnvironmentSpikeModel> EnvironmentSpikes { get; }
+        List<MatchEnvironmentSpringModel> EnvironmentSprings { get; }
+        List<MatchEnvironmentWallModel> EnvironmentWalls { get; }
+        List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; }
         List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; }
         List<MatchSwapFieldModel> SwapFields { get; }
         HashSet<ushort> TeamIds {get; }
@@ -43,8 +47,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort lavaWallId);
         MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle);
         MatchEnvironmentSpringModel GetEnvironmentSpring(ushort springId);
+        MatchEnvironmentSpikeModel AddSpike(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle);
+        MatchEnvironmentSpikeModel GetEnvironmentSpike(ushort spikeId);
         MatchEnvironmentFieldBarrierModel GetFieldBarrier(ushort id);
-        MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> teleportGatePairIds);
+        MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<ushort> teleportGatePairIds);
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);
         void SetTeamGems(ushort teamId, int totalTeamGems);

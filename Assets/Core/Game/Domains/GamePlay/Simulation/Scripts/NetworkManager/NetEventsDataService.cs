@@ -40,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<TalentSwitchNetEventS2C>> TalentSwitchNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<GainBoltsNetEventS2C>> GainBoltsNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>> EnvironmentSpringPlayerCollisionNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C>> EnvironmentSpikePlayerCollisionNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>> PlayerToEnvironmentTeleportGateCollisionNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PreparationPhaseEndedNetEventS2C>> PreparationPhaseEndedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<CreateSwapFieldNetEventS2C>> CreateSwapFieldNetEventsPerClient { get; }
@@ -90,6 +91,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>> _teamLostNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>> _talentSwitchNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>> _environmentSpringPlayerCollisionListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C>> _environmentSpikePlayerCollisionListPool;
         private readonly ConcurrentPool<FixedUnorderedList<GainBoltsNetEventS2C>> _gainBoltsNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>> _playerToEnvironmentTeleportGateCollisionListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PreparationPhaseEndedNetEventS2C>> _preparationPhaseEndedListPool;
@@ -142,6 +144,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             TeamLostNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TeamLostNetEventS2C>>(maxConcurrentPlayers);
             TalentSwitchNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TalentSwitchNetEventS2C>>(maxConcurrentPlayers);
             EnvironmentSpringPlayerCollisionNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>>(maxConcurrentPlayers);
+            EnvironmentSpikePlayerCollisionNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C>>(maxConcurrentPlayers);
             GainBoltsNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<GainBoltsNetEventS2C>>(maxConcurrentPlayers);
             PlayerToEnvironmentTeleportGateCollisionNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>>(maxConcurrentPlayers);
             PreparationPhaseEndedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PreparationPhaseEndedNetEventS2C>>(maxConcurrentPlayers);
@@ -213,6 +216,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _teamLostNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>>(() => new FixedUnorderedList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount), maxConcurrentPlayers);
             _talentSwitchNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>>(() => new FixedUnorderedList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
             _environmentSpringPlayerCollisionListPool = new ConcurrentPool<FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>>(() => new FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>(networkConfig.MaxCap.EnvironmentSpringPlayerCollisionNetEvents), maxConcurrentPlayers);
+            _environmentSpikePlayerCollisionListPool = new ConcurrentPool<FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C>>(() => new FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C>(networkConfig.MaxCap.EnvironmentSpikePlayerCollisionNetEvents), maxConcurrentPlayers);
             _gainBoltsNetEventsListPool = new ConcurrentPool<FixedUnorderedList<GainBoltsNetEventS2C>>(() => new FixedUnorderedList<GainBoltsNetEventS2C>(networkConfig.MaxCap.GainBoltsNetEvents), maxConcurrentPlayers);
             _playerToEnvironmentTeleportGateCollisionListPool = new ConcurrentPool<FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>>(() => new FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(networkConfig.MaxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents), maxConcurrentPlayers);
             _preparationPhaseEndedListPool = new ConcurrentPool<FixedUnorderedList<PreparationPhaseEndedNetEventS2C>>(() => new FixedUnorderedList<PreparationPhaseEndedNetEventS2C>(networkConfig.MaxCap.PreparationPhaseEndedNetEvents), maxConcurrentPlayers);
@@ -446,6 +450,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 LogService.LogError($"Player already exists! {clientId}");
             }
 
+            if (!EnvironmentSpikePlayerCollisionNetEventsPerClient.ContainsKey(clientId))
+            {
+                EnvironmentSpikePlayerCollisionNetEventsPerClient.Add(clientId, _environmentSpikePlayerCollisionListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {clientId}");
+            }
+
             if (!GainBoltsNetEventsPerClient.ContainsKey(clientId))
             {
                 GainBoltsNetEventsPerClient.Add(clientId, _gainBoltsNetEventsListPool.Get());
@@ -635,6 +648,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var environmentSpringPlayerCollisionList = EnvironmentSpringPlayerCollisionNetEventsPerClient[clientId];
             environmentSpringPlayerCollisionList.Clear();
             _environmentSpringPlayerCollisionListPool.Return(environmentSpringPlayerCollisionList);
+            var environmentSpikePlayerCollisionList = EnvironmentSpikePlayerCollisionNetEventsPerClient[clientId];
+            environmentSpikePlayerCollisionList.Clear();
+            _environmentSpikePlayerCollisionListPool.Return(environmentSpikePlayerCollisionList);
             var gainBoltsList = GainBoltsNetEventsPerClient[clientId];
             gainBoltsList.Clear();
             _gainBoltsNetEventsListPool.Return(gainBoltsList);
@@ -752,6 +768,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             TalentSwitchNetEventsPerClient.Remove(clientId);
             StartMatchEligibleChangedNetEventsPerClient.Remove(clientId);
             EnvironmentSpringPlayerCollisionNetEventsPerClient.Remove(clientId);
+            EnvironmentSpikePlayerCollisionNetEventsPerClient.Remove(clientId);
             GainBoltsNetEventsPerClient.Remove(clientId);
             PlayerToEnvironmentTeleportGateCollisionNetEventsPerClient.Remove(clientId);
             PreparationPhaseEndedNetEventsPerClient.Remove(clientId);
@@ -1235,6 +1252,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
+            
+            if (EnvironmentSpikePlayerCollisionNetEventsPerClient.TryGetValue(clientId, out var environmentSpikePlayerCollisionNetEvents))
+            {
+                for (int i = environmentSpikePlayerCollisionNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (environmentSpikePlayerCollisionNetEvents[i].OccuredOnTick <= tick)
+                    {
+                        environmentSpikePlayerCollisionNetEvents.RemoveAt(i);
+                    }
+                }
+            }
 
             if (PlayerToEnvironmentTeleportGateCollisionNetEventsPerClient.TryGetValue(clientId, out var playerToEnvironmentTeleportGateCollisionNetEvents))
             {
@@ -1561,6 +1589,17 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.SpringId = springId;
                 packet.PlayerId = playerId;
                 packet.NewPlayerDirection = newPlayerDirection;
+            }
+        }
+
+        public void AddEnvironmentSpikePlayerCollisionNetEvent(int onTick, ushort spikeId, ushort playerId)
+        {
+            foreach (var kvp in EnvironmentSpikePlayerCollisionNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.SpikeId = spikeId;
+                packet.PlayerId = playerId;
             }
         }
 

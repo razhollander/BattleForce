@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
@@ -40,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchChickenEggsControllers _chickenEggsControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
+        private IEnvironmentSpikeControllers _environmentSpikeControllers;
         private ITalentCardControllers _talentCardControllers;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
@@ -82,6 +84,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
+            _environmentSpikeControllers = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc.IEnvironmentSpikeControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
@@ -123,6 +126,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _bulletControllers.DestroyAll();
             _environmentWallsControllers.DestroyAll();
             _environmentSpringControllers.DestroyAll();
+            _environmentSpikeControllers.DestroyAll();
             _environmentLavaWallsControllers.DestroyAll();
             _talentCardControllers.DestroyAll();
             _powerUpBallControllers.DestroyAll();
@@ -146,6 +150,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateBullets();
             CreateWalls(mapSizeMultiplier);
             CreateSprings(mapSizeMultiplier);
+            CreateSpikes(mapSizeMultiplier);
             CreateLavaWalls(mapSizeMultiplier);
             CreateRotatingWheels(mapSizeMultiplier);
             CreateTalentCards(mapSizeMultiplier);
@@ -206,6 +211,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
 
+        private void CreateSpikes(float mapSizeMultiplier)
+        {
+            var spikes = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetEnvironmentSpikes();
+            if (spikes.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var spike in spikes)
+            {
+                _matchDataService.AddSpike(spike.Id, Vector2.Zero, spike.Position * mapSizeMultiplier, 0, spike.RotationAngle);
+                _environmentSpikeControllers.CreateSpike(spike.Id);
+            }
+        }
+        
         private void CreateTeleportGates(float mapSizeMultiplier)
         {
             var teleportGatePairConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetTeleportGates();
@@ -316,8 +336,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var wallIds = wheelConfig.Walls.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.Walls.Select(x => x.Id).ToList();
                 var lavaWallIds = wheelConfig.LavaWalls.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.LavaWalls.Select(x => x.Id).ToList();
                 var springIds = wheelConfig.Springs.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.Springs.Select(x => x.Id).ToList();
+                var spikeIds = wheelConfig.Spikes.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.Spikes.Select(x => x.Id).ToList();
                 var teleportGatePairIds = wheelConfig.TeleportGatePairs.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.TeleportGatePairs.Select(x => x.Id).ToList();
-                var wheelModel = _matchDataService.AddEnvironmentRotatingWheel(wheelConfig.Id, wheelCenter, wheelConfig.RotationSpeed, wallIds, lavaWallIds, springIds, teleportGatePairIds);
+                var wheelModel = _matchDataService.AddEnvironmentRotatingWheel(wheelConfig.Id, wheelCenter, wheelConfig.RotationSpeed, wallIds, lavaWallIds, springIds, spikeIds, teleportGatePairIds);
                 var rotationSpeed = wheelModel.RotationSpeed;
                 
                 if (wheelConfig.Walls != null)
@@ -372,6 +393,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                         _matchDataService.AddSpring(springConfig.Id, scaledPosition, worldPosition, springConfig.RotationAngle, worldRotation);
                         _environmentSpringControllers.CreateSpring(springConfig.Id);
+                    }
+                }
+
+                if (wheelConfig.Spikes != null)
+                {
+                    foreach (var spikeConfig in wheelConfig.Spikes)
+                    {
+                        var scaledPosition = spikeConfig.Position * mapSizeMultiplier;
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            calculationTick, rotationSpeed, deltaTime, wheelConfig.CenterPosition, scaledPosition, spikeConfig.RotationAngle,
+                            out var worldPosition, out var worldRotation
+                        );
+
+                        _matchDataService.AddSpike(spikeConfig.Id, scaledPosition, worldPosition, spikeConfig.RotationAngle, worldRotation);
+                        _environmentSpikeControllers.CreateSpike(spikeConfig.Id);
                     }
                 }
 

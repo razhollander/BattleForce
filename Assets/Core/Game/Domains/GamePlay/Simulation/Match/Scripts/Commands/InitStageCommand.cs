@@ -78,6 +78,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateStageBoundaries(mapSizeMultiplier);
             CreateTalentCards(mapSizeMultiplier);
             CreateEnvironmentSprings(mapSizeMultiplier);
+            CreateEnvironmentSpikes(mapSizeMultiplier);
             CreateTeleportGates(mapSizeMultiplier);
             CreateRotatingWheels(mapSizeMultiplier);
             CreateFieldBarriers(mapSizeMultiplier);
@@ -357,6 +358,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator.AddEnvironmentSpring(springId, springWorldPosition, springWorldRotationAngle, springSize);
         }
 
+        private void CreateEnvironmentSpikes(float mapSizeMultiplier)
+        {
+            var environmentSpikes = _matchEnvironmentConfigDataService.EnvironmentSpikes;
+            if (environmentSpikes.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var environmentSpike in environmentSpikes)
+            {
+                AddSpikeToEnvironment(environmentSpike.Id, Vector2.Zero, environmentSpike.Position * mapSizeMultiplier, 0, environmentSpike.RotationAngle);
+            }
+        }
+
+        private void AddSpikeToEnvironment(ushort spikeId, Vector2 spikeLocalPosition, Vector2 spikeWorldPosition, float spikeLocalRotationAngle, float spikeWorldRotationAngle)
+        {
+            var spikeSize = _gamePlayConfigService.GamePlayConfig.EnvironmentSpikes.Size.ToNumericsVector2();
+            _matchDataService.EnvironmentData.AddSpike(spikeId, spikeLocalPosition, spikeWorldPosition, spikeLocalRotationAngle, spikeWorldRotationAngle);
+            _physicsSimulator.AddEnvironmentSpike(spikeId, spikeWorldPosition, spikeWorldRotationAngle, spikeSize);
+        }
+        
         private void CreateTeleportGates(float mapSizeMultiplier)
         {
             var teleportGatePairConfigs = _matchEnvironmentConfigDataService.TeleportGates;
@@ -454,6 +476,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         var springId = springConfig.Id;
                         AddSpringToEnvironment(springId, scaledPosition, worldPosition, springConfig.RotationAngle, worldRotation);
                         rotatingWheel.AddSpring(springId);
+                    }
+                }
+                
+                if (!wheelConfig.Spikes.IsNullOrEmpty())
+                {
+                    foreach (var spikeConfig in wheelConfig.Spikes)
+                    {
+                        var scaledPosition = spikeConfig.Position * mapSizeMultiplier;
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, spikeConfig.RotationAngle,
+                            out var worldPosition, out var worldRotation);
+
+                        var spikeId = spikeConfig.Id;
+                        AddSpikeToEnvironment(spikeId, scaledPosition, worldPosition, spikeConfig.RotationAngle, worldRotation);
+                        rotatingWheel.AddSpike(spikeId);
                     }
                 }
 

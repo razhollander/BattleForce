@@ -31,6 +31,7 @@ namespace Core.Scripts.Network
         public int ConcurrentEvironmentStageBoundaries = 256;
         public int ConcurrentEvironmentTeleportPairs = 4;
         public int ConcurrentEvironmentSprings = 32;
+        public int ConcurrentEvironmentSpikes = 32;
         public int ConcurrentChickenEggs = 128;
         public int PacketTypes = 256; // if one day this is changed to a bigger number, need to parse packet types as ushort instead of byte
         public int ConcurrentEnvironmentRotatingWheels = 16;
@@ -75,6 +76,7 @@ namespace Core.Scripts.Network
         public int StartMatchEligibleChangedNetEvents = 32;
         public int TalentSwitchNetEvents = 128;
         public int EnvironmentSpringPlayerCollisionNetEvents = 64;
+        public int EnvironmentSpikePlayerCollisionNetEvents = 64;
         public int GainBoltsNetEvents = 128;
         public int PlayerToEnvironmentTeleportGateCollisionNetEvents = 64;
         public int PreparationPhaseEndedNetEvents = 32;
@@ -112,6 +114,7 @@ namespace Core.Scripts.Network
             public int MaxWalls = 32;
             public int MaxLavaWalls = 16;
             public int MaxSprings = 8;
+            public int MaxSpikes = 16;
             public int MaxTeleportGatePairs = 4;
         }
     }

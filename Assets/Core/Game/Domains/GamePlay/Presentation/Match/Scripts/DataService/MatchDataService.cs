@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchPlayerBulletModel> Bullets { get; private set; }
         public List<MatchEnvironmentWallModel> EnvironmentWalls { get; private set; }
         public List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; private set; }
+        public List<MatchEnvironmentSpikeModel> EnvironmentSpikes { get; }
         public List<MatchEnvironmentSpringModel> EnvironmentSprings { get; private set; }
         public List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; private set; }
         public List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; private set; }
@@ -43,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
             EnvironmentLavaWalls = new List<MatchEnvironmentLavaWallModel>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls);
             EnvironmentSprings = new List<MatchEnvironmentSpringModel>(networkConfig.MaxCap.ConcurrentEvironmentSprings);
+            EnvironmentSpikes = new List<MatchEnvironmentSpikeModel>(networkConfig.MaxCap.ConcurrentEvironmentSpikes);
             RotatingWheels = new List<MatchEnvironmentRotatingWheelModel>(networkConfig.MaxCap.ConcurrentEnvironmentRotatingWheels);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
             PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
@@ -75,6 +77,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchEnvironmentSpringModel GetEnvironmentSpring(ushort springId)
         {
             return EnvironmentSprings.Find(x => x.Id == springId);
+        }
+
+        public MatchEnvironmentSpikeModel GetEnvironmentSpike(ushort spikeId)
+        {
+            return EnvironmentSpikes.Find(x => x.Id == spikeId);
         }
 
         public void RemoveBullet(ushort bulletId)
@@ -193,15 +200,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentSprings.Add(newSpring);
             return newSpring;
         }
-
-        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> teleportGatePairIds)
+        
+        public MatchEnvironmentSpikeModel AddSpike(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle)
         {
-            var newWheel = new MatchEnvironmentRotatingWheelModel(id, centerPosition, rotationSpeed, wallIds, lavaWallIds, springIds, teleportGatePairIds);
+            var newSpike = new MatchEnvironmentSpikeModel(id, localPosition, worldPosition, localRotationAngle, worldRotationAngle);
+            EnvironmentSpikes.Add(newSpike);
+            return newSpike;
+        }
+
+        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<ushort> teleportGatePairIds)
+        {
+            var newWheel = new MatchEnvironmentRotatingWheelModel(id, centerPosition, rotationSpeed, wallIds, lavaWallIds, springIds, spikeIds, teleportGatePairIds);
             RotatingWheels.Add(newWheel);
             return newWheel;
         }
 
-        public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 initialPosition, System.Numerics.Vector2 velocity, float radius, int spawnTick)
+        public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 initialPosition, Vector2 velocity, float radius, int spawnTick)
         {
             var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, initialPosition, velocity, radius, spawnTick);
             Bullets.Add(newBullet);
@@ -215,6 +229,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentWalls.Clear();
             EnvironmentLavaWalls.Clear();
             EnvironmentSprings.Clear();
+            EnvironmentSpikes.Clear();
             RotatingWheels.Clear();
             TalentCards.Clear();
             PowerUpBalls.Clear();

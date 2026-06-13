@@ -52,6 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.PlayerBullet);
                     break;
                 case PhysicsBodyType.EnvironmentSpring:
+                case PhysicsBodyType.EnvironmentSpike:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.EnvironmentTeleportGate:
