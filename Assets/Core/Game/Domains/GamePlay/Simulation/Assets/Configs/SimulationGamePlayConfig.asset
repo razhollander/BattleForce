@@ -133,7 +133,7 @@ MonoBehaviour:
     EnvironmentSpikes:
       Damage: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 6
+    DeafultEnvironmentId: 3
     ShouldChooseRandomStage: 0
     ShouldChooseRandomTalentsForPlayer: 1
     RandomTalentsForPlayersAmount: 3
