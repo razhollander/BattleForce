@@ -1,11 +1,13 @@
 using System.Threading;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 {
     public interface IGameInputActionsController
     {
-        void AddPlayer(ushort playerId, UnityEngine.InputSystem.InputDevice device);
+        void AddPlayer(ushort playerId, InputDevice device);
+        void AddPlayerIfNotAlreadyExist(ushort playerId, InputDevice device);
         void EnableInputs();
         void DisableInputs();
         void RegisterAllInputListeners();

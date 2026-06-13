@@ -57,23 +57,38 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.ClientsNetworkD
         {
             if (!ClientsNetworkDataDictionary.ContainsKey(clientId))
             {
-                LogService.LogError($"Client already exists: {clientId}");
+                LogService.LogError($"Client doesn't exist: {clientId}");
                 return;
             }
 
             ref var playerIds = ref ClientsNetworkDataDictionary[clientId].PlayerIds.AddAndGet();
             playerIds = playerId;
         }
-        
+
+        public bool IsPlayerAssignedToClient(long clientId, ushort playerId)
+        {
+            if (!ClientsNetworkDataDictionary.TryGetValue(clientId, out var clientNetworkData))
+            {
+                return false;
+            }
+            
+            return clientNetworkData.PlayerIds.Contains(playerId);
+        }
+
         public void RemoveClient(long clientId)
         {
             if (!ClientsNetworkDataDictionary.ContainsKey(clientId))
             {
-                LogService.LogError($"Client doesn't exists: {clientId}");
+                LogService.LogError($"Client doesn't exist: {clientId}");
                 return;
             }
 
             ClientsNetworkDataDictionary.Remove(clientId);
+        }
+
+        public bool IsClientExist(long clientId)
+        {
+            return ClientsNetworkDataDictionary.ContainsKey(clientId);
         }
     }
 }
