@@ -98,6 +98,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 
         public EnvironmentSpikeConfig[] GetEnvironmentSpikes()
         {
+            if (string.IsNullOrEmpty(_environmentSpikesJson))
+            {
+                return default;
+            }
             return _environmentSpikesJson.FromJson<EnvironmentSpikeConfig[]>();
         }
 
