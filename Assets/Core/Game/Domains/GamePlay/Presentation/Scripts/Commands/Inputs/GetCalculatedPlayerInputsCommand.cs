@@ -61,7 +61,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
         private void CalculateRightAndLeftInputs(Vector2 playerDirection, out bool isMoveRightInputPressed, out bool isMoveLeftInputPressed)
         {
             var device = _localPlayersDataService.GetInputDeviceForPlayer(_playerId);
-            if (device == null || device is Keyboard || device is Mouse)
+            var isKeyboardInput = device == null || device is Keyboard || device is Mouse;
+            if (isKeyboardInput)
             {
                 isMoveRightInputPressed = _gameInputActionsController.IsPlayerMoveRightInputPressed(_playerId);
                 isMoveLeftInputPressed = _gameInputActionsController.IsPlayerMoveLeftInputPressed(_playerId);

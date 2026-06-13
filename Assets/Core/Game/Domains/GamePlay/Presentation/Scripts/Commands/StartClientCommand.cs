@@ -79,6 +79,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands
 
             var joinRequest = new JoinRequestPacketC2S(_networkConfig.MaxCap.ConcurrentPlayers);
             joinRequest.ClientId = _clientId;
+            
             foreach (var playersJoinedModel in _playersJoinedModels)
             {
                 joinRequest.AddPlayer(playersJoinedModel.PlayerName, playersJoinedModel.PlayerInputType == SupportedInputType.Gamepad, playersJoinedModel.InputDeviceId);

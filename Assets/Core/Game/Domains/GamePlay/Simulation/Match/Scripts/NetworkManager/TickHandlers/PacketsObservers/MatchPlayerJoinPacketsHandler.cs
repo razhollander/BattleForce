@@ -68,8 +68,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     joinResponse.MatchSimulationState = _matchDataService.SimulationState;
                     joinResponse.OccuredOnTick = processedTick;
                     _networkManager.AddClientPeer(clientId, peer);
-                    _clientsNetworkDataService.AddClient(clientId, true);
-                    
+                    _clientsNetworkDataService.SetIsClientCurrentlyConnected(clientId, true);
+                    _netEventsDataService.StartSavingClientEvents(clientId);
+
                     foreach (var playerJoined in kvp.Value.PlayerJoinedList.AsSpan())
                     {
                         var playerName = playerJoined.PlayerName;
@@ -78,7 +79,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                         playersReconnected.Add(existingPlayerState);
                         joinResponse.PlayerIdToDeviceIdDictionary.Add(playerId, playerJoined.InputDeviceId);
                         _simulationInputService.AddPlayer(playerId);
-                        _netEventsDataService.StartSavingClientEvents(playerId);
                         LogService.LogTopic("Processed player rejoined: " + playerName, LogTopicType.ServerNetwork);
                     }
                     

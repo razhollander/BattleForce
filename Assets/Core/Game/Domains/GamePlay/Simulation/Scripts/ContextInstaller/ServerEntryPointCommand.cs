@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
@@ -62,14 +63,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _simulationStateMachine.InitEntryPoint();
             _headLessQuitterController.InitEntryPoint();
 
+            var clientId = _simulationPersistentData.DeviceUniqueIdentifier;
             if (_playbackRecorderService.IsPlaybackEnabled)
             {
-                var matchEnterData = new SimulationMatchEnterData(_playbackRecorderService.Players);
+                var playersPerClientId = new Dictionary<long, EnterMatchPlayerData[]> {{clientId, _playbackRecorderService.Players}};
+                var matchEnterData = new SimulationMatchEnterData(playersPerClientId);
                 _simulationStateMachine.ChangeToMatch(matchEnterData);
             }
             else if (_simulationPersistentData.ShouldSkipMatchMaking)
             {
-                _simulationStateMachine.ChangeToMatch(_sharedGamePlayConfig.DefaultMatchEnterDataConfig.DefaultSimulationMatchEnterData);
+                var playersPerClientId = new Dictionary<long, EnterMatchPlayerData[]> {{clientId, _sharedGamePlayConfig.DefaultMatchEnterDataConfig.Players}};
+                var matchEnterData = new SimulationMatchEnterData(playersPerClientId);
+                _simulationStateMachine.ChangeToMatch(matchEnterData);
             }
             else
             {
