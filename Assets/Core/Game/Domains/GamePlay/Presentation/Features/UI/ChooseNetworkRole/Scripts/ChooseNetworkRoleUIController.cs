@@ -35,14 +35,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly ICommandFactory _commandFactory;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly IDataPersistence _dataPersistence;
-        private readonly IInputDeviceChangedListenerService _inputDeviceChangedListenerService;
+        private readonly IInputDeviceChangedListenerService _nativeInputDeviceService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
 
         private List<PlayerJoinedModel> _playerJoinedModels = new List<PlayerJoinedModel>();
         
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
             IStateMachineService stateMachineService, NetworkConfig networkConfig, IPlaybackIOService playbackIOService,
-            ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig, IDataPersistence dataPersistence, IInputDeviceChangedListenerService inputDeviceChangedListenerService, PresentationGamePlayConfig gamePlayConfig)
+            ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig, IDataPersistence dataPersistence, IInputDeviceChangedListenerService nativeInputDeviceService, PresentationGamePlayConfig gamePlayConfig)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
@@ -52,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _commandFactory = commandFactory;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _dataPersistence = dataPersistence;
-            _inputDeviceChangedListenerService = inputDeviceChangedListenerService;
+            _nativeInputDeviceService = nativeInputDeviceService;
             _gamePlayConfig = gamePlayConfig;
         }
 
@@ -72,8 +72,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             }
             else
             {
-                _inputDeviceChangedListenerService.GamepadAddedEvent += OnGamepadAdded;
-                _inputDeviceChangedListenerService.GamepadRemovedEvent += OnGamepadRemoved;
+                _nativeInputDeviceService.GamepadAddedEvent += OnGamepadAdded;
+                _nativeInputDeviceService.GamepadRemovedEvent += OnGamepadRemoved;
             }
 #if UNITY_SERVER
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
@@ -98,20 +98,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         public void InitExitPoint()
         {
-            _inputDeviceChangedListenerService.GamepadAddedEvent -= OnGamepadAdded;
-            _inputDeviceChangedListenerService.GamepadRemovedEvent -= OnGamepadRemoved;
+            _nativeInputDeviceService.GamepadAddedEvent -= OnGamepadAdded;
+            _nativeInputDeviceService.GamepadRemovedEvent -= OnGamepadRemoved;
         }
 
         private List<PlayerJoinedModel> GetAllPlayerJoinedModels()
         {
             var playerJoinedModels = new List<PlayerJoinedModel>();
-            var currentlyConnectedKeyboards = _inputDeviceChangedListenerService.GetAllConnectedKeyboards();
+            var currentlyConnectedKeyboards = _nativeInputDeviceService.GetAllConnectedKeyboards();
             for (var i = 0; i < currentlyConnectedKeyboards.Count; i++)
             {
                 playerJoinedModels.Add(GetSavedPlayerJoinedModelByDeviceOrDefault(currentlyConnectedKeyboards[i].deviceId, SupportedInputType.Mouse));
             }
             
-            var currentlyConnectedGamepads = _inputDeviceChangedListenerService.GetAllConnectedGamepads();
+            var currentlyConnectedGamepads = _nativeInputDeviceService.GetAllConnectedGamepads();
             for (var i = 0; i < currentlyConnectedGamepads.Count; i++)
             {
                 playerJoinedModels.Add(GetSavedPlayerJoinedModelByDeviceOrDefault(currentlyConnectedGamepads[i].deviceId, SupportedInputType.Gamepad));
@@ -248,53 +248,49 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             LogService.LogTopic("Finished starting Client", LogTopicType.ClientNetwork);
         }
         
-        private List<PlayerJoinedModel> GetPlayersJoined(bool isPlaybackEnabled, string playbackName = "")
+        private List<PlayerJoinedModel> GetPlayersJoined(bool isPlaybackEnabled, string playbackName)
         {
             if (isPlaybackEnabled)
             {
                 _playbackIOService.TryGetPlayback(playbackName, out var playbackFile);
-                var playbackPlayersJoinedModels = new List<PlayerJoinedModel>();
                 var players = playbackFile.Players;
-                var localPlayerConnectedDeviceId = GetLocalPlayerConnectedDeviceId(out var localPlayerDeviceType);
-
-                for (int i = 0; i < players.Length; i++)
-                {
-                    var isFirstPlayer = i == 0;
-                    var deviceId = isFirstPlayer ? localPlayerConnectedDeviceId : -i; // its -i because to not conflict with Unity's real device ids (they start 1,2,3..)
-                    var deviceType = isFirstPlayer ? localPlayerDeviceType : SupportedInputType.Mouse;
-                    var playerData = players[i];
-                    playbackPlayersJoinedModels.Add(new PlayerJoinedModel(playerData.Name, deviceType, deviceId));
-                }
-                return playbackPlayersJoinedModels;
+                var playersJoined = ConvertPlayersEnteredToPlayerJoined(players);
+                return playersJoined;
             }
 
             if (PlayerPrefsSettings.ShouldSkipMatchMaking)
             {
                 var  players = _sharedGamePlayConfig.DefaultMatchEnterDataConfig.Players;
-                var defaultPlayersJoinedModels = new List<PlayerJoinedModel>();
-                var localPlayerConnectedDeviceId = GetLocalPlayerConnectedDeviceId(out var localPlayerDeviceType);
-
-                for (int i = 0; i < players.Length; i++)
-                {
-                    var isFirstPlayer = i == 0;
-                    var deviceId = isFirstPlayer ? localPlayerConnectedDeviceId : -i; // its -i because to not conflict with Unity's real device ids (they start 1,2,3..)
-                    var deviceType = isFirstPlayer ? localPlayerDeviceType : SupportedInputType.Mouse;
-                    var playerData = players[i];
-                    defaultPlayersJoinedModels.Add(new PlayerJoinedModel(playerData.Name, deviceType, deviceId));
-                }
-
-                return defaultPlayersJoinedModels;
+                var playersJoined = ConvertPlayersEnteredToPlayerJoined(players);
+                return playersJoined;
             }
 
             return _playerJoinedModels;
         }
 
-        private int GetLocalPlayerConnectedDeviceId(out SupportedInputType localPlayerDeviceType)
+        private List<PlayerJoinedModel> ConvertPlayersEnteredToPlayerJoined(EnterMatchPlayerData[] players)
+        {
+            var playbackPlayersJoinedModels = new List<PlayerJoinedModel>();
+            var localPlayerConnectedDeviceId = GetFirstLocalPlayerConnectedDeviceId(out var localPlayerDeviceType);
+
+            for (int i = 0; i < players.Length; i++)
+            {
+                var isFirstPlayer = i == 0;
+                var deviceId = isFirstPlayer ? localPlayerConnectedDeviceId : -i; // its -i because to not conflict with Unity's real device ids (they start 1,2,3..)
+                var deviceType = isFirstPlayer ? localPlayerDeviceType : SupportedInputType.Mouse;
+                var playerData = players[i];
+                playbackPlayersJoinedModels.Add(new PlayerJoinedModel(playerData.Name, deviceType, deviceId));
+            }
+
+            return playbackPlayersJoinedModels;
+        }
+
+        private int GetFirstLocalPlayerConnectedDeviceId(out SupportedInputType localPlayerDeviceType)
         {
             var realLocalPlayerDeviceId = 0;
             localPlayerDeviceType = SupportedInputType.Mouse;
             
-            var allConnectGamepads = _inputDeviceChangedListenerService.GetAllConnectedGamepads();
+            var allConnectGamepads = _nativeInputDeviceService.GetAllConnectedGamepads();
             if (allConnectGamepads.Count > 0)
             {
                 realLocalPlayerDeviceId = allConnectGamepads[0].deviceId;
@@ -302,8 +298,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             }
             else 
             {
-                var allConnectedKeyboards = _inputDeviceChangedListenerService.GetAllConnectedKeyboards();
-
+                var allConnectedKeyboards = _nativeInputDeviceService.GetAllConnectedKeyboards();
                 if (allConnectedKeyboards.Count > 0)
                 {
                     realLocalPlayerDeviceId = allConnectedKeyboards[0].deviceId;

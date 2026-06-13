@@ -70,7 +70,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     _networkManager.AddClientPeer(clientId, peer);
                     _clientsNetworkDataService.SetIsClientCurrentlyConnected(clientId, true);
                     _netEventsDataService.StartSavingClientEvents(clientId);
-                    //_netEventsDataService.StartSavingClientEvents(playerId);
 
                     foreach (var playerJoined in kvp.Value.PlayerJoinedList.AsSpan())
                     {

@@ -133,7 +133,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
                  .SetOccuredOnTick(_enterData.StateOccouredOnTick)
                  .Execute();
 
-            AddPlayersDevicesNotAddedDuringMatchMaking();
+            AddPlayersDevicesNotAddedDuringMatchMaking(); // in case we entered from playback
             _gainBoltEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();
