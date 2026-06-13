@@ -82,7 +82,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchEnvironmentSpikeModel GetEnvironmentSpike(ushort spikeId)
         {
             return EnvironmentSpikes.Find(x => x.Id == spikeId);
-
         }
 
         public void RemoveBullet(ushort bulletId)
