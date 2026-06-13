@@ -793,9 +793,9 @@ MonoBehaviour:
         4,\n      \"Y\": 0\n    },\n    \"TalentType\": \"DashPulse\"\n  }\n]"
       _environmentSpringsJson: 
       _environmentSpikesJson: "[\n  {\n    \"Id\": 2,\n    \"Position\": {\n     
-        \"X\": 0,\n      \"Y\": 10.1\n    },\n    \"DirectionAngle\": \"90\"\n  },\n 
-        {\n    \"Id\": 1,\n    \"Position\": {\n      \"X\": 0,\n      \"Y\": -10.1\n   
-        },\n    \"DirectionAngle\": \"270\"\n  }\n]"
+        \"X\": 0,\n      \"Y\": -24.1\n    },\n    \"DirectionAngle\": \"90\"\n 
+        },\n  {\n    \"Id\": 1,\n    \"Position\": {\n      \"X\": 0,\n      \"Y\":
+        24.1\n    },\n    \"DirectionAngle\": \"270\"\n  }\n]"
       _teleportGatesJson: 
       _rotatingWheelsJson: 
       _fieldBarriersJson: "[\n  {\n    \"Position\": {\n      \"x\": 15.08,\n     
