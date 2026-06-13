@@ -17,5 +17,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
     {
         public Vector2 Position;
         public float NormalRotation;
+        public short AttachToRotationWheelId = -1;
     }
 }

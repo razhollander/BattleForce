@@ -79,8 +79,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateTalentCards(mapSizeMultiplier);
             CreateEnvironmentSprings(mapSizeMultiplier);
             CreateEnvironmentSpikes(mapSizeMultiplier);
-            CreateTeleportGates(mapSizeMultiplier);
             CreateRotatingWheels(mapSizeMultiplier);
+            CreateTeleportGates(mapSizeMultiplier);
             CreateFieldBarriers(mapSizeMultiplier);
         }
         
@@ -387,11 +387,69 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
+            var rotatingWheelsConfigs = _matchEnvironmentConfigDataService.RotatingWheels;
+            var wheelsDict = new System.Collections.Generic.Dictionary<ushort, Core.Game.Domains.GamePlay.Shared.Scripts.Configs.EnvironmentRotatingWheelConfig>();
+            if (!rotatingWheelsConfigs.IsNullOrEmpty())
+            {
+                foreach (var wheel in rotatingWheelsConfigs)
+                {
+                    wheelsDict[wheel.Id] = wheel;
+                }
+            }
+
+            var calculationTick = 0;
+            var deltaTime = _networkConfig.DeltaTime;
+
             foreach (var teleportGatePairConfig in teleportGatePairConfigs)
             {
-                AddTeleportGatePairToEnvironment(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateBId, Vector2.Zero, 0, Vector2.Zero, 0,
-                    teleportGatePairConfig.GateA.Position * mapSizeMultiplier, teleportGatePairConfig.GateA.NormalRotation, teleportGatePairConfig.GateB.Position * mapSizeMultiplier,
-                    teleportGatePairConfig.GateB.NormalRotation, mapSizeMultiplier);
+                var gateA = teleportGatePairConfig.GateA;
+                var scaledGateAPos = gateA.Position * mapSizeMultiplier;
+                Vector2 worldPositionA;
+                float worldRotationA;
+
+                if (gateA.AttachToRotationWheelId >= 0 && wheelsDict.TryGetValue((ushort)gateA.AttachToRotationWheelId, out var wheelA))
+                {
+                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                        calculationTick, wheelA.RotationSpeed, deltaTime, wheelA.CenterPosition * mapSizeMultiplier, scaledGateAPos, gateA.NormalRotation,
+                        out worldPositionA, out worldRotationA);
+
+                    var rotatingWheelS2C = _matchDataService.EnvironmentData.GetRotatingWheel(wheelA.Id);
+                    if (rotatingWheelS2C != null && !rotatingWheelS2C.TeleportGatePairIds.Contains(teleportGatePairConfig.Id))
+                    {
+                        rotatingWheelS2C.AddTeleportGatePair(teleportGatePairConfig.Id);
+                    }
+                }
+                else
+                {
+                    worldPositionA = scaledGateAPos;
+                    worldRotationA = gateA.NormalRotation;
+                }
+
+                var gateB = teleportGatePairConfig.GateB;
+                var scaledGateBPos = gateB.Position * mapSizeMultiplier;
+                Vector2 worldPositionB;
+                float worldRotationB;
+
+                if (gateB.AttachToRotationWheelId >= 0 && wheelsDict.TryGetValue((ushort)gateB.AttachToRotationWheelId, out var wheelB))
+                {
+                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                        calculationTick, wheelB.RotationSpeed, deltaTime, wheelB.CenterPosition * mapSizeMultiplier, scaledGateBPos, gateB.NormalRotation,
+                        out worldPositionB, out worldRotationB);
+
+                    var rotatingWheelS2C = _matchDataService.EnvironmentData.GetRotatingWheel(wheelB.Id);
+                    if (rotatingWheelS2C != null && !rotatingWheelS2C.TeleportGatePairIds.Contains(teleportGatePairConfig.Id))
+                    {
+                        rotatingWheelS2C.AddTeleportGatePair(teleportGatePairConfig.Id);
+                    }
+                }
+                else
+                {
+                    worldPositionB = scaledGateBPos;
+                    worldRotationB = gateB.NormalRotation;
+                }
+
+                AddTeleportGatePairToEnvironment(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateBId, scaledGateAPos, gateA.NormalRotation, scaledGateBPos,
+                    gateB.NormalRotation, worldPositionA, worldRotationA, worldPositionB, worldRotationB, mapSizeMultiplier);
             }
         }
         
@@ -494,37 +552,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     }
                 }
 
-                if (!wheelConfig.TeleportGatePairs.IsNullOrEmpty())
-                {
-                    foreach (var teleportPairConfig in wheelConfig.TeleportGatePairs)
-                    {
-                        var scaledGateAPos = teleportPairConfig.GateA.Position * mapSizeMultiplier;
-                        var scaledGateBPos = teleportPairConfig.GateB.Position * mapSizeMultiplier;
-
-                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledGateAPos, teleportPairConfig.GateA.NormalRotation,
-                            out var worldPositionA, out var worldRotationA);
-
-                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledGateBPos, teleportPairConfig.GateB.NormalRotation,
-                            out var worldPositionB, out var worldRotationB);
-
-                        var pairId = teleportPairConfig.Id;
-                        AddTeleportGatePairToEnvironment(pairId,
-                            teleportPairConfig.GateAId,
-                            teleportPairConfig.GateBId,
-                            scaledGateAPos,
-                            teleportPairConfig.GateA.NormalRotation,
-                            scaledGateBPos,
-                            teleportPairConfig.GateB.NormalRotation,
-                            worldPositionA,
-                            worldRotationA,
-                            worldPositionB,
-                            worldRotationB,
-                            mapSizeMultiplier);
-                        rotatingWheel.AddTeleportGatePair(pairId);
-                    }
-                }
             }
         }
     }
