@@ -10,6 +10,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.ClientsNetworkD
         void SetIsClientCurrentlyConnected(long clientId, bool isConnected);
         bool IsClientConnected(long clientId);
         void AssignPlayerToClient(long clientId, ushort playerId);
+        bool IsPlayerAssignedToClient(long clientId, ushort playerId);
         void RemoveClient(long clientId);
+        bool IsClientExist(long clientId);
     }
 }

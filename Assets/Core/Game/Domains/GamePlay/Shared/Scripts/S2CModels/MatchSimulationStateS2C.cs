@@ -735,7 +735,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             throw new System.Exception($"No chicken egg for id {eggId}!");
         }
 
-        public  bool TryGetPlayerByName(string playerName, out PlayerStateS2C playerState)
+        public bool TryGetPlayerByName(string playerName, out PlayerStateS2C playerState)
         {
             for (int i = 0; i < Players.Count; i++)
             {

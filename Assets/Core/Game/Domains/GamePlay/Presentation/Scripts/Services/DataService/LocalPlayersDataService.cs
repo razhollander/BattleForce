@@ -48,10 +48,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService
             _localPlayerIds.Clear();
             _deviceByPlayerId.Clear();
             _localPlayerIds.Clear();
-            
             foreach (var kvp in playerIdToDeviceIdDictionary)
             {
-                AddLocalPlayer(kvp.Key, InputSystem.GetDeviceById(kvp.Value));
+                var device = InputSystem.GetDeviceById(kvp.Value);
+                var isPlayerAddedBySkippingMatchMaking = device == null;
+                if(isPlayerAddedBySkippingMatchMaking)
+                {
+                    continue;
+                }
+                
+                AddLocalPlayer(kvp.Key, device);
             }
         }
     }

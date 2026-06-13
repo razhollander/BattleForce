@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
@@ -128,15 +129,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 return;
             }
 
-            var playersData = new EnterMatchPlayerData[_matchMakingDataService.SimulationState.Players.Count];
+            var dict = new Dictionary<long, EnterMatchPlayerData[]>();
 
-            for (int i = 0; i < _matchMakingDataService.SimulationState.Players.Count; i++)
+            foreach (var clientNetworkData in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
-                var playerState = _matchMakingDataService.SimulationState.Players.GetByIndex(i);
-                playersData[i] = new EnterMatchPlayerData(playerState.Id, playerState.Name, playerState.TeamId);
-            }
+                var playersData = new EnterMatchPlayerData[clientNetworkData.Value.PlayerIds.Count];
 
-            var matchEnterData = new SimulationMatchEnterData(playersData);
+                for (int i = 0; i < playersData.Length; i++)
+                {
+                    var playerState = _matchMakingDataService.SimulationState.GetPlayerById(clientNetworkData.Value.PlayerIds[i]);
+                    playersData[i] = new EnterMatchPlayerData(playerState.Id, playerState.Name, playerState.TeamId);
+                }
+                dict.Add(clientNetworkData.Key, playersData);
+            }
+            var matchEnterData = new SimulationMatchEnterData(dict);
             _simulationStateMachine.ChangeToMatch(matchEnterData);
         }
 

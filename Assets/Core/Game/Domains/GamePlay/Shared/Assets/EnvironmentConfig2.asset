@@ -787,7 +787,16 @@ MonoBehaviour:
       _environmentSpringsJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: 
-      _fieldBarriersJson: 
+      _fieldBarriersJson: "[\n  {\n    \"Position\": {\n      \"x\": 15.08,\n     
+        \"y\": 15.08\n    },\n    \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n   
+        },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\": {\n      \"x\":
+        -20.0,\n      \"y\": -20.0\n    },\n    \"Size\": {\n      \"x\": 3.5,\n     
+        \"y\": 3.5\n    },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\":
+        {\n      \"x\": 15.08,\n      \"y\": -15.08\n    },\n    \"Size\": {\n     
+        \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\": \"Circle\"\n  },\n 
+        {\n    \"Position\": {\n      \"x\": -10.08,\n      \"y\": -10.08\n    },\n   
+        \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\":
+        \"Circle\"\n  }\n]"
       _stageBoundriesWallsJson: 
     - _environmentName: Big Empty
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'

@@ -13,6 +13,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.ClientsNetworkDataService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -218,6 +219,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var currentSimulationState = _matchDataService.SimulationState;
             _fullTickPacket.Tick = processedTick;
             _fullTickPacket.CurrentSimulationState = currentSimulationState;
+
             //_fullTickPacket.PreviousSimulationState = _matchDataService.PreviousSimulationState;
             foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {

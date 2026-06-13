@@ -29,6 +29,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             _commandFactory = commandFactory;
         }
         
+        public void AddPlayerIfNotAlreadyExist(ushort playerId, InputDevice device)
+        {
+            if (_gameInputActionsByPlayer.ContainsKey(playerId))
+            {
+                return;
+            }
+            
+            AddPlayer(playerId, device);
+        }
+        
         public void AddPlayer(ushort playerId, InputDevice device)
         {
             if (_gameInputActionsByPlayer.ContainsKey(playerId))

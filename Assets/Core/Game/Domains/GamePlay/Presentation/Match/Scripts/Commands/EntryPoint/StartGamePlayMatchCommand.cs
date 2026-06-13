@@ -25,6 +25,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
@@ -64,6 +65,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IBackgroundParallaxController _backgroundParallaxController;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private ILocalPlayersDataService _localPlayersDataService;
+        private IGameInputActionsController _gameInputActionsController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -101,6 +103,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
             _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
+            _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
         }
 
         public void Execute()
@@ -129,12 +132,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
                  .SetSimulationState(_enterData.InitialState)
                  .SetOccuredOnTick(_enterData.StateOccouredOnTick)
                  .Execute();
-            _localPlayersDataService.SetLocalPlayers(_enterData.PlayerIdToDeviceIdDictionary);
+
+            AddPlayersDevicesNotAddedDuringMatchMaking();
             _gainBoltEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
+        }
+        
+        private void AddPlayersDevicesNotAddedDuringMatchMaking()
+        {
+            _localPlayersDataService.SetLocalPlayers(_enterData.PlayerIdToDeviceIdDictionary);
+
+            foreach (var kvp in _localPlayersDataService.GetPlayerIdToDeviceIdDictionary())
+            {
+                _gameInputActionsController.AddPlayerIfNotAlreadyExist(kvp.Key,_localPlayersDataService.GetInputDeviceForPlayer(kvp.Key));
+            }
         }
     }
 }
