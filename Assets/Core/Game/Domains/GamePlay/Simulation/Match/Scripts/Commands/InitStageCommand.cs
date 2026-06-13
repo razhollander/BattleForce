@@ -13,6 +13,7 @@ using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersTalentsCooldowns;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
@@ -36,7 +37,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private TryAddARandomTalentForPlayerCommand _tryAddARandomTalentForPlayerCommand;
         private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
-
+        private IPlayerTalentsCooldownsService _playerTalentsCooldownsService;
+        private int _currentTick;
+        
+        public InitStageCommand SetTick(int currentTick)
+        {
+            _currentTick = currentTick;
+            return this;
+        }
+        
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
@@ -55,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _tryAddARandomTalentForPlayerCommand = _commandFactory.CreateCommandVoid<TryAddARandomTalentForPlayerCommand>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
+            _playerTalentsCooldownsService = _diContainer.Resolve<IPlayerTalentsCooldownsService>();
         }
 
         public void Execute()
@@ -170,17 +180,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.IsAlive = true;
                 player.Spaceship.IsSpinned = false;
                 player.Spaceship.TargetedEnemyIds.Clear();
-                
+                var playerId = player.Id;
+                _playerTalentsCooldownsService.RemoveCooldownMultiplierForPlayer(_currentTick, playerId, TalentCooldownMultiplierType.PlayerDead, false);
+
                 if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                 {
-                    _setRandomTalentsForPlayerCommand.SetPlayerId(player.Id).SetTalentsAmount(_gamePlayConfigService.GamePlayConfig.RandomTalentsForPlayersAmount).Execute();
+                    _setRandomTalentsForPlayerCommand.SetPlayerId(playerId).SetTalentsAmount(_gamePlayConfigService.GamePlayConfig.RandomTalentsForPlayersAmount).Execute();
                 }
                 else if (_gamePlayConfigService.GamePlayConfig.ShouldAddTalentEveryXStages)
                 {
                     var didReachStage = _stageNumber % _gamePlayConfigService.GamePlayConfig.EveryXStages == 0;
                     if (didReachStage)
                     {
-                        _tryAddARandomTalentForPlayerCommand.SetPlayerId(player.Id).Execute();
+                        _tryAddARandomTalentForPlayerCommand.SetPlayerId(playerId).Execute();
                     }
                 }
 
@@ -191,7 +203,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     talentState.ClearCooldown();
                 }
                 
-                _physicsSimulator.AddPlayer(player.Id, player.TeamId, position, velocity, radius, heartRadius);
+                _physicsSimulator.AddPlayer(playerId, player.TeamId, position, velocity, radius, heartRadius);
             }
         }
 

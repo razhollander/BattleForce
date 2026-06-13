@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public int RandomTalentsForPlayersAmount = 3;
         public ushort StartMatchCountdownDuration = 1;
         public float ShootCooldownMultiplierWhenDead = 2;
+        public float TalentCooldownMultiplierWhenDead = 2;
         public float StageRestartDelaySeconds = 3f;
         public int GemsCollectedForTeamAlive = 1;
         public int MaxOverllapingFloors = 32;

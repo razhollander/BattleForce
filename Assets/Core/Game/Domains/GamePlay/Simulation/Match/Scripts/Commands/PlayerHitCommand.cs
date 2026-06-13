@@ -11,6 +11,7 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersTalentsCooldowns;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -35,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ushort _byPlayerId;
         private bool _wasHitByAnotherPlayer;
         private IOverrideableNetEventsService _overrideableNetEventsService;
+        private IPlayerTalentsCooldownsService _playerTalentsCooldownsService;
 
         public PlayerHitCommand SetHitDamage(ushort hitDamage)
         {
@@ -71,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
+            _playerTalentsCooldownsService = _diContainer.Resolve<IPlayerTalentsCooldownsService>();
             _playerGainedBoltsCommand = _commandFactory.CreateCommandVoid<PlayerGainedBoltsCommand>();
             _chachedTeamsCurrentlyAlive = new HashSet<ushort>(_sharedGamePlayConfig.MaxTeamsAmount);
             _gemsGainedPerTeamIdPerTeam = new Dictionary<ushort, Dictionary<ushort, int>>(_sharedGamePlayConfig.MaxTeamsAmount);
@@ -125,8 +128,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private void KillPlayer(PlayerStateS2C playerState)
         {
             playerState.Spaceship.IsAlive = false;
+
+            _playerTalentsCooldownsService.AddCooldownMultiplierForPlayer(_processedTick, playerState.Id, TalentCooldownMultiplierType.PlayerDead,
+                _gamePlayConfigService.GamePlayConfig.TalentCooldownMultiplierWhenDead);
+            ChangeDeadPlayerShootCooldown(playerState);
+            
+            playerState.Spaceship.IsEngineOn = false;
+            playerState.Spaceship.Transform.Velocity = Vector2.Zero;
+            _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerIdGotHit);
+
+            if (!_stageDataService.IsStageEnded)
+            {
+                TryAddLosingTeam(playerState.TeamId);
+                TryInvokeMatchEnded();
+            }
+        }
+
+        private void ChangeDeadPlayerShootCooldown(PlayerStateS2C playerState)
+        {
             var shootState = playerState.Spaceship.Shoot;
             var isShootOnCooldown = shootState.MaxCooldown > shootState.CooldownSecondsLeft; 
+
             shootState.MaxCooldown *= _gamePlayConfigService.GamePlayConfig.ShootCooldownMultiplierWhenDead;
 
             if (!isShootOnCooldown)
@@ -134,17 +156,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 shootState.CooldownSecondsLeft = shootState.MaxCooldown;
             }
             
-            playerState.Spaceship.Shoot = shootState;
-            playerState.Spaceship.IsEngineOn = false;
-            playerState.Spaceship.Transform.Velocity = Vector2.Zero;
-            _netEventsDataService.AddPlayerDiedNetEvent(_processedTick, _playerIdGotHit);
             _overrideableNetEventsService.OverridePlayerMaxShootCooldownChangedEvent(_processedTick, _playerIdGotHit, shootState.MaxCooldown, shootState.CooldownSecondsLeft);
-
-            if (!_stageDataService.IsStageEnded)
-            {
-                TryAddLosingTeam(playerState.TeamId);
-                TryInvokeMatchEnded();
-            }
+            playerState.Spaceship.Shoot = shootState;
         }
 
         private void TryAddLosingTeam(ushort losingTeamId)

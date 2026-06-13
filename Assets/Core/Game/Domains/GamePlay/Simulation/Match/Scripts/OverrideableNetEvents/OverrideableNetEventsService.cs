@@ -100,5 +100,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEve
             packet.MaxShootCooldown = maxShootCooldown;
             packet.ShootCooldownSecondsLeft = cooldownSecondsLeft;
         }
+
+        public void OverridePlayerTalentsMaxCooldownMultiplierChangedEvent(int onTick, ushort playerId, FixedOrderedList<TalentStateS2C> playerTalents)
+        {
+            // todo implement this
+        }
     }
 }

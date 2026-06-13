@@ -143,7 +143,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 return false;
             }
 
-            _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
+            _commandFactory.CreateCommandVoid<InitStageCommand>().SetTick(currentTick).Execute();
             SendStartStageToAllClients(currentTick);
             return true;
         }

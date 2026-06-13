@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersTalentsCooldowns;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -41,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private ISimulationInputService _simulationInputService;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
         private IClientsNetworkDataService _clientsNetworkDataService;
+        private IPlayerTalentsCooldownsService _playerTalentsCooldownsService;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -66,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _simulationInputService = _diContainer.Resolve<ISimulationInputService>();
             _clientsNetworkDataService = _diContainer.Resolve<IClientsNetworkDataService>();
+            _playerTalentsCooldownsService = _diContainer.Resolve<IPlayerTalentsCooldownsService>();
             _setRandomTalentsForPlayerCommand =  _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
         }
 
@@ -79,7 +82,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
 
             InitPlayers(_simulationMatchEnterData);
             _stageDataService.InitEntryPoint();
-            _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
+            _commandFactory.CreateCommandVoid<InitStageCommand>().SetTick(_tickService.CurrentTick).Execute();
             _tickProcessor.InitEntryPoint();
         }
 
@@ -159,6 +162,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                     _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown);
                     _playersTalentsManager.AddPlayer(playerId);
                     _simulationInputService.AddPlayer(playerId);
+                    _playerTalentsCooldownsService.AddPlayer(playerId);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.YearsOfPain, playerId, 0, out _, out _);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);

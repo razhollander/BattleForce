@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Numerics;
 using Core.Scripts.Utils.CustomCollections;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
+using Core.Scripts.Extensions.Linq;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
@@ -10,7 +12,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public int SelectedTalentIndex;
         public Vector2 AimDirection; // todo move out of here
         public FixedOrderedList<TalentStateS2C> Talents;
-
+        public float AllTalentsCooldownMultiplier;
+        
         public PlayerTalentsStateS2C(int maxTalents)
         {
             Talents = new FixedOrderedList<TalentStateS2C>(maxTalents);
