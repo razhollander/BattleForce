@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId, _gamePlayConfig, _sharedGamePlayConfig, _networkConfig);
             newPlayerController.CreateView(_view.PlayerUIView, _view.PlayersContainer);
             var playerTalentsState =_matchDataService.GetPlayer(playerId).Spaceship.TalentsState;
-            newPlayerController.UpdateTalents(playerTalentsState.Talents, playerTalentsState.SelectedTalentIndex, currentServerTick);
+            newPlayerController.UpdateTalents(playerTalentsState.Talents, playerTalentsState.SelectedTalentIndex, currentServerTick, playerTalentsState.AllTalentsCooldownMultiplier);
             _playerControllers.Add(playerId, newPlayerController);
         }
 
@@ -61,15 +61,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 
         public void UpdatePlayerTalents(ushort playerId, FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
         {
-            var selectedTalentIndex = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.SelectedTalentIndex;
-            _playerControllers[playerId].UpdateTalents(talents, selectedTalentIndex, currentServerTick);
+            var playerState = _matchDataService.GetPlayer(playerId);
+            var selectedTalentIndex = playerState.Spaceship.TalentsState.SelectedTalentIndex;
+            _playerControllers[playerId].UpdateTalents(talents, selectedTalentIndex, currentServerTick, playerState.Spaceship.TalentsState.AllTalentsCooldownMultiplier);
         }
 
         public void UpdatePlayersTalentCooldowns(int currentServerTick)
         {
             foreach (var playerController in _playerControllers)
             {
-                playerController.Value.UpdateTalentsCooldown(_matchDataService.GetPlayer(playerController.Key).Spaceship.TalentsState.Talents, currentServerTick);
+                var talentsState = _matchDataService.GetPlayer(playerController.Key).Spaceship.TalentsState;
+                playerController.Value.UpdateTalentsCooldown(talentsState.Talents, currentServerTick, talentsState.AllTalentsCooldownMultiplier);
             }
         }
 

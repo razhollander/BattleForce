@@ -48,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>> DeactivateSentryGunTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>> UpdatePlayerTalentStocksNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>> PlayerMaxShootCooldownChangedNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<PlayerTalentCooldownMultiplierChangedNetEventS2C>> PlayerTalentCooldownMultiplierChangedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> CreateGrapplingHookProjectileNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> GrapplingHookHitWallNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> DeactivateGrapplingHookTalentNetEventsPerClient { get; }
@@ -99,6 +100,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddDeactivateSentryGunTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddUpdatePlayerTalentStocksNetEventS2C(int onTick, ushort casterPlayerId, TalentType talentType, int currentStocksAmount, int recieveNextStockOnTick);
         void AddPlayerMaxShootCooldownChangedNetEvent(int onTick, ushort playerId, float maxShootCooldown, float shootCooldownSecondsLeft);
+        void AddPlayerTalentCooldownMultiplierChangedNetEvent(int onTick, ushort playerId, float allTalentsCooldownMultiplier, FixedOrderedList<TalentStateS2C> playerTalents);
         void AddCreateGrapplingHookProjectileNetEvent(int onTick, ushort projectileId, ushort playerCasterId, Vector2 position);
         void AddGrapplingHookHitWallNetEvent(int onTick, ushort projectileId, ushort hitWallId, Vector2 hitPosition);
         void AddDeactivateGrapplingHookTalentNetEvent(int onTick, ushort casterPlayerId, ushort projectileId, int talentCooldownEndTick);

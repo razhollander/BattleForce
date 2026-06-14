@@ -68,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PerformDashPulseNetEventS2C> _cachedUnprocessedPerformDashPulseEvents;
         private readonly CapacityList<UpdatePlayerTalentStocksNetEventS2C> _cachedUnprocessedUpdatePlayerTalentStocksEvents;
         private readonly CapacityList<PlayerMaxShootCooldownChangedNetEventS2C> _cachedUnprocessedPlayerMaxShootCooldownChangedEvents;
+        private readonly CapacityList<PlayerTalentCooldownMultiplierChangedNetEventS2C> _cachedUnprocessedPlayerTalentCooldownMultiplierChangedEvents;
         private readonly CapacityList<PlayerSelectedTalentFinishedCooldownLocalEvent> _cachedPlayerSelectedTalentFinishedCooldownLocalEvents;
         private readonly CapacityList<ActivateUmbrellaTalentNetEventS2C> _cachedUnprocessedActivateUmbrellaTalentEvents;
         private readonly CapacityList<DeactivateUmbrellaTalentNetEventS2C> _cachedUnprocessedDeactivateUmbrellaTalentEvents;
@@ -133,6 +134,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPerformDashPulseEvents = new CapacityList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents);
             _cachedUnprocessedUpdatePlayerTalentStocksEvents = new CapacityList<UpdatePlayerTalentStocksNetEventS2C>(networkConfig.MaxCap.UpdatePlayerTalentStocksNetEvents);
             _cachedUnprocessedPlayerMaxShootCooldownChangedEvents = new CapacityList<PlayerMaxShootCooldownChangedNetEventS2C>(networkConfig.MaxCap.PlayerMaxShootCooldownChangedNetEvents);
+            _cachedUnprocessedPlayerTalentCooldownMultiplierChangedEvents = new CapacityList<PlayerTalentCooldownMultiplierChangedNetEventS2C>(networkConfig.MaxCap.PlayerTalentCooldownMultiplierChangedNetEvents);
             _cachedPlayerSelectedTalentFinishedCooldownLocalEvents = new CapacityList<PlayerSelectedTalentFinishedCooldownLocalEvent>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedUnprocessedActivateUmbrellaTalentEvents = new CapacityList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents);
             _cachedUnprocessedDeactivateUmbrellaTalentEvents = new CapacityList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents);
@@ -203,6 +205,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPerformDashPulseEvents(latestFullTickPacket.PerformDashPulseNetEvents, ignoreEventsNotAboveTick);
             ProcessUpdatePlayerTalentStockEvents(latestFullTickPacket.UpdatePlayerTalentStocksNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerMaxShootCooldownChangedEvents(latestFullTickPacket.PlayerMaxShootCooldownChangedNetEvents, ignoreEventsNotAboveTick);
+            ProcessPlayerTalentCooldownMultiplierChangedEvents(latestFullTickPacket.PlayerTalentCooldownMultiplierChangedNetEvents, ignoreEventsNotAboveTick);
             ProcessActivateUmbrellaTalentEvents(latestFullTickPacket.ActivateUmbrellaTalentNetEvents, ignoreEventsNotAboveTick);
             ProcessDeactivateUmbrellaTalentEvents(latestFullTickPacket.DeactivateUmbrellaTalentNetEvents, ignoreEventsNotAboveTick);
             ProcessCreateMagenticPullFieldEvents(latestFullTickPacket.CreateMagneticPullFieldNetEvents, ignoreEventsNotAboveTick);
@@ -567,6 +570,32 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedPlayerMaxShootCooldownChangedEvents.Sort();
                 _presentationNetEventsHandler.ProcessPlayerMaxShootCooldownChangedEvents(_cachedUnprocessedPlayerMaxShootCooldownChangedEvents);
+            }
+        }
+
+        private void ProcessPlayerTalentCooldownMultiplierChangedEvents(FixedUnorderedList<PlayerTalentCooldownMultiplierChangedNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedPlayerTalentCooldownMultiplierChangedEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick <= LastProcessedTickFromServer)
+                {
+                    continue;
+                }
+
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    continue;
+                }
+
+                _cachedUnprocessedPlayerTalentCooldownMultiplierChangedEvents.Add(netEvent);
+            }
+
+            if (!_cachedUnprocessedPlayerTalentCooldownMultiplierChangedEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerTalentCooldownMultiplierChangedEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerTalentCooldownMultiplierChangedEvents(_cachedUnprocessedPlayerTalentCooldownMultiplierChangedEvents);
             }
         }
 

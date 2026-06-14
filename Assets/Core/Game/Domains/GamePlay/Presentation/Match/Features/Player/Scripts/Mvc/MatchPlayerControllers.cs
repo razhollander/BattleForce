@@ -180,8 +180,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void UpdatePlayerTalents(ushort playerId, Core.Scripts.Utils.CustomCollections.FixedOrderedList<Core.Game.Domains.GamePlay.Shared.S2CModels.TalentStateS2C> talents, int currentServerTick)
         {
-            var selectedTalentIndex = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.SelectedTalentIndex;
-            GetPlayer(playerId).UpdateTalents(talents, selectedTalentIndex, currentServerTick);
+            var playerState = _matchDataService.GetPlayer(playerId);
+            var selectedTalentIndex = playerState.Spaceship.TalentsState.SelectedTalentIndex;
+            GetPlayer(playerId).UpdateTalents(talents, selectedTalentIndex, currentServerTick, playerState.Spaceship.TalentsState.AllTalentsCooldownMultiplier);
         }
 
         public void SetIsTailWaving(ushort playerId, bool isWaving)

@@ -65,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             
             if (wasAtMaxStocks)
             {
-                dashPulseTalentModel.StocksCooldown.RecieveNextStockOnTick = TickUtils.GetTickPassedAfterDuration(tick, dashPulseTalentModel.StocksCooldown.MaxSingleStockCooldown, deltaTime);
+                dashPulseTalentModel.StocksCooldown.RecieveNextStockOnTick = TickUtils.GetTickPassedAfterDuration(tick, dashPulseTalentModel.StocksCooldown.MaxSingleStockCooldown * casterPlayerState.Spaceship.TalentsState.AllTalentsCooldownMultiplier, deltaTime);
             }
             
             _overrideableNetEventsService.OverrideUpdateTalentStockEvent(tick, _casterPlayerId, TalentType, remainingStocksAmount, dashPulseTalentModel.StocksCooldown.RecieveNextStockOnTick);

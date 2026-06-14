@@ -14,18 +14,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEve
         private readonly INetEventsDataService _netEventsDataService;
         private FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> _updatePlayerTalentStocksNetEvents;
         private FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C> _playerMaxShootCooldownChangedNetEvents;
+        private FixedUnorderedList<PlayerTalentCooldownMultiplierChangedNetEventS2C> _playerTalentCooldownMultiplierChangedNetEvents;
 
         public OverrideableNetEventsService(INetEventsDataService netEventsDataService, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _netEventsDataService = netEventsDataService;
             _updatePlayerTalentStocksNetEvents = new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers * sharedGamePlayConfig.MaxConcurrentTalentsForPlayer);
             _playerMaxShootCooldownChangedNetEvents = new FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
+            _playerTalentCooldownMultiplierChangedNetEvents = new FixedUnorderedList<PlayerTalentCooldownMultiplierChangedNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void RegisterAllOverridableNetEvents()
         {
             ProcessUpdatePlayerTalentStocksNetEvents();
             ProcessPlayerMaxShootCooldownChangedNetEvents();
+            ProcessPlayerTalentCooldownMultiplierChangedNetEvents();
+        }
+
+        private void ProcessPlayerTalentCooldownMultiplierChangedNetEvents()
+        {
+            foreach (var netEvent in _playerTalentCooldownMultiplierChangedNetEvents.AsSpan())
+            {
+                _netEventsDataService.AddPlayerTalentCooldownMultiplierChangedNetEvent(netEvent.OccuredOnTick, netEvent.PlayerId, netEvent.AllTalentsCooldownMultiplier, netEvent.Talents);
+            }
+
+            _playerTalentCooldownMultiplierChangedNetEvents.Clear();
         }
 
         private void ProcessPlayerMaxShootCooldownChangedNetEvents()
@@ -101,9 +114,46 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEve
             packet.ShootCooldownSecondsLeft = cooldownSecondsLeft;
         }
 
-        public void OverridePlayerTalentsMaxCooldownMultiplierChangedEvent(int onTick, ushort playerId, FixedOrderedList<TalentStateS2C> playerTalents)
+        public void OverridePlayerTalentsMaxCooldownMultiplierChangedEvent(int onTick, ushort playerId, float allTalentsCooldownMultiplier, FixedOrderedList<TalentStateS2C> playerTalents)
         {
-            // todo implement this
+            for (int i = 0; i < _playerTalentCooldownMultiplierChangedNetEvents.Count; i++)
+            {
+                var evt = _playerTalentCooldownMultiplierChangedNetEvents[i];
+                if (evt.PlayerId != playerId)
+                {
+                    continue;
+                }
+
+                ref var netEvent = ref _playerTalentCooldownMultiplierChangedNetEvents.GetByIndex(i);
+                netEvent.OccuredOnTick = onTick;
+                netEvent.AllTalentsCooldownMultiplier = allTalentsCooldownMultiplier;
+
+                if (netEvent.Talents == null)
+                {
+                    netEvent.Talents = new FixedOrderedList<TalentStateS2C>(playerTalents.Count);
+                }
+
+                netEvent.Talents.Clear();
+                for (int j = 0; j < playerTalents.Count; j++)
+                {
+                    ref var talentState = ref netEvent.Talents.AddAndGet();
+                    talentState = playerTalents[j];
+                }
+
+                return;
+            }
+
+            ref var packet = ref _playerTalentCooldownMultiplierChangedNetEvents.AddAndGet();
+            packet.PlayerId = playerId;
+            packet.OccuredOnTick = onTick;
+            packet.AllTalentsCooldownMultiplier = allTalentsCooldownMultiplier;
+
+            packet.Talents = new FixedOrderedList<TalentStateS2C>(playerTalents.Count);
+            for (int j = 0; j < playerTalents.Count; j++)
+            {
+                ref var talentState = ref packet.Talents.AddAndGet();
+                talentState = playerTalents[j];
+            }
         }
     }
 }

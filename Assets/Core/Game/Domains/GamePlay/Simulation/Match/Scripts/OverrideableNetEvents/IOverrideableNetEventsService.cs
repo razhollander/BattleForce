@@ -8,6 +8,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEve
         void RegisterAllOverridableNetEvents();
         void OverrideUpdateTalentStockEvent(int onTick, ushort casterPlayerId, TalentType talentType, int currentStocksAmount, int recieveNextStockOnTick);
         void OverridePlayerMaxShootCooldownChangedEvent(int onTick, ushort playerId, float maxShootCooldown, float cooldownSecondsLeft);
-        void OverridePlayerTalentsMaxCooldownMultiplierChangedEvent(int onTick, ushort playerId, FixedOrderedList<TalentStateS2C> playerTalents);
+        void OverridePlayerTalentsMaxCooldownMultiplierChangedEvent(int onTick, ushort playerId, float allTalentsCooldownMultiplier, FixedOrderedList<TalentStateS2C> playerTalents);
     }
 }

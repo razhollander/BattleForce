@@ -134,7 +134,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
             
             ref var sentryTalentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
-            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, sentryTalentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, sentryTalentModel.NormalCooldown.MaxCooldown * casterPlayerState.Spaceship.TalentsState.AllTalentsCooldownMultiplier, _networkConfig.DeltaTime);
             sentryTalentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _netEventsDataService.AddDeactivateSentryGunTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);

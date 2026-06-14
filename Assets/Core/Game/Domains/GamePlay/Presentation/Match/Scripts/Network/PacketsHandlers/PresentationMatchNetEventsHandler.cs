@@ -547,6 +547,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessPlayerTalentCooldownMultiplierChangedEvents(CapacityList<PlayerTalentCooldownMultiplierChangedNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                var player = _matchDataService.GetPlayer(netEvent.PlayerId);
+                player.Spaceship.TalentsState.AllTalentsCooldownMultiplier = netEvent.AllTalentsCooldownMultiplier;
+
+                player.Spaceship.TalentsState.Talents.Clear();
+                for (int i = 0; i < netEvent.Talents.Count; i++)
+                {
+                    ref var talentState = ref player.Spaceship.TalentsState.Talents.AddAndGet();
+                    talentState = netEvent.Talents[i];
+                }
+            }
+        }
+
         public void ProcessCreateMagenticPullFieldEvents(CapacityList<CreateMagneticPullFieldNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty())

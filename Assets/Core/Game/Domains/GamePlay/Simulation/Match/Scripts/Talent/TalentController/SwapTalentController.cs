@@ -144,7 +144,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
             ref var swapTalentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
 
-            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, swapTalentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, swapTalentModel.NormalCooldown.MaxCooldown * casterPlayerState.Spaceship.TalentsState.AllTalentsCooldownMultiplier, _networkConfig.DeltaTime);
             swapTalentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _physicsSimulator.RemoveSwapField(_currentActiveSwapFieldId);

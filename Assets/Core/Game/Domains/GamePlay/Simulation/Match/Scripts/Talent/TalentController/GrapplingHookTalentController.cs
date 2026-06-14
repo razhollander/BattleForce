@@ -310,7 +310,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             else
             {
                 ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
-                cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+                cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown * casterPlayerState.Spaceship.TalentsState.AllTalentsCooldownMultiplier, _networkConfig.DeltaTime);
                 talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
             }
 

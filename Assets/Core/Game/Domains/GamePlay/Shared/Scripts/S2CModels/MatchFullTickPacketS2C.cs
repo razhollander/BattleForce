@@ -47,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C> UpdatePlayerTalentStocksNetEvents;
         public FixedUnorderedList<DeactivateSwapTalentNetEventS2C> DestroySwapFieldNetEvents;
         public FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C> PlayerMaxShootCooldownChangedNetEvents;
+        public FixedUnorderedList<PlayerTalentCooldownMultiplierChangedNetEventS2C> PlayerTalentCooldownMultiplierChangedNetEvents;
         public FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C> CreateGrapplingHookProjectileNetEvents;
         public FixedUnorderedList<GrapplingHookHitWallNetEventS2C> GrapplingHookHitWallNetEvents;
         public FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents;
@@ -108,6 +109,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
             UpdatePlayerTalentStocksNetEvents = new FixedUnorderedList<UpdatePlayerTalentStocksNetEventS2C>(maxCap.UpdatePlayerTalentStocksNetEvents);
             PlayerMaxShootCooldownChangedNetEvents = new FixedUnorderedList<PlayerMaxShootCooldownChangedNetEventS2C>(maxCap.PlayerMaxShootCooldownChangedNetEvents);
+            PlayerTalentCooldownMultiplierChangedNetEvents = new FixedUnorderedList<PlayerTalentCooldownMultiplierChangedNetEventS2C>(maxCap.PlayerTalentCooldownMultiplierChangedNetEvents);
             ActivateSentryGunTalentNetEvents = new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(maxCap.ActivateSentryGunTalentNetEvents);
             DeactivateSentryGunTalentNetEvents = new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(maxCap.DeactivateSentryGunTalentNetEvents);
             CreateGrapplingHookProjectileNetEvents = new FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>(maxCap.CreateGrapplingHookProjectileNetEvents);
@@ -162,16 +164,17 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 28)) != 0) SerializedPlayerSpinnedEndedEvents(writer);
             if ((eventMask & (1UL << 29)) != 0) SerializedDestroySwapFieldNetEvents(writer);
             if ((eventMask & (1UL << 30)) != 0) SerializedPlayerMaxShootCooldownChangedNetEvents(writer);
-            if ((eventMask & (1UL << 31)) != 0) SerializedCreateGrapplingHookProjectileNetEvents(writer);
-            if ((eventMask & (1UL << 32)) != 0) SerializedGrapplingHookHitWallNetEvents(writer);
-            if ((eventMask & (1UL << 33)) != 0) SerializedDeactivateGrapplingHookTalentNetEvents(writer);
-            if ((eventMask & (1UL << 34)) != 0) SerializedCreateMagneticPullFieldNetEvents(writer);
-            if ((eventMask & (1UL << 35)) != 0) SerializedActivateUmbrellaTalentNetEvents(writer);
-            if ((eventMask & (1UL << 36)) != 0) SerializedDeactivateUmbrellaTalentNetEvents(writer);
-            if ((eventMask & (1UL << 37)) != 0) SerializedLayChickenEggNetEvents(writer);
-            if ((eventMask & (1UL << 38)) != 0) SerializedChickenEggHitNetEvents(writer);
-            if ((eventMask & (1UL << 39)) != 0) SerializedActivateYearsOfPainTalentNetEvents(writer);
-            if ((eventMask & (1UL << 42)) != 0) SerializedEnvironmentSpikePlayerCollisionEvents(writer);
+            if ((eventMask & (1UL << 31)) != 0) SerializedPlayerTalentCooldownMultiplierChangedNetEvents(writer);
+            if ((eventMask & (1UL << 32)) != 0) SerializedCreateGrapplingHookProjectileNetEvents(writer);
+            if ((eventMask & (1UL << 33)) != 0) SerializedGrapplingHookHitWallNetEvents(writer);
+            if ((eventMask & (1UL << 34)) != 0) SerializedDeactivateGrapplingHookTalentNetEvents(writer);
+            if ((eventMask & (1UL << 35)) != 0) SerializedCreateMagneticPullFieldNetEvents(writer);
+            if ((eventMask & (1UL << 36)) != 0) SerializedActivateUmbrellaTalentNetEvents(writer);
+            if ((eventMask & (1UL << 37)) != 0) SerializedDeactivateUmbrellaTalentNetEvents(writer);
+            if ((eventMask & (1UL << 38)) != 0) SerializedLayChickenEggNetEvents(writer);
+            if ((eventMask & (1UL << 39)) != 0) SerializedChickenEggHitNetEvents(writer);
+            if ((eventMask & (1UL << 40)) != 0) SerializedActivateYearsOfPainTalentNetEvents(writer);
+            if ((eventMask & (1UL << 43)) != 0) SerializedEnvironmentSpikePlayerCollisionEvents(writer);
         }
 
         private ulong CalculateEventMask()
@@ -208,16 +211,17 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (PlayerSpinnedEndedNetEvents.Count > 0) eventMask |= 1UL << 28;
             if (DestroySwapFieldNetEvents.Count > 0) eventMask |= 1UL << 29;
             if (PlayerMaxShootCooldownChangedNetEvents.Count > 0) eventMask |= 1UL << 30;
-            if (CreateGrapplingHookProjectileNetEvents.Count > 0) eventMask |= 1UL << 31;
-            if (GrapplingHookHitWallNetEvents.Count > 0) eventMask |= 1UL << 32;
-            if (DeactivateGrapplingHookTalentNetEvents.Count > 0) eventMask |= 1UL << 33;
-            if (CreateMagneticPullFieldNetEvents.Count > 0) eventMask |= 1UL << 34;
-            if (ActivateUmbrellaTalentNetEvents.Count > 0) eventMask |= 1UL << 35;
-            if (DeactivateUmbrellaTalentNetEvents.Count > 0) eventMask |= 1UL << 36;
-            if (LayChickenEggNetEvents.Count > 0) eventMask |= 1UL << 37;
-            if (ChickenEggHitNetEvents.Count > 0) eventMask |= 1UL << 38;
-            if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 39;
-            if (EnvironmentSpikePlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 42;
+            if (PlayerTalentCooldownMultiplierChangedNetEvents.Count > 0) eventMask |= 1UL << 31;
+            if (CreateGrapplingHookProjectileNetEvents.Count > 0) eventMask |= 1UL << 32;
+            if (GrapplingHookHitWallNetEvents.Count > 0) eventMask |= 1UL << 33;
+            if (DeactivateGrapplingHookTalentNetEvents.Count > 0) eventMask |= 1UL << 34;
+            if (CreateMagneticPullFieldNetEvents.Count > 0) eventMask |= 1UL << 35;
+            if (ActivateUmbrellaTalentNetEvents.Count > 0) eventMask |= 1UL << 36;
+            if (DeactivateUmbrellaTalentNetEvents.Count > 0) eventMask |= 1UL << 37;
+            if (LayChickenEggNetEvents.Count > 0) eventMask |= 1UL << 38;
+            if (ChickenEggHitNetEvents.Count > 0) eventMask |= 1UL << 39;
+            if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 40;
+            if (EnvironmentSpikePlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 43;
 
             return eventMask;
         }
@@ -327,34 +331,37 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 30)) != 0) DeserializedPlayerMaxShootCooldownChangedNetEvents(reader);
             else PlayerMaxShootCooldownChangedNetEvents.Clear();
 
-            if ((eventMask & (1UL << 31)) != 0) DeserializedCreateGrapplingHookProjectileNetEvents(reader);
+            if ((eventMask & (1UL << 31)) != 0) DeserializedPlayerTalentCooldownMultiplierChangedNetEvents(reader);
+            else PlayerTalentCooldownMultiplierChangedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 32)) != 0) DeserializedCreateGrapplingHookProjectileNetEvents(reader);
             else CreateGrapplingHookProjectileNetEvents.Clear();
 
-            if ((eventMask & (1UL << 32)) != 0) DeserializedGrapplingHookHitWallNetEvents(reader);
+            if ((eventMask & (1UL << 33)) != 0) DeserializedGrapplingHookHitWallNetEvents(reader);
             else GrapplingHookHitWallNetEvents.Clear();
 
-            if ((eventMask & (1UL << 33)) != 0) DeserializedDeactivateGrapplingHookTalentNetEvents(reader);
+            if ((eventMask & (1UL << 34)) != 0) DeserializedDeactivateGrapplingHookTalentNetEvents(reader);
             else DeactivateGrapplingHookTalentNetEvents.Clear();
 
-            if ((eventMask & (1UL << 34)) != 0) DeserializedCreateMagneticPullFieldNetEvents(reader);
+            if ((eventMask & (1UL << 35)) != 0) DeserializedCreateMagneticPullFieldNetEvents(reader);
             else CreateMagneticPullFieldNetEvents.Clear();
 
-            if ((eventMask & (1UL << 35)) != 0) DeserializedActivateUmbrellaTalentNetEvents(reader);
+            if ((eventMask & (1UL << 36)) != 0) DeserializedActivateUmbrellaTalentNetEvents(reader);
             else ActivateUmbrellaTalentNetEvents.Clear();
 
-            if ((eventMask & (1UL << 36)) != 0) DeserializedDeactivateUmbrellaTalentNetEvents(reader);
+            if ((eventMask & (1UL << 37)) != 0) DeserializedDeactivateUmbrellaTalentNetEvents(reader);
             else DeactivateUmbrellaTalentNetEvents.Clear();
 
-            if ((eventMask & (1UL << 37)) != 0) DeserializedLayChickenEggNetEvents(reader);
+            if ((eventMask & (1UL << 38)) != 0) DeserializedLayChickenEggNetEvents(reader);
             else LayChickenEggNetEvents.Clear();
 
-            if ((eventMask & (1UL << 38)) != 0) DeserializedChickenEggHitNetEvents(reader);
+            if ((eventMask & (1UL << 39)) != 0) DeserializedChickenEggHitNetEvents(reader);
             else ChickenEggHitNetEvents.Clear();
 
-            if ((eventMask & (1UL << 39)) != 0) DeserializedActivateYearsOfPainTalentNetEvents(reader);
+            if ((eventMask & (1UL << 40)) != 0) DeserializedActivateYearsOfPainTalentNetEvents(reader);
             else ActivateYearsOfPainTalentNetEvents.Clear();
             
-            if ((eventMask & (1UL << 42)) != 0) DeserializedEnvironmentSpikePlayerCollisionEvents(reader);
+            if ((eventMask & (1UL << 43)) != 0) DeserializedEnvironmentSpikePlayerCollisionEvents(reader);
             else EnvironmentSpikePlayerCollisionNetEvents.Clear();
         }
 
@@ -936,6 +943,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
+        private void SerializedPlayerTalentCooldownMultiplierChangedNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerTalentCooldownMultiplierChangedNetEvents.Count);
+            foreach (var netEvent in PlayerTalentCooldownMultiplierChangedNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
         private void DeserializedUpdatePlayerTalentStocksNetEvents(NetDataReader reader)
         {
             var count = reader.GetByte();
@@ -954,6 +970,17 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref PlayerMaxShootCooldownChangedNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedPlayerTalentCooldownMultiplierChangedNetEvents(NetDataReader reader)
+        {
+            var count = reader.GetByte();
+            PlayerTalentCooldownMultiplierChangedNetEvents.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PlayerTalentCooldownMultiplierChangedNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

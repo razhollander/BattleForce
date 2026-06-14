@@ -103,7 +103,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersTa
                 playerTalentsState.Talents[i] = talentState;
             }
 
-            _overrideableNetEventsService.OverridePlayerTalentsMaxCooldownMultiplierChangedEvent(currentTick, playerId, playerTalentsState.Talents);
+            _overrideableNetEventsService.OverridePlayerTalentsMaxCooldownMultiplierChangedEvent(currentTick, playerId, newCooldown, playerTalentsState.Talents);
 
         }
 

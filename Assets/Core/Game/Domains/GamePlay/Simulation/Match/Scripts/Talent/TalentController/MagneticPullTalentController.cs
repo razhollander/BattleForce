@@ -106,7 +106,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
             
             ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
-            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown * casterPlayerState.Spaceship.TalentsState.AllTalentsCooldownMultiplier, _networkConfig.DeltaTime);
             talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _netEventsDataService.AddCreateMagneticPullFieldNetEventS2C(tick, _casterPlayerId, center, direction, cooldownEndTick, didHitEnemy, hitEnemyId);
