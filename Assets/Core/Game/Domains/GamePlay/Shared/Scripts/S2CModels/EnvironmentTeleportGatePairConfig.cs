@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
@@ -13,10 +14,20 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public ushort GateBId => (ushort) (Id * GateCount + 1);
     }
 
+    [Serializable]
     public struct EnvironmentTeleportGateConfig
     {
+        private const ushort NO_ATTACH_TO_ROTATION_WHEEL_ID = 0;
+        
         public Vector2 Position;
         public float NormalRotation;
-        public short AttachToRotationWheelId = -1;
+        public ushort AttachToRotationWheelId;
+        public bool IsAttachedToRotationWheel => AttachToRotationWheelId != NO_ATTACH_TO_ROTATION_WHEEL_ID;
+        public EnvironmentTeleportGateConfig(Vector2 position, float normalRotation, ushort attachToRotationWheelId = NO_ATTACH_TO_ROTATION_WHEEL_ID)
+        {
+            Position = position;
+            NormalRotation = normalRotation;
+            AttachToRotationWheelId = attachToRotationWheelId;
+        }
     }
 }

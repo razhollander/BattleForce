@@ -573,7 +573,11 @@ MonoBehaviour:
       _talentCardsJson: 
       _environmentSpringsJson: 
       _environmentSpikesJson: 
-      _teleportGatesJson: 
+      _teleportGatesJson: "[\n  {\n    \"Id\": 1,\n    \"GateA\": {\n      \"Position\":
+        {\n        \"X\": 0,\n        \"Y\": 0\n      },\n      \"NormalRotation\":
+        270,\n      \"AttachToRotationWheelId\": 101\n    },\n    \"GateB\": {\n     
+        \"Position\": {\n        \"X\": 0,\n        \"Y\": 0\n      },\n      \"NormalRotation\":
+        90,\n      \"AttachToRotationWheelId\": 102\n    }\n  }\n]"
       _rotatingWheelsJson: "[\n  {\n    \"Id\": 101,\n    \"CenterPosition\": {\n     
         \"X\": 5,\n      \"Y\": 0\n    },\n    \"RotationSpeed\": 20,\n    \"Spikes\":
         [\n      {\n        \"Id\": 101,\n        \"Position\": {\n          \"X\":
@@ -581,6 +585,16 @@ MonoBehaviour:
         }\n    ],\n    \"Walls\": [\n      {\n        \"Id\": 101,\n        \"Position\":
         {\n          \"X\": 0,\n          \"Y\": 0\n        },\n        \"Points\":
         [\n          {\n            \"X\": -1,\n            \"Y\": 2.5\n         
+        },\n          {\n            \"X\": 1,\n            \"Y\": 2.5\n         
+        },\n          {\n            \"X\": 1,\n            \"Y\": -2.5\n         
+        },\n          {\n            \"X\": -1,\n            \"Y\": -2.5\n         
+        }\n        ]\n      }\n    ]\n  },\n  {\n    \"Id\": 102,\n    \"CenterPosition\":
+        {\n      \"X\": -5,\n      \"Y\": 0\n    },\n    \"RotationSpeed\": -20,\n   
+        \"Spikes\": [\n      {\n        \"Id\": 102,\n        \"Position\": {\n         
+        \"X\": 1.8,\n          \"Y\": 0\n        },\n        \"DirectionAngle\":
+        0\n      }\n    ],\n    \"Walls\": [\n      {\n        \"Id\": 102,\n       
+        \"Position\": {\n          \"X\": 0,\n          \"Y\": 0\n        },\n       
+        \"Points\": [\n          {\n            \"X\": -1,\n            \"Y\": 2.5\n         
         },\n          {\n            \"X\": 1,\n            \"Y\": 2.5\n         
         },\n          {\n            \"X\": 1,\n            \"Y\": -2.5\n         
         },\n          {\n            \"X\": -1,\n            \"Y\": -2.5\n         
@@ -595,4 +609,4 @@ MonoBehaviour:
         {\n      \"x\": 22,\n      \"y\": -14\n    },\n    \"Size\": {\n      \"x\":
         5,\n      \"y\": 5\n    },\n    \"Shape\": \"Circle\"\n  }\n]"
       _stageBoundriesWallsJson: 
-  AvailableLayoutIndexes: 00000000030000000400000005000000
+  AvailableLayoutIndexes: 000000000300000004000000050000000a000000

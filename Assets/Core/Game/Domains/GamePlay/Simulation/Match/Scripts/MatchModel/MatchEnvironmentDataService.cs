@@ -219,5 +219,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             spike.Transform.LocalPosition = localPosition;
             spike.Transform.WorldPosition = worldPosition;
         }
+
+        public EnvironmentRotatingWheelS2C GetRotatingWheel(ushort wheelId)
+        {
+            foreach (var rotatingWheel in RotatingWheels.AsSpan())
+            {
+                if (rotatingWheel.Id == wheelId) return rotatingWheel;
+            }
+            
+            LogService.LogError("No rotatingWheel found for id: " + wheelId);
+            return null;
+        }
     }
 }

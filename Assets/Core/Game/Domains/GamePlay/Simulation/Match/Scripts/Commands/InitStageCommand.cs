@@ -407,14 +407,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 Vector2 worldPositionA;
                 float worldRotationA;
 
-                if (gateA.AttachToRotationWheelId >= 0 && wheelsDict.TryGetValue((ushort)gateA.AttachToRotationWheelId, out var wheelA))
+                if (gateA.IsAttachedToRotationWheel && wheelsDict.TryGetValue(gateA.AttachToRotationWheelId, out var wheelA))
                 {
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
                         calculationTick, wheelA.RotationSpeed, deltaTime, wheelA.CenterPosition * mapSizeMultiplier, scaledGateAPos, gateA.NormalRotation,
                         out worldPositionA, out worldRotationA);
 
                     var rotatingWheelS2C = _matchDataService.EnvironmentData.GetRotatingWheel(wheelA.Id);
-                    if (rotatingWheelS2C != null && !rotatingWheelS2C.TeleportGatePairIds.Contains(teleportGatePairConfig.Id))
+                    if (!rotatingWheelS2C.TeleportGatePairIds.Contains(teleportGatePairConfig.Id))
                     {
                         rotatingWheelS2C.AddTeleportGatePair(teleportGatePairConfig.Id);
                     }
@@ -430,14 +430,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 Vector2 worldPositionB;
                 float worldRotationB;
 
-                if (gateB.AttachToRotationWheelId >= 0 && wheelsDict.TryGetValue((ushort)gateB.AttachToRotationWheelId, out var wheelB))
+                if (gateB.IsAttachedToRotationWheel && wheelsDict.TryGetValue(gateB.AttachToRotationWheelId, out var wheelB))
                 {
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
                         calculationTick, wheelB.RotationSpeed, deltaTime, wheelB.CenterPosition * mapSizeMultiplier, scaledGateBPos, gateB.NormalRotation,
                         out worldPositionB, out worldRotationB);
 
                     var rotatingWheelS2C = _matchDataService.EnvironmentData.GetRotatingWheel(wheelB.Id);
-                    if (rotatingWheelS2C != null && !rotatingWheelS2C.TeleportGatePairIds.Contains(teleportGatePairConfig.Id))
+                    if (!rotatingWheelS2C.TeleportGatePairIds.Contains(teleportGatePairConfig.Id))
                     {
                         rotatingWheelS2C.AddTeleportGatePair(teleportGatePairConfig.Id);
                     }

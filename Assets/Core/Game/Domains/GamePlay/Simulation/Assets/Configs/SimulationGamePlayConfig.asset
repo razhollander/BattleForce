@@ -138,7 +138,7 @@ MonoBehaviour:
     ShouldChooseRandomTalentsForPlayer: 1
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 1
-    ShootCooldownMultiplierWhenDead: 2
+    ShootCooldownMultiplierWhenDead: 1
     StageRestartDelaySeconds: 3
     GemsCollectedForTeamAlive: 1
     MaxOverllapingFloors: 32
