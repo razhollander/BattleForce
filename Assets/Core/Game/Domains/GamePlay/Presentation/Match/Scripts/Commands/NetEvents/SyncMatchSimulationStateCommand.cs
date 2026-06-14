@@ -24,6 +24,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationTok
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Scripts.Extensions;
 using Core.Scripts.Mvc.WorldCamera;
@@ -65,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         
         private MatchSimulationStateS2C _simulationState;
         private int _stateOccouredOnTick;
+        private Dictionary<ushort, List<RotatingTeleportGate>> _teleportGatesPerWheelId;
 
         public SyncMatchSimulationStateCommand SetSimulationState(MatchSimulationStateS2C simulationState)
         {
@@ -226,11 +229,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
         
-        private System.Collections.Generic.Dictionary<ushort, System.Collections.Generic.List<ushort>> _wheelToTeleportGates;
-
         private void CreateTeleportGates(float mapSizeMultiplier)
         {
-            _wheelToTeleportGates = new System.Collections.Generic.Dictionary<ushort, System.Collections.Generic.List<ushort>>();
+            _teleportGatesPerWheelId = new Dictionary<ushort, List<RotatingTeleportGate>>();
             var teleportGatePairConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetTeleportGates();
             if (teleportGatePairConfigs.IsNullOrEmpty())
             {
@@ -238,7 +239,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
 
             var rotatingWheelsConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetRotatingWheels();
-            var wheelsDict = new System.Collections.Generic.Dictionary<ushort, Core.Game.Domains.GamePlay.Shared.Scripts.Configs.EnvironmentRotatingWheelConfig>();
+            var wheelsDict = new Dictionary<ushort, EnvironmentRotatingWheelConfig>();
             if (!rotatingWheelsConfigs.IsNullOrEmpty())
             {
                 foreach (var wheel in rotatingWheelsConfigs)
@@ -260,11 +261,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 Vector2 worldPositionA = scaledGateAPos;
                 float worldRotationA = gateA.NormalRotation;
 
-                if (gateA.AttachToRotationWheelId >= 0 && wheelsDict.TryGetValue((ushort)gateA.AttachToRotationWheelId, out var wheelA))
+                if (gateA.IsAttachedToRotationWheel && wheelsDict.TryGetValue(gateA.AttachToRotationWheelId, out var wheelA))
                 {
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(calculationTick, wheelA.RotationSpeed, deltaTime, wheelA.CenterPosition * mapSizeMultiplier, scaledGateAPos, gateA.NormalRotation, out worldPositionA, out worldRotationA);
-                    if (!_wheelToTeleportGates.TryGetValue(wheelA.Id, out var listA)) { listA = new System.Collections.Generic.List<ushort>(); _wheelToTeleportGates[wheelA.Id] = listA; }
-                    if (!listA.Contains(teleportGatePairConfig.Id)) listA.Add(teleportGatePairConfig.Id);
+
+                    if (!_teleportGatesPerWheelId.TryGetValue(wheelA.Id, out var listA))
+                    {
+                        listA = new List<RotatingTeleportGate>(); _teleportGatesPerWheelId[wheelA.Id] = listA;
+                    }
+
+                    listA.Add(new RotatingTeleportGate(teleportGatePairConfig.Id, true));
                 }
 
                 var gateB = teleportGatePairConfig.GateB;
@@ -272,11 +278,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 Vector2 worldPositionB = scaledGateBPos;
                 float worldRotationB = gateB.NormalRotation;
 
-                if (gateB.AttachToRotationWheelId >= 0 && wheelsDict.TryGetValue((ushort)gateB.AttachToRotationWheelId, out var wheelB))
+                if (gateB.IsAttachedToRotationWheel && wheelsDict.TryGetValue(gateB.AttachToRotationWheelId, out var wheelB))
                 {
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(calculationTick, wheelB.RotationSpeed, deltaTime, wheelB.CenterPosition * mapSizeMultiplier, scaledGateBPos, gateB.NormalRotation, out worldPositionB, out worldRotationB);
-                    if (!_wheelToTeleportGates.TryGetValue(wheelB.Id, out var listB)) { listB = new System.Collections.Generic.List<ushort>(); _wheelToTeleportGates[wheelB.Id] = listB; }
-                    if (!listB.Contains(teleportGatePairConfig.Id)) listB.Add(teleportGatePairConfig.Id);
+                    if (!_teleportGatesPerWheelId.TryGetValue(wheelB.Id, out var listB)) { listB = new List<RotatingTeleportGate>(); _teleportGatesPerWheelId[wheelB.Id] = listB; }
+                    listB.Add(new RotatingTeleportGate(teleportGatePairConfig.Id, false));
                 }
 
                 _matchDataService.AddTeleportPair(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, scaledGateAPos, gateA.NormalRotation, teleportGatePairConfig.GateBId, scaledGateBPos, gateB.NormalRotation, worldPositionA, worldRotationA, worldPositionB, worldRotationB, gateSize.ToNumericsVector2() * mapSizeMultiplier);
@@ -380,8 +386,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var springIds = wheelConfig.Springs.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.Springs.Select(x => x.Id).ToList();
                 var spikeIds = wheelConfig.Spikes.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.Spikes.Select(x => x.Id).ToList();
 
-                var teleportGatePairIds = new List<ushort>();
-                if (_wheelToTeleportGates != null && _wheelToTeleportGates.TryGetValue(wheelConfig.Id, out var gates)) {
+                var teleportGatePairIds = new List<RotatingTeleportGate>();
+                if (_teleportGatesPerWheelId != null && _teleportGatesPerWheelId.TryGetValue(wheelConfig.Id, out var gates)) {
                     teleportGatePairIds = gates;
                 }
 

@@ -51,9 +51,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                     _environmentSpikeControllers.UpdateSpikeTransform(spikeId);
                 }
 
-                foreach (var pairId in rotatingWheelModel.TeleportGatePairIds)
+                foreach (var pairId in rotatingWheelModel.TeleportGates)
                 {
-                    _environmentTeleportGateControllers.UpdateTeleportGateTransform(pairId);
+                    _environmentTeleportGateControllers.UpdateTeleportGateTransform(pairId.BelongToPairId, pairId.IsGateA);
                 }
             }
         }

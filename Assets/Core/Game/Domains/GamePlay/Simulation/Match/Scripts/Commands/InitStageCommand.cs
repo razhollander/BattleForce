@@ -11,6 +11,7 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
@@ -414,10 +415,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         out worldPositionA, out worldRotationA);
 
                     var rotatingWheelS2C = _matchDataService.EnvironmentData.GetRotatingWheel(wheelA.Id);
-                    if (!rotatingWheelS2C.TeleportGatePairIds.Contains(teleportGatePairConfig.Id))
-                    {
-                        rotatingWheelS2C.AddTeleportGatePair(teleportGatePairConfig.Id);
-                    }
+                    rotatingWheelS2C.AddTeleportGatePair(new RotatingTeleportGate(teleportGatePairConfig.Id, true));
                 }
                 else
                 {
@@ -437,10 +435,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         out worldPositionB, out worldRotationB);
 
                     var rotatingWheelS2C = _matchDataService.EnvironmentData.GetRotatingWheel(wheelB.Id);
-                    if (!rotatingWheelS2C.TeleportGatePairIds.Contains(teleportGatePairConfig.Id))
-                    {
-                        rotatingWheelS2C.AddTeleportGatePair(teleportGatePairConfig.Id);
-                    }
+                    rotatingWheelS2C.AddTeleportGatePair(new RotatingTeleportGate(teleportGatePairConfig.Id, false));
                 }
                 else
                 {

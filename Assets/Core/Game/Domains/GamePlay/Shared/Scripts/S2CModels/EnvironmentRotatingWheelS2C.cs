@@ -14,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<ushort> LavaWallIds;
         public FixedUnorderedList<ushort> SpringIds;
         public FixedUnorderedList<ushort> SpikeIds;
-        public FixedUnorderedList<ushort> TeleportGatePairIds;
+        public FixedUnorderedList<RotatingTeleportGate> TeleportGates;
 
         public EnvironmentRotatingWheelS2C(MaxCap.EnvironmentRotatingWheel maxCap)
         {
@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             LavaWallIds = new FixedUnorderedList<ushort>(maxCap.MaxLavaWalls);
             SpringIds = new FixedUnorderedList<ushort>(maxCap.MaxSprings);
             SpikeIds = new FixedUnorderedList<ushort>(maxCap.MaxSpikes);
-            TeleportGatePairIds = new FixedUnorderedList<ushort>(maxCap.MaxTeleportGatePairs);
+            TeleportGates = new FixedUnorderedList<RotatingTeleportGate>(maxCap.MaxTeleportGates);
         }
 
         public void ClearData()
@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             LavaWallIds.Clear();
             SpringIds.Clear();
             SpikeIds.Clear();
-            TeleportGatePairIds.Clear();
+            TeleportGates.Clear();
         }
         
         public bool Equals(ushort otherId)
@@ -63,10 +63,22 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             spike = spikeId;
         }
 
-        public void AddTeleportGatePair(ushort teleportGatePairId)
+        public void AddTeleportGatePair(RotatingTeleportGate addedTeleportGate)
         {
-            ref var gatePair = ref TeleportGatePairIds.AddAndGet();
-            gatePair = teleportGatePairId;
+            ref var teleportGate = ref TeleportGates.AddAndGet();
+            teleportGate = addedTeleportGate;
+        }
+    }
+
+    public struct RotatingTeleportGate
+    {
+        public ushort BelongToPairId;
+        public bool IsGateA;
+
+        public RotatingTeleportGate(ushort belongToPairId, bool isGateA)
+        {
+            BelongToPairId = belongToPairId;
+            IsGateA = isGateA;
         }
     }
 }

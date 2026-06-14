@@ -126,13 +126,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
             }
 
-            if (!rotatingWheel.TeleportGatePairIds.IsEmpty)
+            if (!rotatingWheel.TeleportGates.IsEmpty)
             {
-                foreach (var teleportGatePairId in rotatingWheel.TeleportGatePairIds.AsSpan())
+                foreach (var teleportGate in rotatingWheel.TeleportGates.AsSpan())
                 {
-                    var teleportGatePair = _matchDataService.EnvironmentData.GetTeleportGatePair(teleportGatePairId);
-                    StepTeleportGateInWheel(tick, deltaTime, rotationSpeed, wheelCenter, ref teleportGatePair.GateA);
-                    StepTeleportGateInWheel(tick, deltaTime, rotationSpeed, wheelCenter, ref teleportGatePair.GateB);
+                    var teleportGatePair = _matchDataService.EnvironmentData.GetTeleportGatePair(teleportGate.BelongToPairId);
+                    if (teleportGate.IsGateA)
+                    {
+                        StepTeleportGateInWheel(tick, deltaTime, rotationSpeed, wheelCenter, ref teleportGatePair.GateA);
+                    }
+                    else
+                    {
+                        StepTeleportGateInWheel(tick, deltaTime, rotationSpeed, wheelCenter, ref teleportGatePair.GateB);
+                    }
                 }
             }
         }

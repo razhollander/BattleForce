@@ -658,25 +658,30 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     spikeModel.WorldRotationAngle = worldRot;
                 }
 
-                foreach (var pairId in wheelModel.TeleportGatePairIds)
+                foreach (var teleportGate in wheelModel.TeleportGates)
                 {
-                    var teleportPairModel = _matchDataService.GetTeleportPair(pairId);
+                    var teleportPairModel = _matchDataService.GetTeleportPair(teleportGate.BelongToPairId);
 
-                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateA.LocalPosition, teleportPairModel.GateA.LocalRotation,
-                        out var worldPosA, out var worldRotA
-                    );
+                    if (teleportGate.IsGateA)
+                    {
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateA.LocalPosition, teleportPairModel.GateA.LocalRotation,
+                            out var worldPosA, out var worldRotA
+                        );
 
-                    teleportPairModel.GateA.WorldPosition = worldPosA;
-                    teleportPairModel.GateA.WorldRotation = worldRotA;
+                        teleportPairModel.GateA.WorldPosition = worldPosA;
+                        teleportPairModel.GateA.WorldRotation = worldRotA;
+                    }
+                    else
+                    {
+                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateB.LocalPosition, teleportPairModel.GateB.LocalRotation,
+                            out var worldPosB, out var worldRotB
+                        );
 
-                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateB.LocalPosition, teleportPairModel.GateB.LocalRotation,
-                        out var worldPosB, out var worldRotB
-                    );
-
-                    teleportPairModel.GateB.WorldPosition = worldPosB;
-                    teleportPairModel.GateB.WorldRotation = worldRotB;
+                        teleportPairModel.GateB.WorldPosition = worldPosB;
+                        teleportPairModel.GateB.WorldRotation = worldRotB;
+                    }
                 }
             }
         }

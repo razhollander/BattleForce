@@ -51,11 +51,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
             return teleportGateView;
         }
 
-        public void InterpulateGatesTransforms()
+        public void InterpulateGatesTransforms(bool isGateA)
         {
             var teleportPairModel = _matchDataService.GetTeleportPair(TeleportPairId);
-            InterpulateTransform(_gateAView.Transform, teleportPairModel.GateA.WorldPosition.ToUnityVector2(), teleportPairModel.GateA.WorldRotation);
-            InterpulateTransform(_gateBView.Transform, teleportPairModel.GateB.WorldPosition.ToUnityVector2(), teleportPairModel.GateB.WorldRotation);
+
+            if (isGateA)
+            {
+                InterpulateTransform(_gateAView.Transform, teleportPairModel.GateA.WorldPosition.ToUnityVector2(), teleportPairModel.GateA.WorldRotation);
+            }
+            else
+            {
+                InterpulateTransform(_gateBView.Transform, teleportPairModel.GateB.WorldPosition.ToUnityVector2(), teleportPairModel.GateB.WorldRotation);
+            }
         }
         
         private void InterpulateTransform(Transform transform, Vector2 position, float rotationDegrees)
