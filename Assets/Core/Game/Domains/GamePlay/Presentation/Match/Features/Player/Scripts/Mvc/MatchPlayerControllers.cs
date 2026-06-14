@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationTok
 using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
@@ -178,10 +179,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetSelectedTalent(talentIndex);
         }
 
-        public void UpdatePlayerTalents(ushort playerId, Core.Scripts.Utils.CustomCollections.FixedOrderedList<Core.Game.Domains.GamePlay.Shared.S2CModels.TalentStateS2C> talents, int currentServerTick)
+        public void UpdatePlayerTalents(ushort playerId, FixedOrderedList<Shared.S2CModels.TalentStateS2C> talents, int currentServerTick)
         {
-            var selectedTalentIndex = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState.SelectedTalentIndex;
-            GetPlayer(playerId).UpdateTalents(talents, selectedTalentIndex, currentServerTick);
+            var playerTalentsState = _matchDataService.GetPlayer(playerId).Spaceship.TalentsState;
+            var selectedTalentIndex = playerTalentsState.SelectedTalentIndex;
+            GetPlayer(playerId).UpdateTalents(talents, selectedTalentIndex, currentServerTick, playerTalentsState.AllTalentsCooldownMultiplier);
         }
 
         public void SetIsTailWaving(ushort playerId, bool isWaving)

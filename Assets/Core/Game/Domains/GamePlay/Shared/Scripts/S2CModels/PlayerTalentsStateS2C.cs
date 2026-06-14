@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using System.Numerics;
 using Core.Scripts.Utils.CustomCollections;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
-using Core.Scripts.Extensions.Linq;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
@@ -126,6 +124,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             writer.Put((byte)SelectedTalentIndex);
             writer.PutVector2AsAngle16(AimDirection);
+            writer.PutFloat16(AllTalentsCooldownMultiplier);
             writer.Put((byte)Talents.Count);
 
             foreach (var talent in Talents.AsSpan())
@@ -138,7 +137,9 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             SelectedTalentIndex = reader.GetByte();
             AimDirection = reader.GetVector2FromAngle16();
+            AllTalentsCooldownMultiplier = reader.GetFloat16();
             var talentsCount = (int)reader.GetByte();
+
             Talents.Clear();
 
             for (int i = 0; i < talentsCount; i++)

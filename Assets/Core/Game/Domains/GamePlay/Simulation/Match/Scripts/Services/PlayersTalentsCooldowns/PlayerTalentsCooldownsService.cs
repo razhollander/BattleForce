@@ -68,9 +68,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersTa
             SendTalentCooldownChangedNetEvent(playerTalentsState, currentTick, playerId, newCooldown);
         }
 
-        private void SendTalentCooldownChangedNetEvent(PlayerTalentsStateS2C playerTalentsState, int currentTick, ushort playerId, float newCooldown)
+        private void SendTalentCooldownChangedNetEvent(PlayerTalentsStateS2C playerTalentsState, int currentTick, ushort playerId, float newCooldownMultiplier)
         {
-            playerTalentsState.AllTalentsCooldownMultiplier = newCooldown;
+            playerTalentsState.AllTalentsCooldownMultiplier = newCooldownMultiplier;
 
             for (int i = 0; i < playerTalentsState.Talents.Count; i++)
             {
@@ -81,7 +81,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersTa
                         if (talentState.IsOnCooldown())
                         {
                             var secondsLeftForCooldown = TickUtils.GetSecondsLeftUntilTick(currentTick, talentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime);
-                            var newMaxCooldown = talentState.NormalCooldown.MaxCooldown * newCooldown;
+                            var newMaxCooldown = talentState.NormalCooldown.MaxCooldown * newCooldownMultiplier;
                             var shouldReduceCooldownToBeNewMaxCooldown = secondsLeftForCooldown > newMaxCooldown;
                             if (shouldReduceCooldownToBeNewMaxCooldown)
                             {
@@ -91,7 +91,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersTa
                         break;
                     case TalentCooldownType.Stocks:
                         var secondsLeftForCooldown2 = TickUtils.GetSecondsLeftUntilTick(currentTick, talentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime);
-                        var newMaxCooldown2 = talentState.StocksCooldown.MaxSingleStockCooldown * newCooldown;
+                        var newMaxCooldown2 = talentState.StocksCooldown.MaxSingleStockCooldown * newCooldownMultiplier;
                         var shouldReduceCooldownToBeNewMaxCooldown2 = secondsLeftForCooldown2 > newMaxCooldown2;
                         if (shouldReduceCooldownToBeNewMaxCooldown2)
                         {

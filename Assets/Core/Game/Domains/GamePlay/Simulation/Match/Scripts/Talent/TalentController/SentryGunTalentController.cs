@@ -126,15 +126,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             {
                 casterPlayerState.Spaceship.IsEngineOn = true;
             }
-            
-            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.SentryGun, out int talentIndex))
+
+            var playerTalentsState = casterPlayerState.Spaceship.TalentsState;
+            if (!playerTalentsState.TryGetTalentIndexByType(TalentType.SentryGun, out int talentIndex))
             {
                 LogService.LogError($"No SentryGun talent found for player id {_casterPlayerId}");
                 return;
             }
             
-            ref var sentryTalentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
-            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, sentryTalentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+            ref var sentryTalentModel = ref playerTalentsState.Talents.Get(talentIndex);
+            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, sentryTalentModel.NormalCooldown.MaxCooldown * playerTalentsState.AllTalentsCooldownMultiplier, _networkConfig.DeltaTime);
             sentryTalentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _netEventsDataService.AddDeactivateSentryGunTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);

@@ -303,14 +303,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             int cooldownEndTick = tick;
 
-            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.GrapplingHook, out int talentIndex))
+            var playerTalentsState = casterPlayerState.Spaceship.TalentsState;
+            if (!playerTalentsState.TryGetTalentIndexByType(TalentType.GrapplingHook, out int talentIndex))
             {
                 LogService.LogError($"No GrapplingHook talent found for player id {_casterPlayerId}");
             }
             else
             {
-                ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
-                cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+                ref var talentModel = ref playerTalentsState.Talents.Get(talentIndex);
+                cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown * playerTalentsState.AllTalentsCooldownMultiplier, _networkConfig.DeltaTime);
                 talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
             }
 

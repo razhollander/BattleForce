@@ -54,13 +54,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             Object.Destroy(_view.gameObject);
         }
 
-        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents, int selectedTalentIndex, int currentServerTick)
+        public void UpdateTalents(FixedOrderedList<TalentStateS2C> talents, int selectedTalentIndex, int currentServerTick, float talentsCooldownMultiplier)
         {
-            _view.UpdateTalents(ConvertTalentsToVisualData(talents, currentServerTick));
+            _view.UpdateTalents(ConvertTalentsToVisualData(talents, currentServerTick, talentsCooldownMultiplier));
             _view.SetSelectedTalent(selectedTalentIndex);
         }
         
-        public void UpdateTalentsCooldown(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
+        public void UpdateTalentsCooldown(FixedOrderedList<TalentStateS2C> talents, int currentServerTick, float talentsCooldownMultiplier)
         {
             for (int i = 0; i < talents.Count; i++)
             {
@@ -69,10 +69,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 switch (talentState.CooldownType)
                 {
                     case TalentCooldownType.Normal: 
-                        UpdateTalentViewNormalCooldown(talentState, i, currentServerTick);
+                        UpdateTalentViewNormalCooldown(talentState, i, currentServerTick, talentsCooldownMultiplier);
                         break;
                     case TalentCooldownType.Stocks: 
-                        UpdateTalentViewStocksCooldown(talentState, i, currentServerTick);
+                        UpdateTalentViewStocksCooldown(talentState, i, currentServerTick, talentsCooldownMultiplier);
                         break;
                     case TalentCooldownType.AlwaysActive:
                         break;
@@ -82,18 +82,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             }
         }
         
-        private void UpdateTalentViewStocksCooldown(TalentStateS2C talentState, int talentViewIndex, int currentServerTick)
+        private void UpdateTalentViewStocksCooldown(TalentStateS2C talentState, int talentViewIndex, int currentServerTick, float talentsCooldownMultiplier)
         {
-            var maxCooldown = talentState.StocksCooldown.MaxSingleStockCooldown;
+            var maxCooldown = talentState.StocksCooldown.MaxSingleStockCooldown * talentsCooldownMultiplier;
             var isOnCooldown = talentState.StocksCooldown.IsOnCooldown();
             var cooldownLeft = talentState.StocksCooldown.IsAtMaxStocks() ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
             _view.UpdateTalentCooldown(talentViewIndex, maxCooldown, cooldownLeft, isOnCooldown);
             _view.UpdateTalentStocks(talentViewIndex, talentState.StocksCooldown.CurrentStocksAmount);
         }
 
-        private void UpdateTalentViewNormalCooldown(TalentStateS2C talentState, int talentViewIndex, int currentServerTick)
+        private void UpdateTalentViewNormalCooldown(TalentStateS2C talentState, int talentViewIndex, int currentServerTick, float talentsCooldownMultiplier)
         {
-            var maxCooldown = talentState.NormalCooldown.MaxCooldown;
+            var maxCooldown = talentState.NormalCooldown.MaxCooldown * talentsCooldownMultiplier;
             var isOnCooldown = talentState.NormalCooldown.IsOnCooldown();
             var cooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
             _view.UpdateTalentCooldown(talentViewIndex, maxCooldown, cooldownLeft, isOnCooldown);
@@ -104,7 +104,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _view.SetSelectedTalent(talentIndex);
         }
 
-        private TalentVisualData[] ConvertTalentsToVisualData(FixedOrderedList<TalentStateS2C> talents, int currentServerTick)
+        private TalentVisualData[] ConvertTalentsToVisualData(FixedOrderedList<TalentStateS2C> talents, int currentServerTick, float talentsCooldownMultiplier)
         {
             var talentsVisualData = new TalentVisualData[talents.Count];
 
@@ -123,7 +123,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                         talentVisualData.CooldownLeft = isOnCooldown ? TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.NormalCooldown.CooldownEndTick, _networkConfig.DeltaTime) : 0;
                         break;
                     case TalentCooldownType.Stocks:
-                        var maxCooldown2 = talentState.StocksCooldown.MaxSingleStockCooldown;
+                        var maxCooldown2 = talentState.StocksCooldown.MaxSingleStockCooldown * talentsCooldownMultiplier;
                         var isOnCooldown2 = talentState.StocksCooldown.IsOnCooldown();
                         var cooldownLeft2 = talentState.StocksCooldown.IsAtMaxStocks() ? 0 : TickUtils.GetSecondsLeftUntilTick(currentServerTick, talentState.StocksCooldown.RecieveNextStockOnTick, _networkConfig.DeltaTime);
                         talentVisualData.IsStockable = true;

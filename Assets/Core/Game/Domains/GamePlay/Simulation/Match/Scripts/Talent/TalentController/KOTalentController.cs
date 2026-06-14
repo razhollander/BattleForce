@@ -217,14 +217,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _isInReturnPhase = false;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
-            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.KO, out int talentIndex))
+            var playerTalentsState = casterPlayerState.Spaceship.TalentsState;
+            if (!playerTalentsState.TryGetTalentIndexByType(TalentType.KO, out int talentIndex))
             {
                 LogService.LogError($"No KO talent found for player id {_casterPlayerId}");
                 return;
             }
-            ref var koTalentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
+            ref var koTalentModel = ref playerTalentsState.Talents.Get(talentIndex);
 
-            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, koTalentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, koTalentModel.NormalCooldown.MaxCooldown * playerTalentsState.AllTalentsCooldownMultiplier, _networkConfig.DeltaTime);
             koTalentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _physicsSimulator.RemoveKOProjectile(_projectileId);

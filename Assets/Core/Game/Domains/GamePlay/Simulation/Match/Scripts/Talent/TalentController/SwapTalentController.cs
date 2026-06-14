@@ -137,14 +137,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             IsCurrentlyActive = false;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
-            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.Swap, out int talentIndex))
+            var playerTalentsState = casterPlayerState.Spaceship.TalentsState;
+            if (!playerTalentsState.TryGetTalentIndexByType(TalentType.Swap, out int talentIndex))
             {
                 LogService.LogError($"No swap talent found for player id {_casterPlayerId}");
                 return;
             }
-            ref var swapTalentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
+            ref var swapTalentModel = ref playerTalentsState.Talents.Get(talentIndex);
 
-            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, swapTalentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, swapTalentModel.NormalCooldown.MaxCooldown * playerTalentsState.AllTalentsCooldownMultiplier, _networkConfig.DeltaTime);
             swapTalentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _physicsSimulator.RemoveSwapField(_currentActiveSwapFieldId);

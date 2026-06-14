@@ -60,7 +60,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var isCurrentlyAiming = IsCurrentlyAiming;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
-            var isCurrentSelectedTalentOnCooldown = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown();
+            var playerTalentsState = casterPlayerState.Spaceship.TalentsState;
+            var isCurrentSelectedTalentOnCooldown = playerTalentsState.GetCurrentSelectedTalent().IsOnCooldown();
             if (isCurrentSelectedTalentOnCooldown)
             {
                 return;
@@ -80,16 +81,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            casterPlayerState.Spaceship.AssistArrowType = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.PlayerAssistArrowType.Hidden;
+            casterPlayerState.Spaceship.AssistArrowType = Shared.Scripts.Enums.PlayerAssistArrowType.Hidden;
             IsCurrentlyAiming = false;
 
-            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType, out int talentIndex))
+            if (!playerTalentsState.TryGetTalentIndexByType(TalentType, out int talentIndex))
             {
                 LogService.LogError($"No Years Of Pain talent found for player id {_casterPlayerId}");
                 return;
             }
 
-            var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var direction = playerTalentsState.AimDirection;
             var offset = casterPlayerState.Spaceship.Transform.Radius;
             var config = _gamePlayConfigService.GamePlayConfig.Talents.YearsOfPainTalentConfig;
             var colliderSize = config.RectangleColliderSize.ToNumericsVector2();
@@ -104,8 +105,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 ApplyEffectToEnemyPhysics(tick, hitEnemyId, casterPlayerState);
             }
 
-            ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
-            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+            ref var talentModel = ref playerTalentsState.Talents.Get(talentIndex);
+            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown * playerTalentsState.AllTalentsCooldownMultiplier, _networkConfig.DeltaTime);
             talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _netEventsDataService.AddActivateYearsOfPainTalentNetEventS2C(tick, _casterPlayerId, direction, cooldownEndTick, didHitEnemy, hitEnemyId);

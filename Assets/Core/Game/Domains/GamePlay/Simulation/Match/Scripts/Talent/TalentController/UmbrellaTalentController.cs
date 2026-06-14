@@ -140,14 +140,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             IsCurrentlyActive = false;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
-            if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.Umbrella, out int talentIndex))
+            var playerTalentsState = casterPlayerState.Spaceship.TalentsState;
+
+            if (!playerTalentsState.TryGetTalentIndexByType(TalentType.Umbrella, out int talentIndex))
             {
                 LogService.LogError($"No Umbrella talent found for player id {_casterPlayerId}");
                 return;
             }
 
-            ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
-            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
+            ref var talentModel = ref playerTalentsState.Talents.Get(talentIndex);
+            var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown * playerTalentsState.AllTalentsCooldownMultiplier, _networkConfig.DeltaTime);
             talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _netEventsDataService.AddDeactivateUmbrellaTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);
