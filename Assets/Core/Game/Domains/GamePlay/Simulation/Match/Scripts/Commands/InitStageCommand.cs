@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
@@ -37,7 +38,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private TryAddARandomTalentForPlayerCommand _tryAddARandomTalentForPlayerCommand;
         private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
-
+        private List<ushort> _cachedShuffledTeamIds;
+        
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
@@ -56,6 +58,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _tryAddARandomTalentForPlayerCommand = _commandFactory.CreateCommandVoid<TryAddARandomTalentForPlayerCommand>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
+            _cachedShuffledTeamIds = new List<ushort>(_sharedGamePlayConfig.MaxTeamsAmount);
         }
 
         public void Execute()
@@ -216,11 +219,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
-            var teamIds = new System.Collections.Generic.List<ushort>(_matchDataService.TeamIds);
-            teamIds.Sort();
+            _cachedShuffledTeamIds.Clear();
+            _cachedShuffledTeamIds.AddRange(_matchDataService.TeamIds);
+            RNG.Shuffle(_cachedShuffledTeamIds);
 
             int barrierIndex = 0;
-            foreach (var teamId in teamIds)
+            foreach (var teamId in _cachedShuffledTeamIds)
             {
                 if (barrierIndex >= barrierConfigs.Length)
                 {
