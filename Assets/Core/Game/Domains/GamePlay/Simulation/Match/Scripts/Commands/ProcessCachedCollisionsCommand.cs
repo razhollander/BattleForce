@@ -403,6 +403,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 spikeId = objectA.Id;
             }
 
+            if (!_matchDataService.SimulationState.GetPlayerById(playerId).Spaceship.IsAlive)
+            {
+                return;
+            }
+            
             var damage = _gamePlayConfigService.GamePlayConfig.EnvironmentSpikes.Damage;
             _playerHitCommand
                 .SetPlayerIdGotHit(playerId)
