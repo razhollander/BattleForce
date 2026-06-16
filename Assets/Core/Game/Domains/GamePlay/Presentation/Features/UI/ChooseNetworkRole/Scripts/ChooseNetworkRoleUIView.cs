@@ -57,28 +57,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
             foreach (var playerJoinedModel in playerJoinedModels)
             {
-                AddPlayerJoinedPanel(playerJoinedModel.PlayerName, playerJoinedModel.PlayerInputType);
+                AddPlayerJoinedPanel(playerJoinedModel.InputDeviceId, playerJoinedModel.PlayerName, playerJoinedModel.PlayerInputType);
             }
             
             _localHostToggle.onValueChanged.AddListener(OnLocalHostToggleChanged);
             OnLocalHostToggleChanged(_localHostToggle.isOn);
         }
 
-        public void AddPlayerJoinedPanel(string playerName, SupportedInputType supportedInputType)
+        public void AddPlayerJoinedPanel(int inputDeviceId, string playerName, SupportedInputType supportedInputType)
         {
             var playerJoinedPanelView = Instantiate(_playerJoinedPanelViewPrefab, _playersJoinedPanelsParent);
             _playerJoinedPanelViews.Add(playerJoinedPanelView);
-            playerJoinedPanelView.Setup(_playerJoinedPanelViews.Count-1, playerName, supportedInputType, OnPlayerNameChanged, OnPlayerRemoveButtonClicked);
+            playerJoinedPanelView.Setup(inputDeviceId, playerName, supportedInputType, OnPlayerNameChanged, OnPlayerRemoveButtonClicked);
         }
 
-        private void OnPlayerRemoveButtonClicked(int playerIndex)
+        private void OnPlayerRemoveButtonClicked(int inputDeviceId)
         {
-            _onRemovePlayerButtonClicked?.Invoke(playerIndex);
+            _onRemovePlayerButtonClicked?.Invoke(inputDeviceId);
         }
 
-        private void OnPlayerNameChanged(int playerIndex, string playerName)
+        private void OnPlayerNameChanged(int inputDeviceId, string playerName)
         {
-            _onPlayerNameChanged?.Invoke(playerIndex, playerName);
+            _onPlayerNameChanged?.Invoke(inputDeviceId, playerName);
         }
 
         private void OnLocalHostToggleChanged(bool isLocalHost)
@@ -126,9 +126,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             gameObject.SetActive(false);
         }
 
-        public void RemovePlayerJoined(int playerIndex)
+        public void RemovePlayerJoined(int playerInputDeviceId)
         {
-            var playerRemoved = _playerJoinedPanelViews[playerIndex];
+            var playerRemoved = _playerJoinedPanelViews.Find(x=>x.InputDeviceId == playerInputDeviceId);
             _playerJoinedPanelViews.Remove(playerRemoved);
             Destroy(playerRemoved.gameObject);
         }

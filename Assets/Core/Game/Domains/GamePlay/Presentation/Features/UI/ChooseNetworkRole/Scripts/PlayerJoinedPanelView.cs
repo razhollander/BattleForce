@@ -16,13 +16,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         [SerializeField] private float _imageMaxRadiusMovment;
         [SerializeField] private SerializableDictionary<SupportedInputType, Sprite> _imagePerInputType;
 
-        private int _playerIndex;
+        public int InputDeviceId { get; private set; }
         private Action<int, string> _onPlayerNameChanged;
         private Action<int> _onRemovePlayerButtonClicked;
 
-        public void Setup(int playerIndex, string playerName, SupportedInputType supportedInputType, Action<int, string> onPlayerNameChanged, Action<int> onRemovePlayerButtonClicked)
+        public void Setup(int inputDeviceId, string playerName, SupportedInputType supportedInputType, Action<int, string> onPlayerNameChanged, Action<int> onRemovePlayerButtonClicked)
         {
-            _playerIndex = playerIndex;
+            InputDeviceId = inputDeviceId;
             _playerNameInputField.text = playerName;
             _inputImage.sprite = _imagePerInputType[supportedInputType];
             _onPlayerNameChanged = onPlayerNameChanged;
@@ -33,12 +33,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnRemovePlayerButtonClicked()
         {
-            _onRemovePlayerButtonClicked?.Invoke(_playerIndex);
+            _onRemovePlayerButtonClicked?.Invoke(InputDeviceId);
         }
 
         private void OnPlayerNameChanged(string newName)
         {
-            _onPlayerNameChanged.Invoke(_playerIndex, newName);
+            _onPlayerNameChanged.Invoke(InputDeviceId, newName);
         }
 
         public void MoveInputImage(Vector2 delta)
