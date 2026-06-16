@@ -50,7 +50,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 .Execute();
 
             _stageEndedUiController.Hide();
-            LogService.LogError("Stage start received");
         }
     }
 }

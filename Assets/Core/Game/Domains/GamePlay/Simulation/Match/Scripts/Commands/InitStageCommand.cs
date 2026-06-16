@@ -63,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
-            LogService.LogError("init stage on server side");
+            LogService.LogTopic("init stage on server side", LogTopicType.ClientNetwork);
             ClearStageData();
             var mapSizeMultiplier = _matchDataService.SimulationState.MapSizeMultiplier = _gamePlayConfigService.GamePlayConfig.StageSizeMultiplier;
             CreateEnvironmentLayout(mapSizeMultiplier);
