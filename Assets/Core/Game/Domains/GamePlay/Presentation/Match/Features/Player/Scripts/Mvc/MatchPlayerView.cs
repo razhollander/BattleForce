@@ -3,6 +3,7 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.WaterGunStream.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Scripts.Extensions;
 using Core.Scripts.Helpers;
@@ -27,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
+        [SerializeField] private WaterGunStreamView _waterGunStreamView;
         [SerializeField] private PlayerChickenView _playerChickenView;
         [SerializeField] private YearsOfPainView _yearsOfPainView;
         [SerializeField] private GameObject _deadAura;
@@ -124,6 +126,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 DisableUmbrellaState();
             }
         }
+
+        public void SetWaterGunState(bool isOn)
+        {
+            if (isOn)
+            {
+                _waterGunStreamView.Show();
+            }
+            else
+            {
+                _waterGunStreamView.Hide();
+            }
+        }
         
         public void SetIsHealthBarShown(bool isShown)
         {
@@ -157,6 +171,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerEyesView.OnDespawned();
             _playerChickenView.SetChickenState(false);
             DisableUmbrellaState();
+            _waterGunStreamView.Hide();
             SetIsLockOnHeartSightShown(false);
             Base.OnDespawned();
         }
@@ -190,6 +205,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             ));
 
             _playerEyesView.UpdateEyesToLookAtDirection(rotation);
+        }
+
+        public void InterpolateWaterGunRotation(System.Numerics.Vector2 aimDirection, float decay)
+        {
+            if (aimDirection.LengthSquared() < 0.0001f)
+            {
+                LogService.LogError("Direction is too small (0) to interpolate");
+                return;
+            }
+
+            _waterGunStreamView.UpdateStream(aimDirection, 0f);
+            _playerEyesView.UpdateEyesToLookAtDirection(aimDirection);
         }
         public void SetIsDeadEffectEnabled(bool isEnabled, CancellationToken cancellationToken)
         {

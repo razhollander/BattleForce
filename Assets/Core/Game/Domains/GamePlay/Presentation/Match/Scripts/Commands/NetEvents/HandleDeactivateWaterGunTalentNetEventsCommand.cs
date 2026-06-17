@@ -1,4 +1,4 @@
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.WaterGunStream.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -8,12 +8,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     public class HandleDeactivateWaterGunTalentNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
-        private IWaterGunStreamControllers _waterGunStreamControllers;
+        private IMatchPlayerControllers _playerControllers;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
-            _waterGunStreamControllers = _diContainer.Resolve<IWaterGunStreamControllers>();
+            _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
         }
 
         public void Execute()
@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var evt in events)
             {
-                _waterGunStreamControllers.Despawn(evt.CasterPlayerId);
+                _playerControllers.SetPlayerWaterGunState(evt.CasterPlayerId, false);
             }
 
             _cachedPresentationEventsService.DeactivateWaterGunTalentNetEvents.Clear();

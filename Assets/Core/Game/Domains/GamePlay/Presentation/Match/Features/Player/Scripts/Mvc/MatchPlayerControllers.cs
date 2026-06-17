@@ -94,6 +94,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetUmbrellaState(isUmbrella);
         }
 
+        public void SetPlayerWaterGunState(ushort playerId, bool isOn)
+        {
+            GetPlayer(playerId).SetWaterGunState(isOn);
+        }
+
         public void SetPlayerChickenState(ushort playerId, bool isChicken)
         {
             GetPlayer(playerId).SetChickenState(isChicken);

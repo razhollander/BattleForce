@@ -80,6 +80,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             {
                 SetUmbrellaState(currentSelectedTalentState.IsCurrentlyActive);
             }
+            else if (currentSelectedTalentState.TalentType == TalentType.WaterGun)
+            {
+                SetWaterGunState(currentSelectedTalentState.IsCurrentlyActive);
+            }
             else if (currentSelectedTalentState.TalentType == TalentType.Chicken)
             {
                 SetChickenState(true);
@@ -104,6 +108,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetUmbrellaState(bool isUmbrellaActive)
         {
             _playerView.SetUmbrellaState(isUmbrellaActive);
+        }
+
+        public void SetWaterGunState(bool isActive)
+        {
+            _playerView.SetWaterGunState(isActive);
         }
         
         public void SetSelectedTalent(int talentIndex)
@@ -132,6 +141,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 selectedTalent.TalentType == TalentType.Umbrella)
             {
                 _playerView.InterpolateUmbrellaRotation(aimDirection, decay);
+            }
+            else if (playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var waterGunTalent) &&
+                     waterGunTalent.TalentType == TalentType.WaterGun &&
+                     waterGunTalent.IsCurrentlyActive)
+            {
+                _playerView.InterpolateWaterGunRotation(aimDirection, decay);
             }
         }
 
