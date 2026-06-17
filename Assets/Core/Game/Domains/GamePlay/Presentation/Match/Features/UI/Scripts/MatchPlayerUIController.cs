@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
@@ -16,15 +17,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly NetworkConfig _networkConfig;
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private MatchPlayerUIView _view;
 
-        public MatchPlayerUIController(IMatchDataService matchDataService, ushort playerId, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig)
+        public MatchPlayerUIController(IMatchDataService matchDataService, ushort playerId, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig,
+            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _matchDataService = matchDataService;
             _playerId = playerId;
             _gamePlayConfig = gamePlayConfig;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkConfig = networkConfig;
+            _stageCancellationTokenProvider = stageCancellationTokenProvider;
         }
 
         public void CreateView(MatchPlayerUIView viewPrefab, Transform parent)
@@ -36,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 
         public void SetHealth(ushort currentHealth, ushort maxHealth)
         {
-            _view.SetHealth(currentHealth, maxHealth);
+            _view.SetHealth(currentHealth, maxHealth, _stageCancellationTokenProvider.CancellationTokenSource.Token);
         }
 
         public void HideHealthBar()

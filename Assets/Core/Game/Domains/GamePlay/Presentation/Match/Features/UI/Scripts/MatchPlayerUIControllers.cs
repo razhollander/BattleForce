@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
@@ -14,21 +15,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly NetworkConfig _networkConfig;
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly Dictionary<ushort, MatchPlayerUIController> _playerControllers = new Dictionary<ushort, MatchPlayerUIController>();
 
         public MatchPlayerUIControllers(MatchPlayerUIControllersView view, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
-            SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig)
+            SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _view = view;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkConfig = networkConfig;
+            _stageCancellationTokenProvider = stageCancellationTokenProvider;
         }
 
         public void AddPlayer(ushort playerId, int currentServerTick)
         {
-            var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId, _gamePlayConfig, _sharedGamePlayConfig, _networkConfig);
+            var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId, _gamePlayConfig, _sharedGamePlayConfig, _networkConfig, _stageCancellationTokenProvider);
             newPlayerController.CreateView(_view.PlayerUIView, _view.PlayersContainer);
             var playerTalentsState =_matchDataService.GetPlayer(playerId).Spaceship.TalentsState;
             newPlayerController.UpdateTalents(playerTalentsState.Talents, playerTalentsState.SelectedTalentIndex, currentServerTick);

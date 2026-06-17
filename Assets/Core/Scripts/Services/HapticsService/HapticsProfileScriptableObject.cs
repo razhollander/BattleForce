@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Core.Scripts.Services.HapticsService
 {
-    [CreateAssetMenu(fileName = "HapticsProfiles", menuName = "BF/Presentation//Haptics Profiles")]
+    [CreateAssetMenu(fileName = "HapticsProfiles", menuName = "BF/Presentation/Haptics Profiles")]
     public class HapticsProfileScriptableObject : ScriptableObject
     {
         [SerializeField] 

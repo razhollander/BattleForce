@@ -245,7 +245,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetHealth(ushort currentHealth, ushort maxHealth)
         {
-            _playerView.UpdateHealthBar(currentHealth, maxHealth);
+            _playerView.UpdateHealthBar(currentHealth, maxHealth, _stageCancellationTokenProvider.CancellationTokenSource.Token);
         }
 
         public void SetTransform(Vector2 position, Vector2 direction)
