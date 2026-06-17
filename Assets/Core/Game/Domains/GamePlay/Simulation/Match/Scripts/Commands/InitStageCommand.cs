@@ -12,10 +12,12 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
+using Core.Scripts.Extensions.Linq;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -383,75 +385,72 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.EnvironmentData.AddSpike(spikeId, spikeLocalPosition, spikeWorldPosition, spikeLocalRotationAngle, spikeWorldRotationAngle);
             _physicsSimulator.AddEnvironmentSpike(spikeId, spikeWorldPosition, spikeWorldRotationAngle, spikeSize);
         }
-        
+
         private void CreateTeleportGates(float mapSizeMultiplier)
         {
             var teleportGatePairConfigs = _matchEnvironmentConfigDataService.TeleportGates;
+
             if (teleportGatePairConfigs.IsNullOrEmpty())
             {
                 return;
             }
 
             var rotatingWheelsConfigs = _matchEnvironmentConfigDataService.RotatingWheels;
-            var wheelsDict = new System.Collections.Generic.Dictionary<ushort, Core.Game.Domains.GamePlay.Shared.Scripts.Configs.EnvironmentRotatingWheelConfig>();
-            if (!rotatingWheelsConfigs.IsNullOrEmpty())
-            {
-                foreach (var wheel in rotatingWheelsConfigs)
-                {
-                    wheelsDict[wheel.Id] = wheel;
-                }
-            }
-
-            var calculationTick = 0;
             var deltaTime = _networkConfig.DeltaTime;
+            var calculationTick = 0;
 
-            foreach (var teleportGatePairConfig in teleportGatePairConfigs)
+            foreach (var pairConfig in teleportGatePairConfigs)
             {
-                var gateA = teleportGatePairConfig.GateA;
-                var scaledGateAPos = gateA.Position * mapSizeMultiplier;
-                Vector2 worldPositionA;
-                float worldRotationA;
+                TryAttachGateToRotatingWheel(pairConfig.Id, pairConfig.GateA, true, mapSizeMultiplier, calculationTick, deltaTime, rotatingWheelsConfigs, out var worldPosA, out var worldRotA);
+                TryAttachGateToRotatingWheel(pairConfig.Id, pairConfig.GateB, false, mapSizeMultiplier, calculationTick, deltaTime, rotatingWheelsConfigs, out var worldPosB, out var worldRotB);
 
-                if (gateA.IsAttachedToRotationWheel && wheelsDict.TryGetValue(gateA.AttachToRotationWheelId, out var wheelA))
-                {
-                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        calculationTick, wheelA.RotationSpeed, deltaTime, wheelA.CenterPosition * mapSizeMultiplier, scaledGateAPos, gateA.NormalRotation,
-                        out worldPositionA, out worldRotationA);
+                var scaledGateAPos = pairConfig.GateA.Position * mapSizeMultiplier;
+                var scaledGateBPos = pairConfig.GateB.Position * mapSizeMultiplier;
 
-                    var rotatingWheelS2C = _matchDataService.EnvironmentData.GetRotatingWheel(wheelA.Id);
-                    rotatingWheelS2C.AddTeleportGatePair(new RotatingTeleportGate(teleportGatePairConfig.Id, true));
-                }
-                else
-                {
-                    worldPositionA = scaledGateAPos;
-                    worldRotationA = gateA.NormalRotation;
-                }
-
-                var gateB = teleportGatePairConfig.GateB;
-                var scaledGateBPos = gateB.Position * mapSizeMultiplier;
-                Vector2 worldPositionB;
-                float worldRotationB;
-
-                if (gateB.IsAttachedToRotationWheel && wheelsDict.TryGetValue(gateB.AttachToRotationWheelId, out var wheelB))
-                {
-                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        calculationTick, wheelB.RotationSpeed, deltaTime, wheelB.CenterPosition * mapSizeMultiplier, scaledGateBPos, gateB.NormalRotation,
-                        out worldPositionB, out worldRotationB);
-
-                    var rotatingWheelS2C = _matchDataService.EnvironmentData.GetRotatingWheel(wheelB.Id);
-                    rotatingWheelS2C.AddTeleportGatePair(new RotatingTeleportGate(teleportGatePairConfig.Id, false));
-                }
-                else
-                {
-                    worldPositionB = scaledGateBPos;
-                    worldRotationB = gateB.NormalRotation;
-                }
-
-                AddTeleportGatePairToEnvironment(teleportGatePairConfig.Id, teleportGatePairConfig.GateAId, teleportGatePairConfig.GateBId, scaledGateAPos, gateA.NormalRotation, scaledGateBPos,
-                    gateB.NormalRotation, worldPositionA, worldRotationA, worldPositionB, worldRotationB, mapSizeMultiplier);
+                AddTeleportGatePairToEnvironment(
+                    pairConfig.Id,
+                    pairConfig.GateAId, pairConfig.GateBId,
+                    scaledGateAPos, pairConfig.GateA.NormalRotation,
+                    scaledGateBPos, pairConfig.GateB.NormalRotation,
+                    worldPosA, worldRotA,
+                    worldPosB, worldRotB,
+                    mapSizeMultiplier
+                );
             }
         }
-        
+
+        private void TryAttachGateToRotatingWheel(
+            ushort pairId,
+            EnvironmentTeleportGateConfig gateConfig,
+            bool isGateA,
+            float mapSizeMultiplier,
+            int calculationTick,
+            float deltaTime,
+            EnvironmentRotatingWheelConfig[] rotatingWheelsConfigs,
+            out Vector2 worldPosition,
+            out float worldRotation)
+        {
+            var scaledPosition = gateConfig.Position * mapSizeMultiplier;
+
+            if (gateConfig.IsAttachedToRotationWheel)
+            {
+                var wheel = rotatingWheelsConfigs.FindWithId(gateConfig.AttachToRotationWheelId);
+
+                EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                    calculationTick, wheel.RotationSpeed, deltaTime, wheel.CenterPosition * mapSizeMultiplier, scaledPosition, gateConfig.NormalRotation,
+                    out worldPosition, out worldRotation
+                );
+
+                var rotatingWheel = _matchDataService.EnvironmentData.GetRotatingWheel(wheel.Id);
+                rotatingWheel.AddTeleportGatePair(new RotatingTeleportGate(pairId, isGateA));
+            }
+            else
+            {
+                worldPosition = scaledPosition;
+                worldRotation = gateConfig.NormalRotation;
+            }
+        }
+
         private void AddTeleportGatePairToEnvironment(ushort teleportPairId, ushort gateAId, ushort gateBId, Vector2 gateAPosition, float gateANormalRotation, Vector2 gateBPosition,
             float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation, float mapSizeMultiplier)
         {

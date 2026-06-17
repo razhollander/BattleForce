@@ -661,27 +661,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 foreach (var teleportGate in wheelModel.TeleportGates)
                 {
                     var teleportPairModel = _matchDataService.GetTeleportPair(teleportGate.BelongToPairId);
+                    var gateModel = teleportGate.IsGateA ? teleportPairModel.GateA : teleportPairModel.GateB;
 
-                    if (teleportGate.IsGateA)
-                    {
-                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateA.LocalPosition, teleportPairModel.GateA.LocalRotation,
-                            out var worldPosA, out var worldRotA
-                        );
+                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                        calculationTick, rotationSpeed, deltaTime, wheelCenter, gateModel.LocalPosition, gateModel.LocalRotation,
+                        out var worldPosA, out var worldRotA
+                    );
 
-                        teleportPairModel.GateA.WorldPosition = worldPosA;
-                        teleportPairModel.GateA.WorldRotation = worldRotA;
-                    }
-                    else
-                    {
-                        EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateB.LocalPosition, teleportPairModel.GateB.LocalRotation,
-                            out var worldPosB, out var worldRotB
-                        );
-
-                        teleportPairModel.GateB.WorldPosition = worldPosB;
-                        teleportPairModel.GateB.WorldRotation = worldRotB;
-                    }
+                    gateModel.WorldPosition = worldPosA;
+                    gateModel.WorldRotation = worldRotA;
                 }
             }
         }
