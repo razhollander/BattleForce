@@ -5,13 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c1e12e0-c131-4b63-94f5-2f0c8aa9c131" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/.claude/skills/add-net-event/SKILL.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/.claude/skills/add-talent/SKILL.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/.claude/skills/coding-guidlines/SKILL.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/PlayerHapticsForPlayerCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/PlayerHapticsForPlayerCommand.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticProfileType.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticProfileType.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsProfile.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsProfile.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsProfileScriptableObject.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsProfileScriptableObject.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsService.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/IHapticsService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/IHapticsService.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Network/PacketsHandlers/StartStagePacketHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Network/PacketsHandlers/StartStagePacketHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/InitStageCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/InitStageCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerTakeDamangeNetEventsCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerTakeDamangeNetEventsCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Services/DataService/ILocalPlayersDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Services/DataService/ILocalPlayersDataService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Services/DataService/LocalPlayersDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Services/DataService/LocalPlayersDataService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/UniversalRP.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/UniversalRP.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/ZenjectInstallers/CoreInstaller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/ZenjectInstallers/CoreInstaller.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,8 +83,6 @@
     <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.test-framework/Samples~/2_ActArrangeAssert/MyExercise_2/StringFormatter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.test-framework/Tests/TestNewCustomAssembly/NewPlayModeTest.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file:///Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/Resources/PackageManager/BuiltInPackages/com.unity.ugui/Editor/TMP/TMP_SerializedPropertyHolder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/11a7ac3c905b442eaf1dbb6eb4717e00b7a00/68/500cd6f8/Func`2.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/27bd554a9f0e46179afd19da1336e638469400/c5/a820054f/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f983fe377b2489e8ed44032915da13e1df600/03/5c8cf73e/Color32.cs" root0="SKIP_HIGHLIGHTING" />
@@ -118,7 +131,6 @@
     <setting file="file://$PROJECT_DIR$/../../../../../../Documents/a/Archive/c/Archive/ArchiveC/Assets/EPF/Game/Domains/3-Gameplay/Subdomains/Bot/Scripts/Goals/AtomicGoals/ThinkOnShot/ThinkOnAssignedShotGoal.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../../../Documents/a/Archive/c/Archive/ArchiveC/Assets/EPF/Game/Domains/3-Gameplay/Subdomains/Bot/Scripts/Goals/AtomicGoals/ThinkOnShot/ThinkOnBreakShotGoal.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../../../Documents/a/Archive/c/Archive/ArchiveC/Assets/EPF/Game/Domains/3-Gameplay/Subdomains/Bot/Scripts/Goals/EvaluatorsPresets/FoulShotStrategy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Editor/LevelEnvironment/Scripts/PolygonPath2D.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIView.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/MatchMaking/Scripts/Network/PacketsHandlers/MatchMakingFullTickPacketsHandler.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/Inputs/ShootInputInvokedCommand.cs" root0="FORCE_HIGHLIGHTING" />
@@ -139,6 +151,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/Services/Logger/EmptyLogger.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/Services/Logger/UnityLogger.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/Utils/CustomCollections/FixedClassUnorderedList.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.memoryprofiler@485b5ba42ef5/Editor/MemorySnapshot/Cached/NativeAllocationEntriesCache.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../NetGameExample/Assets/Code/Shared/Collisions.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -179,7 +192,7 @@
 }</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="$PROJECT_DIR$/../Builds/mac/12/with_lock_on_targets.app/Contents/MacOS/BattleForce2" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../Builds/mac/1/PlaytestChen.app/Contents/MacOS/BattleForce2" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../Builds/1.app/Contents/MacOS" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -308,7 +321,7 @@
       <workItem from="1768077790024" duration="2383000" />
       <workItem from="1769549466405" duration="15086000" />
       <workItem from="1769608023960" duration="5985000" />
-      <workItem from="1781628560179" duration="1335000" />
+      <workItem from="1781628560179" duration="8034000" />
     </task>
     <servers />
   </component>
