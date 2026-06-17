@@ -54,6 +54,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents;
         public FixedUnorderedList<ActivateWaterGunTalentNetEventS2C> ActivateWaterGunTalentNetEvents;
         public FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C> DeactivateWaterGunTalentNetEvents;
+        public FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C> ActivateHeadbuttChargingNetEvents;
+        public FixedUnorderedList<PerformHeadbuttDashNetEventS2C> PerformHeadbuttDashNetEvents;
+        public FixedUnorderedList<HeadbuttHitEnemyNetEventS2C> HeadbuttHitEnemyNetEvents;
+        public FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C> DeactivateHeadbuttTalentNetEvents;
         public FixedUnorderedList<CreateMagneticPullFieldNetEventS2C> CreateMagneticPullFieldNetEvents;
         public FixedUnorderedList<LayChickenEggNetEventS2C> LayChickenEggNetEvents;
         public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
@@ -121,6 +125,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
             ActivateWaterGunTalentNetEvents = new FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>(maxCap.ActivateWaterGunTalentNetEvents);
             DeactivateWaterGunTalentNetEvents = new FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>(maxCap.DeactivateWaterGunTalentNetEvents);
+            ActivateHeadbuttChargingNetEvents = new FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>(maxCap.ActivateHeadbuttChargingNetEvents);
+            PerformHeadbuttDashNetEvents = new FixedUnorderedList<PerformHeadbuttDashNetEventS2C>(maxCap.PerformHeadbuttDashNetEvents);
+            HeadbuttHitEnemyNetEvents = new FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>(maxCap.HeadbuttHitEnemyNetEvents);
+            DeactivateHeadbuttTalentNetEvents = new FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>(maxCap.DeactivateHeadbuttTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
             ChickenEggHitNetEvents = new FixedUnorderedList<ChickenEggHitNetEventS2C>(maxCap.ChickenEggHitNetEvents);
             PlayerLockOnHeartTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(maxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxCap.ConcurrentEnemyPlayers));
@@ -178,6 +186,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 42)) != 0) SerializedEnvironmentSpikePlayerCollisionEvents(writer);
             if ((eventMask & (1UL << 43)) != 0) SerializedActivateWaterGunTalentNetEvents(writer);
             if ((eventMask & (1UL << 44)) != 0) SerializedDeactivateWaterGunTalentNetEvents(writer);
+            if ((eventMask & (1UL << 45)) != 0) SerializedActivateHeadbuttChargingNetEvents(writer);
+            if ((eventMask & (1UL << 46)) != 0) SerializedPerformHeadbuttDashNetEvents(writer);
+            if ((eventMask & (1UL << 47)) != 0) SerializedHeadbuttHitEnemyNetEvents(writer);
+            if ((eventMask & (1UL << 48)) != 0) SerializedDeactivateHeadbuttTalentNetEvents(writer);
         }
 
         private ulong CalculateEventMask()
@@ -223,6 +235,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (LayChickenEggNetEvents.Count > 0) eventMask |= 1UL << 37;
             if (ActivateWaterGunTalentNetEvents.Count > 0) eventMask |= 1UL << 43;
             if (DeactivateWaterGunTalentNetEvents.Count > 0) eventMask |= 1UL << 44;
+            if (ActivateHeadbuttChargingNetEvents.Count > 0) eventMask |= 1UL << 45;
+            if (PerformHeadbuttDashNetEvents.Count > 0) eventMask |= 1UL << 46;
+            if (HeadbuttHitEnemyNetEvents.Count > 0) eventMask |= 1UL << 47;
+            if (DeactivateHeadbuttTalentNetEvents.Count > 0) eventMask |= 1UL << 48;
             if (ChickenEggHitNetEvents.Count > 0) eventMask |= 1UL << 38;
             if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 39;
             if (EnvironmentSpikePlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 42;
@@ -370,6 +386,18 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask & (1UL << 44)) != 0) DeserializedDeactivateWaterGunTalentNetEvents(reader);
             else DeactivateWaterGunTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 45)) != 0) DeserializedActivateHeadbuttChargingNetEvents(reader);
+            else ActivateHeadbuttChargingNetEvents.Clear();
+
+            if ((eventMask & (1UL << 46)) != 0) DeserializedPerformHeadbuttDashNetEvents(reader);
+            else PerformHeadbuttDashNetEvents.Clear();
+
+            if ((eventMask & (1UL << 47)) != 0) DeserializedHeadbuttHitEnemyNetEvents(reader);
+            else HeadbuttHitEnemyNetEvents.Clear();
+
+            if ((eventMask & (1UL << 48)) != 0) DeserializedDeactivateHeadbuttTalentNetEvents(reader);
+            else DeactivateHeadbuttTalentNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1235,6 +1263,78 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref DeactivateWaterGunTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateHeadbuttChargingNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateHeadbuttChargingNetEvents.Count);
+            foreach (var netEvent in ActivateHeadbuttChargingNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedActivateHeadbuttChargingNetEvents(NetDataReader reader)
+        {
+            ActivateHeadbuttChargingNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateHeadbuttChargingNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPerformHeadbuttDashNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PerformHeadbuttDashNetEvents.Count);
+            foreach (var netEvent in PerformHeadbuttDashNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedPerformHeadbuttDashNetEvents(NetDataReader reader)
+        {
+            PerformHeadbuttDashNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PerformHeadbuttDashNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedHeadbuttHitEnemyNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)HeadbuttHitEnemyNetEvents.Count);
+            foreach (var netEvent in HeadbuttHitEnemyNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedHeadbuttHitEnemyNetEvents(NetDataReader reader)
+        {
+            HeadbuttHitEnemyNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref HeadbuttHitEnemyNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateHeadbuttTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateHeadbuttTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateHeadbuttTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateHeadbuttTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateHeadbuttTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateHeadbuttTalentNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

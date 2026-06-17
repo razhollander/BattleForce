@@ -49,6 +49,7 @@ MonoBehaviour:
         - rid: 2200602851054190754
         - rid: 2200602851054190755
         - rid: 1717594783917015173
+        - rid: 1717594787500785824
       TalentsArrowConfigs:
         TalentCooldownConfigs:
         - TalentType: 1
@@ -119,8 +120,16 @@ MonoBehaviour:
         DurationInSeconds: 3
         ConeAngleDegrees: 45
         ConeRange: 15
-        EnemyPushForcePerTick: 40
-        CasterRecoilForcePerTick: 15
+        EnemyPushForcePerTick: 400
+        CasterRecoilForcePerTick: 100
+      HeadbuttTalentConfig:
+        MaxChargeForce: 30
+        MaxChargeDurationSeconds: 2
+        MaxDashWindowSeconds: 1.5
+        MinDashWindowSeconds: 0.3
+        EnemyPushForce: 25
+        EnemySpinAmount: 15
+        CasterVelocityDamping: 0.05
       TalentCardWidth: 1.602175
       TalentCardHeight: 2.382844
     Lava:
@@ -165,6 +174,11 @@ MonoBehaviour:
       data:
         TalentType: 11
         CooldownInSeconds: 5
+    - rid: 1717594787500785824
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 12
+        CooldownInSeconds: 6
     - rid: 2200602851054190747
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:

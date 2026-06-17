@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly ChickenTalentController _chickenTalentController;
         private readonly YearsOfPainTalentController _yearsOfPainTalentController;
         private readonly WaterGunTalentController _waterGunTalentController;
+        private readonly HeadbuttTalentController _headbuttTalentController;
         
         private ushort _casterPlayerId;
 
@@ -39,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfigService, networkConfig, physicsSimulator);
             _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
             _waterGunTalentController = new WaterGunTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig);
+            _headbuttTalentController = new HeadbuttTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -54,6 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _chickenTalentController.SetCasterId(casterPlayerId);
             _yearsOfPainTalentController.SetCasterId(casterPlayerId);
             _waterGunTalentController.SetCasterId(casterPlayerId);
+            _headbuttTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)
@@ -70,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.Chicken: return _chickenTalentController;
                 case TalentType.YearsOfPain: return _yearsOfPainTalentController;
                 case TalentType.WaterGun: return _waterGunTalentController;
+                case TalentType.Headbutt: return _headbuttTalentController;
                 default: return default;
             }
         }
@@ -91,6 +95,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _chickenTalentController?.OnTick(tick, deltaTime);
             _yearsOfPainTalentController?.OnTick(tick, deltaTime);
             _waterGunTalentController?.OnTick(tick, deltaTime);
+            _headbuttTalentController?.OnTick(tick, deltaTime);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)
@@ -118,6 +123,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _grapplingHookTalentController.HitWall(wallId, tick);
         }
 
+        public void TryHeadbuttHitEnemy(ushort potentialCasterId, ushort potentialEnemyId, int tick)
+        {
+            if (potentialCasterId != _casterPlayerId) return;
+            _headbuttTalentController.HitEnemy(potentialEnemyId, tick);
+        }
+
         public void ResetData()
         {
             _swapTalentController.ResetData();
@@ -130,6 +141,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _chickenTalentController.ResetData();
             _yearsOfPainTalentController.ResetData();
             _waterGunTalentController.ResetData();
+            _headbuttTalentController.ResetData();
         }
     }
 }

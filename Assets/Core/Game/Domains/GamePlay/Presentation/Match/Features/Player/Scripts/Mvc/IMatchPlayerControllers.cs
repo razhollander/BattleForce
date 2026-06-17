@@ -30,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void SetPlayersSpinnedState(ushort playerId, bool isOn);
         void SetPlayerUmbrellaState(ushort playerId, bool isOn);
         void SetPlayerWaterGunState(ushort playerId, bool isOn);
+        void SetPlayerHeadbuttChargingState(ushort playerId, bool isCharging);
         void SetPlayerChickenState(ushort playerId, bool isOn);
         void PlayLayEggAnimation(ushort playerId);
         void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction);

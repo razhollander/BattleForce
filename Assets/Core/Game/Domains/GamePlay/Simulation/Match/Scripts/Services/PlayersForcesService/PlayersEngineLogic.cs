@@ -35,6 +35,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
             {
                 return;
             }
+
+            // Engine is kept off during Headbutt charging phase (IsCurrentlyActive=false means not dashing, so engine-off = charging)
+            var isPlayerHeadbuttCharging = selectedTalent is {TalentType: TalentType.Headbutt, IsCurrentlyActive: false}
+                                           && !playerSpaceshipState.IsEngineOn;
+            if (isPlayerHeadbuttCharging)
+            {
+                return;
+            }
             
             var isPlayerIdle = playerSpaceshipState.Transform.Velocity.Length() < _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TurnEngineOnWhenReachVelocity;
             if (isPlayerIdle)

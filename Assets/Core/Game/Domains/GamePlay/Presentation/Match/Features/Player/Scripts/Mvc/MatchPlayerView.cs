@@ -127,6 +127,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
         }
 
+        public void SetHeadbuttChargingState(bool isCharging)
+        {
+            // VFX hookup: play/stop charging particle system once prefab is assigned
+        }
+
         public void SetWaterGunState(bool isOn)
         {
             if (isOn)

@@ -13,5 +13,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         MagneticPull = 9,
         Chicken = 10,
         WaterGun = 11,
+        Headbutt = 12,
     }
 }

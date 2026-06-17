@@ -99,6 +99,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetWaterGunState(isOn);
         }
 
+        public void SetPlayerHeadbuttChargingState(ushort playerId, bool isCharging)
+        {
+            GetPlayer(playerId).SetHeadbuttChargingState(isCharging);
+        }
+
         public void SetPlayerChickenState(ushort playerId, bool isChicken)
         {
             GetPlayer(playerId).SetChickenState(isChicken);

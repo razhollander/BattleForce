@@ -114,6 +114,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _playerView.SetWaterGunState(isActive);
         }
+
+        public void SetHeadbuttChargingState(bool isCharging)
+        {
+            _playerView.SetHeadbuttChargingState(isCharging);
+        }
         
         public void SetSelectedTalent(int talentIndex)
         {

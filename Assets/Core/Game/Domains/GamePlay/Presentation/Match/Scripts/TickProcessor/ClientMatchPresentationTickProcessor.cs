@@ -62,6 +62,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleDeactivateUmbrellaTalentNetEventsCommand _handleDeactivateUmbrellaTalentNetEventsCommand;
         private readonly HandleActivateWaterGunTalentNetEventsCommand _handleActivateWaterGunTalentNetEventsCommand;
         private readonly HandleDeactivateWaterGunTalentNetEventsCommand _handleDeactivateWaterGunTalentNetEventsCommand;
+        private readonly HandleActivateHeadbuttChargingNetEventsCommand _handleActivateHeadbuttChargingNetEventsCommand;
+        private readonly HandlePerformHeadbuttDashNetEventsCommand _handlePerformHeadbuttDashNetEventsCommand;
+        private readonly HandleDeactivateHeadbuttTalentNetEventsCommand _handleDeactivateHeadbuttTalentNetEventsCommand;
+        private readonly HandleHeadbuttHitEnemyNetEventsCommand _handleHeadbuttHitEnemyNetEventsCommand;
         private readonly HandleLayChickenEggNetEventsCommand _handleLayChickenEggNetEventsCommand;
         private readonly HandleChickenEggHitNetEventsCommand _handleChickenEggHitNetEventsCommand;
         private readonly UpdateKOProjectilesTransformCommand _updateKOProjectilesTransformCommand;
@@ -117,6 +121,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateUmbrellaTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateUmbrellaTalentNetEventsCommand>();
             _handleActivateWaterGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateWaterGunTalentNetEventsCommand>();
             _handleDeactivateWaterGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateWaterGunTalentNetEventsCommand>();
+            _handleActivateHeadbuttChargingNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateHeadbuttChargingNetEventsCommand>();
+            _handlePerformHeadbuttDashNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformHeadbuttDashNetEventsCommand>();
+            _handleDeactivateHeadbuttTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateHeadbuttTalentNetEventsCommand>();
+            _handleHeadbuttHitEnemyNetEventsCommand = commandFactory.CreateCommandVoid<HandleHeadbuttHitEnemyNetEventsCommand>();
             _handleLayChickenEggNetEventsCommand = commandFactory.CreateCommandVoid<HandleLayChickenEggNetEventsCommand>();
             _handleChickenEggHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleChickenEggHitNetEventsCommand>();
             _handleKOProjectHitPlayerNetEventsCommand = commandFactory.CreateCommandVoid<HandleKOProjectHitPlayerNetEventsCommand>();
@@ -181,6 +189,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateUmbrellaTalentNetEventsCommand.Execute();
             _handleActivateWaterGunTalentNetEventsCommand.Execute();
             _handleDeactivateWaterGunTalentNetEventsCommand.Execute();
+            _handleActivateHeadbuttChargingNetEventsCommand.Execute();
+            _handlePerformHeadbuttDashNetEventsCommand.Execute();
+            _handleDeactivateHeadbuttTalentNetEventsCommand.Execute();
+            _handleHeadbuttHitEnemyNetEventsCommand.Execute();
             _handleLayChickenEggNetEventsCommand.Execute(); // must be after _handleTalentSwitchNetEventsCommand.Execute();
             _handleChickenEggHitNetEventsCommand.Execute();
             _handlePerformDashPulseNetEventsCommand.Execute();

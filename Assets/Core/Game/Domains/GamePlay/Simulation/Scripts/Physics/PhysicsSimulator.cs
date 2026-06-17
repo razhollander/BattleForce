@@ -1110,9 +1110,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var body = GetBody(koProjectile, projectileId);
             var fixture = body.GetFixtureList();
             var filter = fixture.FilterData;
-            filter.maskBits = 0x0000; 
+            filter.maskBits = 0x0000;
             fixture.FilterData = filter; // not sure needed
             body.SetAwake(true); // not sure needed
+        }
+
+        public void EnablePlayerDashCollision(ushort playerId)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
+            var fixture = body.GetFixtureList();
+            // fixture.Sensor = true;
+            var filter = fixture.FilterData;
+            // Add CollideOnlyWithPlayer to maskBits so caster.mask & enemy.category != 0
+            filter.maskBits |= PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            // Add PlayerSpaceship collision bit to categoryBits so enemy.mask & caster.category != 0
+            filter.categoryBits |= PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
+            fixture.FilterData = filter;
+            body.SetAwake(true);
+        }
+
+        public void DisablePlayerDashCollision(ushort playerId)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
+            var fixture = body.GetFixtureList();
+            // fixture.Sensor = false;
+            var filter = fixture.FilterData;
+            filter.maskBits = PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
+            filter.categoryBits = PhysicsBodyType.PlayerSpaceship.GetCollisionsCategory();
+            fixture.FilterData = filter;
+            body.SetAwake(true);
         }
 
         public void AddChickenEgg(ushort eggId, ushort teamId, Vector2 position, float eggRadius)

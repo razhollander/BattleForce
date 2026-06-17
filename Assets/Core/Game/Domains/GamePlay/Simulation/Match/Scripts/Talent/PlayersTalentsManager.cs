@@ -199,6 +199,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             }
         }
 
+        public void TryHeadbuttHitEnemy(ushort potentialCasterId, ushort potentialEnemyId, int tick)
+        {
+            var casterState = _matchDataService.SimulationState.GetPlayerById(potentialCasterId);
+            var enemyState = _matchDataService.SimulationState.GetPlayerById(potentialEnemyId);
+            if (casterState.TeamId == enemyState.TeamId) return;
+
+            if (_talentControllersPerPlayer.TryGetValue(potentialCasterId, out var controllers))
+            {
+                controllers.TryHeadbuttHitEnemy(potentialCasterId, potentialEnemyId, tick);
+            }
+        }
+
         private TalentStateS2C AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)
         {
             ref var newTalent = ref playerState.Spaceship.TalentsState.Talents.AddAndGet();

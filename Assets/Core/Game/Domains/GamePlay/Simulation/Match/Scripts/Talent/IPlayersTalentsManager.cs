@@ -16,5 +16,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         void HitKOTalentWithEnemy(ushort casterId, ushort enemyPlayerId, int tick);
         void HitKOTalentWithWall(ushort casterId);
         void HitGrapplingHookWithWall(ushort casterId, ushort projectileId, ushort wallId, int tick);
+        void TryHeadbuttHitEnemy(ushort potentialCasterId, ushort potentialEnemyId, int tick);
     }
 }

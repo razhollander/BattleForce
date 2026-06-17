@@ -54,5 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void RemoveChickenEgg(ushort eggId);
         bool RectangleCastOnPlayers(Vector2 center, Vector2 size, float angleRadians, short ignoreTeamId, out PhysicsBodyData hitBodyData);
         bool RayCast(Vector2 point1, Vector2 point2, out PhysicsBodyData hitBodyData, PhysicsBodyType[] bodyTypesRayCastCanHit = null);
+        void EnablePlayerDashCollision(ushort playerId);
+        void DisablePlayerDashCollision(ushort playerId);
     }
 }

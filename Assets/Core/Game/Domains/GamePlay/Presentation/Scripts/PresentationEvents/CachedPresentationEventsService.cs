@@ -45,6 +45,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents { get; } = new();
         public List<ActivateWaterGunTalentNetEventS2C> ActivateWaterGunTalentNetEvents { get; } = new();
         public List<DeactivateWaterGunTalentNetEventS2C> DeactivateWaterGunTalentNetEvents { get; } = new();
+        public List<ActivateHeadbuttChargingNetEventS2C> ActivateHeadbuttChargingNetEvents { get; } = new();
+        public List<PerformHeadbuttDashNetEventS2C> PerformHeadbuttDashNetEvents { get; } = new();
+        public List<HeadbuttHitEnemyNetEventS2C> HeadbuttHitEnemyNetEvents { get; } = new();
+        public List<DeactivateHeadbuttTalentNetEventS2C> DeactivateHeadbuttTalentNetEvents { get; } = new();
         public List<CreateMagneticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents { get; } = new();
         public List<LayChickenEggNetEventS2C> LayChickenEggNetEvents { get; } = new();
         public List<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents { get; } = new();

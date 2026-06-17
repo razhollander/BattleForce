@@ -97,9 +97,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandleGrapplingHookWallCollision(objectA, objectB);
                 HandleChickenEggPlayerCollision(objectA, objectB);
                 HandleChickenEggKOProjectileCollision(objectA, objectB);
+                HandleHeadbuttPlayerCollision(objectA, objectB);
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandleHeadbuttPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            bool isPlayerToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            if (!isPlayerToPlayer) return;
+
+            _playersTalentsManager.TryHeadbuttHitEnemy(objectA.Id, objectB.Id, _processedTick);
+            _playersTalentsManager.TryHeadbuttHitEnemy(objectB.Id, objectA.Id, _processedTick);
         }
 
         private void HandleChickenEggKOProjectileCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)

@@ -130,6 +130,14 @@ If your talent needs an external trigger (collision callback, like Swap's `Compl
 
 ---
 
+### 6. Use Unity MCP for editor things
+
+1. In BattleForce/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Configs/TalentsConfig.asset assign a new talent to the dictionary
+2. In BattleForce/Assets/Core/Game/Domains/GamePlay/Simulation/Assets/Configs/SimulationGamePlayConfig.asset assign a new talent cooldown to the dictionary
+3. In BattleForce/Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Configs/TalentIconsConfig.asset assign a new sprite for the talent
+
+---
+
 ## Net events: decide per talent, then use `/add-net-event`
 
 Net events vary entirely by talent — there is no single pattern. Look at existing talents:
