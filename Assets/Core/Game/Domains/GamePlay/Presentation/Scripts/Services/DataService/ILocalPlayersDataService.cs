@@ -7,6 +7,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService
     {
         bool IsClientJoined { get; }
         List<ushort> LocalPlayersIds { get; }
+        bool TryGetLocalPlayerInputDevice(ushort playerId, out InputDevice inputDevice);
         Dictionary<ushort, int> GetPlayerIdToDeviceIdDictionary();
         void AddLocalPlayer(ushort playerId, InputDevice device);
         void RemoveLocalPlayer(ushort playerId);

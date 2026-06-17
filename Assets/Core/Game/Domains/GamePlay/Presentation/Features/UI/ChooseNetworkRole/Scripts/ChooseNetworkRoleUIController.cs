@@ -91,8 +91,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         public void InitExitPoint()
         {
+            RemoveListeners();
+        }
+
+        public void RemoveListeners()
+        {
             _nativeInputDeviceService.GamepadAddedEvent -= OnGamepadAdded;
-            _nativeInputDeviceService.GamepadRemovedEvent -= OnGamepadRemoved;
+            _nativeInputDeviceService.GamepadRemovedEvent -= OnGamepadRemoved; 
         }
 
         private List<PlayerJoinedModel> GetAllPlayerJoinedModels()
@@ -231,6 +236,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             var port = _uiView.Port;
             var playersJoinedModels = GetPlayersJoined(isPlaybackEnabled, playbackName);
             var clientId = _gamePlayConfig.ShouldOverrideClientId ? _gamePlayConfig.ClientIdOverride : NetworkUtils.GetDeviceUniqueId();
+            RemoveListeners();
             
             _commandFactory.CreateCommandAsync<StartClientCommand>()
                 .SetIsHost(isHost)
