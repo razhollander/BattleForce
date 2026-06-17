@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
 {
@@ -12,9 +13,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
         public readonly List<ushort> LavaWallIds;
         public readonly List<ushort> SpringIds;
         public readonly List<ushort> SpikeIds;
-        public readonly List<ushort> TeleportGatePairIds;
+        public readonly List<RotatingTeleportGate> TeleportGates;
 
-        public MatchEnvironmentRotatingWheelModel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<ushort> teleportGatePairIds)
+        public MatchEnvironmentRotatingWheelModel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<RotatingTeleportGate> teleportGates)
         {
             Id = id;
             CenterPosition = centerPosition;
@@ -23,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
             LavaWallIds = lavaWallIds;
             SpringIds = springIds;
             SpikeIds = spikeIds;
-            TeleportGatePairIds = teleportGatePairIds;
+            TeleportGates = teleportGates;
         }
     }
 }

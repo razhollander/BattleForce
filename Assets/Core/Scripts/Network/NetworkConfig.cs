@@ -115,7 +115,7 @@ namespace Core.Scripts.Network
             public int MaxLavaWalls = 16;
             public int MaxSprings = 8;
             public int MaxSpikes = 16;
-            public int MaxTeleportGatePairs = 4;
+            public int MaxTeleportGates = 8;
         }
     }
 }

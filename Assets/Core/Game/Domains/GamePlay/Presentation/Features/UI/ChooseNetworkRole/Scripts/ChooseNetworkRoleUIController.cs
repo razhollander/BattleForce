@@ -83,17 +83,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnGamepadRemoved(Gamepad gamepad)
         {
-            var playerJoinedIndex = _playerJoinedModels.FindIndex(p => p.InputDeviceId == gamepad.deviceId);
-            var didFindPlayer = playerJoinedIndex != -1;
-
-            if (!didFindPlayer)
-            {
-                LogService.LogError("Didn't find player for device id " + gamepad.deviceId + " when removing gamepad.");
-                return;
-            }
-            LogService.LogError($"Remove index {playerJoinedIndex} for device id {gamepad.deviceId}");
-            _uiView.RemovePlayerJoined(playerJoinedIndex);
-            _playerJoinedModels.RemoveAt(playerJoinedIndex);
+            var playerInputDeviceId = gamepad.deviceId;
+            _uiView.RemovePlayerJoined(playerInputDeviceId);
+            var playerToRemove = _playerJoinedModels.Find(x=>x.InputDeviceId == playerInputDeviceId);
+            _playerJoinedModels.Remove(playerToRemove);
         }
 
         public void InitExitPoint()
@@ -145,13 +138,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             
             var playerJoinedModel = GetSavedPlayerJoinedModelByDeviceOrDefault(gamepad.deviceId,SupportedInputType.Gamepad);
             _playerJoinedModels.Add(playerJoinedModel);
-            _uiView.AddPlayerJoinedPanel(playerJoinedModel.PlayerName, playerJoinedModel.PlayerInputType);
+            _uiView.AddPlayerJoinedPanel(playerJoinedModel.InputDeviceId, playerJoinedModel.PlayerName, playerJoinedModel.PlayerInputType);
         }
 
-        private void OnRemovePlayerButtonClicked(int playerIndex)
+        private void OnRemovePlayerButtonClicked(int inputDeviceId)
         {
-            _playerJoinedModels.RemoveAt(playerIndex);
-            _uiView.RemovePlayerJoined(playerIndex);
+            var playerToRmove = _playerJoinedModels.Find(x => x.InputDeviceId == inputDeviceId);
+            _playerJoinedModels.Remove(playerToRmove);
+            _uiView.RemovePlayerJoined(inputDeviceId);
         }
 
         private void PopulatePlaybacksDropdown()
@@ -321,9 +315,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
                 PREFS_PORT_HOST_KEY, _uiView.Port);
         }
 
-        private void OnPlayerNameChanged(int playerIndex, string playerName)
+        private void OnPlayerNameChanged(int inputDeviceId, string playerName)
         {
-            _playerJoinedModels[playerIndex].PlayerName = playerName;
+            _playerJoinedModels.Find(x=>x.InputDeviceId==inputDeviceId).PlayerName = playerName;
         }
         
         private void OnClientClicked()

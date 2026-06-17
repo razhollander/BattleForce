@@ -6,9 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="3c1e12e0-c131-4b63-94f5-2f0c8aa9c131" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/EntryPoint/StartGamePlayMatchCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/EntryPoint/StartGamePlayMatchCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Records/playback.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Records/playback.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Records/playback_debug.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Records/playback_debug.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Network/PacketsHandlers/StartStagePacketHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Network/PacketsHandlers/StartStagePacketHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/InitStageCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Commands/InitStageCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/UniversalRP.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/UniversalRP.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -163,7 +166,8 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.38791734&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#159 on fix/teleport-gate-rotating-wheels…07236&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -175,7 +179,7 @@
 }</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="$PROJECT_DIR$/1.app/Contents/MacOS/BattleForce2" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../Builds/mac/12/with_lock_on_targets.app/Contents/MacOS/BattleForce2" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../Builds/1.app/Contents/MacOS" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -183,7 +187,7 @@
       <method v="2" />
     </configuration>
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="/Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/MacOS/Unity" />
+      <option name="EXE_PATH" value="/Applications/Unity/Hub/Editor/6000.3.16f1/Unity.app/Contents/MacOS/Unity" />
       <option name="PROGRAM_PARAMETERS" value="-projectPath $PROJECT_DIR$ -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -191,7 +195,7 @@
       <method v="2" />
     </configuration>
     <configuration name="Unit Tests (batch mode)" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="/Applications/Unity/Hub/Editor/6000.0.47f1/Unity.app/Contents/MacOS/Unity" />
+      <option name="EXE_PATH" value="/Applications/Unity/Hub/Editor/6000.3.16f1/Unity.app/Contents/MacOS/Unity" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath $PROJECT_DIR$ -testResults Logs/results.xml -testPlatform EditMode -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -211,15 +215,13 @@
       </option>
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="74835">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" value="74835" />
+      <option name="pid" />
       <option name="projectPathOnTarget" />
       <option name="runtimes">
-        <list>
-          <MonoRuntime />
-        </list>
+        <list />
       </option>
       <option name="selectedOptions">
         <list />
@@ -306,6 +308,7 @@
       <workItem from="1768077790024" duration="2383000" />
       <workItem from="1769549466405" duration="15086000" />
       <workItem from="1769608023960" duration="5985000" />
+      <workItem from="1781628560179" duration="1335000" />
     </task>
     <servers />
   </component>
@@ -459,10 +462,10 @@
           <line>26</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/StateMachineService/StateMachineService.cs" containingFunctionPresentation="Method 'EnterInitialGameState'">
             <startOffsets>
-              <option value="863" />
+              <option value="843" />
             </startOffsets>
             <endOffsets>
-              <option value="922" />
+              <option value="876" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="20" />
@@ -472,10 +475,10 @@
           <line>27</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/StateMachineService/StateMachineService.cs" containingFunctionPresentation="Method 'EnterInitialGameState'">
             <startOffsets>
-              <option value="935" />
+              <option value="889" />
             </startOffsets>
             <endOffsets>
-              <option value="995" />
+              <option value="948" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="21" />
@@ -485,10 +488,10 @@
           <line>29</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Scripts/GameInitiator/GameInitiator.cs" containingFunctionPresentation="Method 'LoadEntryPoint'">
             <startOffsets>
-              <option value="1288" />
+              <option value="1300" />
             </startOffsets>
             <endOffsets>
-              <option value="1419" />
+              <option value="1301" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="22" />
@@ -524,10 +527,10 @@
           <line>30</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/StateMachineService/BaseGameState.cs" containingFunctionPresentation="Method 'StartState'">
             <startOffsets>
-              <option value="1192" />
+              <option value="1204" />
             </startOffsets>
             <endOffsets>
-              <option value="1268" />
+              <option value="1205" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="25" />
@@ -573,10 +576,10 @@
           <line>22</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/box2d-netstandard-2.4/examples/Box2D.WorldTests/TestDebugDrawer.cs" containingFunctionPresentation="Method 'DrawTransform'">
             <startOffsets>
-              <option value="793" />
+              <option value="781" />
             </startOffsets>
             <endOffsets>
-              <option value="849" />
+              <option value="837" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="44" />
@@ -586,10 +589,10 @@
           <line>29</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/box2d-netstandard-2.4/examples/Box2D.WorldTests/TestDebugDrawer.cs" containingFunctionPresentation="Method 'DrawPoint'">
             <startOffsets>
-              <option value="1179" />
+              <option value="1155" />
             </startOffsets>
             <endOffsets>
-              <option value="1221" />
+              <option value="1197" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="45" />
@@ -599,10 +602,10 @@
           <line>40</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/box2d-netstandard-2.4/examples/Box2D.WorldTests/TestDebugDrawer.cs" containingFunctionPresentation="Method 'DrawPolygon'">
             <startOffsets>
-              <option value="1770" />
+              <option value="1709" />
             </startOffsets>
             <endOffsets>
-              <option value="1794" />
+              <option value="1733" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="46" />
@@ -612,10 +615,10 @@
           <line>54</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/box2d-netstandard-2.4/examples/Box2D.WorldTests/TestDebugDrawer.cs" containingFunctionPresentation="Method 'DrawSolidPolygon'">
             <startOffsets>
-              <option value="2329" />
+              <option value="2219" />
             </startOffsets>
             <endOffsets>
-              <option value="2351" />
+              <option value="2241" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="47" />
@@ -625,10 +628,10 @@
           <line>73</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/box2d-netstandard-2.4/examples/Box2D.WorldTests/TestDebugDrawer.cs" containingFunctionPresentation="Method 'DrawCircle'">
             <startOffsets>
-              <option value="3144" />
+              <option value="2997" />
             </startOffsets>
             <endOffsets>
-              <option value="3179" />
+              <option value="3032" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="48" />
@@ -638,10 +641,10 @@
           <line>97</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Plugins/box2d-netstandard-2.4/examples/Box2D.WorldTests/TestDebugDrawer.cs" containingFunctionPresentation="Method 'DrawSegment'">
             <startOffsets>
-              <option value="4217" />
+              <option value="3958" />
             </startOffsets>
             <endOffsets>
-              <option value="4290" />
+              <option value="4019" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="49" />
@@ -688,12 +691,12 @@
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerInitiator.cs</url>
           <line>39</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerInitiator.cs" containingFunctionPresentation="Method 'StartEntryPoint'">
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerInitiator.cs" containingFunctionPresentation="Method 'LoadEntryPoint'">
             <startOffsets>
-              <option value="1999" />
+              <option value="2143" />
             </startOffsets>
             <endOffsets>
-              <option value="2034" />
+              <option value="2179" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="55" />
@@ -739,12 +742,12 @@
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs</url>
           <line>76</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" containingFunctionPresentation="Method 'OnHostClickedAsync'">
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" containingFunctionPresentation="Method 'InitEntryPoint'">
             <startOffsets>
-              <option value="2799" />
+              <option value="4161" />
             </startOffsets>
             <endOffsets>
-              <option value="2877" />
+              <option value="4162" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="71" />
@@ -754,10 +757,10 @@
           <line>23</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/GamePlayInitiator.cs" containingFunctionPresentation="Constructor 'GamePlayInitiator'">
             <startOffsets>
-              <option value="1128" />
+              <option value="1140" />
             </startOffsets>
             <endOffsets>
-              <option value="1161" />
+              <option value="1141" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="92" />
@@ -797,25 +800,18 @@
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/LoadingRing/PlayerLoadingRing.cs</url>
           <line>35</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/LoadingRing/PlayerLoadingRing.cs" containingFunctionPresentation="Method 'SetRingScale'">
-            <startOffsets>
-              <option value="1360" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1405" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/LoadingRing/PlayerLoadingRing.cs" containingFunctionPresentation="Method 'SetRingScale'" />
           <option name="timeStamp" value="127" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerEntryPointCommand.cs</url>
           <line>30</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerEntryPointCommand.cs" containingFunctionPresentation="Method 'Execute'">
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/ContextInstaller/ServerEntryPointCommand.cs" containingFunctionPresentation="Method 'SetEnterData'">
             <startOffsets>
-              <option value="1373" />
+              <option value="1576" />
             </startOffsets>
             <endOffsets>
-              <option value="1374" />
+              <option value="1629" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="134" />
@@ -908,10 +904,10 @@
           <line>39</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Initiator/GamePlayMatchInitiator.cs" containingFunctionPresentation="Method 'StartEntryPoint'">
             <startOffsets>
-              <option value="2074" />
+              <option value="2086" />
             </startOffsets>
             <endOffsets>
-              <option value="2139" />
+              <option value="2087" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="171" />
@@ -934,10 +930,10 @@
           <line>33</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Initiator/GamePlayMatchInitiator.cs" containingFunctionPresentation="Method 'LoadEntryPoint'">
             <startOffsets>
-              <option value="1703" />
+              <option value="1715" />
             </startOffsets>
             <endOffsets>
-              <option value="1768" />
+              <option value="1716" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="173" />
@@ -984,15 +980,28 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/UI/Scripts/MatchPlayerUIController.cs</url>
           <line>24</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/UI/Scripts/MatchPlayerUIController.cs" containingFunctionPresentation="Method 'CreateView'">
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/UI/Scripts/MatchPlayerUIController.cs" containingFunctionPresentation="Constructor 'MatchPlayerUIController'">
             <startOffsets>
-              <option value="1024" />
+              <option value="1169" />
             </startOffsets>
             <endOffsets>
-              <option value="1112" />
+              <option value="1202" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="178" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs</url>
+          <line>319</line>
+          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" containingFunctionPresentation="Method 'OnPlayerNameChanged'">
+            <startOffsets>
+              <option value="14634" />
+            </startOffsets>
+            <endOffsets>
+              <option value="14718" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="179" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

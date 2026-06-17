@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -208,9 +209,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newSpike;
         }
 
-        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<ushort> teleportGatePairIds)
+        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<RotatingTeleportGate> teleportGates)
         {
-            var newWheel = new MatchEnvironmentRotatingWheelModel(id, centerPosition, rotationSpeed, wallIds, lavaWallIds, springIds, spikeIds, teleportGatePairIds);
+            var newWheel = new MatchEnvironmentRotatingWheelModel(id, centerPosition, rotationSpeed, wallIds, lavaWallIds, springIds, spikeIds, teleportGates);
             RotatingWheels.Add(newWheel);
             return newWheel;
         }

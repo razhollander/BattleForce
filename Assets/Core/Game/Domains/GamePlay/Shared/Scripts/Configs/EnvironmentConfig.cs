@@ -172,7 +172,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                             CheckConfigArray(w.Walls, $"Layout {index} RotatingWheel {w.Id} Wall", errorBuilder);
                             CheckConfigArray(w.LavaWalls, $"Layout {index} RotatingWheel {w.Id} LavaWall", errorBuilder);
                             CheckConfigArray(w.Springs, $"Layout {index} RotatingWheel {w.Id} Spring", errorBuilder);
-                            CheckConfigArray(w.TeleportGatePairs, $"Layout {index} RotatingWheel {w.Id} TeleportGatePair", errorBuilder);
                         }
                     }
                 }
