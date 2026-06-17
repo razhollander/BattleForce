@@ -44,6 +44,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<PlayerSelectedTalentFinishedCooldownLocalEvent> PlayerSelectedTalentFinishedCooldownLocalEvents { get; }
         List<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents { get; }
         List<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents { get; }
+        List<ActivateWaterGunTalentNetEventS2C> ActivateWaterGunTalentNetEvents { get; }
+        List<DeactivateWaterGunTalentNetEventS2C> DeactivateWaterGunTalentNetEvents { get; }
         List<CreateMagneticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents { get; }
         List<LayChickenEggNetEventS2C> LayChickenEggNetEvents { get; }
         List<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents { get; }

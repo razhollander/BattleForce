@@ -24,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public MagneticPullTalentConfig MagneticPullTalentConfig;
         public ChickenTalentConfig ChickenTalentConfig;
         public YearsOfPainTalentConfig YearsOfPainTalentConfig;
+        public WaterGunTalentConfig WaterGunTalentConfig;
         public float TalentCardWidth = 1.602175f;
         public float TalentCardHeight = 2.382844f;
     }

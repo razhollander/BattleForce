@@ -52,6 +52,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents;
         public FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents;
         public FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents;
+        public FixedUnorderedList<ActivateWaterGunTalentNetEventS2C> ActivateWaterGunTalentNetEvents;
+        public FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C> DeactivateWaterGunTalentNetEvents;
         public FixedUnorderedList<CreateMagneticPullFieldNetEventS2C> CreateMagneticPullFieldNetEvents;
         public FixedUnorderedList<LayChickenEggNetEventS2C> LayChickenEggNetEvents;
         public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
@@ -117,6 +119,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             ActivateYearsOfPainTalentNetEvents = new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(maxCap.ActivateYearsOfPainTalentNetEvents);
             ActivateUmbrellaTalentNetEvents = new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(maxCap.ActivateUmbrellaTalentNetEvents);
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
+            ActivateWaterGunTalentNetEvents = new FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>(maxCap.ActivateWaterGunTalentNetEvents);
+            DeactivateWaterGunTalentNetEvents = new FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>(maxCap.DeactivateWaterGunTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
             ChickenEggHitNetEvents = new FixedUnorderedList<ChickenEggHitNetEventS2C>(maxCap.ChickenEggHitNetEvents);
             PlayerLockOnHeartTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(maxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxCap.ConcurrentEnemyPlayers));
@@ -172,6 +176,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 38)) != 0) SerializedChickenEggHitNetEvents(writer);
             if ((eventMask & (1UL << 39)) != 0) SerializedActivateYearsOfPainTalentNetEvents(writer);
             if ((eventMask & (1UL << 42)) != 0) SerializedEnvironmentSpikePlayerCollisionEvents(writer);
+            if ((eventMask & (1UL << 43)) != 0) SerializedActivateWaterGunTalentNetEvents(writer);
+            if ((eventMask & (1UL << 44)) != 0) SerializedDeactivateWaterGunTalentNetEvents(writer);
         }
 
         private ulong CalculateEventMask()
@@ -215,6 +221,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (ActivateUmbrellaTalentNetEvents.Count > 0) eventMask |= 1UL << 35;
             if (DeactivateUmbrellaTalentNetEvents.Count > 0) eventMask |= 1UL << 36;
             if (LayChickenEggNetEvents.Count > 0) eventMask |= 1UL << 37;
+            if (ActivateWaterGunTalentNetEvents.Count > 0) eventMask |= 1UL << 43;
+            if (DeactivateWaterGunTalentNetEvents.Count > 0) eventMask |= 1UL << 44;
             if (ChickenEggHitNetEvents.Count > 0) eventMask |= 1UL << 38;
             if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 39;
             if (EnvironmentSpikePlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 42;
@@ -356,6 +364,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             
             if ((eventMask & (1UL << 42)) != 0) DeserializedEnvironmentSpikePlayerCollisionEvents(reader);
             else EnvironmentSpikePlayerCollisionNetEvents.Clear();
+
+            if ((eventMask & (1UL << 43)) != 0) DeserializedActivateWaterGunTalentNetEvents(reader);
+            else ActivateWaterGunTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 44)) != 0) DeserializedDeactivateWaterGunTalentNetEvents(reader);
+            else DeactivateWaterGunTalentNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1181,6 +1195,46 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (var i = 0; i < count; i++)
             {
                 ref var netEvent = ref PlayerLockedOnTargetHitNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateWaterGunTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateWaterGunTalentNetEvents.Count);
+            foreach (var netEvent in ActivateWaterGunTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedActivateWaterGunTalentNetEvents(NetDataReader reader)
+        {
+            ActivateWaterGunTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateWaterGunTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateWaterGunTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateWaterGunTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateWaterGunTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedDeactivateWaterGunTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateWaterGunTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateWaterGunTalentNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

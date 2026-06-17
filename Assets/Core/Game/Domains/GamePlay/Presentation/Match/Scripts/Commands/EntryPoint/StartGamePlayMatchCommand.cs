@@ -14,6 +14,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scri
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.WaterGunStream.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
@@ -66,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IMagneticPullEffectController _magneticPullEffectController;
         private IBackgroundParallaxController _backgroundParallaxController;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
+        private IWaterGunStreamControllers _waterGunStreamControllers;
         private ILocalPlayersDataService _localPlayersDataService;
         private IGameInputActionsController _gameInputActionsController;
 
@@ -105,6 +107,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _magneticPullEffectController = _diContainer.Resolve<IMagneticPullEffectController>();
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
+            _waterGunStreamControllers = _diContainer.Resolve<IWaterGunStreamControllers>();
             _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
         }
@@ -132,6 +135,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentTeleportGateControllers.InitEntryPoint();
             _backgroundParallaxController.InitEntryPoint();
             _lockOnTargetEffectController.InitEntryPoint();
+            _waterGunStreamControllers.InitEntryPoint();
             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
                  .SetSimulationState(_enterData.InitialState)
                  .SetOccuredOnTick(_enterData.StateOccouredOnTick)

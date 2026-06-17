@@ -48,6 +48,7 @@ MonoBehaviour:
         - rid: 2200602851054190753
         - rid: 2200602851054190754
         - rid: 2200602851054190755
+        - rid: 1717594783917015173
       TalentsArrowConfigs:
         TalentCooldownConfigs:
         - TalentType: 1
@@ -114,6 +115,12 @@ MonoBehaviour:
         PushForce: 100
         MaxSpin: 200
         MinSpin: 180
+      WaterGunTalentConfig:
+        DurationInSeconds: 3
+        ConeAngleDegrees: 45
+        ConeRange: 15
+        EnemyPushForcePerTick: 40
+        CasterRecoilForcePerTick: 15
       TalentCardWidth: 1.602175
       TalentCardHeight: 2.382844
     Lava:
@@ -133,9 +140,9 @@ MonoBehaviour:
     EnvironmentSpikes:
       Damage: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 0
-    ShouldChooseRandomStage: 1
-    ShouldChooseRandomTalentsForPlayer: 1
+    DeafultEnvironmentId: 10
+    ShouldChooseRandomStage: 0
+    ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 1
     ShootCooldownMultiplierWhenDead: 1
@@ -153,6 +160,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 1717594783917015173
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 11
+        CooldownInSeconds: 5
     - rid: 2200602851054190747
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:

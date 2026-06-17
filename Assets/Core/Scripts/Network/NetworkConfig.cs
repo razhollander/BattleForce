@@ -101,6 +101,8 @@ namespace Core.Scripts.Network
         public int DeactivateGrapplingHookTalentNetEvents = 128;
         public int ActivateUmbrellaTalentNetEvents = 128;
         public int DeactivateUmbrellaTalentNetEvents = 128;
+        public int ActivateWaterGunTalentNetEvents = 128;
+        public int DeactivateWaterGunTalentNetEvents = 128;
         public int CreateMagneticPullFieldNetEvents = 128;
         public int LayChickenEggNetEvents = 128;
         public int ChickenEggHitNetEvents = 128;

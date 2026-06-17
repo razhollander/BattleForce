@@ -530,6 +530,34 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessActivateWaterGunTalentEvents(CapacityList<ActivateWaterGunTalentNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.WaterGun);
+                _cachedPresentationEventsService.ActivateWaterGunTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateWaterGunTalentEvents(CapacityList<DeactivateWaterGunTalentNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.WaterGun, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateWaterGunTalentNetEvents.Add(netEvent);
+            }
+        }
+
         public void ProcessPlayerMaxShootCooldownChangedEvents(CapacityList<PlayerMaxShootCooldownChangedNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty())

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
 {
     [CreateAssetMenu(fileName = "TalentCardsConfig", menuName = "BF/Presentation/Talent Cards Config")]
-    public class TalentCardsConfig : ScriptableObject
+    public class TalentIconsConfig : ScriptableObject
     {
         [SerializeField]
         public SerializableDictionary<TalentType, Sprite> TalentSprites = new SerializableDictionary<TalentType, Sprite>();

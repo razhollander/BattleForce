@@ -71,6 +71,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PlayerSelectedTalentFinishedCooldownLocalEvent> _cachedPlayerSelectedTalentFinishedCooldownLocalEvents;
         private readonly CapacityList<ActivateUmbrellaTalentNetEventS2C> _cachedUnprocessedActivateUmbrellaTalentEvents;
         private readonly CapacityList<DeactivateUmbrellaTalentNetEventS2C> _cachedUnprocessedDeactivateUmbrellaTalentEvents;
+        private readonly CapacityList<ActivateWaterGunTalentNetEventS2C> _cachedUnprocessedActivateWaterGunTalentEvents;
+        private readonly CapacityList<DeactivateWaterGunTalentNetEventS2C> _cachedUnprocessedDeactivateWaterGunTalentEvents;
         private readonly CapacityList<CreateMagneticPullFieldNetEventS2C> _cachedUnprocessedCreateMagenticPullFieldEvents;
         private readonly CapacityList<LayChickenEggNetEventS2C> _cachedUnprocessedLayChickenEggEvents;
         private readonly CapacityList<ChickenEggHitNetEventS2C> _cachedUnprocessedChickenEggHitEvents;
@@ -136,6 +138,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedPlayerSelectedTalentFinishedCooldownLocalEvents = new CapacityList<PlayerSelectedTalentFinishedCooldownLocalEvent>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedUnprocessedActivateUmbrellaTalentEvents = new CapacityList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents);
             _cachedUnprocessedDeactivateUmbrellaTalentEvents = new CapacityList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents);
+            _cachedUnprocessedActivateWaterGunTalentEvents = new CapacityList<ActivateWaterGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateWaterGunTalentNetEvents);
+            _cachedUnprocessedDeactivateWaterGunTalentEvents = new CapacityList<DeactivateWaterGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateWaterGunTalentNetEvents);
             _cachedUnprocessedCreateMagenticPullFieldEvents = new CapacityList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents);
             _cachedUnprocessedLayChickenEggEvents = new CapacityList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents);
             _cachedUnprocessedChickenEggHitEvents = new CapacityList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents);
@@ -205,6 +209,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPlayerMaxShootCooldownChangedEvents(latestFullTickPacket.PlayerMaxShootCooldownChangedNetEvents, ignoreEventsNotAboveTick);
             ProcessActivateUmbrellaTalentEvents(latestFullTickPacket.ActivateUmbrellaTalentNetEvents, ignoreEventsNotAboveTick);
             ProcessDeactivateUmbrellaTalentEvents(latestFullTickPacket.DeactivateUmbrellaTalentNetEvents, ignoreEventsNotAboveTick);
+            ProcessActivateWaterGunTalentEvents(latestFullTickPacket.ActivateWaterGunTalentNetEvents, ignoreEventsNotAboveTick);
+            ProcessDeactivateWaterGunTalentEvents(latestFullTickPacket.DeactivateWaterGunTalentNetEvents, ignoreEventsNotAboveTick);
             ProcessCreateMagenticPullFieldEvents(latestFullTickPacket.CreateMagneticPullFieldNetEvents, ignoreEventsNotAboveTick);
             ProcessLayChickenEggEvents(latestFullTickPacket.LayChickenEggNetEvents, ignoreEventsNotAboveTick);
             ProcessChickenEggHitEvents(latestFullTickPacket.ChickenEggHitNetEvents, ignoreEventsNotAboveTick);
@@ -529,6 +535,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedDeactivateUmbrellaTalentEvents.Sort();
                 _presentationNetEventsHandler.ProcessDeactivateUmbrellaTalentEvents(_cachedUnprocessedDeactivateUmbrellaTalentEvents);
+            }
+        }
+
+        private void ProcessActivateWaterGunTalentEvents(FixedUnorderedList<ActivateWaterGunTalentNetEventS2C> activateWaterGunTalentNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedActivateWaterGunTalentEvents.Clear();
+
+            foreach (var netEvent in activateWaterGunTalentNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedActivateWaterGunTalentEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedActivateWaterGunTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedActivateWaterGunTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessActivateWaterGunTalentEvents(_cachedUnprocessedActivateWaterGunTalentEvents);
+            }
+        }
+
+        private void ProcessDeactivateWaterGunTalentEvents(FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C> deactivateWaterGunTalentNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedDeactivateWaterGunTalentEvents.Clear();
+
+            foreach (var netEvent in deactivateWaterGunTalentNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedDeactivateWaterGunTalentEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedDeactivateWaterGunTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDeactivateWaterGunTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateWaterGunTalentEvents(_cachedUnprocessedDeactivateWaterGunTalentEvents);
             }
         }
 
