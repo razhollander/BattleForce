@@ -12,6 +12,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService
         public List<ushort> LocalPlayersIds => _localPlayerIds;
         public bool IsClientJoined => LocalPlayersIds.Count > 0;
 
+        public bool TryGetLocalPlayerInputDevice(ushort playerId, out InputDevice inputDevice)
+        {
+            return _deviceByPlayerId.TryGetValue(playerId, out inputDevice);
+        }
+
         public Dictionary<ushort, int> GetPlayerIdToDeviceIdDictionary()
         {
             return _deviceIdByPlayerId;
