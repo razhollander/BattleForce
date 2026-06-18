@@ -49,7 +49,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     .Execute();
                 _playerControllers.SetPlayerHealth(playerTakeDamageId, currentHealth, maxHealth);
                 _matchPlayerUIControllers.SetPlayerHealth(playerTakeDamageId, currentHealth, maxHealth);
-                _audioService.PlayAudio(AudioClipType.PlayerTakeDamage, AudioChannelType.Fx);
+
+                if (currentHealth > 0)
+                {
+                    _audioService.PlayAudio(AudioClipType.PlayerTakeDamage, AudioChannelType.Fx);
+                }
             }
             
             playerTakeDamageEvents.Clear();
