@@ -130,12 +130,15 @@ MonoBehaviour:
       MaxSpin: 65
       MinSpin: 50
       Size: {x: 2, y: 1}
-    DeafultEnvironmentId: 7
+    EnvironmentSpikes:
+      Damage: 1
+      Size: {x: 4.1362, y: 1.663131}
+    DeafultEnvironmentId: 0
     ShouldChooseRandomStage: 1
     ShouldChooseRandomTalentsForPlayer: 1
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 1
-    ShootCooldownMultiplierWhenDead: 2
+    ShootCooldownMultiplierWhenDead: 1
     StageRestartDelaySeconds: 3
     GemsCollectedForTeamAlive: 1
     MaxOverllapingFloors: 32
@@ -146,6 +149,7 @@ MonoBehaviour:
     PreparationPhaseDuration: 4
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
+    StageSizeMultiplier: 1
   references:
     version: 2
     RefIds:

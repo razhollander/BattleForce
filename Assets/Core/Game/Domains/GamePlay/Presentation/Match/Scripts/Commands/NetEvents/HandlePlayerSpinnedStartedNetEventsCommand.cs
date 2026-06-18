@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.HapticsService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.AudioService;
 
@@ -11,12 +12,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchPlayerControllers _playerControllers;
+        private ICommandFactory _commandFactory;
         private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _audioService = _diContainer.Resolve<IAudioService>();
         }
 
@@ -30,6 +33,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in events)
             {
+                _commandFactory.CreateCommandVoid<PlayHapticsForPlayerCommand>()
+                    .SetPlayerId(netEvent.PlayerId)
+                    .SetHapticProfileType(HapticType.Spinned).Execute();
                 _playerControllers.SetPlayersSpinnedState(netEvent.PlayerId, true);
                 _audioService.PlayAudio(AudioClipType.SpinnedStarted, AudioChannelType.Fx);
             }

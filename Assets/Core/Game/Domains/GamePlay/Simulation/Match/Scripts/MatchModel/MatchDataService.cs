@@ -43,13 +43,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         }
         
         public PlayerStateS2C AddPlayer(ushort playerId, ushort teamId, string playerName, Vector2 position, Vector2 direction, Vector2 velocity, float radius, ushort health,
-            float shootCooldown, bool isPlayerConnected)
+            float shootCooldown)
         {
             var newPlayer = _simulationState.Players.AddAndGet();
             newPlayer.Id = playerId;
             newPlayer.Name = playerName;
             newPlayer.TeamId = teamId;
-            newPlayer.IsConnected = isPlayerConnected;
             newPlayer.Spaceship.Health.CurrentHealth = health;
             newPlayer.Spaceship.Health.MaxHealth = health;
             newPlayer.Spaceship.Transform.Position = position;

@@ -1,5 +1,7 @@
 using ASoliman.Utils.EditableRefs;
+using Core.Scripts.Services.HapticsService;
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
@@ -14,6 +16,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
         [EditableRef] public TeamFloorConfig TeamFloor;
         [EditableRef] public EnvironmentTeleportConfig Teleports;
         [EditableRef] public EnvironmentFieldBarriersConfig FieldBarriers;
+        [EditableRef] public HapticsConfig HapticsConfig;
+        public bool ShouldOverrideClientId = false;
+        [EnableIf(nameof(ShouldOverrideClientId))]
+        public long ClientIdOverride = 1;
         public SerializableDictionary<int, Color> ColorPerTeamId;
     }
 }

@@ -209,5 +209,36 @@ namespace Core.Scripts.Utils.CustomCollections
                 _count = value.Length;
             }
         }
+        
+        public void Sort()
+        {
+            if (_count <= 1)
+                return;
+
+            Array.Sort(_items, 0, _count);
+        }
+
+        public void RemoveRange(int index, int count)
+        {
+            if (count <= 0)
+                return;
+
+            if ((uint)index >= (uint)_count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            if (count < 0 || index + count > _count)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
+            int end = index + count;
+
+            // Move items from the back to fill the removed range
+            int itemsToMove = Math.Min(count, _count - end);
+            for (int i = 0; i < itemsToMove; i++)
+            {
+                _items[index + i] = _items[_count - 1 - i];
+            }
+
+            _count -= count;
+        }
     }
 }

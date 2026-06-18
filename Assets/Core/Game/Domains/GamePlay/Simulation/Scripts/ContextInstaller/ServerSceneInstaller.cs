@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.ClientsNetworkDataService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
@@ -37,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<ISimulationGamePlayConfigService>().To<SimulationGamePlayConfigService>().AsSingle().WithArguments(_gamePlayConfig).NonLazy();
             Container.Bind<IPlaybackIOService>().To<PlaybackIOService>().AsSingle().NonLazy();
             Container.Bind<ISimulationInputService>().To<SimulationInputService>().AsSingle();
+            Container.Bind<IClientsNetworkDataService>().To<ClientsNetworkDataService>().AsSingle();
         }
     }
 }

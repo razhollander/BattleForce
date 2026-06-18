@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
@@ -53,9 +54,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _moneyText.text = money+"$";
         }
 
-        public void SetHealth(int health, int maxHealth)
+        public void SetHealth(int health, int maxHealth, CancellationToken cancellationToken)
         {
-            _healthBar.UpdateBar(health, maxHealth);
+            _healthBar.UpdateBar(health, maxHealth, cancellationToken);
         }
 
         public void HideHealthBar()

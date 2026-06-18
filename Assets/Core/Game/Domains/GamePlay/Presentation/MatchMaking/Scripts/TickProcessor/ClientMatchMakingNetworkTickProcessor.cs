@@ -70,7 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
 
         private void SendCurrentTickInputsToServer()
         {
-            _sendInputsToServerCommand.SetPlayerId(_matchMakingDataService.LocalPlayer.PlayerId).Execute();
+            _sendInputsToServerCommand.Execute();
         }
     }
 }

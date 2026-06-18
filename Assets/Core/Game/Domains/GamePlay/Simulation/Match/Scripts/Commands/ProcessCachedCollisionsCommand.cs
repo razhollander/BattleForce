@@ -89,6 +89,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerEnvironmentSpringCollision(objectA, objectB);
+                HandlePlayerEnvironmentSpikeCollision(objectA, objectB);
                 HandlePlayerTeleportGateCollision(objectA, objectB);
                 HandleSwapFieldPlayerCollision(objectA, objectB);
                 HandleKOProjectilePlayerCollision(objectA, objectB);
@@ -360,9 +361,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             var springAngle = _matchDataService.EnvironmentData.GetSpring(springId).WorldDirectionDegrees.ToRadians();
             var pushDirection = springAngle.FromAngleRadians();
-            var forceMagnitude = _gamePlayConfigService.GamePlayConfig.EnvironmentSprings.Force;
+            var environmentSpringsConfig = _gamePlayConfigService.GamePlayConfig.EnvironmentSprings;
+            var forceMagnitude = environmentSpringsConfig.Force * _matchDataService.SimulationState.MapSizeMultiplier;
             var force = pushDirection * forceMagnitude;
-            var randomSpin = RNG.NextFloat(_gamePlayConfigService.GamePlayConfig.EnvironmentSprings.MinSpin, _gamePlayConfigService.GamePlayConfig.EnvironmentSprings.MaxSpin);
+            var randomSpin = RNG.NextFloat(environmentSpringsConfig.MinSpin, environmentSpringsConfig.MaxSpin);
 
             playerState.Spaceship.Transform.Velocity += force;
             playerState.Spaceship.Transform.Direction = force.Normalize();
@@ -375,6 +377,45 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 .Execute();
 
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
+        }
+
+        private void HandlePlayerEnvironmentSpikeCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isPlayerToSpike = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.EnvironmentSpike;
+            var isSpikeToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.EnvironmentSpike && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerToSpike && !isSpikeToPlayer)
+            {
+                return;
+            }
+
+            ushort playerId;
+            ushort spikeId;
+
+            if (isPlayerToSpike)
+            {
+                playerId = objectA.Id;
+                spikeId = objectB.Id;
+            }
+            else
+            {
+                playerId = objectB.Id;
+                spikeId = objectA.Id;
+            }
+
+            if (!_matchDataService.SimulationState.GetPlayerById(playerId).Spaceship.IsAlive)
+            {
+                return;
+            }
+            LogService.LogError("Hit player with spike!");
+            var damage = _gamePlayConfigService.GamePlayConfig.EnvironmentSpikes.Damage;
+            _playerHitCommand
+                .SetPlayerIdGotHit(playerId)
+                .SetHitDamage(damage)
+                .SetProcessedTick(_processedTick)
+                .Execute();
+
+            _netEventsDataService.AddEnvironmentSpikePlayerCollisionNetEvent(_processedTick, spikeId, playerId);
         }
 
         private void HandleBulletWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

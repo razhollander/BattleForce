@@ -8,6 +8,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.LocalEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -35,15 +36,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         {
             foreach (var playerRejoinAcceptNetEvent in playerRejoinAcceptNetEvents)
             {
-                var playerId = playerRejoinAcceptNetEvent.PlayerState.Id;
-                var isLocalPlayer = playerRejoinAcceptNetEvent.IsLocal;
-                LogService.LogTopic(
-                    $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerId,
-                    LogTopicType.ClientNetwork);
-
-                if (!isLocalPlayer)
+                foreach (var playerState in playerRejoinAcceptNetEvent.Players.AsSpan())       
                 {
-                    _addMatchPlayerCommand.SetPlayerState(playerRejoinAcceptNetEvent.PlayerState).SetCurrentServerTick(currentServerTick).Execute();
+                    var isLocalPlayer = playerRejoinAcceptNetEvent.IsLocal;
+                    LogService.LogTopic(
+                        $"Join packet accepted processed,  isLocalPlayer:{isLocalPlayer}, player id: " + playerState.Id,
+                        LogTopicType.ClientNetwork);
+
+                    if (!isLocalPlayer)
+                    {
+                        _addMatchPlayerCommand.SetPlayerState(playerState).SetCurrentServerTick(currentServerTick).Execute();
+                    }
                 }
             }
         }
@@ -290,6 +293,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var environmentSpringPlayerCollisionNetEvent in environmentSpringPlayerCollisionNetEvents)
             {
                 _cachedPresentationEventsService.EnvironmentSpringPlayerCollisionNetEvents.Add(environmentSpringPlayerCollisionNetEvent);
+            }
+        }
+
+        public void ProcessEnvironmentSpikePlayerCollisionEvents(CapacityList<EnvironmentSpikePlayerCollisionNetEventS2C> environmentSpikePlayerCollisionNetEvents)
+        {
+            if (environmentSpikePlayerCollisionNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var environmentSpikePlayerCollisionNetEvent in environmentSpikePlayerCollisionNetEvents)
+            {
+                _cachedPresentationEventsService.EnvironmentSpikePlayerCollisionNetEvents.Add(environmentSpikePlayerCollisionNetEvent);
             }
         }
 

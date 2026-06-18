@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [TextArea(1, 5)] [SerializeField] private string _lavaWallsJson;
         [TextArea(1, 5)] [SerializeField] private string _talentCardsJson;
         [TextArea(1, 5)] [SerializeField] private string _environmentSpringsJson;
+        [TextArea(1, 5)] [SerializeField] private string _environmentSpikesJson;
         [TextArea(1, 5)] [SerializeField] private string _teleportGatesJson;
         [TextArea(1, 5)] [SerializeField] private string _rotatingWheelsJson;
         [TextArea(1, 5)] [SerializeField] private string _fieldBarriersJson;
@@ -65,6 +66,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             _environmentSpringsJson = environmentSpringsJson;
         }
 
+        public void SetEnvironmentSpikesJson(string environmentSpikesJson)
+        {
+            _environmentSpikesJson = environmentSpikesJson;
+        }
+
         public void SetTeleportGatesJson(string teleportGatesJson)
         {
             _teleportGatesJson = teleportGatesJson;
@@ -88,6 +94,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public EnvironmentSpringConfig[] GetEnvironmentSprings()
         {
             return _environmentSpringsJson.FromJson<EnvironmentSpringConfig[]>();
+        }
+
+        public EnvironmentSpikeConfig[] GetEnvironmentSpikes()
+        {
+            if (string.IsNullOrEmpty(_environmentSpikesJson))
+            {
+                return default;
+            }
+            return _environmentSpikesJson.FromJson<EnvironmentSpikeConfig[]>();
         }
 
         public EnvironmentTeleportGatePairConfig[] GetTeleportGates()

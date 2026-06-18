@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers
 
             _timePassedSinceLastPacket = 0;
             _networkManager.OnPacketReceivedEvent += OnPacketReceived;
-            _networkManager.OnPeerDisconnectedEvent += OnPeerDisconnected;
+            _networkManager.OnClientPeerDisconnectedEvent += OnPeerDisconnected;
             LogService.LogTopic("HeadLessQuitterController Initialized", LogTopicType.ServerNetwork);
         }
 
@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers
             }
 
             _networkManager.OnPacketReceivedEvent -= OnPacketReceived;
-            _networkManager.OnPeerDisconnectedEvent -= OnPeerDisconnected;
+            _networkManager.OnClientPeerDisconnectedEvent -= OnPeerDisconnected;
         }
 
         public void StepTimer(float deltaTime)
@@ -74,7 +74,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers
             _timePassedSinceLastPacket = 0;
         }
 
-        private void OnPeerDisconnected(ushort playerId)
+        private void OnPeerDisconnected(long clientId)
         {
             if (_networkManager.ConnectedPeersCount == 0)
             {

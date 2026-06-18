@@ -99,11 +99,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
                 return;
             }
             
-            var playerId = (ushort)peer.Tag;
-            RecordPacket(playerId, packetBytes);
+            var clientId = (long)peer.Tag;
+            RecordPacket(clientId, packetBytes);
         }
         
-        private void RecordPacket(ushort playerId, byte[] data)
+        private void RecordPacket(long clientId, byte[] data)
         {
             var serverTick = _tickService.CurrentTick;
             if (!_ticks.TryGetValue(serverTick, out var tickData))
@@ -114,7 +114,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
 
             tickData.Packets.Add(new RecordedPacket
             {
-                PlayerId = playerId,
+                ClientId = clientId,
                 Data = data
             });
         }

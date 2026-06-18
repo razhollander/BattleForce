@@ -9,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         Vector2 EnvironmentHalfSize { get; }
         TalentCardConfig[] TalentCards { get; }
         EnvironmentSpringConfig[] EnvironmentSprings { get; }
+        EnvironmentSpikeConfig[] EnvironmentSpikes { get; }
         EnvironmentTeleportGatePairConfig[] TeleportGates { get; }
         WallConfig[] LavaWallConfigs { get; }
         WallConfig[] StageBoundaries { get; }

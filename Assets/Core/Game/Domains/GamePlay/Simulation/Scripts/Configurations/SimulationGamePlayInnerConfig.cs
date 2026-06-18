@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public LavaConfig Lava;
         public PowerUpsConfig PowerUps;
         public EnvironmentSpringsConfig EnvironmentSprings;
+        public EnvironmentSpikesConfig EnvironmentSpikes;
         public int DeafultEnvironmentId = 6;
         public bool ShouldChooseRandomStage = true;
         public bool ShouldChooseRandomTalentsForPlayer = true;
@@ -30,5 +31,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public bool ShouldAddTalentEveryXStages = false;
         [ConditionalField(nameof(ShouldAddTalentEveryXStages), true)]
         public int EveryXStages = 2;
+        public float StageSizeMultiplier = 1.0f;
     }
 }

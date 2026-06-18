@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
@@ -10,6 +11,7 @@ using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.Pac
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.ClientsNetworkDataService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
 using Core.Scripts.Network;
@@ -35,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly IStartMatchWallController _startMatchWallController;
         private readonly ISimulationStateMachine _simulationStateMachine;
         private readonly IHeadLessQuitterController _headLessQuitterController;
+        private readonly IClientsNetworkDataService _clientsNetworkDataService;
 
         private StepTimersCommand _stepTimersCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
@@ -48,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             IPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchMakingDataService matchMakingDataService,
             IPlayerJoinPacketsHandler playerJoinPacketsHandler, INetEventsDataService netEventsDataService,
             ICommandFactory commandFactory, ITickService tickService, IStartMatchWallController startMatchWallController, ISimulationStateMachine simulationStateMachine,
-            IHeadLessQuitterController headLessQuitterController)
+            IHeadLessQuitterController headLessQuitterController, IClientsNetworkDataService clientsNetworkDataService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -61,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _startMatchWallController = startMatchWallController;
             _simulationStateMachine = simulationStateMachine;
             _headLessQuitterController = headLessQuitterController;
+            _clientsNetworkDataService = clientsNetworkDataService;
         }
 
         public void InitEntryPoint()
@@ -107,7 +111,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _handleIfAnyPlayerChangedTeamFloorCommand.SetTick(currentTick).Execute();
                 _handleIfStartMatchEligiblityChangedCommand.SetTick(currentTick).Execute();
                 MoveToMatchStateIfCountdownEnded();
-                RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
+                RemoveOlderThanTickEventsPerClient(processPlayersInputsResult.HeighestProcessedTickPerClient);
                 SendCurrentTickStateToAllClients(currentTick);
                 _headLessQuitterController.QuitIfTimeOut();
             }
@@ -125,15 +129,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 return;
             }
 
-            var playersData = new EnterMatchPlayerData[_matchMakingDataService.SimulationState.Players.Count];
+            var dict = new Dictionary<long, EnterMatchPlayerData[]>();
 
-            for (int i = 0; i < _matchMakingDataService.SimulationState.Players.Count; i++)
+            foreach (var clientNetworkData in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
-                var playerState = _matchMakingDataService.SimulationState.Players.GetByIndex(i);
-                playersData[i] = new EnterMatchPlayerData(playerState.Id, playerState.Name, playerState.TeamId);
-            }
+                var playersData = new EnterMatchPlayerData[clientNetworkData.Value.PlayerIds.Count];
 
-            var matchEnterData = new SimulationMatchEnterData(playersData);
+                for (int i = 0; i < playersData.Length; i++)
+                {
+                    var playerState = _matchMakingDataService.SimulationState.GetPlayerById(clientNetworkData.Value.PlayerIds[i]);
+                    playersData[i] = new EnterMatchPlayerData(playerState.Id, playerState.Name, playerState.TeamId);
+                }
+                dict.Add(clientNetworkData.Key, playersData);
+            }
+            var matchEnterData = new SimulationMatchEnterData(dict);
             _simulationStateMachine.ChangeToMatch(matchEnterData);
         }
 
@@ -143,15 +152,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             return _playerInputsPacketsHandler.ProcessInputs(processedTick);
         }
 
-        private void RemoveOlderThanTickEventsPerPlayer(CapacityDict<ushort, int> heighestProcessedTickPerPlayer)
+        private void RemoveOlderThanTickEventsPerClient(CapacityDict<long, int> heighestProcessedTickPerClient)
         {
-            foreach (var playerState in _matchMakingDataService.SimulationState.Players.AsSpan())        
+            foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
-                var playerId = playerState.Id;
+                var clientId = kvp.Key;
 
-                if (heighestProcessedTickPerPlayer.TryGetValue(playerId, out int heighestProcessedTick))
+                if (heighestProcessedTickPerClient.TryGetValue(clientId, out int heighestProcessedTick))
                 {
-                    _netEventsDataService.RemoveAllEventsOlderThanTick(playerId, heighestProcessedTick);
+                    _netEventsDataService.RemoveAllEventsOlderThanTick(clientId, heighestProcessedTick);
                 }
             }
         }
@@ -166,18 +175,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             var currentSimulationState = _matchMakingDataService.SimulationState;
             _fullTickPacket.Tick = processedTick;
             _fullTickPacket.CurrentSimulationState = currentSimulationState;
-            //_fullTickPacket.PreviousSimulationState = _matchDataService.PreviousSimulationState;
-            foreach (var playerState in currentSimulationState.Players.AsSpan())
+            
+            foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
-                var playerId = playerState.Id;
-                _fullTickPacket.BulletSpawnNetEvents = _netEventsDataService.BulletSpawnNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerJoinAcceptNetEvents = _netEventsDataService.MatchMakingPlayerJoinAcceptNetEventsPerPlayer[playerId];
-                _fullTickPacket.BulletDestroyedNetEvents = _netEventsDataService.BulletDestroyedNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerSwitchTeamNetEvents = _netEventsDataService.PlayerSwitchTeamNetEventsPerPlayer[playerId];
-                _fullTickPacket.StartMatchCountdownNetEvents = _netEventsDataService.StartMatchCountdownNetEventsPerPlayer[playerId];
-                _fullTickPacket.StopMatchCountdownNetEvents = _netEventsDataService.StopMatchCountdownNetEventsPerPlayer[playerId];
-                _fullTickPacket.StartMatchEligibleChangedNetEvents = _netEventsDataService.StartMatchEligibleChangedNetEventsPerPlayer[playerId];
-                _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchMakingFullTick, _fullTickPacket,
+                // check if connected first??
+                var clientId = kvp.Key;
+                _fullTickPacket.BulletSpawnNetEvents = _netEventsDataService.BulletSpawnNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerJoinAcceptNetEvents = _netEventsDataService.MatchMakingPlayerJoinAcceptNetEventsPerClient[clientId];
+                _fullTickPacket.BulletDestroyedNetEvents = _netEventsDataService.BulletDestroyedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerSwitchTeamNetEvents = _netEventsDataService.PlayerSwitchTeamNetEventsPerClient[clientId];
+                _fullTickPacket.StartMatchCountdownNetEvents = _netEventsDataService.StartMatchCountdownNetEventsPerClient[clientId];
+                _fullTickPacket.StopMatchCountdownNetEvents = _netEventsDataService.StopMatchCountdownNetEventsPerClient[clientId];
+                _fullTickPacket.StartMatchEligibleChangedNetEvents = _netEventsDataService.StartMatchEligibleChangedNetEventsPerClient[clientId];
+                _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchMakingFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }
         }

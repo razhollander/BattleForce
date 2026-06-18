@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
     public class MatchEnvironmentDataService
     {
         private readonly FixedClassUnorderedList<EnvironmentSpringS2C> _springs;
+        private readonly FixedClassUnorderedList<EnvironmentSpikeS2C> _spikes;
         private readonly FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> _teleportGates;
         private readonly FixedClassUnorderedList<EnvironmentWallS2C> _lavaWalls;
         private readonly FixedClassUnorderedList<EnvironmentWallS2C> _stageBoundaries;
@@ -22,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
 
         public FixedClassUnorderedList<EnvironmentRotatingWheelS2C> RotatingWheels => _rotatingWheels;
         public FixedClassUnorderedList<EnvironmentSpringS2C> Springs => _springs;
+        public FixedClassUnorderedList<EnvironmentSpikeS2C> Spikes => _spikes;
         public FixedClassUnorderedList<EnvironmentTeleportGatePairS2C> TeleportGates => _teleportGates;
         public FixedClassUnorderedList<EnvironmentWallS2C> LavaWalls => _lavaWalls;
         public FixedClassUnorderedList<EnvironmentWallS2C> StageBoundaries => _stageBoundaries;
@@ -31,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public MatchEnvironmentDataService(NetworkConfig networkConfig)
         {
             _springs = new FixedClassUnorderedList<EnvironmentSpringS2C>(networkConfig.MaxCap.ConcurrentEvironmentSprings, ()=> new EnvironmentSpringS2C());
+            _spikes = new FixedClassUnorderedList<EnvironmentSpikeS2C>(networkConfig.MaxCap.ConcurrentEvironmentSpikes, ()=> new EnvironmentSpikeS2C());
             _teleportGates = new FixedClassUnorderedList<EnvironmentTeleportGatePairS2C>(networkConfig.MaxCap.ConcurrentEvironmentTeleportPairs, ()=> new EnvironmentTeleportGatePairS2C());
             _lavaWalls = new FixedClassUnorderedList<EnvironmentWallS2C>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls, ()=> new EnvironmentWallS2C());
             _stageBoundaries = new FixedClassUnorderedList<EnvironmentWallS2C>(networkConfig.MaxCap.ConcurrentEvironmentStageBoundaries, ()=> new EnvironmentWallS2C());
@@ -42,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public void ClearData()
         {
             _springs.Clear();
+            _spikes.Clear();
             _teleportGates.Clear();
             _lavaWalls.Clear();
             _stageBoundaries.Clear();
@@ -137,6 +141,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             return _springs.FindWithId(springId);
         }
         
+        public EnvironmentSpikeS2C GetSpike(ushort spikeId)
+        {
+            return _spikes.FindWithId(spikeId);
+        }
+        
         public EnvironmentTeleportGatePairS2C GetTeleportGatePair(ushort teleportGatePairId)
         {
             return _teleportGates.FindWithId(teleportGatePairId);
@@ -199,6 +208,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             teleportGatePair.GateB.Transform.WorldPosition = gateBWorldPosition;
             teleportGatePair.GateB.Transform.WorldRotationDegrees = gateBWorldRotation;
             teleportGatePair.GateB.Id = gateBId;
+        }
+
+        public void AddSpike(ushort spikeId, Vector2 localPosition, Vector2 worldPosition, float localRotationDegrees, float worldRotationDegrees)
+        {
+            var spike = _spikes.AddAndGet();
+            spike.Id = spikeId;
+            spike.Transform.LocalRotationDegrees = localRotationDegrees;
+            spike.Transform.WorldRotationDegrees = worldRotationDegrees;
+            spike.Transform.LocalPosition = localPosition;
+            spike.Transform.WorldPosition = worldPosition;
+        }
+
+        public EnvironmentRotatingWheelS2C GetRotatingWheel(ushort wheelId)
+        {
+            foreach (var rotatingWheel in RotatingWheels.AsSpan())
+            {
+                if (rotatingWheel.Id == wheelId) return rotatingWheel;
+            }
+            
+            LogService.LogError("No rotatingWheel found for id: " + wheelId);
+            return null;
         }
     }
 }

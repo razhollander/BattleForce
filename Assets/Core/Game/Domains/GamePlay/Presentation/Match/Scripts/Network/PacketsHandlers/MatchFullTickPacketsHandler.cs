@@ -10,6 +10,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.LocalEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Scripts.Extensions;
@@ -52,6 +53,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<GainBoltsNetEventS2C> _cachedUnprocessedGainBoltsEvents;
         private readonly CapacityList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> _cachedUnprocessedPlayerToEnvironmentTeleportCollisionEvents;
         private readonly CapacityList<EnvironmentSpringPlayerCollisionNetEventS2C> _cachedUnprocessedEnvironmentSpringPlayerCollisionEvents;
+        private readonly CapacityList<EnvironmentSpikePlayerCollisionNetEventS2C> _cachedUnprocessedEnvironmentSpikePlayerCollisionEvents;
         private readonly CapacityList<PreparationPhaseEndedNetEventS2C> _cachedUnprocessedPreparationPhaseEndedEvents;
         private readonly CapacityList<CreateSwapFieldNetEventS2C> _cachedUnprocessedCreateSwapFieldEvents;
         private readonly CapacityList<DeactivateSwapTalentNetEventS2C> _cachedUnprocessedDeactivateSwapTalentEvents;
@@ -114,6 +116,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedTeamLostEvents = new CapacityList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
             _cachedUnprocessedTalentSwitchEvents = new CapacityList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents);
             _cachedUnprocessedEnvironmentSpringPlayerCollisionEvents = new CapacityList<EnvironmentSpringPlayerCollisionNetEventS2C>(networkConfig.MaxCap.EnvironmentSpringPlayerCollisionNetEvents);
+            _cachedUnprocessedEnvironmentSpikePlayerCollisionEvents = new CapacityList<EnvironmentSpikePlayerCollisionNetEventS2C>(networkConfig.MaxCap.EnvironmentSpikePlayerCollisionNetEvents);
             _cachedUnprocessedGainBoltsEvents = new CapacityList<GainBoltsNetEventS2C>(networkConfig.MaxCap.GainBoltsNetEvents);
             _cachedUnprocessedPlayerToEnvironmentTeleportCollisionEvents = new CapacityList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C>(networkConfig.MaxCap.PlayerToEnvironmentTeleportGateCollisionNetEvents);
             _cachedUnprocessedPreparationPhaseEndedEvents = new CapacityList<PreparationPhaseEndedNetEventS2C>(networkConfig.MaxCap.PreparationPhaseEndedNetEvents);
@@ -184,6 +187,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessTalentSwitchEvents(latestFullTickPacket.TalentSwitchNetEvents, ignoreEventsNotAboveTick);
             ProcessGainBoltsEvents(latestFullTickPacket.GainBoltsNetEvents, ignoreEventsNotAboveTick);
             ProcessEnvironmentSpringPlayerCollisionEvents(latestFullTickPacket.EnvironmentSpringPlayerCollisionNetEvents, ignoreEventsNotAboveTick);
+            ProcessEnvironmentSpikePlayerCollisionEvents(latestFullTickPacket.EnvironmentSpikePlayerCollisionNetEvents, ignoreEventsNotAboveTick);
             ProcessEnvironmentTeleportPlayerCollisionEvents(latestFullTickPacket.PlayerToEnvironmentTeleportGateCollisionNetEvents, ignoreEventsNotAboveTick);
             ProcessPreparationPhaseEndedEvents(latestFullTickPacket.PreparationPhaseEndedNetEvents, ignoreEventsNotAboveTick);
             ProcessCreateSwapFieldEvents(latestFullTickPacket.CreateSwapFieldNetEvents, ignoreEventsNotAboveTick);
@@ -265,6 +269,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        private void ProcessEnvironmentSpikePlayerCollisionEvents(FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C> environmentSpikePlayerCollisionNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedEnvironmentSpikePlayerCollisionEvents.Clear();
+
+            foreach (var netEvent in environmentSpikePlayerCollisionNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedEnvironmentSpikePlayerCollisionEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedEnvironmentSpikePlayerCollisionEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedEnvironmentSpikePlayerCollisionEvents.Sort();
+                _presentationNetEventsHandler.ProcessEnvironmentSpikePlayerCollisionEvents(_cachedUnprocessedEnvironmentSpikePlayerCollisionEvents);
+            }
+        }
+        
         private void ProcessEnvironmentTeleportPlayerCollisionEvents(FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> playerToEnvironmentTeleportGateCollisionNetEvents, int ignoreEventsNotAboveTick)
         {
             _cachedUnprocessedPlayerToEnvironmentTeleportCollisionEvents.Clear();
@@ -622,26 +645,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     springModel.WorldRotationAngle = worldRot;
                 }
 
-
-                foreach (var pairId in wheelModel.TeleportGatePairIds)
+                foreach (var spikeId in wheelModel.SpikeIds)
                 {
-                    var teleportPairModel = _matchDataService.GetTeleportPair(pairId);
+                    var spikeModel = _matchDataService.GetEnvironmentSpike(spikeId);
 
                     EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateA.LocalPosition, teleportPairModel.GateA.LocalRotation,
+                        calculationTick, rotationSpeed, deltaTime, wheelCenter, spikeModel.LocalPosition, spikeModel.LocalRotationAngle,
+                        out var worldPos, out var worldRot
+                    );
+
+                    spikeModel.WorldPosition = worldPos;
+                    spikeModel.WorldRotationAngle = worldRot;
+                }
+
+                foreach (var teleportGate in wheelModel.TeleportGates)
+                {
+                    var teleportPairModel = _matchDataService.GetTeleportPair(teleportGate.BelongToPairId);
+                    var gateModel = teleportGate.IsGateA ? teleportPairModel.GateA : teleportPairModel.GateB;
+
+                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                        calculationTick, rotationSpeed, deltaTime, wheelCenter, gateModel.LocalPosition, gateModel.LocalRotation,
                         out var worldPosA, out var worldRotA
                     );
 
-                    teleportPairModel.GateA.WorldPosition = worldPosA;
-                    teleportPairModel.GateA.WorldRotation = worldRotA;
-
-                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                        calculationTick, rotationSpeed, deltaTime, wheelCenter, teleportPairModel.GateB.LocalPosition, teleportPairModel.GateB.LocalRotation,
-                        out var worldPosB, out var worldRotB
-                    );
-
-                    teleportPairModel.GateB.WorldPosition = worldPosB;
-                    teleportPairModel.GateB.WorldRotation = worldRotB;
+                    gateModel.WorldPosition = worldPosA;
+                    gateModel.WorldRotation = worldRotA;
                 }
             }
         }
@@ -1143,7 +1171,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public void ManagedOnGUI()
         {
             InitStyles();
-            GUILayout.Box($"Last packet: {_lastPacketSize}b, Average: {_averagePacketSizeReceived}b, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds}b", _highVisStyle);
+            GUILayout.Box($"Ping: {_networkManager.Ping}, Last packet: {_lastPacketSize}b, Average: {_averagePacketSizeReceived}b, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds}b", _highVisStyle);
         }
         
         private void InitStyles()

@@ -104,14 +104,41 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     spring.Transform.WorldPosition = worldPosition;
                 }
             }
-
-            if (!rotatingWheel.TeleportGatePairIds.IsEmpty)
+            
+            if (!rotatingWheel.SpikeIds.IsEmpty)
             {
-                foreach (var teleportGatePairId in rotatingWheel.TeleportGatePairIds.AsSpan())
+                foreach (var spikeId in rotatingWheel.SpikeIds.AsSpan()) // todo for ai, create new SpringState/WallState and use them instead of using and updating the configs
                 {
-                    var teleportGatePair = _matchDataService.EnvironmentData.GetTeleportGatePair(teleportGatePairId);
-                    StepTeleportGateInWheel(tick, deltaTime, rotationSpeed, wheelCenter, ref teleportGatePair.GateA);
-                    StepTeleportGateInWheel(tick, deltaTime, rotationSpeed, wheelCenter, ref teleportGatePair.GateB);
+                    var spike = _matchDataService.EnvironmentData.GetSpike(spikeId);
+                    EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                        tick,
+                        rotationSpeed,
+                        deltaTime,
+                        wheelCenter,
+                        spike.Transform.LocalPosition,
+                        spike.Transform.LocalRotationDegrees,
+                        out var worldPosition,
+                        out var newRotation
+                    );
+
+                    spike.Transform.WorldRotationDegrees = newRotation;
+                    spike.Transform.WorldPosition = worldPosition;
+                }
+            }
+
+            if (!rotatingWheel.TeleportGates.IsEmpty)
+            {
+                foreach (var teleportGate in rotatingWheel.TeleportGates.AsSpan())
+                {
+                    var teleportGatePair = _matchDataService.EnvironmentData.GetTeleportGatePair(teleportGate.BelongToPairId);
+                    if (teleportGate.IsGateA)
+                    {
+                        StepTeleportGateInWheel(tick, deltaTime, rotationSpeed, wheelCenter, ref teleportGatePair.GateA);
+                    }
+                    else
+                    {
+                        StepTeleportGateInWheel(tick, deltaTime, rotationSpeed, wheelCenter, ref teleportGatePair.GateB);
+                    }
                 }
             }
         }

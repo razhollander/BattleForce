@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public int ConnectedPeersCount => _netManager.ConnectedPeersCount;
         public event Action OnPacketReceivedEvent;
-        public event Action<ushort> OnPeerDisconnectedEvent;
+        public event Action<long> OnClientPeerDisconnectedEvent;
 
         public ServerNetworkManager(NetworkConfig networkConfig)
         {
@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private void AddListeners()
         {
             _packetsListener.OnPacketReceivedEvent += OnPacketReceived;
-            _packetsListener.OnPeerDisconnectedEvent += OnPeerDisconnected;
+            _packetsListener.OnClientPeerDisconnectedEvent += OnClientPeerDisconnected;
         }
         
         private void OnPacketReceived()
@@ -48,9 +48,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             OnPacketReceivedEvent?.Invoke();
         }
 
-        private void OnPeerDisconnected(ushort playerId)
+        private void OnClientPeerDisconnected(long clientId)
         {
-            OnPeerDisconnectedEvent?.Invoke(playerId);
+            OnClientPeerDisconnectedEvent?.Invoke(clientId);
         }
 
         
@@ -79,7 +79,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private void RemoveListeners()
         {
             _packetsListener.OnPacketReceivedEvent -= OnPacketReceived;
-            _packetsListener.OnPeerDisconnectedEvent -= OnPeerDisconnected;
+            _packetsListener.OnClientPeerDisconnectedEvent -= OnClientPeerDisconnected;
         }
 
         // public void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
@@ -87,10 +87,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         //     _packetsSender.SendPacketToAllPlayersSerialized(type, packet, deliveryMethod);
         // }
 
-        public void SendPacketToPlayerSerialized<T>(ushort playerId, PacketTypeS2C type, T packet,
+        public void SendPacketToClientSerialized<T>(long clientId, PacketTypeS2C type, T packet,
             DeliveryMethod deliveryMethod) where T : INetSerializable
         {
-            _packetsSender.SendPacketToPlayerSerialized(playerId, type, packet, deliveryMethod);
+            _packetsSender.SendPacketToClientSerialized(clientId, type, packet, deliveryMethod);
         }
 
         public void SendPacketToPeerSerialized<T>(NetPeer peer, PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
@@ -98,14 +98,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _packetsSender.SendPacketToPeerSerialized(peer, type, packet, deliveryMethod);
         }
 
-        public void AddPlayerPeer(ushort playerId, NetPeer peer)
+        public void AddClientPeer(long clientId, NetPeer peer)
         {
-            _packetsSender.AddPlayerPeer(playerId, peer);
+            _packetsSender.AddClientPeer(clientId, peer);
         }
 
-        public void RemovePlayerPeer(ushort playerId)
+        public void RemoveClientPeer(long clientId)
         {
-            _packetsSender.RemovePlayerPeer(playerId);
+            _packetsSender.RemoveClientPeer(clientId);
         }
 
         public void PollEvents()
@@ -113,14 +113,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _netManager.PollEvents();
         }
 
-        public int GetPlayerPeerId(ushort playerId)
+        public bool TryGetClientPeerId(long clientId, out int peerId)
         {
-            return _packetsSender.GetPlayerPeerId(playerId);
+            return _packetsSender.TryGetClientPeerId(clientId, out peerId);
         }  
         
-        public bool IsPlayerPeerConencted(ushort playerId)
+        public bool IsClientPeerConencted(long clientId)
         {
-            return _packetsSender.IsPlayerConnected(playerId);
+            return _packetsSender.IsClientConnected(clientId);
         }
 
         public void RegisterPacketsObserver(IPacketsObserver packetsObserver)

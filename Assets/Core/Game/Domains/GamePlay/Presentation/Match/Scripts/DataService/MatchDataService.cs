@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Models;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -18,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchPlayerBulletModel> Bullets { get; private set; }
         public List<MatchEnvironmentWallModel> EnvironmentWalls { get; private set; }
         public List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; private set; }
+        public List<MatchEnvironmentSpikeModel> EnvironmentSpikes { get; }
         public List<MatchEnvironmentSpringModel> EnvironmentSprings { get; private set; }
         public List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; private set; }
         public List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; private set; }
@@ -30,8 +32,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
         public List<MatchChickenEggModel> ChickenEggs { get; private set; }
 
-        public MatchPlayerModel LocalPlayer { get; private set; }
-        public bool IsPlayerJoined => LocalPlayer != null;
         public HashSet<ushort> TeamIds  {get; private set; }
         public int StartPhaseInitialTick { get; set; }
         public bool IsInPreparationPhase { get; set; }
@@ -45,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentWalls = new List<MatchEnvironmentWallModel>(networkConfig.MaxCap.ConcurrentEvironmentWalls);
             EnvironmentLavaWalls = new List<MatchEnvironmentLavaWallModel>(networkConfig.MaxCap.ConcurrentEvironmentLavaWalls);
             EnvironmentSprings = new List<MatchEnvironmentSpringModel>(networkConfig.MaxCap.ConcurrentEvironmentSprings);
+            EnvironmentSpikes = new List<MatchEnvironmentSpikeModel>(networkConfig.MaxCap.ConcurrentEvironmentSpikes);
             RotatingWheels = new List<MatchEnvironmentRotatingWheelModel>(networkConfig.MaxCap.ConcurrentEnvironmentRotatingWheels);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
             PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
@@ -77,6 +78,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchEnvironmentSpringModel GetEnvironmentSpring(ushort springId)
         {
             return EnvironmentSprings.Find(x => x.Id == springId);
+        }
+
+        public MatchEnvironmentSpikeModel GetEnvironmentSpike(ushort spikeId)
+        {
+            return EnvironmentSpikes.Find(x => x.Id == spikeId);
         }
 
         public void RemoveBullet(ushort bulletId)
@@ -184,34 +190,37 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newBarrier;
         }
 
+        public void SetLocalPlayer(int playerId)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle)
         {
             var newSpring = new MatchEnvironmentSpringModel(id, localPosition, worldPosition, localRotationAngle, worldRotationAngle);
             EnvironmentSprings.Add(newSpring);
             return newSpring;
         }
-
-        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(EnvironmentRotatingWheelConfig config)
+        
+        public MatchEnvironmentSpikeModel AddSpike(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle)
         {
-            var newWheel = new MatchEnvironmentRotatingWheelModel(config.Id, config.CenterPosition, config.RotationSpeed, 
-                config.Walls.IsNullOrEmpty() ? new List<ushort>() : config.Walls.Select(x=>x.Id).ToList(), 
-                config.LavaWalls.IsNullOrEmpty() ? new List<ushort>() : config.LavaWalls.Select(x=>x.Id).ToList(), 
-                config.Springs.IsNullOrEmpty() ? new List<ushort>() : config.Springs.Select(x=>x.Id).ToList(),
-                config.TeleportGatePairs.IsNullOrEmpty() ? new List<ushort>() : config.TeleportGatePairs.Select(x=>x.Id).ToList());
+            var newSpike = new MatchEnvironmentSpikeModel(id, localPosition, worldPosition, localRotationAngle, worldRotationAngle);
+            EnvironmentSpikes.Add(newSpike);
+            return newSpike;
+        }
+
+        public MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<RotatingTeleportGate> teleportGates)
+        {
+            var newWheel = new MatchEnvironmentRotatingWheelModel(id, centerPosition, rotationSpeed, wallIds, lavaWallIds, springIds, spikeIds, teleportGates);
             RotatingWheels.Add(newWheel);
             return newWheel;
         }
 
-        public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 initialPosition, System.Numerics.Vector2 velocity, float radius, int spawnTick)
+        public MatchPlayerBulletModel AddBullet(ushort bulletId, ushort belongToPlayerId, Vector2 initialPosition, Vector2 velocity, float radius, int spawnTick)
         {
             var newBullet = new MatchPlayerBulletModel(bulletId, belongToPlayerId, initialPosition, velocity, radius, spawnTick);
             Bullets.Add(newBullet);
             return newBullet;
-        }
-
-        public void SetLocalPlayer(int playerId)
-        {
-            LocalPlayer = Players.Find(x => x.PlayerId == playerId);
         }
 
         public void ClearAll()
@@ -221,6 +230,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             EnvironmentWalls.Clear();
             EnvironmentLavaWalls.Clear();
             EnvironmentSprings.Clear();
+            EnvironmentSpikes.Clear();
             RotatingWheels.Clear();
             TalentCards.Clear();
             PowerUpBalls.Clear();

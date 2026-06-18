@@ -11,7 +11,9 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.ClientsNetworkDataService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -35,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IHeadLessQuitterController _headLessQuitterController;
         private readonly IStageDataService _stageDataService;
         private readonly IOverrideableNetEventsService _overrideableNetEventsService;
+        private readonly IClientsNetworkDataService _clientsNetworkDataService;
 
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private TryDamagePlayersOnTargetCommand _tryDamagePlayersOnTargetCommand;
@@ -53,7 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IServerNetworkManager networkManager,
             IMatchPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IMatchPlayerJoinPacketsHandler iIMatchPlayerJoinPacketsHandler, INetEventsDataService netEventsDataService,
-            ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController, IStageDataService stageDataService, IOverrideableNetEventsService overrideableNetEventsService)
+            ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController, IStageDataService stageDataService, IOverrideableNetEventsService overrideableNetEventsService, IClientsNetworkDataService clientsNetworkDataService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -66,6 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _headLessQuitterController = headLessQuitterController;
             _stageDataService = stageDataService;
             _overrideableNetEventsService = overrideableNetEventsService;
+            _clientsNetworkDataService = clientsNetworkDataService;
             _fullTickPacket = new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig);
             _cachedStartMatchPacket = new StartMatchPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount);
             _startStagePacket = new StartStagePacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount);
@@ -113,9 +117,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _trySendPlayersLockOnTargetChangedCommand.SetProcessedTick(currentTick).Execute();
                 _tryDamagePlayersOnTargetCommand.SetProcessedTick(currentTick).Execute();
                 _overrideableNetEventsService.RegisterAllOverridableNetEvents();
-                RemoveOlderThanTickEventsPerPlayer(processPlayersInputsResult.HeighestProcessedTickPerPlayer);
+                RemoveOlderThanTickEventsPerClient(processPlayersInputsResult.HeighestProcessedTickPerClient);
                 SendCurrentTickStateToAllClients(currentTick);
-                SendStartMatchToNotAcknowledgedPlayers(currentTick);
+                SendStartMatchToNotAcknowledgedClients(currentTick);
                 _headLessQuitterController.QuitIfTimeOut();
             }
             catch (Exception e)
@@ -140,47 +144,50 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
 
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
-            SendStartStageToAllPlayers(currentTick);
+            SendStartStageToAllClients(currentTick);
             return true;
         }
 
-        private void SendStartStageToAllPlayers(int processedTick)
+        private void SendStartStageToAllClients(int processedTick)
         {
-            foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
+            foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
-                if (!playerState.IsConnected)
+                if (!kvp.Value.IsConnected)
                 {
                     return;
                 }
-                
-                SendStartStagePacketToClient(playerState.Id, processedTick, DeliveryMethod.ReliableUnordered); // we don't send in a net event cause it can fill quickly our packet buffer
+
+                var clientId = kvp.Key;
+                SendStartStagePacketToClient(clientId, processedTick, DeliveryMethod.ReliableUnordered); // we don't send in a net event cause it can fill quickly our packet buffer
             }
         }
         
-        private void SendStartStagePacketToClient(ushort playerId, int processedTick, DeliveryMethod deliveryMethod)
+        private void SendStartStagePacketToClient(long clientId, int processedTick, DeliveryMethod deliveryMethod)
         {
             _startStagePacket.InitialState = _matchDataService.SimulationState;
             _startStagePacket.OccuredOnTick = processedTick;
-            _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.StartStage, _startStagePacket, deliveryMethod);
+            _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.StartStage, _startStagePacket, deliveryMethod);
         }
         
-        private void SendStartMatchToNotAcknowledgedPlayers(int processedTick)
+        private void SendStartMatchToNotAcknowledgedClients(int processedTick)
         {
-            foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
+            foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
-                var didPlayerAcknowledgeMatch = _playerInputsPacketsHandler.DidReceiveAnyInputFromPlayer(playerState.Id);
-                if (!didPlayerAcknowledgeMatch && playerState.IsConnected)
+                var clientId = kvp.Key;
+                var clientNetworkData = kvp.Value;
+                var didClientAcknowledgeMatch = _playerInputsPacketsHandler.DidReceiveAnyInputFromClient(clientId);
+                if (!didClientAcknowledgeMatch && clientNetworkData.IsConnected)
                 {
-                    SendStartMatchPacketToClient(playerState.Id, processedTick, DeliveryMethod.Unreliable);
+                    SendStartMatchPacketToClient(clientId, processedTick, DeliveryMethod.Unreliable);
                 }
             }
         }
 
-        private void SendStartMatchPacketToClient(ushort playerId, int processedTick, DeliveryMethod deliveryMethod)
+        private void SendStartMatchPacketToClient(long clientId, int processedTick, DeliveryMethod deliveryMethod)
         {
             _cachedStartMatchPacket.InitialState = _matchDataService.SimulationState;
             _cachedStartMatchPacket.OccuredOnTick = processedTick;
-            _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.StartMatch, _cachedStartMatchPacket, deliveryMethod);
+            _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.StartMatch, _cachedStartMatchPacket, deliveryMethod);
         }
 
         private ProcessPlayersInputsResult ProcessPackets(int processedTick, float deltaTime)
@@ -189,15 +196,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             return _playerInputsPacketsHandler.ProcessInputs(processedTick, deltaTime);
         }
 
-        private void RemoveOlderThanTickEventsPerPlayer(CapacityDict<ushort, int> heighestProcessedTickPerPlayer)
+        private void RemoveOlderThanTickEventsPerClient(CapacityDict<long, int> heighestProcessedTickPerClient)
         {
-            foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())        
+            foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
-                var playerId = playerState.Id;
+                var clientId = kvp.Key;
 
-                if (heighestProcessedTickPerPlayer.TryGetValue(playerId, out int tickOfPlayer))
+                if (heighestProcessedTickPerClient.TryGetValue(clientId, out int tickOfClient))
                 {
-                    _netEventsDataService.RemoveAllEventsOlderThanTick(playerId, tickOfPlayer);
+                    _netEventsDataService.RemoveAllEventsOlderThanTick(clientId, tickOfClient);
                 }
             }
         }
@@ -212,56 +219,58 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var currentSimulationState = _matchDataService.SimulationState;
             _fullTickPacket.Tick = processedTick;
             _fullTickPacket.CurrentSimulationState = currentSimulationState;
+
             //_fullTickPacket.PreviousSimulationState = _matchDataService.PreviousSimulationState;
-            foreach (var playerState in currentSimulationState.Players.AsSpan())
+            foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
-                if (!playerState.IsConnected)
+                if (!kvp.Value.IsConnected)
                 {
                     return;
                 }
-                
-                var playerId = playerState.Id;
-                _fullTickPacket.BulletSpawnNetEvents = _netEventsDataService.BulletSpawnNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerJoinAcceptNetEvents = _netEventsDataService.PlayerRejoinAcceptNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerTakeDamageNetEvents = _netEventsDataService.PlayerTakeDamageNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerDiedNetEvents = _netEventsDataService.PlayerDiedNetEventsPerPlayer[playerId];
-                _fullTickPacket.BulletDestroyedNetEvents = _netEventsDataService.BulletDestroyedNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerSwapNetEvents = _netEventsDataService.PlayerSwapNetEventsPerPlayer[playerId];
-                _fullTickPacket.TalentCardObtainedNetEvents = _netEventsDataService.TalentCardObtainedNetEventsPerPlayer[playerId];
-                _fullTickPacket.TalentCardHitNetEvents = _netEventsDataService.TalentCardHitNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerSpinnedStartedNetEvents = _netEventsDataService.PlayerSpinnedStartedNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerSpinnedEndedNetEvents = _netEventsDataService.PlayerSpinnedEndedNetEventsPerPlayer[playerId];
-                _fullTickPacket.PowerUpSpawnedNetEvents = _netEventsDataService.PowerUpBallSpawnedNetEventsPerPlayer[playerId];
-                _fullTickPacket.PowerUpObtainedNetEvents = _netEventsDataService.PowerUpBallObtainedNetEventsPerPlayer[playerId];
-                _fullTickPacket.StageEndNetEvents = _netEventsDataService.StageEndNetEventsPerPlayer[playerId];
-                _fullTickPacket.TeamLostNetEvents = _netEventsDataService.TeamLostNetEventsPerPlayer[playerId];
-                _fullTickPacket.TalentSwitchNetEvents = _netEventsDataService.TalentSwitchNetEventsPerPlayer[playerId];
-                _fullTickPacket.EnvironmentSpringPlayerCollisionNetEvents = _netEventsDataService.EnvironmentSpringPlayerCollisionNetEventsPerPlayer[playerId];
-                _fullTickPacket.GainBoltsNetEvents = _netEventsDataService.GainBoltsNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerToEnvironmentTeleportGateCollisionNetEvents = _netEventsDataService.PlayerToEnvironmentTeleportGateCollisionNetEventsPerPlayer[playerId];
-                _fullTickPacket.PreparationPhaseEndedNetEvents = _netEventsDataService.PreparationPhaseEndedNetEventsPerPlayer[playerId];
-                _fullTickPacket.CreateSwapFieldNetEvents = _netEventsDataService.CreateSwapFieldNetEventsPerPlayer[playerId];
-                _fullTickPacket.CreateKOProjectileNetEvents = _netEventsDataService.CreateKOProjectileNetEventsPerPlayer[playerId];
-                _fullTickPacket.KOProjectHitPlayerNetEvents = _netEventsDataService.KOProjectHitPlayerNetEventsPerPlayer[playerId];
-                _fullTickPacket.DeactivateKOTalentNetEvents = _netEventsDataService.DeactivateKOTalentNetEventsPerPlayer[playerId];
-                _fullTickPacket.ActivateSentryGunTalentNetEvents = _netEventsDataService.ActivateSentryGunTalentNetEventsPerPlayer[playerId];
-                _fullTickPacket.DeactivateSentryGunTalentNetEvents = _netEventsDataService.DeactivateSentryGunTalentNetEventsPerPlayer[playerId];
-                _fullTickPacket.PerformDashPulseNetEvents = _netEventsDataService.PerformDashPulseNetEventsPerPlayer[playerId];
-                _fullTickPacket.UpdatePlayerTalentStocksNetEvents = _netEventsDataService.UpdatePlayerTalentStocksNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerMaxShootCooldownChangedNetEvents = _netEventsDataService.PlayerMaxShootCooldownChangedNetEventsPerPlayer[playerId];
-                _fullTickPacket.DestroySwapFieldNetEvents = _netEventsDataService.DeactivateSwapTalentNetEventsPerPlayer[playerId];
-                _fullTickPacket.CreateGrapplingHookProjectileNetEvents = _netEventsDataService.CreateGrapplingHookProjectileNetEventsPerPlayer[playerId];
-                _fullTickPacket.GrapplingHookHitWallNetEvents = _netEventsDataService.GrapplingHookHitWallNetEventsPerPlayer[playerId];
-                _fullTickPacket.DeactivateGrapplingHookTalentNetEvents = _netEventsDataService.DeactivateGrapplingHookTalentNetEventsPerPlayer[playerId];
-                _fullTickPacket.ActivateUmbrellaTalentNetEvents = _netEventsDataService.ActivateUmbrellaTalentNetEventsPerPlayer[playerId];
-                _fullTickPacket.DeactivateUmbrellaTalentNetEvents = _netEventsDataService.DeactivateUmbrellaTalentNetEventsPerPlayer[playerId];
-                _fullTickPacket.CreateMagneticPullFieldNetEvents = _netEventsDataService.CreateMagneticPullFieldNetEventsPerPlayer[playerId];
-                _fullTickPacket.LayChickenEggNetEvents = _netEventsDataService.LayChickenEggNetEventsPerPlayer[playerId];
-                _fullTickPacket.ChickenEggHitNetEvents = _netEventsDataService.ChickenEggHitNetEventsPerPlayer[playerId];
-                _fullTickPacket.ActivateYearsOfPainTalentNetEvents = _netEventsDataService.ActivateYearsOfPainTalentNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents = _netEventsDataService.PlayerLockOnHeartTargetsChangedNetEventsPerPlayer[playerId];
-                _fullTickPacket.PlayerLockedOnTargetHitNetEvents = _netEventsDataService.PlayerLockedOnTargetHitNetEventsPerPlayer[playerId];
-                _networkManager.SendPacketToPlayerSerialized(playerId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
+
+                var clientId = kvp.Key;
+                _fullTickPacket.BulletSpawnNetEvents = _netEventsDataService.BulletSpawnNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerJoinAcceptNetEvents = _netEventsDataService.PlayerRejoinAcceptNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerTakeDamageNetEvents = _netEventsDataService.PlayerTakeDamageNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerDiedNetEvents = _netEventsDataService.PlayerDiedNetEventsPerClient[clientId];
+                _fullTickPacket.BulletDestroyedNetEvents = _netEventsDataService.BulletDestroyedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerSwapNetEvents = _netEventsDataService.PlayerSwapNetEventsPerClient[clientId];
+                _fullTickPacket.TalentCardObtainedNetEvents = _netEventsDataService.TalentCardObtainedNetEventsPerClient[clientId];
+                _fullTickPacket.TalentCardHitNetEvents = _netEventsDataService.TalentCardHitNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerSpinnedStartedNetEvents = _netEventsDataService.PlayerSpinnedStartedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerSpinnedEndedNetEvents = _netEventsDataService.PlayerSpinnedEndedNetEventsPerClient[clientId];
+                _fullTickPacket.PowerUpSpawnedNetEvents = _netEventsDataService.PowerUpBallSpawnedNetEventsPerClient[clientId];
+                _fullTickPacket.PowerUpObtainedNetEvents = _netEventsDataService.PowerUpBallObtainedNetEventsPerClient[clientId];
+                _fullTickPacket.StageEndNetEvents = _netEventsDataService.StageEndNetEventsPerClient[clientId];
+                _fullTickPacket.TeamLostNetEvents = _netEventsDataService.TeamLostNetEventsPerClient[clientId];
+                _fullTickPacket.TalentSwitchNetEvents = _netEventsDataService.TalentSwitchNetEventsPerClient[clientId];
+                _fullTickPacket.EnvironmentSpringPlayerCollisionNetEvents = _netEventsDataService.EnvironmentSpringPlayerCollisionNetEventsPerClient[clientId];
+                _fullTickPacket.EnvironmentSpikePlayerCollisionNetEvents = _netEventsDataService.EnvironmentSpikePlayerCollisionNetEventsPerClient[clientId];
+                _fullTickPacket.GainBoltsNetEvents = _netEventsDataService.GainBoltsNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerToEnvironmentTeleportGateCollisionNetEvents = _netEventsDataService.PlayerToEnvironmentTeleportGateCollisionNetEventsPerClient[clientId];
+                _fullTickPacket.PreparationPhaseEndedNetEvents = _netEventsDataService.PreparationPhaseEndedNetEventsPerClient[clientId];
+                _fullTickPacket.CreateSwapFieldNetEvents = _netEventsDataService.CreateSwapFieldNetEventsPerClient[clientId];
+                _fullTickPacket.CreateKOProjectileNetEvents = _netEventsDataService.CreateKOProjectileNetEventsPerClient[clientId];
+                _fullTickPacket.KOProjectHitPlayerNetEvents = _netEventsDataService.KOProjectHitPlayerNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateKOTalentNetEvents = _netEventsDataService.DeactivateKOTalentNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateSentryGunTalentNetEvents = _netEventsDataService.ActivateSentryGunTalentNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateSentryGunTalentNetEvents = _netEventsDataService.DeactivateSentryGunTalentNetEventsPerClient[clientId];
+                _fullTickPacket.PerformDashPulseNetEvents = _netEventsDataService.PerformDashPulseNetEventsPerClient[clientId];
+                _fullTickPacket.UpdatePlayerTalentStocksNetEvents = _netEventsDataService.UpdatePlayerTalentStocksNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerMaxShootCooldownChangedNetEvents = _netEventsDataService.PlayerMaxShootCooldownChangedNetEventsPerClient[clientId];
+                _fullTickPacket.DestroySwapFieldNetEvents = _netEventsDataService.DeactivateSwapTalentNetEventsPerClient[clientId];
+                _fullTickPacket.CreateGrapplingHookProjectileNetEvents = _netEventsDataService.CreateGrapplingHookProjectileNetEventsPerClient[clientId];
+                _fullTickPacket.GrapplingHookHitWallNetEvents = _netEventsDataService.GrapplingHookHitWallNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateGrapplingHookTalentNetEvents = _netEventsDataService.DeactivateGrapplingHookTalentNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateUmbrellaTalentNetEvents = _netEventsDataService.ActivateUmbrellaTalentNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateUmbrellaTalentNetEvents = _netEventsDataService.DeactivateUmbrellaTalentNetEventsPerClient[clientId];
+                _fullTickPacket.CreateMagneticPullFieldNetEvents = _netEventsDataService.CreateMagneticPullFieldNetEventsPerClient[clientId];
+                _fullTickPacket.LayChickenEggNetEvents = _netEventsDataService.LayChickenEggNetEventsPerClient[clientId];
+                _fullTickPacket.ChickenEggHitNetEvents = _netEventsDataService.ChickenEggHitNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateYearsOfPainTalentNetEvents = _netEventsDataService.ActivateYearsOfPainTalentNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents = _netEventsDataService.PlayerLockOnHeartTargetsChangedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerLockedOnTargetHitNetEvents = _netEventsDataService.PlayerLockedOnTargetHitNetEventsPerClient[clientId];
+                _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }
         }

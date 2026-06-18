@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
@@ -9,6 +10,9 @@ using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
+using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 {
@@ -19,16 +23,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         private ITickCounterService _tickCounterService;
         private IMatchPlayerControllers _matchPlayerControllers;
         private IMatchDataService _matchDataService;
+        private ILocalPlayersDataService _localPlayersDataService;
         private GetCalculatedPlayerInputsCommand _getCalculatedPlayerInputsCommand;
-        
-        private ushort _playerId;
+        private FixedUnorderedList<MatchLocalPlayerInputDataC2S> _cachedLocalPlayersInputs;
+        private MatchPlayersInputPacketC2S _cachedPlayerInputPacket;
 
-        public SendMatchInputsToServerCommand SetPlayerId(ushort playerId)
-        {
-            _playerId = playerId;
-            return this;
-        }
-        
         public override void ResolveDependencies()
         {
              _clientNetworkManager = _diContainer.Resolve<IClientNetworkManager>();
@@ -36,35 +35,49 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
              _tickCounterService = _diContainer.Resolve<ITickCounterService>();
              _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
              _matchDataService = _diContainer.Resolve<IMatchDataService>();
+             _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
              var commandFactory = _diContainer.Resolve<ICommandFactory>();
+             var networkConfig = _diContainer.Resolve<NetworkConfig>();
              _getCalculatedPlayerInputsCommand = commandFactory.CreateCommandWithResult<GetCalculatedPlayerInputsCommand, GetCalculatedPlayerInputsCommand.Result>();
+             _cachedLocalPlayersInputs = new FixedUnorderedList<MatchLocalPlayerInputDataC2S>(networkConfig.MaxCap.ConcurrentPlayers);
+             _cachedPlayerInputPacket = new MatchPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void Execute()
         {
-          var playerPosition = _matchPlayerControllers.GetPlayerPosition(_playerId);
-            var playerDirection = _matchDataService.GetPlayer(_playerId).Spaceship.Transform.Direction;
-            var calculatedInputs = _getCalculatedPlayerInputsCommand
-                .SetPlayerDirection(playerDirection)
-                .SetPlayerPosition(playerPosition)
-                .Execute();
-            LogService.LogTopic(
-                $"Sending: isMoveRightInputPressed:{calculatedInputs.IsMoveRightInputPressed},isMoveLeftInputPressed:{calculatedInputs.IsMoveLeftInputPressed},isShootInputPressed:{calculatedInputs.IsShootInputPressed}",
-                LogTopicType.ClientNetwork);
-            var playerInputPacket = new MatchPlayerInputPacketC2S
+            _cachedLocalPlayersInputs.Clear();
+
+            foreach (var playerId in _localPlayersDataService.LocalPlayersIds)
             {
-                Tick = _tickCounterService.CurrentClientTick,
-                HeighestProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer,
-                IsMoveLeftInputPressed = calculatedInputs.IsMoveLeftInputPressed,
-                IsMoveRightInputPressed = calculatedInputs.IsMoveRightInputPressed,
-                IsShootInputPressed = calculatedInputs.IsShootInputPressed,
-                IsTalentAInputPressed = calculatedInputs.IsTalentAInputPressed,
-                IsTalentBInputPressed = calculatedInputs.IsTalentBInputPressed,
-                IsTalentCInputPressed = calculatedInputs.IsTalentCInputPressed,
-                AimDirection = calculatedInputs.AimDirection
-            };
-            
-            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchPlayerInput, playerInputPacket, DeliveryMethod.Unreliable);
+                var playerPosition = _matchPlayerControllers.GetPlayerPosition(playerId);
+                var playerDirection = _matchDataService.GetPlayer(playerId).Spaceship.Transform.Direction;
+
+                var calculatedInputs = _getCalculatedPlayerInputsCommand
+                    .SetPlayerDirection(playerDirection)
+                    .SetPlayerId(playerId)
+                    .SetPlayerPosition(playerPosition)
+                    .Execute();
+
+                LogService.LogTopic(
+                    $"Sending: isMoveRightInputPressed:{calculatedInputs.IsMoveRightInputPressed},isMoveLeftInputPressed:{calculatedInputs.IsMoveLeftInputPressed},isShootInputPressed:{calculatedInputs.IsShootInputPressed}",
+                    LogTopicType.ClientNetwork);
+
+                ref var playerInputDataC2S = ref _cachedLocalPlayersInputs.AddAndGet();
+                playerInputDataC2S.PlayerId = playerId;
+                playerInputDataC2S.IsMoveLeftInputPressed = calculatedInputs.IsMoveLeftInputPressed;
+                playerInputDataC2S.IsMoveRightInputPressed = calculatedInputs.IsMoveRightInputPressed;
+                playerInputDataC2S.IsShootInputPressed = calculatedInputs.IsShootInputPressed;
+                playerInputDataC2S.IsTalentAInputPressed = calculatedInputs.IsTalentAInputPressed;
+                playerInputDataC2S.IsTalentBInputPressed = calculatedInputs.IsTalentBInputPressed;
+                playerInputDataC2S.IsTalentCInputPressed = calculatedInputs.IsTalentCInputPressed;
+                playerInputDataC2S.AimDirection = calculatedInputs.AimDirection;
+            }
+
+            _cachedPlayerInputPacket.Tick = _tickCounterService.CurrentClientTick;
+            _cachedPlayerInputPacket.HeighestProcessedTickFromServer = _fullTickPacketsHandler.LastProcessedTickFromServer;
+            _cachedPlayerInputPacket.PlayerInputs = _cachedLocalPlayersInputs;
+
+            _clientNetworkManager.SendPacketSerialized(PacketTypeC2S.MatchPlayersInput, _cachedPlayerInputPacket, DeliveryMethod.Unreliable);
         }
     }
 }

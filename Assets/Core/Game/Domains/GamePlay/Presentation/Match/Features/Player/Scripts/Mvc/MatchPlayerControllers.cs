@@ -17,20 +17,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
-        private readonly IInputBeingUsedService _inputBeingUsedService;
         private readonly List<MatchPlayerController> _playerControllers = new ();
         private Transform _playersParent;
 
 
         public MatchPlayerControllers(IMatchDataService matchDataService, MatchPlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IInputBeingUsedService inputBeingUsedService)
+            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _matchDataService = matchDataService;
             _playerPool = new MatchPlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
-            _inputBeingUsedService = inputBeingUsedService;
         }
 
         public void InitEntryPoint()
@@ -42,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void AddPlayer(ushort playerId)
         {
             var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform,
-                _stageCancellationTokenProvider, _inputBeingUsedService);
+                _stageCancellationTokenProvider);
             playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
         }

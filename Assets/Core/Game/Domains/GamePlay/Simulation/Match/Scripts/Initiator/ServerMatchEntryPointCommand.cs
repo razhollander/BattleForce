@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
@@ -14,10 +15,12 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.ClientsNetworkDataService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
 {
@@ -37,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private IStageDataService _stageDataService;
         private ISimulationInputService _simulationInputService;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
+        private IClientsNetworkDataService _clientsNetworkDataService;
         
         private SimulationMatchEnterData _simulationMatchEnterData;
 
@@ -61,6 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _simulationInputService = _diContainer.Resolve<ISimulationInputService>();
+            _clientsNetworkDataService = _diContainer.Resolve<IClientsNetworkDataService>();
             _setRandomTalentsForPlayerCommand =  _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
         }
 
@@ -108,38 +113,60 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             }
             else
             {
-                _playbackRecorderService.StartRecording(RNG.Seed, _simulationMatchEnterData.Players);
+                var allPlayers = new List<EnterMatchPlayerData>();
+                foreach (var kvp in _simulationMatchEnterData.PlayersPerClient)
+                {
+                    allPlayers.AddRange(kvp.Value);
+                }
+                
+                _playbackRecorderService.StartRecording(RNG.Seed, allPlayers.ToArray());
             }
         }
 
         private void InitPlayers(SimulationMatchEnterData simulationMatchEnterData)
         {
-            var playerDatas = simulationMatchEnterData.Players;
-
-            for (var i = 0; i < playerDatas.Length; i++)
+            foreach (var kvp in simulationMatchEnterData.PlayersPerClient)
             {
-                var player = playerDatas[i];
-                var playerId = player.Id;
-                var playerName = player.Name;
-                var playerTeamId = player.TeamId;
-                
-                var startingDirection = Vector2.UnitX;
-                var velocity = Vector2.Zero;
-                var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
-                var health = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.StartHealth;
-                var shootCooldown = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.ShootCooldown;
-                var position = Vector2.Zero;
-                var isPlayerConnected = _networkManager.IsPlayerPeerConencted(playerId);
-                _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown, isPlayerConnected);
-                _playersTalentsManager.AddPlayer(playerId);
-                _simulationInputService.AddPlayer(playerId);
-                 _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
-                  _playersTalentsManager.TryAddTalentToPlayer(TalentType.YearsOfPain, playerId, 0, out _, out _);
-                  _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
-                //
-                if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
+                var clientId = kvp.Key;
+                var playerDatas = kvp.Value;
+
+                var didReachByEnteringStraightToMatchThroughCheats = !_clientsNetworkDataService.IsClientExist(clientId);
+                if (didReachByEnteringStraightToMatchThroughCheats)
                 {
-                    _setRandomTalentsForPlayerCommand.SetPlayerId(playerId).SetTalentsAmount(_gamePlayConfigService.GamePlayConfig.RandomTalentsForPlayersAmount).Execute();
+                    _clientsNetworkDataService.AddClient(clientId, false);
+                }
+                
+                for (var i = 0; i < playerDatas.Length; i++)
+                {
+                    var player = playerDatas[i];
+                    var playerId = player.Id;
+                    var playerName = player.Name;
+                    var playerTeamId = player.TeamId;
+
+                    var startingDirection = Vector2.UnitX;
+                    var velocity = Vector2.Zero;
+                    var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.DefaultPlayerRadius;
+                    var health = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.StartHealth;
+                    var shootCooldown = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.ShootCooldown;
+                    var position = Vector2.Zero;
+
+                    var didAddPlayerByEnteringStraightToMatchThroughCheats = !_clientsNetworkDataService.IsPlayerAssignedToClient(clientId, playerId);
+                    if (didAddPlayerByEnteringStraightToMatchThroughCheats)
+                    {
+                        _clientsNetworkDataService.AssignPlayerToClient(clientId, playerId);
+                    }
+                    
+                    _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown);
+                    _playersTalentsManager.AddPlayer(playerId);
+                    _simulationInputService.AddPlayer(playerId);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Umbrella, playerId, 0, out _, out _);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
+                
+                    if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
+                    {
+                        _setRandomTalentsForPlayerCommand.SetPlayerId(playerId).SetTalentsAmount(_gamePlayConfigService.GamePlayConfig.RandomTalentsForPlayersAmount).Execute();
+                    }
                 }
             }
         }

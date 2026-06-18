@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnvironmentConfig2
   m_EditorClassIdentifier: 
   _environmentLayoutConfigs:
-    m_keys: 020000006300000001000000000000000300000004000000050000000600000007000000
+    m_keys: 0200000063000000010000000000000003000000040000000500000006000000070000000a0000000b000000
     m_values:
     - _environmentName: Default
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -51,6 +51,7 @@ MonoBehaviour:
         \"DashPulse\"\n  }\n]"
       _environmentSpringsJson: '[   { "Id": 1, "Position": { "X": 8.0, "Y": 5.0 },
         "DirectionAngle": "135" }]'
+      _environmentSpikesJson: 
       _teleportGatesJson: '[   {     "Id": 1,     "GateA": {       "Position": {        
         "X": -4.5,         "Y": 7       },       "NormalRotation": 270     },    
         "GateB": {       "Position": {         "X": 3.25,         "Y": -3       },      
@@ -138,6 +139,7 @@ MonoBehaviour:
       _lavaWallsJson: 
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: 
       _fieldBarriersJson: 
@@ -250,6 +252,7 @@ MonoBehaviour:
       _lavaWallsJson: 
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: "[\n  {\n    \"Id\": 100,\n    \"CenterPosition\": {\n     
         \"X\": 20.0,\n      \"Y\": 0.0\n    },\n    \"RotationSpeed\": 10,\n    \"Walls\":
@@ -569,6 +572,7 @@ MonoBehaviour:
         \"X\": 0,\n      \"Y\": 1.1\n    },\n    \"DirectionAngle\": \"90\"\n  },\n 
         {\n    \"Id\": 1,\n    \"Position\": {\n      \"X\": 0,\n      \"Y\": -1.1\n   
         },\n    \"DirectionAngle\": \"270\"\n  }\n]"
+      _environmentSpikesJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: "[\n  {\n    \"Id\": 200,\n    \"CenterPosition\": {\n     
         \"X\": -30,\n      \"Y\": 0\n    },\n    \"RotationSpeed\": 60,\n    \"Walls\":
@@ -631,6 +635,10 @@ MonoBehaviour:
         }\n]"
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: "[\n  {\n    \"Id\": 2,\n    \"Position\": {\n     
+        \"X\": -43,\n      \"Y\": 0\n    },\n    \"DirectionAngle\": \"0\"\n  },\n 
+        {\n    \"Id\": 1,\n    \"Position\": {\n      \"X\": 43,\n      \"Y\": 0\n   
+        },\n    \"DirectionAngle\": \"180\"\n  }\n]"
       _teleportGatesJson: 
       _rotatingWheelsJson: "[\n  {\n    \"Id\": 101,\n    \"CenterPosition\": {\n     
         \"X\": 0.0,\n      \"Y\": 0.0\n    },\n    \"RotationSpeed\": 10,\n    \"Springs\":
@@ -673,6 +681,7 @@ MonoBehaviour:
         \"X\": -28.16, \"Y\": 4 }\n    ]\n  }\n]"
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: 
       _teleportGatesJson: "[\n  {\n    \"Id\": 1,\n    \"GateA\": { \"Position\":
         { \"X\": -20, \"Y\": 24.64 }, \"NormalRotation\": 270 },\n    \"GateB\":
         { \"Position\": { \"X\": -20, \"Y\": -24.64 }, \"NormalRotation\": 90 }\n 
@@ -731,6 +740,7 @@ MonoBehaviour:
       _lavaWallsJson: 
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: 
       _teleportGatesJson: "[\n  {\n    \"Id\": 1,\n    \"GateA\": { \"Position\":
         { \"X\": -4, \"Y\": 15.08 }, \"NormalRotation\": 180 },\n    \"GateB\": {
         \"Position\": { \"X\": 4, \"Y\": 15.08 }, \"NormalRotation\": 0 }\n  },\n 
@@ -785,9 +795,22 @@ MonoBehaviour:
         \"Swap\"\n  },\n    {\n    \"Id\": 3,\n    \"Position\": {\n      \"X\":
         4,\n      \"Y\": 0\n    },\n    \"TalentType\": \"DashPulse\"\n  }\n]"
       _environmentSpringsJson: 
+      _environmentSpikesJson: "[\n  {\n    \"Id\": 2,\n    \"Position\": {\n     
+        \"X\": 0,\n      \"Y\": -24.1\n    },\n    \"DirectionAngle\": \"90\"\n 
+        },\n  {\n    \"Id\": 1,\n    \"Position\": {\n      \"X\": 0,\n      \"Y\":
+        24.1\n    },\n    \"DirectionAngle\": \"270\"\n  }\n]"
       _teleportGatesJson: 
       _rotatingWheelsJson: 
-      _fieldBarriersJson: 
+      _fieldBarriersJson: "[\n  {\n    \"Position\": {\n      \"x\": 15.08,\n     
+        \"y\": 15.08\n    },\n    \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n   
+        },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\": {\n      \"x\":
+        -20.0,\n      \"y\": -20.0\n    },\n    \"Size\": {\n      \"x\": 3.5,\n     
+        \"y\": 3.5\n    },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\":
+        {\n      \"x\": 15.08,\n      \"y\": -15.08\n    },\n    \"Size\": {\n     
+        \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\": \"Circle\"\n  },\n 
+        {\n    \"Position\": {\n      \"x\": -10.08,\n      \"y\": -10.08\n    },\n   
+        \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\":
+        \"Circle\"\n  }\n]"
       _stageBoundriesWallsJson: 
     - _environmentName: Big Empty
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -809,8 +832,170 @@ MonoBehaviour:
       _lavaWallsJson: 
       _talentCardsJson: 
       _environmentSpringsJson: 
+      _environmentSpikesJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: 
       _fieldBarriersJson: 
       _stageBoundriesWallsJson: 
-  AvailableLayoutIndexes: 00000000030000000400000005000000
+    - _environmentName: Crazy Eyes
+      _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
+      _wallsJson: "[\n  {\n    \"Id\": 1,\n    \"Points\": [\n      { \"X\": -47.32,
+        \"Y\": -8.16 },\n      { \"X\": -43.80, \"Y\": -8.16 },\n      { \"X\": -43.80,
+        \"Y\": 8.16 },\n      { \"X\": -47.32, \"Y\": 8.16 }\n    ]\n  },\n  {\n   
+        \"Id\": 2,\n    \"Points\": [\n      { \"X\": 43.80, \"Y\": -8.16 },\n     
+        { \"X\": 47.32, \"Y\": -8.16 },\n      { \"X\": 47.32, \"Y\": 8.16 },\n     
+        { \"X\": 43.80, \"Y\": 8.16 }\n    ]\n  },\n  {\n    \"Id\": 3,\n    \"Points\":
+        [\n      { \"X\": -27.32, \"Y\": 24.64 },\n      { \"X\": 27.32, \"Y\": 24.64
+        },\n      { \"X\": 27.32, \"Y\": 28.16 },\n      { \"X\": -27.32, \"Y\":
+        28.16 }\n    ]\n  },\n  {\n    \"Id\": 4,\n    \"Points\": [\n      { \"X\":
+        -27.32, \"Y\": -28.16 },\n      { \"X\": 27.32, \"Y\": -28.16 },\n      {
+        \"X\": 27.32, \"Y\": -24.64 },\n      { \"X\": -27.32, \"Y\": -24.64 }\n   
+        ]\n  },\n  {\n    \"Id\": 5,\n    \"Points\": [\n      { \"X\": -47.32, \"Y\":
+        8.16 },\n      { \"X\": -45.80, \"Y\": 15.81 },\n      { \"X\": -41.46, \"Y\":
+        22.30 },\n      { \"X\": -38.97, \"Y\": 19.81 },\n      { \"X\": -43.80,
+        \"Y\": 8.16 }\n    ]\n  },\n  {\n    \"Id\": 6,\n    \"Points\": [\n     
+        { \"X\": 27.32, \"Y\": 28.16 },\n      { \"X\": 34.97, \"Y\": 26.64 },\n     
+        { \"X\": 41.46, \"Y\": 22.30 },\n      { \"X\": 38.97, \"Y\": 19.81 },\n     
+        { \"X\": 27.32, \"Y\": 24.64 }\n    ]\n  },\n  {\n    \"Id\": 7,\n    \"Points\":
+        [\n      { \"X\": 47.32, \"Y\": -8.16 },\n      { \"X\": 45.80, \"Y\": -15.81
+        },\n      { \"X\": 41.46, \"Y\": -22.30 },\n      { \"X\": 38.97, \"Y\":
+        -19.81 },\n      { \"X\": 43.80, \"Y\": -8.16 }\n    ]\n  },\n  {\n    \"Id\":
+        8,\n    \"Points\": [\n      { \"X\": -27.32, \"Y\": -28.16 },\n      { \"X\":
+        -34.97, \"Y\": -26.64 },\n      { \"X\": -41.46, \"Y\": -22.30 },\n     
+        { \"X\": -38.97, \"Y\": -19.81 },\n      { \"X\": -27.32, \"Y\": -24.64 }\n   
+        ]\n  },\n  {\n    \"Id\": 9,\n    \"Points\": [\n      { \"X\": -41.46, \"Y\":
+        22.30 },\n      { \"X\": -34.97, \"Y\": 26.64 },\n      { \"X\": -27.32,
+        \"Y\": 28.16 },\n      { \"X\": -27.32, \"Y\": 24.64 },\n      { \"X\": -38.97,
+        \"Y\": 19.81 }\n    ]\n  },\n  {\n    \"Id\": 10,\n    \"Points\": [\n     
+        { \"X\": 41.46, \"Y\": 22.30 },\n      { \"X\": 45.80, \"Y\": 15.81 },\n     
+        { \"X\": 47.32, \"Y\": 8.16 },\n      { \"X\": 43.80, \"Y\": 8.16 },\n     
+        { \"X\": 38.97, \"Y\": 19.81 }\n    ]\n  },\n  {\n    \"Id\": 11,\n    \"Points\":
+        [\n      { \"X\": 41.46, \"Y\": -22.30 },\n      { \"X\": 34.97, \"Y\": -26.64
+        },\n      { \"X\": 27.32, \"Y\": -28.16 },\n      { \"X\": 27.32, \"Y\":
+        -24.64 },\n      { \"X\": 38.97, \"Y\": -19.81 }\n    ]\n  },\n  {\n    \"Id\":
+        12,\n    \"Points\": [\n      { \"X\": -41.46, \"Y\": -22.30 },\n      {
+        \"X\": -45.80, \"Y\": -15.81 },\n      { \"X\": -47.32, \"Y\": -8.16 },\n     
+        { \"X\": -43.80, \"Y\": -8.16 },\n      { \"X\": -38.97, \"Y\": -19.81 }\n   
+        ]\n  }\n]"
+      _lavaWallsJson: 
+      _talentCardsJson: 
+      _environmentSpringsJson: 
+      _environmentSpikesJson: 
+      _teleportGatesJson: "[\n  {\n    \"Id\": 1,\n    \"GateA\": {\n      \"Position\":
+        {\n        \"X\": -1.2,\n        \"Y\": 0\n      },\n      \"NormalRotation\":
+        180,\n      \"AttachToRotationWheelId\": 101\n    },\n    \"GateB\": {\n     
+        \"Position\": {\n        \"X\": -1.2,\n        \"Y\": 0\n      },\n     
+        \"NormalRotation\": 180,\n      \"AttachToRotationWheelId\": 102\n    }\n 
+        }\n]"
+      _rotatingWheelsJson: "[\n  {\n    \"Id\": 101,\n    \"CenterPosition\": {\n     
+        \"X\": 16.5,\n      \"Y\": 0\n    },\n    \"RotationSpeed\": 20,\n    \"Spikes\":
+        [\n      {\n        \"Id\": 101,\n        \"Position\": {\n          \"X\":
+        1.8,\n          \"Y\": 0\n        },\n        \"DirectionAngle\": 0\n     
+        }\n    ],\n    \"Walls\": [\n      {\n        \"Id\": 101,\n        \"Position\":
+        {\n          \"X\": 0,\n          \"Y\": 0\n        },\n        \"Points\":
+        [\n          {\n            \"X\": -1,\n            \"Y\": 3\n          },\n         
+        {\n            \"X\": 1,\n            \"Y\": 3\n          },\n          {\n           
+        \"X\": 1,\n            \"Y\": -3\n          },\n          {\n           
+        \"X\": -1,\n            \"Y\": -3\n          }\n        ]\n      }\n    ]\n 
+        },\n  {\n    \"Id\": 102,\n    \"CenterPosition\": {\n      \"X\": -16.5,\n     
+        \"Y\": 0\n    },\n    \"RotationSpeed\": -20,\n    \"Spikes\": [\n      {\n       
+        \"Id\": 102,\n        \"Position\": {\n          \"X\": 1.8,\n          \"Y\":
+        0\n        },\n        \"DirectionAngle\": 0\n      }\n    ],\n    \"Walls\":
+        [\n      {\n        \"Id\": 102,\n        \"Position\": {\n          \"X\":
+        0,\n          \"Y\": 0\n        },\n        \"Points\": [\n          {\n           
+        \"X\": -1,\n            \"Y\": 3\n          },\n          {\n           
+        \"X\": 1,\n            \"Y\": 3\n          },\n          {\n            \"X\":
+        1,\n            \"Y\": -3\n          },\n          {\n            \"X\":
+        -1,\n            \"Y\": -3\n          }\n        ]\n      }\n    ]\n  }\n]"
+      _fieldBarriersJson: "[\n  {\n    \"Position\": {\n      \"x\": -22,\n     
+        \"y\": -14\n    },\n    \"Size\": {\n      \"x\": 5,\n      \"y\": 5\n   
+        },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\": {\n      \"x\":
+        22,\n      \"y\": 14\n    },\n    \"Size\": {\n      \"x\": 5,\n      \"y\":
+        5\n    },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\": {\n     
+        \"x\": -22,\n      \"y\": 14\n    },\n    \"Size\": {\n      \"x\": 5,\n     
+        \"y\": 5\n    },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\":
+        {\n      \"x\": 22,\n      \"y\": -14\n    },\n    \"Size\": {\n      \"x\":
+        5,\n      \"y\": 5\n    },\n    \"Shape\": \"Circle\"\n  }\n]"
+      _stageBoundriesWallsJson: 
+    - _environmentName: Earphone
+      _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
+      _wallsJson: "[\n  {\"Id\": 1, \"Points\": [{\"X\": 0.00, \"Y\": -30.00}, {\"X\":
+        7.76, \"Y\": -28.98}, {\"X\": 7.25, \"Y\": -27.05}, {\"X\": 0.00, \"Y\":
+        -28.00}]},\n  {\"Id\": 2, \"Points\": [{\"X\": 7.76, \"Y\": -28.98}, {\"X\":
+        15.00, \"Y\": -25.98}, {\"X\": 14.00, \"Y\": -24.25}, {\"X\": 7.25, \"Y\":
+        -27.05}]},\n  {\"Id\": 3, \"Points\": [{\"X\": 15.00, \"Y\": -25.98}, {\"X\":
+        21.21, \"Y\": -21.21}, {\"X\": 19.80, \"Y\": -19.80}, {\"X\": 14.00, \"Y\":
+        -24.25}]},\n  {\"Id\": 4, \"Points\": [{\"X\": 21.21, \"Y\": -21.21}, {\"X\":
+        25.98, \"Y\": -15.00}, {\"X\": 24.25, \"Y\": -14.00}, {\"X\": 19.80, \"Y\":
+        -19.80}]},\n  {\"Id\": 5, \"Points\": [{\"X\": 25.98, \"Y\": -15.00}, {\"X\":
+        28.98, \"Y\": -7.76}, {\"X\": 27.05, \"Y\": -7.25}, {\"X\": 24.25, \"Y\":
+        -14.00}]},\n  {\"Id\": 6, \"Points\": [{\"X\": 28.98, \"Y\": -7.76}, {\"X\":
+        30.00, \"Y\": 0.00}, {\"X\": 28.00, \"Y\": 0.00}, {\"X\": 27.05, \"Y\": -7.25}]},\n 
+        {\"Id\": 7, \"Points\": [{\"X\": 30.00, \"Y\": 0.00}, {\"X\": 28.98, \"Y\":
+        7.76}, {\"X\": 27.05, \"Y\": 7.25}, {\"X\": 28.00, \"Y\": 0.00}]},\n  {\"Id\":
+        8, \"Points\": [{\"X\": 28.98, \"Y\": 7.76}, {\"X\": 25.98, \"Y\": 15.00},
+        {\"X\": 24.25, \"Y\": 14.00}, {\"X\": 27.05, \"Y\": 7.25}]},\n  {\"Id\":
+        9, \"Points\": [{\"X\": 25.98, \"Y\": 15.00}, {\"X\": 21.21, \"Y\": 21.21},
+        {\"X\": 19.80, \"Y\": 19.80}, {\"X\": 24.25, \"Y\": 14.00}]},\n  {\"Id\":
+        10, \"Points\": [{\"X\": 21.21, \"Y\": 21.21}, {\"X\": 15.00, \"Y\": 25.98},
+        {\"X\": 14.00, \"Y\": 24.25}, {\"X\": 19.80, \"Y\": 19.80}]},\n  {\"Id\":
+        11, \"Points\": [{\"X\": 15.00, \"Y\": 25.98}, {\"X\": 7.76, \"Y\": 28.98},
+        {\"X\": 7.25, \"Y\": 27.05}, {\"X\": 14.00, \"Y\": 24.25}]},\n  {\"Id\":
+        12, \"Points\": [{\"X\": 7.76, \"Y\": 28.98}, {\"X\": 0.00, \"Y\": 30.00},
+        {\"X\": 0.00, \"Y\": 28.00}, {\"X\": 7.25, \"Y\": 27.05}]},\n  {\"Id\": 13,
+        \"Points\": [{\"X\": 0.00, \"Y\": 30.00}, {\"X\": -7.76, \"Y\": 28.98}, {\"X\":
+        -7.25, \"Y\": 27.05}, {\"X\": 0.00, \"Y\": 28.00}]},\n  {\"Id\": 14, \"Points\":
+        [{\"X\": -7.76, \"Y\": 28.98}, {\"X\": -15.00, \"Y\": 25.98}, {\"X\": -14.00,
+        \"Y\": 24.25}, {\"X\": -7.25, \"Y\": 27.05}]},\n  {\"Id\": 15, \"Points\":
+        [{\"X\": -15.00, \"Y\": 25.98}, {\"X\": -21.21, \"Y\": 21.21}, {\"X\": -19.80,
+        \"Y\": 19.80}, {\"X\": -14.00, \"Y\": 24.25}]},\n  {\"Id\": 16, \"Points\":
+        [{\"X\": -21.21, \"Y\": 21.21}, {\"X\": -25.98, \"Y\": 15.00}, {\"X\": -24.25,
+        \"Y\": 14.00}, {\"X\": -19.80, \"Y\": 19.80}]},\n  {\"Id\": 17, \"Points\":
+        [{\"X\": -25.98, \"Y\": 15.00}, {\"X\": -28.98, \"Y\": 7.76}, {\"X\": -27.05,
+        \"Y\": 7.25}, {\"X\": -24.25, \"Y\": 14.00}]},\n  {\"Id\": 18, \"Points\":
+        [{\"X\": -28.98, \"Y\": 7.76}, {\"X\": -30.00, \"Y\": 0.00}, {\"X\": -28.00,
+        \"Y\": 0.00}, {\"X\": -27.05, \"Y\": 7.25}]},\n  {\"Id\": 19, \"Points\":
+        [{\"X\": -30.00, \"Y\": 0.00}, {\"X\": -28.98, \"Y\": -7.76}, {\"X\": -27.05,
+        \"Y\": -7.25}, {\"X\": -28.00, \"Y\": 0.00}]},\n  {\"Id\": 20, \"Points\":
+        [{\"X\": -28.98, \"Y\": -7.76}, {\"X\": -25.98, \"Y\": -15.00}, {\"X\": -24.25,
+        \"Y\": -14.00}, {\"X\": -27.05, \"Y\": -7.25}]},\n  {\"Id\": 21, \"Points\":
+        [{\"X\": -25.98, \"Y\": -15.00}, {\"X\": -21.21, \"Y\": -21.21}, {\"X\":
+        -19.80, \"Y\": -19.80}, {\"X\": -24.25, \"Y\": -14.00}]},\n  {\"Id\": 22,
+        \"Points\": [{\"X\": -36.00, \"Y\": -30.00}, {\"X\": 0.00, \"Y\": -30.00},
+        {\"X\": 0.00, \"Y\": -28.00}, {\"X\": -36.00, \"Y\": -28.00}]},\n  {\"Id\":
+        23, \"Points\": [{\"X\": -36.00, \"Y\": -21.21}, {\"X\": -21.21, \"Y\": -21.21},
+        {\"X\": -19.80, \"Y\": -19.80}, {\"X\": -36.00, \"Y\": -19.80}]},\n  {\"Id\":
+        24, \"Points\": [{\"X\": -38.00, \"Y\": -30.00}, {\"X\": -36.00, \"Y\": -30.00},
+        {\"X\": -36.00, \"Y\": -19.80}, {\"X\": -38.00, \"Y\": -19.80}]}\n]"
+      _lavaWallsJson: "[\n  {\n    \"Id\": 1,\n    \"Points\": [\n      {\n       
+        \"X\": -36.00,\n        \"Y\": -28.00\n      },\n      {\n        \"X\":
+        -21.21,\n        \"Y\": -28.00\n      },\n      {\n        \"X\": -21.21,\n       
+        \"Y\": -21.21\n      },\n      {\n        \"X\": -36.00,\n        \"Y\":
+        -21.21\n      }\n    ]\n  }\n]"
+      _talentCardsJson: 
+      _environmentSpringsJson: 
+      _environmentSpikesJson: 
+      _teleportGatesJson: "[\n  {\n    \"Id\": 1,\n    \"GateA\": {\n      \"Position\":
+        {\n        \"X\": 1,\n        \"Y\": 24\n      },\n      \"NormalRotation\":
+        0,\n      \"AttachToRotationWheelId\": 101\n    },\n    \"GateB\": {\n     
+        \"Position\": {\n        \"X\": -36,\n        \"Y\": -24.75\n      },\n     
+        \"NormalRotation\": 0,\n    }\n  }\n]"
+      _rotatingWheelsJson: "[\n  {\n    \"Id\": 101,\n    \"CenterPosition\": {\n     
+        \"X\": 0,\n      \"Y\": 0\n    },\n    \"RotationSpeed\": -12,\n    \"Walls\":
+        [\n      {\n        \"Id\": 201,\n        \"Position\": {\n          \"X\":
+        0,\n          \"Y\": 14\n        },\n        \"Points\": [\n          {\n           
+        \"X\": -0.5,\n            \"Y\": 14\n          },\n          {\n           
+        \"X\": 0.5,\n            \"Y\": 14\n          },\n          {\n           
+        \"X\": 0.5,\n            \"Y\": -14\n          },\n          {\n           
+        \"X\": -0.5,\n            \"Y\": -14\n          }\n        ]\n      }\n   
+        ]\n  }\n]"
+      _fieldBarriersJson: "[\n  {\n    \"Position\": { \"x\": -18.0, \"y\": -8.0
+        },\n    \"Size\": { \"x\": 3.5, \"y\": 3.5 },\n    \"Shape\": \"Circle\"\n 
+        },\n  {\n    \"Position\": { \"x\": -6.0, \"y\": 8.0},\n    \"Size\": { \"x\":
+        3.5, \"y\": 3.5 },\n    \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\":
+        { \"x\": 6.0, \"y\": -8.0 },\n    \"Size\": { \"x\": 3.5, \"y\": 3.5 },\n   
+        \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\": { \"x\": 18.0, \"y\":
+        8.0 },\n    \"Size\": { \"x\": 3.5, \"y\": 3.5 },\n    \"Shape\": \"Circle\"\n 
+        }\n]"
+      _stageBoundriesWallsJson: 
+  AvailableLayoutIndexes: 000000000300000004000000050000000a0000000b000000

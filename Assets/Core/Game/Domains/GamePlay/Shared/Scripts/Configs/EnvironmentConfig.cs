@@ -72,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 
         public void SetEnvironmentSprings(S2CModels.EnvironmentSpringConfig[] environmentSprings, int index)
         {
-             if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
             {
                 environmentLayout.SetEnvironmentSpringsJson(environmentSprings.ToJson());
             }
@@ -87,7 +87,24 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 #endif
         }
 
-        public void SetTeleportGates(Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.EnvironmentTeleportGatePairS2C[] teleportGates, int index)
+        public void SetEnvironmentSpikes(S2CModels.EnvironmentSpikeConfig[] environmentSpikes, int index)
+        {
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetEnvironmentSpikesJson(environmentSpikes.ToJson());
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetEnvironmentSpikesJson(environmentSpikes.ToJson());
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
+
+        public void SetTeleportGates(S2CModels.EnvironmentTeleportGatePairS2C[] teleportGates, int index)
         {
             if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
             {
@@ -141,6 +158,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                     CheckConfigArray(layout.GetStageBoundaries(), $"Layout {index} StageBoundary", errorBuilder);
                     CheckConfigArray(layout.GetTalentCards(), $"Layout {index} TalentCard", errorBuilder);
                     CheckConfigArray(layout.GetEnvironmentSprings(), $"Layout {index} EnvironmentSpring", errorBuilder);
+                    CheckConfigArray(layout.GetEnvironmentSpikes(), $"Layout {index} EnvironmentSpike", errorBuilder);
                     CheckConfigArray(layout.GetTeleportGates(), $"Layout {index} TeleportGate", errorBuilder);
 
                     var wheels = layout.GetRotatingWheels();
@@ -154,7 +172,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                             CheckConfigArray(w.Walls, $"Layout {index} RotatingWheel {w.Id} Wall", errorBuilder);
                             CheckConfigArray(w.LavaWalls, $"Layout {index} RotatingWheel {w.Id} LavaWall", errorBuilder);
                             CheckConfigArray(w.Springs, $"Layout {index} RotatingWheel {w.Id} Spring", errorBuilder);
-                            CheckConfigArray(w.TeleportGatePairs, $"Layout {index} RotatingWheel {w.Id} TeleportGatePair", errorBuilder);
                         }
                     }
                 }

@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -31,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedClassUnorderedList<StageEndNetEventS2C> StageEndNetEvents;
         public FixedUnorderedList<TeamLostNetEventS2C> TeamLostNetEvents;
         public FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C> EnvironmentSpringPlayerCollisionNetEvents;
+        public FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C> EnvironmentSpikePlayerCollisionNetEvents;
         public FixedUnorderedList<TalentSwitchNetEventS2C> TalentSwitchNetEvents;
         public FixedUnorderedList<GainBoltsNetEventS2C> GainBoltsNetEvents;
         public FixedUnorderedList<PlayerToEnvironmentTeleportGateCollisionNetEventS2C> PlayerToEnvironmentTeleportGateCollisionNetEvents;
@@ -89,6 +91,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             TeamLostNetEvents = new FixedUnorderedList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
             TalentSwitchNetEvents = new FixedUnorderedList<TalentSwitchNetEventS2C>(maxCap.TalentSwitchNetEvents);
             EnvironmentSpringPlayerCollisionNetEvents = new FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>(maxCap.EnvironmentSpringPlayerCollisionNetEvents);
+            EnvironmentSpikePlayerCollisionNetEvents = new FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C>(maxCap.EnvironmentSpikePlayerCollisionNetEvents);
             GainBoltsNetEvents = new FixedUnorderedList<GainBoltsNetEventS2C>(maxCap.GainBoltsNetEvents);
 
             PlayerToEnvironmentTeleportGateCollisionNetEvents =
@@ -168,6 +171,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 37)) != 0) SerializedLayChickenEggNetEvents(writer);
             if ((eventMask & (1UL << 38)) != 0) SerializedChickenEggHitNetEvents(writer);
             if ((eventMask & (1UL << 39)) != 0) SerializedActivateYearsOfPainTalentNetEvents(writer);
+            if ((eventMask & (1UL << 42)) != 0) SerializedEnvironmentSpikePlayerCollisionEvents(writer);
         }
 
         private ulong CalculateEventMask()
@@ -213,6 +217,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (LayChickenEggNetEvents.Count > 0) eventMask |= 1UL << 37;
             if (ChickenEggHitNetEvents.Count > 0) eventMask |= 1UL << 38;
             if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 39;
+            if (EnvironmentSpikePlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 42;
 
             return eventMask;
         }
@@ -348,6 +353,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask & (1UL << 39)) != 0) DeserializedActivateYearsOfPainTalentNetEvents(reader);
             else ActivateYearsOfPainTalentNetEvents.Clear();
+            
+            if ((eventMask & (1UL << 42)) != 0) DeserializedEnvironmentSpikePlayerCollisionEvents(reader);
+            else EnvironmentSpikePlayerCollisionNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -435,6 +443,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         {
             writer.Put((byte)EnvironmentSpringPlayerCollisionNetEvents.Count);
             foreach (var netEvent in EnvironmentSpringPlayerCollisionNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void SerializedEnvironmentSpikePlayerCollisionEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)EnvironmentSpikePlayerCollisionNetEvents.Count);
+            foreach (var netEvent in EnvironmentSpikePlayerCollisionNetEvents.AsSpan())
             {
                 netEvent.Serialize(writer);
             }
@@ -619,6 +636,17 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (var i = 0; i < count; i++)
             {
                 ref var netEvent = ref EnvironmentSpringPlayerCollisionNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void DeserializedEnvironmentSpikePlayerCollisionEvents(NetDataReader reader)
+        {
+            EnvironmentSpikePlayerCollisionNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref EnvironmentSpikePlayerCollisionNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

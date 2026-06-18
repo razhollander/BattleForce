@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using CoreDomain.Scripts.CoreInitiator.Base;
 
@@ -7,13 +8,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator
     {
         public readonly MatchSimulationStateS2C InitialState;
         public readonly int StateOccouredOnTick;
-        public readonly ushort LocalPlayerId;
-
-        public GamePlayMatchInitiatorEnterData(MatchSimulationStateS2C initialState, ushort localPlayerId, int stateOccouredOnTick)
+        public Dictionary<ushort, int> PlayerIdToDeviceIdDictionary;
+        
+        public GamePlayMatchInitiatorEnterData(MatchSimulationStateS2C initialState, int stateOccouredOnTick, Dictionary<ushort,int>playerIdToDeviceIdDictionary)
         {
             InitialState = initialState;
-            LocalPlayerId = localPlayerId;
             StateOccouredOnTick = stateOccouredOnTick;
+            PlayerIdToDeviceIdDictionary = new Dictionary<ushort, int>(playerIdToDeviceIdDictionary.Count);
+
+            foreach (var kvp in playerIdToDeviceIdDictionary)
+            {
+                PlayerIdToDeviceIdDictionary.Add(kvp.Key, kvp.Value);
+            }
         }
     }
 }
+

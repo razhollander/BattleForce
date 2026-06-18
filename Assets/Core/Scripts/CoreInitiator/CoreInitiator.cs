@@ -90,6 +90,11 @@ namespace CoreDomain.Scripts.CoreInitiator
             _worldCameraController.InitEntryPoint();
         }
 
+        private void OnDestroy()
+        {
+            _worldCameraController.InitExitPoint();
+        }
+
         private async Awaitable LoadGameScene(CancellationTokenSource cancellationTokenSource)
         {
             await _sceneLoaderService.TryLoadScene(SceneType.GameScene, new GameInitiatorEnterData(), cancellationTokenSource);
