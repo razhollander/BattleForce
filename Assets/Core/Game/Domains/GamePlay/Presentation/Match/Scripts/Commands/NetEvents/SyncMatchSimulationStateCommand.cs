@@ -168,16 +168,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         private void CreateFieldBarriers(float mapSizeMultiplier)
         {
+            if (!_simulationState.IsInPreparationPhase)
+            {
+                return;
+            }
+            
             var barrierConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetFieldBarriers();
             if (barrierConfigs.IsNullOrEmpty())
             {
                 return;
             }
 
-            var teamIds = new List<ushort>(_matchDataService.TeamIds);
-            teamIds.Sort();
             ushort barrierIndex = 0;
-            foreach (var teamId in teamIds)
+            foreach (var teamId in _simulationState.FieldBarriersOrderedByTeamId.AsSpan())
             {
                 var barrierConfig = barrierConfigs[barrierIndex];
                 _matchDataService.AddFieldBarrier(barrierIndex, teamId, barrierConfig.Position * mapSizeMultiplier, barrierConfig.Size * mapSizeMultiplier, barrierConfig.Shape);

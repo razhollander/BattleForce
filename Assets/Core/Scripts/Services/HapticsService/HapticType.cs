@@ -1,6 +1,6 @@
 namespace Core.Scripts.Services.HapticsService
 {
-    public enum HapticProfileType
+    public enum HapticType
     {
         None = 0,
         DamageTaken = 1,

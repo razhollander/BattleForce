@@ -9,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ILocalPlayersDataService _localPlayersDataService;
         private IHapticsService _hapticsService;
-        private HapticProfileType _hapticProfileType;
+        private HapticType _hapticType;
         
         private ushort _playerId;
 
@@ -19,9 +19,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             return this;
         }
         
-        public PlayHapticsForPlayerCommand SetHapticProfileType(HapticProfileType hapticProfileType)
+        public PlayHapticsForPlayerCommand SetHapticProfileType(HapticType hapticType)
         {
-            _hapticProfileType = hapticProfileType;
+            _hapticType = hapticType;
             return this;
         }
         
@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             if (_localPlayersDataService.TryGetLocalPlayerInputDevice(_playerId, out var inputDevice) && inputDevice is Gamepad gamepad)
             {
-                _hapticsService.PlayHaptics(_hapticProfileType, gamepad);
+                _hapticsService.PlayHaptics(_hapticType, gamepad);
             }
         }
     }

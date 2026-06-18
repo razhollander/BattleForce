@@ -4,9 +4,9 @@ using UnityEngine;
 namespace Core.Scripts.Services.HapticsService
 {
     [CreateAssetMenu(fileName = "HapticsProfiles", menuName = "BF/Presentation/Haptics Profiles")]
-    public class HapticsProfileScriptableObject : ScriptableObject
+    public class HapticsConfig : ScriptableObject
     {
         [SerializeField] 
-        public SerializableDictionary<HapticProfileType, HapticsProfile> Profiles = new SerializableDictionary<HapticProfileType, HapticsProfile>();
+        public SerializableDictionary<HapticType, HapticsProfile> Profiles = new SerializableDictionary<HapticType, HapticsProfile>();
     }
 }

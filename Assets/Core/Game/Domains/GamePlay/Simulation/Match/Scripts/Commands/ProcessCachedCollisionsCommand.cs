@@ -407,7 +407,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 return;
             }
-            
+            LogService.LogError("Hit player with spike!");
             var damage = _gamePlayConfigService.GamePlayConfig.EnvironmentSpikes.Damage;
             _playerHitCommand
                 .SetPlayerIdGotHit(playerId)

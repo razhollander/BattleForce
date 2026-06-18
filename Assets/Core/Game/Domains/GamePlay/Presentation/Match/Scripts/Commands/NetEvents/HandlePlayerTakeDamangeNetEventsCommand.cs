@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var maxHealth = playerModel.Spaceship.Health.MaxHealth;
                 _commandFactory.CreateCommandVoid<PlayHapticsForPlayerCommand>()
                     .SetPlayerId(playerTakeDamageId)
-                    .SetHapticProfileType(HapticProfileType.DamageTaken)
+                    .SetHapticProfileType(HapticType.DamageTaken)
                     .Execute();
                 _playerControllers.SetPlayerHealth(playerTakeDamageId, currentHealth, maxHealth);
                 _matchPlayerUIControllers.SetPlayerHealth(playerTakeDamageId, currentHealth, maxHealth);

@@ -4,6 +4,6 @@ namespace Core.Scripts.Services.HapticsService
 {
     public interface IHapticsService
     {
-        void PlayHaptics(HapticProfileType hapticProfileType, Gamepad gamepad);
+        void PlayHaptics(HapticType hapticType, Gamepad gamepad);
     }
 }

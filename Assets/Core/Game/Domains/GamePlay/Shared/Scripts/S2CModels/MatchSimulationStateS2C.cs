@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentChickenEggStateS2C> ChickenEggs;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
+        public FixedOrderedList<ushort> FieldBarriersOrderedByTeamId;
         public int EnvironmentLayoutId;
         public StageType StageType;
         public int StartPhaseInitialTick;
@@ -42,10 +43,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             ChickenEggs = new FixedUnorderedList<TalentChickenEggStateS2C>(maxChickenEggs);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
+            FieldBarriersOrderedByTeamId = new FixedOrderedList<ushort>(maxTeams);
         }
 
         public void Serialize(NetDataWriter writer)
         {
+            var amountOfTeams = (byte)GemsPerTeamId.Count;
+            writer.Put(amountOfTeams);
+
             var playerCount = Players.Count;
             writer.Put((byte)playerCount);
             foreach (var player in Players.AsSpan())
@@ -74,14 +79,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 powerUp.Serialize(writer);
             }
 
-            writer.Put((ushort)GemsPerTeamId.Count);
             foreach (var kvp in GemsPerTeamId)
             {
                 writer.Put(kvp.Key);
                 writer.Put(kvp.Value);
             }
-
-            writer.Put((ushort)BoltsPerTeam.Count);
+            
             foreach (var kvp in BoltsPerTeam)
             {
                 writer.Put(kvp.Key);
@@ -114,6 +117,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var chickenEgg in ChickenEggs.AsSpan())
             {
                 chickenEgg.Serialize(writer);
+            }  
+            
+            foreach (var teamId in FieldBarriersOrderedByTeamId.AsSpan())
+            {
+                writer.Put((byte)teamId);
             }
 
             writer.Put((byte)EnvironmentLayoutId);
@@ -127,6 +135,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         
         public void Deserialize(NetDataReader reader)
         {
+            var amountOfTeams = reader.GetByte();
+            
             var playersCount = reader.GetByte();
             Players.Clear();
             for (var i = 0; i < playersCount; i++)
@@ -160,8 +170,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
             
             GemsPerTeamId.Clear();
-            var jemsCount = reader.GetUShort();
-            for (int i = 0; i < jemsCount; i++)
+            for (int i = 0; i < amountOfTeams; i++)
             {
                 var teamId = reader.GetUShort();
                 var jems = reader.GetInt();
@@ -169,8 +178,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
 
             BoltsPerTeam.Clear();
-            var boltsCount = reader.GetUShort();
-            for (int i = 0; i < boltsCount; i++)
+            for (int i = 0; i < amountOfTeams; i++)
             {
                 var teamId = reader.GetUShort();
                 var bolts = reader.GetInt();
@@ -207,6 +215,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var chickenEgg = ref ChickenEggs.AddAndGet();
                 chickenEgg.Deserialize(reader);
+            }
+            
+            FieldBarriersOrderedByTeamId.Clear();
+            for (var i = 0; i < amountOfTeams; i++)
+            {
+                ref var teamId = ref FieldBarriersOrderedByTeamId.AddAndGet();
+                teamId = reader.GetByte();
             }
 
             EnvironmentLayoutId = reader.GetByte();
@@ -759,6 +774,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             KOProjectiles.Clear();
             GrapplingHookProjectiles.Clear();
             ChickenEggs.Clear();
+            FieldBarriersOrderedByTeamId.Clear();
         }
     }
 }

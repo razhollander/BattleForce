@@ -159,8 +159,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                     _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown);
                     _playersTalentsManager.AddPlayer(playerId);
                     _simulationInputService.AddPlayer(playerId);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Chicken, playerId, 0, out _, out _);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
-                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.YearsOfPain, playerId, 0, out _, out _);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
                 
                     if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)

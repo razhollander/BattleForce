@@ -9,32 +9,32 @@ namespace Core.Scripts.Services.HapticsService
 {
     public class HapticsService : IHapticsService
     {
-        // 1. Update the DllImport to accept an integer index
         [DllImport("MacRumblePlugin")]
         private static extern void PlayMacBluetoothRumble(int index, float lowFreq, float highFreq);
-
-        private readonly HapticsProfileScriptableObject _hapticsProfileScriptableObject;
+        [DllImport("MacRumblePlugin")]
+        private static extern void ResetMacBluetoothRumble();
+        private readonly HapticsConfig _hapticsConfig;
         private readonly Dictionary<Gamepad, CancellationTokenSource> _activeHapticsTasks = new();
 
-        public HapticsService(HapticsProfileScriptableObject hapticsProfileScriptableObject)
+        public HapticsService(HapticsConfig hapticsConfig)
         {
-            _hapticsProfileScriptableObject = hapticsProfileScriptableObject;
+            _hapticsConfig = hapticsConfig;
+#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+            ResetMacBluetoothRumble();
+#endif
         }
 
-        public void PlayHaptics(HapticProfileType hapticProfileType, Gamepad gamepad)
+        public void PlayHaptics(HapticType hapticType, Gamepad gamepad)
         {
-            PlayOneShotRoutineAsync(gamepad, _hapticsProfileScriptableObject.Profiles[hapticProfileType], CancellationToken.None).Forget();
+            PlayOneShotRoutineAsync(gamepad, _hapticsConfig.Profiles[hapticType], new CancellationToken()).Forget();
         }
 
         private async Awaitable PlayOneShotRoutineAsync(Gamepad gamepad, HapticsProfile profile, CancellationToken token)
         {
-            // 2. Find the index of this specific gamepad in Unity's hardware list
-// To this:
+           
             int gamepadIndex = Gamepad.all.IndexOf(g => g == gamepad);            
-            // Failsafe: If gamepad isn't found, default to 0
             if (gamepadIndex < 0) gamepadIndex = 0; 
-
-            // 3. Pass the index into the Mac rumble function
+            
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
             PlayMacBluetoothRumble(gamepadIndex, profile.LowFrequency, profile.HighFrequency);
 #else
@@ -49,7 +49,6 @@ namespace Core.Scripts.Services.HapticsService
             {
                 if (gamepad != null)
                 {
-                    // 4. Pass the index to stop the specific gamepad
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
                     PlayMacBluetoothRumble(gamepadIndex, 0f, 0f);
 #else
@@ -71,8 +70,6 @@ namespace Core.Scripts.Services.HapticsService
                 _activeHapticsTasks.Remove(gamepad);
             }
             
-            // 5. Find the index for the safety stop method
-// To this:
             int gamepadIndex = Gamepad.all.IndexOf(g => g == gamepad);
             if (gamepadIndex < 0) gamepadIndex = 0;
 
