@@ -15,12 +15,12 @@ MonoBehaviour:
   Profiles:
     m_keys: 010000000200000003000000
     m_values:
-    - LowFrequency: 0.088
-      HighFrequency: 0.227
+    - LowFrequency: 1
+      HighFrequency: 0.05
       Duration: 0.2
     - LowFrequency: 0.454
       HighFrequency: 0.62
       Duration: 0.1
-    - LowFrequency: 0
-      HighFrequency: 0.525
-      Duration: 0.25
+    - LowFrequency: 1
+      HighFrequency: 1
+      Duration: 0.5

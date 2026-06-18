@@ -235,6 +235,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
                 var barrierConfig = barrierConfigs[barrierIndex];
                 _matchDataService.EnvironmentData.AddFieldBarrier((ushort)barrierIndex, teamId, barrierConfig.Position * mapSizeMultiplier, barrierConfig.Size * mapSizeMultiplier, barrierConfig.Shape);
+                ref var refTeamId = ref _matchDataService.SimulationState.FieldBarriersOrderedByTeamId.AddAndGet();
+                refTeamId = teamId;
                 barrierIndex++;
             }
         }

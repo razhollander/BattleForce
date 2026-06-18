@@ -34,7 +34,7 @@ namespace CoreDomain.Scripts.ZenjectInstallers
         [SerializeField] private UICameraView _uiCameraView;
         [SerializeField] private WorldCameraView _worldCameraView;
         [SerializeField] private NetworkConfig _networkConfig;
-        [SerializeField] private HapticsProfileScriptableObject _hapticsProfileScriptableObject;
+        [SerializeField] private HapticsConfig _hapticsConfig;
 
         public override void InstallBindings()
         {
@@ -55,7 +55,7 @@ namespace CoreDomain.Scripts.ZenjectInstallers
             Container.BindInterfacesTo<UICameraController>().AsSingle().WithArguments(_uiCameraView).NonLazy();
             Container.BindInterfacesTo<WorldCameraController>().AsSingle().WithArguments(_worldCameraView).NonLazy();
             Container.BindInterfacesTo<TimerService>().AsSingle().NonLazy();
-            Container.BindInterfacesTo<HapticsService>().AsSingle().WithArguments(_hapticsProfileScriptableObject).NonLazy();
+            Container.BindInterfacesTo<HapticsService>().AsSingle().WithArguments(_hapticsConfig).NonLazy();
             Container.Bind<IUnityMainThreadDispatcher>().To<UnityMainThreadDispatcher>().AsSingle().NonLazy();
             Container.Bind<CoreAudioClipsScriptableObject>().FromScriptableObject(_coreAudioClipsScriptableObject).AsSingle().NonLazy();
             Container.Bind<GameInputActions>().AsSingle().NonLazy();
