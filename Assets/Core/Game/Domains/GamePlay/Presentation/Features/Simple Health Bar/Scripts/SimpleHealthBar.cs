@@ -1,6 +1,9 @@
 ﻿/* Written by Kaz Crowe */
 /* SimpleHealthBar.cs */
 
+using System.Threading;
+using Core.Scripts.Extensions;
+using Core.Scripts.Utils;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -108,12 +111,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scr
 		}
 
 		#region PUBLIC FUNCTIONS
+
 		/// <summary>
 		/// Updates the health bar with the current and max values.
 		/// </summary>
 		/// <param name="currentValue">The current value of the bar.</param>
 		/// <param name="maxValue">The maximum value of the bar.</param>
-		public void UpdateBar ( float currentValue, float maxValue )
+		/// <param name="cancellationToken">cancellationToken</param>
+		public void UpdateBar ( float currentValue, float maxValue, CancellationToken cancellationToken)
 		{
 			// If the bar image is left unassigned, then return.
 			if( barImage == null )
@@ -136,6 +141,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scr
 			barImage.fillAmount = targetFill;
 			lerpBG.Kill();
 			lerpBG = DOTween.To(() => barImageBG.fillAmount, x => barImageBG.fillAmount = x, targetFill, lerpTime);
+			lerpBG.WithCancellationSafe(cancellationToken).Forget();
 			// Call the functions for the options.
 			UpdateOptions();
 		}

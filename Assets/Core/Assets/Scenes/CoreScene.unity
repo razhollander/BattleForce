@@ -784,6 +784,7 @@ MonoBehaviour:
   _uiCameraView: {fileID: 2130148136}
   _worldCameraView: {fileID: 1433494645}
   _networkConfig: {fileID: 11400000, guid: b7e0e344763e24e639529857dcf51380, type: 2}
+  _hapticsConfig: {fileID: 11400000, guid: 98eba74a2ce484f0490a67113c877eed, type: 2}
 --- !u!1 &2079734857
 GameObject:
   m_ObjectHideFlags: 0

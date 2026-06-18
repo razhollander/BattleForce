@@ -95,9 +95,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _moveAssistArrowSpriteRenderer.color = color.Darken(0.3f);
         }
         
-        public void UpdateHealthBar(int health, int maxHealth)
+        public void UpdateHealthBar(int health, int maxHealth, CancellationToken cancellationToken)
         {
-            _healthBar.UpdateBar(health, maxHealth);
+            _healthBar.UpdateBar(health, maxHealth, cancellationToken);
         }
         
         public void SetIsSpinned(bool isSpinned, CancellationTokenSource cancellationTokenSource)
