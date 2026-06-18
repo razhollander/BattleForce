@@ -69,6 +69,8 @@ MonoBehaviour:
           IsArrowShownOnlyWhilePressed: 1
         - TalentType: 10
           IsArrowShownOnlyWhilePressed: 0
+        - TalentType: 11
+          IsArrowShownOnlyWhilePressed: 1
       HammerTalentConfig:
         HammerSpeed: 10
         HammerSize: 1
@@ -119,8 +121,8 @@ MonoBehaviour:
         DurationInSeconds: 3
         ConeAngleDegrees: 45
         ConeRange: 15
-        EnemyPushForcePerTick: 40
-        CasterRecoilForcePerTick: 15
+        EnemyPushForcePerTick: 200
+        CasterRecoilForcePerTick: 100
       TalentCardWidth: 1.602175
       TalentCardHeight: 2.382844
     Lava:
@@ -164,7 +166,7 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 11
-        CooldownInSeconds: 5
+        CooldownInSeconds: 1
     - rid: 2200602851054190747
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
