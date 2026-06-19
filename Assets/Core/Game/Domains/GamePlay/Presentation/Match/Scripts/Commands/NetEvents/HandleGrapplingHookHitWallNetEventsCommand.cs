@@ -1,8 +1,8 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in events)
             {
                 _hookProjectilesControllers.UpdateOnHit(netEvent.ProjectileId);
-                _audioService.PlayAudio(AudioClipType.GrapplingHookHit, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.GrapplingHookHit);
             }
 
             _cachedPresentationEventsService.GrapplingHookHitWallNetEvents.Clear();

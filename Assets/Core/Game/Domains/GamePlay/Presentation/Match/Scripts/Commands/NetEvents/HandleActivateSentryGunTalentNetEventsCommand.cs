@@ -2,8 +2,8 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in events)
             {
                 _playerControllers.SetPlayerSentryGunState(netEvent.CasterPlayerId, true);
-                _audioService.PlayAudio(AudioClipType.SentryGunCast, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.SentryGunCast);
             }
 
             _cachedPresentationEventsService.ActivateSentryGunTalentNetEvents.Clear();

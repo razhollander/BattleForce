@@ -5,8 +5,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -55,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _talentCardControllers.DestroyTalentCard(talentCardObtainedNetEvent.TalentCardId);
                 _matchPlayerUIControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.PlayerTalents, _currentServerTick);
                 _playerControllers.UpdatePlayerTalents(obtainedByPlayerId, talentCardObtainedNetEvent.PlayerTalents, _currentServerTick);
-                _audioService.PlayAudio(AudioClipType.TalentCardObtained, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.TalentCardObtained);
                 
                 var isFirstTalentObtained = talentCardObtainedNetEvent.PlayerTalents.Count == 1;
                 if (isFirstTalentObtained || talentCardObtainedNetEvent.DidReplaceTalent)

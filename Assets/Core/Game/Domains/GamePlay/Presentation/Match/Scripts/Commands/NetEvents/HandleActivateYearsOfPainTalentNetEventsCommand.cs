@@ -1,7 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in _cachedPresentationEventsService.ActivateYearsOfPainTalentNetEvents)
             {
                 _matchPlayerControllers.PlayerYearsOfPainForPlayer(netEvent.CasterPlayerId, netEvent.Direction);
-                _audioService.PlayAudio(AudioClipType.YearsOfPainCast, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.YearsOfPainCast);
             }
 
             _cachedPresentationEventsService.ActivateYearsOfPainTalentNetEvents.Clear();

@@ -2,8 +2,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -34,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in _cachedPresentationEventsService.CreateMagenticPullFieldNetEvents)
             {
                 _magneticPullEffectController.PlayFieldEffect(netEvent.Position.ToUnityVector2(), netEvent.Direction.ToUnityVector2(), _sharedConfig.MagneticPullFieldRadius);
-                _audioService.PlayAudio(AudioClipType.MagneticPullCast, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.MagneticPullCast);
 
                 if (netEvent.HasHit)
                 {

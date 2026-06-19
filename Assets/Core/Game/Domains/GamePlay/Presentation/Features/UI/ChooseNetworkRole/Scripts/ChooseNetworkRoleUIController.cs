@@ -8,8 +8,8 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using Core.Scripts.Network;
+using Core.Scripts.Services.AudioService;
 using Core.Scripts.Utils;
-using CoreDomain.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.DataPersistence;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -165,7 +165,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnPlayPlaybackClicked()
         {
-            _audioService.PlayAudio(AudioClipType.UiClick, AudioChannelType.Fx);
+            _audioService.PlayAudio(AudioClipType.UiClick);
             _ = OnPlayPlaybackClickedAsync();
         }
 
@@ -188,7 +188,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnServerClicked()
         {
-            _audioService.PlayAudio(AudioClipType.UiClick, AudioChannelType.Fx);
+            _audioService.PlayAudio(AudioClipType.UiClick);
             _ = OnServerClickedAsync();
         }
 
@@ -213,7 +213,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnHostClicked()
         {
-            _audioService.PlayAudio(AudioClipType.UiClick, AudioChannelType.Fx);
+            _audioService.PlayAudio(AudioClipType.UiClick);
             StartHost().Forget();
         }
 
@@ -335,7 +335,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         
         private void OnClientClicked()
         {
-            _audioService.PlayAudio(AudioClipType.UiClick, AudioChannelType.Fx);
+            _audioService.PlayAudio(AudioClipType.UiClick);
             SaveLocallyChosenParameters();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;

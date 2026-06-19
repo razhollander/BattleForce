@@ -2,9 +2,9 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using Core.Scripts.Services.HapticsService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     .SetPlayerId(netEvent.PlayerId)
                     .SetHapticProfileType(HapticType.Spinned).Execute();
                 _playerControllers.SetPlayersSpinnedState(netEvent.PlayerId, true);
-                _audioService.PlayAudio(AudioClipType.SpinnedStarted, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.SpinnedStarted);
             }
 
             events.Clear();

@@ -4,8 +4,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using Core.Scripts.Services.HapticsService;
-using CoreDomain.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -52,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                 if (currentHealth > 0)
                 {
-                    _audioService.PlayAudio(AudioClipType.PlayerTakeDamage, AudioChannelType.Fx);
+                    _audioService.PlayAudio(AudioClipType.PlayerTakeDamage);
                 }
             }
             

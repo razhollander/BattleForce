@@ -3,8 +3,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var playerCasterTeamId = _matchDataService.GetPlayerTeamId(casterPlayerId);
                 _matchPlayerControllers.PlayLayEggAnimation(casterPlayerId);
                 _chickenEggsControllers.CreateEgg(netEvent.EggId, netEvent.Position, playerCasterTeamId);
-                _audioService.PlayAudio(AudioClipType.ChickenEggLay, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.ChickenEggLay);
             }
 
             netEvents.Clear();

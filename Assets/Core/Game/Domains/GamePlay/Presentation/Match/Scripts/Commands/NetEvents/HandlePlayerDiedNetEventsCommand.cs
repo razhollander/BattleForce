@@ -3,8 +3,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _matchPlayerControllers.SetIsTailWaving(playerDiedEvent.PlayerId, false);
                 _matchPlayerControllers.SetIsDeadAuraEnabled(playerDiedEvent.PlayerId, true);
                 _matchPlayerUIControllers.SwitchToPlayerDeadState(playerId);
-                _audioService.PlayAudio(AudioClipType.PlayerDied, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.PlayerDied);
             }
 
             playerDiedEvents.Clear();

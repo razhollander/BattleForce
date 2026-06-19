@@ -3,8 +3,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mv
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var playerPosition = _playerControllers.GetPlayerPosition(powerUpBallObtainedEvent.ObtainedByPlayerId);
                 _powerUpBallObtainedEffectController.PlayEffect(powerUpBallPosition, playerPosition);
                 _powerUpBallControllers.DestroyPowerUpBall(powerUpBallId);
-                _audioService.PlayAudio(AudioClipType.PowerUpBallObtained, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.PowerUpBallObtained);
             }
             
             powerUpBallObtainedNetEvents.Clear();

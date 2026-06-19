@@ -1,8 +1,8 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var powerUpBallId = powerUpBallsSpawnEvent.PowerUpBallId;
                 _powerUpBallControllers.CreatePowerUpBall(powerUpBallId, powerUpBallsSpawnEvent.Position.ToUnityVector2());
-                _audioService.PlayAudio(AudioClipType.PowerUpBallSpawned, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.PowerUpBallSpawned);
             }
             
             powerUpBallsSpawnEvents.Clear();

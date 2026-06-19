@@ -1,7 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using CoreDomain.Scripts.Services.AudioService;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Utils;
 
@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var currentRadius = MathUtils.RemapClamped(swapFieldCreatedEvent.OccuredOnTick,
                     swapFieldCreatedEvent.EndOnTick, 0, swapFieldCreatedEvent.MaxRadius, _tick); // we intentioanly don't use the model in the match data service, because we may not have it in an edge case that the field was created and destroyed at the same tick.
                 _swapFieldControllers.CreateSwapField(swapFieldCreatedEvent.SwapFieldId, currentRadius, playerPosition);
-                _audioService.PlayAudio(AudioClipType.TalentCast, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.TalentCast);
             }
 
             _cachedPresentationEventsService.CreateSwapFieldNetEvents.Clear();

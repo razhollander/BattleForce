@@ -1,7 +1,7 @@
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
 using UnityEngine;
 
-namespace CoreDomain.Scripts.Services.AudioService
+namespace Core.Scripts.Services.AudioService
 {
     public abstract class AudioClipsScriptableObject : ScriptableObject
     {

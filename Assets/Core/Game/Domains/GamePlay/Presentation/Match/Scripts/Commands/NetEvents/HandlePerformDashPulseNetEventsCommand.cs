@@ -4,8 +4,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in _cachedPresentationEventsService.PerformDashPulseNetEvents)
             {
                 PlayDashPulseEffectForPlayer(netEvent.CasterPlayerId);
-                _audioService.PlayAudio(AudioClipType.DashPulseCast, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.DashPulseCast);
             }
 
             _cachedPresentationEventsService.PerformDashPulseNetEvents.Clear();

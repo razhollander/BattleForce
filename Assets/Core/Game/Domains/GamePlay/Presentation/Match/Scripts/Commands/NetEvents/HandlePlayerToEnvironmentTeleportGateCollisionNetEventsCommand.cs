@@ -5,8 +5,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -45,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _teelportEffectController.PlayEffect(teleportGateCollisionEvent.ExitPoint.ToUnityVector2());
                 var playerState = _matchDataService.GetPlayer(playerId);
                 _playerControllers.SetPlayerTransform(playerId, playerState.Spaceship.Transform.Position, playerState.Spaceship.Transform.Direction);
-                _audioService.PlayAudio(AudioClipType.TeleportGateCollision, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.TeleportGateCollision);
             }
             
             _cachedPresentationEventsService.PlayerToEnvironmentTeleportGateCollisionNetEvents.Clear();

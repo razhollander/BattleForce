@@ -2,9 +2,9 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var evt in events)
             {
                 _chickenEggsControllers.BreakAndDestroyEgg(evt.EggId, _stageCancellationTokenProvider.CancellationTokenSource).Forget();
-                _audioService.PlayAudio(AudioClipType.ChickenEggHit, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.ChickenEggHit);
             }
 
             events.Clear();

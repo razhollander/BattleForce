@@ -3,7 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
-using CoreDomain.Scripts.Services.AudioService;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Sirenix.Utilities;
 
@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var bulletColor = _gameplayConfig.ColorPerTeamId[_matchDataService.GetPlayer(bulletsSpawnEvent.BelongToPlayerId).TeamId];
                 _bulletControllers.CreateBullet(bulletId, bulletsSpawnEvent.BulletRadius, bulletsSpawnEvent.Position, bulletColor);
                 _playerControllers.ShootBulletEffectForPlayer(bulletsSpawnEvent.BelongToPlayerId);
-                _audioService.PlayAudio(AudioClipType.PlayerShoot, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.PlayerShoot);
             }
             
             bulletsSpawnEvents.Clear();

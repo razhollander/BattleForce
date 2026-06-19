@@ -1,4 +1,4 @@
-namespace CoreDomain.Scripts.Services.AudioService
+namespace Core.Scripts.Services.AudioService
 {
     public enum AudioClipType
     {

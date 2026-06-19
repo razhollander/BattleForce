@@ -1,7 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
-using CoreDomain.Scripts.Services.AudioService;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
             
-            _audioService.PlayAudio(AudioClipType.Swap, AudioChannelType.Fx); // play only once no matter how many events received
+            _audioService.PlayAudio(AudioClipType.Swap); // play only once no matter how many events received
             //BlinkPlayersWithoutSwapEffect(playersSwapEvents);
             playersSwapEvents.Clear();
         }

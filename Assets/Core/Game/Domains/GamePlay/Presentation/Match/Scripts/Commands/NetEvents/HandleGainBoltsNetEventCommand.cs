@@ -4,9 +4,9 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoa
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
-using CoreDomain.Scripts.Services.AudioService;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var playerTransform = _matchPlayerControllers.GetPlayerTransform(gainBoltsEvent.PlayerId);
                 var effectSpawnPosition = playerTransform.position.ToVector2XY() + player.Spaceship.Transform.Radius * Vector2.up;
                 _gainBoltEffectController.PlayEffect(gainBoltsEvent.GainedAmount, effectSpawnPosition, playerTransform);
-                _audioService.PlayAudio(AudioClipType.GainBolts, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.GainBolts);
             }
 
             gainBoltsNetEvents.Clear();

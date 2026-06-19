@@ -3,7 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scrip
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Scripts.Extensions;
-using CoreDomain.Scripts.Services.AudioService;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -38,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                 _koProjectilesControllers.CreateKOProjectile(koProjectileModel.Id, koProjectileModel.Position.ToUnityVector2(), koProjectileModel.Rotation.ToUnityVector2(),
                     playerCasterPosition, koProjectileModel.Size);
-                _audioService.PlayAudio(AudioClipType.TalentCast, AudioChannelType.Fx);
+                _audioService.PlayAudio(AudioClipType.TalentCast);
             }
             
             _cachedPresentationEventsService.CreateKOProjectileNetEvents.Clear();
