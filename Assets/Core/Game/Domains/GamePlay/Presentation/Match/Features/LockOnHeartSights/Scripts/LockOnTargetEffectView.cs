@@ -10,12 +10,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
     public class LockOnTargetEffectView : MonoBehaviour, IPoolable
     {
         private const string LOCK_ON_TARGET_ANIMATION_NAME = "LockOnTarget";
-        
+        private const string LOCK_ON_TARGET_SHOOTABLE_ANIMATION_NAME = "LockOnTargetShootable";
+
+        [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private LineRenderer _lineRenderer;
         [SerializeField] private Animation _animation;
         [SerializeField] private float _hitLineWidth = 0.2f;
         [SerializeField] private float _idleLineWidth = 0.1f;
         [SerializeField] private float _lineHitDurationInSeconds = 0.3f;
+        [SerializeField] private Sprite _shootableSprite;
+        [SerializeField] private Sprite _lockOnTargetSprite;
+        [SerializeField] private Color _lineColorLockOnTarget = Color.white;
+        [SerializeField] private Color _lineColorShootable = Color.white;
+        
         private CancellationTokenSource _currentAnimationCancellationTokenSource;
 
         public Action Despawn { get; set; }
@@ -31,24 +38,48 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
 
         public async Awaitable PlayLockOnTargetAnimationLooped(CancellationToken cancellationToken)
         {
+            var animationCancellationTokenSource = RestartAnimationCancellationTokenSource(cancellationToken);
             _lineRenderer.startWidth = _idleLineWidth;
             _lineRenderer.endWidth = _idleLineWidth;
-            _currentAnimationCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            while (!_currentAnimationCancellationTokenSource.IsCancellationRequested)
-            {
-                await _animation.PlayAsync(LOCK_ON_TARGET_ANIMATION_NAME, cancellationToken: _currentAnimationCancellationTokenSource.Token);
-                PlayLineHitAnimation(_currentAnimationCancellationTokenSource.Token).Forget();
-            }
+            // while (!animationCancellationTokenSource.IsCancellationRequested)
+            // {
+            _lineRenderer.startColor = _lineColorLockOnTarget;
+            _lineRenderer.endColor = _lineColorLockOnTarget;
+                _spriteRenderer.sprite = _lockOnTargetSprite;
+                await _animation.PlayAsync(LOCK_ON_TARGET_ANIMATION_NAME, cancellationToken: animationCancellationTokenSource.Token);
+                //PlayLineHitAnimation(animationCancellationTokenSource.Token).Forget();
+            //}
         }
 
-        private async Awaitable PlayLineHitAnimation(CancellationToken cancellationToken)
+        public async Awaitable PlayLockOnTargetShootableAnimationLooped(CancellationToken cancellationToken)
         {
+            var animationCancellationTokenSource = RestartAnimationCancellationTokenSource(cancellationToken);
             _lineRenderer.startWidth = _hitLineWidth;
             _lineRenderer.endWidth = _hitLineWidth;
-            await Awaitable.WaitForSecondsAsync(_lineHitDurationInSeconds, cancellationToken);
-            _lineRenderer.startWidth = _idleLineWidth;
-            _lineRenderer.endWidth = _idleLineWidth;
+            _lineRenderer.startColor = _lineColorShootable;
+            _lineRenderer.endColor = _lineColorShootable;
+            // while (!animationCancellationTokenSource.IsCancellationRequested)
+            // {
+                _spriteRenderer.sprite = _shootableSprite;
+                await _animation.PlayAsync(LOCK_ON_TARGET_SHOOTABLE_ANIMATION_NAME, cancellationToken: animationCancellationTokenSource.Token);
+            //}
         }
+
+        private CancellationTokenSource RestartAnimationCancellationTokenSource(CancellationToken cancellationToken)
+        {
+            _currentAnimationCancellationTokenSource?.Cancel();
+            _currentAnimationCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            return _currentAnimationCancellationTokenSource;
+        }
+
+        // private async Awaitable PlayLineHitAnimation(CancellationToken cancellationToken)
+        // {
+        //     _lineRenderer.startWidth = _hitLineWidth;
+        //     _lineRenderer.endWidth = _hitLineWidth;
+        //     await Awaitable.WaitForSecondsAsync(_lineHitDurationInSeconds, cancellationToken);
+        //     _lineRenderer.startWidth = _idleLineWidth;
+        //     _lineRenderer.endWidth = _idleLineWidth;
+        // }
 
         public void OnDespawned()
         {

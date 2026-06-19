@@ -73,11 +73,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         {
             InitRNG();
             SetCurrentTickIfPlayback();
-            _playerInputsPacketsHandler.InitEntryPoint();
             _matchPlayerJoinPacketsHandler.InitEntryPoint();
             TrySwitchToPlayback();
 
             InitPlayers(_simulationMatchEnterData);
+            _playerInputsPacketsHandler.InitEntryPoint();
             _stageDataService.InitEntryPoint();
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
             _tickProcessor.InitEntryPoint();

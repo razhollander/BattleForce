@@ -12,7 +12,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly Dictionary<ushort, PlayerLockOnTargetTimers> _playerTimers;
-        private readonly List<(ushort CasterId, ushort TargetId)> _cachedPlayersToDamage;
 
         public LockOnTargetTimerService(IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig)
         {
@@ -20,7 +19,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _sharedGamePlayConfig = sharedGamePlayConfig;
 
             _playerTimers = new Dictionary<ushort, PlayerLockOnTargetTimers>(networkConfig.MaxCap.ConcurrentPlayers);
-            _cachedPlayersToDamage = new List<(ushort CasterId, ushort TargetId)>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void StepTimers(float deltaTime)
@@ -42,17 +40,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             }
         }
 
-        public List<(ushort CasterId, ushort TargetId)> GetPlayersToDamage()
+        public bool IsTargetShootable(ushort casterId, ushort targetId)
         {
-            _cachedPlayersToDamage.Clear();
-            var limit = _sharedGamePlayConfig.LockOnTargetDurationInSeconds;
-
-            foreach (var playerTimer in _playerTimers.Values)
+            if (!_playerTimers.TryGetValue(casterId, out var playerTimer))
             {
-                playerTimer.CollectPlayersToDamage(limit, _cachedPlayersToDamage);
+                return false;
             }
 
-            return _cachedPlayersToDamage;
+            return playerTimer.IsTargetShootable(targetId, _sharedGamePlayConfig.LockOnTargetDurationInSeconds);
         }
 
         public void ResetTimer(ushort casterId, ushort targetId)

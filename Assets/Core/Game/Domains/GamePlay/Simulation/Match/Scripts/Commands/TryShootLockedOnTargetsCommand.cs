@@ -1,31 +1,40 @@
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    public class TryDamagePlayersOnTargetCommand : BaseCommand, ICommandVoid
+    public class TryShootLockedOnTargetsCommand : BaseCommand, ICommandVoid
     {
         private ICommandFactory _commandFactory;
+        private IMatchDataService _matchDataService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
         private INetEventsDataService _netEventsDataService;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
-
-        private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
 
-        public TryDamagePlayersOnTargetCommand SetProcessedTick(int processedTick)
+        private int _processedTick;
+        private ushort _casterPlayerId;
+
+        public TryShootLockedOnTargetsCommand SetProcessedTick(int processedTick)
         {
             _processedTick = processedTick;
+            return this;
+        }
+
+        public TryShootLockedOnTargetsCommand SetCasterPlayerId(ushort casterPlayerId)
+        {
+            _casterPlayerId = casterPlayerId;
             return this;
         }
 
         public override void ResolveDependencies()
         {
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
@@ -34,24 +43,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
-            var playersToDamage = _lockOnTargetTimerService.GetPlayersToDamage();
+            var casterState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
+            var targetedEnemyIds = casterState.Spaceship.TargetedEnemyIds;
 
-            foreach (var pair in playersToDamage)
+            for (int i = 0; i < targetedEnemyIds.Count; i++)
             {
-                var casterId = pair.CasterId;
-                var targetId = pair.TargetId;
+                var targetId = targetedEnemyIds[i].PlayerTargetId;
 
-                LogService.Log("hitting player: " + targetId + " by player: " + casterId + "");
-                
-                _lockOnTargetTimerService.ResetTimer(casterId, targetId);
+                if (!_lockOnTargetTimerService.IsTargetShootable(_casterPlayerId, targetId))
+                {
+                    continue;
+                }
+
+                _lockOnTargetTimerService.ResetTimer(_casterPlayerId, targetId);
                 _playerHitCommand
                     .SetPlayerIdGotHit(targetId)
-                    .SetWasHitByAnotherPlayer(true, casterId)
+                    .SetWasHitByAnotherPlayer(true, _casterPlayerId)
                     .SetProcessedTick(_processedTick)
                     .SetHitDamage(_gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartHitDamage)
                     .Execute();
 
-                _netEventsDataService.AddPlayerLockedOnTargetHitNetEvent(_processedTick, casterId, targetId);
+                _netEventsDataService.AddPlayerLockedOnTargetHitNetEvent(_processedTick, _casterPlayerId, targetId);
             }
         }
     }

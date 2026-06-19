@@ -108,7 +108,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddLayChickenEggNetEventS2C(int tick, ushort casterId, ushort eggId, Vector2 position);
         void AddChickenEggHitNetEventS2C(int tick, ushort eggId);
         void AddActivateYearsOfPainTalentNetEventS2C(int tick, ushort casterPlayerId, Vector2 direction, int cooldownEndTick, bool didHitEnemy, ushort hitEnemyId);
-        void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<ushort> playerIdsLockedOnTarget);
+        void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget);
         void AddPlayerLockedOnTargetHitNetEvent(int onTick, ushort casterPlayId, ushort hitPlayerId);
     }
 }

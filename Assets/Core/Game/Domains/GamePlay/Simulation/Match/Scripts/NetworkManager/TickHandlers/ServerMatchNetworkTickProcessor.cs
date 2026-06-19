@@ -40,7 +40,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IClientsNetworkDataService _clientsNetworkDataService;
 
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
-        private TryDamagePlayersOnTargetCommand _tryDamagePlayersOnTargetCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private StepTimersCommand _stepTimersCommand;
@@ -79,7 +78,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         {
             _tryEndPlayersSpinCommand = _commandFactory.CreateCommandVoid<TryEndPlayersSpinCommand>();
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
-            _tryDamagePlayersOnTargetCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersOnTargetCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
@@ -115,7 +113,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _tryEndPlayersSpinCommand.SetTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
                 _trySendPlayersLockOnTargetChangedCommand.SetProcessedTick(currentTick).Execute();
-                _tryDamagePlayersOnTargetCommand.SetProcessedTick(currentTick).Execute();
                 _overrideableNetEventsService.RegisterAllOverridableNetEvents();
                 RemoveOlderThanTickEventsPerClient(processPlayersInputsResult.HeighestProcessedTickPerClient);
                 SendCurrentTickStateToAllClients(currentTick);

@@ -66,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IMagneticPullEffectController _magneticPullEffectController;
         private IBackgroundParallaxController _backgroundParallaxController;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
+        private ILockOnTargetShootEffectController _lockOnTargetShootEffectController;
         private ILocalPlayersDataService _localPlayersDataService;
         private IGameInputActionsController _gameInputActionsController;
 
@@ -105,6 +106,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _magneticPullEffectController = _diContainer.Resolve<IMagneticPullEffectController>();
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
+            _lockOnTargetShootEffectController = _diContainer.Resolve<ILockOnTargetShootEffectController>();
             _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
         }
@@ -132,6 +134,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentTeleportGateControllers.InitEntryPoint();
             _backgroundParallaxController.InitEntryPoint();
             _lockOnTargetEffectController.InitEntryPoint();
+            _lockOnTargetShootEffectController.InitEntryPoint();
             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
                  .SetSimulationState(_enterData.InitialState)
                  .SetOccuredOnTick(_enterData.StateOccouredOnTick)

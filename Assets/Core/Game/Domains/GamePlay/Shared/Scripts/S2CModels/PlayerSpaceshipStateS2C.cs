@@ -17,14 +17,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsAlive = true;
         public bool IsSpinned;
         public PlayerAssistArrowType AssistArrowType;
-        public readonly FixedUnorderedList<ushort> TargetedEnemyIds;
+        public readonly FixedUnorderedList<PlayerOnTargetS2C> TargetedEnemyIds;
 
         public bool IsPlayerLockOnTargetSightShown => TargetedEnemyIds.Count > 0;
 
         public PlayerSpaceshipStateS2C(int maxTalents, int maxEnemiesAmount)
         {
             TalentsState = new PlayerTalentsStateS2C(maxTalents);
-            TargetedEnemyIds = new FixedUnorderedList<ushort>(maxEnemiesAmount);
+            TargetedEnemyIds = new FixedUnorderedList<PlayerOnTargetS2C>(maxEnemiesAmount);
         }
 
         public PlayerSpaceshipStateS2C GetClone()
@@ -66,7 +66,9 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((byte) targetedEnemyIdsAmount);
             for (int i = 0; i < targetedEnemyIdsAmount; i++)
             {
-                writer.Put((byte)TargetedEnemyIds[i]);
+                var targetedEnemy = TargetedEnemyIds[i];
+                writer.Put((byte)targetedEnemy.PlayerTargetId);
+                writer.Put(targetedEnemy.IsLockOnTargetShootable);
             }
         }
 
@@ -85,8 +87,9 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TargetedEnemyIds.Clear();
             for (int i = 0; i < targetedEnemyIdsAmount; i++)
             {
-                ref var enemyId = ref TargetedEnemyIds.AddAndGet();
-                enemyId = reader.GetByte();
+                ref var targetedEnemy = ref TargetedEnemyIds.AddAndGet();
+                targetedEnemy.PlayerTargetId = reader.GetByte();
+                targetedEnemy.IsLockOnTargetShootable = reader.GetBool();
             }
         }
 

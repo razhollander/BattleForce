@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         private readonly IPlayersTalentsManager _playersTalentsManager;
         private readonly IPlaybackRecorderService _playerbackRecorderService;
-        private readonly TryPerformShootForPlayerIfNotOnCooldownCommand _tryPerformShootForPlayerIfNotOnCooldownCommand;
+        private TryShootLockedOnTargetsCommand _tryShootLockedOnTargetsCommand;
 
         public bool DidReceiveAnyInputFromClient(long clientId)
         {
@@ -82,13 +82,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _playerInputPacketsPool = new ConcurrentPool<MatchPlayersInputPacketC2S>(() => new MatchPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers), maxAmountOfInputPacketsPlusMaxClientsAmount);
             _earliestInputPacketsPool = new ConcurrentPool<MatchPlayersInputPacketC2S>(() => new MatchPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers), networkConfig.MaxCap.ConcurrentPlayers);
             _heighestProcessedTickPerClient = new CapacityDict<long, int>(networkConfig.MaxCap.ConcurrentPlayers);
-            _tryPerformShootForPlayerIfNotOnCooldownCommand = _commandFactory.CreateCommandVoid<TryPerformShootForPlayerIfNotOnCooldownCommand>();
         }
 
         public void InitEntryPoint()
         {
             _networkManager.RegisterPacketsObserver(this);
             _updateSubscriptionService.RegisterGuiUpdatable(this);
+            _tryShootLockedOnTargetsCommand = _commandFactory.CreateCommandVoid<TryShootLockedOnTargetsCommand>();
         }
 
         public void InitExitPoint()
@@ -155,7 +155,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     }
 
                     var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-                    UpdatePlayerShoot(processedTick, true, playerState);
+                    UpdatePlayerShoot(processedTick, playerInput.IsShootInputPressed, playerState);
 
                     playerState.Spaceship.TalentsState.AimDirection = playerInput.AimDirection;
                     UpdatePlayerDirection(playerInput, playerState);
@@ -300,34 +300,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         {
             var playerId = playerModel.Id;
             _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, isShootInputPressed);
-            var shootState = playerModel.Spaceship.Shoot;
-            var isReadyToShoot = false;//shootState.CooldownSecondsLeft == shootState.MaxCooldown;
 
-            if (!isReadyToShoot)
+            var wasShootInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
+            if (!wasShootInputDownThisTick)
             {
                 return;
             }
 
-            var isEnemyInfrontOfPlayer = _physicsSimulator.ArcCastOnPlayers(
-                playerModel.Spaceship.Transform.Position,
-                _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.AutoShootRange,
-                playerModel.Spaceship.Transform.Direction,
-                _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.AutoShootAngleDegrees,
-                (short)playerModel.TeamId,
-                out var hitBodyData);
-
-            if (!isEnemyInfrontOfPlayer)
-            {
-                return;
-            }
-
-            var enemyId = hitBodyData.Id;
-            var enemyPlayerModel = _matchDataService.SimulationState.GetPlayerById(enemyId);
-            var doesPlayersLookAtSameDirection = System.Numerics.Vector2.Dot(playerModel.Spaceship.Transform.Direction, enemyPlayerModel.Spaceship.Transform.Direction) > 0;
-            if (doesPlayersLookAtSameDirection)
-            {
-                _tryPerformShootForPlayerIfNotOnCooldownCommand.SetPlayerId(playerId).SetTick(processedTick).Execute();
-            }
+            _tryShootLockedOnTargetsCommand.SetCasterPlayerId(playerId).SetProcessedTick(processedTick).Execute();
         }
 
         private void UpdatePlayerDirection(MatchLocalPlayerInputDataC2S playerInputData, PlayerStateS2C playerState)

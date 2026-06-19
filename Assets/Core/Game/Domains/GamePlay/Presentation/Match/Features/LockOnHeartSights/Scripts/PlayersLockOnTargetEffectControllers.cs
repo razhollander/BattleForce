@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -31,14 +32,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
             _effectsPool.InitPool();
         }
 
-        public void AddPlayer(ushort casterPlayerId, FixedUnorderedList<ushort> casterTargetedEnemyIds)
+        public void AddPlayer(ushort casterPlayerId, FixedUnorderedList<PlayerOnTargetS2C> casterTargetedEnemyIds)
         {
             _targetEffectControllerPerPlayerId[casterPlayerId] = new PlayerLockOnTargetEffectController(casterPlayerId, casterTargetedEnemyIds, _effectsPool, _sharedGamePlayConfig,
                 _networkConfig, _stageCancellationTokenProvider);
             RefreshTargetEffectsOfCaster(casterPlayerId, casterTargetedEnemyIds);
         }
 
-        public void RefreshTargetEffectsOfCaster(ushort casterPlayerId, FixedUnorderedList<ushort> playerIdsLockedOnTarget)
+        public void RefreshTargetEffectsOfCaster(ushort casterPlayerId, FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)
         {
             if (!_targetEffectControllerPerPlayerId.TryGetValue(casterPlayerId, out var casterActiveEffects))
             {

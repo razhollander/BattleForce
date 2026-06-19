@@ -78,6 +78,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             int teamIdsCount = _matchDataService.TeamIds.Count;
             foreach (ushort teamId in _matchDataService.TeamIds)
             {
+                LogService.LogError("add team: "+teamId);
+
                 _gemsGainedPerTeamIdPerTeam[teamId] = new Dictionary<ushort, int>(teamIdsCount);
             } 
             
@@ -100,13 +102,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             var newHealth = (ushort)Math.Max(DEAD_HEALTH_AMOUNT, playerState.Spaceship.Health.CurrentHealth - _hitDamage);
             playerState.Spaceship.Health.CurrentHealth = newHealth;
-            var isKillingBlow = newHealth > DEAD_HEALTH_AMOUNT;
+            var isStillAlive = newHealth > DEAD_HEALTH_AMOUNT;
             
-            LogService.LogTopic($"Player Hit! Id {_playerIdGotHit} hit with damage {_hitDamage}, new health: {newHealth}, is alive: {isKillingBlow}", LogTopicType.ServerNetwork);
-            _netEventsDataService.AddPlayerTakeDamageNetEvent(_processedTick, _playerIdGotHit, newHealth, _hitDamage, isKillingBlow);
+            LogService.LogTopic($"Player Hit! Id {_playerIdGotHit} hit with damage {_hitDamage}, new health: {newHealth}, is alive: {isStillAlive}", LogTopicType.ServerNetwork);
+            _netEventsDataService.AddPlayerTakeDamageNetEvent(_processedTick, _playerIdGotHit, newHealth, _hitDamage, isStillAlive);
             var boltsGained = _gamePlayConfigService.GamePlayConfig.BoltsGainedPerHit;
             
-            if (!isKillingBlow)
+            if (!isStillAlive)
             {
                 KillPlayer(playerState);
                 boltsGained += _gamePlayConfigService.GamePlayConfig.BoltsGainedPerKill;
@@ -155,7 +157,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _stageDataService.AddLosingTeam(losingTeamId);
-            
+            LogService.LogError("count: "+_gemsGainedPerTeamIdPerTeam.Count);
             var gemsGainedPerTeam = _gemsGainedPerTeamIdPerTeam[losingTeamId];
             gemsGainedPerTeam.Clear();
             var totalGemsPerTeam= _totalGemsPerTeamIdPerTeam[losingTeamId];

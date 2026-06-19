@@ -20,8 +20,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         private IPhysicsSimulator _physicsSimulator;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private INetEventsDataService _netEventsDataService;
-        
-        private FixedUnorderedList<ushort> _cachedLockedOnHeartIds;
+        private ILockOnTargetTimerService _lockOnTargetTimerService;
+
+        private FixedUnorderedList<PlayerOnTargetS2C> _cachedLockedOnHeartIds;
         private readonly PhysicsBodyType[] _cachedBodyTypesRayCastCanHit = {PhysicsBodyType.PlayerHeart, PhysicsBodyType.Wall, PhysicsBodyType.PlayerSpaceship, PhysicsBodyType.StartMatchWall};
         private int _processedTick;
 
@@ -30,15 +31,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _processedTick = processedTick;
             return this;
         }
-        
+
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
+            _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
             var networkConfig = _diContainer.Resolve<NetworkConfig>();
-            _cachedLockedOnHeartIds = new FixedUnorderedList<ushort>(networkConfig.MaxCap.ConcurrentPlayers - 1);
+            _cachedLockedOnHeartIds = new FixedUnorderedList<PlayerOnTargetS2C>(networkConfig.MaxCap.ConcurrentPlayers - 1);
         }
 
         public void Execute()
@@ -66,15 +68,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
                 for (int i = 0; i < _cachedLockedOnHeartIds.Count; i++)
                 {
-                    ref var targetedEnemyId = ref casterTargetedEnemyIds.AddAndGet();
-                    targetedEnemyId = _cachedLockedOnHeartIds[i];
+                    ref var targetedEnemy = ref casterTargetedEnemyIds.AddAndGet();
+                    targetedEnemy = _cachedLockedOnHeartIds[i];
                 }
 
                 _netEventsDataService.AddPlayerLockOnHeartTargetsChangedNetEvent(_processedTick, playerState.Id, casterTargetedEnemyIds);
             }
         }
 
-        private void FindTargetedEnemyIdsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<ushort> outputTargetedEnemyIds)
+        private void FindTargetedEnemyIdsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<PlayerOnTargetS2C> outputTargetedEnemyIds)
         {
             if (casterPlayerState.Spaceship.IsSpinned || !casterPlayerState.Spaceship.IsAlive)
             {
@@ -132,8 +134,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                     }
                 }
                 
-                ref var targetedPlayerId = ref outputTargetedEnemyIds.AddAndGet();
-                targetedPlayerId = targetedPlayerState.Id;
+                ref var targetedPlayer = ref outputTargetedEnemyIds.AddAndGet();
+                targetedPlayer.PlayerTargetId = targetedPlayerState.Id;
+                targetedPlayer.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterPlayerState.Id, targetedPlayerState.Id);
             }
         }
     }
