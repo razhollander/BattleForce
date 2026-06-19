@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
             
-            _audioService.PlayAudio(AudioClipType.Swap); // play only once no matter how many events received
+            _audioService.PlayAudio(AudioClipType.SwapHit); // play only once no matter how many events received
             //BlinkPlayersWithoutSwapEffect(playersSwapEvents);
             playersSwapEvents.Clear();
         }

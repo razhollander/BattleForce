@@ -15,7 +15,7 @@ namespace Core.Scripts.Services.AudioService
         MagneticPullHit = 12,
         SentryGunCast = 13,
         UmbrellaCast = 14,
-        YearsOfPainCast = 15,
+        YearsOfPainHit = 15,
         ChickenEggLay = 16,
         ChickenEggHit = 17,
         GrapplingHookHit = 18,
@@ -29,6 +29,6 @@ namespace Core.Scripts.Services.AudioService
         BulletDestroyed = 28,
         PowerUpBallSpawned = 29,
         PowerUpBallObtained = 30,
-        Swap = 31,
+        SwapHit = 31,
     }
 }

@@ -32,13 +32,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in _cachedPresentationEventsService.ActivateYearsOfPainTalentNetEvents)
             {
                 _matchPlayerControllers.PlayerYearsOfPainForPlayer(netEvent.CasterPlayerId, netEvent.Direction);
-                _audioService.PlayAudio(AudioClipType.YearsOfPainCast);
                 didHitAnyPlayer |= netEvent.HasHit;
             }
 
             if (didHitAnyPlayer)
             {
                 _worldCameraController.ShakeCamera(10,0.25f);
+                _audioService.PlayAudio(AudioClipType.YearsOfPainHit);
             }
 
             _cachedPresentationEventsService.ActivateYearsOfPainTalentNetEvents.Clear();
