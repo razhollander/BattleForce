@@ -30,10 +30,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
+            _audioService.PlayAudio(AudioClipType.SentryGunCast);
+            
             foreach (var netEvent in events)
             {
                 _playerControllers.SetPlayerSentryGunState(netEvent.CasterPlayerId, true);
-                _audioService.PlayAudio(AudioClipType.SentryGunCast);
             }
 
             _cachedPresentationEventsService.ActivateSentryGunTalentNetEvents.Clear();

@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                 _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, casterPlayerId, hookModel.Position.ToUnityVector2(), rotation.ToUnityVector2(),
                     casterPosition, hookModel.IsHookAttached);
-                _audioService.PlayAudio(AudioClipType.TalentCast);
+                _audioService.PlayAudio(AudioClipType.GrapplingHookShoot);
             }
 
             _cachedPresentationEventsService.CreateGrapplingHookProjectileNetEvents.Clear();

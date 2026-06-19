@@ -31,7 +31,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in events)
             {
                 _playerControllers.SetPlayersSpinnedState(netEvent.PlayerId, false);
-                _audioService.PlayAudio(AudioClipType.SpinnedEnded);
             }
 
             events.Clear();

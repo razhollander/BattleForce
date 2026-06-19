@@ -31,19 +31,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
+            _audioService.PlayAudio(AudioClipType.MagneticPullCast);
+            bool didHitAnyPlayer = false;
+
             foreach (var netEvent in _cachedPresentationEventsService.CreateMagenticPullFieldNetEvents)
             {
                 _magneticPullEffectController.PlayFieldEffect(netEvent.Position.ToUnityVector2(), netEvent.Direction.ToUnityVector2(), _sharedConfig.MagneticPullFieldRadius);
-                _audioService.PlayAudio(AudioClipType.MagneticPullCast);
 
                 if (netEvent.HasHit)
                 {
                     var enemyPosition = _matchPlayerControllers.GetPlayerPosition(netEvent.HitEnemyId);
                     var casterPosition = _matchPlayerControllers.GetPlayerPosition(netEvent.CasterPlayerId);
                     _magneticPullEffectController.PlayHitEffect(casterPosition, enemyPosition);
+                    didHitAnyPlayer = true;
                 }
             }
 
+            if (didHitAnyPlayer)
+            {
+                _audioService.PlayAudio(AudioClipType.MagneticPullHit);
+            }
+            
             _cachedPresentationEventsService.CreateMagenticPullFieldNetEvents.Clear();
         }
     }

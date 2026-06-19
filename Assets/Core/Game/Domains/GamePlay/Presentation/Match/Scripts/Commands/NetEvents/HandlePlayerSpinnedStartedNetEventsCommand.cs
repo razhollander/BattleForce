@@ -37,7 +37,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     .SetPlayerId(netEvent.PlayerId)
                     .SetHapticProfileType(HapticType.Spinned).Execute();
                 _playerControllers.SetPlayersSpinnedState(netEvent.PlayerId, true);
-                _audioService.PlayAudio(AudioClipType.SpinnedStarted);
             }
 
             events.Clear();

@@ -38,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                 _koProjectilesControllers.CreateKOProjectile(koProjectileModel.Id, koProjectileModel.Position.ToUnityVector2(), koProjectileModel.Rotation.ToUnityVector2(),
                     playerCasterPosition, koProjectileModel.Size);
-                _audioService.PlayAudio(AudioClipType.TalentCast);
+                _audioService.PlayAudio(AudioClipType.KOProjectileShoot);
             }
             
             _cachedPresentationEventsService.CreateKOProjectileNetEvents.Clear();
