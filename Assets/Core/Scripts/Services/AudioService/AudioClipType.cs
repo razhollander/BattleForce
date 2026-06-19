@@ -33,5 +33,6 @@ namespace CoreDomain.Scripts.Services.AudioService
         BulletDestroyed = 28,
         PowerUpBallSpawned = 29,
         PowerUpBallObtained = 30,
+        Swap = 31,
     }
 }
