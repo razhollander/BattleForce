@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: PowerUpsConfig
   m_EditorClassIdentifier: 
   PowerUpSprites:
-    m_keys: 
-    m_values: []
+    m_keys: 01000000
+    m_values:
+    - {fileID: 21300000, guid: 25f4e7c9b16a7498785e8cf196b5a347, type: 3}

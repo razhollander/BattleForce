@@ -24,6 +24,7 @@ namespace Core.Scripts.Network
     {
         public int ConcurrentPlayers = 8;
         public int ConcurrentEnemyPlayers => ConcurrentPlayers - 1;
+        public int ConcurrentLockOnTargets => ConcurrentEnemyPlayers + ConcurrentPowerUpBalls;
         public int ConcurrentBullets = 256;
         public int ConcurrentTalentCards = 128;
         public int ConcurrentEvironmentWalls = 256;
@@ -107,6 +108,7 @@ namespace Core.Scripts.Network
         public int ActivateYearsOfPainTalentNetEvents = 128;
         public int PlayerLockOnHeartTargetsChangedNetEvents = 128;
         public int PlayerLockOnHeartTargetHitNetEvents = 128;
+        public int PlayerPowerUpChangedNetEvents = 64;
 
         [Serializable]
         public class EnvironmentRotatingWheel

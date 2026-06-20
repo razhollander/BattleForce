@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
 using UnityEngine;
 using Zenject;
@@ -92,6 +93,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetPlayerUmbrellaState(ushort playerId, bool isUmbrella)
         {
             GetPlayer(playerId).SetUmbrellaState(isUmbrella);
+        }
+
+        public void SetPlayerCurrentPowerUp(ushort playerId, PowerUpType powerUpType)
+        {
+            GetPlayer(playerId).SetCurrentPowerUp(powerUpType);
         }
 
         public void SetPlayerChickenState(ushort playerId, bool isChicken)

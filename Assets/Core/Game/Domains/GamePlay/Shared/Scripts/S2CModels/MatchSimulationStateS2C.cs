@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         
         public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs)
         {
-            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer, maxPlayers-1));
+            Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer, maxPlayers - 1 + maxPowerUpBalls));
             Bullets = new FixedOrderedList<PlayerBulletS2C>(maxBullets);
             TalentCards = new FixedUnorderedList<TalentCardS2C>(maxTalentCards);
             PowerUpBalls = new FixedUnorderedList<PowerUpBallS2C>(maxPowerUpBalls);

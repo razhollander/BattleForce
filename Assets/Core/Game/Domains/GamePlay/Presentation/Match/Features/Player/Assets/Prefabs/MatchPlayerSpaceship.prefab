@@ -2582,15 +2582,18 @@ PrefabInstance:
       addedObject: {fileID: 7362873474621591369}
     - targetCorrespondingSourceObject: {fileID: 1218084602524261265, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       insertIndex: 1
-      addedObject: {fileID: 1805123323571989139}
+      addedObject: {fileID: 1683330553566013140}
     - targetCorrespondingSourceObject: {fileID: 1218084602524261265, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       insertIndex: 2
-      addedObject: {fileID: 4980779192031936318}
+      addedObject: {fileID: 1805123323571989139}
     - targetCorrespondingSourceObject: {fileID: 1218084602524261265, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       insertIndex: 3
-      addedObject: {fileID: 5328661682920501087}
+      addedObject: {fileID: 4980779192031936318}
     - targetCorrespondingSourceObject: {fileID: 1218084602524261265, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       insertIndex: 4
+      addedObject: {fileID: 5328661682920501087}
+    - targetCorrespondingSourceObject: {fileID: 1218084602524261265, guid: 62780855e77504170a719c539f4d7be9, type: 3}
+      insertIndex: 5
       addedObject: {fileID: 7683536375570391786}
     - targetCorrespondingSourceObject: {fileID: 6367321170785206256, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       insertIndex: 5
@@ -2691,7 +2694,7 @@ MonoBehaviour:
   _deadAura: {fileID: 8956675606127571364}
   _playerEyesView: {fileID: 6666478967031745484}
   _talentsHudView: {fileID: 3040328858012371818}
-  _lockOnHeartSightView: {fileID: 0}
+  _powerUpHudView: {fileID: 1990836679674911245}
   _crownGameObject: {fileID: 2730109357798013871}
   _deadTombstoneView: {fileID: 8592168888811366223}
 --- !u!4 &3673364497760119067 stripped
@@ -2745,3 +2748,116 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac7dae3e72f3b4dfebcf4b5c80ae44b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1001 &7184034264933520178
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4763135978522840468}
+    m_Modifications:
+    - target: {fileID: 7179756977389261255, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_Name
+      value: MatchPlayerPowerUpUIView
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 87.1725
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 87.1725
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.4100003
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 2.56
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.41
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+--- !u!224 &1683330553566013140 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8425871109068813798, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+  m_PrefabInstance: {fileID: 7184034264933520178}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1990836679674911245 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8651993710047758655, guid: eda35fa5506494503aca853e5cecde93, type: 3}
+  m_PrefabInstance: {fileID: 7184034264933520178}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 916c4d10d9c2d4ca6897a50e89dbc63e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PresentationMatchAssembly::Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc.MatchPlayerPowerUpHudView

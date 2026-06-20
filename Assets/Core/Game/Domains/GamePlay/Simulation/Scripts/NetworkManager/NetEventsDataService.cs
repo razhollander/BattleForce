@@ -67,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> ActivateYearsOfPainTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>> PlayerLockOnHeartTargetsChangedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> PlayerLockedOnTargetHitNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>> PlayerPowerUpChangedNetEventsPerClient { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -88,6 +89,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedClassUnorderedList<StageEndNetEventS2C>> _stageEndNetEventsListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>> _playerLockOnHeartTargetsChangedNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> _playerLockOnHeartTargetHitNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>> _playerPowerUpChangedNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>> _teamLostNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>> _talentSwitchNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>> _environmentSpringPlayerCollisionListPool;
@@ -141,6 +143,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             StageEndNetEventsPerClient = new CapacityDict<long, FixedClassUnorderedList<StageEndNetEventS2C>>(maxConcurrentPlayers);
             PlayerLockOnHeartTargetsChangedNetEventsPerClient = new CapacityDict<long, FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>>(maxConcurrentPlayers);
             PlayerLockedOnTargetHitNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>>(maxConcurrentPlayers);
+            PlayerPowerUpChangedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>>(maxConcurrentPlayers);
             TeamLostNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TeamLostNetEventS2C>>(maxConcurrentPlayers);
             TalentSwitchNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TalentSwitchNetEventS2C>>(maxConcurrentPlayers);
             EnvironmentSpringPlayerCollisionNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>>(maxConcurrentPlayers);
@@ -207,12 +210,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }, maxConcurrentPlayers);
             _playerLockOnHeartTargetsChangedNetEventsListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>>(() =>
             {
-                var list = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(networkConfig.MaxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxConcurrentPlayers-1));
+                var list = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(networkConfig.MaxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(networkConfig.MaxCap.ConcurrentLockOnTargets));
                 list.Clear();
                 return list;
             }, maxConcurrentPlayers);
 
             _playerLockOnHeartTargetHitNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>>(() => new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.PlayerLockOnHeartTargetHitNetEvents), maxConcurrentPlayers);
+            _playerPowerUpChangedNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>>(() => new FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>(networkConfig.MaxCap.PlayerPowerUpChangedNetEvents), maxConcurrentPlayers);
             _teamLostNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>>(() => new FixedUnorderedList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount), maxConcurrentPlayers);
             _talentSwitchNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>>(() => new FixedUnorderedList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
             _environmentSpringPlayerCollisionListPool = new ConcurrentPool<FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>>(() => new FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>(networkConfig.MaxCap.EnvironmentSpringPlayerCollisionNetEvents), maxConcurrentPlayers);
@@ -413,7 +417,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 LogService.LogError($"Player already exists! {clientId}");
             }
-            
+
+            if (!PlayerPowerUpChangedNetEventsPerClient.ContainsKey(clientId))
+            {
+                PlayerPowerUpChangedNetEventsPerClient.Add(clientId, _playerPowerUpChangedNetEventsListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {clientId}");
+            }
+
             if (!TeamLostNetEventsPerClient.ContainsKey(clientId))
             {
                 TeamLostNetEventsPerClient.Add(clientId, _teamLostNetEventsListPool.Get());
@@ -636,6 +649,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var playerLockOnTargetHitList = PlayerLockedOnTargetHitNetEventsPerClient[clientId];
             playerLockOnTargetHitList.Clear();
             _playerLockOnHeartTargetHitNetEventsListPool.Return(playerLockOnTargetHitList);
+            var playerPowerUpChangedList = PlayerPowerUpChangedNetEventsPerClient[clientId];
+            playerPowerUpChangedList.Clear();
+            _playerPowerUpChangedNetEventsListPool.Return(playerPowerUpChangedList);
             var teamLostList = TeamLostNetEventsPerClient[clientId];
             teamLostList.Clear();
             _teamLostNetEventsListPool.Return(teamLostList);
@@ -764,6 +780,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             StageEndNetEventsPerClient.Remove(clientId);
             PlayerLockOnHeartTargetsChangedNetEventsPerClient.Remove(clientId);
             PlayerLockedOnTargetHitNetEventsPerClient.Remove(clientId);
+            PlayerPowerUpChangedNetEventsPerClient.Remove(clientId);
             TeamLostNetEventsPerClient.Remove(clientId);
             TalentSwitchNetEventsPerClient.Remove(clientId);
             StartMatchEligibleChangedNetEventsPerClient.Remove(clientId);
@@ -988,6 +1005,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
+        public void AddPlayerPowerUpChangedNetEvent(int onTick, ushort playerId, PowerUpType powerUp)
+        {
+            foreach (var kvp in PlayerPowerUpChangedNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.PlayerId = playerId;
+                netEvent.PowerUp = powerUp;
+            }
+        }
+
         public void RemoveAllEventsOlderThanTick(long clientId, int tick)
         {
             if (BulletSpawnNetEventsPerClient.TryGetValue(clientId, out var bulletSpawnNetEvents))
@@ -1194,6 +1222,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     if (playerLockedOnTargetHitNetEvents[i].OccuredOnTick < tick)
                     {
                         playerLockedOnTargetHitNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PlayerPowerUpChangedNetEventsPerClient.TryGetValue(clientId, out var playerPowerUpChangedNetEvents))
+            {
+                for (int i = playerPowerUpChangedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerPowerUpChangedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerPowerUpChangedNetEvents.RemoveAt(i);
                     }
                 }
             }

@@ -24,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             {
                 writer.Put((byte)target.PlayerTargetId);
                 writer.Put(target.IsLockOnTargetShootable);
+                writer.Put((byte)target.TargetType);
             }
         }
 
@@ -38,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
                 ref var target = ref PlayerIdsLockedOnTarget.AddAndGet();
                 target.PlayerTargetId = reader.GetByte();
                 target.IsLockOnTargetShootable = reader.GetBool();
+                target.TargetType = (LockOnTargetType)reader.GetByte();
             }
         }
 

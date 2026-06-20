@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private INetEventsDataService _netEventsDataService;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private PlayerHitCommand _playerHitCommand;
+        private ObtainPowerUpBallCommand _obtainPowerUpBallCommand;
 
         private int _processedTick;
         private ushort _casterPlayerId;
@@ -39,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
+            _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
         }
 
         public void Execute()
@@ -48,7 +50,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             for (int i = 0; i < targetedEnemyIds.Count; i++)
             {
-                var targetId = targetedEnemyIds[i].PlayerTargetId;
+                var target = targetedEnemyIds[i];
+                var targetId = target.PlayerTargetId;
 
                 if (!_lockOnTargetTimerService.IsTargetShootable(_casterPlayerId, targetId))
                 {
@@ -56,15 +59,38 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
 
                 _lockOnTargetTimerService.ResetTimer(_casterPlayerId, targetId);
-                _playerHitCommand
-                    .SetPlayerIdGotHit(targetId)
-                    .SetWasHitByAnotherPlayer(true, _casterPlayerId)
-                    .SetProcessedTick(_processedTick)
-                    .SetHitDamage(_gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartHitDamage)
-                    .Execute();
 
-                _netEventsDataService.AddPlayerLockedOnTargetHitNetEvent(_processedTick, _casterPlayerId, targetId);
+                switch (target.TargetType)
+                {
+                    case LockOnTargetType.Heart:
+                        ShootHeartTarget(targetId);
+                        break;
+                    case LockOnTargetType.PowerUpBall:
+                        ShootPowerUpBallTarget(targetId);
+                        break;
+                }
             }
+        }
+
+        private void ShootHeartTarget(ushort targetId)
+        {
+            _playerHitCommand
+                .SetPlayerIdGotHit(targetId)
+                .SetWasHitByAnotherPlayer(true, _casterPlayerId)
+                .SetProcessedTick(_processedTick)
+                .SetHitDamage(_gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartHitDamage)
+                .Execute();
+
+            _netEventsDataService.AddPlayerLockedOnTargetHitNetEvent(_processedTick, _casterPlayerId, targetId);
+        }
+
+        private void ShootPowerUpBallTarget(ushort powerUpBallId)
+        {
+            _obtainPowerUpBallCommand
+                .SetProcessedTick(_processedTick)
+                .SetPowerUpBallId(powerUpBallId)
+                .SetObtainedByPlayerId(_casterPlayerId)
+                .Execute();
         }
     }
 }

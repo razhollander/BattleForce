@@ -35,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
         private SpinPlayerCommand _spinPlayerCommand;
+        private ObtainPowerUpBallCommand _obtainPowerUpBallCommand;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
         {
@@ -50,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
             _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
@@ -752,14 +754,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ref var powerUpBall = ref _matchDataService.SimulationState.PowerUpBalls.GetByIndex(powerUpBallIndex);
             var powerUpBallId = powerUpBall.Id;
             DestroyBullet(bulletModel, bulletBody);
-            DestroyPowerUpBall(powerUpBallId, powerUpBody);
-            _netEventsDataService.AddPowerUpObtainedNetEvent(_processedTick, powerUpBallId, bulletModel.BelongToPlayerId);
-        }
-
-        private void DestroyPowerUpBall(ushort powerUpBallId, Body powerUpBallBody)
-        {
-            _matchDataService.SimulationState.RemovePowerUpBallById(powerUpBallId);
-            _physicsSimulator.RemoveBody(powerUpBallBody);
+            _obtainPowerUpBallCommand
+                .SetProcessedTick(_processedTick)
+                .SetPowerUpBallId(powerUpBallId)
+                .SetObtainedByPlayerId(bulletModel.BelongToPlayerId)
+                .Execute();
         }
 
         private bool TryGetPowerUpBallToBulletCollisionData(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact, bool isBulletToPowerUpCollision, out PlayerBulletS2C bulletModel, out int powerUpBallIndex, out Body bulletBody, out Body powerUpBallBody)

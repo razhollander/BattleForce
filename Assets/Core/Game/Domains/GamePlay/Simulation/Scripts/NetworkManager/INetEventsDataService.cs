@@ -59,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> ActivateYearsOfPainTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>> PlayerLockOnHeartTargetsChangedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> PlayerLockedOnTargetHitNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>> PlayerPowerUpChangedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C>> EnvironmentSpikePlayerCollisionNetEventsPerClient { get; }
         
         void StartSavingClientEvents(long clientId);
@@ -110,5 +111,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddActivateYearsOfPainTalentNetEventS2C(int tick, ushort casterPlayerId, Vector2 direction, int cooldownEndTick, bool didHitEnemy, ushort hitEnemyId);
         void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget);
         void AddPlayerLockedOnTargetHitNetEvent(int onTick, ushort casterPlayId, ushort hitPlayerId);
+        void AddPlayerPowerUpChangedNetEvent(int onTick, ushort playerId, PowerUpType powerUp);
     }
 }

@@ -50,5 +50,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<ActivateYearsOfPainTalentNetEventS2C> ActivateYearsOfPainTalentNetEvents { get; }
         List<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents { get; }
         List<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents { get; }
+        List<PlayerPowerUpChangedNetEventS2C> PlayerPowerUpChangedNetEvents { get; }
     }
 }

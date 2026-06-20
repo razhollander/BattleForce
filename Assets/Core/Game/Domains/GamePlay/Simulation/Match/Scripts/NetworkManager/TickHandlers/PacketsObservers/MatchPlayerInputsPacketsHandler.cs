@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
@@ -49,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly ConcurrentPool<FixedClassUnorderedList<MatchPlayersInputPacketC2S>> _inputsListsPool;
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         private readonly IPlayersTalentsManager _playersTalentsManager;
+        private readonly IPlayersPowerUpsManager _playersPowerUpsManager;
         private readonly IPlaybackRecorderService _playerbackRecorderService;
         private TryShootLockedOnTargetsCommand _tryShootLockedOnTargetsCommand;
 
@@ -59,7 +61,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, INetEventsDataService netEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, ISimulationInputService simulationInputService, IClientsNetworkDataService clientsNetworkDataService)
+            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, ISimulationInputService simulationInputService, IClientsNetworkDataService clientsNetworkDataService,
+            IPlayersPowerUpsManager playersPowerUpsManager)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -70,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _updateSubscriptionService = updateSubscriptionService;
             _commandFactory = commandFactory;
             _playersTalentsManager = playersTalentsManager;
+            _playersPowerUpsManager = playersPowerUpsManager;
             _playerbackRecorderService = playerbackRecorderService;
             _simulationInputService = simulationInputService;
             _clientsNetworkDataService = clientsNetworkDataService;
@@ -166,13 +170,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentAInput, isTalentAInputPressed);
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentBInput, isTalentBInputPressed);
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentCInput, isTalentCInputPressed);
+                    _simulationInputService.SetPlayerInput(playerId, PlayerInputType.PowerUpInput, playerInput.IsPowerUpInputPressed);
 
                     TrySwitchTalent(processedTick, playerState);
                     ProcessPlayerTalentInput(processedTick, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, playerState, deltaTime);
+                    ProcessPlayerPowerUpInput(processedTick, playerState);
                 }
             }
 
             return earliestInputsPerClient;
+        }
+
+        private void ProcessPlayerPowerUpInput(int processedTick, PlayerStateS2C playerState)
+        {
+            var playerId = playerState.Id;
+            var wasPowerUpInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.PowerUpInput);
+            _playersPowerUpsManager.ProcessPowerUpInput(playerId, processedTick, wasPowerUpInputDownThisTick);
         }
 
         private void ProcessPlayerTalentInput(int processedTick, bool isTalentAInputPressed, bool isTalentBInputPressed, bool isTalentCInputPressed, PlayerStateS2C playerState, float deltaTime)
@@ -183,6 +196,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
 
             var playerId = playerState.Id;
+
+            if (_playersPowerUpsManager.IsPlayerAimingPowerUp(playerId))
+            {
+                return;
+            }
             _playersTalentsManager.ProcessAllTalentsTickOfPlayer(playerId, processedTick, deltaTime); // not sure should be here
             
             if (currentSelectedTalent.IsOnCooldown())

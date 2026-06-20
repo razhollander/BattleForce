@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void SetPlayerSentryGunState(ushort playerId, bool isOn);
         void SetPlayersSpinnedState(ushort playerId, bool isOn);
         void SetPlayerUmbrellaState(ushort playerId, bool isOn);
+        void SetPlayerCurrentPowerUp(ushort playerId, PowerUpType powerUpType);
         void SetPlayerChickenState(ushort playerId, bool isOn);
         void PlayLayEggAnimation(ushort playerId);
         void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction);

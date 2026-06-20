@@ -1,8 +1,11 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 {
@@ -10,12 +13,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
     {
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private IMatchPlayerControllers _playerControllers;
+        private IPowerUpBallControllers _powerUpBallControllers;
         private IMatchDataService _matchDataService;
 
         public override void ResolveDependencies()
         {
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+            _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
         }
 
@@ -24,13 +29,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             foreach (var playerModel in _matchDataService.Players)
             {
                 var casterPlayerHeadPosition = _playerControllers.GetPlayerHeadTransform(playerModel.PlayerId).position.ToVector2XY();
-                
+
                 foreach (var targetedEnemy in playerModel.Spaceship.TargetedEnemyIds.AsSpan())
                 {
-                    var targetedEnemyId = targetedEnemy.PlayerTargetId;
-                    var targetPlayerHeartPosition = _playerControllers.GetPlayerHeartTransform(targetedEnemyId).position.ToVector2XY();
-                    _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedEnemyId, casterPlayerHeadPosition, targetPlayerHeartPosition);
+                    var targetedId = targetedEnemy.PlayerTargetId;
+                    var targetPosition = GetTargetPosition(targetedEnemy);
+                    _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedId, casterPlayerHeadPosition, targetPosition);
                 }
+            }
+        }
+
+        private Vector2 GetTargetPosition(PlayerOnTargetS2C targetedEnemy)
+        {
+            switch (targetedEnemy.TargetType)
+            {
+                case LockOnTargetType.PowerUpBall:
+                    return _powerUpBallControllers.GetPowerUpBallPosition(targetedEnemy.PlayerTargetId);
+                default:
+                    return _playerControllers.GetPlayerHeartTransform(targetedEnemy.PlayerTargetId).position.ToVector2XY();
             }
         }
     }

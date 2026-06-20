@@ -267,6 +267,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.ActivateYearsOfPainTalentNetEvents = _netEventsDataService.ActivateYearsOfPainTalentNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents = _netEventsDataService.PlayerLockOnHeartTargetsChangedNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerLockedOnTargetHitNetEvents = _netEventsDataService.PlayerLockedOnTargetHitNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerPowerUpChangedNetEvents = _netEventsDataService.PlayerPowerUpChangedNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

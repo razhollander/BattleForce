@@ -190,6 +190,15 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PowerUp"",
+                    ""type"": ""Button"",
+                    ""id"": ""c1d2e3f4-a5b6-47c8-9d0e-1f2a3b4c5d6e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -366,6 +375,28 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""TalentC"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d4c3b2a1-6f5e-4d8c-9b0a-2e1f3a4b5c6d"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""PowerUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e5d4c3b2-7a6f-4e9d-8c1b-3f2a4b5c6d7e"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PowerUp"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -975,6 +1006,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         m_GamePlay_TalentA = m_GamePlay.FindAction("TalentA", throwIfNotFound: true);
         m_GamePlay_TalentB = m_GamePlay.FindAction("TalentB", throwIfNotFound: true);
         m_GamePlay_TalentC = m_GamePlay.FindAction("TalentC", throwIfNotFound: true);
+        m_GamePlay_PowerUp = m_GamePlay.FindAction("PowerUp", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1079,6 +1111,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_GamePlay_TalentA;
     private readonly InputAction m_GamePlay_TalentB;
     private readonly InputAction m_GamePlay_TalentC;
+    private readonly InputAction m_GamePlay_PowerUp;
     /// <summary>
     /// Provides access to input actions defined in input action map "GamePlay".
     /// </summary>
@@ -1134,6 +1167,10 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "GamePlay/TalentC".
         /// </summary>
         public InputAction @TalentC => m_Wrapper.m_GamePlay_TalentC;
+        /// <summary>
+        /// Provides access to the underlying input action "GamePlay/PowerUp".
+        /// </summary>
+        public InputAction @PowerUp => m_Wrapper.m_GamePlay_PowerUp;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1193,6 +1230,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @TalentC.started += instance.OnTalentC;
             @TalentC.performed += instance.OnTalentC;
             @TalentC.canceled += instance.OnTalentC;
+            @PowerUp.started += instance.OnPowerUp;
+            @PowerUp.performed += instance.OnPowerUp;
+            @PowerUp.canceled += instance.OnPowerUp;
         }
 
         /// <summary>
@@ -1237,6 +1277,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @TalentC.started -= instance.OnTalentC;
             @TalentC.performed -= instance.OnTalentC;
             @TalentC.canceled -= instance.OnTalentC;
+            @PowerUp.started -= instance.OnPowerUp;
+            @PowerUp.performed -= instance.OnPowerUp;
+            @PowerUp.canceled -= instance.OnPowerUp;
         }
 
         /// <summary>
@@ -1614,6 +1657,13 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnTalentC(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PowerUp" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPowerUp(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

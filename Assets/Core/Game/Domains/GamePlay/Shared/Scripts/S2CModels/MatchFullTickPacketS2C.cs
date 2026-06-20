@@ -58,7 +58,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C> ActivateYearsOfPainTalentNetEvents;
         public FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents;
         public FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents;
-        
+        public FixedUnorderedList<PlayerPowerUpChangedNetEventS2C> PlayerPowerUpChangedNetEvents;
+
         public MatchFullTickPacketS2C()
         {
             // use this from the server?
@@ -119,8 +120,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
             ChickenEggHitNetEvents = new FixedUnorderedList<ChickenEggHitNetEventS2C>(maxCap.ChickenEggHitNetEvents);
-            PlayerLockOnHeartTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(maxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxCap.ConcurrentEnemyPlayers));
+            PlayerLockOnHeartTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(maxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxCap.ConcurrentLockOnTargets));
             PlayerLockedOnTargetHitNetEvents = new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(maxCap.ConcurrentPlayers);
+            PlayerPowerUpChangedNetEvents = new FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>(maxCap.PlayerPowerUpChangedNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -172,6 +174,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 38)) != 0) SerializedChickenEggHitNetEvents(writer);
             if ((eventMask & (1UL << 39)) != 0) SerializedActivateYearsOfPainTalentNetEvents(writer);
             if ((eventMask & (1UL << 42)) != 0) SerializedEnvironmentSpikePlayerCollisionEvents(writer);
+            if ((eventMask & (1UL << 40)) != 0) SerializedPlayerPowerUpChangedNetEvents(writer);
         }
 
         private ulong CalculateEventMask()
@@ -218,6 +221,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (ChickenEggHitNetEvents.Count > 0) eventMask |= 1UL << 38;
             if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 39;
             if (EnvironmentSpikePlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 42;
+            if (PlayerPowerUpChangedNetEvents.Count > 0) eventMask |= 1UL << 40;
 
             return eventMask;
         }
@@ -356,6 +360,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             
             if ((eventMask & (1UL << 42)) != 0) DeserializedEnvironmentSpikePlayerCollisionEvents(reader);
             else EnvironmentSpikePlayerCollisionNetEvents.Clear();
+
+            if ((eventMask & (1UL << 40)) != 0) DeserializedPlayerPowerUpChangedNetEvents(reader);
+            else PlayerPowerUpChangedNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1181,6 +1188,26 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (var i = 0; i < count; i++)
             {
                 ref var netEvent = ref PlayerLockedOnTargetHitNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerPowerUpChangedNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerPowerUpChangedNetEvents.Count);
+            foreach (var netEvent in PlayerPowerUpChangedNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedPlayerPowerUpChangedNetEvents(NetDataReader reader)
+        {
+            PlayerPowerUpChangedNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PlayerPowerUpChangedNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

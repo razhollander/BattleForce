@@ -6,6 +6,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     {
         public ushort PlayerTargetId;
         public bool IsLockOnTargetShootable;
+        public LockOnTargetType TargetType;
 
         public int CompareTo(PlayerOnTargetS2C other)
         {

@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsAlive = true;
         public bool IsSpinned;
         public PlayerAssistArrowType AssistArrowType;
+        public PowerUpType CurrentPowerUp;
         public readonly FixedUnorderedList<PlayerOnTargetS2C> TargetedEnemyIds;
 
         public bool IsPlayerLockOnTargetSightShown => TargetedEnemyIds.Count > 0;
@@ -38,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 IsAlive = this.IsAlive,
                 IsSpinned = this.IsSpinned,
                 AssistArrowType = this.AssistArrowType,
+                CurrentPowerUp = this.CurrentPowerUp,
             };
 
             clone.TargetedEnemyIds.Clear();
@@ -61,7 +63,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put(IsAlive);
             writer.Put((ushort)AssistArrowType);
             writer.Put(IsSpinned);
-            
+            writer.Put((byte)CurrentPowerUp);
+
             var targetedEnemyIdsAmount = TargetedEnemyIds.Count;
             writer.Put((byte) targetedEnemyIdsAmount);
             for (int i = 0; i < targetedEnemyIdsAmount; i++)
@@ -69,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 var targetedEnemy = TargetedEnemyIds[i];
                 writer.Put((byte)targetedEnemy.PlayerTargetId);
                 writer.Put(targetedEnemy.IsLockOnTargetShootable);
+                writer.Put((byte)targetedEnemy.TargetType);
             }
         }
 
@@ -82,6 +86,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             IsAlive = reader.GetBool();
             AssistArrowType = (PlayerAssistArrowType)reader.GetUShort();
             IsSpinned = reader.GetBool();
+            CurrentPowerUp = (PowerUpType)reader.GetByte();
 
             var targetedEnemyIdsAmount = reader.GetByte();
             TargetedEnemyIds.Clear();
@@ -90,6 +95,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 ref var targetedEnemy = ref TargetedEnemyIds.AddAndGet();
                 targetedEnemy.PlayerTargetId = reader.GetByte();
                 targetedEnemy.IsLockOnTargetShootable = reader.GetBool();
+                targetedEnemy.TargetType = (LockOnTargetType)reader.GetByte();
             }
         }
 

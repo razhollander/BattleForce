@@ -8,6 +8,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -33,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private IMatchDataService _matchDataService;
         private IPlaybackRecorderService _playbackRecorderService;
         private IPlayersTalentsManager _playersTalentsManager;
+        private IPlayersPowerUpsManager _playersPowerUpsManager;
         private IServerNetworkManager _networkManager;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private ITickService _tickService;
@@ -60,6 +62,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
+            _playersPowerUpsManager = _diContainer.Resolve<IPlayersPowerUpsManager>();
             _networkManager = _diContainer.Resolve<IServerNetworkManager>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _tickService = _diContainer.Resolve<ITickService>();
@@ -161,6 +164,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                     
                     _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown);
                     _playersTalentsManager.AddPlayer(playerId);
+                    _playersPowerUpsManager.AddPlayer(playerId);
                     _simulationInputService.AddPlayer(playerId);
                     _lockOnTargetTimerService.AddPlayer(playerId);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.Umbrella, playerId, 0, out _, out _);

@@ -716,5 +716,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.PlayerLockedOnTargetHitNetEvents.Add(netEvent);
             }
         }
+
+        public void ProcessPlayerPowerUpChangedEvents(CapacityList<PlayerPowerUpChangedNetEventS2C> playerPowerUpChangedNetEvents)
+        {
+            if (playerPowerUpChangedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in playerPowerUpChangedNetEvents)
+            {
+                _matchDataService.GetPlayer(netEvent.PlayerId).Spaceship.CurrentPowerUp = netEvent.PowerUp;
+                _cachedPresentationEventsService.PlayerPowerUpChangedNetEvents.Add(netEvent);
+            }
+        }
     }
 }

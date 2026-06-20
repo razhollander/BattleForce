@@ -31,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private GameObject _deadAura;
         [SerializeField] private PlayerEyesView _playerEyesView;
         [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
+        [SerializeField] private MatchPlayerPowerUpHudView _powerUpHudView;
         [SerializeField] private GameObject _crownGameObject;
         [SerializeField] private DeadTombstoneView _deadTombstoneView;
         public Action Despawn { get; set; }
@@ -232,6 +233,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsKinged(bool isKinged)
         {
             _crownGameObject.SetActive(isKinged);
+        }
+
+        public void SetCurrentPowerUp(bool hasPowerUp, Sprite icon)
+        {
+            if (_powerUpHudView == null)
+            {
+                return;
+            }
+
+            _powerUpHudView.SetPowerUp(hasPowerUp, icon);
         }
     }
 }

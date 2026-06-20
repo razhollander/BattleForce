@@ -120,11 +120,12 @@ MonoBehaviour:
       DamageAmount: 1
       DamageIntervalInSeconds: 1
     PowerUps:
-      SpawnMinSecondsInterval: 5
-      SpawnMaxSecondsInterval: 10
+      SpawnMinSecondsInterval: 1
+      SpawnMaxSecondsInterval: 2
       MaxConcurrentPowerUpBalls: 5
       MoveSpeed: 5
       Radius: 1.269
+      ObtainablePowerUps: 01000000
     EnvironmentSprings:
       Force: 40
       MaxSpin: 65
@@ -133,8 +134,8 @@ MonoBehaviour:
     EnvironmentSpikes:
       Damage: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 0
-    ShouldChooseRandomStage: 1
+    DeafultEnvironmentId: 6
+    ShouldChooseRandomStage: 0
     ShouldChooseRandomTalentsForPlayer: 1
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 100

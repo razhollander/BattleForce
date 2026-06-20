@@ -15,6 +15,7 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Scripts.Extensions.Linq;
@@ -35,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         private IPlayersTalentsManager _playersTalentsManager;
+        private IPlayersPowerUpsManager _playersPowerUpsManager;
         private ICommandFactory _commandFactory;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
         private TryAddARandomTalentForPlayerCommand _tryAddARandomTalentForPlayerCommand;
@@ -55,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
+            _playersPowerUpsManager = _diContainer.Resolve<IPlayersPowerUpsManager>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
             _tryAddARandomTalentForPlayerCommand = _commandFactory.CreateCommandVoid<TryAddARandomTalentForPlayerCommand>();
@@ -131,6 +134,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.IsInShowoffWinners = false;
             _matchDataService.SimulationState.CurrentStageWinnerTeamId = 0;
             _playersTalentsManager.ResetAllTalentsData();
+            _playersPowerUpsManager.RemoveAllPowerUps();
             _preparationPhaseTimerService.RestartTimer();
             _playersOutsideStageTrackerService.ClearAllData();
             _lockOnTargetTimerService.ResetAllTimers();

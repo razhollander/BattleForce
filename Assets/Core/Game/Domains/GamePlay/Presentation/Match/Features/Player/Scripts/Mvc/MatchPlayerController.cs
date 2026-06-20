@@ -59,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
             SetIsLockOnHeartSightShown(playerModel.Spaceship.IsPlayerLockOnTargetSightShown);
+            SetCurrentPowerUp(playerModel.Spaceship.CurrentPowerUp);
             var isKinged = _matchDataService.TryGetKingedPlayers(out var kingedPlayers) && kingedPlayers.Exists(x => x.PlayerId == PlayerId);
             SetIsKinged(isKinged);
         }
@@ -104,6 +105,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetUmbrellaState(bool isUmbrellaActive)
         {
             _playerView.SetUmbrellaState(isUmbrellaActive);
+        }
+
+        public void SetCurrentPowerUp(PowerUpType powerUpType)
+        {
+            var hasPowerUp = powerUpType != PowerUpType.None;
+            UnityEngine.Sprite icon = null;
+            if (hasPowerUp && _gamePlayConfig.PowerUps != null && _gamePlayConfig.PowerUps.PowerUpSprites.ContainsKey(powerUpType))
+            {
+                icon = _gamePlayConfig.PowerUps.PowerUpSprites[powerUpType];
+            }
+
+            _playerView.SetCurrentPowerUp(hasPowerUp, icon);
         }
         
         public void SetSelectedTalent(int talentIndex)

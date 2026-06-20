@@ -70,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleActivateYearsOfPainTalentNetEventsCommand _handleActivateYearsOfPainTalentNetEventsCommand;
         private readonly HandlePlayerLockOnHeartTargetsChangedNetEventsCommand _handlePlayerLockOnHeartTargetsChangedNetEventsCommand;
         private readonly HandlePlayerLockedOnTargetHitNetEventsCommand _handlePlayerLockedOnTargetHitNetEventsCommand;
+        private readonly HandlePlayerPowerUpChangedNetEventsCommand _handlePlayerPowerUpChangedNetEventsCommand;
         private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
@@ -125,6 +126,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleActivateYearsOfPainTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateYearsOfPainTalentNetEventsCommand>();
             _handlePlayerLockOnHeartTargetsChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockOnHeartTargetsChangedNetEventsCommand>();
             _handlePlayerLockedOnTargetHitNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockedOnTargetHitNetEventsCommand>();
+            _handlePlayerPowerUpChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerPowerUpChangedNetEventsCommand>();
             _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
             _lockOnTargetEffectController = lockOnTargetEffectController;
         }
@@ -192,6 +194,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands.Execute();
             _handlePlayerLockOnHeartTargetsChangedNetEventsCommand.Execute();
             _handlePlayerLockedOnTargetHitNetEventsCommand.Execute();
+            _handlePlayerPowerUpChangedNetEventsCommand.Execute();
             _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnHeartTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
         }
     }
