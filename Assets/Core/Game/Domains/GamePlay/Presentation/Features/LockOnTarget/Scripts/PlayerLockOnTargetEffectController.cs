@@ -16,7 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
         private readonly IStateMachineService _stateMachineService;
         private readonly LockOnTargetEffectPool _effectsPool;
 
-        private readonly Dictionary<ushort, ActiveTargetEffect> _activeEffectsPerEnemy;
+        private readonly Dictionary<ushort, LockOnTargetEffectView> _activeEffectsPerEnemy;
         private readonly List<ushort> _cachedEnemyIdsToRemove;
         private readonly ushort _casterPlayerId;
 
@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _stateMachineService = stateMachineService;
             _effectsPool = effectsPool;
-            _activeEffectsPerEnemy = new Dictionary<ushort, ActiveTargetEffect>(networkConfig.MaxCap.ConcurrentPlayers - 1);
+            _activeEffectsPerEnemy = new Dictionary<ushort, LockOnTargetEffectView>(networkConfig.MaxCap.ConcurrentPlayers - 1);
             _cachedEnemyIdsToRemove = new List<ushort>(networkConfig.MaxCap.ConcurrentPlayers - 1);
         }
 
@@ -46,21 +46,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             var enemyId = target.PlayerTargetId;
             var isShootable = target.IsLockOnTargetShootable;
 
-            if (!_activeEffectsPerEnemy.TryGetValue(enemyId, out var activeEffect))
+            if (!_activeEffectsPerEnemy.TryGetValue(enemyId, out var _))
             {
                 var newTargetEffectView = _effectsPool.Spawn();
                 newTargetEffectView.Setup(_sharedGamePlayConfig.LockOnTargetDurationInSeconds);
-                PlayAnimationForState(newTargetEffectView, isShootable);
-                _activeEffectsPerEnemy[enemyId] = new ActiveTargetEffect(newTargetEffectView, isShootable);
-                return;
+                _activeEffectsPerEnemy[enemyId] = newTargetEffectView;
             }
-
-            var didShootableChange = activeEffect.IsShootable != isShootable;
-            if (didShootableChange)
-            {
-                PlayAnimationForState(activeEffect.View, isShootable);
-                _activeEffectsPerEnemy[enemyId] = new ActiveTargetEffect(activeEffect.View, isShootable);
-            }
+            PlayAnimationForState(_activeEffectsPerEnemy[enemyId], isShootable);
         }
 
         private void DespawnTargetsWhichArentShownAnymore(FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)
@@ -76,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
 
             foreach (var enemyId in _cachedEnemyIdsToRemove)
             {
-                _activeEffectsPerEnemy[enemyId].View.Despawn();
+                _activeEffectsPerEnemy[enemyId].Despawn();
                 _activeEffectsPerEnemy.Remove(enemyId);
             }
         }
@@ -102,29 +94,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
                 return;
             }
 
-            activeEffect.View.UpdatePosition(startPoint, endPoint, endPoint);
+            activeEffect.UpdatePosition(startPoint, endPoint, endPoint);
         }
 
         public void DestroyAll()
         {
             foreach (var activeEffect in _activeEffectsPerEnemy.Values)
             {
-                activeEffect.View.Despawn();
+                activeEffect.Despawn();
             }
 
             _activeEffectsPerEnemy.Clear();
-        }
-
-        private readonly struct ActiveTargetEffect
-        {
-            public readonly LockOnTargetEffectView View;
-            public readonly bool IsShootable;
-
-            public ActiveTargetEffect(LockOnTargetEffectView view, bool isShootable)
-            {
-                View = view;
-                IsShootable = isShootable;
-            }
         }
     }
 }

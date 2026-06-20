@@ -183,16 +183,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
 
         private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, MatchMakingPlayerStateS2C playerModel)
         {
-            var shootState = playerModel.Spaceship.Shoot;
-            var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
+            //var shootState = playerModel.Spaceship.Shoot;
+            //var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
 
-            if (!shouldShoot)
+            if (!isShootInputPressed)
             {
                 return;
             }
 
-            shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
-            playerModel.Spaceship.Shoot = shootState;
+            // shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
+            // playerModel.Spaceship.Shoot = shootState;
             _tryShootLockedOnWallCommand.SetCasterPlayerId(playerModel.Id).SetTick(processedTick).Execute();
         }
 

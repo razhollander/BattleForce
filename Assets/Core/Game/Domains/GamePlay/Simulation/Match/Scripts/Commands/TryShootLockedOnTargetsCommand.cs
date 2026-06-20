@@ -49,8 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             for (int i = 0; i < targetedEnemyIds.Count; i++)
             {
                 var targetId = targetedEnemyIds[i].PlayerTargetId;
-
-                if (!_lockOnTargetTimerService.IsTargetShootable(_casterPlayerId, targetId))
+                if (!targetedEnemyIds[i].IsLockOnTargetShootable)
                 {
                     continue;
                 }

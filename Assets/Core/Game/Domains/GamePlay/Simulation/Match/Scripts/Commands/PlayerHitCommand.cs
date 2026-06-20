@@ -78,8 +78,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             int teamIdsCount = _matchDataService.TeamIds.Count;
             foreach (ushort teamId in _matchDataService.TeamIds)
             {
-                LogService.LogError("add team: "+teamId);
-
                 _gemsGainedPerTeamIdPerTeam[teamId] = new Dictionary<ushort, int>(teamIdsCount);
             } 
             
@@ -157,7 +155,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _stageDataService.AddLosingTeam(losingTeamId);
-            LogService.LogError("count: "+_gemsGainedPerTeamIdPerTeam.Count);
             var gemsGainedPerTeam = _gemsGainedPerTeamIdPerTeam[losingTeamId];
             gemsGainedPerTeam.Clear();
             var totalGemsPerTeam= _totalGemsPerTeamIdPerTeam[losingTeamId];

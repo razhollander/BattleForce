@@ -34,12 +34,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOn
             }
         }
 
-        public bool IsShootable(ushort playerId)
+        public bool IsWallShootableByPlayer(ushort playerId)
         {
             return _timerPerPlayer.TryGetValue(playerId, out var timer) && timer >= _sharedGamePlayConfig.LockOnTargetDurationInSeconds;
         }
 
-        public void ResetTimer(ushort playerId)
+        public void ResetPlayerTimer(ushort playerId)
         {
             if (_timerPerPlayer.ContainsKey(playerId))
             {
