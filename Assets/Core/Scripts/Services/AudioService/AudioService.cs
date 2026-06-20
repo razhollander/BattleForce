@@ -50,7 +50,7 @@ namespace Core.Scripts.Services.AudioService
             foreach (var kvp in audioClipsScriptableObject.AudioClips)
             {
                 var audioClipId = kvp.Key;
-                var audioClip = kvp.Value;
+                var audioClip = kvp.Value.Clip;
 
                 if (_activeLoopAudioSources.ContainsKey(audioClipId))
                 {
@@ -64,7 +64,7 @@ namespace Core.Scripts.Services.AudioService
                     {
                         continue;
                     }
-                    
+
                     DespawnOneShotSource(poolable);
                 }
             }
@@ -78,7 +78,7 @@ namespace Core.Scripts.Services.AudioService
         
         public async Awaitable PlayAudioAsync(AudioClipType audioClipType, CancellationToken cancellationToken)
         {
-            if (!TryGetAudioClip(audioClipType, out var clip))
+            if (!TryGetAudioData(audioClipType, out var audioData))
             {
                 return;
             }
@@ -86,8 +86,9 @@ namespace Core.Scripts.Services.AudioService
             var poolable = _audioSourcePool.Spawn();
             poolable.name = POOLABLE_ONE_SHOT_AUDIO_OBJECT_NAME_FORMAT.Format(audioClipType);
             var source = poolable.AudioSource;
-            source.clip = clip;
+            source.clip = audioData.Clip;
             source.loop = false;
+            source.SetAudioSourceVolume(audioData.Volume);
             source.Play();
             _activeOneShotAudioSources.Add(poolable);
 
@@ -95,7 +96,7 @@ namespace Core.Scripts.Services.AudioService
 
             try
             {
-                await Awaitable.WaitForSecondsAsync(clip.length, cancellationToken);
+                await Awaitable.WaitForSecondsAsync(audioData.Clip.length, cancellationToken);
             }
             finally
             {
@@ -105,7 +106,7 @@ namespace Core.Scripts.Services.AudioService
         
         public void PlayAudioLoop(AudioClipType audioClipType)
         {
-            if (!TryGetAudioClip(audioClipType, out var clip))
+            if (!TryGetAudioData(audioClipType, out var audioData))
             {
                 return;
             }
@@ -113,8 +114,9 @@ namespace Core.Scripts.Services.AudioService
             var poolable = _audioSourcePool.Spawn();
             poolable.name = POOLABLE_LOOP_AUDIO_OBJECT_NAME_FORMAT.Format(audioClipType);
             var source = poolable.AudioSource;
-            source.clip = clip;
+            source.clip = audioData.Clip;
             source.loop = true;
+            source.SetAudioSourceVolume(audioData.Volume);
             source.Play();
 
             StopLoopAudio(audioClipType);
@@ -169,18 +171,18 @@ namespace Core.Scripts.Services.AudioService
             despawn.Invoke();
         }
 
-        private bool TryGetAudioClip(AudioClipType audioClipId, out AudioClip audioClip)
+        private bool TryGetAudioData(AudioClipType audioClipId, out AudioData audioData)
         {
             foreach (var audioClipsScriptableObject in _audioClipsScriptableObjects)
             {
-                if (audioClipsScriptableObject.AudioClips.TryGetValue(audioClipId, out audioClip))
+                if (audioClipsScriptableObject.AudioClips.TryGetValue(audioClipId, out audioData))
                 {
                     return true;
                 }
             }
 
             LogService.LogError($"No clip of name {audioClipId} found");
-            audioClip = null;
+            audioData = default;
             return false;
         }
     }
