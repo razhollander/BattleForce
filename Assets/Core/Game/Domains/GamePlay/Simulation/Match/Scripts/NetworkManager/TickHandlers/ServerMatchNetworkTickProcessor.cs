@@ -268,6 +268,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents = _netEventsDataService.PlayerLockOnHeartTargetsChangedNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerLockedOnTargetHitNetEvents = _netEventsDataService.PlayerLockedOnTargetHitNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerPowerUpChangedNetEvents = _netEventsDataService.PlayerPowerUpChangedNetEventsPerClient[clientId];
+                _fullTickPacket.SonicSlapActivatedNetEvents = _netEventsDataService.SonicSlapActivatedNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

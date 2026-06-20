@@ -1,6 +1,8 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpController;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
+using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
 {
@@ -8,9 +10,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
     {
         private readonly SonicSlapPowerUpController _sonicSlapPowerUpController;
 
-        public PlayerPowerUpControllers(IMatchDataService matchDataService)
+        public PlayerPowerUpControllers(IMatchDataService matchDataService, INetEventsDataService netEventsDataService, NetworkConfig networkConfig)
         {
-            _sonicSlapPowerUpController = new SonicSlapPowerUpController(matchDataService);
+            _sonicSlapPowerUpController = new SonicSlapPowerUpController(matchDataService, netEventsDataService, networkConfig);
         }
 
         public void SetCasterId(ushort casterPlayerId)

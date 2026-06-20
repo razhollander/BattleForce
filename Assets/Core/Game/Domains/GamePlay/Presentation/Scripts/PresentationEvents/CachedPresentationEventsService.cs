@@ -50,5 +50,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents { get; } = new();
         public List<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents { get; } = new();
         public List<PlayerPowerUpChangedNetEventS2C> PlayerPowerUpChangedNetEvents { get; } = new();
+        public List<SonicSlapActivatedNetEventS2C> SonicSlapActivatedNetEvents { get; } = new();
     }
 }

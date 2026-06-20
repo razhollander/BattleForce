@@ -79,6 +79,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C> _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents;
         private readonly CapacityList<PlayerLockedOnTargetHitNetEventS2C> _cachedUnprocessedPlayerLockedOnTargetHitNetEvents;
         private readonly CapacityList<PlayerPowerUpChangedNetEventS2C> _cachedUnprocessedPlayerPowerUpChangedNetEvents;
+        private readonly CapacityList<SonicSlapActivatedNetEventS2C> _cachedUnprocessedSonicSlapActivatedNetEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
 
         private int _largestPacketSizeInLast5Seconds;
@@ -146,6 +147,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents = new CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedUnprocessedPlayerLockedOnTargetHitNetEvents = new CapacityList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedUnprocessedPlayerPowerUpChangedNetEvents = new CapacityList<PlayerPowerUpChangedNetEventS2C>(networkConfig.MaxCap.PlayerPowerUpChangedNetEvents);
+            _cachedUnprocessedSonicSlapActivatedNetEvents = new CapacityList<SonicSlapActivatedNetEventS2C>(networkConfig.MaxCap.SonicSlapActivatedNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -216,6 +218,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPlayerLockOnHeartTargetsChangedNetEvents(latestFullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerLockedOnTargetHitNetEvents(latestFullTickPacket.PlayerLockedOnTargetHitNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerPowerUpChangedNetEvents(latestFullTickPacket.PlayerPowerUpChangedNetEvents, ignoreEventsNotAboveTick);
+            ProcessSonicSlapActivatedNetEvents(latestFullTickPacket.SonicSlapActivatedNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -1071,6 +1074,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedPlayerPowerUpChangedNetEvents.Sort();
                 _presentationNetEventsHandler.ProcessPlayerPowerUpChangedEvents(_cachedUnprocessedPlayerPowerUpChangedNetEvents);
+            }
+        }
+
+        private void ProcessSonicSlapActivatedNetEvents(FixedClassUnorderedList<SonicSlapActivatedNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            for (int i = 0; i < _cachedUnprocessedSonicSlapActivatedNetEvents.Count; i++)
+            {
+                _cachedUnprocessedSonicSlapActivatedNetEvents[i].AffectedPlayerIds.Clear();
+            }
+            _cachedUnprocessedSonicSlapActivatedNetEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedSonicSlapActivatedNetEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedSonicSlapActivatedNetEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedSonicSlapActivatedNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessSonicSlapActivatedEvents(_cachedUnprocessedSonicSlapActivatedNetEvents);
             }
         }
 

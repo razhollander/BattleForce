@@ -68,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>> PlayerLockOnHeartTargetsChangedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> PlayerLockedOnTargetHitNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>> PlayerPowerUpChangedNetEventsPerClient { get; }
+        public CapacityDict<long, FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>> SonicSlapActivatedNetEventsPerClient { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -90,6 +91,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>> _playerLockOnHeartTargetsChangedNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> _playerLockOnHeartTargetHitNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>> _playerPowerUpChangedNetEventsListPool;
+        private readonly ConcurrentPool<FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>> _sonicSlapActivatedNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>> _teamLostNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>> _talentSwitchNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>> _environmentSpringPlayerCollisionListPool;
@@ -144,6 +146,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerLockOnHeartTargetsChangedNetEventsPerClient = new CapacityDict<long, FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>>(maxConcurrentPlayers);
             PlayerLockedOnTargetHitNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>>(maxConcurrentPlayers);
             PlayerPowerUpChangedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>>(maxConcurrentPlayers);
+            SonicSlapActivatedNetEventsPerClient = new CapacityDict<long, FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>>(maxConcurrentPlayers);
             TeamLostNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TeamLostNetEventS2C>>(maxConcurrentPlayers);
             TalentSwitchNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TalentSwitchNetEventS2C>>(maxConcurrentPlayers);
             EnvironmentSpringPlayerCollisionNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>>(maxConcurrentPlayers);
@@ -217,6 +220,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
             _playerLockOnHeartTargetHitNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>>(() => new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.PlayerLockOnHeartTargetHitNetEvents), maxConcurrentPlayers);
             _playerPowerUpChangedNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>>(() => new FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>(networkConfig.MaxCap.PlayerPowerUpChangedNetEvents), maxConcurrentPlayers);
+            _sonicSlapActivatedNetEventsListPool = new ConcurrentPool<FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>>(() =>
+            {
+                var list = new FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>(networkConfig.MaxCap.SonicSlapActivatedNetEvents, () => new SonicSlapActivatedNetEventS2C(networkConfig.MaxCap.ConcurrentEnemyPlayers));
+                list.Clear();
+                return list;
+            }, maxConcurrentPlayers);
             _teamLostNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>>(() => new FixedUnorderedList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount), maxConcurrentPlayers);
             _talentSwitchNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>>(() => new FixedUnorderedList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
             _environmentSpringPlayerCollisionListPool = new ConcurrentPool<FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>>(() => new FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>(networkConfig.MaxCap.EnvironmentSpringPlayerCollisionNetEvents), maxConcurrentPlayers);
@@ -421,6 +430,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             if (!PlayerPowerUpChangedNetEventsPerClient.ContainsKey(clientId))
             {
                 PlayerPowerUpChangedNetEventsPerClient.Add(clientId, _playerPowerUpChangedNetEventsListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {clientId}");
+            }
+
+            if (!SonicSlapActivatedNetEventsPerClient.ContainsKey(clientId))
+            {
+                SonicSlapActivatedNetEventsPerClient.Add(clientId, _sonicSlapActivatedNetEventsListPool.Get());
             }
             else
             {
@@ -652,6 +670,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var playerPowerUpChangedList = PlayerPowerUpChangedNetEventsPerClient[clientId];
             playerPowerUpChangedList.Clear();
             _playerPowerUpChangedNetEventsListPool.Return(playerPowerUpChangedList);
+            var sonicSlapActivatedList = SonicSlapActivatedNetEventsPerClient[clientId];
+            sonicSlapActivatedList.Clear();
+            _sonicSlapActivatedNetEventsListPool.Return(sonicSlapActivatedList);
             var teamLostList = TeamLostNetEventsPerClient[clientId];
             teamLostList.Clear();
             _teamLostNetEventsListPool.Return(teamLostList);
@@ -781,6 +802,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerLockOnHeartTargetsChangedNetEventsPerClient.Remove(clientId);
             PlayerLockedOnTargetHitNetEventsPerClient.Remove(clientId);
             PlayerPowerUpChangedNetEventsPerClient.Remove(clientId);
+            SonicSlapActivatedNetEventsPerClient.Remove(clientId);
             TeamLostNetEventsPerClient.Remove(clientId);
             TalentSwitchNetEventsPerClient.Remove(clientId);
             StartMatchEligibleChangedNetEventsPerClient.Remove(clientId);
@@ -1016,6 +1038,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
+        public void AddSonicSlapActivatedNetEvent(int onTick, ushort casterPlayerId, FixedUnorderedList<ushort> affectedPlayerIds)
+        {
+            foreach (var kvp in SonicSlapActivatedNetEventsPerClient)
+            {
+                var netEvent = kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.CasterPlayerId = casterPlayerId;
+                netEvent.AffectedPlayerIds.Clear();
+                foreach (var affectedPlayerId in affectedPlayerIds.AsSpan())
+                {
+                    ref var affectedId = ref netEvent.AffectedPlayerIds.AddAndGet();
+                    affectedId = affectedPlayerId;
+                }
+            }
+        }
+
         public void RemoveAllEventsOlderThanTick(long clientId, int tick)
         {
             if (BulletSpawnNetEventsPerClient.TryGetValue(clientId, out var bulletSpawnNetEvents))
@@ -1233,6 +1271,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     if (playerPowerUpChangedNetEvents[i].OccuredOnTick < tick)
                     {
                         playerPowerUpChangedNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (SonicSlapActivatedNetEventsPerClient.TryGetValue(clientId, out var sonicSlapActivatedNetEvents))
+            {
+                for (int i = sonicSlapActivatedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (sonicSlapActivatedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        sonicSlapActivatedNetEvents[i].AffectedPlayerIds.Clear();
+                        sonicSlapActivatedNetEvents.RemoveAt(i);
                     }
                 }
             }

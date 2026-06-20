@@ -109,6 +109,7 @@ namespace Core.Scripts.Network
         public int PlayerLockOnHeartTargetsChangedNetEvents = 128;
         public int PlayerLockOnHeartTargetHitNetEvents = 128;
         public int PlayerPowerUpChangedNetEvents = 64;
+        public int SonicSlapActivatedNetEvents = 64;
 
         [Serializable]
         public class EnvironmentRotatingWheel

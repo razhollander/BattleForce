@@ -59,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents;
         public FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents;
         public FixedUnorderedList<PlayerPowerUpChangedNetEventS2C> PlayerPowerUpChangedNetEvents;
+        public FixedClassUnorderedList<SonicSlapActivatedNetEventS2C> SonicSlapActivatedNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -123,6 +124,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PlayerLockOnHeartTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(maxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxCap.ConcurrentLockOnTargets));
             PlayerLockedOnTargetHitNetEvents = new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(maxCap.ConcurrentPlayers);
             PlayerPowerUpChangedNetEvents = new FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>(maxCap.PlayerPowerUpChangedNetEvents);
+            SonicSlapActivatedNetEvents = new FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>(maxCap.SonicSlapActivatedNetEvents, () => new SonicSlapActivatedNetEventS2C(maxCap.ConcurrentEnemyPlayers));
         }
 
         public void Serialize(NetDataWriter writer)
@@ -175,6 +177,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 39)) != 0) SerializedActivateYearsOfPainTalentNetEvents(writer);
             if ((eventMask & (1UL << 42)) != 0) SerializedEnvironmentSpikePlayerCollisionEvents(writer);
             if ((eventMask & (1UL << 40)) != 0) SerializedPlayerPowerUpChangedNetEvents(writer);
+            if ((eventMask & (1UL << 41)) != 0) SerializedSonicSlapActivatedNetEvents(writer);
         }
 
         private ulong CalculateEventMask()
@@ -222,6 +225,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 39;
             if (EnvironmentSpikePlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 42;
             if (PlayerPowerUpChangedNetEvents.Count > 0) eventMask |= 1UL << 40;
+            if (SonicSlapActivatedNetEvents.Count > 0) eventMask |= 1UL << 41;
 
             return eventMask;
         }
@@ -363,6 +367,17 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask & (1UL << 40)) != 0) DeserializedPlayerPowerUpChangedNetEvents(reader);
             else PlayerPowerUpChangedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 41)) != 0)
+            {
+                DeserializedSonicSlapActivatedNetEvents(reader);
+            }
+            else
+            {
+                for (int i = 0; i < SonicSlapActivatedNetEvents.Count; i++)
+                    SonicSlapActivatedNetEvents[i].AffectedPlayerIds.Clear();
+                SonicSlapActivatedNetEvents.Clear();
+            }
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1208,6 +1223,31 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (var i = 0; i < count; i++)
             {
                 ref var netEvent = ref PlayerPowerUpChangedNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedSonicSlapActivatedNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)SonicSlapActivatedNetEvents.Count);
+            foreach (var netEvent in SonicSlapActivatedNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedSonicSlapActivatedNetEvents(NetDataReader reader)
+        {
+            for (int i = 0; i < SonicSlapActivatedNetEvents.Count; i++)
+            {
+                SonicSlapActivatedNetEvents[i].AffectedPlayerIds.Clear();
+            }
+
+            SonicSlapActivatedNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                var netEvent = SonicSlapActivatedNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

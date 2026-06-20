@@ -730,5 +730,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.PlayerPowerUpChangedNetEvents.Add(netEvent);
             }
         }
+
+        public void ProcessSonicSlapActivatedEvents(CapacityList<SonicSlapActivatedNetEventS2C> sonicSlapActivatedNetEvents)
+        {
+            if (sonicSlapActivatedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in sonicSlapActivatedNetEvents)
+            {
+                _cachedPresentationEventsService.SonicSlapActivatedNetEvents.Add(netEvent);
+            }
+        }
     }
 }
