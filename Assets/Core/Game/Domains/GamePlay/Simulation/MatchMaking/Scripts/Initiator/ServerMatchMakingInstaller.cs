@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOnWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchEligibilityLogic;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TeamFloor;
@@ -29,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Initiator
             _diContainer.Bind<IPlayerInputsPacketsHandler>().To<MatchMakingPlayerInputsPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersOnTeamFloorTrackerService>().To<PlayersOnTeamFloorTrackerService>().AsSingle().NonLazy();
             _diContainer.Bind<IStartMatchWallController>().To<StartMatchWallController>().AsSingle().NonLazy();
+            _diContainer.Bind<ILockOnWallTimerService>().To<LockOnWallTimerService>().AsSingle().NonLazy();
             _diContainer.Bind<ITeamFloorDataService>().To<TeamFloorDataService>().AsSingle().NonLazy();
             _diContainer.Bind<IStartMatchEligibilityLogicService>().To<StartMatchEligibilityLogicService>().AsSingle().NonLazy();
         }

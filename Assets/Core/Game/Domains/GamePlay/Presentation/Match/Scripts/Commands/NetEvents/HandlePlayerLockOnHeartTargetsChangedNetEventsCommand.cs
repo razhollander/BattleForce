@@ -4,7 +4,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
-    using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
+    using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 
     public class HandlePlayerLockOnHeartTargetsChangedNetEventsCommand : BaseCommand, ICommandVoid
     {

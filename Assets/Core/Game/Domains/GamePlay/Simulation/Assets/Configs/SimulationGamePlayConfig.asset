@@ -137,7 +137,7 @@ MonoBehaviour:
     ShouldChooseRandomStage: 1
     ShouldChooseRandomTalentsForPlayer: 1
     RandomTalentsForPlayersAmount: 3
-    StartMatchCountdownDuration: 1
+    StartMatchCountdownDuration: 100
     ShootCooldownMultiplierWhenDead: 1
     StageRestartDelaySeconds: 3
     GemsCollectedForTeamAlive: 1

@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOnWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.TickHandlers.PacketObservers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
@@ -44,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private MatchMakingFullTickPacketS2C _fullTickPacket;
         private HandleIfAnyPlayerChangedTeamFloorCommand _handleIfAnyPlayerChangedTeamFloorCommand;
         private HandleIfStartMatchEligiblityChangedCommand _handleIfStartMatchEligiblityChangedCommand;
+        private UpdatePlayersLockOnWallStateCommand _updatePlayersLockOnWallStateCommand;
         private Stopwatch _sw;
         private long _last;
 
@@ -74,6 +76,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
             _handleIfAnyPlayerChangedTeamFloorCommand = _commandFactory.CreateCommandVoid<HandleIfAnyPlayerChangedTeamFloorCommand>();
             _handleIfStartMatchEligiblityChangedCommand = _commandFactory.CreateCommandVoid<HandleIfStartMatchEligiblityChangedCommand>();
+            _updatePlayersLockOnWallStateCommand = _commandFactory.CreateCommandVoid<UpdatePlayersLockOnWallStateCommand>();
             _tickService.RegisterObserver(this);
         }
 
@@ -108,6 +111,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick);
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
+                _updatePlayersLockOnWallStateCommand.Execute();
                 _handleIfAnyPlayerChangedTeamFloorCommand.SetTick(currentTick).Execute();
                 _handleIfStartMatchEligiblityChangedCommand.SetTick(currentTick).Execute();
                 MoveToMatchStateIfCountdownEnded();

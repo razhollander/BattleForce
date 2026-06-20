@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnHeartSight
 {
     public class LockOnHeartSightView : MonoBehaviour
     {

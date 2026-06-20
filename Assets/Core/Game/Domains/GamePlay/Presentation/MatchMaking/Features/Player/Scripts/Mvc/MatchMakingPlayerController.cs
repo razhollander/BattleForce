@@ -94,5 +94,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
         {
             _playerView.SetColor(color);
         }
+
+        public void SetIsLockOnHeartSightShown(bool isShown)
+        {
+            _playerView.SetIsLockOnHeartSightShown(isShown);
+        }
     }
 }

@@ -1,7 +1,7 @@
 using CoreDomain.Scripts.Helpers.Pools;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
 {
     public class LockOnTargetShootEffectPool : PrefabsPool<LockOnTargetShootEffectView>
     {

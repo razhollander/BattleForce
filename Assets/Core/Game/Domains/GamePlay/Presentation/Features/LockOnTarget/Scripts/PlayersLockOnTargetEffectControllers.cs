@@ -1,29 +1,29 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
+using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
 using Zenject;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
 {
     public class PlayersLockOnTargetEffectControllers : ILockOnTargetEffectController
     {
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly NetworkConfig _networkConfig;
-        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
+        private readonly IStateMachineService _stateMachineService;
         private readonly LockOnTargetEffectPool _effectsPool;
 
         private readonly Dictionary<ushort, PlayerLockOnTargetEffectController> _targetEffectControllerPerPlayerId = new Dictionary<ushort, PlayerLockOnTargetEffectController>();
 
         public PlayersLockOnTargetEffectControllers(
-            LockOnTargetEffectView prefab, DiContainer diContainer, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
+            LockOnTargetEffectView prefab, DiContainer diContainer, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, IStateMachineService stateMachineService)
         {
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkConfig = networkConfig;
-            _stageCancellationTokenProvider = stageCancellationTokenProvider;
+            _stateMachineService = stateMachineService;
             _effectsPool = new LockOnTargetEffectPool(prefab, diContainer);
         }
 
@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
         public void AddPlayer(ushort casterPlayerId, FixedUnorderedList<PlayerOnTargetS2C> casterTargetedEnemyIds)
         {
             _targetEffectControllerPerPlayerId[casterPlayerId] = new PlayerLockOnTargetEffectController(casterPlayerId, casterTargetedEnemyIds, _effectsPool, _sharedGamePlayConfig,
-                _networkConfig, _stageCancellationTokenProvider);
+                _networkConfig, _stateMachineService);
             RefreshTargetEffectsOfCaster(casterPlayerId, casterTargetedEnemyIds);
         }
 

@@ -3,7 +3,7 @@ using System.Threading;
 using CoreDomain.Scripts.Helpers.Pools;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
 {
     public class LockOnTargetShootEffectView : MonoBehaviour, IPoolable
     {

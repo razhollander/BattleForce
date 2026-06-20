@@ -1,18 +1,18 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
+using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
 {
     public class PlayerLockOnTargetEffectController
     {
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
+        private readonly IStateMachineService _stateMachineService;
         private readonly LockOnTargetEffectPool _effectsPool;
 
         private readonly Dictionary<ushort, ActiveTargetEffect> _activeEffectsPerEnemy;
@@ -20,11 +20,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
         private ushort _casterPlayerId;
 
         public PlayerLockOnTargetEffectController(ushort casterPlayerId, FixedUnorderedList<PlayerOnTargetS2C> casterTargetedEnemyIds, LockOnTargetEffectPool effectsPool,
-            SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
+            SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, IStateMachineService stateMachineService)
         {
             _casterPlayerId = casterPlayerId;
             _sharedGamePlayConfig = sharedGamePlayConfig;
-            _stageCancellationTokenProvider = stageCancellationTokenProvider;
+            _stateMachineService = stateMachineService;
             _effectsPool = effectsPool;
             _activeEffectsPerEnemy = new Dictionary<ushort, ActiveTargetEffect>(networkConfig.MaxCap.ConcurrentPlayers - 1);
             _cachedEnemyIdsToRemove = new List<ushort>(networkConfig.MaxCap.ConcurrentPlayers - 1);
@@ -72,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSigh
 
         private void PlayAnimationForState(LockOnTargetEffectView view, bool isShootable)
         {
-            var cancellationToken = _stageCancellationTokenProvider.CancellationTokenSource.Token;
+            var cancellationToken = _stateMachineService.CurrentState().CancellationTokenSource.Token;
             if (isShootable)
             {
                 view.PlayLockOnTargetShootableAnimationLooped(cancellationToken).Forget();
