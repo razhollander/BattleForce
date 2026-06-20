@@ -7,7 +7,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
         public PlayerTransformStateS2C Transform;
         public PlayerShootStateS2C Shoot;
         public bool IsLockingOnWall;
-        public bool IsWallShootable;
+        public bool IsLockingOnWallShootable;
 
         public MatchMakingPlayerSpaceshipStateS2C()
         {
@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             Transform.Serialize(writer);
             Shoot.Serialize(writer);
             writer.Put(IsLockingOnWall);
-            writer.Put(IsWallShootable);
+            writer.Put(IsLockingOnWallShootable);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             Transform.Deserialize(reader);
             Shoot.Deserialize(reader);
             IsLockingOnWall = reader.GetBool();
-            IsWallShootable = reader.GetBool();
+            IsLockingOnWallShootable = reader.GetBool();
         }
 
         public void SerializeDeltas(NetDataWriter writer)
@@ -34,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             Transform.SerializeDeltas(writer);
             Shoot.SerializeDeltas(writer);
             writer.Put(IsLockingOnWall);
-            writer.Put(IsWallShootable);
+            writer.Put(IsLockingOnWallShootable);
         }
 
         public void DeserializeDeltas(NetDataReader reader)
@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             Transform.DeserializeDeltas(reader);
             Shoot.DeserializeDeltas(reader);
             IsLockingOnWall = reader.GetBool();
-            IsWallShootable = reader.GetBool();
+            IsLockingOnWallShootable = reader.GetBool();
         }
 
         public MatchMakingPlayerSpaceshipStateS2C GetClone()
@@ -52,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
                 Shoot = this.Shoot,
                 Transform = this.Transform,
                 IsLockingOnWall = this.IsLockingOnWall,
-                IsWallShootable = this.IsWallShootable
+                IsLockingOnWallShootable = this.IsLockingOnWallShootable
             };
         }
     }

@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             gameObject.SetActive(true);
         }
 
-        public async Awaitable PlayLockOnTargetAnimationLooped(CancellationToken cancellationToken)
+        public async Awaitable PlayLockOnTargetAnimation(CancellationToken cancellationToken)
         {
             var animationCancellationTokenSource = RestartAnimationCancellationTokenSource(cancellationToken);
             _lineRenderer.startWidth = _idleLineWidth;
@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             await _animation.PlayAsync(LOCK_ON_TARGET_ANIMATION_NAME, cancellationToken: animationCancellationTokenSource.Token);
         }
 
-        public async Awaitable PlayLockOnTargetShootableAnimationLooped(CancellationToken cancellationToken)
+        public async Awaitable PlayLockOnTargetShootableAnimation(CancellationToken cancellationToken)
         {
             var animationCancellationTokenSource = RestartAnimationCancellationTokenSource(cancellationToken);
             _lineRenderer.startWidth = _hitLineWidth;

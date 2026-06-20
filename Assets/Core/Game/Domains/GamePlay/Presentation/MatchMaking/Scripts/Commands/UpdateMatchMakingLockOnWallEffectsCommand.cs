@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
                 EnsurePlayerAdded(playerId);
 
                 var isLockingOnWall = player.Spaceship.IsLockingOnWall;
-                var isWallShootable = player.Spaceship.IsWallShootable;
+                var isWallShootable = player.Spaceship.IsLockingOnWallShootable;
 
                 _cachedWallTargets.Clear();
                 if (isLockingOnWall)

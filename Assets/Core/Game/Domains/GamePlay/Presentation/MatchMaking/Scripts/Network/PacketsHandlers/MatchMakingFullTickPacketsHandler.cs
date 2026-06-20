@@ -248,7 +248,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 player.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
                 player.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
                 player.Spaceship.IsLockingOnWall = playerState.Spaceship.IsLockingOnWall;
-                player.Spaceship.IsWallShootable = playerState.Spaceship.IsWallShootable;
+                player.Spaceship.IsLockingOnWallShootable = playerState.Spaceship.IsLockingOnWallShootable;
             }
         }
 

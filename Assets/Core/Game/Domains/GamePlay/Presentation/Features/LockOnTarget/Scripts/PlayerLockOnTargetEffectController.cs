@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
@@ -32,10 +33,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
 
         public void RefreshTargetEffectsOfCaster(FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)
         {
+            DespawnTargetsWhichArentShownAnymore(playerIdsLockedOnTarget);
+
+            foreach (var target in playerIdsLockedOnTarget.AsSpan())
+            {
+                UpdateLockOnTargetEffectForTarget(target);
+            }
+        }
+
+        private void UpdateLockOnTargetEffectForTarget(PlayerOnTargetS2C target)
+        {
+            var enemyId = target.PlayerTargetId;
+            var isShootable = target.IsLockOnTargetShootable;
+
+            if (!_activeEffectsPerEnemy.TryGetValue(enemyId, out var activeEffect))
+            {
+                var newTargetEffectView = _effectsPool.Spawn();
+                newTargetEffectView.Setup(_sharedGamePlayConfig.LockOnTargetDurationInSeconds);
+                PlayAnimationForState(newTargetEffectView, isShootable);
+                _activeEffectsPerEnemy[enemyId] = new ActiveTargetEffect(newTargetEffectView, isShootable);
+                return;
+            }
+
+            var didShootableChange = activeEffect.IsShootable != isShootable;
+            if (didShootableChange)
+            {
+                PlayAnimationForState(activeEffect.View, isShootable);
+                _activeEffectsPerEnemy[enemyId] = new ActiveTargetEffect(activeEffect.View, isShootable);
+            }
+        }
+
+        private void DespawnTargetsWhichArentShownAnymore(FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)
+        {
             _cachedEnemyIdsToRemove.Clear();
             foreach (var enemyId in _activeEffectsPerEnemy.Keys)
             {
-                if (!ContainsTarget(playerIdsLockedOnTarget, enemyId))
+                if (!playerIdsLockedOnTarget.ContainsWithId(enemyId))
                 {
                     _cachedEnemyIdsToRemove.Add(enemyId);
                 }
@@ -46,27 +79,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
                 _activeEffectsPerEnemy[enemyId].View.Despawn();
                 _activeEffectsPerEnemy.Remove(enemyId);
             }
-
-            foreach (var target in playerIdsLockedOnTarget.AsSpan())
-            {
-                var enemyId = target.PlayerTargetId;
-                var isShootable = target.IsLockOnTargetShootable;
-
-                if (!_activeEffectsPerEnemy.TryGetValue(enemyId, out var activeEffect))
-                {
-                    var newTargetEffectView = _effectsPool.Spawn();
-                    newTargetEffectView.Setup(_sharedGamePlayConfig.LockOnTargetDurationInSeconds);
-                    PlayAnimationForState(newTargetEffectView, isShootable);
-                    _activeEffectsPerEnemy[enemyId] = new ActiveTargetEffect(newTargetEffectView, isShootable);
-                    continue;
-                }
-
-                if (activeEffect.IsShootable != isShootable)
-                {
-                    PlayAnimationForState(activeEffect.View, isShootable);
-                    _activeEffectsPerEnemy[enemyId] = new ActiveTargetEffect(activeEffect.View, isShootable);
-                }
-            }
         }
 
         private void PlayAnimationForState(LockOnTargetEffectView view, bool isShootable)
@@ -74,11 +86,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             var cancellationToken = _stateMachineService.CurrentState().CancellationTokenSource.Token;
             if (isShootable)
             {
-                view.PlayLockOnTargetShootableAnimationLooped(cancellationToken).Forget();
+                view.PlayLockOnTargetShootableAnimation(cancellationToken).Forget();
             }
             else
             {
-                view.PlayLockOnTargetAnimationLooped(cancellationToken).Forget();
+                view.PlayLockOnTargetAnimation(cancellationToken).Forget();
             }
         }
 
@@ -101,19 +113,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             }
 
             _activeEffectsPerEnemy.Clear();
-        }
-
-        private static bool ContainsTarget(FixedUnorderedList<PlayerOnTargetS2C> targets, ushort enemyId)
-        {
-            for (int i = 0; i < targets.Count; i++)
-            {
-                if (targets[i].PlayerTargetId == enemyId)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private readonly struct ActiveTargetEffect

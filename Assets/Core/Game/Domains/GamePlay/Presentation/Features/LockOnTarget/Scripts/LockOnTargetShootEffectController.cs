@@ -21,10 +21,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             _effectsPool.InitPool();
         }
 
-        public void Play(Vector2 casterHeadPosition, Vector2 targetHeartPosition)
+        public void Play(Vector2 startPosition, Vector2 targetPosition)
         {
             var effectView = _effectsPool.Spawn();
-            effectView.Play(casterHeadPosition, targetHeartPosition, _stateMachineService.CurrentState().CancellationTokenSource.Token).Forget();
+            effectView.Play(startPosition, targetPosition, _stateMachineService.CurrentState().CancellationTokenSource.Token).Forget();
         }
     }
 }
