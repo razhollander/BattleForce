@@ -26,8 +26,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
 
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
-                var isAliveEnemy = playerState.TeamId != casterTeamId && playerState.Spaceship.IsAlive;
-                if (!isAliveEnemy)
+                var isEnemyPlayer = playerState.TeamId != casterTeamId;
+                if (!isEnemyPlayer)
                 {
                     continue;
                 }
