@@ -31,7 +31,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var powerUpBallId = powerUpBallsSpawnEvent.PowerUpBallId;
                 _powerUpBallControllers.CreatePowerUpBall(powerUpBallId, powerUpBallsSpawnEvent.Position.ToUnityVector2());
-                _audioService.PlayAudio(AudioClipType.PowerUpBallSpawned);
             }
             
             powerUpBallsSpawnEvents.Clear();

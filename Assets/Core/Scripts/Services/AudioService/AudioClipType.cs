@@ -2,7 +2,7 @@ namespace Core.Scripts.Services.AudioService
 {
     public enum AudioClipType
     {
-        GamePlayBGMusic = 0,
+        None = 0,
         GrapplingHookShoot = 1,
         KOProjectileShoot = 2,
         SwapFieldCreated = 3,
@@ -26,6 +26,8 @@ namespace Core.Scripts.Services.AudioService
         GainBolts = 23,
         TeleportGateCollision = 24,
         EnvironmentSpringCollision = 25,
+        MatchGamePlayBGMusic = 26,
+        MatchMakingGamePlayBGMusic = 27,
         BulletDestroyed = 28,
         PowerUpBallSpawned = 29,
         PowerUpBallObtained = 30,

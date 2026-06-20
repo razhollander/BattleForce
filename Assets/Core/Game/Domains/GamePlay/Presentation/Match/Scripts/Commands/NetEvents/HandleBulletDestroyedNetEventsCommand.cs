@@ -30,7 +30,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var bulletDestroyedNetEvent in bulletDestroyedNetEvents)
             {
                 _bulletControllers.DestroyBullet(bulletDestroyedNetEvent.BulletId);
-                _audioService.PlayAudio(AudioClipType.BulletDestroyed);
             }
             
             bulletDestroyedNetEvents.Clear();

@@ -46,7 +46,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var playerTransform = _matchPlayerControllers.GetPlayerTransform(gainBoltsEvent.PlayerId);
                 var effectSpawnPosition = playerTransform.position.ToVector2XY() + player.Spaceship.Transform.Radius * Vector2.up;
                 _gainBoltEffectController.PlayEffect(gainBoltsEvent.GainedAmount, effectSpawnPosition, playerTransform);
-                _audioService.PlayAudio(AudioClipType.GainBolts);
             }
 
             gainBoltsNetEvents.Clear();

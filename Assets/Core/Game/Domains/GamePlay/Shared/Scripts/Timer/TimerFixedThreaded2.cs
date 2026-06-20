@@ -144,7 +144,7 @@ namespace Core.Game.Domains.GamePlay.Shared
             [Conditional("WINDOWS")]
             public static void Begin1ms()
             {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || WINDOWS
+#if  WINDOWS // || UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN 
             if (Interlocked.Increment(ref _refCount) == 1)
                 timeBeginPeriod(1);
 #endif
@@ -152,7 +152,7 @@ namespace Core.Game.Domains.GamePlay.Shared
 
             public static void End1ms()
             {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || WINDOWS
+#if  WINDOWS // || UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             int count = Interlocked.Decrement(ref _refCount);
             if (count == 0)
                 timeEndPeriod(1);
@@ -163,7 +163,7 @@ namespace Core.Game.Domains.GamePlay.Shared
 #endif
             }
 
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || WINDOWS
+#if  WINDOWS // || UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
         [DllImport("winmm.dll", EntryPoint = "timeBeginPeriod", ExactSpelling = true)]
         private static extern uint timeBeginPeriod(uint uMilliseconds);
 
