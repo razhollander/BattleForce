@@ -17,9 +17,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
 
         private readonly Dictionary<ushort, ActiveTargetEffect> _activeEffectsPerEnemy;
         private readonly List<ushort> _cachedEnemyIdsToRemove;
-        private ushort _casterPlayerId;
+        private readonly ushort _casterPlayerId;
 
-        public PlayerLockOnTargetEffectController(ushort casterPlayerId, FixedUnorderedList<PlayerOnTargetS2C> casterTargetedEnemyIds, LockOnTargetEffectPool effectsPool,
+        public PlayerLockOnTargetEffectController(ushort casterPlayerId, LockOnTargetEffectPool effectsPool,
             SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, IStateMachineService stateMachineService)
         {
             _casterPlayerId = casterPlayerId;
@@ -28,7 +28,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             _effectsPool = effectsPool;
             _activeEffectsPerEnemy = new Dictionary<ushort, ActiveTargetEffect>(networkConfig.MaxCap.ConcurrentPlayers - 1);
             _cachedEnemyIdsToRemove = new List<ushort>(networkConfig.MaxCap.ConcurrentPlayers - 1);
-            RefreshTargetEffectsOfCaster(casterTargetedEnemyIds);
         }
 
         public void RefreshTargetEffectsOfCaster(FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)

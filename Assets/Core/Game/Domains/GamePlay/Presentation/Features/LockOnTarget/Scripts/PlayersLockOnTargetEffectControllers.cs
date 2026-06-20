@@ -34,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
 
         public void AddPlayer(ushort casterPlayerId, FixedUnorderedList<PlayerOnTargetS2C> casterTargetedEnemyIds)
         {
-            _targetEffectControllerPerPlayerId[casterPlayerId] = new PlayerLockOnTargetEffectController(casterPlayerId, casterTargetedEnemyIds, _effectsPool, _sharedGamePlayConfig,
+            _targetEffectControllerPerPlayerId[casterPlayerId] = new PlayerLockOnTargetEffectController(casterPlayerId, _effectsPool, _sharedGamePlayConfig,
                 _networkConfig, _stateMachineService);
             RefreshTargetEffectsOfCaster(casterPlayerId, casterTargetedEnemyIds);
         }

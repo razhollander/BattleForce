@@ -1,4 +1,3 @@
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -10,15 +9,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
     {
         private readonly IMatchDataService _matchDataService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly Dictionary<ushort, PlayerLockOnTargetTimers> _playerTimers;
 
         public LockOnTargetTimerService(IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig)
         {
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
-
             _playerTimers = new Dictionary<ushort, PlayerLockOnTargetTimers>(networkConfig.MaxCap.ConcurrentPlayers);
+        }
+
+        public void AddPlayer(ushort casterId)
+        {
+            _playerTimers[casterId] = new PlayerLockOnTargetTimers(casterId);
         }
 
         public void StepTimers(float deltaTime)
@@ -31,8 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
                 if (!_playerTimers.TryGetValue(casterId, out var playerTimer))
                 {
-                    playerTimer = new PlayerLockOnTargetTimers(casterId);
-                    _playerTimers[casterId] = playerTimer;
+                    continue;
                 }
 
                 var targetedIds = casterState.Spaceship.TargetedEnemyIds;

@@ -31,8 +31,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             _lineRenderer.positionCount = 2;
             _lineRenderer.SetPosition(0, casterHeadPosition);
             _lineRenderer.SetPosition(1, targetHeartPosition);
-            await Awaitable.WaitForSecondsAsync(_laserDurationInSeconds, cancellationToken);
-            Despawn();
+            try
+            {
+                await Awaitable.WaitForSecondsAsync(_laserDurationInSeconds, cancellationToken);
+            }
+            finally
+            {
+                Despawn();
+            }
         }
     }
 }

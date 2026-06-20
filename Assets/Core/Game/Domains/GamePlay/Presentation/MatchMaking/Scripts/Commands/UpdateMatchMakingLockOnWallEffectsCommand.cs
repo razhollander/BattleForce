@@ -9,11 +9,6 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
 {
-    /// <summary>
-    /// Drives the (shared) lock-on effects in match making each frame from the per-player wall-lock state.
-    /// The target is always the StartMatchWall center (world origin). The shoot laser is derived client-side
-    /// from the shootable -> not-shootable transition that happens when the player confirms the shot.
-    /// </summary>
     public class UpdateMatchMakingLockOnWallEffectsCommand : BaseCommand, ICommandVoid
     {
         private IMatchMakingDataService _matchMakingDataService;
