@@ -30,9 +30,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOn
 
         public void Execute()
         {
+            var isWallEnabled = _matchMakingDataService.SimulationState.StartMatchWall.IsEnabled;
+
             foreach (var playerState in _matchMakingDataService.SimulationState.Players.AsSpan())
             {
-                var isLockingOnWall = IsPlayerLockingOnWall(playerState);
+                var isLockingOnWall = isWallEnabled && IsPlayerLockingOnWall(playerState);
                 playerState.Spaceship.IsLockingOnWall = isLockingOnWall;
                 playerState.Spaceship.IsWallShootable = isLockingOnWall && _lockOnWallTimerService.IsShootable(playerState.Id);
             }
