@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Core.Scripts.Services.AudioService;
 using Core.Scripts.Utils;
 using UnityEditor;
@@ -15,9 +17,10 @@ namespace Core.Scripts.Editor
         private static GameObject _previewObject;
         private static AudioSource _previewSource;
         private static readonly float[] _samples = new float[SAMPLE_COUNT];
-
         private static float _peakLevel;
         private static double _peakHoldTime;
+
+        private int _selectedAddTypeIndex;
 
         private void OnEnable()
         {
@@ -91,17 +94,14 @@ namespace Core.Scripts.Editor
         {
             var rect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.Height(METER_HEIGHT), GUILayout.ExpandWidth(true));
 
-            // Background
             EditorGUI.DrawRect(rect, new Color(0.15f, 0.15f, 0.15f));
 
-            // RMS bar — green → yellow → red
             var fillRect = new Rect(rect.x, rect.y, rect.width * Mathf.Clamp01(rms), rect.height);
             var barColor = rms < 0.6f
                 ? Color.Lerp(new Color(0.2f, 0.85f, 0.2f), new Color(0.95f, 0.85f, 0.1f), rms / 0.6f)
                 : Color.Lerp(new Color(0.95f, 0.85f, 0.1f), new Color(0.95f, 0.2f, 0.1f), (rms - 0.6f) / 0.4f);
             EditorGUI.DrawRect(fillRect, barColor);
 
-            // Peak hold marker
             if (rms >= _peakLevel)
             {
                 _peakLevel = rms;
@@ -151,8 +151,35 @@ namespace Core.Scripts.Editor
                 return;
             }
 
+            // --- Add row ---
+            var unusedTypes = GetUnusedTypes(keysProp);
+            EditorGUILayout.BeginHorizontal();
+            GUI.enabled = unusedTypes.Count > 0;
+            _selectedAddTypeIndex = Mathf.Clamp(_selectedAddTypeIndex, 0, Mathf.Max(0, unusedTypes.Count - 1));
+            var displayNames = unusedTypes.ConvertAll(t => t.ToString()).ToArray();
+            _selectedAddTypeIndex = EditorGUILayout.Popup(_selectedAddTypeIndex, displayNames);
+            if (GUILayout.Button("Add", GUILayout.Width(50)) && unusedTypes.Count > 0)
+            {
+                var newType = unusedTypes[_selectedAddTypeIndex];
+                var newIndex = keysProp.arraySize;
+                keysProp.InsertArrayElementAtIndex(newIndex);
+                valuesProp.InsertArrayElementAtIndex(newIndex);
+                keysProp.GetArrayElementAtIndex(newIndex).enumValueIndex = (int)newType;
+                var newValueProp = valuesProp.GetArrayElementAtIndex(newIndex);
+                newValueProp.FindPropertyRelative("Clip").objectReferenceValue = null;
+                newValueProp.FindPropertyRelative("Volume").floatValue = 0f;
+                _selectedAddTypeIndex = 0;
+                serializedObject.ApplyModifiedProperties();
+            }
+            GUI.enabled = true;
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space(4);
+
+            // --- Entries ---
             var isPlaying = _previewSource != null && _previewSource.isPlaying;
             var rms = isPlaying ? SampleRms() : 0f;
+            var removeIndex = -1;
 
             for (var i = 0; i < keysProp.arraySize; i++)
             {
@@ -186,9 +213,18 @@ namespace Core.Scripts.Editor
                     EditorGUILayout.LabelField($"vol: {effectiveVolume:F2}", GUILayout.Width(60));
                 }
 
+                GUILayout.FlexibleSpace();
+
+                var prevColor = GUI.color;
+                GUI.color = new Color(1f, 0.4f, 0.4f);
+                if (GUILayout.Button("−", GUILayout.Width(22)))
+                {
+                    removeIndex = i;
+                }
+                GUI.color = prevColor;
+
                 EditorGUILayout.EndHorizontal();
 
-                // Show the level meter only on the currently playing clip
                 var thisClipPlaying = isPlaying && _previewSource.clip == clip;
                 if (thisClipPlaying)
                 {
@@ -202,8 +238,7 @@ namespace Core.Scripts.Editor
                 EditorGUILayout.PropertyField(volumeProp, new GUIContent("Volume"));
                 if (EditorGUI.EndChangeCheck() && isPlaying && _previewSource.clip == clip)
                 {
-                    var newVolume = volumeProp.floatValue;
-                    _previewSource.SetAudioSourceVolume(newVolume);
+                    _previewSource.SetAudioSourceVolume(volumeProp.floatValue);
                 }
 
                 EditorGUI.indentLevel--;
@@ -212,7 +247,43 @@ namespace Core.Scripts.Editor
                 EditorGUILayout.Space(2);
             }
 
+            if (removeIndex >= 0)
+            {
+                if (isPlaying && _previewSource.clip == (AudioClip)valuesProp.GetArrayElementAtIndex(removeIndex).FindPropertyRelative("Clip").objectReferenceValue)
+                {
+                    StopPreview();
+                }
+
+                keysProp.DeleteArrayElementAtIndex(removeIndex);
+                valuesProp.DeleteArrayElementAtIndex(removeIndex);
+            }
+
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private static List<AudioClipType> GetUnusedTypes(SerializedProperty keysProp)
+        {
+            var used = new HashSet<int>();
+            for (var i = 0; i < keysProp.arraySize; i++)
+            {
+                used.Add(keysProp.GetArrayElementAtIndex(i).enumValueIndex);
+            }
+
+            var result = new List<AudioClipType>();
+            foreach (AudioClipType value in Enum.GetValues(typeof(AudioClipType)))
+            {
+                if (value == AudioClipType.None)
+                {
+                    continue;
+                }
+
+                if (!used.Contains((int)value))
+                {
+                    result.Add(value);
+                }
+            }
+
+            return result;
         }
     }
 }
