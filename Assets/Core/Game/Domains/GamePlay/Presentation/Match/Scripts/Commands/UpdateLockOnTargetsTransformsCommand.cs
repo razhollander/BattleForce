@@ -1,4 +1,4 @@
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Scripts.Extensions;
@@ -25,8 +25,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             {
                 var casterPlayerHeadPosition = _playerControllers.GetPlayerHeadTransform(playerModel.PlayerId).position.ToVector2XY();
                 
-                foreach (var targetedEnemyId in playerModel.Spaceship.TargetedEnemyIds.AsSpan())
+                foreach (var targetedEnemy in playerModel.Spaceship.TargetedEnemyIds.AsSpan())
                 {
+                    var targetedEnemyId = targetedEnemy.PlayerTargetId;
                     var targetPlayerHeartPosition = _playerControllers.GetPlayerHeartTransform(targetedEnemyId).position.ToVector2XY();
                     _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedEnemyId, casterPlayerHeadPosition, targetPlayerHeartPosition);
                 }

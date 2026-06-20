@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7721639568857208960}
   - component: {fileID: 1866360971573727914}
-  - component: {fileID: 1985614297950690443}
+  - component: {fileID: 2403652232341299280}
   m_Layer: 0
   m_Name: LockOnHeartSight
   m_TagString: Untagged
@@ -92,7 +92,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &1985614297950690443
+--- !u!114 &2403652232341299280
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,6 +101,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 352588385464499130}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9baf6dd5bf214acea40c8dcc88bc1688, type: 3}
+  m_Script: {fileID: 11500000, guid: 480349a8eb865423e948c5e3cb69ef3e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: PresentationMatchAssembly::Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts.LockOnHeartSightView
+  m_EditorClassIdentifier: PresentationAssembly::Core.Game.Domains.GamePlay.Presentation.Features.LockOnHeartSight.LockOnHeartSightView

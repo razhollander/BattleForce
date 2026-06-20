@@ -6,6 +6,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
     {
         public PlayerTransformStateS2C Transform;
         public PlayerShootStateS2C Shoot;
+        public bool IsLockingOnWall;
+        public bool IsLockingOnWallShootable;
 
         public MatchMakingPlayerSpaceshipStateS2C()
         {
@@ -15,24 +17,32 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
         {
             Transform.Serialize(writer);
             Shoot.Serialize(writer);
+            writer.Put(IsLockingOnWall);
+            writer.Put(IsLockingOnWallShootable);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             Transform.Deserialize(reader);
             Shoot.Deserialize(reader);
+            IsLockingOnWall = reader.GetBool();
+            IsLockingOnWallShootable = reader.GetBool();
         }
 
         public void SerializeDeltas(NetDataWriter writer)
         {
             Transform.SerializeDeltas(writer);
             Shoot.SerializeDeltas(writer);
+            writer.Put(IsLockingOnWall);
+            writer.Put(IsLockingOnWallShootable);
         }
 
         public void DeserializeDeltas(NetDataReader reader)
         {
             Transform.DeserializeDeltas(reader);
             Shoot.DeserializeDeltas(reader);
+            IsLockingOnWall = reader.GetBool();
+            IsLockingOnWallShootable = reader.GetBool();
         }
 
         public MatchMakingPlayerSpaceshipStateS2C GetClone()
@@ -40,7 +50,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             return new MatchMakingPlayerSpaceshipStateS2C()
             {
                 Shoot = this.Shoot,
-                Transform = this.Transform
+                Transform = this.Transform,
+                IsLockingOnWall = this.IsLockingOnWall,
+                IsLockingOnWallShootable = this.IsLockingOnWallShootable
             };
         }
     }

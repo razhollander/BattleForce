@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Utils.CustomCollections;
 
@@ -18,13 +19,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _cachedTargetsToRemoveBuffer = new List<ushort>();
         }
 
-        public void StepTimers(FixedUnorderedList<ushort> targetedIds, float deltaTime)
+        public void StepTimers(FixedUnorderedList<PlayerOnTargetS2C> targetedIds, float deltaTime)
         {
             _cachedTargetsToRemoveBuffer.Clear();
 
             foreach (var targetId in _targetTimers.Keys)
             {
-                if (!targetedIds.Contains(targetId))
+                if (!targetedIds.ContainsWithId(targetId))
                 {
                     _cachedTargetsToRemoveBuffer.Add(targetId);
                 }
@@ -37,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
             for (int i = 0; i < targetedIds.Count; i++)
             {
-                var targetId = targetedIds[i];
+                var targetId = targetedIds[i].PlayerTargetId;
                 if (_targetTimers.TryGetValue(targetId, out var timer))
                 {
                     _targetTimers[targetId] = timer + deltaTime;
@@ -49,15 +50,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             }
         }
 
-        public void CollectPlayersToDamage(float durationLimit, List<(ushort CasterId, ushort TargetId)> outputList)
+        public bool IsTargetShootable(ushort targetId, float durationLimit)
         {
-            foreach (var kvp in _targetTimers)
+            return _targetTimers.TryGetValue(targetId, out var timer) && timer >= durationLimit;
+        }
+
+        private static bool ContainsTarget(FixedUnorderedList<PlayerOnTargetS2C> targetedIds, ushort targetId)
+        {
+            for (int i = 0; i < targetedIds.Count; i++)
             {
-                if (kvp.Value >= durationLimit)
+                if (targetedIds[i].PlayerTargetId == targetId)
                 {
-                    outputList.Add((CasterId, kvp.Key));
+                    return true;
                 }
             }
+
+            return false;
         }
 
         public void ResetTimer(ushort targetId)

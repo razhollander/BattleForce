@@ -77,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         private readonly CapacityList<ActivateYearsOfPainTalentNetEventS2C> _cachedUnprocessedActivateYearsOfPainTalentEvents;
         private readonly CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C> _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents;
+        private readonly CapacityList<PlayerLockedOnTargetHitNetEventS2C> _cachedUnprocessedPlayerLockedOnTargetHitNetEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
 
         private int _largestPacketSizeInLast5Seconds;
@@ -142,6 +143,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             _cachedUnprocessedActivateYearsOfPainTalentEvents = new CapacityList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents);
             _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents = new CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
+            _cachedUnprocessedPlayerLockedOnTargetHitNetEvents = new CapacityList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -210,6 +212,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessChickenEggHitEvents(latestFullTickPacket.ChickenEggHitNetEvents, ignoreEventsNotAboveTick);
             ProcessActivateYearsOfPainTalentEvents(latestFullTickPacket.ActivateYearsOfPainTalentNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerLockOnHeartTargetsChangedNetEvents(latestFullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents, ignoreEventsNotAboveTick);
+            ProcessPlayerLockedOnTargetHitNetEvents(latestFullTickPacket.PlayerLockedOnTargetHitNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -1029,7 +1032,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _presentationNetEventsHandler.ProcessPlayerLockOnHeartTargetsChangedEvents(_cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents);
             }
         }
-        
+
+        private void ProcessPlayerLockedOnTargetHitNetEvents(FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedPlayerLockedOnTargetHitNetEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedPlayerLockedOnTargetHitNetEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPlayerLockedOnTargetHitNetEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerLockedOnTargetHitNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerLockedOnTargetHitEvents(_cachedUnprocessedPlayerLockedOnTargetHitNetEvents);
+            }
+        }
+
         private void ProcessActivateYearsOfPainTalentEvents(FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C> events, int ignoreEventsNotAboveTick)
         {
             _cachedUnprocessedActivateYearsOfPainTalentEvents.Clear();

@@ -6,7 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.LocalEvents;
 using Core.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Mvc.WorldCamera;
@@ -69,6 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleCreateMagenticPullFieldNetEventsCommand _handleCreateMagenticPullFieldNetEventsCommand;
         private readonly HandleActivateYearsOfPainTalentNetEventsCommand _handleActivateYearsOfPainTalentNetEventsCommand;
         private readonly HandlePlayerLockOnHeartTargetsChangedNetEventsCommand _handlePlayerLockOnHeartTargetsChangedNetEventsCommand;
+        private readonly HandlePlayerLockedOnTargetHitNetEventsCommand _handlePlayerLockedOnTargetHitNetEventsCommand;
         private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
@@ -123,6 +124,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands = commandFactory.CreateCommandVoid<HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands>();
             _handleActivateYearsOfPainTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateYearsOfPainTalentNetEventsCommand>();
             _handlePlayerLockOnHeartTargetsChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockOnHeartTargetsChangedNetEventsCommand>();
+            _handlePlayerLockedOnTargetHitNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockedOnTargetHitNetEventsCommand>();
             _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
             _lockOnTargetEffectController = lockOnTargetEffectController;
         }
@@ -189,6 +191,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateObjectTransformInsideRotatingWheelsCommand.Execute();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands.Execute();
             _handlePlayerLockOnHeartTargetsChangedNetEventsCommand.Execute();
+            _handlePlayerLockedOnTargetHitNetEventsCommand.Execute();
             _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnHeartTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
         }
     }

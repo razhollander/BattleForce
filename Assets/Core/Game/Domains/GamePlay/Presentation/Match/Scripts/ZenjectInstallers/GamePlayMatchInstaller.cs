@@ -22,7 +22,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
@@ -66,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private MagneticPullFieldView _magneticPullFieldViewPrefab;
         [SerializeField] private MagneticPullHitEffectView _magneticPullHitEffectViewPrefab;
         [SerializeField] private LockOnTargetEffectView lockOnTargetEffectViewPrefab;
+        [SerializeField] private LockOnTargetShootEffectView lockOnTargetShootEffectViewPrefab;
 
         [SerializeField] private ChickenEggView _chickenEggViewPrefab;
         [SerializeField] private BackgroundParallaxView _backgroundParallaxView;
@@ -114,6 +115,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<MagneticPullEffectController>().AsSingle().WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<BackgroundParallaxController>().AsSingle().WithArguments(_backgroundParallaxView).NonLazy();
             Container.BindInterfacesTo<PlayersLockOnTargetEffectControllers>().AsSingle().WithArguments(lockOnTargetEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<LockOnTargetShootEffectController>().AsSingle().WithArguments(lockOnTargetShootEffectViewPrefab).NonLazy();
         }
     }
 }

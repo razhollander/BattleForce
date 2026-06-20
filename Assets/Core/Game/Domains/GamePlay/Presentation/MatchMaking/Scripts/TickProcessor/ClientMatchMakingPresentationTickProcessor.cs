@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.NetEvents;
 using Core.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Mvc.WorldCamera;
@@ -18,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandleBulletDestroyedNetEventsCommand _handleBulletDestroyedNetEventsCommand;
         private readonly HandlePlayerSwitchTeamNetEventsCommand _handlePlayerSwitchTeamNetEventsCommand;
+        private readonly UpdateMatchMakingLockOnWallEffectsCommand _updateMatchMakingLockOnWallEffectsCommand;
 
         public ClientMatchMakingPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchMakingPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchMakingBulletControllers bulletControllers)
@@ -28,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
             _handleBulletSpawnNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletSpawnNetEventsCommand>();
             _handleBulletDestroyedNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>();
             _handlePlayerSwitchTeamNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerSwitchTeamNetEventsCommand>();
+            _updateMatchMakingLockOnWallEffectsCommand = commandFactory.CreateCommandVoid<UpdateMatchMakingLockOnWallEffectsCommand>();
         }
         
         public void StartTick()
@@ -49,6 +52,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
+            _updateMatchMakingLockOnWallEffectsCommand.Execute();
         }
     }
 }

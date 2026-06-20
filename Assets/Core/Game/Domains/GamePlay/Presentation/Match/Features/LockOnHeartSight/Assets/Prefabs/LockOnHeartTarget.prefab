@@ -138,11 +138,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c355ecab749f4d00b79ec9fbf04a00c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: PresentationMatchAssembly::Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts.LockOnTargetEffectView
+  _spriteRenderer: {fileID: 8163573851686870344}
   _lineRenderer: {fileID: 4997365468746134124}
   _animation: {fileID: 7784148480999777261}
   _hitLineWidth: 0.25
   _idleLineWidth: 0.06
   _lineHitDurationInSeconds: 0.3
+  _shootableSprite: {fileID: 21300000, guid: 499153809f0df4e37bb72d3cc473b5b6, type: 3}
+  _lockOnTargetSprite: {fileID: 3144964985678245144, guid: df38cfec16e104c809e1d9bb8d10c97d, type: 3}
+  _lineColorLockOnTarget: {r: 1, g: 0.35686275, b: 0.52156866, a: 1}
+  _lineColorShootable: {r: 0.35686275, g: 1, b: 0.627451, a: 1}
 --- !u!111 &7784148480999777261
 Animation:
   m_ObjectHideFlags: 0
@@ -155,6 +160,7 @@ Animation:
   m_Animation: {fileID: 7400000, guid: f57c19280bd3a4a358ae294089498f8b, type: 2}
   m_Animations:
   - {fileID: 7400000, guid: f57c19280bd3a4a358ae294089498f8b, type: 2}
+  - {fileID: 7400000, guid: df1566602c9e3439983c6f61f99d5a06, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 0
   m_AnimatePhysics: 0
@@ -192,7 +198,7 @@ Transform:
   m_Children:
   - {fileID: 2290549749484072148}
   m_Father: {fileID: 1947213236572327592}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 29.090916}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 269.9847}
 --- !u!212 &8163573851686870344
 SpriteRenderer:
   serializedVersion: 2
