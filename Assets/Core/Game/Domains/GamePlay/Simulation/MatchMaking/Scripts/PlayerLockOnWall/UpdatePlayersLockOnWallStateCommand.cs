@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOn
             {
                 var isLockingOnWall = isWallEnabled && IsPlayerLockingOnWall(playerState);
                 playerState.Spaceship.IsLockingOnWall = isLockingOnWall;
-                playerState.Spaceship.IsLockingOnWallShootable = isLockingOnWall && _lockOnWallTimerService.IsShootable(playerState.Id);
+                playerState.Spaceship.IsLockingOnWallShootable = isLockingOnWall && _lockOnWallTimerService.IsWallShootableByPlayer(playerState.Id);
             }
         }
 

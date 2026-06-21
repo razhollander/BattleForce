@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Scripts.Extensions;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
@@ -11,6 +12,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
 {
     public class UpdateMatchMakingLockOnWallEffectsCommand : BaseCommand, ICommandVoid
     {
+        private static readonly Vector2 WALL_CENTER = Vector2.zero;
+
         private IMatchMakingDataService _matchMakingDataService;
         private IMatchMakingPlayerControllers _playerControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
@@ -35,8 +38,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
 
         public void Execute()
         {
-            var wallCenter = Vector2.zero;
-
             foreach (var player in _matchMakingDataService.Players)
             {
                 var playerId = player.PlayerId;
@@ -57,14 +58,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
 
                 if (isLockingOnWall)
                 {
-                    var headPosition = ToUnityVector2(player.Spaceship.Transform.GetHeadPosition());
-                    _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerId, _wallTargetId, headPosition, wallCenter);
+                    var headPosition = player.Spaceship.Transform.GetHeadPosition().ToUnityVector2();
+                    _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerId, _wallTargetId, headPosition, WALL_CENTER);
 
                     var wasShootable = _wasShootablePerPlayer.TryGetValue(playerId, out var previousShootable) && previousShootable;
                     var didJustShoot = wasShootable && !isWallShootable;
                     if (didJustShoot)
                     {
-                        _lockOnTargetShootEffectController.Play(headPosition, wallCenter);
+                        _lockOnTargetShootEffectController.Play(headPosition, WALL_CENTER);
                     }
                 }
 
@@ -82,11 +83,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
 
             _cachedWallTargets.Clear();
             _lockOnTargetEffectController.AddPlayer(playerId, _cachedWallTargets);
-        }
-
-        private static Vector2 ToUnityVector2(System.Numerics.Vector2 vector)
-        {
-            return new Vector2(vector.X, vector.Y);
         }
     }
 }

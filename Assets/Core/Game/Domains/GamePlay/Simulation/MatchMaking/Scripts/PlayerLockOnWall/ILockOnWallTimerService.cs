@@ -3,7 +3,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOn
     public interface ILockOnWallTimerService
     {
         void StepTimers(float deltaTime);
-        bool IsShootable(ushort playerId);
-        void ResetTimer(ushort playerId);
+        bool IsWallShootableByPlayer(ushort playerId);
+        void ResetPlayerTimer(ushort playerId);
     }
 }

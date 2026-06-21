@@ -25,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
             foreach (var targetId in _targetTimers.Keys)
             {
-                if (!ContainsTarget(targetedIds, targetId))
+                if (!targetedIds.ContainsWithId(targetId))
                 {
                     _cachedTargetsToRemoveBuffer.Add(targetId);
                 }

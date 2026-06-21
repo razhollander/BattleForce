@@ -125,14 +125,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 }
 
                 var isTargetSpinned = targetedPlayerState.Spaceship.IsSpinned;
-                if (!isTargetSpinned)
+                var didRayTowardEnemyHeartHitAnything =_physicsSimulator.RayCast(rayOriginPosition, enemyHeartPos, out var hitBodyData, _cachedBodyTypesRayCastCanHit);
+                var didHitValidBody = isTargetSpinned 
+                    ? hitBodyData.PhysicsBodyType is PhysicsBodyType.PlayerHeart or PhysicsBodyType.PlayerSpaceship 
+                    : hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerHeart;
+                var didHitEnemyHeart = didRayTowardEnemyHeartHitAnything && didHitValidBody && hitBodyData.Id == targetedPlayerState.Id;
+                if (!didHitEnemyHeart)
                 {
-                    var didRayTowardEnemyHeartHitAnything =_physicsSimulator.RayCast(rayOriginPosition, enemyHeartPos, out var hitBodyData, _cachedBodyTypesRayCastCanHit);
-                    var didHitEnemyHeart = didRayTowardEnemyHeartHitAnything && hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerHeart && hitBodyData.Id == targetedPlayerState.Id;
-                    if (!didHitEnemyHeart)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
                 
                 ref var targetedPlayer = ref outputTargetedEnemyIds.AddAndGet();

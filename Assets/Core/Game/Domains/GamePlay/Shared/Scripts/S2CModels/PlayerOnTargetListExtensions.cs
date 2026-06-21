@@ -13,9 +13,9 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             for (int i = 0; i < listA.Count; i++)
             {
-                var a = listA[i];
-                var b = listB[i];
-                var isDifferent = a.PlayerTargetId != b.PlayerTargetId || a.IsLockOnTargetShootable != b.IsLockOnTargetShootable;
+                var playerOnTargetA = listA[i];
+                var playerOnTargetB = listB[i];
+                var isDifferent = playerOnTargetA.PlayerTargetId != playerOnTargetB.PlayerTargetId || playerOnTargetA.IsLockOnTargetShootable != playerOnTargetB.IsLockOnTargetShootable;
                 if (isDifferent)
                 {
                     return false;
