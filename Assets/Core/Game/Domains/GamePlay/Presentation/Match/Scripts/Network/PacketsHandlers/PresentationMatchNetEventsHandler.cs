@@ -696,11 +696,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 
                 for (int i = 0; i < netEvent.PlayerIdsLockedOnTarget.Count; i++)
                 {
-                    ref var playerId = ref player.Spaceship.TargetedEnemyIds.AddAndGet();
-                    playerId = netEvent.PlayerIdsLockedOnTarget[i];
+                    ref var targetedEnemy = ref player.Spaceship.TargetedEnemyIds.AddAndGet();
+                    targetedEnemy = netEvent.PlayerIdsLockedOnTarget[i];
                 }
                 
                 _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessPlayerLockedOnTargetHitEvents(CapacityList<PlayerLockedOnTargetHitNetEventS2C> playerLockedOnTargetHitNetEvents)
+        {
+            if (playerLockedOnTargetHitNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in playerLockedOnTargetHitNetEvents)
+            {
+                _cachedPresentationEventsService.PlayerLockedOnTargetHitNetEvents.Add(netEvent);
             }
         }
     }

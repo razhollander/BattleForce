@@ -8,11 +8,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
     {
         public int OccuredOnTick;
         public ushort PlayerId;
-        public FixedUnorderedList<ushort> PlayerIdsLockedOnTarget;
+        public FixedUnorderedList<PlayerOnTargetS2C> PlayerIdsLockedOnTarget;
 
         public PlayerLockOnHeartTargetsChangedNetEventS2C(int maxTargets)
         {
-            PlayerIdsLockedOnTarget = new FixedUnorderedList<ushort>(maxTargets);
+            PlayerIdsLockedOnTarget = new FixedUnorderedList<PlayerOnTargetS2C>(maxTargets);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -22,7 +22,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             writer.Put((byte)PlayerIdsLockedOnTarget.Count);
             foreach (var target in PlayerIdsLockedOnTarget.AsSpan())
             {
-                writer.Put((byte)target);
+                writer.Put((byte)target.PlayerTargetId);
+                writer.Put(target.IsLockOnTargetShootable);
             }
         }
 
@@ -35,7 +36,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             for (var i = 0; i < count; i++)
             {
                 ref var target = ref PlayerIdsLockedOnTarget.AddAndGet();
-                target = reader.GetByte();
+                target.PlayerTargetId = reader.GetByte();
+                target.IsLockOnTargetShootable = reader.GetBool();
             }
         }
 

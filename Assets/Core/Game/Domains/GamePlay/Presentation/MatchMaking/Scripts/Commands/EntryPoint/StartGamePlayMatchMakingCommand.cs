@@ -1,5 +1,6 @@
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.TeamFloor.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.Walls.Scripts.Mvcs;
@@ -44,6 +45,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
         private IBackgroundParallaxController _backgroundParallaxController;
         private ILocalPlayersDataService _localPlayersDataService;
         private IGameInputActionsController _gameInputActionsController;
+        private ILockOnTargetEffectController _lockOnTargetEffectController;
+        private ILockOnTargetShootEffectController _lockOnTargetShootEffectController;
         private IAudioService _audioService;
 
         public StartGamePlayMatchMakingCommand SetEnterData(GamePlayMatchMakingInitiatorEnterData enterData)
@@ -72,6 +75,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
             _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
+            _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
+            _lockOnTargetShootEffectController = _diContainer.Resolve<ILockOnTargetShootEffectController>();
             _audioService = _diContainer.Resolve<IAudioService>();
         }
 
@@ -88,6 +93,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _matchMakingUiController.InitEntryPoint(_enterData.IPAddress, _enterData.Port, _enterData.IsHost);
             _tickProcessor.InitEntryPoint();
             _backgroundParallaxController.InitEntryPoint();
+            _lockOnTargetEffectController.InitEntryPoint();
+            _lockOnTargetShootEffectController.InitEntryPoint();
             AddPlayersDevices();
             
             _commandFactory.CreateCommandVoid<SyncMatchMakingSimulationStateCommand>()

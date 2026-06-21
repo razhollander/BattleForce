@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOnWall;
 using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.StartMatchWall;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
@@ -10,7 +11,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands
         private IMatchMakingDataService _matchMakingDataService;
         private IStartMatchWallController _startMatchWallController;
         private IHeadLessQuitterController _headLessQuitterController;
-        
+        private ILockOnWallTimerService _lockOnWallTimerService;
+
         private float _deltaTime;
 
         public StepTimersCommand SetStepDeltaTime(float deltaTime)
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _startMatchWallController = _diContainer.Resolve<IStartMatchWallController>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
+            _lockOnWallTimerService = _diContainer.Resolve<ILockOnWallTimerService>();
         }
 
         public void Execute()
@@ -31,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands
             StepPlayersShootCooldown(_deltaTime);
             _startMatchWallController.StepTimer(_deltaTime);
             _headLessQuitterController.StepTimer(_deltaTime);
+            _lockOnWallTimerService.StepTimers(_deltaTime);
         }
 
         private void StepPlayersShootCooldown(float deltaTime)

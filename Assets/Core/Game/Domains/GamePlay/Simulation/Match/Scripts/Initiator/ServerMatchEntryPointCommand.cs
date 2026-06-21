@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -39,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private NetworkConfig _networkConfig;
         private IStageDataService _stageDataService;
         private ISimulationInputService _simulationInputService;
+        private ILockOnTargetTimerService _lockOnTargetTimerService;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
         private IClientsNetworkDataService _clientsNetworkDataService;
         
@@ -65,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _simulationInputService = _diContainer.Resolve<ISimulationInputService>();
+            _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
             _clientsNetworkDataService = _diContainer.Resolve<IClientsNetworkDataService>();
             _setRandomTalentsForPlayerCommand =  _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
         }
@@ -73,11 +76,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         {
             InitRNG();
             SetCurrentTickIfPlayback();
-            _playerInputsPacketsHandler.InitEntryPoint();
             _matchPlayerJoinPacketsHandler.InitEntryPoint();
             TrySwitchToPlayback();
 
             InitPlayers(_simulationMatchEnterData);
+            _playerInputsPacketsHandler.InitEntryPoint();
             _stageDataService.InitEntryPoint();
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
             _tickProcessor.InitEntryPoint();
@@ -159,6 +162,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                     _matchDataService.AddPlayer(playerId, playerTeamId, playerName, position, startingDirection, velocity, radius, health, shootCooldown);
                     _playersTalentsManager.AddPlayer(playerId);
                     _simulationInputService.AddPlayer(playerId);
+                    _lockOnTargetTimerService.AddPlayer(playerId);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.Umbrella, playerId, 0, out _, out _);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
