@@ -201,8 +201,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 return;
             }
-            _playersTalentsManager.ProcessAllTalentsTickOfPlayer(playerId, processedTick, deltaTime); // not sure should be here
-            
+
             if (currentSelectedTalent.IsOnCooldown())
             {
                 return;

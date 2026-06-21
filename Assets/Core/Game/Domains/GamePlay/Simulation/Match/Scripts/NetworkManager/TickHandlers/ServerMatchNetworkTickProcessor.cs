@@ -46,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private TryEndPlayersSpinCommand _tryEndPlayersSpinCommand;
         private TryEndStagePreparationPhaseCommand _tryEndStagePreparationPhaseCommand;
         private StepAllPlayersTalentsCooldownsCommand _stepAllPlayersTalentsCooldownsCommand;
+        private StepAllPlayersTalentsCommand _stepAllPlayersTalentsCommand;
         private TrySendPlayersLockOnTargetChangedCommand _trySendPlayersLockOnTargetChangedCommand;
         
         private readonly MatchFullTickPacketS2C _fullTickPacket;
@@ -83,6 +84,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
             _tryEndStagePreparationPhaseCommand = _commandFactory.CreateCommandVoid<TryEndStagePreparationPhaseCommand>();
             _stepAllPlayersTalentsCooldownsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCooldownsCommand>();
+            _stepAllPlayersTalentsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCommand>();
             _trySendPlayersLockOnTargetChangedCommand = _commandFactory.CreateCommandVoid<TrySendPlayersLockOnTargetChangedCommand>();
             _tickService.RegisterObserver(this);
         }
@@ -107,6 +109,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 _stepAllPlayersTalentsCooldownsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick, stepDeltaTime);
+                _stepAllPlayersTalentsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
