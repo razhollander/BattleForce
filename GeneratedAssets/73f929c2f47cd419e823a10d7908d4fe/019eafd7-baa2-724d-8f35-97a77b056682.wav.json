@@ -1,0 +1,15 @@
+{
+    "asset": "73f929c2f47cd419e823a10d7908d4fe",
+    "fileName": "019eafd7-baa2-724d-8f35-97a77b056682.wav",
+    "prompt": "Soft funny cartoon pop shoot, light comedic pew, gentle low volume, game sound effect",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

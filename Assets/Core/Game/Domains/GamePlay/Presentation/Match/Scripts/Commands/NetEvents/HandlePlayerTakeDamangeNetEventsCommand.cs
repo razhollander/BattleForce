@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using Core.Scripts.Services.HapticsService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -16,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchPlayerUIControllers _matchPlayerUIControllers;
         private ICommandFactory _commandFactory;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _matchPlayerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -47,6 +50,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _playerControllers.SetPlayerHealth(playerTakeDamageId, currentHealth, maxHealth);
                 _matchPlayerUIControllers.SetPlayerHealth(playerTakeDamageId, currentHealth, maxHealth);
             }
+            
+            _audioService.PlayAudio(AudioClipType.PlayerTakeDamage);
             
             playerTakeDamageEvents.Clear();
         }

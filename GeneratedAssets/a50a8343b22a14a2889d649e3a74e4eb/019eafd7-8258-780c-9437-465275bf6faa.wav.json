@@ -1,0 +1,15 @@
+{
+    "asset": "a50a8343b22a14a2889d649e3a74e4eb",
+    "fileName": "019eafd7-8258-780c-9437-465275bf6faa.wav",
+    "prompt": "Soft cute cartoon bubble pop, gentle plip blip, low volume, comedic game sound effect",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

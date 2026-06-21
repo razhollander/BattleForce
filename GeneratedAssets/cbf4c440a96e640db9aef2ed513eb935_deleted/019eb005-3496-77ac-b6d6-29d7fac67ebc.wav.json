@@ -1,0 +1,15 @@
+{
+    "asset": "cbf4c440a96e640db9aef2ed513eb935",
+    "fileName": "019eb005-3496-77ac-b6d6-29d7fac67ebc.wav",
+    "prompt": "Comedic cartoon defeat sound, funny descending sad trombone style wah-wah, playful game over, soft gentle volume",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 2.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

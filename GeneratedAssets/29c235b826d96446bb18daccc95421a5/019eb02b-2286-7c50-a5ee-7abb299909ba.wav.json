@@ -1,0 +1,15 @@
+{
+    "asset": "29c235b826d96446bb18daccc95421a5",
+    "fileName": "019eb02b-2286-7c50-a5ee-7abb299909ba.wav",
+    "prompt": "Cartoon spinning whir starting up, playful whirling tornado spin begins, comedic, soft gentle volume",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 2.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

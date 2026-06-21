@@ -1,0 +1,15 @@
+{
+    "asset": "269759876cc8a4a6aa4c3e83955380a3",
+    "fileName": "019eb004-56ed-7e49-8c49-b4bf925d9376.wav",
+    "prompt": "Cartoon magnetic pull suction hum with a soft wobble, whimsical magic attraction effect, gentle quiet volume",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 2.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

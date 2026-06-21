@@ -1,0 +1,15 @@
+{
+    "asset": "43d2c297292e74d3291fccbb96a18cb9",
+    "fileName": "019eafd7-b8f5-73ed-8800-ff06cf8cee39.wav",
+    "prompt": "Soft cartoon UI button click, gentle bubbly pop tick, low volume, menu sound effect",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 1.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

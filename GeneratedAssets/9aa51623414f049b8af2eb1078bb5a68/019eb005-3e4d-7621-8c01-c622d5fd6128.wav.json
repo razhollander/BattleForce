@@ -1,0 +1,15 @@
+{
+    "asset": "9aa51623414f049b8af2eb1078bb5a68",
+    "fileName": "019eb005-3e4d-7621-8c01-c622d5fd6128.wav",
+    "prompt": "Light card whoosh thwip with a soft paper impact, quick playful cartoon card hit, gentle quiet volume",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 2.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

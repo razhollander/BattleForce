@@ -1,0 +1,15 @@
+{
+    "asset": "7271694a4f7754e7fb3fc98a03b2a39b",
+    "fileName": "019eb004-888c-7ff9-a465-cf190922dab7.wav",
+    "prompt": "Funny cartoon chicken cluck followed by a soft pop plop as an egg is laid, playful comedic, gentle quiet volume",
+    "negativePrompt": "",
+    "model": "elevenlabs-sound-effects-v2",
+    "modelName": "ElevenLabs Sound Effects V2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "duration": 2.0,
+    "autoTrim": false,
+    "hasReference": false,
+    "voice": ""
+}

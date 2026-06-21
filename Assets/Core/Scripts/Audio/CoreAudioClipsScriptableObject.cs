@@ -1,4 +1,4 @@
-using CoreDomain.Scripts.Services.AudioService;
+using Core.Scripts.Services.AudioService;
 using UnityEngine;
 
 namespace CoreDomain.Scripts.Audio

@@ -1,13 +1,15 @@
 using System.Threading;
 using UnityEngine;
 
-namespace CoreDomain.Scripts.Services.AudioService
+namespace Core.Scripts.Services.AudioService
 {
     public interface IAudioService
     {
         void InitEntryPoint();
-        void PlayAudio(AudioClipType audioClipType, AudioChannelType audioChannel, AudioPlayType audioPlayType = AudioPlayType.OneShot);
-        Awaitable PlayAudioAsync(AudioClipType audioClipType, AudioChannelType audioChannel, CancellationTokenSource cancellationTokenSource, AudioPlayType audioPlayType = AudioPlayType.OneShot);
+        void PlayAudio(AudioClipType audioClipType);
+        void PlayAudioLoop(AudioClipType audioClipType);
+        void StopLoopAudio(AudioClipType audioClipType);
+        Awaitable PlayAudioAsync(AudioClipType audioClipType, CancellationToken cancellationToken);
         void StopAllAudio();
         void AddAudioClips(AudioClipsScriptableObject audioClipsScriptableObject);
         void RemoveAudioClips(AudioClipsScriptableObject audioClipsScriptableObject);
