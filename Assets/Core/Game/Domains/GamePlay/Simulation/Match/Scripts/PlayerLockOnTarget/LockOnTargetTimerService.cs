@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Network;
@@ -41,21 +42,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             }
         }
 
-        public bool IsTargetShootable(ushort casterId, ushort targetId)
+        public bool IsTargetShootable(ushort casterId, ushort targetId, LockOnTargetType targetType)
         {
             if (!_playerTimers.TryGetValue(casterId, out var playerTimer))
             {
                 return false;
             }
 
-            return playerTimer.IsTargetShootable(targetId, _sharedGamePlayConfig.LockOnTargetDurationInSeconds);
+            return playerTimer.IsTargetShootable(new LockOnTargetKey(targetId, targetType), _sharedGamePlayConfig.LockOnTargetDurationInSeconds);
         }
 
-        public void ResetTimer(ushort casterId, ushort targetId)
+        public void ResetTimer(ushort casterId, ushort targetId, LockOnTargetType targetType)
         {
             if (_playerTimers.TryGetValue(casterId, out var playerTimer))
             {
-                playerTimer.ResetTimer(targetId);
+                playerTimer.ResetTimer(new LockOnTargetKey(targetId, targetType));
             }
         }
 

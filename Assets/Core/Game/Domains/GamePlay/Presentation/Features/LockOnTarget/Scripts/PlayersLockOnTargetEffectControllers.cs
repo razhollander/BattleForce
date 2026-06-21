@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             casterActiveEffects.RefreshTargetEffectsOfCaster(playerIdsLockedOnTarget);
         }
 
-        public void UpdateTargetsPositionOnPlayer(ushort casterPlayerId, ushort targetPlayerId, Vector2 startPoint, Vector2 endPoint)
+        public void UpdateTargetsPositionOnPlayer(ushort casterPlayerId, LockOnTargetKey targetKey, Vector2 startPoint, Vector2 endPoint)
         {
             if (!_targetEffectControllerPerPlayerId.TryGetValue(casterPlayerId, out var casterActiveEffects))
             {
@@ -58,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
                 return;
             }
 
-            casterActiveEffects.UpdateTargetsPositionOnPlayer(targetPlayerId, startPoint, endPoint);
+            casterActiveEffects.UpdateTargetsPositionOnPlayer(targetKey, startPoint, endPoint);
         }
 
         public void DestroyAll()

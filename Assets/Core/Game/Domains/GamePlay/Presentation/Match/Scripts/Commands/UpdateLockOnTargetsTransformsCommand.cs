@@ -32,9 +32,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 
                 foreach (var targetedEnemy in playerModel.Spaceship.LockOnTargetObjects.AsSpan())
                 {
-                    var targetedId = targetedEnemy.TargetId;
                     var targetPosition = GetTargetPosition(targetedEnemy);
-                    _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedId, casterPlayerHeadPosition, targetPosition);
+                    _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedEnemy.GetKey(), casterPlayerHeadPosition, targetPosition);
                 }
             }
         }

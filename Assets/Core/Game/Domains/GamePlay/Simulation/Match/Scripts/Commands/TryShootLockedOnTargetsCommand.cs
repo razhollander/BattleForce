@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     continue;
                 }
 
-                _lockOnTargetTimerService.ResetTimer(_casterPlayerId, targetId);
+                _lockOnTargetTimerService.ResetTimer(_casterPlayerId, targetId, target.TargetType);
 
                 switch (target.TargetType)
                 {

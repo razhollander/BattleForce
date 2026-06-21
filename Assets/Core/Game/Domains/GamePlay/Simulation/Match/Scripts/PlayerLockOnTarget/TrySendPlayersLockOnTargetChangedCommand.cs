@@ -137,7 +137,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 
                 ref var targetedPlayer = ref outputTargetedEnemyIds.AddAndGet();
                 targetedPlayer.TargetId = targetedPlayerState.Id;
-                targetedPlayer.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterPlayerState.Id, targetedPlayerState.Id);
+                targetedPlayer.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterPlayerState.Id, targetedPlayerState.Id, LockOnTargetType.Heart);
                 targetedPlayer.TargetType = LockOnTargetType.Heart;
             }
         }
@@ -188,7 +188,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
                 ref var targetedBall = ref outputTargetedEnemyIds.AddAndGet();
                 targetedBall.TargetId = powerUpBall.Id;
-                targetedBall.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterPlayerState.Id, powerUpBall.Id);
+                targetedBall.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterPlayerState.Id, powerUpBall.Id, LockOnTargetType.PowerUpBall);
                 targetedBall.TargetType = LockOnTargetType.PowerUpBall;
             }
         }
