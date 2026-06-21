@@ -45,6 +45,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
+            return;
+            
             var isSpawnTimerEnded = _iPowerUpsSpawnerService.IsSpawnTimerEnded();
             if (isSpawnTimerEnded)
             {

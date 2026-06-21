@@ -1,5 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using CoreDomain.Scripts.Services.AudioService;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
-            _audioService.PlayAudio(AudioClipType.SonicSlap, AudioChannelType.Fx);
+            //_audioService.PlayAudio(AudioClipType.SonicSlap);
 
             _cachedPresentationEventsService.SonicSlapActivatedNetEvents.Clear();
         }
