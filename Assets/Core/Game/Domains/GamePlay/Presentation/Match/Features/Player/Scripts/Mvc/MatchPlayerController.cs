@@ -110,10 +110,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetCurrentPowerUp(PowerUpType powerUpType)
         {
             var hasPowerUp = powerUpType != PowerUpType.None;
-            UnityEngine.Sprite icon = null;
-            if (hasPowerUp && _gamePlayConfig.PowerUps != null && _gamePlayConfig.PowerUps.PowerUpSprites.ContainsKey(powerUpType))
+            Sprite icon = null;
+            if (hasPowerUp && _gamePlayConfig.PowerUps.PowerUpSprites.TryGetValue(powerUpType, out var powerUpSprite))
             {
-                icon = _gamePlayConfig.PowerUps.PowerUpSprites[powerUpType];
+                icon = powerUpSprite;
             }
 
             _playerView.SetCurrentPowerUp(hasPowerUp, icon);

@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
                 }
 
                 var headPosition = player.Spaceship.Transform.GetHeadPosition().ToUnityVector2();
-                _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(player.PlayerId, wallTargets[0].PlayerTargetId, headPosition, WALL_CENTER);
+                _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(player.PlayerId, wallTargets[0].TargetId, headPosition, WALL_CENTER);
             }
         }
     }

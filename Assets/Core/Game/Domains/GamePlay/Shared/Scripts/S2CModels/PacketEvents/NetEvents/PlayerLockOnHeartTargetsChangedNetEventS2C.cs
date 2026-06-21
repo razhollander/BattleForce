@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             writer.Put((byte)PlayerIdsLockedOnTarget.Count);
             foreach (var target in PlayerIdsLockedOnTarget.AsSpan())
             {
-                writer.Put((byte)target.PlayerTargetId);
+                writer.Put((byte)target.TargetId);
                 writer.Put(target.IsLockOnTargetShootable);
                 writer.Put((byte)target.TargetType);
             }
@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             for (var i = 0; i < count; i++)
             {
                 ref var target = ref PlayerIdsLockedOnTarget.AddAndGet();
-                target.PlayerTargetId = reader.GetByte();
+                target.TargetId = reader.GetByte();
                 target.IsLockOnTargetShootable = reader.GetBool();
                 target.TargetType = (LockOnTargetType)reader.GetByte();
             }

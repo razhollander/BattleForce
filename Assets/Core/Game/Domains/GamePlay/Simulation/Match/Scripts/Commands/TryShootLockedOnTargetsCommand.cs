@@ -46,12 +46,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public void Execute()
         {
             var casterState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            var targetedEnemyIds = casterState.Spaceship.TargetedEnemyIds;
+            var targetedEnemyIds = casterState.Spaceship.LockOnTargetObjects;
 
             for (int i = 0; i < targetedEnemyIds.Count; i++)
             {
                 var target = targetedEnemyIds[i];
-                var targetId = target.PlayerTargetId;
+                var targetId = target.TargetId;
                 if (!targetedEnemyIds[i].IsLockOnTargetShootable)
                 {
                     continue;

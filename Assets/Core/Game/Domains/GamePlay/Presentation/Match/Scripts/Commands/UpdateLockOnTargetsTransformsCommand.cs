@@ -30,9 +30,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             {
                 var casterPlayerHeadPosition = _playerControllers.GetPlayerHeadTransform(playerModel.PlayerId).position.ToVector2XY();
 
-                foreach (var targetedEnemy in playerModel.Spaceship.TargetedEnemyIds.AsSpan())
+                foreach (var targetedEnemy in playerModel.Spaceship.LockOnTargetObjects.AsSpan())
                 {
-                    var targetedId = targetedEnemy.PlayerTargetId;
+                    var targetedId = targetedEnemy.TargetId;
                     var targetPosition = GetTargetPosition(targetedEnemy);
                     _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedId, casterPlayerHeadPosition, targetPosition);
                 }
@@ -44,9 +44,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             switch (targetedEnemy.TargetType)
             {
                 case LockOnTargetType.PowerUpBall:
-                    return _powerUpBallControllers.GetPowerUpBallPosition(targetedEnemy.PlayerTargetId);
+                    return _powerUpBallControllers.GetPowerUpBallPosition(targetedEnemy.TargetId);
                 default:
-                    return _playerControllers.GetPlayerHeartTransform(targetedEnemy.PlayerTargetId).position.ToVector2XY();
+                    return _playerControllers.GetPlayerHeartTransform(targetedEnemy.TargetId).position.ToVector2XY();
             }
         }
     }

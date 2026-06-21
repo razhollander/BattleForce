@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                     continue;
                 }
 
-                var targetedIds = casterState.Spaceship.TargetedEnemyIds;
+                var targetedIds = casterState.Spaceship.LockOnTargetObjects;
                 playerTimer.StepTimers(targetedIds, deltaTime);
             }
         }

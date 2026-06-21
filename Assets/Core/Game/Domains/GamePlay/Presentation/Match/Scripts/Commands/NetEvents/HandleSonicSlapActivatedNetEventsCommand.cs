@@ -22,10 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
-            foreach (var netEvent in _cachedPresentationEventsService.SonicSlapActivatedNetEvents)
-            {
-                _audioService.PlayAudio(AudioClipType.Spin, AudioChannelType.Fx);
-            }
+            _audioService.PlayAudio(AudioClipType.SonicSlap, AudioChannelType.Fx);
 
             _cachedPresentationEventsService.SonicSlapActivatedNetEvents.Clear();
         }

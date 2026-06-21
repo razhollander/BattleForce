@@ -8,16 +8,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private GameObject _container;
         [SerializeField] private Image _powerUpImage;
 
-        public void SetPowerUp(bool hasPowerUp, Sprite icon)
+        public void SetPowerUp(bool isShown, Sprite powerUpSprite)
         {
-            if (_container != null)
-            {
-                _container.SetActive(hasPowerUp);
-            }
+            _container.SetActive(isShown);
 
-            if (hasPowerUp && _powerUpImage != null)
+            if (isShown)
             {
-                _powerUpImage.sprite = icon;
+                _powerUpImage.sprite = powerUpSprite;
             }
         }
     }

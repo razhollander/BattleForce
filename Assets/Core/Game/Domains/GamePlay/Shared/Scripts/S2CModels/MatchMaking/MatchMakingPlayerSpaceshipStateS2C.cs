@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             for (int i = 0; i < ObjectsLockedOnTarget.Count; i++)
             {
                 var targetedEnemy = ObjectsLockedOnTarget[i];
-                writer.Put((byte)targetedEnemy.PlayerTargetId);
+                writer.Put((byte)targetedEnemy.TargetId);
                 writer.Put(targetedEnemy.IsLockOnTargetShootable);
                 writer.Put((byte)targetedEnemy.TargetType);
             }
@@ -44,7 +44,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             for (int i = 0; i < targetedEnemyIdsAmount; i++)
             {
                 ref var targetedEnemy = ref ObjectsLockedOnTarget.AddAndGet();
-                targetedEnemy.PlayerTargetId = reader.GetByte();
+                targetedEnemy.TargetId = reader.GetByte();
                 targetedEnemy.IsLockOnTargetShootable = reader.GetBool();
                 targetedEnemy.TargetType = (LockOnTargetType)reader.GetByte();
             }

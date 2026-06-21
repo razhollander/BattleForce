@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
 
         private void UpdateLockOnTargetEffectForTarget(ObjectLockedOnTargetS2C target)
         {
-            var enemyId = target.PlayerTargetId;
+            var enemyId = target.TargetId;
             var isShootable = target.IsLockOnTargetShootable;
 
             if (!_activeEffectsPerEnemy.TryGetValue(enemyId, out var _))

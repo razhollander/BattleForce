@@ -38,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
             for (int i = 0; i < targetedIds.Count; i++)
             {
-                var targetId = targetedIds[i].PlayerTargetId;
+                var targetId = targetedIds[i].TargetId;
                 if (_targetTimers.TryGetValue(targetId, out var timer))
                 {
                     _targetTimers[targetId] = timer + deltaTime;
@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         {
             for (int i = 0; i < targetedIds.Count; i++)
             {
-                if (targetedIds[i].PlayerTargetId == targetId)
+                if (targetedIds[i].TargetId == targetId)
                 {
                     return true;
                 }

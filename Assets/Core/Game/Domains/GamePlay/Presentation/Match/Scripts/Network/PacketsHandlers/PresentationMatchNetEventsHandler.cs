@@ -692,11 +692,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var netEvent in playerLockOnHeartTargetsChangedNetEvents)
             {
                 var player = _matchDataService.GetPlayer(netEvent.PlayerId);
-                player.Spaceship.TargetedEnemyIds.Clear();
+                player.Spaceship.LockOnTargetObjects.Clear();
                 
                 for (int i = 0; i < netEvent.PlayerIdsLockedOnTarget.Count; i++)
                 {
-                    ref var targetedEnemy = ref player.Spaceship.TargetedEnemyIds.AddAndGet();
+                    ref var targetedEnemy = ref player.Spaceship.LockOnTargetObjects.AddAndGet();
                     targetedEnemy = netEvent.PlayerIdsLockedOnTarget[i];
                 }
                 

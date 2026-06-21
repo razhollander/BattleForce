@@ -10,5 +10,6 @@ namespace CoreDomain.Scripts.Services.AudioService
         Hit = 5,
         Spin = 6,
         UiClick = 7,
+        SonicSlap = 30,
     }
 }

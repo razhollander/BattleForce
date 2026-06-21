@@ -235,14 +235,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _crownGameObject.SetActive(isKinged);
         }
 
-        public void SetCurrentPowerUp(bool hasPowerUp, Sprite icon)
+        public void SetCurrentPowerUp(bool shouldShowPowerUp, Sprite powerUpIcon)
         {
-            if (_powerUpHudView == null)
-            {
-                return;
-            }
-
-            _powerUpHudView.SetPowerUp(hasPowerUp, icon);
+            _powerUpHudView.SetPowerUp(shouldShowPowerUp, powerUpIcon);
         }
     }
 }

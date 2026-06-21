@@ -179,7 +179,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.IsEngineOn = true;
                 player.Spaceship.IsAlive = true;
                 player.Spaceship.IsSpinned = false;
-                player.Spaceship.TargetedEnemyIds.Clear();
+                player.Spaceship.LockOnTargetObjects.Clear();
                 
                 if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                 {

@@ -56,7 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOn
                 if (isLockingOnWall)
                 {
                     ref var target = ref _cachedWallTargets.AddAndGet();
-                    target.PlayerTargetId = _sharedGamePlayConfig.MinEntityId;
+                    target.TargetId = _sharedGamePlayConfig.MinEntityId;
                     target.IsLockOnTargetShootable = _lockOnWallTimerService.IsWallShootableByPlayer(playerState.Id);
                     target.TargetType = LockOnTargetType.StartMatchWall;
                 }

@@ -18,19 +18,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsSpinned;
         public PlayerAssistArrowType AssistArrowType;
         public PowerUpType CurrentPowerUp;
-        public readonly FixedUnorderedList<ObjectLockedOnTargetS2C> TargetedEnemyIds;
+        public readonly FixedUnorderedList<ObjectLockedOnTargetS2C> LockOnTargetObjects;
 
-        public bool IsPlayerLockOnTargetSightShown => TargetedEnemyIds.Count > 0;
+        public bool IsPlayerLockOnTargetSightShown => LockOnTargetObjects.Count > 0;
 
         public PlayerSpaceshipStateS2C(int maxTalents, int maxEnemiesAmount)
         {
             TalentsState = new PlayerTalentsStateS2C(maxTalents);
-            TargetedEnemyIds = new FixedUnorderedList<ObjectLockedOnTargetS2C>(maxEnemiesAmount);
+            LockOnTargetObjects = new FixedUnorderedList<ObjectLockedOnTargetS2C>(maxEnemiesAmount);
         }
 
         public PlayerSpaceshipStateS2C GetClone()
         {
-            var clone = new PlayerSpaceshipStateS2C(TalentsState.Talents.Capacity, TargetedEnemyIds.Capacity)
+            var clone = new PlayerSpaceshipStateS2C(TalentsState.Talents.Capacity, LockOnTargetObjects.Capacity)
             {
                 Transform = this.Transform,
                 Shoot = this.Shoot,
@@ -42,11 +42,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 CurrentPowerUp = this.CurrentPowerUp,
             };
 
-            clone.TargetedEnemyIds.Clear();
-            for (int i = 0; i < TargetedEnemyIds.Count; i++)
+            clone.LockOnTargetObjects.Clear();
+            for (int i = 0; i < LockOnTargetObjects.Count; i++)
             {
-                ref var targetedEnemyId = ref clone.TargetedEnemyIds.AddAndGet();
-                targetedEnemyId = this.TargetedEnemyIds[i];
+                ref var targetedEnemyId = ref clone.LockOnTargetObjects.AddAndGet();
+                targetedEnemyId = this.LockOnTargetObjects[i];
             }
             
             clone.TalentsState.CopyFrom(this.TalentsState);
@@ -65,12 +65,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put(IsSpinned);
             writer.Put((byte)CurrentPowerUp);
 
-            var targetedEnemyIdsAmount = TargetedEnemyIds.Count;
+            var targetedEnemyIdsAmount = LockOnTargetObjects.Count;
             writer.Put((byte) targetedEnemyIdsAmount);
             for (int i = 0; i < targetedEnemyIdsAmount; i++)
             {
-                var targetedEnemy = TargetedEnemyIds[i];
-                writer.Put((byte)targetedEnemy.PlayerTargetId);
+                var targetedEnemy = LockOnTargetObjects[i];
+                writer.Put((byte)targetedEnemy.TargetId);
                 writer.Put(targetedEnemy.IsLockOnTargetShootable);
                 writer.Put((byte)targetedEnemy.TargetType);
             }
@@ -89,11 +89,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             CurrentPowerUp = (PowerUpType)reader.GetByte();
 
             var targetedEnemyIdsAmount = reader.GetByte();
-            TargetedEnemyIds.Clear();
+            LockOnTargetObjects.Clear();
             for (int i = 0; i < targetedEnemyIdsAmount; i++)
             {
-                ref var targetedEnemy = ref TargetedEnemyIds.AddAndGet();
-                targetedEnemy.PlayerTargetId = reader.GetByte();
+                ref var targetedEnemy = ref LockOnTargetObjects.AddAndGet();
+                targetedEnemy.TargetId = reader.GetByte();
                 targetedEnemy.IsLockOnTargetShootable = reader.GetBool();
                 targetedEnemy.TargetType = (LockOnTargetType)reader.GetByte();
             }

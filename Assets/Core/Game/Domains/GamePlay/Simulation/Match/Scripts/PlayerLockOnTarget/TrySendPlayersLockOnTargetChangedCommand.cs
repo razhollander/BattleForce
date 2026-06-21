@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 FindTargetedPowerUpBallsOfCaster(playerState, _cachedLockedOnHeartIds);
                 _cachedLockedOnHeartIds.Sort();
 
-                var casterTargetedEnemyIds = playerState.Spaceship.TargetedEnemyIds;
+                var casterTargetedEnemyIds = playerState.Spaceship.LockOnTargetObjects;
                 var areIdentical = _cachedLockedOnHeartIds.IsIdentical(casterTargetedEnemyIds);
 
                 if (areIdentical)
@@ -136,7 +136,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 }
                 
                 ref var targetedPlayer = ref outputTargetedEnemyIds.AddAndGet();
-                targetedPlayer.PlayerTargetId = targetedPlayerState.Id;
+                targetedPlayer.TargetId = targetedPlayerState.Id;
                 targetedPlayer.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterPlayerState.Id, targetedPlayerState.Id);
                 targetedPlayer.TargetType = LockOnTargetType.Heart;
             }
@@ -187,7 +187,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 }
 
                 ref var targetedBall = ref outputTargetedEnemyIds.AddAndGet();
-                targetedBall.PlayerTargetId = powerUpBall.Id;
+                targetedBall.TargetId = powerUpBall.Id;
                 targetedBall.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterPlayerState.Id, powerUpBall.Id);
                 targetedBall.TargetType = LockOnTargetType.PowerUpBall;
             }
