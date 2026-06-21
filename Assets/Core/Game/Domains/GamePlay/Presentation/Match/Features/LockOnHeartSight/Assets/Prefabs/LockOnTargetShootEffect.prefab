@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1947213236572327592}
   - component: {fileID: 2666207878272819854}
   m_Layer: 0
-  m_Name: LockOnTargetShoot
+  m_Name: LockOnTargetShootEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

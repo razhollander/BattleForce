@@ -103,7 +103,7 @@ GameObject:
   - component: {fileID: 7351513350059897862}
   - component: {fileID: 7784148480999777261}
   m_Layer: 0
-  m_Name: LockOnHeartTarget
+  m_Name: LockOnTargetEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
