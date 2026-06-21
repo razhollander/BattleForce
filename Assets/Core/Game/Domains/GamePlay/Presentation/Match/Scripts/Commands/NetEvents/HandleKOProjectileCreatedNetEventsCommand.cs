@@ -13,7 +13,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IKOProjectilesControllers _koProjectilesControllers;
         private IMatchPlayerControllers _playerControllers;
-        private IMatchDataService _matchDataService;
         private IAudioService _audioService;
 
         public override void ResolveDependencies()
@@ -21,7 +20,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _koProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
-            _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _audioService = _diContainer.Resolve<IAudioService>();
         }
 
@@ -30,6 +28,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             var netEvents = _cachedPresentationEventsService.CreateKOProjectileNetEvents;
             if (netEvents.Count == 0) return;
 
+            _audioService.PlayAudio(AudioClipType.KOCast);
+            
             foreach (var netEvent in netEvents)
             {
                 var koProjectileModel = netEvent.KoProjectile;

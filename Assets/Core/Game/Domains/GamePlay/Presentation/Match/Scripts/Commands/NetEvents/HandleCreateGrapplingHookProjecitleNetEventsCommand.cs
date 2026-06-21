@@ -34,6 +34,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
+            _audioService.PlayAudio(AudioClipType.GrapplingHookCast);
+            
             foreach (var netEvent in netEvents)
             {
                 var hookModel = netEvent.GrapplingHookProjectile;
@@ -43,7 +45,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                 _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, casterPlayerId, hookModel.Position.ToUnityVector2(), rotation.ToUnityVector2(),
                     casterPosition, hookModel.IsHookAttached);
-                _audioService.PlayAudio(AudioClipType.GrapplingHookShoot);
             }
 
             _cachedPresentationEventsService.CreateGrapplingHookProjectileNetEvents.Clear();

@@ -3,8 +3,8 @@ namespace Core.Scripts.Services.AudioService
     public enum AudioClipType
     {
         None = 0,
-        GrapplingHookShoot = 1,
-        KOProjectileShoot = 2,
+        GrapplingHookCast = 1,
+        KOCast = 2,
         SwapFieldCreated = 3,
         MagneticPullCast = 4,
         StageWinLaugh = 5,
