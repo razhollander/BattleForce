@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             }
         }
 
-        private Vector2 GetTargetPosition(PlayerOnTargetS2C targetedEnemy)
+        private Vector2 GetTargetPosition(ObjectLockedOnTargetS2C targetedEnemy)
         {
             switch (targetedEnemy.TargetType)
             {

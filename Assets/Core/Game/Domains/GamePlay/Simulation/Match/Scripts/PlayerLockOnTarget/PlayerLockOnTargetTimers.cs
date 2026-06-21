@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _cachedTargetsToRemoveBuffer = new List<ushort>();
         }
 
-        public void StepTimers(FixedUnorderedList<PlayerOnTargetS2C> targetedIds, float deltaTime)
+        public void StepTimers(FixedUnorderedList<ObjectLockedOnTargetS2C> targetedIds, float deltaTime)
         {
             _cachedTargetsToRemoveBuffer.Clear();
 
@@ -55,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             return _targetTimers.TryGetValue(targetId, out var timer) && timer >= durationLimit;
         }
 
-        private static bool ContainsTarget(FixedUnorderedList<PlayerOnTargetS2C> targetedIds, ushort targetId)
+        private static bool ContainsTarget(FixedUnorderedList<ObjectLockedOnTargetS2C> targetedIds, ushort targetId)
         {
             for (int i = 0; i < targetedIds.Count; i++)
             {

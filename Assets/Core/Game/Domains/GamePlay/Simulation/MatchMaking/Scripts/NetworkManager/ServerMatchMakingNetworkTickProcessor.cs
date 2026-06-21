@@ -111,7 +111,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick);
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
-                _updatePlayersLockOnWallStateCommand.Execute();
+                _updatePlayersLockOnWallStateCommand.SetTick(currentTick).Execute();
                 _handleIfAnyPlayerChangedTeamFloorCommand.SetTick(currentTick).Execute();
                 _handleIfStartMatchEligiblityChangedCommand.SetTick(currentTick).Execute();
                 MoveToMatchStateIfCountdownEnded();
@@ -191,6 +191,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _fullTickPacket.StartMatchCountdownNetEvents = _netEventsDataService.StartMatchCountdownNetEventsPerClient[clientId];
                 _fullTickPacket.StopMatchCountdownNetEvents = _netEventsDataService.StopMatchCountdownNetEventsPerClient[clientId];
                 _fullTickPacket.StartMatchEligibleChangedNetEvents = _netEventsDataService.StartMatchEligibleChangedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents = _netEventsDataService.PlayerLockOnHeartTargetsChangedNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchMakingFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

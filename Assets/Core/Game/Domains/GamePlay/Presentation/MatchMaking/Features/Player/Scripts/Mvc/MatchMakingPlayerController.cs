@@ -38,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
+            _playerView.SetIsLockOnHeartSightShown(playerModel.Spaceship.IsLockingOnWall);
         }
 
         public void UpdateTransform()

@@ -130,5 +130,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 _startMatchButtonController.SetIsEnabled(evt.IsEligible);
             }
         }
+
+        public void ProcessPlayerLockOnHeartTargetsChangedEvents(CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C> playerLockOnHeartTargetsChangedNetEvents)
+        {
+            if (playerLockOnHeartTargetsChangedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in playerLockOnHeartTargetsChangedNetEvents)
+            {
+                var player = _matchDataService.GetPlayer(netEvent.PlayerId);
+                player.Spaceship.ObjectsLockedOnTarget.Clear();
+
+                for (int i = 0; i < netEvent.PlayerIdsLockedOnTarget.Count; i++)
+                {
+                    ref var targetedEnemy = ref player.Spaceship.ObjectsLockedOnTarget.AddAndGet();
+                    targetedEnemy = netEvent.PlayerIdsLockedOnTarget[i];
+                }
+
+                _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);
+            }
+        }
     }
 }

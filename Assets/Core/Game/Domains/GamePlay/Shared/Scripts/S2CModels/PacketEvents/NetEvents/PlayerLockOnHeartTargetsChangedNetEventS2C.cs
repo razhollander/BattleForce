@@ -8,11 +8,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
     {
         public int OccuredOnTick;
         public ushort PlayerId;
-        public FixedUnorderedList<PlayerOnTargetS2C> PlayerIdsLockedOnTarget;
+        public FixedUnorderedList<ObjectLockedOnTargetS2C> PlayerIdsLockedOnTarget;
 
         public PlayerLockOnHeartTargetsChangedNetEventS2C(int maxTargets)
         {
-            PlayerIdsLockedOnTarget = new FixedUnorderedList<PlayerOnTargetS2C>(maxTargets);
+            PlayerIdsLockedOnTarget = new FixedUnorderedList<ObjectLockedOnTargetS2C>(maxTargets);
         }
 
         public void Serialize(NetDataWriter writer)

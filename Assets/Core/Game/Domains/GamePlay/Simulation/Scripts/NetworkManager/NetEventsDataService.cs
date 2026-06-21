@@ -1000,7 +1000,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
         
-        public void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)
+        public void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<ObjectLockedOnTargetS2C> playerIdsLockedOnTarget)
         {
             foreach (var kvp in PlayerLockOnHeartTargetsChangedNetEventsPerClient)
             {

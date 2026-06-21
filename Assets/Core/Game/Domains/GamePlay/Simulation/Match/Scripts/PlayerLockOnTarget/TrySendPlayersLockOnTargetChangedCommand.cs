@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         private INetEventsDataService _netEventsDataService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
 
-        private FixedUnorderedList<PlayerOnTargetS2C> _cachedLockedOnHeartIds;
+        private FixedUnorderedList<ObjectLockedOnTargetS2C> _cachedLockedOnHeartIds;
         private readonly PhysicsBodyType[] _cachedBodyTypesRayCastCanHit = {PhysicsBodyType.PlayerHeart, PhysicsBodyType.Wall, PhysicsBodyType.PlayerSpaceship, PhysicsBodyType.StartMatchWall, PhysicsBodyType.PowerUpBall};
         private int _processedTick;
 
@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
             var networkConfig = _diContainer.Resolve<NetworkConfig>();
-            _cachedLockedOnHeartIds = new FixedUnorderedList<PlayerOnTargetS2C>(networkConfig.MaxCap.ConcurrentLockOnTargets);
+            _cachedLockedOnHeartIds = new FixedUnorderedList<ObjectLockedOnTargetS2C>(networkConfig.MaxCap.ConcurrentLockOnTargets);
         }
 
         public void Execute()
@@ -77,7 +77,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             }
         }
 
-        private void FindTargetedEnemyIdsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<PlayerOnTargetS2C> outputTargetedEnemyIds)
+        private void FindTargetedEnemyIdsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedEnemyIds)
         {
             if (casterPlayerState.Spaceship.IsSpinned || !casterPlayerState.Spaceship.IsAlive)
             {
@@ -142,7 +142,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             }
         }
 
-        private void FindTargetedPowerUpBallsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<PlayerOnTargetS2C> outputTargetedEnemyIds)
+        private void FindTargetedPowerUpBallsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedEnemyIds)
         {
             if (casterPlayerState.Spaceship.IsSpinned || !casterPlayerState.Spaceship.IsAlive)
             {

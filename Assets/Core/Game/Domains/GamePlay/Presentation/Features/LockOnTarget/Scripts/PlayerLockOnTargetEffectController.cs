@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             _cachedEnemyIdsToRemove = new List<ushort>(networkConfig.MaxCap.ConcurrentPlayers - 1);
         }
 
-        public void RefreshTargetEffectsOfCaster(FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)
+        public void RefreshTargetEffectsOfCaster(FixedUnorderedList<ObjectLockedOnTargetS2C> playerIdsLockedOnTarget)
         {
             DespawnTargetsWhichArentShownAnymore(playerIdsLockedOnTarget);
 
@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             }
         }
 
-        private void UpdateLockOnTargetEffectForTarget(PlayerOnTargetS2C target)
+        private void UpdateLockOnTargetEffectForTarget(ObjectLockedOnTargetS2C target)
         {
             var enemyId = target.PlayerTargetId;
             var isShootable = target.IsLockOnTargetShootable;
@@ -55,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             PlayAnimationForState(_activeEffectsPerEnemy[enemyId], isShootable);
         }
 
-        private void DespawnTargetsWhichArentShownAnymore(FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)
+        private void DespawnTargetsWhichArentShownAnymore(FixedUnorderedList<ObjectLockedOnTargetS2C> playerIdsLockedOnTarget)
         {
             _cachedEnemyIdsToRemove.Clear();
             foreach (var enemyId in _activeEffectsPerEnemy.Keys)

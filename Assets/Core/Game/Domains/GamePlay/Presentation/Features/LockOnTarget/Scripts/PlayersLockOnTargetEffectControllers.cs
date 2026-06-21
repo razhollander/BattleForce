@@ -32,14 +32,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             _effectsPool.InitPool();
         }
 
-        public void AddPlayer(ushort casterPlayerId, FixedUnorderedList<PlayerOnTargetS2C> casterTargetedEnemyIds)
+        public void AddPlayer(ushort casterPlayerId, FixedUnorderedList<ObjectLockedOnTargetS2C> casterTargetedEnemyIds)
         {
             _targetEffectControllerPerPlayerId[casterPlayerId] = new PlayerLockOnTargetEffectController(casterPlayerId, _effectsPool, _sharedGamePlayConfig,
                 _networkConfig, _stateMachineService);
             RefreshTargetEffectsOfCaster(casterPlayerId, casterTargetedEnemyIds);
         }
 
-        public void RefreshTargetEffectsOfCaster(ushort casterPlayerId, FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)
+        public void RefreshTargetEffectsOfCaster(ushort casterPlayerId, FixedUnorderedList<ObjectLockedOnTargetS2C> playerIdsLockedOnTarget)
         {
             if (!_targetEffectControllerPerPlayerId.TryGetValue(casterPlayerId, out var casterActiveEffects))
             {

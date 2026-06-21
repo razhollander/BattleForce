@@ -1,9 +1,8 @@
+using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
-using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
 {
@@ -11,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
     {
         private IMatchMakingDataService _matchMakingDataService;
         private IMatchMakingPlayerControllers _playerControllers;
+        private ILockOnTargetEffectController _lockOnTargetEffectController;
         private MatchMakingPlayerStateS2C _playerState;
 
         public AddMatchMakingPlayerCommand SetPlayerState(MatchMakingPlayerStateS2C playerState)
@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
         {
             _matchMakingDataService = _diContainer.Resolve<IMatchMakingDataService>();
             _playerControllers = _diContainer.Resolve<IMatchMakingPlayerControllers>();
+            _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
         }
 
         public void Execute()
@@ -30,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands
             var playerId = _playerState.Id;
             _matchMakingDataService.AddPlayer(_playerState);
             _playerControllers.AddPlayer(playerId);
+            _lockOnTargetEffectController.AddPlayer(playerId, _playerState.Spaceship.ObjectsLockedOnTarget);
         }
     }
 }

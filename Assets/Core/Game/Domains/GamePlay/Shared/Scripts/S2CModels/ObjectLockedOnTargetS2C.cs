@@ -2,13 +2,13 @@ using System;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 {
-    public struct PlayerOnTargetS2C : IComparable<PlayerOnTargetS2C>, IEquatable<ushort>
+    public struct ObjectLockedOnTargetS2C : IComparable<ObjectLockedOnTargetS2C>, IEquatable<ushort>
     {
         public ushort PlayerTargetId;
         public bool IsLockOnTargetShootable;
         public LockOnTargetType TargetType;
 
-        public int CompareTo(PlayerOnTargetS2C other)
+        public int CompareTo(ObjectLockedOnTargetS2C other)
         {
             return PlayerTargetId.CompareTo(other.PlayerTargetId);
         }

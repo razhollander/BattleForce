@@ -38,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly CapacityList<StartMatchCountdownNetEventS2C> _cachedUnprocessedStartMatchCountdownEvents;
         private readonly CapacityList<StopMatchCountdownNetEventS2C> _cachedUnprocessedStopMatchCountdownEvents;
         private readonly CapacityList<StartMatchEligibleChangedNetEventS2C> _cachedUnprocessedStartMatchEligibleChangedEvents;
+        private readonly CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C> _cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents;
         private readonly ConcurrentPool<MatchMakingFullTickPacketS2C> _fullTickPacketsPool;
         private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchMakingFullTick;
@@ -62,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             _cachedUnprocessedStopMatchCountdownEvents = new CapacityList<StopMatchCountdownNetEventS2C>(networkConfig.MaxCap.StopMatchCountdownNetEvents);
             _cachedUnprocessedPlayerSwitchTeamEvents = new CapacityList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents);
             _cachedUnprocessedStartMatchEligibleChangedEvents = new CapacityList<StartMatchEligibleChangedNetEventS2C>(networkConfig.MaxCap.StartMatchEligibleChangedNetEvents);
+            _cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents = new CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C>(networkConfig.MaxCap.PlayerLockOnHeartTargetsChangedNetEvents);
 
             _fullTickPacketsPool =
                 new ConcurrentPool<MatchMakingFullTickPacketS2C>(() => new MatchMakingFullTickPacketS2C(networkConfig.MaxCap), networkConfig.MaxCap.FullTickPacketsNetEvents);
@@ -98,6 +100,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             ProcessStartMatchCountdownEvents(latestFullTickPacket.StartMatchCountdownNetEvents, ignoreEventsNotAboveTick);
             ProcessStopMatchCountdownEvents(latestFullTickPacket.StopMatchCountdownNetEvents, ignoreEventsNotAboveTick);
             ProcessStartMatchEligibleChangedEvents(latestFullTickPacket.StartMatchEligibleChangedNetEvents, ignoreEventsNotAboveTick);
+            ProcessPlayerLockOnHeartTargetsChangedEvents(latestFullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -239,6 +242,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             }
         }
 
+        private void ProcessPlayerLockOnHeartTargetsChangedEvents(FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            for (int i = 0; i < _cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents.Count; i++)
+            {
+                _cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents[i].PlayerIdsLockedOnTarget.Clear();
+            }
+            _cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerLockOnHeartTargetsChangedEvents(_cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents);
+            }
+        }
+
         private void UpdatePlayersDeltas(MatchMakingSimulationStateS2C simulationState)
         {
             foreach (var player in _matchDataService.Players)
@@ -247,8 +273,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 player.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
                 player.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
                 player.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
-                player.Spaceship.IsLockingOnWall = playerState.Spaceship.IsLockingOnWall;
-                player.Spaceship.IsLockingOnWallShootable = playerState.Spaceship.IsLockingOnWallShootable;
             }
         }
 
