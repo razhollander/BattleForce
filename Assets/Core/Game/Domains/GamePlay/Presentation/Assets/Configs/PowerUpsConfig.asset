@@ -15,4 +15,4 @@ MonoBehaviour:
   PowerUpSprites:
     m_keys: 01000000
     m_values:
-    - {fileID: 21300000, guid: 25f4e7c9b16a7498785e8cf196b5a347, type: 3}
+    - {fileID: 21300000, guid: 22491a6b32eb04e20b14a55efc0a2420, type: 3}
