@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Packet
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -15,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
         private IStartMatchPacketHandler _startMatchPacketHandler;
         private ITickProcessor _tickProcessor;
         private IBackgroundParallaxController _backgroundParallaxController;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
@@ -23,10 +25,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _startMatchPacketHandler = _diContainer.Resolve<IStartMatchPacketHandler>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
         {
+            _audioService.StopLoopAudio(AudioClipType.MatchMakingGamePlayBGMusic);
             _startMatchPacketHandler.InitExitPoint();
             _fullTickPacketsHandler.InitExitPoint();    
             _backgroundParallaxController.InitExitPoint();

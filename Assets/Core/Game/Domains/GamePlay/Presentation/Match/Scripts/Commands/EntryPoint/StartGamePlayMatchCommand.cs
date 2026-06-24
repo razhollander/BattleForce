@@ -30,6 +30,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
 
@@ -69,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ILockOnTargetShootEffectController _lockOnTargetShootEffectController;
         private ILocalPlayersDataService _localPlayersDataService;
         private IGameInputActionsController _gameInputActionsController;
+        private IAudioService _audioService;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -89,7 +91,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
-            _environmentSpikeControllers = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc.IEnvironmentSpikeControllers>();
+            _environmentSpikeControllers = _diContainer.Resolve<IEnvironmentSpikeControllers>();
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
@@ -109,10 +111,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _lockOnTargetShootEffectController = _diContainer.Resolve<ILockOnTargetShootEffectController>();
             _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
         {
+            _audioService.PlayAudioLoop(AudioClipType.MatchGamePlayBGMusic);
             _fullTickPacketsHandler.InitEntryPoint();
             _startStagePacketHandler.InitEntryPoint();
             _talentCardControllers.InitEntryPoint();
@@ -139,7 +143,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
                  .SetSimulationState(_enterData.InitialState)
                  .SetOccuredOnTick(_enterData.StateOccouredOnTick)
                  .Execute();
-
             AddPlayersDevicesNotAddedDuringMatchMaking(); // in case we entered from playback
             _gainBoltEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();

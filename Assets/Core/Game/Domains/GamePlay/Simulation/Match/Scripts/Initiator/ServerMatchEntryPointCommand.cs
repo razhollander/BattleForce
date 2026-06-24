@@ -164,8 +164,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                     _simulationInputService.AddPlayer(playerId);
                     _lockOnTargetTimerService.AddPlayer(playerId);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.Umbrella, playerId, 0, out _, out _);
-                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
-                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.DashPulse, playerId, 0, out _, out _);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.MagneticPull, playerId, 0, out _, out _);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Chicken, playerId, 0, out _, out _);
                 
                     if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                     {

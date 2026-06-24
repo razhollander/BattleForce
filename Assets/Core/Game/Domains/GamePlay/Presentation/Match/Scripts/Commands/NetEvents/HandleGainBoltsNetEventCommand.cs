@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoa
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IGainBoltEffectController _gainBoltEffectController;
         private IMatchDataService _matchDataService;
         private IMatchPlayerControllers _matchPlayerControllers;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
@@ -25,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _gainBoltEffectController = _diContainer.Resolve<IGainBoltEffectController>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()

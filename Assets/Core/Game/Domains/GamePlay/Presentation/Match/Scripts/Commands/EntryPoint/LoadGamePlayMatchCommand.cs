@@ -1,6 +1,6 @@
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Initiator;
-using CoreDomain.Scripts.Services.AudioService;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
 
