@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Mvc.WorldCamera;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Sirenix.Utilities;
@@ -16,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IWorldCameraController _worldCameraController;
         private IMatchPlayerControllers _matchPlayerControllers;
         private IMatchDataService _matchDataService;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
             _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -34,6 +37,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
+            _audioService.PlayAudio(AudioClipType.StageWinLaugh);
+            
             foreach (var stageEndEvent in stageEndEvents)
             {
                 var winningTeamId = stageEndEvent.WinningTeamId;

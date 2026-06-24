@@ -311,6 +311,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.PlayYearsOfPainAnimation(direction.ToUnityVector2(), _stageCancellationTokenProvider.CancellationTokenSource);
         }
 
+        public void PlaySonicSnapEffect()
+        {
+            _playerView.PlaySonicSnapEffect(_stageCancellationTokenProvider.CancellationTokenSource.Token);
+        }
+
         public void SetIsDeadEffectEnabled(bool isEnabled)
         {
             _playerView.SetIsDeadEffectEnabled(isEnabled, _stageCancellationTokenProvider.CancellationTokenSource.Token);

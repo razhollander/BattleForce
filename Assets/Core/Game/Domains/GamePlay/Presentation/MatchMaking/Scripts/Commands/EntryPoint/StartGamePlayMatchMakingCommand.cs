@@ -18,6 +18,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Scripts.Network;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
 
@@ -46,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
         private IGameInputActionsController _gameInputActionsController;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private ILockOnTargetShootEffectController _lockOnTargetShootEffectController;
+        private IAudioService _audioService;
 
         public StartGamePlayMatchMakingCommand SetEnterData(GamePlayMatchMakingInitiatorEnterData enterData)
         {
@@ -75,10 +77,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.E
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
             _lockOnTargetShootEffectController = _diContainer.Resolve<ILockOnTargetShootEffectController>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public async Awaitable Execute(CancellationTokenSource cancellationTokenSource)
         {
+            _audioService.PlayAudioLoop(AudioClipType.MatchMakingGamePlayBGMusic);
             _fullTickPacketsHandler.InitEntryPoint();
             _startMatchPacketHandler.InitEntryPoint();
             _playerControllers.InitEntryPoint();

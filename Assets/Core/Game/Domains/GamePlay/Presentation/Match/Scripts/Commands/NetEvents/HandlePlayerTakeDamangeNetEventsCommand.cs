@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using Core.Scripts.Services.HapticsService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using UnityEngine;
@@ -18,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchPlayerUIControllers _matchPlayerUIControllers;
         private ICommandFactory _commandFactory;
+        private IAudioService _audioService;
         private IHitDamageIndicatorEffectController _hitDamageIndicatorEffectController;
 
         public override void ResolveDependencies()
@@ -27,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _matchPlayerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _audioService = _diContainer.Resolve<IAudioService>();
             _hitDamageIndicatorEffectController = _diContainer.Resolve<IHitDamageIndicatorEffectController>();
         }
 
@@ -55,7 +58,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var effectSpawnPosition = playerTransform.position.ToVector2XY() + playerModel.Spaceship.Transform.Radius * Vector2.up;
                 _hitDamageIndicatorEffectController.PlayEffect(playerTakeDamageEvent.HitDamage, effectSpawnPosition, playerTransform);
             }
-
+            
+            _audioService.PlayAudio(AudioClipType.PlayerTakeDamage);
             playerTakeDamageEvents.Clear();
         }
     }
