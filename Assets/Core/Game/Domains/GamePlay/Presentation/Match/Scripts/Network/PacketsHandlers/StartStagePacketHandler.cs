@@ -46,8 +46,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public void OnPacketReceived(NetDataReader reader)
         {
             _startStagePacket.Deserialize(reader);
-            /*_audioService.StopLoopAudio(AudioClipType.MatchGamePlayBGMusic);
-            _audioService.PlayAudioLoop(AudioClipType.MatchGamePlayBGMusic);*/
             _lastFullSyncTickDataService.LastFullSyncTick = _startStagePacket.OccuredOnTick;
             LogService.LogTopic("Stage start received", LogTopicType.ClientNetwork);
             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
