@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -9,11 +10,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private IMatchPlayerControllers _playerControllers;
         private ICachedPresentationEventsService _cachedPresentationEventsService;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -24,8 +27,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
             
+            _audioService.PlayAudio(AudioClipType.SwapHit); // play only once no matter how many events received
             //BlinkPlayersWithoutSwapEffect(playersSwapEvents);
-            
             playersSwapEvents.Clear();
         }
 

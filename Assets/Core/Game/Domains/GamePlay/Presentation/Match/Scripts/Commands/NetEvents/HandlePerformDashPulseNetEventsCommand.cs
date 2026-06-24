@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -14,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IDashPulseGustEffectController _dashPulseGustEffectController;
         private IMatchDataService _matchDataService;
         private IMatchPlayerControllers _playerControllers;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
@@ -21,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -33,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in _cachedPresentationEventsService.PerformDashPulseNetEvents)
             {
                 PlayDashPulseEffectForPlayer(netEvent.CasterPlayerId);
+                _audioService.PlayAudio(AudioClipType.DashPulseCast);
             }
 
             _cachedPresentationEventsService.PerformDashPulseNetEvents.Clear();
