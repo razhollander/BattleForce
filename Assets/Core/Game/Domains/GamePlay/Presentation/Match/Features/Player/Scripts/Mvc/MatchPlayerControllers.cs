@@ -115,6 +115,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).PlayerYearsOfPain(direction);
         }
 
+        public void PlaySonicSnapEffectForPlayer(ushort playerId)
+        {
+            GetPlayer(playerId).PlaySonicSnapEffect();
+        }
+
         public void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled)
         {
             GetPlayer(playerId).SetIsDeadEffectEnabled(isEnabled);

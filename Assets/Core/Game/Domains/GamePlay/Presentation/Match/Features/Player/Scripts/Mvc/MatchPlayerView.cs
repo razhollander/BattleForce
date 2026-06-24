@@ -28,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
         [SerializeField] private PlayerChickenView _playerChickenView;
         [SerializeField] private YearsOfPainView _yearsOfPainView;
+        [SerializeField] private SonicSnapEffectView _sonicSnapEffectView;
         [SerializeField] private GameObject _deadAura;
         [SerializeField] private PlayerEyesView _playerEyesView;
         [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
@@ -110,6 +111,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void PlayYearsOfPainAnimation(Vector2 direction, CancellationTokenSource cancellationTokenSource)
         {
             _yearsOfPainView.PlayAndHide(direction, cancellationTokenSource).Forget();
+        }
+
+        public void PlaySonicSnapEffect(CancellationToken cancellationToken)
+        {
+            _sonicSnapEffectView.PlaySnapEffect(cancellationToken).Forget();
         }
 
         public void SetUmbrellaState(bool isOn)
@@ -221,6 +227,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void OnSpawned()
         {
             SetIsHealthBarShown(true);
+            _sonicSnapEffectView.Hide();
             Base.OnSpawned();
         }
 
