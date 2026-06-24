@@ -13,6 +13,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scrip
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
@@ -64,7 +65,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
-        
+        private IPreparationPhaseCountdownController _preparationPhaseCountdownController;
+
         private MatchSimulationStateS2C _simulationState;
         private int _stateOccouredOnTick;
 
@@ -108,6 +110,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
+            _preparationPhaseCountdownController = _diContainer.Resolve<IPreparationPhaseCountdownController>();
         }
 
         public void Execute()
@@ -119,6 +122,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _stageCancellationTokenProvider.CancelAndRegenarateStageToken();
             DestroyAll();
             CreateAll();
+            UpdateCountdown();
+        }
+
+        private void UpdateCountdown()
+        {
+            if (!_simulationState.IsInPreparationPhase)
+            {
+                _preparationPhaseCountdownController.StopCountdown();
+                return;
+            }
+
+            var elapsedTicks = _fullTickPacketsHandler.LastProcessedTickFromServer - _stateOccouredOnTick;
+            _preparationPhaseCountdownController.PlayCountdown(elapsedTicks);
         }
 
         private void DestroyAll()

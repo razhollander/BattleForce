@@ -80,6 +80,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PlayerLockedOnTargetHitNetEventS2C> _cachedUnprocessedPlayerLockedOnTargetHitNetEvents;
         private readonly CapacityList<PlayerPowerUpChangedNetEventS2C> _cachedUnprocessedPlayerPowerUpChangedNetEvents;
         private readonly CapacityList<SonicSlapActivatedNetEventS2C> _cachedUnprocessedSonicSlapActivatedNetEvents;
+        private readonly CapacityList<PerformGalacticPullNetEventS2C> _cachedUnprocessedPerformGalacticPullNetEvents;
+        private readonly CapacityList<DeactivateGalacticForceFieldNetEventS2C> _cachedUnprocessedDeactivateGalacticForceFieldNetEvents;
+        private readonly CapacityList<ActivateNukePowerUpNetEventS2C> _cachedUnprocessedActivateNukePowerUpNetEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
 
         private int _largestPacketSizeInLast5Seconds;
@@ -148,6 +151,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPlayerLockedOnTargetHitNetEvents = new CapacityList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedUnprocessedPlayerPowerUpChangedNetEvents = new CapacityList<PlayerPowerUpChangedNetEventS2C>(networkConfig.MaxCap.PlayerPowerUpChangedNetEvents);
             _cachedUnprocessedSonicSlapActivatedNetEvents = new CapacityList<SonicSlapActivatedNetEventS2C>(networkConfig.MaxCap.SonicSlapActivatedNetEvents);
+            _cachedUnprocessedPerformGalacticPullNetEvents = new CapacityList<PerformGalacticPullNetEventS2C>(networkConfig.MaxCap.PerformGalacticPullNetEvents);
+            _cachedUnprocessedDeactivateGalacticForceFieldNetEvents = new CapacityList<DeactivateGalacticForceFieldNetEventS2C>(networkConfig.MaxCap.DeactivateGalacticForceFieldNetEvents);
+            _cachedUnprocessedActivateNukePowerUpNetEvents = new CapacityList<ActivateNukePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateNukePowerUpNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -219,6 +225,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPlayerLockedOnTargetHitNetEvents(latestFullTickPacket.PlayerLockedOnTargetHitNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerPowerUpChangedNetEvents(latestFullTickPacket.PlayerPowerUpChangedNetEvents, ignoreEventsNotAboveTick);
             ProcessSonicSlapActivatedNetEvents(latestFullTickPacket.SonicSlapActivatedNetEvents, ignoreEventsNotAboveTick);
+            ProcessPerformGalacticPullNetEvents(latestFullTickPacket.PerformGalacticPullNetEvents, ignoreEventsNotAboveTick);
+            ProcessDeactivateGalacticForceFieldNetEvents(latestFullTickPacket.DeactivateGalacticForceFieldNetEvents, ignoreEventsNotAboveTick);
+            ProcessActivateNukePowerUpNetEvents(latestFullTickPacket.ActivateNukePowerUpNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -1294,6 +1303,57 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedChickenEggHitEvents.Sort();
                 _presentationNetEventsHandler.ProcessChickenEggHitEvents(_cachedUnprocessedChickenEggHitEvents);
+            }
+        }
+
+        private void ProcessPerformGalacticPullNetEvents(FixedUnorderedList<PerformGalacticPullNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedPerformGalacticPullNetEvents.Clear();
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedPerformGalacticPullNetEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedPerformGalacticPullNetEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPerformGalacticPullNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessPerformGalacticPullEvents(_cachedUnprocessedPerformGalacticPullNetEvents);
+            }
+        }
+
+        private void ProcessDeactivateGalacticForceFieldNetEvents(FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedDeactivateGalacticForceFieldNetEvents.Clear();
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedDeactivateGalacticForceFieldNetEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedDeactivateGalacticForceFieldNetEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDeactivateGalacticForceFieldNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateGalacticForceFieldEvents(_cachedUnprocessedDeactivateGalacticForceFieldNetEvents);
+            }
+        }
+
+        private void ProcessActivateNukePowerUpNetEvents(FixedUnorderedList<ActivateNukePowerUpNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedActivateNukePowerUpNetEvents.Clear();
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedActivateNukePowerUpNetEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedActivateNukePowerUpNetEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedActivateNukePowerUpNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessActivateNukePowerUpEvents(_cachedUnprocessedActivateNukePowerUpNetEvents);
             }
         }
     }

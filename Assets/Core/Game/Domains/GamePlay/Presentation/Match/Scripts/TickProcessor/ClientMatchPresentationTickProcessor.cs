@@ -72,6 +72,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandlePlayerLockedOnTargetHitNetEventsCommand _handlePlayerLockedOnTargetHitNetEventsCommand;
         private readonly HandlePlayerPowerUpChangedNetEventsCommand _handlePlayerPowerUpChangedNetEventsCommand;
         private readonly HandleSonicSlapActivatedNetEventsCommand _handleSonicSlapActivatedNetEventsCommand;
+        private readonly HandlePerformGalacticPullNetEventsCommand _handlePerformGalacticPullNetEventsCommand;
+        private readonly HandleDeactivateGalacticForceFieldNetEventsCommand _handleDeactivateGalacticForceFieldNetEventsCommand;
+        private readonly HandleActivateNukePowerUpNetEventsCommand _handleActivateNukePowerUpNetEventsCommand;
         private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
@@ -129,6 +132,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePlayerLockedOnTargetHitNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockedOnTargetHitNetEventsCommand>();
             _handlePlayerPowerUpChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerPowerUpChangedNetEventsCommand>();
             _handleSonicSlapActivatedNetEventsCommand = commandFactory.CreateCommandVoid<HandleSonicSlapActivatedNetEventsCommand>();
+            _handlePerformGalacticPullNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformGalacticPullNetEventsCommand>();
+            _handleDeactivateGalacticForceFieldNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateGalacticForceFieldNetEventsCommand>();
+            _handleActivateNukePowerUpNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateNukePowerUpNetEventsCommand>();
             _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
             _lockOnTargetEffectController = lockOnTargetEffectController;
         }
@@ -198,6 +204,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePlayerLockedOnTargetHitNetEventsCommand.Execute();
             _handlePlayerPowerUpChangedNetEventsCommand.Execute();
             _handleSonicSlapActivatedNetEventsCommand.Execute();
+            _handlePerformGalacticPullNetEventsCommand.Execute();
+            _handleDeactivateGalacticForceFieldNetEventsCommand.Execute();
+            _handleActivateNukePowerUpNetEventsCommand.Execute();
             _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnHeartTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
         }
     }

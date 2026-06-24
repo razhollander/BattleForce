@@ -41,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
+        private ApplyGalacticPullForcesCommand _applyGalacticPullForcesCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private StepTimersCommand _stepTimersCommand;
         private TryEndPlayersSpinCommand _tryEndPlayersSpinCommand;
@@ -86,6 +87,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _stepAllPlayersTalentsCooldownsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCooldownsCommand>();
             _stepAllPlayersTalentsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCommand>();
             _trySendPlayersLockOnTargetChangedCommand = _commandFactory.CreateCommandVoid<TrySendPlayersLockOnTargetChangedCommand>();
+            _applyGalacticPullForcesCommand = _commandFactory.CreateCommandVoid<ApplyGalacticPullForcesCommand>();
             _tickService.RegisterObserver(this);
         }
 
@@ -111,6 +113,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 var processPlayersInputsResult = ProcessPackets(currentTick, stepDeltaTime);
                 _stepAllPlayersTalentsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
+                _applyGalacticPullForcesCommand.SetTick(currentTick).Execute();
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
                 _tryEndPlayersSpinCommand.SetTick(currentTick).Execute();
@@ -272,6 +275,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.PlayerLockedOnTargetHitNetEvents = _netEventsDataService.PlayerLockedOnTargetHitNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerPowerUpChangedNetEvents = _netEventsDataService.PlayerPowerUpChangedNetEventsPerClient[clientId];
                 _fullTickPacket.SonicSlapActivatedNetEvents = _netEventsDataService.SonicSlapActivatedNetEventsPerClient[clientId];
+                _fullTickPacket.PerformGalacticPullNetEvents = _netEventsDataService.PerformGalacticPullNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateGalacticForceFieldNetEvents = _netEventsDataService.DeactivateGalacticForceFieldNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

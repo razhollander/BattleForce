@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
+using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
 {
@@ -18,13 +19,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
         private readonly ConcurrentPool<PlayerPowerUpControllers> _powerUpControllersPool;
 
         public PlayersPowerUpsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, INetEventsDataService netEventsDataService,
-            ISimulationGamePlayConfigService gamePlayConfigService)
+            ISimulationGamePlayConfigService gamePlayConfigService, ICommandFactory commandFactory)
         {
             _matchDataService = matchDataService;
             _netEventsDataService = netEventsDataService;
             _gamePlayConfigService = gamePlayConfigService;
             _powerUpControllersPerPlayer = new Dictionary<int, PlayerPowerUpControllers>(networkConfig.MaxCap.ConcurrentPlayers);
-            _powerUpControllersPool = new ConcurrentPool<PlayerPowerUpControllers>(() => new PlayerPowerUpControllers(matchDataService, netEventsDataService, networkConfig), networkConfig.MaxCap.ConcurrentPlayers);
+            _powerUpControllersPool = new ConcurrentPool<PlayerPowerUpControllers>(() => new PlayerPowerUpControllers(matchDataService, netEventsDataService, networkConfig, gamePlayConfigService, commandFactory), networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)

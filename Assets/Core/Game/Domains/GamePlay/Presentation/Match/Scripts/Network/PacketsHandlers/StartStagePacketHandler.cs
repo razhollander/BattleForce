@@ -47,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             LogService.LogTopic("Stage start received", LogTopicType.ClientNetwork);
             _commandFactory.CreateCommandVoid<SyncMatchSimulationStateCommand>()
                 .SetSimulationState(_startStagePacket.InitialState)
+                .SetOccuredOnTick(_startStagePacket.OccuredOnTick)
                 .Execute();
 
             _stageEndedUiController.Hide();

@@ -743,5 +743,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.SonicSlapActivatedNetEvents.Add(netEvent);
             }
         }
+
+        public void ProcessPerformGalacticPullEvents(CapacityList<PerformGalacticPullNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.PerformGalacticPullNetEvents.Add(netEvent);
+        }
+
+        public void ProcessDeactivateGalacticForceFieldEvents(CapacityList<DeactivateGalacticForceFieldNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.DeactivateGalacticForceFieldNetEvents.Add(netEvent);
+        }
+
+        public void ProcessActivateNukePowerUpEvents(CapacityList<ActivateNukePowerUpNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.ActivateNukePowerUpNetEvents.Add(netEvent);
+        }
     }
 }

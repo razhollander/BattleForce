@@ -3,6 +3,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     public enum PowerUpType
     {
         None = 0,
-        SonicSlap = 1
+        SonicSlap = 1,
+        GalacticPull = 2,
+        Nuke = 3
     }
 }

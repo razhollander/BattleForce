@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentKOProjectileS2C> KOProjectiles;
         public FixedUnorderedList<TalentGrapplingHookProjectileStateS2C> GrapplingHookProjectiles;
         public FixedUnorderedList<TalentChickenEggStateS2C> ChickenEggs;
+        public FixedUnorderedList<GalacticForceFieldS2C> GalacticForceFields;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
         public FixedOrderedList<ushort> FieldBarriersOrderedByTeamId;
@@ -31,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public ushort CurrentStageWinnerTeamId;
         public float MapSizeMultiplier;
         
-        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs)
+        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs, int maxGalacticForceFields)
         {
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer, maxPlayers - 1 + maxPowerUpBalls));
             Bullets = new FixedOrderedList<PlayerBulletS2C>(maxBullets);
@@ -41,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             KOProjectiles = new FixedUnorderedList<TalentKOProjectileS2C>(maxPlayers);
             GrapplingHookProjectiles = new FixedUnorderedList<TalentGrapplingHookProjectileStateS2C>(maxPlayers);
             ChickenEggs = new FixedUnorderedList<TalentChickenEggStateS2C>(maxChickenEggs);
+            GalacticForceFields = new FixedUnorderedList<GalacticForceFieldS2C>(maxGalacticForceFields);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
             FieldBarriersOrderedByTeamId = new FixedOrderedList<ushort>(maxTeams);
@@ -117,8 +119,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var chickenEgg in ChickenEggs.AsSpan())
             {
                 chickenEgg.Serialize(writer);
-            }  
-            
+            }
+
+            var galacticForceFieldsCount = GalacticForceFields.Count;
+            writer.Put((byte)galacticForceFieldsCount);
+            foreach (var field in GalacticForceFields.AsSpan())
+            {
+                field.Serialize(writer);
+            }
+
             foreach (var teamId in FieldBarriersOrderedByTeamId.AsSpan())
             {
                 writer.Put((byte)teamId);
@@ -216,7 +225,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 ref var chickenEgg = ref ChickenEggs.AddAndGet();
                 chickenEgg.Deserialize(reader);
             }
-            
+
+            var galacticForceFieldsCount = reader.GetByte();
+            GalacticForceFields.Clear();
+            for (var i = 0; i < galacticForceFieldsCount; i++)
+            {
+                ref var field = ref GalacticForceFields.AddAndGet();
+                field.Deserialize(reader);
+            }
+
             FieldBarriersOrderedByTeamId.Clear();
             for (var i = 0; i < amountOfTeams; i++)
             {
@@ -765,6 +782,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return false;
         }
 
+        public void RemoveGalacticForceFieldById(ushort fieldId)
+        {
+            for (int i = 0; i < GalacticForceFields.Count; i++)
+            {
+                if (GalacticForceFields[i].Id == fieldId)
+                {
+                    GalacticForceFields.RemoveAt(i);
+                    return;
+                }
+            }
+            throw new System.Exception($"No galactic force field for id {fieldId}!");
+        }
+
         public void ClearObjectStates()
         {
             Bullets.Clear();
@@ -774,6 +804,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             KOProjectiles.Clear();
             GrapplingHookProjectiles.Clear();
             ChickenEggs.Clear();
+            GalacticForceFields.Clear();
             FieldBarriersOrderedByTeamId.Clear();
         }
     }

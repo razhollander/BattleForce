@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastKOProjectileCreatedId = 0;
         private ushort _lastGrapplingHookProjectileCreatedId = 0;
         private ushort _lastChickenEggCreatedId = 0;
+        private ushort _lastGalacticForceFieldCreatedId = 0;
         public List<int> DidntPlayYetStageIndexes { get; } = new List<int>();
         public MatchEnvironmentDataService EnvironmentData { get; private set; }
         public HashSet<ushort> TeamIds { get; private set; }
@@ -35,7 +36,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
                 maxCap.ConcurrentTalentCards,
                 maxCap.ConcurrentPowerUpBalls,
                 sharedGamePlayConfig.MaxTeamsAmount,
-                maxCap.ConcurrentChickenEggs);
+                maxCap.ConcurrentChickenEggs,
+                maxCap.ConcurrentGalacticForceFields);
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
@@ -144,6 +146,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             egg.Position = position;
 
             return egg;
+        }
+
+        public GalacticForceFieldS2C AddGalacticForceField(ushort casterPlayerId, ushort casterTeamId, int endTick)
+        {
+            ref var field = ref SimulationState.GalacticForceFields.AddAndGet();
+            var fieldId = (ushort)(++_lastGalacticForceFieldCreatedId % ushort.MaxValue);
+            field.Id = fieldId;
+            field.CasterPlayerId = casterPlayerId;
+            field.CasterTeamId = casterTeamId;
+            field.EndTick = endTick;
+            return field;
         }
     }
 }

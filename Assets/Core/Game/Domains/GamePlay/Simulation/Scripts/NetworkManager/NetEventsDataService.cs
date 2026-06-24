@@ -69,6 +69,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> PlayerLockedOnTargetHitNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>> PlayerPowerUpChangedNetEventsPerClient { get; }
         public CapacityDict<long, FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>> SonicSlapActivatedNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PerformGalacticPullNetEventS2C>> PerformGalacticPullNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>> DeactivateGalacticForceFieldNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> ActivateNukePowerUpNetEventsPerClient { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -121,6 +124,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>> _layChickenEggNetEventsPool;
         private readonly ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>> _chickenEggHitNetEventsPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> _activateYearsOfPainTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PerformGalacticPullNetEventS2C>> _performGalacticPullNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>> _deactivateGalacticForceFieldNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> _activateNukePowerUpNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -176,6 +182,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             LayChickenEggNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>>(maxConcurrentPlayers);
             ChickenEggHitNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ChickenEggHitNetEventS2C>>(maxConcurrentPlayers);
             ActivateYearsOfPainTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(maxConcurrentPlayers);
+            PerformGalacticPullNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PerformGalacticPullNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateGalacticForceFieldNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>>(maxConcurrentPlayers);
+            ActivateNukePowerUpNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>>(maxConcurrentPlayers);
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -255,6 +264,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _layChickenEggNetEventsPool = new ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>>(() => new FixedUnorderedList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents), maxConcurrentPlayers);
             _chickenEggHitNetEventsPool = new ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>>(() => new FixedUnorderedList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents), maxConcurrentPlayers);
             _activateYearsOfPainTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents), maxConcurrentPlayers);
+            _performGalacticPullNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformGalacticPullNetEventS2C>>(() => new FixedUnorderedList<PerformGalacticPullNetEventS2C>(networkConfig.MaxCap.PerformGalacticPullNetEvents), maxConcurrentPlayers);
+            _deactivateGalacticForceFieldNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>>(() => new FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>(networkConfig.MaxCap.DeactivateGalacticForceFieldNetEvents), maxConcurrentPlayers);
+            _activateNukePowerUpNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateNukePowerUpNetEventS2C>>(() => new FixedUnorderedList<ActivateNukePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateNukePowerUpNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingClientEvents(long clientId)
@@ -605,8 +617,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 ActivateYearsOfPainTalentNetEventsPerClient.Add(clientId, _activateYearsOfPainTalentNetEventsListPool.Get());
             }
+            if (!PerformGalacticPullNetEventsPerClient.ContainsKey(clientId))
+            {
+                PerformGalacticPullNetEventsPerClient.Add(clientId, _performGalacticPullNetEventsListPool.Get());
+            }
+            if (!DeactivateGalacticForceFieldNetEventsPerClient.ContainsKey(clientId))
+            {
+                DeactivateGalacticForceFieldNetEventsPerClient.Add(clientId, _deactivateGalacticForceFieldNetEventsListPool.Get());
+            }
+            if (!ActivateNukePowerUpNetEventsPerClient.ContainsKey(clientId))
+            {
+                ActivateNukePowerUpNetEventsPerClient.Add(clientId, _activateNukePowerUpNetEventsListPool.Get());
+            }
         }
-        
+
         public void StopSavingClientEvents(long clientId)
         {
             var bulletSpawnedList = BulletSpawnNetEventsPerClient[clientId];
@@ -782,6 +806,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             activateYearsOfPainTalentNetEventsList.Clear();
             _activateYearsOfPainTalentNetEventsListPool.Return(activateYearsOfPainTalentNetEventsList);
 
+            var performGalacticPullNetEventsList = PerformGalacticPullNetEventsPerClient[clientId];
+            performGalacticPullNetEventsList.Clear();
+            _performGalacticPullNetEventsListPool.Return(performGalacticPullNetEventsList);
+
+            var deactivateGalacticForceFieldNetEventsList = DeactivateGalacticForceFieldNetEventsPerClient[clientId];
+            deactivateGalacticForceFieldNetEventsList.Clear();
+            _deactivateGalacticForceFieldNetEventsListPool.Return(deactivateGalacticForceFieldNetEventsList);
+
+            var activateNukePowerUpNetEventsList = ActivateNukePowerUpNetEventsPerClient[clientId];
+            activateNukePowerUpNetEventsList.Clear();
+            _activateNukePowerUpNetEventsListPool.Return(activateNukePowerUpNetEventsList);
+
             BulletSpawnNetEventsPerClient.Remove(clientId);
             PlayerRejoinAcceptNetEventsPerClient.Remove(clientId);
             MatchMakingPlayerJoinAcceptNetEventsPerClient.Remove(clientId);
@@ -829,6 +865,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             LayChickenEggNetEventsPerClient.Remove(clientId);
             ChickenEggHitNetEventsPerClient.Remove(clientId);
             ActivateYearsOfPainTalentNetEventsPerClient.Remove(clientId);
+            PerformGalacticPullNetEventsPerClient.Remove(clientId);
+            DeactivateGalacticForceFieldNetEventsPerClient.Remove(clientId);
+            ActivateNukePowerUpNetEventsPerClient.Remove(clientId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -1051,6 +1090,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     ref var affectedId = ref netEvent.AffectedPlayerIds.AddAndGet();
                     affectedId = affectedPlayerId;
                 }
+            }
+        }
+
+        public void AddPerformGalacticPullNetEvent(int onTick, ushort fieldId, ushort casterPlayerId, ushort casterTeamId, int endTick)
+        {
+            foreach (var kvp in PerformGalacticPullNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.FieldId = fieldId;
+                netEvent.CasterPlayerId = casterPlayerId;
+                netEvent.CasterTeamId = casterTeamId;
+                netEvent.EndTick = endTick;
+            }
+        }
+
+        public void AddDeactivateGalacticForceFieldNetEvent(int onTick, ushort fieldId)
+        {
+            foreach (var kvp in DeactivateGalacticForceFieldNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.FieldId = fieldId;
+            }
+        }
+
+        public void AddActivateNukePowerUpNetEvent(int onTick, ushort casterPlayerId, Vector2 casterPosition)
+        {
+            foreach (var kvp in ActivateNukePowerUpNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.CasterPlayerId = casterPlayerId;
+                netEvent.CasterPosition = casterPosition;
             }
         }
 
@@ -1571,6 +1644,28 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                     if (activateYearsOfPainTalentNetEvents[i].OccuredOnTick < tick)
                     {
                         activateYearsOfPainTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PerformGalacticPullNetEventsPerClient.TryGetValue(clientId, out var performGalacticPullNetEvents))
+            {
+                for (int i = performGalacticPullNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (performGalacticPullNetEvents[i].OccuredOnTick < tick)
+                    {
+                        performGalacticPullNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateGalacticForceFieldNetEventsPerClient.TryGetValue(clientId, out var deactivateGalacticForceFieldNetEvents))
+            {
+                for (int i = deactivateGalacticForceFieldNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateGalacticForceFieldNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateGalacticForceFieldNetEvents.RemoveAt(i);
                     }
                 }
             }

@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
@@ -6,6 +7,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Services.DataService;
 using Core.Scripts.Extensions;
 using Core.Scripts.Services.HapticsService;
 using CoreDomain.Scripts.Services.CommandFactory;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -16,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchPlayerUIControllers _matchPlayerUIControllers;
         private ICommandFactory _commandFactory;
+        private IHitDamageIndicatorEffectController _hitDamageIndicatorEffectController;
 
         public override void ResolveDependencies()
         {
@@ -24,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _matchPlayerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _hitDamageIndicatorEffectController = _diContainer.Resolve<IHitDamageIndicatorEffectController>();
         }
 
         public void Execute()
@@ -33,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 return;
             }
-            
+
             foreach (var playerTakeDamageEvent in playerTakeDamageEvents)
             {
                 var playerTakeDamageId = playerTakeDamageEvent.PlayerId;
@@ -46,8 +50,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     .Execute();
                 _playerControllers.SetPlayerHealth(playerTakeDamageId, currentHealth, maxHealth);
                 _matchPlayerUIControllers.SetPlayerHealth(playerTakeDamageId, currentHealth, maxHealth);
+
+                var playerTransform = _playerControllers.GetPlayerTransform(playerTakeDamageId);
+                var effectSpawnPosition = playerTransform.position.ToVector2XY() + playerModel.Spaceship.Transform.Radius * Vector2.up;
+                _hitDamageIndicatorEffectController.PlayEffect(playerTakeDamageEvent.HitDamage, effectSpawnPosition, playerTransform);
             }
-            
+
             playerTakeDamageEvents.Clear();
         }
     }

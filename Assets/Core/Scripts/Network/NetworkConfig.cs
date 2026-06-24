@@ -110,6 +110,10 @@ namespace Core.Scripts.Network
         public int PlayerLockOnHeartTargetHitNetEvents = 128;
         public int PlayerPowerUpChangedNetEvents = 64;
         public int SonicSlapActivatedNetEvents = 64;
+        public int ActivateNukePowerUpNetEvents = 16;
+        public int ConcurrentGalacticForceFields = 16;
+        public int PerformGalacticPullNetEvents = 64;
+        public int DeactivateGalacticForceFieldNetEvents = 64;
 
         [Serializable]
         public class EnvironmentRotatingWheel
