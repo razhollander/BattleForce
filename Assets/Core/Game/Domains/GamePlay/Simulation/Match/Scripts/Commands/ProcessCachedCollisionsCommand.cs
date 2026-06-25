@@ -716,9 +716,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
             LogService.LogTopic($"new pos {_physicsSimulator.GetPlayer(playerModel.Id).Position}, prev pos: {playerModel.Spaceship.Transform.Position} ", LogTopicType.ServerNetwork);
-            playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0
-                ? System.Numerics.Vector2.Normalize(reflectedVelocity)
-                : System.Numerics.Vector2.Zero;
+            var currentDirection = playerModel.Spaceship.Transform.Direction;
+            var reflectedDirection = currentDirection.ReflectFromWall(collisionNormal);
+            playerModel.Spaceship.Transform.Direction = reflectedDirection.Length() > 0
+                ? System.Numerics.Vector2.Normalize(reflectedDirection)
+                : currentDirection;
         }
 
         private PlayerStateS2C GetPlayerFromCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, bool isPlayerToWallCollision, bool isWallToPlayerCollision)
