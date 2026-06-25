@@ -5,6 +5,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         None = 0,
         SonicSlap = 1,
         GalacticPull = 2,
-        Nuke = 3
+        Nuke = 3,
+        Shuffle = 4
     }
 }

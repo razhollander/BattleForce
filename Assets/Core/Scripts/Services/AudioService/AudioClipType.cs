@@ -33,5 +33,6 @@ namespace Core.Scripts.Services.AudioService
         PowerUpBallObtained = 30,
         SwapHit = 31,
         SonicSlap = 32,
+        ShufflePowerUp = 33,
     }
 }

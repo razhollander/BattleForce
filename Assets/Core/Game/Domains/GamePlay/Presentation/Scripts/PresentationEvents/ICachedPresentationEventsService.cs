@@ -55,5 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<PerformGalacticPullNetEventS2C> PerformGalacticPullNetEvents { get; }
         List<DeactivateGalacticForceFieldNetEventS2C> DeactivateGalacticForceFieldNetEvents { get; }
         List<ActivateNukePowerUpNetEventS2C> ActivateNukePowerUpNetEvents { get; }
+        List<ActivateShufflePowerUpNetEventS2C> ActivateShufflePowerUpNetEvents { get; }
+        List<ShuffleSwapPlayerPositionNetEventS2C> ShuffleSwapPlayerPositionNetEvents { get; }
     }
 }

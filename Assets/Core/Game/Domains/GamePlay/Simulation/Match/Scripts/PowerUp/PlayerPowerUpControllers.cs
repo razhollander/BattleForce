@@ -13,12 +13,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
         private readonly SonicSlapPowerUpController _sonicSlapPowerUpController;
         private readonly GalacticPullPowerUpController _galacticPullPowerUpController;
         private readonly NukePowerUpController _nukePowerUpController;
+        private readonly ShufflePowerUpController _shufflePowerUpController;
 
         public PlayerPowerUpControllers(IMatchDataService matchDataService, INetEventsDataService netEventsDataService, NetworkConfig networkConfig, ISimulationGamePlayConfigService gamePlayConfigService, ICommandFactory commandFactory)
         {
             _sonicSlapPowerUpController = new SonicSlapPowerUpController(matchDataService, netEventsDataService, networkConfig);
             _galacticPullPowerUpController = new GalacticPullPowerUpController(matchDataService, netEventsDataService, gamePlayConfigService, networkConfig);
             _nukePowerUpController = new NukePowerUpController(matchDataService, netEventsDataService, gamePlayConfigService, commandFactory);
+            _shufflePowerUpController = new ShufflePowerUpController(matchDataService, netEventsDataService, networkConfig);
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -26,11 +28,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
             _sonicSlapPowerUpController.SetCasterId(casterPlayerId);
             _galacticPullPowerUpController.SetCasterId(casterPlayerId);
             _nukePowerUpController.SetCasterId(casterPlayerId);
+            _shufflePowerUpController.SetCasterId(casterPlayerId);
         }
 
         public void Perform(PowerUpType powerUpType, int tick)
         {
             GetPowerUpByType(powerUpType)?.Perform(tick);
+        }
+
+        public void OnTick(int tick)
+        {
+            _shufflePowerUpController.OnTick(tick);
         }
 
         private IPowerUpController GetPowerUpByType(PowerUpType powerUpType)
@@ -40,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
                 case PowerUpType.SonicSlap: return _sonicSlapPowerUpController;
                 case PowerUpType.GalacticPull: return _galacticPullPowerUpController;
                 case PowerUpType.Nuke: return _nukePowerUpController;
+                case PowerUpType.Shuffle: return _shufflePowerUpController;
                 default: return default;
             }
         }

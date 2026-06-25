@@ -764,5 +764,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var netEvent in events)
                 _cachedPresentationEventsService.ActivateNukePowerUpNetEvents.Add(netEvent);
         }
+
+        public void ProcessActivateShufflePowerUpEvents(CapacityList<ActivateShufflePowerUpNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.ActivateShufflePowerUpNetEvents.Add(netEvent);
+        }
+
+        public void ProcessShuffleSwapPlayerPositionEvents(CapacityList<ShuffleSwapPlayerPositionNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.ShuffleSwapPlayerPositionNetEvents.Add(netEvent);
+        }
     }
 }

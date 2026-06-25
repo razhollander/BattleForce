@@ -198,9 +198,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var playerId = playerState.Id;
 
             if (_playersPowerUpsManager.IsPlayerAimingPowerUp(playerId))
-            {
                 return;
-            }
+
+            if (_playersPowerUpsManager.IsPerformInProgressForPlayer(playerId))
+                return;
 
             if (currentSelectedTalent.IsOnCooldown())
             {

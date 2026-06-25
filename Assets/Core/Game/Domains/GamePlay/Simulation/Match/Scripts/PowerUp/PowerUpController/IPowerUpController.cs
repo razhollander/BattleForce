@@ -7,5 +7,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
         PowerUpType PowerUpType { get; }
         void SetCasterId(ushort casterPlayerId);
         void Perform(int tick);
+        void OnTick(int tick);
     }
 }

@@ -27,8 +27,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             _casterPlayerId = casterPlayerId;
         }
 
+        public void OnTick(int tick) { }
+
         public void Perform(int tick)
         {
+            _matchDataService.SimulationState.SetIsPowerUpCurrentlyActiveForPlayer(_casterPlayerId, true);
             var casterTeamId = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId).TeamId;
             _cachedAffectedPlayerIds.Clear();
 
@@ -48,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             }
 
             _netEventsDataService.AddSonicSlapActivatedNetEvent(tick, _casterPlayerId, _cachedAffectedPlayerIds);
+            _matchDataService.SimulationState.SetIsPowerUpCurrentlyActiveForPlayer(_casterPlayerId, false);
         }
     }
 }

@@ -36,8 +36,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             _casterPlayerId = casterPlayerId;
         }
 
+        public void OnTick(int tick) { }
+
         public void Perform(int tick)
         {
+            _matchDataService.SimulationState.SetIsPowerUpCurrentlyActiveForPlayer(_casterPlayerId, true);
             var casterState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             var casterTeamId = casterState.TeamId;
             var casterPosition = casterState.Spaceship.Transform.Position;
@@ -63,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             }
 
             _netEventsDataService.AddActivateNukePowerUpNetEvent(tick, _casterPlayerId, casterPosition);
+            _matchDataService.SimulationState.SetIsPowerUpCurrentlyActiveForPlayer(_casterPlayerId, false);
         }
     }
 }

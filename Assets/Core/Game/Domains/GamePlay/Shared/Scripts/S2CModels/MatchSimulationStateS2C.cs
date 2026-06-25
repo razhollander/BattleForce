@@ -309,7 +309,17 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             GetPlayerById(playerId).Spaceship.TalentsState.TrySetIsTalentActive(talentType, isActive);
         }
-        
+
+        public bool GetIsPowerUpCurrentlyActiveForPlayer(ushort playerId)
+        {
+            return GetPlayerById(playerId).Spaceship.IsPowerUpCurrentlyActive;
+        }
+
+        public void SetIsPowerUpCurrentlyActiveForPlayer(ushort playerId, bool isActive)
+        {
+            GetPlayerById(playerId).Spaceship.IsPowerUpCurrentlyActive = isActive;
+        }
+
         public bool GetIsTalentAimingForPlayer(ushort playerId, TalentType talentType)
         {
             if (GetPlayerById(playerId).Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent))

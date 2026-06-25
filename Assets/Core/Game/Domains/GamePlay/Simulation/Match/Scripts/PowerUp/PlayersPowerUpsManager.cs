@@ -76,9 +76,39 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
                 return;
             }
 
-            _powerUpControllersPerPlayer[playerId].Perform(currentPowerUp, tick);
-            playerState.Spaceship.CurrentPowerUp = PowerUpType.None;
-            _netEventsDataService.AddPlayerPowerUpChangedNetEvent(tick, playerId, PowerUpType.None);
+            var controllers = _powerUpControllersPerPlayer[playerId];
+            controllers.Perform(currentPowerUp, tick);
+
+            if (!playerState.Spaceship.IsPowerUpCurrentlyActive)
+            {
+                playerState.Spaceship.CurrentPowerUp = PowerUpType.None;
+                _netEventsDataService.AddPlayerPowerUpChangedNetEvent(tick, playerId, PowerUpType.None);
+            }
+        }
+
+        public void OnTick(int tick)
+        {
+            foreach (var kvp in _powerUpControllersPerPlayer)
+            {
+                var playerId = (ushort)kvp.Key;
+                var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+                var wasActive = playerState.Spaceship.IsPowerUpCurrentlyActive;
+                kvp.Value.OnTick(tick);
+
+                if (wasActive && !playerState.Spaceship.IsPowerUpCurrentlyActive)
+                {
+                    playerState.Spaceship.CurrentPowerUp = PowerUpType.None;
+                    _netEventsDataService.AddPlayerPowerUpChangedNetEvent(tick, playerId, PowerUpType.None);
+                }
+            }
+        }
+
+        public bool IsPerformInProgressForPlayer(ushort playerId)
+        {
+            if (!_powerUpControllersPerPlayer.ContainsKey(playerId))
+                return false;
+
+            return _matchDataService.SimulationState.GetIsPowerUpCurrentlyActiveForPlayer(playerId);
         }
 
         public void RemoveAllPowerUps()

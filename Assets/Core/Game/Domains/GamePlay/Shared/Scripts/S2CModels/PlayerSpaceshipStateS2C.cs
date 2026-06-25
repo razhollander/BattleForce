@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsSpinned;
         public PlayerAssistArrowType AssistArrowType;
         public PowerUpType CurrentPowerUp;
+        public bool IsPowerUpCurrentlyActive;
         public readonly FixedUnorderedList<ObjectLockedOnTargetS2C> LockOnTargetObjects;
 
         public bool IsPlayerLockOnTargetSightShown => LockOnTargetObjects.Count > 0;
@@ -40,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 IsSpinned = this.IsSpinned,
                 AssistArrowType = this.AssistArrowType,
                 CurrentPowerUp = this.CurrentPowerUp,
+                IsPowerUpCurrentlyActive = this.IsPowerUpCurrentlyActive,
             };
 
             clone.LockOnTargetObjects.Clear();
@@ -64,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((ushort)AssistArrowType);
             writer.Put(IsSpinned);
             writer.Put((byte)CurrentPowerUp);
+            writer.Put(IsPowerUpCurrentlyActive);
 
             var targetedEnemyIdsAmount = LockOnTargetObjects.Count;
             writer.Put((byte) targetedEnemyIdsAmount);
@@ -87,6 +90,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             AssistArrowType = (PlayerAssistArrowType)reader.GetUShort();
             IsSpinned = reader.GetBool();
             CurrentPowerUp = (PowerUpType)reader.GetByte();
+            IsPowerUpCurrentlyActive = reader.GetBool();
 
             var targetedEnemyIdsAmount = reader.GetByte();
             LockOnTargetObjects.Clear();

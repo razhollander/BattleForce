@@ -83,6 +83,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PerformGalacticPullNetEventS2C> _cachedUnprocessedPerformGalacticPullNetEvents;
         private readonly CapacityList<DeactivateGalacticForceFieldNetEventS2C> _cachedUnprocessedDeactivateGalacticForceFieldNetEvents;
         private readonly CapacityList<ActivateNukePowerUpNetEventS2C> _cachedUnprocessedActivateNukePowerUpNetEvents;
+        private readonly CapacityList<ActivateShufflePowerUpNetEventS2C> _cachedUnprocessedActivateShufflePowerUpNetEvents;
+        private readonly CapacityList<ShuffleSwapPlayerPositionNetEventS2C> _cachedUnprocessedShuffleSwapPlayerPositionNetEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
 
         private int _largestPacketSizeInLast5Seconds;
@@ -154,6 +156,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPerformGalacticPullNetEvents = new CapacityList<PerformGalacticPullNetEventS2C>(networkConfig.MaxCap.PerformGalacticPullNetEvents);
             _cachedUnprocessedDeactivateGalacticForceFieldNetEvents = new CapacityList<DeactivateGalacticForceFieldNetEventS2C>(networkConfig.MaxCap.DeactivateGalacticForceFieldNetEvents);
             _cachedUnprocessedActivateNukePowerUpNetEvents = new CapacityList<ActivateNukePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateNukePowerUpNetEvents);
+            _cachedUnprocessedActivateShufflePowerUpNetEvents = new CapacityList<ActivateShufflePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents);
+            _cachedUnprocessedShuffleSwapPlayerPositionNetEvents = new CapacityList<ShuffleSwapPlayerPositionNetEventS2C>(networkConfig.MaxCap.ShuffleSwapPlayerPositionNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -228,6 +232,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPerformGalacticPullNetEvents(latestFullTickPacket.PerformGalacticPullNetEvents, ignoreEventsNotAboveTick);
             ProcessDeactivateGalacticForceFieldNetEvents(latestFullTickPacket.DeactivateGalacticForceFieldNetEvents, ignoreEventsNotAboveTick);
             ProcessActivateNukePowerUpNetEvents(latestFullTickPacket.ActivateNukePowerUpNetEvents, ignoreEventsNotAboveTick);
+            ProcessActivateShufflePowerUpNetEvents(latestFullTickPacket.ActivateShufflePowerUpNetEvents, ignoreEventsNotAboveTick);
+            ProcessShuffleSwapPlayerPositionNetEvents(latestFullTickPacket.ShuffleSwapPlayerPositionNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -1354,6 +1360,36 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedActivateNukePowerUpNetEvents.Sort();
                 _presentationNetEventsHandler.ProcessActivateNukePowerUpEvents(_cachedUnprocessedActivateNukePowerUpNetEvents);
+            }
+        }
+
+        private void ProcessActivateShufflePowerUpNetEvents(FixedUnorderedList<ActivateShufflePowerUpNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedActivateShufflePowerUpNetEvents.Clear();
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                    _cachedUnprocessedActivateShufflePowerUpNetEvents.Add(netEvent);
+            }
+            if (!_cachedUnprocessedActivateShufflePowerUpNetEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedActivateShufflePowerUpNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessActivateShufflePowerUpEvents(_cachedUnprocessedActivateShufflePowerUpNetEvents);
+            }
+        }
+
+        private void ProcessShuffleSwapPlayerPositionNetEvents(FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedShuffleSwapPlayerPositionNetEvents.Clear();
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                    _cachedUnprocessedShuffleSwapPlayerPositionNetEvents.Add(netEvent);
+            }
+            if (!_cachedUnprocessedShuffleSwapPlayerPositionNetEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedShuffleSwapPlayerPositionNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessShuffleSwapPlayerPositionEvents(_cachedUnprocessedShuffleSwapPlayerPositionNetEvents);
             }
         }
     }
