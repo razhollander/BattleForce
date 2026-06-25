@@ -125,7 +125,12 @@ MonoBehaviour:
       MaxConcurrentPowerUpBalls: 5
       MoveSpeed: 5
       Radius: 1.269
-      ObtainablePowerUps: 01000000
+      ObtainablePowerUps: 04000000
+      GalacticPullDurationSeconds: 5
+      GalacticPullForce: 8
+      NukeForce: 50
+      NukeMinSpinAmount: 200
+      NukeMaxSpinAmount: 300
     EnvironmentSprings:
       Force: 40
       MaxSpin: 65

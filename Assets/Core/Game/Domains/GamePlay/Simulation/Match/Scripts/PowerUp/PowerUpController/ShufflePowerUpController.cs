@@ -10,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
 {
     public class ShufflePowerUpController : IPowerUpController
     {
-        private const int SwapIntervalInTicks = 15;
+        private const int SwapIntervalInTicks = 5;
 
         private struct PendingPlayerSwap
         {
@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
         private readonly INetEventsDataService _netEventsDataService;
         private readonly FixedUnorderedList<ushort> _cachedPlayerIds;
         private readonly PendingPlayerSwap[] _pendingSwaps;
+        private readonly ushort[] _shuffleBuffer;
         private int _pendingSwapsCount;
         private int _nextSwapIndex;
         private int _nextSwapTick;
@@ -37,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             _netEventsDataService = netEventsDataService;
             _cachedPlayerIds = new FixedUnorderedList<ushort>(networkConfig.MaxCap.ConcurrentPlayers);
             _pendingSwaps = new PendingPlayerSwap[networkConfig.MaxCap.ConcurrentPlayers];
+            _shuffleBuffer = new ushort[networkConfig.MaxCap.ConcurrentPlayers];
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -83,19 +85,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
 
         private void PreCalculateSwapPairs()
         {
-            _pendingSwapsCount = 0;
             var playerCount = _cachedPlayerIds.Count;
+            for (int i = 0; i < playerCount; i++)
+                _shuffleBuffer[i] = _cachedPlayerIds.GetByIndex(i);
+
+            _pendingSwapsCount = 0;
+
+            // Sattolo's algorithm: NextInt(0, i) (exclusive of i) forces a single N-cycle,
+            // guaranteeing every player ends up at a different position.
             for (int i = playerCount - 1; i > 0; i--)
             {
-                var randomIndex = (int)RNG.NextFloat(0f, i + 1f);
-                if (randomIndex == i)
-                    continue;
+                var randomIndex = RNG.NextInt(0, i);
 
                 _pendingSwaps[_pendingSwapsCount++] = new PendingPlayerSwap
                 {
-                    PlayerId1 = _cachedPlayerIds.Get(i),
-                    PlayerId2 = _cachedPlayerIds.Get(randomIndex)
+                    PlayerId1 = _shuffleBuffer[i],
+                    PlayerId2 = _shuffleBuffer[randomIndex]
                 };
+
+                (_shuffleBuffer[i], _shuffleBuffer[randomIndex]) = (_shuffleBuffer[randomIndex], _shuffleBuffer[i]);
             }
         }
 
@@ -103,12 +111,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
         {
             var swap = _pendingSwaps[_nextSwapIndex++];
 
-            var state1 = _matchDataService.SimulationState.GetPlayerById(swap.PlayerId1);
-            var state2 = _matchDataService.SimulationState.GetPlayerById(swap.PlayerId2);
+            var spaceship1 = _matchDataService.SimulationState.GetPlayerById(swap.PlayerId1).Spaceship;
+            var spaceship2 = _matchDataService.SimulationState.GetPlayerById(swap.PlayerId2).Spaceship;
 
-            var tempPosition = state1.Spaceship.Transform.Position;
-            state1.Spaceship.Transform.Position = state2.Spaceship.Transform.Position;
-            state2.Spaceship.Transform.Position = tempPosition;
+            (spaceship1.Transform.Position, spaceship2.Transform.Position) = (spaceship2.Transform.Position, spaceship1.Transform.Position);
 
             _netEventsDataService.AddShuffleSwapPlayerPositionNetEvent(tick, _casterPlayerId);
         }

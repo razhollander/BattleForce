@@ -6,6 +6,7 @@ namespace Core.Scripts.Services.AudioService
     public interface IAudioService
     {
         void InitEntryPoint();
+        void PlayRandomAudio(params AudioClipType[] audioClipTypes);
         void PlayAudio(AudioClipType audioClipType);
         void PlayAudioLoop(AudioClipType audioClipType);
         void StopLoopAudio(AudioClipType audioClipType);

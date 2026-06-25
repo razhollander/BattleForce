@@ -7,12 +7,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     public class HandleActivateShufflePowerUpNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
-        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
-            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -20,8 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             var netEvents = _cachedPresentationEventsService.ActivateShufflePowerUpNetEvents;
             if (netEvents.Count == 0)
                 return;
-
-            _audioService.PlayAudio(AudioClipType.ShufflePowerUp);
+            
             netEvents.Clear();
         }
     }

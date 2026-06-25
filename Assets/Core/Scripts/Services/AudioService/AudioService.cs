@@ -70,6 +70,13 @@ namespace Core.Scripts.Services.AudioService
             }
         }
 
+        public void PlayRandomAudio(params AudioClipType[] audioClipTypes)
+        {
+            var randomIndex = Random.Range(0, audioClipTypes.Length);
+            var audioClipType = audioClipTypes[randomIndex];
+            PlayAudioAsync(audioClipType, Application.exitCancellationToken).Forget();
+        }
+        
         public void PlayAudio(AudioClipType audioClipType)
         {
             PlayAudioAsync(audioClipType, Application.exitCancellationToken).Forget();

@@ -48,9 +48,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<CreateKOProjectileNetEventS2C>> CreateKOProjectileNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> KOProjectHitPlayerNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateKOTalentNetEventS2C>> DeactivateKOTalentNetEventsPerClient { get; }
-        public CapacityDict<long, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> PlayerGrapplingHookShotNetEventsPerClient { get; }
-        public CapacityDict<long, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> PlayerGrapplingHookHitNetEventsPerClient { get; }
-        public CapacityDict<long, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> PlayerGrapplingHookDeactivatedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PerformDashPulseNetEventS2C>> PerformDashPulseNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>> ActivateSentryGunTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>> DeactivateSentryGunTalentNetEventsPerClient { get; }
@@ -169,9 +166,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             CreateKOProjectileNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateKOProjectileNetEventS2C>>(maxConcurrentPlayers);
             KOProjectHitPlayerNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(maxConcurrentPlayers);
             DeactivateKOTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(maxConcurrentPlayers);
-            PlayerGrapplingHookShotNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>>(maxConcurrentPlayers);
-            PlayerGrapplingHookHitNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>>(maxConcurrentPlayers);
-            PlayerGrapplingHookDeactivatedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(maxConcurrentPlayers);
             ActivateSentryGunTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateSentryGunTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>>(maxConcurrentPlayers);
             PerformDashPulseNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PerformDashPulseNetEventS2C>>(maxConcurrentPlayers);
@@ -553,18 +547,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 KOProjectHitPlayerNetEventsPerClient.Add(clientId, _koProjectHitPlayerNetEventsListPool.Get());
             }
-            if (!PlayerGrapplingHookShotNetEventsPerClient.ContainsKey(clientId))
-            {
-                PlayerGrapplingHookShotNetEventsPerClient.Add(clientId, _playerGrapplingHookShotNetEventsListPool.Get());
-            }
-            if (!PlayerGrapplingHookHitNetEventsPerClient.ContainsKey(clientId))
-            {
-                PlayerGrapplingHookHitNetEventsPerClient.Add(clientId, _playerGrapplingHookHitNetEventsListPool.Get());
-            }
-            if (!PlayerGrapplingHookDeactivatedNetEventsPerClient.ContainsKey(clientId))
-            {
-                PlayerGrapplingHookDeactivatedNetEventsPerClient.Add(clientId, _playerGrapplingHookDeactivatedNetEventsListPool.Get());
-            }
             if (!DeactivateKOTalentNetEventsPerClient.ContainsKey(clientId))
             {
                 DeactivateKOTalentNetEventsPerClient.Add(clientId, _deactivateKOTalentNetEventsListPool.Get());
@@ -753,17 +735,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _koProjectHitPlayerNetEventsListPool.Return(koProjectHitPlayerNetEventsList);
 
             var deactivateKOTalentNetEventsList = DeactivateKOTalentNetEventsPerClient[clientId];
-            var playerGrapplingHookShotNetEventsList = PlayerGrapplingHookShotNetEventsPerClient[clientId];
-            var playerGrapplingHookHitNetEventsList = PlayerGrapplingHookHitNetEventsPerClient[clientId];
-            var playerGrapplingHookDeactivatedNetEventsList = PlayerGrapplingHookDeactivatedNetEventsPerClient[clientId];
             deactivateKOTalentNetEventsList.Clear();
-            playerGrapplingHookShotNetEventsList.Clear();
-            playerGrapplingHookHitNetEventsList.Clear();
-            playerGrapplingHookDeactivatedNetEventsList.Clear();
             _deactivateKOTalentNetEventsListPool.Return(deactivateKOTalentNetEventsList);
-            _playerGrapplingHookShotNetEventsListPool.Return(playerGrapplingHookShotNetEventsList);
-            _playerGrapplingHookHitNetEventsListPool.Return(playerGrapplingHookHitNetEventsList);
-            _playerGrapplingHookDeactivatedNetEventsListPool.Return(playerGrapplingHookDeactivatedNetEventsList);
             
             var performDashPulseNetEventsList = PerformDashPulseNetEventsPerClient[clientId];
             performDashPulseNetEventsList.Clear();
@@ -872,14 +845,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             CreateKOProjectileNetEventsPerClient.Remove(clientId);
             KOProjectHitPlayerNetEventsPerClient.Remove(clientId);
             DeactivateKOTalentNetEventsPerClient.Remove(clientId);
-            PlayerGrapplingHookShotNetEventsPerClient.Remove(clientId);
-            PlayerGrapplingHookHitNetEventsPerClient.Remove(clientId);
-            PlayerGrapplingHookDeactivatedNetEventsPerClient.Remove(clientId);
             PerformDashPulseNetEventsPerClient.Remove(clientId);
             ActivateSentryGunTalentNetEventsPerClient.Remove(clientId);
             DeactivateSentryGunTalentNetEventsPerClient.Remove(clientId);
             UpdatePlayerTalentStocksNetEventsPerClient.Remove(clientId);
             PlayerMaxShootCooldownChangedNetEventsPerClient.Remove(clientId);
+            CreateGrapplingHookProjectileNetEventsPerClient.Remove(clientId);
+            GrapplingHookHitWallNetEventsPerClient.Remove(clientId);
+            DeactivateGrapplingHookTalentNetEventsPerClient.Remove(clientId);
             ActivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
             DeactivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
             LayChickenEggNetEventsPerClient.Remove(clientId);
@@ -1712,6 +1685,39 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                     if (deactivateGalacticForceFieldNetEvents[i].OccuredOnTick < tick)
                     {
                         deactivateGalacticForceFieldNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+            
+            if (ActivateNukePowerUpNetEventsPerClient.TryGetValue(clientId, out var activateNukePowerUpNetEvents))
+            {
+                for (int i = activateNukePowerUpNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateNukePowerUpNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateNukePowerUpNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+            
+            if (ActivateShufflePowerUpNetEventsPerClient.TryGetValue(clientId, out var activateShufflePowerUpNetEvents))
+            {
+                for (int i = activateShufflePowerUpNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateShufflePowerUpNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateShufflePowerUpNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+            
+            if (ShuffleSwapPlayerPositionNetEventsPerClient.TryGetValue(clientId, out var shuffleSwapPlayerPositionNetEvents))
+            {
+                for (int i = shuffleSwapPlayerPositionNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (shuffleSwapPlayerPositionNetEvents[i].OccuredOnTick < tick)
+                    {
+                        shuffleSwapPlayerPositionNetEvents.RemoveAt(i);
                     }
                 }
             }

@@ -21,8 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             if (netEvents.Count == 0)
                 return;
 
-            foreach (var _ in netEvents)
-                _audioService.PlayAudio(AudioClipType.ShufflePowerUp);
+            _audioService.PlayRandomAudio(AudioClipType.SingleShufflePowerUp1, AudioClipType.SingleShufflePowerUp2);
 
             netEvents.Clear();
         }
