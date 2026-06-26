@@ -149,8 +149,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedChickenEggHitEvents = new CapacityList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents);
 
             _cachedUnprocessedActivateYearsOfPainTalentEvents = new CapacityList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents);
-            _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents = new CapacityList<PlayerLockOnTargetsChangedNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
-            _cachedUnprocessedPlayerLockedOnTargetHitNetEvents = new CapacityList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
+            _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents = new CapacityList<PlayerLockOnTargetsChangedNetEventS2C>(networkConfig.MaxCap.PlayerLockOnTargetsChangedNetEvents);
+            _cachedUnprocessedPlayerLockedOnTargetHitNetEvents = new CapacityList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.PlayerLockOnTargetHitNetEvents);
             _cachedUnprocessedPlayerPowerUpChangedNetEvents = new CapacityList<PlayerPowerUpChangedNetEventS2C>(networkConfig.MaxCap.PlayerPowerUpChangedNetEvents);
             _cachedUnprocessedSonicSlapActivatedNetEvents = new CapacityList<SonicSlapActivatedNetEventS2C>(networkConfig.MaxCap.SonicSlapActivatedNetEvents);
             _cachedUnprocessedPerformGalacticPullNetEvents = new CapacityList<PerformGalacticPullNetEventS2C>(networkConfig.MaxCap.PerformGalacticPullNetEvents);
