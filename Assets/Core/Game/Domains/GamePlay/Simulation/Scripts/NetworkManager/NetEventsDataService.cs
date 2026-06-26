@@ -1045,10 +1045,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 var packet = kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.PlayerId = playerId;
-                packet.PlayerIdsLockedOnTarget.Clear();
+                packet.LockedOnTargetObjects.Clear();
                 foreach (var playerLockedOnTarget in playerIdsLockedOnTarget.AsSpan())
                 {
-                    ref var playerlockOnId = ref packet.PlayerIdsLockedOnTarget.AddAndGet();
+                    ref var playerlockOnId = ref packet.LockedOnTargetObjects.AddAndGet();
                     playerlockOnId = playerLockedOnTarget;
                 }
             }

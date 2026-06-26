@@ -1035,7 +1035,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         {
             for (int i = 0; i < _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Count; i++)
             {
-                _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents[i].PlayerIdsLockedOnTarget.Clear();   
+                _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();   
             }
             _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Clear();
 

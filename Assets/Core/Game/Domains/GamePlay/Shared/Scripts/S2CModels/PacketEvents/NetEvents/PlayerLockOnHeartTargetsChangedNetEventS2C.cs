@@ -8,19 +8,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
     {
         public int OccuredOnTick;
         public ushort PlayerId;
-        public FixedUnorderedList<ObjectLockedOnTargetS2C> PlayerIdsLockedOnTarget;
+        public FixedUnorderedList<ObjectLockedOnTargetS2C> LockedOnTargetObjects;
 
         public PlayerLockOnHeartTargetsChangedNetEventS2C(int maxTargets)
         {
-            PlayerIdsLockedOnTarget = new FixedUnorderedList<ObjectLockedOnTargetS2C>(maxTargets);
+            LockedOnTargetObjects = new FixedUnorderedList<ObjectLockedOnTargetS2C>(maxTargets);
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)PlayerId);
-            writer.Put((byte)PlayerIdsLockedOnTarget.Count);
-            foreach (var target in PlayerIdsLockedOnTarget.AsSpan())
+            writer.Put((byte)LockedOnTargetObjects.Count);
+            foreach (var target in LockedOnTargetObjects.AsSpan())
             {
                 writer.Put((byte)target.TargetId);
                 writer.Put(target.IsLockOnTargetShootable);
@@ -32,11 +32,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
         {
             OccuredOnTick = reader.GetInt();
             PlayerId = reader.GetByte();
-            PlayerIdsLockedOnTarget.Clear();
+            LockedOnTargetObjects.Clear();
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                ref var target = ref PlayerIdsLockedOnTarget.AddAndGet();
+                ref var target = ref LockedOnTargetObjects.AddAndGet();
                 target.TargetId = reader.GetByte();
                 target.IsLockOnTargetShootable = reader.GetBool();
                 target.TargetType = (LockOnTargetType)reader.GetByte();

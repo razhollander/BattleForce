@@ -143,10 +143,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 var player = _matchDataService.GetPlayer(netEvent.PlayerId);
                 player.Spaceship.ObjectsLockedOnTarget.Clear();
 
-                for (int i = 0; i < netEvent.PlayerIdsLockedOnTarget.Count; i++)
+                for (int i = 0; i < netEvent.LockedOnTargetObjects.Count; i++)
                 {
                     ref var targetedEnemy = ref player.Spaceship.ObjectsLockedOnTarget.AddAndGet();
-                    targetedEnemy = netEvent.PlayerIdsLockedOnTarget[i];
+                    targetedEnemy = netEvent.LockedOnTargetObjects[i];
                 }
 
                 _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);

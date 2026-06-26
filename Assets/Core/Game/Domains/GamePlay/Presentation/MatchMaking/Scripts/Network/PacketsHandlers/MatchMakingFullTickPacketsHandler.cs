@@ -246,7 +246,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         {
             for (int i = 0; i < _cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents.Count; i++)
             {
-                _cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents[i].PlayerIdsLockedOnTarget.Clear();
+                _cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents[i].LockedOnTargetObjects.Clear();
             }
             _cachedUnprocessedPlayerLockOnHeartTargetsChangedEvents.Clear();
 

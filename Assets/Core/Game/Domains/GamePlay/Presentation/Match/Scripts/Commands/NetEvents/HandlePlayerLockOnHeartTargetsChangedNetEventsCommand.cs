@@ -27,10 +27,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents)
             {
-                var isLockOnHeartSightShown = netEvent.PlayerIdsLockedOnTarget.Count > 0;
+                var isLockOnHeartSightShown = netEvent.LockedOnTargetObjects.Count > 0;
                 _matchPlayerControllers.SetPlayerIsLockOnHeartSightShown(netEvent.PlayerId, isLockOnHeartSightShown);
-                _lockOnTargetEffectController.RefreshTargetEffectsOfCaster(netEvent.PlayerId, netEvent.PlayerIdsLockedOnTarget);
-                netEvent.PlayerIdsLockedOnTarget.Clear();
+                _lockOnTargetEffectController.RefreshTargetEffectsOfCaster(netEvent.PlayerId, netEvent.LockedOnTargetObjects);
             }
 
 

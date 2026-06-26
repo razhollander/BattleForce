@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
             foreach (var netEvent in _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents)
             {
                 var playerId = netEvent.PlayerId;
-                var targets = netEvent.PlayerIdsLockedOnTarget;
+                var targets = netEvent.LockedOnTargetObjects;
                 var isLockingOnWall = targets.Count > 0;
                 var isWallShootable = isLockingOnWall && targets[0].IsLockOnTargetShootable;
 
@@ -56,7 +56,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
                 }
 
                 _wasShootablePerPlayer[playerId] = isWallShootable;
-                netEvent.PlayerIdsLockedOnTarget.Clear();
+                netEvent.LockedOnTargetObjects.Clear();
             }
 
             _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Clear();

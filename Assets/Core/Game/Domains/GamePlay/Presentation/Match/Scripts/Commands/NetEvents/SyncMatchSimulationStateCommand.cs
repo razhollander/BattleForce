@@ -363,7 +363,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             foreach (var talentCard in _simulationState.TalentCards.AsSpan())
             {
-                _matchDataService.AddTalentCard(talentCard.Id, talentCard.Position.ToUnityVector2(), talentCard.TalentType, talentCard.Health);
+                _matchDataService.AddTalentCard(talentCard.Id, talentCard.Position.ToUnityVector2()*mapSizeMultiplier, talentCard.TalentType, talentCard.Health);
                 _talentCardControllers.CreateTalentCard(talentCard.Id);
             }
         }

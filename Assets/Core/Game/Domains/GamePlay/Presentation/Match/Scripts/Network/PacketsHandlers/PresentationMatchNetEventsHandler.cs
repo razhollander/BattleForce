@@ -694,10 +694,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 var player = _matchDataService.GetPlayer(netEvent.PlayerId);
                 player.Spaceship.LockOnTargetObjects.Clear();
                 
-                for (int i = 0; i < netEvent.PlayerIdsLockedOnTarget.Count; i++)
+                for (int i = 0; i < netEvent.LockedOnTargetObjects.Count; i++)
                 {
-                    ref var targetedEnemy = ref player.Spaceship.LockOnTargetObjects.AddAndGet();
-                    targetedEnemy = netEvent.PlayerIdsLockedOnTarget[i];
+                    ref var objectLockedOnTarget = ref player.Spaceship.LockOnTargetObjects.AddAndGet();
+                    objectLockedOnTarget = netEvent.LockedOnTargetObjects[i];
                 }
                 
                 _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);

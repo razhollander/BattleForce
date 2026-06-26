@@ -47,8 +47,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             clone.LockOnTargetObjects.Clear();
             for (int i = 0; i < LockOnTargetObjects.Count; i++)
             {
-                ref var targetedEnemyId = ref clone.LockOnTargetObjects.AddAndGet();
-                targetedEnemyId = this.LockOnTargetObjects[i];
+                ref var lockOnTargetObject = ref clone.LockOnTargetObjects.AddAndGet();
+                lockOnTargetObject = this.LockOnTargetObjects[i];
             }
             
             clone.TalentsState.CopyFrom(this.TalentsState);
@@ -63,19 +63,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentsState.Serialize(writer);
             writer.Put(IsEngineOn);
             writer.Put(IsAlive);
-            writer.Put((ushort)AssistArrowType);
+            writer.Put((ushort)AssistArrowType); // byte
             writer.Put(IsSpinned);
             writer.Put((byte)CurrentPowerUp);
             writer.Put(IsPowerUpCurrentlyActive);
 
-            var targetedEnemyIdsAmount = LockOnTargetObjects.Count;
-            writer.Put((byte) targetedEnemyIdsAmount);
-            for (int i = 0; i < targetedEnemyIdsAmount; i++)
+            var lockOnTargetObjectsAmount = LockOnTargetObjects.Count;
+            writer.Put((byte) lockOnTargetObjectsAmount);
+            for (int i = 0; i < lockOnTargetObjectsAmount; i++)
             {
-                var targetedEnemy = LockOnTargetObjects[i];
-                writer.Put((byte)targetedEnemy.TargetId);
-                writer.Put(targetedEnemy.IsLockOnTargetShootable);
-                writer.Put((byte)targetedEnemy.TargetType);
+                var lockOnTargetObject = LockOnTargetObjects[i];
+                writer.Put((byte)lockOnTargetObject.TargetId);
+                writer.Put(lockOnTargetObject.IsLockOnTargetShootable);
+                writer.Put((byte)lockOnTargetObject.TargetType);
             }
         }
 
@@ -87,14 +87,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentsState.Deserialize(reader);
             IsEngineOn = reader.GetBool();
             IsAlive = reader.GetBool();
-            AssistArrowType = (PlayerAssistArrowType)reader.GetUShort();
+            AssistArrowType = (PlayerAssistArrowType)reader.GetUShort(); // byte
             IsSpinned = reader.GetBool();
             CurrentPowerUp = (PowerUpType)reader.GetByte();
             IsPowerUpCurrentlyActive = reader.GetBool();
 
-            var targetedEnemyIdsAmount = reader.GetByte();
+            var lockOnTargetObjectsAmount = reader.GetByte();
             LockOnTargetObjects.Clear();
-            for (int i = 0; i < targetedEnemyIdsAmount; i++)
+            for (int i = 0; i < lockOnTargetObjectsAmount; i++)
             {
                 ref var targetedEnemy = ref LockOnTargetObjects.AddAndGet();
                 targetedEnemy.TargetId = reader.GetByte();

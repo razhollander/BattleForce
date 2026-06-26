@@ -274,7 +274,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             else
             {
                 for (int i = 0; i < PlayerLockOnHeartTargetsChangedNetEvents.Count; i++)
-                    PlayerLockOnHeartTargetsChangedNetEvents[i].PlayerIdsLockedOnTarget.Clear();
+                    PlayerLockOnHeartTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();
                 PlayerLockOnHeartTargetsChangedNetEvents.Clear();
             }
             
@@ -1211,7 +1211,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         {
             for (int i = 0; i < PlayerLockOnHeartTargetsChangedNetEvents.Count; i++)
             {
-                PlayerLockOnHeartTargetsChangedNetEvents[i].PlayerIdsLockedOnTarget.Clear();
+                PlayerLockOnHeartTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();
             }
             
             PlayerLockOnHeartTargetsChangedNetEvents.Clear();
