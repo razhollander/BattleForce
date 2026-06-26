@@ -77,7 +77,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 .SetPlayerIdGotHit(targetId)
                 .SetWasHitByAnotherPlayer(true, _casterPlayerId)
                 .SetProcessedTick(_processedTick)
-                .SetHitDamage(_gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartHitDamage)
+                .SetHitDamage(_gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHitDamage)
                 .Execute();
 
             _netEventsDataService.AddPlayerLockedOnTargetHitNetEvent(_processedTick, _casterPlayerId, targetId);

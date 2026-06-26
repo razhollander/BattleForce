@@ -74,7 +74,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOn
                     targetedEnemy = _cachedWallTargets[i];
                 }
 
-                _netEventsDataService.AddPlayerLockOnHeartTargetsChangedNetEvent(_processedTick, playerState.Id, targetedEnemyIds);
+                _netEventsDataService.AddPlayerLockOnTargetsChangedNetEvent(_processedTick, playerState.Id, targetedEnemyIds);
             }
         }
 
@@ -87,7 +87,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOn
             var directionToWall = wallCenter - rayOriginPosition;
             var deltaAngleRadians = MathUtils.DeltaAbsoluteAngleRadians(MathUtils.GetAngle(playerDirection), MathUtils.GetAngle(directionToWall));
             var deltaAngleDegrees = deltaAngleRadians * Mathf.Rad2Deg;
-            var maxLockOnArcAngle = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees;
+            var maxLockOnArcAngle = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees;
 
             if (deltaAngleDegrees > maxLockOnArcAngle)
             {

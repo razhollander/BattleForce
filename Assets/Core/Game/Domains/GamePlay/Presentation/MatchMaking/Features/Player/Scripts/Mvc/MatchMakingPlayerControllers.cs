@@ -87,9 +87,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             }
         }
 
-        public void SetIsLockOnHeartSightShownForPlayer(ushort playerId, bool isShown)
+        public void SetIsLockOnTargetSightShownForPlayer(ushort playerId, bool isShown)
         {
-            GetPlayer(playerId).SetIsLockOnHeartSightShown(isShown);
+            GetPlayer(playerId).SetIsLockOnTargetSightShown(isShown);
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<LayChickenEggNetEventS2C> LayChickenEggNetEvents { get; } = new();
         public List<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents { get; } = new();
         public List<ActivateYearsOfPainTalentNetEventS2C> ActivateYearsOfPainTalentNetEvents { get; } = new();
-        public List<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents { get; } = new();
+        public List<PlayerLockOnTargetsChangedNetEventS2C> PlayerLockOnTargetsChangedNetEvents { get; } = new();
         public List<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents { get; } = new();
         public List<PlayerPowerUpChangedNetEventS2C> PlayerPowerUpChangedNetEvents { get; } = new();
         public List<SonicSlapActivatedNetEventS2C> SonicSlapActivatedNetEvents { get; } = new();

@@ -32,19 +32,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
 
         public void Execute()
         {
-            if (_cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Count == 0)
+            if (_cachedPresentationEventsService.PlayerLockOnTargetsChangedNetEvents.Count == 0)
             {
                 return;
             }
 
-            foreach (var netEvent in _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents)
+            foreach (var netEvent in _cachedPresentationEventsService.PlayerLockOnTargetsChangedNetEvents)
             {
                 var playerId = netEvent.PlayerId;
                 var targets = netEvent.LockedOnTargetObjects;
                 var isLockingOnWall = targets.Count > 0;
                 var isWallShootable = isLockingOnWall && targets[0].IsLockOnTargetShootable;
 
-                _playerControllers.SetIsLockOnHeartSightShownForPlayer(playerId, isLockingOnWall);
+                _playerControllers.SetIsLockOnTargetSightShownForPlayer(playerId, isLockingOnWall);
                 _lockOnTargetEffectController.RefreshTargetEffectsOfCaster(playerId, targets);
 
                 var wasShootable = _wasShootablePerPlayer.TryGetValue(playerId, out var previousShootable) && previousShootable;
@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Commands.N
                 netEvent.LockedOnTargetObjects.Clear();
             }
 
-            _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Clear();
+            _cachedPresentationEventsService.PlayerLockOnTargetsChangedNetEvents.Clear();
         }
     }
 }

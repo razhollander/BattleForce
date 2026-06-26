@@ -4,13 +4,13 @@ using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public class PlayerLockOnHeartTargetsChangedNetEventS2C : INetSerializable, IComparable<PlayerLockOnHeartTargetsChangedNetEventS2C>
+    public class PlayerLockOnTargetsChangedNetEventS2C : INetSerializable, IComparable<PlayerLockOnTargetsChangedNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort PlayerId;
         public FixedUnorderedList<ObjectLockedOnTargetS2C> LockedOnTargetObjects;
 
-        public PlayerLockOnHeartTargetsChangedNetEventS2C(int maxTargets)
+        public PlayerLockOnTargetsChangedNetEventS2C(int maxTargets)
         {
             LockedOnTargetObjects = new FixedUnorderedList<ObjectLockedOnTargetS2C>(maxTargets);
         }
@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             }
         }
 
-        public int CompareTo(PlayerLockOnHeartTargetsChangedNetEventS2C other)
+        public int CompareTo(PlayerLockOnTargetsChangedNetEventS2C other)
         {
             return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }

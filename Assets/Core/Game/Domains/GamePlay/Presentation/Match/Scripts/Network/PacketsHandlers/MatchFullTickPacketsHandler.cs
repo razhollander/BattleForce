@@ -76,7 +76,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<ChickenEggHitNetEventS2C> _cachedUnprocessedChickenEggHitEvents;
 
         private readonly CapacityList<ActivateYearsOfPainTalentNetEventS2C> _cachedUnprocessedActivateYearsOfPainTalentEvents;
-        private readonly CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C> _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents;
+        private readonly CapacityList<PlayerLockOnTargetsChangedNetEventS2C> _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents;
         private readonly CapacityList<PlayerLockedOnTargetHitNetEventS2C> _cachedUnprocessedPlayerLockedOnTargetHitNetEvents;
         private readonly CapacityList<PlayerPowerUpChangedNetEventS2C> _cachedUnprocessedPlayerPowerUpChangedNetEvents;
         private readonly CapacityList<SonicSlapActivatedNetEventS2C> _cachedUnprocessedSonicSlapActivatedNetEvents;
@@ -149,7 +149,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedChickenEggHitEvents = new CapacityList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents);
 
             _cachedUnprocessedActivateYearsOfPainTalentEvents = new CapacityList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents);
-            _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents = new CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
+            _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents = new CapacityList<PlayerLockOnTargetsChangedNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedUnprocessedPlayerLockedOnTargetHitNetEvents = new CapacityList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.ConcurrentPlayers);
             _cachedUnprocessedPlayerPowerUpChangedNetEvents = new CapacityList<PlayerPowerUpChangedNetEventS2C>(networkConfig.MaxCap.PlayerPowerUpChangedNetEvents);
             _cachedUnprocessedSonicSlapActivatedNetEvents = new CapacityList<SonicSlapActivatedNetEventS2C>(networkConfig.MaxCap.SonicSlapActivatedNetEvents);
@@ -225,7 +225,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessLayChickenEggEvents(latestFullTickPacket.LayChickenEggNetEvents, ignoreEventsNotAboveTick);
             ProcessChickenEggHitEvents(latestFullTickPacket.ChickenEggHitNetEvents, ignoreEventsNotAboveTick);
             ProcessActivateYearsOfPainTalentEvents(latestFullTickPacket.ActivateYearsOfPainTalentNetEvents, ignoreEventsNotAboveTick);
-            ProcessPlayerLockOnHeartTargetsChangedNetEvents(latestFullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents, ignoreEventsNotAboveTick);
+            ProcessPlayerLockOnTargetsChangedNetEvents(latestFullTickPacket.PlayerLockOnTargetsChangedNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerLockedOnTargetHitNetEvents(latestFullTickPacket.PlayerLockedOnTargetHitNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerPowerUpChangedNetEvents(latestFullTickPacket.PlayerPowerUpChangedNetEvents, ignoreEventsNotAboveTick);
             ProcessSonicSlapActivatedNetEvents(latestFullTickPacket.SonicSlapActivatedNetEvents, ignoreEventsNotAboveTick);
@@ -1031,26 +1031,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
         
-        private void ProcessPlayerLockOnHeartTargetsChangedNetEvents(FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> events, int ignoreEventsNotAboveTick)
+        private void ProcessPlayerLockOnTargetsChangedNetEvents(FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C> events, int ignoreEventsNotAboveTick)
         {
-            for (int i = 0; i < _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Count; i++)
+            for (int i = 0; i < _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents.Count; i++)
             {
-                _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();   
+                _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();   
             }
-            _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Clear();
+            _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents.Clear();
 
             foreach (var netEvent in events.AsSpan())
             {
                 if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
                 {
-                    _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);
+                    _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents.Add(netEvent);
                 }
             }
 
-            if (!_cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.IsNullOrEmpty())
+            if (!_cachedUnprocessedPlayerLockOnTargetsChangedNetEvents.IsNullOrEmpty())
             {
-                _cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents.Sort();
-                _presentationNetEventsHandler.ProcessPlayerLockOnHeartTargetsChangedEvents(_cachedUnprocessedPlayerLockOnHeartTargetsChangedNetEvents);
+                _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerLockOnTargetsChangedEvents(_cachedUnprocessedPlayerLockOnTargetsChangedNetEvents);
             }
         }
 

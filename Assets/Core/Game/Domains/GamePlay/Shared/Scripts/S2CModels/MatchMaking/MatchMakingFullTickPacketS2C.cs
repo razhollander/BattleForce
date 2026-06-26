@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
         public FixedUnorderedList<StartMatchCountdownNetEventS2C> StartMatchCountdownNetEvents;
         public FixedUnorderedList<StopMatchCountdownNetEventS2C> StopMatchCountdownNetEvents;
         public FixedUnorderedList<StartMatchEligibleChangedNetEventS2C> StartMatchEligibleChangedNetEvents;
-        public FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents;
+        public FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C> PlayerLockOnTargetsChangedNetEvents;
 
         public MatchMakingFullTickPacketS2C()
         {
@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             StartMatchCountdownNetEvents = new FixedUnorderedList<StartMatchCountdownNetEventS2C>(maxCap.StartMatchCountdownNetEvents);
             StopMatchCountdownNetEvents = new FixedUnorderedList<StopMatchCountdownNetEventS2C>(maxCap.StopMatchCountdownNetEvents);
             StartMatchEligibleChangedNetEvents = new FixedUnorderedList<StartMatchEligibleChangedNetEventS2C>(maxCap.StartMatchEligibleChangedNetEvents);
-            PlayerLockOnHeartTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(maxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxCap.ConcurrentLockOnTargets));
+            PlayerLockOnTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>(maxCap.PlayerLockOnTargetsChangedNetEvents, () => new PlayerLockOnTargetsChangedNetEventS2C(maxCap.ConcurrentLockOnTargets));
         }
 
         public void Serialize(NetDataWriter writer)
@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             SerializedStartMatchCountdownEvents(writer);
             SerializedStopMatchCountdownEvents(writer);
             SerializedStartMatchEligibleChangedEvents(writer);
-            SerializedPlayerLockOnHeartTargetsChangedEvents(writer);
+            SerializedPlayerLockOnTargetsChangedEvents(writer);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -64,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             DeserializedStartMatchCountdownEvents(reader);
             DeserializedStopMatchCountdownEvents(reader);
             DeserializedStartMatchEligibleChangedEvents(reader);
-            DeserializedPlayerLockOnHeartTargetsChangedEvents(reader);
+            DeserializedPlayerLockOnTargetsChangedEvents(reader);
         }
         
         private void SerializedBulletDestroyedEvents(NetDataWriter writer)
@@ -208,22 +208,22 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             }
         }
 
-        private void SerializedPlayerLockOnHeartTargetsChangedEvents(NetDataWriter writer)
+        private void SerializedPlayerLockOnTargetsChangedEvents(NetDataWriter writer)
         {
-            writer.Put((byte)PlayerLockOnHeartTargetsChangedNetEvents.Count);
-            foreach (var evt in PlayerLockOnHeartTargetsChangedNetEvents.AsSpan())
+            writer.Put((byte)PlayerLockOnTargetsChangedNetEvents.Count);
+            foreach (var evt in PlayerLockOnTargetsChangedNetEvents.AsSpan())
             {
                 evt.Serialize(writer);
             }
         }
 
-        private void DeserializedPlayerLockOnHeartTargetsChangedEvents(NetDataReader reader)
+        private void DeserializedPlayerLockOnTargetsChangedEvents(NetDataReader reader)
         {
-            PlayerLockOnHeartTargetsChangedNetEvents.Clear();
+            PlayerLockOnTargetsChangedNetEvents.Clear();
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                var evt = PlayerLockOnHeartTargetsChangedNetEvents.AddAndGet();
+                var evt = PlayerLockOnTargetsChangedNetEvents.AddAndGet();
                 evt.Deserialize(reader);
             }
         }

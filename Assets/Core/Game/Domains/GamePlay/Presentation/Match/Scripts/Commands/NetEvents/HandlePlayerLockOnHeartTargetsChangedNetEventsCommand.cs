@@ -5,7 +5,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
-    public class HandlePlayerLockOnHeartTargetsChangedNetEventsCommand : BaseCommand, ICommandVoid
+    public class HandlePlayerLockOnTargetsChangedNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchPlayerControllers _matchPlayerControllers;
@@ -20,20 +20,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            if (_cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Count == 0)
+            if (_cachedPresentationEventsService.PlayerLockOnTargetsChangedNetEvents.Count == 0)
             {
                 return;
             }
 
-            foreach (var netEvent in _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents)
+            foreach (var netEvent in _cachedPresentationEventsService.PlayerLockOnTargetsChangedNetEvents)
             {
-                var isLockOnHeartSightShown = netEvent.LockedOnTargetObjects.Count > 0;
-                _matchPlayerControllers.SetPlayerIsLockOnHeartSightShown(netEvent.PlayerId, isLockOnHeartSightShown);
+                var isLockOnTargetSightShown = netEvent.LockedOnTargetObjects.Count > 0;
+                _matchPlayerControllers.SetPlayerIsLockOnTargetSightShown(netEvent.PlayerId, isLockOnTargetSightShown);
                 _lockOnTargetEffectController.RefreshTargetEffectsOfCaster(netEvent.PlayerId, netEvent.LockedOnTargetObjects);
             }
 
 
-            _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Clear();
+            _cachedPresentationEventsService.PlayerLockOnTargetsChangedNetEvents.Clear();
         }
     }
 }

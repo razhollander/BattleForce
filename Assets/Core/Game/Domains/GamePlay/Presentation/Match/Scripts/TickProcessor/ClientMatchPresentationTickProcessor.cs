@@ -68,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands;
         private readonly HandleCreateMagenticPullFieldNetEventsCommand _handleCreateMagenticPullFieldNetEventsCommand;
         private readonly HandleActivateYearsOfPainTalentNetEventsCommand _handleActivateYearsOfPainTalentNetEventsCommand;
-        private readonly HandlePlayerLockOnHeartTargetsChangedNetEventsCommand _handlePlayerLockOnHeartTargetsChangedNetEventsCommand;
+        private readonly HandlePlayerLockOnTargetsChangedNetEventsCommand _handlePlayerLockOnTargetsChangedNetEventsCommand;
         private readonly HandlePlayerLockedOnTargetHitNetEventsCommand _handlePlayerLockedOnTargetHitNetEventsCommand;
         private readonly HandlePlayerPowerUpChangedNetEventsCommand _handlePlayerPowerUpChangedNetEventsCommand;
         private readonly HandleSonicSlapActivatedNetEventsCommand _handleSonicSlapActivatedNetEventsCommand;
@@ -130,7 +130,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleCreateMagenticPullFieldNetEventsCommand = commandFactory.CreateCommandVoid<HandleCreateMagenticPullFieldNetEventsCommand>();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands = commandFactory.CreateCommandVoid<HandleProcessPlayerSelectedTalentFinishedCooldownEventsCommands>();
             _handleActivateYearsOfPainTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateYearsOfPainTalentNetEventsCommand>();
-            _handlePlayerLockOnHeartTargetsChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockOnHeartTargetsChangedNetEventsCommand>();
+            _handlePlayerLockOnTargetsChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockOnTargetsChangedNetEventsCommand>();
             _handlePlayerLockedOnTargetHitNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockedOnTargetHitNetEventsCommand>();
             _handlePlayerPowerUpChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerPowerUpChangedNetEventsCommand>();
             _handleSonicSlapActivatedNetEventsCommand = commandFactory.CreateCommandVoid<HandleSonicSlapActivatedNetEventsCommand>();
@@ -204,7 +204,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
             _updateObjectTransformInsideRotatingWheelsCommand.Execute();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands.Execute();
-            _handlePlayerLockOnHeartTargetsChangedNetEventsCommand.Execute();
+            _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute();
             _handlePlayerLockedOnTargetHitNetEventsCommand.Execute();
             _handlePlayerPowerUpChangedNetEventsCommand.Execute();
             _handleSonicSlapActivatedNetEventsCommand.Execute();
@@ -213,7 +213,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleActivateNukePowerUpNetEventsCommand.Execute();
             _handleActivateShufflePowerUpNetEventsCommand.Execute();
             _handleShuffleSwapPlayerPositionNetEventsCommand.Execute();
-            _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnHeartTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
+            _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
         }
     }
 }

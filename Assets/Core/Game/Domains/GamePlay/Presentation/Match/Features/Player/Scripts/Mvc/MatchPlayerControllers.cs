@@ -125,9 +125,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetIsDeadEffectEnabled(isEnabled);
         }
 
-        public void SetPlayerIsLockOnHeartSightShown(ushort playerId, bool isShown)
+        public void SetPlayerIsLockOnTargetSightShown(ushort playerId, bool isShown)
         {
-            GetPlayer(playerId).SetIsLockOnHeartSightShown(isShown);
+            GetPlayer(playerId).SetIsLockOnTargetSightShown(isShown);
         }
 
         public void SetIsPlayerKinged(ushort playerId, bool isKinged)

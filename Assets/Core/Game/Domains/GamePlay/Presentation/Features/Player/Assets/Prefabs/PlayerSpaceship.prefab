@@ -1336,7 +1336,7 @@ MonoBehaviour:
   _playerNameText: {fileID: 2447704602733785927}
   _tailView: {fileID: 2261358914737223833}
   _heart: {fileID: 8660608062844915603}
-  _lockOnHeartSightView: {fileID: 4049904679518351413}
+  _lockOnTargetSightView: {fileID: 4049904679518351413}
 --- !u!1 &8477916259467920202
 GameObject:
   m_ObjectHideFlags: 0

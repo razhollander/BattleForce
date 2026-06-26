@@ -106,8 +106,8 @@ namespace Core.Scripts.Network
         public int LayChickenEggNetEvents = 128;
         public int ChickenEggHitNetEvents = 128;
         public int ActivateYearsOfPainTalentNetEvents = 128;
-        public int PlayerLockOnHeartTargetsChangedNetEvents = 128;
-        public int PlayerLockOnHeartTargetHitNetEvents = 128;
+        public int PlayerLockOnTargetsChangedNetEvents = 128;
+        public int PlayerLockOnTargetHitNetEvents = 128;
         public int PlayerPowerUpChangedNetEvents = 64;
         public int SonicSlapActivatedNetEvents = 64;
         public int ActivateNukePowerUpNetEvents = 16;

@@ -57,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<LayChickenEggNetEventS2C> LayChickenEggNetEvents;
         public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
         public FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C> ActivateYearsOfPainTalentNetEvents;
-        public FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents;
+        public FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C> PlayerLockOnTargetsChangedNetEvents;
         public FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents;
         public FixedUnorderedList<PlayerPowerUpChangedNetEventS2C> PlayerPowerUpChangedNetEvents;
         public FixedClassUnorderedList<SonicSlapActivatedNetEventS2C> SonicSlapActivatedNetEvents;
@@ -127,7 +127,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
             ChickenEggHitNetEvents = new FixedUnorderedList<ChickenEggHitNetEventS2C>(maxCap.ChickenEggHitNetEvents);
-            PlayerLockOnHeartTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(maxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxCap.ConcurrentLockOnTargets));
+            PlayerLockOnTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>(maxCap.PlayerLockOnTargetsChangedNetEvents, () => new PlayerLockOnTargetsChangedNetEventS2C(maxCap.ConcurrentLockOnTargets));
             PlayerLockedOnTargetHitNetEvents = new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(maxCap.ConcurrentPlayers);
             PlayerPowerUpChangedNetEvents = new FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>(maxCap.PlayerPowerUpChangedNetEvents);
             SonicSlapActivatedNetEvents = new FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>(maxCap.SonicSlapActivatedNetEvents, () => new SonicSlapActivatedNetEventS2C(maxCap.ConcurrentEnemyPlayers));
@@ -150,7 +150,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 1)) != 0) SerializedBulletSpawnedEvents(writer);
             if ((eventMask & (1UL << 2)) != 0) SerializedPlayerTakeDamageEvents(writer);
             if ((eventMask & (1UL << 3)) != 0) SerializedPlayerDiedEvents(writer);
-            if ((eventMask & (1UL << 4)) != 0) SerializedPlayerLockOnHeartTargetsChangedNetEvents(writer);
+            if ((eventMask & (1UL << 4)) != 0) SerializedPlayerLockOnTargetsChangedNetEvents(writer);
             if ((eventMask & (1UL << 5)) != 0) SerializedPlayerLockedOnTargetHitNetEvents(writer);
             if ((eventMask & (1UL << 6)) != 0) SerializedBulletDestroyedEvents(writer);
             if ((eventMask & (1UL << 7)) != 0) SerializedPlayerSwapEvents(writer);
@@ -203,7 +203,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (BulletSpawnNetEvents.Count > 0) eventMask |= 1UL << 1;
             if (PlayerTakeDamageNetEvents.Count > 0) eventMask |= 1UL << 2;
             if (PlayerDiedNetEvents.Count > 0) eventMask |= 1UL << 3;
-            if (PlayerLockOnHeartTargetsChangedNetEvents.Count > 0) eventMask |= 1UL << 4;
+            if (PlayerLockOnTargetsChangedNetEvents.Count > 0) eventMask |= 1UL << 4;
             if (PlayerLockedOnTargetHitNetEvents.Count > 0) eventMask |= 1UL << 5;
             if (BulletDestroyedNetEvents.Count > 0) eventMask |= 1UL << 6;
             if (PlayerSwapNetEvents.Count > 0) eventMask |= 1UL << 7;
@@ -270,12 +270,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 3)) != 0) DeserializedPlayerDiedEvents(reader);
             else PlayerDiedNetEvents.Clear();
 
-            if ((eventMask & (1UL << 4)) != 0) DeserializedPlayerLockOnHeartTargetsChangedNetEvents(reader);
+            if ((eventMask & (1UL << 4)) != 0) DeserializedPlayerLockOnTargetsChangedNetEvents(reader);
             else
             {
-                for (int i = 0; i < PlayerLockOnHeartTargetsChangedNetEvents.Count; i++)
-                    PlayerLockOnHeartTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();
-                PlayerLockOnHeartTargetsChangedNetEvents.Clear();
+                for (int i = 0; i < PlayerLockOnTargetsChangedNetEvents.Count; i++)
+                    PlayerLockOnTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();
+                PlayerLockOnTargetsChangedNetEvents.Clear();
             }
             
             if ((eventMask & (1UL << 5)) != 0) DeserializedPlayerLockedOnTargetHitNetEvents(reader);
@@ -1198,27 +1198,27 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
-        private void SerializedPlayerLockOnHeartTargetsChangedNetEvents(NetDataWriter writer)
+        private void SerializedPlayerLockOnTargetsChangedNetEvents(NetDataWriter writer)
         {
-            writer.Put((byte)PlayerLockOnHeartTargetsChangedNetEvents.Count);
-            foreach (var netEvent in PlayerLockOnHeartTargetsChangedNetEvents.AsSpan())
+            writer.Put((byte)PlayerLockOnTargetsChangedNetEvents.Count);
+            foreach (var netEvent in PlayerLockOnTargetsChangedNetEvents.AsSpan())
             {
                 netEvent.Serialize(writer);
             }
         }
 
-        private void DeserializedPlayerLockOnHeartTargetsChangedNetEvents(NetDataReader reader)
+        private void DeserializedPlayerLockOnTargetsChangedNetEvents(NetDataReader reader)
         {
-            for (int i = 0; i < PlayerLockOnHeartTargetsChangedNetEvents.Count; i++)
+            for (int i = 0; i < PlayerLockOnTargetsChangedNetEvents.Count; i++)
             {
-                PlayerLockOnHeartTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();
+                PlayerLockOnTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();
             }
             
-            PlayerLockOnHeartTargetsChangedNetEvents.Clear();
+            PlayerLockOnTargetsChangedNetEvents.Clear();
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                var netEvent = PlayerLockOnHeartTargetsChangedNetEvents.AddAndGet();
+                var netEvent = PlayerLockOnTargetsChangedNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

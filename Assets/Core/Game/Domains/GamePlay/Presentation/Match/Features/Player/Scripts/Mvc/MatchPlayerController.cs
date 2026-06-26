@@ -58,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             UpdateTalents(playerModel.Spaceship.TalentsState.Talents, playerModel.Spaceship.TalentsState.SelectedTalentIndex, 0);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
-            SetIsLockOnHeartSightShown(playerModel.Spaceship.IsPlayerLockOnTargetSightShown);
+            SetIsLockOnTargetSightShown(playerModel.Spaceship.IsPlayerLockOnTargetSightShown);
             SetCurrentPowerUp(playerModel.Spaceship.CurrentPowerUp);
             var isKinged = _matchDataService.TryGetKingedPlayers(out var kingedPlayers) && kingedPlayers.Exists(x => x.PlayerId == PlayerId);
             SetIsKinged(isKinged);
@@ -369,9 +369,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetSelectedTalent(selectedTalentIndex, _stageCancellationTokenProvider.CancellationTokenSource.Token);
         }
 
-        public void SetIsLockOnHeartSightShown(bool isShown)
+        public void SetIsLockOnTargetSightShown(bool isShown)
         {
-            _playerView.SetIsLockOnHeartSightShown(isShown);
+            _playerView.SetIsLockOnTargetSightShown(isShown);
         }
 
         public Transform GetHeadTransform()

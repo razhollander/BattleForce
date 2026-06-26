@@ -231,9 +231,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             Base.OnSpawned();
         }
 
-        public void SetIsLockOnHeartSightShown(bool isShown)
+        public void SetIsLockOnTargetSightShown(bool isShown)
         {
-            Base.SetIsLockOnHeartSightShown(isShown);
+            Base.SetIsLockOnTargetSightShown(isShown);
             _playerEyesView.UpdateEyesAccordingToIsSightShown(isShown);
         }
 

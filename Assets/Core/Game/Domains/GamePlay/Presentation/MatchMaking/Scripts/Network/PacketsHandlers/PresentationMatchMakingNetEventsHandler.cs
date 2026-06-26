@@ -131,14 +131,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             }
         }
 
-        public void ProcessPlayerLockOnHeartTargetsChangedEvents(CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C> playerLockOnHeartTargetsChangedNetEvents)
+        public void ProcessPlayerLockOnTargetsChangedEvents(CapacityList<PlayerLockOnTargetsChangedNetEventS2C> playerLockOnTargetsChangedNetEvents)
         {
-            if (playerLockOnHeartTargetsChangedNetEvents.IsNullOrEmpty())
+            if (playerLockOnTargetsChangedNetEvents.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var netEvent in playerLockOnHeartTargetsChangedNetEvents)
+            foreach (var netEvent in playerLockOnTargetsChangedNetEvents)
             {
                 var player = _matchDataService.GetPlayer(netEvent.PlayerId);
                 player.Spaceship.ObjectsLockedOnTarget.Clear();
@@ -149,7 +149,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                     targetedEnemy = netEvent.LockedOnTargetObjects[i];
                 }
 
-                _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);
+                _cachedPresentationEventsService.PlayerLockOnTargetsChangedNetEvents.Add(netEvent);
             }
         }
     }

@@ -276,7 +276,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.LayChickenEggNetEvents = _netEventsDataService.LayChickenEggNetEventsPerClient[clientId];
                 _fullTickPacket.ChickenEggHitNetEvents = _netEventsDataService.ChickenEggHitNetEventsPerClient[clientId];
                 _fullTickPacket.ActivateYearsOfPainTalentNetEvents = _netEventsDataService.ActivateYearsOfPainTalentNetEventsPerClient[clientId];
-                _fullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents = _netEventsDataService.PlayerLockOnHeartTargetsChangedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerLockOnTargetsChangedNetEvents = _netEventsDataService.PlayerLockOnTargetsChangedNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerLockedOnTargetHitNetEvents = _netEventsDataService.PlayerLockedOnTargetHitNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerPowerUpChangedNetEvents = _netEventsDataService.PlayerPowerUpChangedNetEventsPerClient[clientId];
                 _fullTickPacket.SonicSlapActivatedNetEvents = _netEventsDataService.SonicSlapActivatedNetEventsPerClient[clientId];
