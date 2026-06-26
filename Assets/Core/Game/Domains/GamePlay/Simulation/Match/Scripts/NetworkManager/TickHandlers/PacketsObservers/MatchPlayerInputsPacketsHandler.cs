@@ -392,16 +392,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             newPacket.Deserialize(reader);
     
             var shouldIgnorePacket = !isReceivedFromPlayback && _playerbackRecorderService.IsPlaybackEnabled;
+            var clientId = (long)peer.Tag;
+            
             if (!shouldIgnorePacket)
             {
-                var clientId = (long)peer.Tag;
+                OnClientInputsReceived(newPacket, clientId);
+            }
+            
+            if(!isReceivedFromPlayback)
+            {
                 var heighestProcessedTickOfClient = _heighestProcessedTickPerClient.TryGetValue(clientId, out int value) ? value : -1;
                 if (newPacket.HeighestProcessedTickFromServer > heighestProcessedTickOfClient)
                 {
                     _heighestProcessedTickPerClient[clientId] = newPacket.HeighestProcessedTickFromServer;
                 }
-    
-                OnClientInputsReceived(newPacket, clientId);
             }
             
             _playerInputPacketsPool.Return(newPacket);

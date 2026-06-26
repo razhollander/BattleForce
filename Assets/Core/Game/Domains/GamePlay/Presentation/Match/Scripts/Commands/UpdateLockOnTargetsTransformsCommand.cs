@@ -30,10 +30,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             {
                 var casterPlayerHeadPosition = _playerControllers.GetPlayerHeadTransform(playerModel.PlayerId).position.ToVector2XY();
 
-                foreach (var targetedEnemy in playerModel.Spaceship.LockOnTargetObjects.AsSpan())
+                foreach (var targetedObject in playerModel.Spaceship.LockOnTargetObjects.AsSpan())
                 {
-                    var targetPosition = GetTargetPosition(targetedEnemy);
-                    _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedEnemy.GetKey(), casterPlayerHeadPosition, targetPosition);
+                    var targetPosition = GetTargetPosition(targetedObject);
+                    _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedObject.GetKey(), casterPlayerHeadPosition, targetPosition);
                 }
             }
         }
