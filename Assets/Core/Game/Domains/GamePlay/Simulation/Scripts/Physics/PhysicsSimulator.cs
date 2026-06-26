@@ -1165,30 +1165,71 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             RemoveBody(body);
         }
 
-        public bool RayCast(Vector2 point1, Vector2 point2, out PhysicsBodyData hitBodyData, PhysicsBodyType[] bodyTypesRayCastCanHit = null)
+        public bool RayCast(Vector2 point1, Vector2 point2, out PhysicsBodyData hitBodyData, PhysicsBodyType[] bodyTypesRayCastCanHit = null, PhysicsBodyData? ignoredBody = null)
         {
-            var didHit = false;
-            PhysicsBodyData bodyHitData = default;
-            var closestFraction = 1f;
-            _world.RayCast(OnRayCastHit, point1, point2);
+            // Box2D's RayCast ignores any fixture whose interior already contains the ray origin. Detect that case
+            // explicitly and treat it as the closest possible hit (collision point == ray origin, fraction 0).
+            var didHit = TryGetBodyContainingPoint(point1, bodyTypesRayCastCanHit, ignoredBody, out var bodyHitData);
 
-            void OnRayCastHit(Fixture fixture, Vector2 point, Vector2 normal, float fraction)
+            if (!didHit)
             {
-                var body = fixture.Body;
-                var bodyData = (PhysicsBodyData) body.UserData;
-                var didRayHitClosetBody = fraction <= closestFraction && (bodyTypesRayCastCanHit == null || bodyTypesRayCastCanHit.Contains(bodyData.PhysicsBodyType));
-                if (didRayHitClosetBody)
+                var closestFraction = 1f;
+                _world.RayCast(OnRayCastHit, point1, point2);
+
+                void OnRayCastHit(Fixture fixture, Vector2 point, Vector2 normal, float fraction)
                 {
-                    didHit = true;
-                    closestFraction = fraction;
-                    bodyHitData = bodyData;
+                    var body = fixture.Body;
+                    var bodyData = (PhysicsBodyData) body.UserData;
+                    var didRayHitClosetBody = fraction <= closestFraction && !IsIgnoredBody(bodyData, ignoredBody) && (bodyTypesRayCastCanHit == null || bodyTypesRayCastCanHit.Contains(bodyData.PhysicsBodyType));
+                    if (didRayHitClosetBody)
+                    {
+                        didHit = true;
+                        closestFraction = fraction;
+                        bodyHitData = bodyData;
+                    }
                 }
             }
-            
+
             _unityMainThreadDispatcher.EnqueueDraw(() => DebugDrawUtils.DrawLine(point1.ToUnityVector2(), point2.ToUnityVector2(), didHit ? UnityEngine.Color.green : UnityEngine.Color.red));
 
             hitBodyData = bodyHitData;
             return didHit;
+        }
+
+        private bool TryGetBodyContainingPoint(Vector2 point, PhysicsBodyType[] bodyTypesRayCastCanHit, PhysicsBodyData? ignoredBody, out PhysicsBodyData hitBodyData)
+        {
+            var currentBody = _world.GetBodyList();
+
+            while (currentBody != null)
+            {
+                var bodyData = (PhysicsBodyData) currentBody.UserData;
+
+                if (!IsIgnoredBody(bodyData, ignoredBody) && (bodyTypesRayCastCanHit == null || bodyTypesRayCastCanHit.Contains(bodyData.PhysicsBodyType)))
+                {
+                    var fixture = currentBody.GetFixtureList();
+
+                    while (fixture != null)
+                    {
+                        if (fixture.TestPoint(point))
+                        {
+                            hitBodyData = bodyData;
+                            return true;
+                        }
+
+                        fixture = fixture.GetNext();
+                    }
+                }
+
+                currentBody = currentBody.GetNext();
+            }
+
+            hitBodyData = default;
+            return false;
+        }
+
+        private static bool IsIgnoredBody(PhysicsBodyData bodyData, PhysicsBodyData? ignoredBody)
+        {
+            return ignoredBody.HasValue && ignoredBody.Value.Id == bodyData.Id && ignoredBody.Value.PhysicsBodyType == bodyData.PhysicsBodyType;
         }
     }
 }

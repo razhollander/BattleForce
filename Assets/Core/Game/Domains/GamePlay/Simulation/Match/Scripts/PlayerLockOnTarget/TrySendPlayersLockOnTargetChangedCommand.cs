@@ -85,9 +85,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             }
             
             var rayOriginPosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
+            var casterBody = new PhysicsBodyData(casterPlayerState.Id, PhysicsBodyType.PlayerSpaceship);
             var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange;
             var maxLockOnTargetRangeSquare = radius * radius;
-            
+
             DebugDrawUtils.DrawArc2D(rayOriginPosition, casterPlayerState.Spaceship.Transform.Direction, radius,
                 _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees);
 
@@ -125,7 +126,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 }
 
                 var isTargetSpinned = targetedPlayerState.Spaceship.IsSpinned;
-                var didRayTowardEnemyHeartHitAnything =_physicsSimulator.RayCast(rayOriginPosition, enemyHeartPos, out var hitBodyData, _cachedBodyTypesRayCastCanHit);
+                var didRayTowardEnemyHeartHitAnything =_physicsSimulator.RayCast(rayOriginPosition, enemyHeartPos, out var hitBodyData, _cachedBodyTypesRayCastCanHit, casterBody);
                 var didHitValidBody = isTargetSpinned 
                     ? hitBodyData.PhysicsBodyType is PhysicsBodyType.PlayerHeart or PhysicsBodyType.PlayerSpaceship 
                     : hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerHeart;
@@ -150,6 +151,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             }
 
             var rayOriginPosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
+            var casterBody = new PhysicsBodyData(casterPlayerState.Id, PhysicsBodyType.PlayerSpaceship);
             var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange;
             var maxLockOnRangeSquare = radius * radius;
             var maxLockOnAngle = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees;
@@ -179,7 +181,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                     continue;
                 }
 
-                var didRayTowardBallHitAnything = _physicsSimulator.RayCast(rayOriginPosition, ballPosition, out var hitBodyData, _cachedBodyTypesRayCastCanHit);
+                var didRayTowardBallHitAnything = _physicsSimulator.RayCast(rayOriginPosition, ballPosition, out var hitBodyData, _cachedBodyTypesRayCastCanHit, casterBody);
                 var didHitBall = didRayTowardBallHitAnything && hitBodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && hitBodyData.Id == powerUpBall.Id;
                 if (!didHitBall)
                 {

@@ -94,7 +94,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOn
                 return false;
             }
 
-            var didRayHitAnything = _physicsSimulator.RayCast(rayOriginPosition, wallCenter, out var hitBodyData, _cachedBodyTypesRayCastCanHit);
+            var casterBody = new PhysicsBodyData(playerState.Id, PhysicsBodyType.PlayerSpaceship);
+            var didRayHitAnything = _physicsSimulator.RayCast(rayOriginPosition, wallCenter, out var hitBodyData, _cachedBodyTypesRayCastCanHit, casterBody);
             var didHitWall = didRayHitAnything && hitBodyData.PhysicsBodyType == PhysicsBodyType.StartMatchWall && hitBodyData.Id == _sharedGamePlayConfig.MinEntityId;
             return didHitWall;
         }
