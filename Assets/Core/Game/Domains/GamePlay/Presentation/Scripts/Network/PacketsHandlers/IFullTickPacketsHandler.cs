@@ -5,6 +5,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandler
         int LastProcessedTickFromServer { get; }
         void InitEntryPoint();
         void ProcessStateLatestTick();
+        void ClearUnprocessedPacketsByView();
         void InitExitPoint();
     }
 }

@@ -24,7 +24,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly IMatchPlayerUIControllers _matchPlayerUIControllers;
         private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
         private readonly IWorldCameraController _worldCameraController;
-        private readonly ILockOnTargetEffectController _lockOnTargetEffectController;
 
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
@@ -80,7 +79,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler, ILockOnTargetEffectController lockOnTargetEffectController)
+            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
@@ -140,7 +139,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleActivateShufflePowerUpNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateShufflePowerUpNetEventsCommand>();
             _handleShuffleSwapPlayerPositionNetEventsCommand = commandFactory.CreateCommandVoid<HandleShuffleSwapPlayerPositionNetEventsCommand>();
             _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
-            _lockOnTargetEffectController = lockOnTargetEffectController;
         }
         
         public void InitEntryPoint()
@@ -214,6 +212,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleActivateShufflePowerUpNetEventsCommand.Execute();
             _handleShuffleSwapPlayerPositionNetEventsCommand.Execute();
             _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
+            _fullTickPacketsHandler.ClearUnprocessedPacketsByView();
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
@@ -34,7 +35,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
 
         private readonly PresentationMatchNetEventsHandler _presentationNetEventsHandler;
-        private readonly CapacityDict<int, MatchFullTickPacketS2C> _fullTickPackets;
+        private readonly CapacityDict<int, MatchFullTickPacketS2C> _fullTickPacketsUnprocessedByLogic;
+        private readonly CapacityDict<int, MatchFullTickPacketS2C> _fullTickPacketsUnprocessedByView;
         private readonly CapacityList<PlayerRejoinAcceptPacketS2C> _cachedUnprocessedPlayerRejoinedEvents;
         private readonly CapacityList<BulletSpawnNetEventS2C> _cachedUnprocessedBulletSpawnedEvents;
         private readonly CapacityList<PlayerTakeDamageNetEventS2C> _cachedUnprocessedPlayerTakeDamageEvents;
@@ -107,7 +109,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _updateSubscriptionService = updateSubscriptionService;
             _lastFullSyncTickDataService = lastFullSyncTickDataService;
             _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory);
-            _fullTickPackets = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
+            _fullTickPacketsUnprocessedByLogic = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
+            _fullTickPacketsUnprocessedByView = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerRejoinedEvents = new CapacityList<PlayerRejoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
             _cachedUnprocessedPlayerTakeDamageEvents = new CapacityList<PlayerTakeDamageNetEventS2C>(networkConfig.MaxCap.PlayerTakeDamageNetEvents);
@@ -169,13 +172,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         public void ProcessStateLatestTick()
         {
-            if (_fullTickPackets.IsNullOrEmpty())
+            if (_fullTickPacketsUnprocessedByLogic.IsNullOrEmpty())
             {
                 return;
             }
 
-            var latestTickReceivedFromServer = _fullTickPackets.Keys.Max();
-            var latestFullTickPacket = _fullTickPackets[latestTickReceivedFromServer];
+            var latestTickReceivedFromServer = _fullTickPacketsUnprocessedByLogic.Keys.Max();
+            var latestFullTickPacket = _fullTickPacketsUnprocessedByLogic[latestTickReceivedFromServer];
             var ignoreEventsNotAboveTick = Mathf.Max(LastProcessedTickFromServer, _lastFullSyncTickDataService.LastFullSyncTick);
 
             if (latestTickReceivedFromServer <= ignoreEventsNotAboveTick)
@@ -184,7 +187,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 return;
             }
             
+            ProcessLogicOfPacket(latestFullTickPacket, latestTickReceivedFromServer, ignoreEventsNotAboveTick);
 
+            LastProcessedTickFromServer = latestTickReceivedFromServer;
+            
+            foreach (var kvp in _fullTickPacketsUnprocessedByLogic)
+            {
+                var packetTick = kvp.Key;
+                var doesPacketNeedToBeProcessByView = packetTick == latestTickReceivedFromServer;
+                if (doesPacketNeedToBeProcessByView)
+                {
+                    _fullTickPacketsUnprocessedByView.Add(packetTick, latestFullTickPacket);
+                }
+                else
+                {
+                    _fullTickPacketsPool.Return(kvp.Value);
+                }
+            }
+
+            _fullTickPacketsUnprocessedByLogic.Clear();
+        }
+
+        private void ProcessLogicOfPacket(MatchFullTickPacketS2C latestFullTickPacket, int latestTickReceivedFromServer, int ignoreEventsNotAboveTick)
+        {
             ProcessPlayerRejoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents, latestTickReceivedFromServer, ignoreEventsNotAboveTick);
             ProcessPlayersTalentsNormalCooldownsTimersIfEnded(latestTickReceivedFromServer);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents, ignoreEventsNotAboveTick);
@@ -241,17 +266,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdateRotatingWheels(latestTickReceivedFromServer);
             UpdateKOProjectilesTransform(simulationState);
             UpdateGrapplingHookProjectilesTransform(simulationState);
-
-            LastProcessedTickFromServer = latestTickReceivedFromServer;
-
-            foreach (var kvp in _fullTickPackets)
-            {
-                _fullTickPacketsPool.Return(kvp.Value);
-            }
-
-            _fullTickPackets.Clear();
         }
-        
+
         /// <summary>
         /// the server doesn't send this to the client because we prefer to save this redundent bandwidth,
         /// so the client need to clear the cooldowns on its own.
@@ -1198,12 +1214,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             newPacket.Deserialize(reader);
             OnFullTickReceived(newPacket);
         }
+
+        public void ClearUnprocessedPacketsByView()
+        {
+            foreach (var kvp in _fullTickPacketsUnprocessedByView)
+            {
+                _fullTickPacketsPool.Return(kvp.Value);   
+            }
+            
+            _fullTickPacketsUnprocessedByView.Clear();
+        }
         
         private void OnFullTickReceived(MatchFullTickPacketS2C fullTickPacket)
         {
             LogService.LogTopic("FullTickPacket accepted received", LogTopicType.ClientNetwork);
             var tick = fullTickPacket.Tick;
-            _fullTickPackets.Add(tick, fullTickPacket);
+            _fullTickPacketsUnprocessedByLogic.Add(tick, fullTickPacket);
         }
 
         public void InitExitPoint()

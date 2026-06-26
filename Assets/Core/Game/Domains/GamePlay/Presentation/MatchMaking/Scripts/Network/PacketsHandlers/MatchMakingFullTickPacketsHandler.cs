@@ -30,8 +30,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly IClientNetworkManager _networkManager;
         private readonly IMatchMakingDataService _matchDataService;
         private readonly PresentationMatchMakingNetEventsHandler _presentationNetEventsHandler;
-        private readonly CapacityDict<int, MatchMakingFullTickPacketS2C> _fullTickPackets;
-        private readonly CapacityList<MatchMakingPlayerJoinAcceptPacketS2C> _cachedUnprocessedPlayerJoinedEvents;
+        private readonly CapacityDict<int, MatchMakingFullTickPacketS2C> _fullTickPacketsUnprocessedByLogic;
+        private readonly CapacityDict<int, MatchMakingFullTickPacketS2C> _fullTickPacketsUnprocessedByView;        private readonly CapacityList<MatchMakingPlayerJoinAcceptPacketS2C> _cachedUnprocessedPlayerJoinedEvents;
         private readonly CapacityList<BulletSpawnNetEventS2C> _cachedUnprocessedBulletSpawnedEvents;
         private readonly CapacityList<BulletDestroyedNetEventS2C> _cachedUnprocessedBulletDestroyedEvents;
         private readonly CapacityList<PlayerSwitchTeamNetEventS2C> _cachedUnprocessedPlayerSwitchTeamEvents;
@@ -55,7 +55,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
             _presentationNetEventsHandler = new PresentationMatchMakingNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory, startMatchButtonController);
 
-            _fullTickPackets = new CapacityDict<int, MatchMakingFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
+            _fullTickPacketsUnprocessedByLogic = new CapacityDict<int, MatchMakingFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
+            _fullTickPacketsUnprocessedByView = new CapacityDict<int, MatchMakingFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _cachedUnprocessedPlayerJoinedEvents = new CapacityList<MatchMakingPlayerJoinAcceptPacketS2C>(networkConfig.MaxCap.PlayerJoinAcceptNetEvents);
             _cachedUnprocessedBulletSpawnedEvents = new CapacityList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents);
             _cachedUnprocessedBulletDestroyedEvents = new CapacityList<BulletDestroyedNetEventS2C>(networkConfig.MaxCap.BulletDestroyedNetEvents);
@@ -76,13 +77,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
         public void ProcessStateLatestTick()
         {
-            if (_fullTickPackets.IsNullOrEmpty())
+            if (_fullTickPacketsUnprocessedByLogic.IsNullOrEmpty())
             {
                 return;
             }
 
-            var latestTickReceivedFromServer = _fullTickPackets.Keys.Max();
-            var latestFullTickPacket = _fullTickPackets[latestTickReceivedFromServer];
+            var latestTickReceivedFromServer = _fullTickPacketsUnprocessedByLogic.Keys.Max();
+            var latestFullTickPacket = _fullTickPacketsUnprocessedByLogic[latestTickReceivedFromServer];
 
             if (latestTickReceivedFromServer <= LastProcessedTickFromServer)
             {
@@ -93,6 +94,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
             var ignoreEventsNotAboveTick = UnityEngine.Mathf.Max(LastProcessedTickFromServer, _lastFullSyncTickDataService.LastFullSyncTick);
 
+            ProcessLogicOfPacket(latestFullTickPacket, ignoreEventsNotAboveTick);
+
+            LastProcessedTickFromServer = latestTickReceivedFromServer;
+
+            foreach (var kvp in _fullTickPacketsUnprocessedByLogic)
+            {
+                var packetTick = kvp.Key;
+                var doesPacketNeedToBeProcessByView = packetTick == latestTickReceivedFromServer;
+                if (doesPacketNeedToBeProcessByView)
+                {
+                    _fullTickPacketsUnprocessedByView.Add(packetTick, latestFullTickPacket);
+                }
+                else
+                {
+                    _fullTickPacketsPool.Return(kvp.Value);
+                }
+            }
+
+            _fullTickPacketsUnprocessedByLogic.Clear();
+        }
+
+        private void ProcessLogicOfPacket(MatchMakingFullTickPacketS2C latestFullTickPacket, int ignoreEventsNotAboveTick)
+        {
             ProcessPlayerJoinedEvents(latestFullTickPacket.PlayerJoinAcceptNetEvents, ignoreEventsNotAboveTick);
             ProcessBulletSpawnedEvents(latestFullTickPacket.BulletSpawnNetEvents, ignoreEventsNotAboveTick);
             ProcessBulletDestroyedEvents(latestFullTickPacket.BulletDestroyedNetEvents, ignoreEventsNotAboveTick);
@@ -104,17 +128,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
-
-            LastProcessedTickFromServer = latestTickReceivedFromServer;
-
-            foreach (var kvp in _fullTickPackets)
-            {
-                _fullTickPacketsPool.Return(kvp.Value);
-            }
-
-            _fullTickPackets.Clear();
         }
-        
+
+        public void ClearUnprocessedPacketsByView()
+        {
+            foreach (var kvp in _fullTickPacketsUnprocessedByView)
+            {
+                _fullTickPacketsPool.Return(kvp.Value);   
+            }
+            
+            _fullTickPacketsUnprocessedByView.Clear();
+        }
+
         private void ProcessBulletDestroyedEvents(FixedUnorderedList<BulletDestroyedNetEventS2C> bulletDestroyedNetEvents, int ignoreEventsNotAboveTick)
         {
             _cachedUnprocessedBulletDestroyedEvents.Clear();
@@ -297,7 +322,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         {
             LogService.LogTopic("FullTickPacket accepted received", LogTopicType.ClientNetwork);
             var tick = fullTickPacket.Tick;
-            _fullTickPackets.Add(tick, fullTickPacket);
+            _fullTickPacketsUnprocessedByLogic.Add(tick, fullTickPacket);
         }
 
         public void InitExitPoint()
