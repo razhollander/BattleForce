@@ -18,14 +18,43 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         [SerializeField] private float _deafultOrthographicSize = 30f;
 
         private CancellationTokenSource _shakeCancellationTokenSource;
+        private CancellationTokenSource _zoomCancellationTokenSource;
         public Camera Camera => _camera;
         public Camera BaseCamera => _baseCamera;
 
         public void MultiplyOthographicSize(float multiplier)
         {
+            _zoomCancellationTokenSource?.Cancel();
+            _zoomCancellationTokenSource = null;
             var orthoSize = _deafultOrthographicSize * multiplier;
             _cinemachineCamera.Lens.OrthographicSize = orthoSize;
             _cinemachineGroupFraming.OrthoSizeRange.y = orthoSize;
+        }
+
+        public void LerpOrthographicSize(float targetMultiplier, float durationSeconds, CancellationTokenSource stateCts)
+        {
+            _zoomCancellationTokenSource?.Cancel();
+            _zoomCancellationTokenSource = new CancellationTokenSource();
+            _zoomCancellationTokenSource.CancelWhenTokenCancelled(stateCts.Token);
+            LerpOrthographicSizeAsync(targetMultiplier, durationSeconds, _zoomCancellationTokenSource.Token).Forget();
+        }
+
+        private async Awaitable LerpOrthographicSizeAsync(float targetMultiplier, float durationSeconds, CancellationToken token)
+        {
+            var startSize = _cinemachineGroupFraming.OrthoSizeRange.y;
+            var targetSize = _deafultOrthographicSize * targetMultiplier;
+            var elapsed = 0f;
+
+            while (elapsed < durationSeconds && !token.IsCancellationRequested)
+            {
+                elapsed += Time.deltaTime;
+                var size = Mathf.Lerp(startSize, targetSize, Mathf.Clamp01(elapsed / durationSeconds));
+                _cinemachineGroupFraming.OrthoSizeRange.y = size;
+                _cinemachineCamera.Lens.OrthographicSize = size;
+                await Awaitable.NextFrameAsync(cancellationToken: default);
+            }
+
+            _zoomCancellationTokenSource = null;
         }
         
         public void AddFollowTarget(Transform target, float weight, float radius)

@@ -12,6 +12,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 {
     public class HandleStageEndNetEventsCommand : BaseCommand, ICommandVoid
     {
+        private const float WinnerZoomMultiplier = 0.2f;
+        private const float WinnerZoomDurationSeconds = 1.5f;
+
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IStageEndedUiController _stageEndedUiController;
         private IWorldCameraController _worldCameraController;
@@ -48,8 +51,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 {
                     _stageEndedUiController.Show(winningTeamId, stageEndEvent.JemsWonPerTeam);
                     _worldCameraController.ShakeCamera(10,0.5f);
-                    _worldCameraController.ClearTargets();
                     SetPlayersInTeamKinged();
+                    ZoomCameraOnLastAlivePlayer();
                 }
             }
 
@@ -65,10 +68,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var playerModel in kingedPlayers)
             {
-                var kinggedPlayerId = playerModel.PlayerId;
-                _worldCameraController.AddFollowTarget(_matchPlayerControllers.GetPlayerTransform(kinggedPlayerId));
-                _matchPlayerControllers.SetIsPlayerKinged(kinggedPlayerId, true);
+                _matchPlayerControllers.SetIsPlayerKinged(playerModel.PlayerId, true);
             }
+        }
+
+        // Zoom on the last surviving player (first kinged player). Reset on next stage start via SyncMatchSimulationStateCommand.
+        private void ZoomCameraOnLastAlivePlayer()
+        {
+            _worldCameraController.ClearTargets();
+
+            if (!_matchDataService.TryGetKingedPlayers(out var kingedPlayers) || kingedPlayers.Count == 0)
+            {
+                return;
+            }
+
+            _worldCameraController.AddFollowTarget(_matchPlayerControllers.GetPlayerTransform(kingedPlayers[0].PlayerId));
+            _worldCameraController.LerpOrthographicSizeMultiplier(WinnerZoomMultiplier, WinnerZoomDurationSeconds);
         }
     }
 }

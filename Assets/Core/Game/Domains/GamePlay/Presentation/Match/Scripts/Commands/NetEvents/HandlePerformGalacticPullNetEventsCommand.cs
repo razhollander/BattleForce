@@ -23,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in events)
             {
                 // TODO: spawn GalacticForceField star visual (Unity side)
-                // GalacticForceFieldControllers.CreateField(netEvent.FieldId, netEvent.CasterTeamId, netEvent.EndTick)
+                //GalacticForceFieldControllers.CreateField(netEvent.FieldId, netEvent.CasterTeamId, netEvent.EndTick)
             }
 
             events.Clear();

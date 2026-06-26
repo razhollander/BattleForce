@@ -9,6 +9,7 @@ namespace Core.Scripts.Mvc.WorldCamera
         void ClearTargets();
         void ShakeCamera(float intensity, float durationInSeconds);
         void MultiplyOthographicSize(float multiplier);
+        void LerpOrthographicSizeMultiplier(float targetMultiplier, float durationSeconds);
         void InitEntryPoint();
 
         void InitExitPoint();

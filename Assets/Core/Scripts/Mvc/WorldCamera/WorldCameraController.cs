@@ -37,6 +37,11 @@ namespace Core.Scripts.Mvc.WorldCamera
         {
             _worldCameraView.MultiplyOthographicSize(multiplier);
         }
+
+        public void LerpOrthographicSizeMultiplier(float targetMultiplier, float durationSeconds)
+        {
+            _worldCameraView.LerpOrthographicSize(targetMultiplier, durationSeconds, _stateMachineService.CurrentState().CancellationTokenSource);
+        }
         
         public void AddFollowTarget(Transform target)
         {
