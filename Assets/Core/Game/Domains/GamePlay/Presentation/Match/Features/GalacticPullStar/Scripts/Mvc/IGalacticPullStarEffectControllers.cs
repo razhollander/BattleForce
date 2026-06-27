@@ -1,0 +1,10 @@
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc
+{
+    public interface IGalacticPullStarEffectControllers
+    {
+        void InitEntryPoint();
+        void ShowStar(ushort fieldId, ushort casterTeamId);
+        void HideStar(ushort fieldId);
+        void DestroyAll();
+    }
+}

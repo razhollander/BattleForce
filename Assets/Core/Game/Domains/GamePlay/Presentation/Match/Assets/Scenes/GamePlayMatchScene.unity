@@ -984,6 +984,7 @@ MonoBehaviour:
   lockOnTargetEffectViewPrefab: {fileID: 7351513350059897862, guid: a6f337b7b848c4597bcb15c7faead624, type: 3}
   lockOnTargetShootEffectViewPrefab: {fileID: 2666207878272819854, guid: d39ed28c19d944da58dc6a8f4753a93c, type: 3}
   _chickenEggViewPrefab: {fileID: 8334673388257318348, guid: 76fd7cd9194ac401cbae9285ed1554de, type: 3}
+  _galacticPullStarEffectViewPrefab: {fileID: 991498017605524902, guid: 9a72457d23b2943488c0b0287afcdd9d, type: 3}
   _backgroundParallaxView: {fileID: 620390907}
 --- !u!1001 &3063400823214837600
 PrefabInstance:

@@ -9,6 +9,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
@@ -66,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private IPreparationPhaseCountdownController _preparationPhaseCountdownController;
+        private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
 
         private MatchSimulationStateS2C _simulationState;
         private int _stateOccouredOnTick;
@@ -111,6 +113,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
             _preparationPhaseCountdownController = _diContainer.Resolve<IPreparationPhaseCountdownController>();
+            _galacticPullStarEffectControllers = _diContainer.Resolve<IGalacticPullStarEffectControllers>();
         }
 
         public void Execute()
@@ -157,6 +160,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers.DestroyAll();
             _grapplingHookProjectilesControllers.DestroyAll();
             _chickenEggsControllers.DestroyAll();
+            _galacticPullStarEffectControllers.DestroyAll();
             _lockOnTargetEffectController.DestroyAll();
         }
 
@@ -180,6 +184,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateKOPRojectiles();
             CreateGrapplingHookPRojectiles();
             CreateChickenEggs();
+            CreateGalacticPullStars();
         }
 
         private void CreateFieldBarriers(float mapSizeMultiplier)
@@ -562,6 +567,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _matchDataService.AddChickenEgg(egg.Id, casterPlayerId, egg.Position.ToUnityVector2());
                 var playerCasterTeamId = _matchDataService.GetPlayerTeamId(casterPlayerId);
                 _chickenEggsControllers.CreateEgg(egg.Id, egg.Position, playerCasterTeamId);
+            }
+        }
+
+        private void CreateGalacticPullStars()
+        {
+            foreach (var field in _simulationState.GalacticForceFields.AsSpan())
+            {
+                _galacticPullStarEffectControllers.ShowStar(field.Id, field.CasterTeamId);
             }
         }
 

@@ -11,6 +11,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Telepor
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.PlayerTeleportEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
@@ -48,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IMatchPlayerControllers _playerControllers;
         private IMatchBulletControllers _bulletControllers;
         private IMatchChickenEggsControllers _chickenEggsControllers;
+        private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
         private ITickProcessor _tickProcessor;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
@@ -90,6 +92,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
+            _galacticPullStarEffectControllers = _diContainer.Resolve<IGalacticPullStarEffectControllers>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
@@ -134,6 +137,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
             _chickenEggsControllers.InitEntryPoint();
+            _galacticPullStarEffectControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
             _environmentSpringControllers.InitEntryPoint();
             _environmentSpikeControllers.InitEntryPoint();

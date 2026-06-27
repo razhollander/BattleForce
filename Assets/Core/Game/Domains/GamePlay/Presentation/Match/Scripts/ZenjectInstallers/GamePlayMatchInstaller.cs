@@ -15,6 +15,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Telepor
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.PlayerTeleportEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
@@ -75,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private LockOnTargetShootEffectView lockOnTargetShootEffectViewPrefab;
 
         [SerializeField] private ChickenEggView _chickenEggViewPrefab;
+        [SerializeField] private GalacticPullStarEffectView _galacticPullStarEffectViewPrefab;
         [SerializeField] private BackgroundParallaxView _backgroundParallaxView;
 
         public override void InstallBindings()
@@ -106,6 +109,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<MatchPlayerUIControllers>().AsSingle().WithArguments(_matchPlayerUIControllersView).NonLazy();
             Container.BindInterfacesTo<MatchBulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchChickenEggsControllers>().AsSingle().WithArguments(_chickenEggViewPrefab).NonLazy();
+            Container.BindInterfacesTo<GalacticPullStarEffectControllers>().AsSingle().WithArguments(_galacticPullStarEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpringControllers>().AsSingle().WithArguments(_environmentSpringViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpikeControllers>().AsSingle().WithArguments(_environmentSpikeViewPrefab).NonLazy();
