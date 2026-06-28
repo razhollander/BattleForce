@@ -57,6 +57,10 @@ description: Supersonic Genesis code-review conventions and architecture rules.
 
 * No overkill. Do not burn down house to kill spider. (E.g., Do not hide all popups just to hide one active popup).
 
+### **Garbage**
+
+* No garbage allocation in the simulation domain! everything should be pre-allocated!
+
 ### **Single Responsibility**
 
 * One class, one job, one reason to change.  
