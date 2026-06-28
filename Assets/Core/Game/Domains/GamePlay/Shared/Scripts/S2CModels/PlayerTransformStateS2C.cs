@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -14,7 +15,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             get { return _Velocity;}
             set
             {
+                LogVelocityIfUnvalid(value);
                 _Velocity = value;
+            }
+        }
+
+        [Conditional("ERROR_LOGS_ENABLED")]
+        private void LogVelocityIfUnvalid(Vector2 value)
+        {
+            var valueFinite = !float.IsNaN(value.X) && !float.IsNaN(value.Y) && !float.IsInfinity(value.X) && !float.IsInfinity(value.Y);
+            var prevFinite = !float.IsNaN(_Velocity.X) && !float.IsNaN(_Velocity.Y) && !float.IsInfinity(_Velocity.X) && !float.IsInfinity(_Velocity.Y);
+            if (!valueFinite && prevFinite)
+            {
+                LogService.LogError($"[VelNaN] Velocity set to non-finite {value} (was {_Velocity}).\n{System.Environment.StackTrace}");
             }
         }
 

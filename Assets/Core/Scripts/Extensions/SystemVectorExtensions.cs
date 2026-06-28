@@ -38,14 +38,24 @@ namespace Core.Scripts.Extensions
             return Vector2.Dot(direction, wallNormal) < 0;
         }
 
-        public static Vector2 Normalize(this Vector2 v)
+        public static Vector2 NormalizeSafe(this Vector2 v)
         {
-            if (v == Vector2.Zero)
+            if (v.IsAlmostEqual(Vector2.Zero))
             {
                 return Vector2.Zero;
             }
             
             return Vector2.Normalize(v);
+        }
+        
+        public static bool IsAlmostEqual(this Vector2 v, Vector2 other)
+        {
+            return v.X.IsAlmostEqual(other.X) && v.Y.IsAlmostEqual(other.Y);
+        }
+        
+        public static bool IsFinite(this Vector2 v)
+        {
+            return !float.IsNaN(v.X) && !float.IsNaN(v.Y) && !float.IsInfinity(v.X) && !float.IsInfinity(v.Y);
         }
     }
 }

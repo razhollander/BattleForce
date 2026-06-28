@@ -165,7 +165,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 }
                 else
                 {
-                    var directionToCaster = Vector2.Normalize(casterPlayerState.Spaceship.Transform.Position - projectile.Position);
+                    var directionToCaster = (casterPlayerState.Spaceship.Transform.Position - projectile.Position).NormalizeSafe();
                     projectile.Velocity = directionToCaster * config.ProjectileSpeed * config.ReturnProjectileSpeedMultiplier;
                 }
             }
@@ -195,7 +195,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                         }
                         else
                         {
-                            var directionToHook = Vector2.Normalize(projectile.Position - casterPlayerState.Spaceship.Transform.Position);
+                            var directionToHook = (projectile.Position - casterPlayerState.Spaceship.Transform.Position).NormalizeSafe();
                             casterPlayerState.Spaceship.Transform.Velocity += directionToHook * config.PlayerPullForceWhileHooked * deltaTime;
 
                             // casterPlayerState.Spaceship.Transform.Direction = MathUtils.RotateTowards(casterPlayerState.Spaceship.Transform.Direction,

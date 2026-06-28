@@ -12,6 +12,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
@@ -117,7 +118,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var config = _gamePlayConfigService.GamePlayConfig.Talents.MagneticPullTalentConfig;
             var hitEnemyPlayer = _matchDataService.SimulationState.GetPlayerById(enemyId);
             var pullForce = config.PushForce;
-            var directionToEnemy = Vector2.Normalize(hitEnemyPlayer.Spaceship.Transform.Position - casterPlayerState.Spaceship.Transform.Position);
+            var directionToEnemy = (hitEnemyPlayer.Spaceship.Transform.Position - casterPlayerState.Spaceship.Transform.Position).NormalizeSafe();
 
             var forceToEnemy = -directionToEnemy * pullForce;
             hitEnemyPlayer.Spaceship.Transform.Velocity += forceToEnemy;

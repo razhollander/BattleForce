@@ -56,7 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
 
                 var dir = playerState.Spaceship.Transform.Position - casterPosition;
                 var isAtSamePosition = dir.LengthSquared() == 0f;
-                var pushDirection = isAtSamePosition ? RNG.NextFloat(0f, 360f).AngleToVector() : Vector2.Normalize(dir);
+                var pushDirection = isAtSamePosition ? RNG.NextFloat(0f, 360f).AngleToVector() : dir.NormalizeSafe();
                 _addForceToPlayerCommand.SetPlayerId(playerState.Id).SetForce(pushDirection * nukeForce).ShouldTurnOffEngine(false).Execute();
 
                 var spinMagnitude = RNG.NextFloat(minSpin, maxSpin);

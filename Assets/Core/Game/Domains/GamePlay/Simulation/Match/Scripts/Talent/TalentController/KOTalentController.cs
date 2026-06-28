@@ -146,7 +146,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 }
                 else
                 {
-                    var directionToCaster = Vector2.Normalize(casterPlayerState.Spaceship.Transform.Position - projectile.Position);
+                    var directionToCaster = (casterPlayerState.Spaceship.Transform.Position - projectile.Position).NormalizeSafe();
                     projectile.Velocity = directionToCaster * koConfig.ProjectileSpeed * koConfig.ReturnSpeedMultiplier;
                     projectile.Rotation = directionToCaster * -1;
                 }
@@ -178,7 +178,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var koConfig = _gamePlayConfigService.GamePlayConfig.Talents.KOTalentConfig;
             ref var projectile = ref _matchDataService.SimulationState.GetKOProjectileById(_projectileId);
             var enemyPlayerState = _matchDataService.SimulationState.GetPlayerById(enemyPlayerId);
-            var pushDirection = projectile.Velocity.Normalize();
+            var pushDirection = projectile.Velocity.NormalizeSafe();
             var pushForce = pushDirection * koConfig.PushForce;
             var randomSpin = RNG.NextFloat(koConfig.MinSpin, koConfig.MaxSpin);
 

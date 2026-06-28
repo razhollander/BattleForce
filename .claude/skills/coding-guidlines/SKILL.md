@@ -176,5 +176,6 @@ Must follow strict MVC. No break rule.
   * Never use destroyCancellationToken.
   * Never check if(gameObject.activeInHierarchy/activeSelf)
   * A method that gets a CancellationToken as a parameter is always async.
+  * Use v.NormalizeSafe() instead of Vector2.Normalize(v)
 * **Reflection**: Never at runtime\!
 

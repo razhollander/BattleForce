@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -31,7 +32,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersTalentsManager _playersTalentsManager;
         private ITeleportGateService _teleportGateService;
         private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
-        
+        private IPlayersTouchingWallDataService _playersTouchingWallDataService;
+
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
         private SpinPlayerCommand _spinPlayerCommand;
@@ -55,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
+            _playersTouchingWallDataService = _diContainer.Resolve<IPlayersTouchingWallDataService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
         }
@@ -89,6 +92,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
                 HandlePlayerLavaCollision(objectA, objectB, collisionEvent.Type);
                 HandlePlayerStageBoundaryCollision(objectA, objectB, collisionEvent.Type);
+                HandlePlayerWallStickTracking(objectA, objectB, collisionEvent.Type, collisionEvent.Contact);
 
                 if (collisionEvent.Type != PhysicsEventEventType.Begin)
                 {
@@ -381,7 +385,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var randomSpin = RNG.NextFloat(environmentSpringsConfig.MinSpin, environmentSpringsConfig.MaxSpin);
 
             playerState.Spaceship.Transform.Velocity += force;
-            playerState.Spaceship.Transform.Direction = force.Normalize();
+            playerState.Spaceship.Transform.Direction = force.NormalizeSafe();
             playerState.Spaceship.IsEngineOn = false;
 
             _spinPlayerCommand
@@ -508,6 +512,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             else if (eventType == PhysicsEventEventType.End)
             {
                 _playersOutsideStageTrackerService.OnPlayerExitStageBoundary(playerId);
+            }
+        }
+
+        private void HandlePlayerWallStickTracking(PhysicsBodyData objectA, PhysicsBodyData objectB, PhysicsEventEventType eventType, Contact contact)
+        {
+            var isPlayerToWall = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
+            var isWallToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerToWall && !isWallToPlayer)
+            {
+                return;
+            }
+
+            var playerId = isPlayerToWall ? objectA.Id : objectB.Id;
+            var wallId = isPlayerToWall ? objectB.Id : objectA.Id;
+
+            if (eventType == PhysicsEventEventType.Begin)
+            {
+                contact.GetWorldManifold(out var worldManifold);
+                _playersTouchingWallDataService.OnPlayerBeginTouchWall(playerId, wallId, worldManifold.normal, _processedTick);
+            }
+            else if (eventType == PhysicsEventEventType.End)
+            {
+                _playersTouchingWallDataService.OnPlayerEndTouchWall(playerId, wallId);
             }
         }
 
@@ -731,7 +759,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var currentDirection = playerModel.Spaceship.Transform.Direction;
             var reflectedDirection = currentDirection.ReflectFromWall(collisionNormal);
             playerModel.Spaceship.Transform.Direction = reflectedDirection.Length() > 0
-                ? System.Numerics.Vector2.Normalize(reflectedDirection)
+                ? reflectedDirection.NormalizeSafe()
                 : currentDirection;
         }
 
