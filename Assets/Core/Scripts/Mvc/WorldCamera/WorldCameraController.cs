@@ -23,6 +23,10 @@ namespace Core.Scripts.Mvc.WorldCamera
             _updateSubscriptionService = updateSubscriptionService;
         }
 
+        public Transform CameraTransform => _worldCameraView.Camera.transform;
+
+        public float OrthographicSize => _worldCameraView.Camera.orthographicSize;
+
         public void InitEntryPoint()
         {
             _updateSubscriptionService.RegisterLateUpdatable(this);

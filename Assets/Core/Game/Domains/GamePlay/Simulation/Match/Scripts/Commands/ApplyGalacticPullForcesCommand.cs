@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -62,6 +63,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     }
 
                     playerState.Spaceship.Transform.Velocity += pullDelta;
+                    if (playerState.Name == "Alon")
+                    {
+//                        LogService.LogError($"added: {pullDelta}, new:{playerState.Spaceship.Transform.Velocity}");
+                    }
                 }
             }
         }

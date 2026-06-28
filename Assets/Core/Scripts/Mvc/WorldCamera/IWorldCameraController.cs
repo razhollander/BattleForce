@@ -4,6 +4,8 @@ namespace Core.Scripts.Mvc.WorldCamera
 {
     public interface IWorldCameraController
     {
+        Transform CameraTransform { get; }
+        float OrthographicSize { get; }
         void AddFollowTarget(Transform target);
         void RemoveFollowTarget(Transform target);
         void ClearTargets();
