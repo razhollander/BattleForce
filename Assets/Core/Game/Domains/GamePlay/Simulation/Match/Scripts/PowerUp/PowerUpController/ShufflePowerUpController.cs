@@ -1,8 +1,11 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 
@@ -10,8 +13,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
 {
     public class ShufflePowerUpController : IPowerUpController
     {
-        private const int SwapIntervalInTicks = 5;
-
         private struct PendingPlayerSwap
         {
             public ushort PlayerId1;
@@ -20,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
 
         private readonly IMatchDataService _matchDataService;
         private readonly INetEventsDataService _netEventsDataService;
+        private readonly NetworkConfig _networkConfig;
         private readonly FixedUnorderedList<ushort> _cachedPlayerIds;
         private readonly PendingPlayerSwap[] _pendingSwaps;
         private readonly ushort[] _shuffleBuffer;
@@ -27,15 +29,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
         private int _nextSwapIndex;
         private int _nextSwapTick;
         private ushort _casterPlayerId;
+        private readonly ISimulationGamePlayConfigService _simulationGamePlayConfigService;
 
         public PowerUpType PowerUpType => PowerUpType.Shuffle;
 
         private bool IsSequenceInProgress => _nextSwapIndex < _pendingSwapsCount;
 
-        public ShufflePowerUpController(IMatchDataService matchDataService, INetEventsDataService netEventsDataService, NetworkConfig networkConfig)
+        public ShufflePowerUpController(IMatchDataService matchDataService, INetEventsDataService netEventsDataService, NetworkConfig networkConfig,
+            ISimulationGamePlayConfigService simulationGamePlayConfigService)
         {
             _matchDataService = matchDataService;
             _netEventsDataService = netEventsDataService;
+            _networkConfig = networkConfig;
+            _simulationGamePlayConfigService = simulationGamePlayConfigService;
             _cachedPlayerIds = new FixedUnorderedList<ushort>(networkConfig.MaxCap.ConcurrentPlayers);
             _pendingSwaps = new PendingPlayerSwap[networkConfig.MaxCap.ConcurrentPlayers];
             _shuffleBuffer = new ushort[networkConfig.MaxCap.ConcurrentPlayers];
@@ -64,7 +70,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
 
             if (IsSequenceInProgress)
             {
-                _nextSwapTick = tick + SwapIntervalInTicks;
+                _nextSwapTick = TickUtils.GetTickPassedAfterDuration(tick, _simulationGamePlayConfigService.GamePlayConfig.PowerUps.ShuffleSwapIntervalInSeconds, _networkConfig.DeltaTime);
             }
             else
             {

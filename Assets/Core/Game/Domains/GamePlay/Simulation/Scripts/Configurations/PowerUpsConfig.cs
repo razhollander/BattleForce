@@ -16,5 +16,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float NukeForce = 15f;
         public float NukeMinSpinAmount = 180f;
         public float NukeMaxSpinAmount = 720f;
+        public float ShuffleSwapIntervalInSeconds = 0.35f;
     }
 }

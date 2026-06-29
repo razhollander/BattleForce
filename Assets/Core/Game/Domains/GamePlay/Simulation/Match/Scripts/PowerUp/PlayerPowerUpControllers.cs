@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
             _sonicSlapPowerUpController = new SonicSlapPowerUpController(matchDataService, netEventsDataService, networkConfig);
             _galacticPullPowerUpController = new GalacticPullPowerUpController(matchDataService, netEventsDataService, gamePlayConfigService, networkConfig);
             _nukePowerUpController = new NukePowerUpController(matchDataService, netEventsDataService, gamePlayConfigService, commandFactory);
-            _shufflePowerUpController = new ShufflePowerUpController(matchDataService, netEventsDataService, networkConfig);
+            _shufflePowerUpController = new ShufflePowerUpController(matchDataService, netEventsDataService, networkConfig, gamePlayConfigService);
         }
 
         public void SetCasterId(ushort casterPlayerId)
