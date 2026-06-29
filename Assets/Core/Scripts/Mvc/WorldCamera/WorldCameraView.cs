@@ -36,11 +36,12 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             _zoomCancellationTokenSource?.Cancel();
             _zoomCancellationTokenSource = new CancellationTokenSource();
             _zoomCancellationTokenSource.CancelWhenTokenCancelled(stateCts.Token);
-            LerpOrthographicSizeAsync(targetMultiplier, durationSeconds, _zoomCancellationTokenSource.Token).Forget();
+            LerpOrthographicSizeAsync(targetMultiplier, durationSeconds, _zoomCancellationTokenSource).Forget();
         }
 
-        private async Awaitable LerpOrthographicSizeAsync(float targetMultiplier, float durationSeconds, CancellationToken token)
+        private async Awaitable LerpOrthographicSizeAsync(float targetMultiplier, float durationSeconds, CancellationTokenSource cancellationTokenSource)
         {
+            var token = cancellationTokenSource.Token;
             var startSize = _cinemachineGroupFraming.OrthoSizeRange.y;
             var targetSize = _deafultOrthographicSize * targetMultiplier;
             var elapsed = 0f;
@@ -54,7 +55,11 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
                 await Awaitable.NextFrameAsync(cancellationToken: default);
             }
 
-            _zoomCancellationTokenSource = null;
+            // Only clear the field if a newer zoom hasn't already replaced it, otherwise we'd orphan the newer run's token.
+            if (_zoomCancellationTokenSource == cancellationTokenSource)
+            {
+                _zoomCancellationTokenSource = null;
+            }
         }
         
         public void AddFollowTarget(Transform target, float weight, float radius)

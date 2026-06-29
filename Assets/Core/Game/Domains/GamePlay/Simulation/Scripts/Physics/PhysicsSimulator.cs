@@ -1180,7 +1180,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 {
                     var body = fixture.Body;
                     var bodyData = (PhysicsBodyData) body.UserData;
-                    var didRayHitClosetBody = fraction <= closestFraction && !IsIgnoredBody(bodyData, ignoredBody) && (bodyTypesRayCastCanHit == null || bodyTypesRayCastCanHit.Contains(bodyData.PhysicsBodyType));
+                    var didRayHitClosetBody = fraction <= closestFraction && !IsIgnoredBody(bodyData, ignoredBody) && CanRayCastHit(bodyTypesRayCastCanHit, bodyData.PhysicsBodyType);
                     if (didRayHitClosetBody)
                     {
                         didHit = true;
@@ -1204,7 +1204,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             {
                 var bodyData = (PhysicsBodyData) currentBody.UserData;
 
-                if (!IsIgnoredBody(bodyData, ignoredBody) && (bodyTypesRayCastCanHit == null || bodyTypesRayCastCanHit.Contains(bodyData.PhysicsBodyType)))
+                if (!IsIgnoredBody(bodyData, ignoredBody) && CanRayCastHit(bodyTypesRayCastCanHit, bodyData.PhysicsBodyType))
                 {
                     var fixture = currentBody.GetFixtureList();
 
@@ -1230,6 +1230,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private static bool IsIgnoredBody(PhysicsBodyData bodyData, PhysicsBodyData? ignoredBody)
         {
             return ignoredBody.HasValue && ignoredBody.Value.Id == bodyData.Id && ignoredBody.Value.PhysicsBodyType == bodyData.PhysicsBodyType;
+        }
+
+        // Allocation-free replacement for the LINQ Array.Contains used in the per-raycast hot path.
+        private static bool CanRayCastHit(PhysicsBodyType[] bodyTypesRayCastCanHit, PhysicsBodyType bodyType)
+        {
+            return bodyTypesRayCastCanHit == null || System.Array.IndexOf(bodyTypesRayCastCanHit, bodyType) >= 0;
         }
     }
 }

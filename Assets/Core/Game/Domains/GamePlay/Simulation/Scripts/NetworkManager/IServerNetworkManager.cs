@@ -10,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
     {
         int ConnectedPeersCount { get; }
         event Action OnPacketReceivedEvent;
+        event Action OnClientPeerConnectedEvent;
         event Action<long> OnClientPeerDisconnectedEvent;
         void InitEntryPoint(int port);
         void InitExitPoint();

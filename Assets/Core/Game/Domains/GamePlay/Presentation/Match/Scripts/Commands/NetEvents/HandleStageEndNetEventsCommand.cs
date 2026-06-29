@@ -12,8 +12,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 {
     public class HandleStageEndNetEventsCommand : BaseCommand, ICommandVoid
     {
-        private const float WinnerZoomMultiplier = 0.2f;
-        private const float WinnerZoomDurationSeconds = 1.5f;
+        private const float WINNER_ZOOM_MULTIPLIER = 0.2f;
+        private const float WINNER_ZOOM_DURATION_SECONDS = 1.5f;
 
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IStageEndedUiController _stageEndedUiController;
@@ -83,7 +83,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
 
             _worldCameraController.AddFollowTarget(_matchPlayerControllers.GetPlayerTransform(kingedPlayers[0].PlayerId));
-            _worldCameraController.LerpOrthographicSizeMultiplier(WinnerZoomMultiplier, WinnerZoomDurationSeconds);
+            _worldCameraController.LerpOrthographicSizeMultiplier(WINNER_ZOOM_MULTIPLIER, WINNER_ZOOM_DURATION_SECONDS);
         }
     }
 }

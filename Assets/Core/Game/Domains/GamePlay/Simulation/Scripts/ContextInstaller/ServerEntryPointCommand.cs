@@ -21,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ITickService _tickService;
         private ISimulationPersistentData _simulationPersistentData;
         private IHeadLessQuitterController _headLessQuitterController;
+        private ISimulationSpeedupController _simulationSpeedupController;
         private IPlaybackRecorderService _playbackRecorderService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         
@@ -40,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _tickService = _diContainer.Resolve<ITickService>();
             _simulationPersistentData = _diContainer.Resolve<ISimulationPersistentData>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
+            _simulationSpeedupController = _diContainer.Resolve<ISimulationSpeedupController>();
             _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
@@ -62,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _physicsSimulator.InitEntryPoint();
             _simulationStateMachine.InitEntryPoint();
             _headLessQuitterController.InitEntryPoint();
+            _simulationSpeedupController.InitEntryPoint();
 
             var clientId = _simulationPersistentData.DeviceUniqueIdentifier;
             if (_playbackRecorderService.IsPlaybackEnabled)

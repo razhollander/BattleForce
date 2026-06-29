@@ -181,5 +181,6 @@ Must follow strict MVC. No break rule.
   * Never check if(gameObject.activeInHierarchy/activeSelf)
   * A method that gets a CancellationToken as a parameter is always async.
   * Use v.NormalizeSafe() instead of Vector2.Normalize(v)
+  * For every Register should also be Unregister, same fore events/listeners.
 * **Reflection**: Never at runtime\!
 

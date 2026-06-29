@@ -9,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     public class ProvideNormalForceToPlayerStickWithWallCommand : BaseCommand, ICommandVoid
     {
         // For how many ticks a player must keep touching a wall before we start cancelling the velocity it pushes into it.
-        private const int StickToWallTicksThreshold = 12;
+        private const int STICK_TO_WALL_TICKS_THRESHOLD = 6;
 
         private IMatchDataService _matchDataService;
         private IPlayersTouchingWallDataService _playersTouchingWallDataService;
@@ -34,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
-            var playersStickToWall = _playersTouchingWallDataService.GetPlayersStickToWall(_tick, StickToWallTicksThreshold);
+            var playersStickToWall = _playersTouchingWallDataService.GetPlayersStickToWall(_tick, STICK_TO_WALL_TICKS_THRESHOLD);
 
             for (int i = 0; i < playersStickToWall.Count; i++)
             {

@@ -156,6 +156,7 @@ MonoBehaviour:
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
     StageSizeMultiplier: 1
+    SpeedupSimulation: 1
   references:
     version: 2
     RefIds:

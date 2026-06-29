@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25a263755dbf84cc4996adfc4da6ab78, type: 3}
+  m_Name: GalacticStarsVisualData
+  m_EditorClassIdentifier: PresentationMatchAssembly::Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.GalacticStarsVisualData
+  _visualDatas:
+  - _planetSprite: {fileID: 21300000, guid: d0eecc9e13b124560b38c93841a5d3a9, type: 3}
+    _gravityForceMaterial: {fileID: 2100000, guid: 962f4ef1912f54a2b806533562b7b818, type: 2}
+  - _planetSprite: {fileID: 21300000, guid: 6cd783727b41d41f38f296ec07fa019c, type: 3}
+    _gravityForceMaterial: {fileID: 2100000, guid: 1dc64c22dd75e428cab18edde0ec9f95, type: 2}
+  - _planetSprite: {fileID: 21300000, guid: d73444ca317b24ae1b7bfc9607021d34, type: 3}
+    _gravityForceMaterial: {fileID: 2100000, guid: 82b5ddb8299f242a5a2ed32094a83896, type: 2}

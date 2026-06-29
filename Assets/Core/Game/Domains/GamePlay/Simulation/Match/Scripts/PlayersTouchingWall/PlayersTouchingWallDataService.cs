@@ -9,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
 {
     public class PlayersTouchingWallDataService : IPlayersTouchingWallDataService
     {
-        private const int MaxWallsPerPlayer = 16;
+        private const int MAX_WALLS_PER_PLAYER = 16;
 
         private readonly CapacityDict<ushort, PlayerTouchingWallsData> _playersTouchingWall;
         private readonly ConcurrentPool<PlayerTouchingWallsData> _playerDataPool;
@@ -19,8 +19,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
         {
             var maxPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             _playersTouchingWall = new CapacityDict<ushort, PlayerTouchingWallsData>(maxPlayers);
-            _playerDataPool = new ConcurrentPool<PlayerTouchingWallsData>(() => new PlayerTouchingWallsData(MaxWallsPerPlayer), maxPlayers);
-            _cachedPlayersStickToWall = new List<PlayerStickToWallData>(maxPlayers * MaxWallsPerPlayer);
+            _playerDataPool = new ConcurrentPool<PlayerTouchingWallsData>(() => new PlayerTouchingWallsData(MAX_WALLS_PER_PLAYER), maxPlayers);
+            _cachedPlayersStickToWall = new List<PlayerStickToWallData>(maxPlayers * MAX_WALLS_PER_PLAYER);
         }
 
         public void OnPlayerBeginTouchWall(ushort playerId, ushort wallId, Vector2 wallNormal, int tick)

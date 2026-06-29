@@ -63,10 +63,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     }
 
                     playerState.Spaceship.Transform.Velocity += pullDelta;
-                    if (playerState.Name == "Alon")
-                    {
-//                        LogService.LogError($"added: {pullDelta}, new:{playerState.Spaceship.Transform.Velocity}");
-                    }
                 }
             }
         }

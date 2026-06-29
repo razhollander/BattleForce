@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ISimulationStateMachine _simulationStateMachine;
         private ITickService _tickService;
         private IHeadLessQuitterController _headLessQuitterController;
+        private ISimulationSpeedupController _simulationSpeedupController;
 
         public override void ResolveDependencies()
         {
@@ -22,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _simulationStateMachine = _diContainer.Resolve<ISimulationStateMachine>();
             _tickService = _diContainer.Resolve<ITickService>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
+            _simulationSpeedupController = _diContainer.Resolve<ISimulationSpeedupController>();
         }
 
         public void Execute()
@@ -30,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _physicsSimulator.InitExitPoint();
             _simulationStateMachine.InitExitPoint();
             _headLessQuitterController.InitExitPoint();
+            _simulationSpeedupController.InitExitPoint();
             
             _tickService.StopTick(); // must be last this stops the thread
         }

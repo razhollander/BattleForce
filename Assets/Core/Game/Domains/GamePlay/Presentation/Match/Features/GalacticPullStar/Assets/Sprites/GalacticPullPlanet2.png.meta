@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a25b91e1b8661422484ec7104a484569
+guid: 6cd783727b41d41f38f296ec07fa019c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8840673239013590854
-    second: GalacticPullIcon_0
+      213: 6566851893468725946
+    second: GalacticPullPlanet2_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,7 +72,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 256
+    maxTextureSize: 1024
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: GalacticPullIcon_0
+      name: GalacticPullPlanet2_0
       rect:
         serializedVersion: 2
-        x: 64
-        y: 77
-        width: 142
-        height: 101
+        x: 194
+        y: 195
+        width: 635
+        height: 635
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 64705b2987160ba70800000000000000
-      internalID: 8840673239013590854
+      spriteID: ab20ec22105222b50800000000000000
+      internalID: 6566851893468725946
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      GalacticPullIcon_0: 8840673239013590854
+      GalacticPullPlanet2_0: 6566851893468725946
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

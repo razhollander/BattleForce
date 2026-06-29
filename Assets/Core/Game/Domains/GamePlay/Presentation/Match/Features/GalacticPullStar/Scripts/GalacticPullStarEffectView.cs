@@ -4,6 +4,7 @@ using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.Pools;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts
 {
@@ -12,42 +13,58 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
         private static readonly int OUTLINE_SHADER_PROPERTY = Shader.PropertyToID("_OutlineColor");
 
         [SerializeField] private SpriteRenderer _starSpriteRenderer;
-        [SerializeField] private float _hiddenLocalY = 6f;
-        [SerializeField] private float _slideInDurationInSeconds = 0.35f;
+        [SerializeField] private SpriteRenderer _gravityForceSpriteRenderer;
+        [SerializeField] private float _shownScale = 100f;
+        [SerializeField] private float _scaleInDurationInSeconds = 0.35f;
+        [SerializeField] private Ease _scaleInEase = Ease.OutBounce;
+        [SerializeField] private float _slideOutOffsetY = 6f;
         [SerializeField] private float _slideOutDurationInSeconds = 0.25f;
         [SerializeField] private float _reflowDurationInSeconds = 0.2f;
 
         private Material _starMaterial;
+        private int _planetBaseSortingOrder;
+        private int _gravityForceBaseSortingOrder;
 
         public Action Despawn { get; set; }
 
-        public void Setup(Color outlineColor)
+        public void Setup(Color outlineColor, GalacticStarVisualData visualData)
         {
             _starMaterial.SetColor(OUTLINE_SHADER_PROPERTY, outlineColor);
+            _starSpriteRenderer.sprite = visualData.PlanetSprite;
+            _gravityForceSpriteRenderer.sharedMaterial = visualData.GravityForceMaterial;
         }
 
-        public async Awaitable SlideIn(float targetLocalX, CancellationTokenSource cancellationTokenSource)
+        // Draws this star (and its gravity force) above stars with a lower order, keeping each
+        // renderer's authored relative offset.
+        public void SetSortingOrder(int order)
         {
-            transform.localPosition = new Vector3(targetLocalX, _hiddenLocalY, 0f);
-            await transform.DOLocalMove(new Vector3(targetLocalX, 0f, 0f), _slideInDurationInSeconds)
-                .SetEase(Ease.OutBack)
-                .WithCancellationSafe(cancellationTokenSource.Token);
+            _starSpriteRenderer.sortingOrder = _planetBaseSortingOrder + order;
+            _gravityForceSpriteRenderer.sortingOrder = _gravityForceBaseSortingOrder + order;
         }
 
-        public async Awaitable MoveToSlot(float targetLocalX, CancellationTokenSource cancellationTokenSource)
+        public async Awaitable ScaleInAsync(float targetLocalY, CancellationToken cancellationToken)
         {
-            await transform.DOLocalMoveX(targetLocalX, _reflowDurationInSeconds)
+            transform.localPosition = new Vector3(0f, targetLocalY, 0f);
+            transform.localScale = Vector3.zero;
+            await transform.DOScale(_shownScale, _scaleInDurationInSeconds)
+                .SetEase(_scaleInEase)
+                .WithCancellationSafe(cancellationToken);
+        }
+
+        public async Awaitable MoveToSlotAsync(float targetLocalY, CancellationToken cancellationToken)
+        {
+            await transform.DOLocalMoveY(targetLocalY, _reflowDurationInSeconds)
                 .SetEase(Ease.OutQuad)
-                .WithCancellationSafe(cancellationTokenSource.Token);
+                .WithCancellationSafe(cancellationToken);
         }
 
-        public async Awaitable SlideOut(CancellationTokenSource cancellationTokenSource)
+        public async Awaitable SlideOutAsync(CancellationToken cancellationToken)
         {
             try
             {
-                await transform.DOLocalMoveY(_hiddenLocalY, _slideOutDurationInSeconds)
+                await transform.DOLocalMoveY(transform.localPosition.y - _slideOutOffsetY, _slideOutDurationInSeconds)
                     .SetEase(Ease.InBack)
-                    .WithCancellationSafe(cancellationTokenSource.Token);
+                    .WithCancellationSafe(cancellationToken);
             }
             finally
             {
@@ -58,6 +75,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
         public void OnCreated()
         {
             _starMaterial = _starSpriteRenderer.material;
+            _planetBaseSortingOrder = _starSpriteRenderer.sortingOrder;
+            _gravityForceBaseSortingOrder = _gravityForceSpriteRenderer.sortingOrder;
         }
 
         public void OnSpawned()

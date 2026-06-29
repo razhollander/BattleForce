@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -47,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             if (!_matchDataService.SimulationState.TryGetPowerUpBallIndexById(_powerUpBallId, out _))
             {
+                LogService.Log("PowerUpBall not found in match data service, probably already got shot the tick");
                 return;
             }
 

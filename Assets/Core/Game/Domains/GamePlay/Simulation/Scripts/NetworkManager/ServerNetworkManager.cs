@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         public int ConnectedPeersCount => _netManager.ConnectedPeersCount;
         public event Action OnPacketReceivedEvent;
+        public event Action OnClientPeerConnectedEvent;
         public event Action<long> OnClientPeerDisconnectedEvent;
 
         public ServerNetworkManager(NetworkConfig networkConfig)
@@ -40,12 +41,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private void AddListeners()
         {
             _packetsListener.OnPacketReceivedEvent += OnPacketReceived;
+            _packetsListener.OnClientPeerConnectedEvent += OnClientPeerConnected;
             _packetsListener.OnClientPeerDisconnectedEvent += OnClientPeerDisconnected;
         }
-        
+
         private void OnPacketReceived()
         {
             OnPacketReceivedEvent?.Invoke();
+        }
+
+        private void OnClientPeerConnected()
+        {
+            OnClientPeerConnectedEvent?.Invoke();
         }
 
         private void OnClientPeerDisconnected(long clientId)
@@ -79,6 +86,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private void RemoveListeners()
         {
             _packetsListener.OnPacketReceivedEvent -= OnPacketReceived;
+            _packetsListener.OnClientPeerConnectedEvent -= OnClientPeerConnected;
             _packetsListener.OnClientPeerDisconnectedEvent -= OnClientPeerDisconnected;
         }
 

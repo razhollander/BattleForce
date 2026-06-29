@@ -17,27 +17,32 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
             _starsParent = starsParent;
         }
 
-        public void CreateView(Color outlineColor)
+        public void CreateView(Color outlineColor, GalacticStarVisualData visualData)
         {
             _view = _pool.Spawn();
             _view.name = "GalacticPullStarEffect_" + FieldId;
             _view.transform.SetParent(_starsParent, false);
-            _view.Setup(outlineColor);
+            _view.Setup(outlineColor, visualData);
         }
 
-        public async Awaitable SlideIn(float targetLocalX, CancellationTokenSource cancellationTokenSource)
+        public void SetSortingOrder(int order)
         {
-            await _view.SlideIn(targetLocalX, cancellationTokenSource);
+            _view.SetSortingOrder(order);
         }
 
-        public async Awaitable MoveToSlot(float targetLocalX, CancellationTokenSource cancellationTokenSource)
+        public async Awaitable ScaleInAsync(float targetLocalY, CancellationToken cancellationToken)
         {
-            await _view.MoveToSlot(targetLocalX, cancellationTokenSource);
+            await _view.ScaleInAsync(targetLocalY, cancellationToken);
         }
 
-        public async Awaitable SlideOutAndDestroy(CancellationTokenSource cancellationTokenSource)
+        public async Awaitable MoveToSlotAsync(float targetLocalY, CancellationToken cancellationToken)
         {
-            await _view.SlideOut(cancellationTokenSource);
+            await _view.MoveToSlotAsync(targetLocalY, cancellationToken);
+        }
+
+        public async Awaitable SlideOutAndDestroyAsync(CancellationToken cancellationToken)
+        {
+            await _view.SlideOutAsync(cancellationToken);
         }
 
         public void Destroy()

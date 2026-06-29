@@ -8,7 +8,7 @@ namespace Core.Game.Domains.GamePlay.Shared
 {
     public sealed class TimerFixedThreaded2
     {
-        private readonly float _fixedDelta;
+        private float _fixedDelta;
         private double _accumulator;
         private long _lastTime;
 
@@ -21,12 +21,23 @@ namespace Core.Game.Domains.GamePlay.Shared
         private readonly object _lock = new object();
         private readonly string _threadName;
 
-        public TimerFixedThreaded2(string threadName, int ticksPerSecond, Action onTickAction)
+        public TimerFixedThreaded2(string threadName, float ticksPerSecond, Action onTickAction)
         {
             _threadName = threadName;
-            _fixedDelta = ticksPerSecond < 0 ? 0 : 1.0f / ticksPerSecond;
+            _fixedDelta = ToFixedDelta(ticksPerSecond);
             _stopwatch = new Stopwatch();
             _onTickAction = onTickAction ?? throw new ArgumentNullException(nameof(onTickAction));
+        }
+
+        // Can be called while the timer thread is running; the loop picks up the new delta on its next iteration.
+        public void SetTicksPerSecond(float ticksPerSecond)
+        {
+            _fixedDelta = ToFixedDelta(ticksPerSecond);
+        }
+
+        private static float ToFixedDelta(float ticksPerSecond)
+        {
+            return ticksPerSecond <= 0 ? 0 : 1.0f / ticksPerSecond;
         }
 
         public void Start(CancellationTokenSource cancellationTokenSource)

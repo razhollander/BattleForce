@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Shared;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationSpeedMultiplier;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -10,22 +11,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
     public class TickService : ITickService
     {
         private readonly NetworkConfig _networkConfig;
+        private readonly ISimulationSpeedMultiplierDataService _speedMultiplierDataService;
         private TimerFixedThreaded2 _fixedTimer;
         private readonly List<ITickObserver> _observers;
 
         public int CurrentTick { get; private set; }
 
-        public TickService(NetworkConfig networkConfig)
+        public TickService(NetworkConfig networkConfig, ISimulationSpeedMultiplierDataService speedMultiplierDataService)
         {
             _networkConfig = networkConfig;
+            _speedMultiplierDataService = speedMultiplierDataService;
             _observers = new List<ITickObserver>(2);
         }
-        
+
         public void StartTick()
         {
             var cancellationTokenSource = new CancellationTokenSource();
-            _fixedTimer = new TimerFixedThreaded2("Server Thread", _networkConfig.TicksPerSeconds, OnTick);
+            _fixedTimer = new TimerFixedThreaded2("Server Thread", GetTicksPerSecond(), OnTick);
+            _speedMultiplierDataService.OnMultiplierChangedEvent += OnSpeedMultiplierChanged;
             _fixedTimer.Start(cancellationTokenSource);
+        }
+
+        private void OnSpeedMultiplierChanged()
+        {
+            _fixedTimer.SetTicksPerSecond(GetTicksPerSecond());
+        }
+
+        private float GetTicksPerSecond()
+        {
+            return _networkConfig.TicksPerSeconds * _speedMultiplierDataService.Multiplier;
         }
 
         private void OnTick()
@@ -54,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
 
         public void StopTick()
         {
+            _speedMultiplierDataService.OnMultiplierChangedEvent -= OnSpeedMultiplierChanged;
             _fixedTimer.Stop();
         }
 

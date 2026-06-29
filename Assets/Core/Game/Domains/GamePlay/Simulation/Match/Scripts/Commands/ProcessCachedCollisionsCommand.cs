@@ -77,19 +77,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
                 var objectA = collisionEvent.BodyDataA;
                 var objectB = collisionEvent.BodyDataB;
-                var isPlayer = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
-                var isPlayer2 = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
-
-                if (isPlayer||isPlayer2)
-                {
-                    var playerId = isPlayer ? objectA.Id : objectB.Id;
-                    var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-
-                    if (playerState.Name == "Alon")
-                    {
-                        LogService.LogError($"Collision: {collisionEvent.Type}");
-                    }
-                }
+                
                 HandlePlayerLavaCollision(objectA, objectB, collisionEvent.Type);
                 HandlePlayerStageBoundaryCollision(objectA, objectB, collisionEvent.Type);
                 HandlePlayerWallStickTracking(objectA, objectB, collisionEvent.Type, collisionEvent.Contact);
