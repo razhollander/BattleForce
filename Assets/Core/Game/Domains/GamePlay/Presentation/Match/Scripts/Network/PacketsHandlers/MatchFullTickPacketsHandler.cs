@@ -1049,10 +1049,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         
         private void ProcessPlayerLockOnTargetsChangedNetEvents(FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C> events, int ignoreEventsNotAboveTick)
         {
-            for (int i = 0; i < _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents.Count; i++)
-            {
-                _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();   
-            }
             _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents.Clear();
 
             foreach (var netEvent in events.AsSpan())
@@ -1110,10 +1106,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         private void ProcessSonicSlapActivatedNetEvents(FixedClassUnorderedList<SonicSlapActivatedNetEventS2C> events, int ignoreEventsNotAboveTick)
         {
-            for (int i = 0; i < _cachedUnprocessedSonicSlapActivatedNetEvents.Count; i++)
-            {
-                _cachedUnprocessedSonicSlapActivatedNetEvents[i].AffectedPlayerIds.Clear();
-            }
             _cachedUnprocessedSonicSlapActivatedNetEvents.Clear();
 
             foreach (var netEvent in events.AsSpan())
