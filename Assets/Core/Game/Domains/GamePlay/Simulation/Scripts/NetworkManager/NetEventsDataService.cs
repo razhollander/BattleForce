@@ -69,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<PerformGalacticPullNetEventS2C>> PerformGalacticPullNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>> DeactivateGalacticForceFieldNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> ActivateNukePowerUpNetEventsPerClient { get; }
-        public CapacityDict<long, FixedUnorderedList<ActivateShufflePowerUpNetEventS2C>> ActivateShufflePowerUpNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>> DeactivateShufflePowerUpNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>> ShuffleSwapPlayerPositionNetEventsPerClient { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
@@ -123,7 +123,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<PerformGalacticPullNetEventS2C>> _performGalacticPullNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>> _deactivateGalacticForceFieldNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> _activateNukePowerUpNetEventsListPool;
-        private readonly ConcurrentPool<FixedUnorderedList<ActivateShufflePowerUpNetEventS2C>> _activateShufflePowerUpNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>> _activateShufflePowerUpNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>> _shuffleSwapPlayerPositionNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
@@ -180,7 +180,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PerformGalacticPullNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PerformGalacticPullNetEventS2C>>(maxConcurrentPlayers);
             DeactivateGalacticForceFieldNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>>(maxConcurrentPlayers);
             ActivateNukePowerUpNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>>(maxConcurrentPlayers);
-            ActivateShufflePowerUpNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateShufflePowerUpNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateShufflePowerUpNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>>(maxConcurrentPlayers);
             ShuffleSwapPlayerPositionNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>>(maxConcurrentPlayers);
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
@@ -261,7 +261,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _performGalacticPullNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformGalacticPullNetEventS2C>>(() => new FixedUnorderedList<PerformGalacticPullNetEventS2C>(networkConfig.MaxCap.PerformGalacticPullNetEvents), maxConcurrentPlayers);
             _deactivateGalacticForceFieldNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>>(() => new FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>(networkConfig.MaxCap.DeactivateGalacticForceFieldNetEvents), maxConcurrentPlayers);
             _activateNukePowerUpNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateNukePowerUpNetEventS2C>>(() => new FixedUnorderedList<ActivateNukePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateNukePowerUpNetEvents), maxConcurrentPlayers);
-            _activateShufflePowerUpNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateShufflePowerUpNetEventS2C>>(() => new FixedUnorderedList<ActivateShufflePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents), maxConcurrentPlayers);
+            _activateShufflePowerUpNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>>(() => new FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents), maxConcurrentPlayers);
             _shuffleSwapPlayerPositionNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>>(() => new FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>(networkConfig.MaxCap.ShuffleSwapPlayerPositionNetEvents), maxConcurrentPlayers);
         }
 
@@ -613,9 +613,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 ActivateNukePowerUpNetEventsPerClient.Add(clientId, _activateNukePowerUpNetEventsListPool.Get());
             }
-            if (!ActivateShufflePowerUpNetEventsPerClient.ContainsKey(clientId))
+            if (!DeactivateShufflePowerUpNetEventsPerClient.ContainsKey(clientId))
             {
-                ActivateShufflePowerUpNetEventsPerClient.Add(clientId, _activateShufflePowerUpNetEventsListPool.Get());
+                DeactivateShufflePowerUpNetEventsPerClient.Add(clientId, _activateShufflePowerUpNetEventsListPool.Get());
             }
             if (!ShuffleSwapPlayerPositionNetEventsPerClient.ContainsKey(clientId))
             {
@@ -801,7 +801,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             activateNukePowerUpNetEventsList.Clear();
             _activateNukePowerUpNetEventsListPool.Return(activateNukePowerUpNetEventsList);
 
-            var activateShufflePowerUpNetEventsList = ActivateShufflePowerUpNetEventsPerClient[clientId];
+            var activateShufflePowerUpNetEventsList = DeactivateShufflePowerUpNetEventsPerClient[clientId];
             activateShufflePowerUpNetEventsList.Clear();
             _activateShufflePowerUpNetEventsListPool.Return(activateShufflePowerUpNetEventsList);
 
@@ -855,7 +855,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PerformGalacticPullNetEventsPerClient.Remove(clientId);
             DeactivateGalacticForceFieldNetEventsPerClient.Remove(clientId);
             ActivateNukePowerUpNetEventsPerClient.Remove(clientId);
-            ActivateShufflePowerUpNetEventsPerClient.Remove(clientId);
+            DeactivateShufflePowerUpNetEventsPerClient.Remove(clientId);
 
             var shuffleSwapPlayerPositionNetEventsList = ShuffleSwapPlayerPositionNetEventsPerClient[clientId];
             shuffleSwapPlayerPositionNetEventsList.Clear();
@@ -1120,9 +1120,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddActivateShufflePowerUpNetEvent(int onTick, ushort casterPlayerId)
+        public void AddDectivateShufflePowerUpNetEvent(int onTick, ushort casterPlayerId)
         {
-            foreach (var kvp in ActivateShufflePowerUpNetEventsPerClient)
+            foreach (var kvp in DeactivateShufflePowerUpNetEventsPerClient)
             {
                 ref var netEvent = ref kvp.Value.AddAndGet();
                 netEvent.OccuredOnTick = onTick;
@@ -1694,7 +1694,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 }
             }
             
-            if (ActivateShufflePowerUpNetEventsPerClient.TryGetValue(clientId, out var activateShufflePowerUpNetEvents))
+            if (DeactivateShufflePowerUpNetEventsPerClient.TryGetValue(clientId, out var activateShufflePowerUpNetEvents))
             {
                 for (int i = activateShufflePowerUpNetEvents.Count - 1; i >= 0; i--)
                 {

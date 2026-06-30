@@ -4,7 +4,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
-    public class HandleActivateShufflePowerUpNetEventsCommand : BaseCommand, ICommandVoid
+    public class HandleDeactivateShufflePowerUpNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
 
@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            var netEvents = _cachedPresentationEventsService.ActivateShufflePowerUpNetEvents;
+            var netEvents = _cachedPresentationEventsService.DeactivateShufflePowerUpNetEvents;
             if (netEvents.Count == 0)
                 return;
             

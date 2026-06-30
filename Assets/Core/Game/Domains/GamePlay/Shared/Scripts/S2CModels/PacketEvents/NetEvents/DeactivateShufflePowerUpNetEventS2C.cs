@@ -3,7 +3,7 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
 {
-    public struct ActivateShufflePowerUpNetEventS2C : INetSerializable, IComparable<ActivateShufflePowerUpNetEventS2C>
+    public struct DeactivateShufflePowerUpNetEventS2C : INetSerializable, IComparable<DeactivateShufflePowerUpNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort CasterPlayerId;
@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             CasterPlayerId = reader.GetByte();
         }
 
-        public int CompareTo(ActivateShufflePowerUpNetEventS2C other)
+        public int CompareTo(DeactivateShufflePowerUpNetEventS2C other)
         {
             return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }

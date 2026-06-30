@@ -54,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<PerformGalacticPullNetEventS2C> PerformGalacticPullNetEvents { get; } = new();
         public List<DeactivateGalacticForceFieldNetEventS2C> DeactivateGalacticForceFieldNetEvents { get; } = new();
         public List<ActivateNukePowerUpNetEventS2C> ActivateNukePowerUpNetEvents { get; } = new();
-        public List<ActivateShufflePowerUpNetEventS2C> ActivateShufflePowerUpNetEvents { get; } = new();
+        public List<DeactivateShufflePowerUpNetEventS2C> DeactivateShufflePowerUpNetEvents { get; } = new();
         public List<ShuffleSwapPlayerPositionNetEventS2C> ShuffleSwapPlayerPositionNetEvents { get; } = new();
     }
 }

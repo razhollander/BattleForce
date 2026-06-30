@@ -66,7 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<PerformGalacticPullNetEventS2C>> PerformGalacticPullNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>> DeactivateGalacticForceFieldNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> ActivateNukePowerUpNetEventsPerClient { get; }
-        CapacityDict<long, FixedUnorderedList<ActivateShufflePowerUpNetEventS2C>> ActivateShufflePowerUpNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>> DeactivateShufflePowerUpNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>> ShuffleSwapPlayerPositionNetEventsPerClient { get; }
         
         void StartSavingClientEvents(long clientId);
@@ -123,7 +123,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddPerformGalacticPullNetEvent(int onTick, ushort fieldId, ushort casterPlayerId, ushort casterTeamId, int endTick);
         void AddDeactivateGalacticForceFieldNetEvent(int onTick, ushort fieldId);
         void AddActivateNukePowerUpNetEvent(int onTick, ushort casterPlayerId, Vector2 casterPosition);
-        void AddActivateShufflePowerUpNetEvent(int onTick, ushort casterPlayerId);
+        void AddDectivateShufflePowerUpNetEvent(int onTick, ushort casterPlayerId);
         void AddShuffleSwapPlayerPositionNetEvent(int onTick, ushort casterPlayerId);
     }
 }

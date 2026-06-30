@@ -54,6 +54,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
 
         public void Perform(int tick)
         {
+            if (IsSequenceInProgress)
+            {
+                return;
+            }
+            
             CollectPlayerIds();
             PreCalculateSwapPairs();
             _nextSwapIndex = 0;
@@ -75,7 +80,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             else
             {
                 _matchDataService.SimulationState.SetIsPowerUpCurrentlyActiveForPlayer(_casterPlayerId, false);
-                _netEventsDataService.AddActivateShufflePowerUpNetEvent(tick, _casterPlayerId);
+                _netEventsDataService.AddDectivateShufflePowerUpNetEvent(tick, _casterPlayerId);
             }
         }
 

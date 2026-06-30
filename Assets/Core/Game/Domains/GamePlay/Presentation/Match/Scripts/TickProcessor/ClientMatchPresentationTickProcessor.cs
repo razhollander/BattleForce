@@ -74,7 +74,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandlePerformGalacticPullNetEventsCommand _handlePerformGalacticPullNetEventsCommand;
         private readonly HandleDeactivateGalacticForceFieldNetEventsCommand _handleDeactivateGalacticForceFieldNetEventsCommand;
         private readonly HandleActivateNukePowerUpNetEventsCommand _handleActivateNukePowerUpNetEventsCommand;
-        private readonly HandleActivateShufflePowerUpNetEventsCommand _handleActivateShufflePowerUpNetEventsCommand;
+        private readonly HandleDeactivateShufflePowerUpNetEventsCommand _handleDeactivateShufflePowerUpNetEventsCommand;
         private readonly HandleShuffleSwapPlayerPositionNetEventsCommand _handleShuffleSwapPlayerPositionNetEventsCommand;
         private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
 
@@ -136,7 +136,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePerformGalacticPullNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformGalacticPullNetEventsCommand>();
             _handleDeactivateGalacticForceFieldNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateGalacticForceFieldNetEventsCommand>();
             _handleActivateNukePowerUpNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateNukePowerUpNetEventsCommand>();
-            _handleActivateShufflePowerUpNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateShufflePowerUpNetEventsCommand>();
+            _handleDeactivateShufflePowerUpNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateShufflePowerUpNetEventsCommand>();
             _handleShuffleSwapPlayerPositionNetEventsCommand = commandFactory.CreateCommandVoid<HandleShuffleSwapPlayerPositionNetEventsCommand>();
             _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
         }
@@ -209,7 +209,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePerformGalacticPullNetEventsCommand.Execute();
             _handleDeactivateGalacticForceFieldNetEventsCommand.Execute();
             _handleActivateNukePowerUpNetEventsCommand.Execute();
-            _handleActivateShufflePowerUpNetEventsCommand.Execute();
+            _handleDeactivateShufflePowerUpNetEventsCommand.Execute();
             _handleShuffleSwapPlayerPositionNetEventsCommand.Execute();
             _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
             _fullTickPacketsHandler.ClearUnprocessedPacketsByView();

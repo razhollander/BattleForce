@@ -283,7 +283,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.PerformGalacticPullNetEvents = _netEventsDataService.PerformGalacticPullNetEventsPerClient[clientId];
                 _fullTickPacket.DeactivateGalacticForceFieldNetEvents = _netEventsDataService.DeactivateGalacticForceFieldNetEventsPerClient[clientId];
                 _fullTickPacket.ActivateNukePowerUpNetEvents = _netEventsDataService.ActivateNukePowerUpNetEventsPerClient[clientId];
-                _fullTickPacket.ActivateShufflePowerUpNetEvents = _netEventsDataService.ActivateShufflePowerUpNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateShufflePowerUpNetEvents = _netEventsDataService.DeactivateShufflePowerUpNetEventsPerClient[clientId];
                 _fullTickPacket.ShuffleSwapPlayerPositionNetEvents = _netEventsDataService.ShuffleSwapPlayerPositionNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
