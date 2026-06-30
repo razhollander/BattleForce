@@ -87,6 +87,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<ActivateNukePowerUpNetEventS2C> _cachedUnprocessedActivateNukePowerUpNetEvents;
         private readonly CapacityList<DeactivateShufflePowerUpNetEventS2C> _cachedUnprocessedDeactivateShufflePowerUpNetEvents;
         private readonly CapacityList<ShuffleSwapPlayerPositionNetEventS2C> _cachedUnprocessedShuffleSwapPlayerPositionNetEvents;
+        private readonly CapacityList<ActivateShuffleNetEventS2C> _cachedUnprocessedActivateShuffleNetEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
 
         private int _largestPacketSizeInLast5Seconds;
@@ -161,6 +162,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedActivateNukePowerUpNetEvents = new CapacityList<ActivateNukePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateNukePowerUpNetEvents);
             _cachedUnprocessedDeactivateShufflePowerUpNetEvents = new CapacityList<DeactivateShufflePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents);
             _cachedUnprocessedShuffleSwapPlayerPositionNetEvents = new CapacityList<ShuffleSwapPlayerPositionNetEventS2C>(networkConfig.MaxCap.ShuffleSwapPlayerPositionNetEvents);
+            _cachedUnprocessedActivateShuffleNetEvents = new CapacityList<ActivateShuffleNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -259,6 +261,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessActivateNukePowerUpNetEvents(latestFullTickPacket.ActivateNukePowerUpNetEvents, ignoreEventsNotAboveTick);
             ProcessActivateShufflePowerUpNetEvents(latestFullTickPacket.DeactivateShufflePowerUpNetEvents, ignoreEventsNotAboveTick);
             ProcessShuffleSwapPlayerPositionNetEvents(latestFullTickPacket.ShuffleSwapPlayerPositionNetEvents, ignoreEventsNotAboveTick);
+            ProcessActivateShuffleNetEvents(latestFullTickPacket.ActivateShuffleNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -1408,6 +1411,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedShuffleSwapPlayerPositionNetEvents.Sort();
                 _presentationNetEventsHandler.ProcessShuffleSwapPlayerPositionEvents(_cachedUnprocessedShuffleSwapPlayerPositionNetEvents);
+            }
+        }
+
+        private void ProcessActivateShuffleNetEvents(FixedUnorderedList<ActivateShuffleNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedActivateShuffleNetEvents.Clear();
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                    _cachedUnprocessedActivateShuffleNetEvents.Add(netEvent);
+            }
+            if (!_cachedUnprocessedActivateShuffleNetEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedActivateShuffleNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessActivateShuffleEvents(_cachedUnprocessedActivateShuffleNetEvents);
             }
         }
     }

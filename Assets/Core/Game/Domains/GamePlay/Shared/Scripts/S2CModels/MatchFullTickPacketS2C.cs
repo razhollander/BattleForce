@@ -66,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<ActivateNukePowerUpNetEventS2C> ActivateNukePowerUpNetEvents;
         public FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C> DeactivateShufflePowerUpNetEvents;
         public FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C> ShuffleSwapPlayerPositionNetEvents;
+        public FixedUnorderedList<ActivateShuffleNetEventS2C> ActivateShuffleNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -136,6 +137,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             ActivateNukePowerUpNetEvents = new FixedUnorderedList<ActivateNukePowerUpNetEventS2C>(maxCap.ActivateNukePowerUpNetEvents);
             DeactivateShufflePowerUpNetEvents = new FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>(maxCap.ActivateShufflePowerUpNetEvents);
             ShuffleSwapPlayerPositionNetEvents = new FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>(maxCap.ShuffleSwapPlayerPositionNetEvents);
+            ActivateShuffleNetEvents = new FixedUnorderedList<ActivateShuffleNetEventS2C>(maxCap.ActivateShufflePowerUpNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -194,6 +196,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 45)) != 0) SerializedActivateNukePowerUpNetEvents(writer);
             if ((eventMask & (1UL << 46)) != 0) SerializedDeactivateShufflePowerUpNetEvents(writer);
             if ((eventMask & (1UL << 47)) != 0) SerializedShuffleSwapPlayerPositionNetEvents(writer);
+            if ((eventMask & (1UL << 48)) != 0) SerializedActivateShuffleNetEvents(writer);
         }
 
         private ulong CalculateEventMask()
@@ -247,6 +250,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (ActivateNukePowerUpNetEvents.Count > 0) eventMask |= 1UL << 45;
             if (DeactivateShufflePowerUpNetEvents.Count > 0) eventMask |= 1UL << 46;
             if (ShuffleSwapPlayerPositionNetEvents.Count > 0) eventMask |= 1UL << 47;
+            if (ActivateShuffleNetEvents.Count > 0) eventMask |= 1UL << 48;
 
             return eventMask;
         }
@@ -414,6 +418,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask & (1UL << 47)) != 0) DeserializedShuffleSwapPlayerPositionNetEvents(reader);
             else ShuffleSwapPlayerPositionNetEvents.Clear();
+
+            if ((eventMask & (1UL << 48)) != 0) DeserializedActivateShuffleNetEvents(reader);
+            else ActivateShuffleNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1374,6 +1381,24 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (var i = 0; i < count; i++)
             {
                 ref var netEvent = ref ShuffleSwapPlayerPositionNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateShuffleNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateShuffleNetEvents.Count);
+            foreach (var netEvent in ActivateShuffleNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedActivateShuffleNetEvents(NetDataReader reader)
+        {
+            ActivateShuffleNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateShuffleNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

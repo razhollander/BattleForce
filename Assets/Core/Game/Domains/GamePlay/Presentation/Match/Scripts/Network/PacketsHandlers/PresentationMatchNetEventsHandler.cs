@@ -778,5 +778,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var netEvent in events)
                 _cachedPresentationEventsService.ShuffleSwapPlayerPositionNetEvents.Add(netEvent);
         }
+
+        public void ProcessActivateShuffleEvents(CapacityList<ActivateShuffleNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.ActivateShuffleNetEvents.Add(netEvent);
+        }
     }
 }

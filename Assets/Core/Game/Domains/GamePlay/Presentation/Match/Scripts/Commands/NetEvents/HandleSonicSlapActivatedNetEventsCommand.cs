@@ -28,12 +28,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in netEvents)
             {
+                _matchPlayerControllers.ShowPowerUpEffect(netEvent.CasterPlayerId);
+                
                 foreach (var affectedPlayerId in netEvent.AffectedPlayerIds.AsSpan())
                 {
                     _matchPlayerControllers.PlaySonicSnapEffectForPlayer(affectedPlayerId);
                 }
             }
-
+            _audioService.PlayAudio(AudioClipType.PowerUpActivated);
             _audioService.PlayAudio(AudioClipType.SonicSlap);
             netEvents.Clear();
         }

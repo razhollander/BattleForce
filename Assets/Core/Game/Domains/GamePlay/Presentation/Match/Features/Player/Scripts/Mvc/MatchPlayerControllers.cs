@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
+using Core.Scripts.Utils;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
@@ -118,6 +120,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void PlaySonicSnapEffectForPlayer(ushort playerId)
         {
             GetPlayer(playerId).PlaySonicSnapEffect();
+        }
+
+        public void ShowPowerUpEffect(ushort playerId)
+        {
+            GetPlayer(playerId).ShowActivatePowerUpEffect(_stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
         }
 
         public void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled)

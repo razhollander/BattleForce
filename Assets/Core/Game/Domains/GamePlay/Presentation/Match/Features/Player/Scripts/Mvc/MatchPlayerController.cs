@@ -316,6 +316,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.PlaySonicSnapEffect(_stageCancellationTokenProvider.CancellationTokenSource.Token);
         }
 
+        public async Awaitable ShowActivatePowerUpEffect(CancellationToken cancellationToken)
+        {
+            await _playerView.ShowActivatePowerUpEffect(cancellationToken);
+        }
+
         public void SetIsDeadEffectEnabled(bool isEnabled)
         {
             _playerView.SetIsDeadEffectEnabled(isEnabled, _stageCancellationTokenProvider.CancellationTokenSource.Token);

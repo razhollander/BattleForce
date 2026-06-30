@@ -34,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void PlayLayEggAnimation(ushort playerId);
         void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction);
         void PlaySonicSnapEffectForPlayer(ushort playerId);
+        void ShowPowerUpEffect(ushort playerId);
         void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled);
         void SetPlayerIsLockOnTargetSightShown(ushort playerId, bool isShown);
         void SetIsPlayerKinged(ushort playerId, bool isKinged);

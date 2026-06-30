@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Scripts.Extensions;
 using Core.Scripts.Helpers;
@@ -35,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private MatchPlayerPowerUpHudView _powerUpHudView;
         [SerializeField] private GameObject _crownGameObject;
         [SerializeField] private DeadTombstoneView _deadTombstoneView;
+        [SerializeField] private ActivatePowerUpEffectView _activatePowerUpEffectView;
         public Action Despawn { get; set; }
         
         public PlayerView Base => _playerView;
@@ -245,6 +247,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetCurrentPowerUp(bool shouldShowPowerUp, Sprite powerUpIcon)
         {
             _powerUpHudView.SetPowerUp(shouldShowPowerUp, powerUpIcon);
+        }
+        
+        public async Awaitable ShowActivatePowerUpEffect(CancellationToken cancellationToken)
+        {
+            await _activatePowerUpEffectView.PlayAnimation(cancellationToken);
         }
     }
 }

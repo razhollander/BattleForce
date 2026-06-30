@@ -68,7 +68,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> ActivateNukePowerUpNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>> DeactivateShufflePowerUpNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>> ShuffleSwapPlayerPositionNetEventsPerClient { get; }
-        
+        CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>> ActivateShuffleNetEventsPerClient { get; }
+
         void StartSavingClientEvents(long clientId);
         void StopSavingClientEvents(long clientId);
         void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius, Vector2 velocity);
@@ -125,5 +126,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddActivateNukePowerUpNetEvent(int onTick, ushort casterPlayerId, Vector2 casterPosition);
         void AddDectivateShufflePowerUpNetEvent(int onTick, ushort casterPlayerId);
         void AddShuffleSwapPlayerPositionNetEvent(int onTick, ushort casterPlayerId);
+        void AddActivateShuffleNetEvent(int onTick, ushort casterPlayerId);
     }
 }

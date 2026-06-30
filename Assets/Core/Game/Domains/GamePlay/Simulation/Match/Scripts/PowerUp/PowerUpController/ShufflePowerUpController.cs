@@ -64,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             _nextSwapIndex = 0;
             _nextSwapTick = tick;
             _matchDataService.SimulationState.SetIsPowerUpCurrentlyActiveForPlayer(_casterPlayerId, true);
+            _netEventsDataService.AddActivateShuffleNetEvent(tick, _casterPlayerId);
         }
 
         public void OnTick(int tick)

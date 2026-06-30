@@ -71,6 +71,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> ActivateNukePowerUpNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>> DeactivateShufflePowerUpNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>> ShuffleSwapPlayerPositionNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>> ActivateShuffleNetEventsPerClient { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -125,6 +126,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> _activateNukePowerUpNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>> _activateShufflePowerUpNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>> _shuffleSwapPlayerPositionNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateShuffleNetEventS2C>> _activateShuffleNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -182,6 +184,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             ActivateNukePowerUpNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>>(maxConcurrentPlayers);
             DeactivateShufflePowerUpNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>>(maxConcurrentPlayers);
             ShuffleSwapPlayerPositionNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>>(maxConcurrentPlayers);
+            ActivateShuffleNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>>(maxConcurrentPlayers);
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -263,6 +266,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _activateNukePowerUpNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateNukePowerUpNetEventS2C>>(() => new FixedUnorderedList<ActivateNukePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateNukePowerUpNetEvents), maxConcurrentPlayers);
             _activateShufflePowerUpNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>>(() => new FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents), maxConcurrentPlayers);
             _shuffleSwapPlayerPositionNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>>(() => new FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>(networkConfig.MaxCap.ShuffleSwapPlayerPositionNetEvents), maxConcurrentPlayers);
+            _activateShuffleNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateShuffleNetEventS2C>>(() => new FixedUnorderedList<ActivateShuffleNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingClientEvents(long clientId)
@@ -621,6 +625,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 ShuffleSwapPlayerPositionNetEventsPerClient.Add(clientId, _shuffleSwapPlayerPositionNetEventsListPool.Get());
             }
+            if (!ActivateShuffleNetEventsPerClient.ContainsKey(clientId))
+            {
+                ActivateShuffleNetEventsPerClient.Add(clientId, _activateShuffleNetEventsListPool.Get());
+            }
         }
 
         public void StopSavingClientEvents(long clientId)
@@ -861,6 +869,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             shuffleSwapPlayerPositionNetEventsList.Clear();
             _shuffleSwapPlayerPositionNetEventsListPool.Return(shuffleSwapPlayerPositionNetEventsList);
             ShuffleSwapPlayerPositionNetEventsPerClient.Remove(clientId);
+
+            var activateShuffleNetEventsList = ActivateShuffleNetEventsPerClient[clientId];
+            activateShuffleNetEventsList.Clear();
+            _activateShuffleNetEventsListPool.Return(activateShuffleNetEventsList);
+            ActivateShuffleNetEventsPerClient.Remove(clientId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -1133,6 +1146,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public void AddShuffleSwapPlayerPositionNetEvent(int onTick, ushort casterPlayerId)
         {
             foreach (var kvp in ShuffleSwapPlayerPositionNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddActivateShuffleNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in ActivateShuffleNetEventsPerClient)
             {
                 ref var netEvent = ref kvp.Value.AddAndGet();
                 netEvent.OccuredOnTick = onTick;
@@ -1712,6 +1735,17 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                     if (shuffleSwapPlayerPositionNetEvents[i].OccuredOnTick < tick)
                     {
                         shuffleSwapPlayerPositionNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (ActivateShuffleNetEventsPerClient.TryGetValue(clientId, out var activateShuffleNetEvents))
+            {
+                for (int i = activateShuffleNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateShuffleNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateShuffleNetEvents.RemoveAt(i);
                     }
                 }
             }
