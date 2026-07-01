@@ -127,6 +127,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).ShowActivatePowerUpEffect(_stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
         }
 
+        public void StartPowerUpGrantingPhase(ushort playerId)
+        {
+            GetPlayer(playerId).StartPowerUpGrantingPhase(_stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
+        }
+
+        public void EndPowerUpGrantingPhase(ushort playerId, PowerUpType grantedPowerUp)
+        {
+            GetPlayer(playerId).EndPowerUpGrantingPhase(grantedPowerUp, _stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
+        }
+
         public void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled)
         {
             GetPlayer(playerId).SetIsDeadEffectEnabled(isEnabled);

@@ -744,6 +744,36 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessStartPowerUpGrantingPhaseEvents(CapacityList<StartPowerUpGrantingPhaseNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                _matchDataService.GetPlayer(netEvent.PlayerId).Spaceship.IsCurrentlyInGrantingPowerUpPhase = true;
+                _cachedPresentationEventsService.StartPowerUpGrantingPhaseNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessEndPowerUpGrantingPhaseEvents(CapacityList<EndPowerUpGrantingPhaseNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                var spaceship = _matchDataService.GetPlayer(netEvent.PlayerId).Spaceship;
+                spaceship.IsCurrentlyInGrantingPowerUpPhase = false;
+                spaceship.CurrentPowerUp = netEvent.GrantedPowerUp;
+                _cachedPresentationEventsService.EndPowerUpGrantingPhaseNetEvents.Add(netEvent);
+            }
+        }
+
         public void ProcessPerformGalacticPullEvents(CapacityList<PerformGalacticPullNetEventS2C> events)
         {
             if (events.IsNullOrEmpty()) return;

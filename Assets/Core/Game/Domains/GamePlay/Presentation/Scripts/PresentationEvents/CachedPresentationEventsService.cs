@@ -57,5 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<DeactivateShufflePowerUpNetEventS2C> DeactivateShufflePowerUpNetEvents { get; } = new();
         public List<ShuffleSwapPlayerPositionNetEventS2C> ShuffleSwapPlayerPositionNetEvents { get; } = new();
         public List<ActivateShuffleNetEventS2C> ActivateShuffleNetEvents { get; } = new();
+        public List<StartPowerUpGrantingPhaseNetEventS2C> StartPowerUpGrantingPhaseNetEvents { get; } = new();
+        public List<EndPowerUpGrantingPhaseNetEventS2C> EndPowerUpGrantingPhaseNetEvents { get; } = new();
     }
 }

@@ -116,6 +116,8 @@ namespace Core.Scripts.Network
         public int ConcurrentGalacticForceFields = 16;
         public int PerformGalacticPullNetEvents = 64;
         public int DeactivateGalacticForceFieldNetEvents = 64;
+        public int StartPowerUpGrantingPhaseNetEvents = 64;
+        public int EndPowerUpGrantingPhaseNetEvents = 64;
 
         [Serializable]
         public class EnvironmentRotatingWheel

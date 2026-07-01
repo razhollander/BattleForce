@@ -286,6 +286,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.DeactivateShufflePowerUpNetEvents = _netEventsDataService.DeactivateShufflePowerUpNetEventsPerClient[clientId];
                 _fullTickPacket.ShuffleSwapPlayerPositionNetEvents = _netEventsDataService.ShuffleSwapPlayerPositionNetEventsPerClient[clientId];
                 _fullTickPacket.ActivateShuffleNetEvents = _netEventsDataService.ActivateShuffleNetEventsPerClient[clientId];
+                _fullTickPacket.StartPowerUpGrantingPhaseNetEvents = _netEventsDataService.StartPowerUpGrantingPhaseNetEventsPerClient[clientId];
+                _fullTickPacket.EndPowerUpGrantingPhaseNetEvents = _netEventsDataService.EndPowerUpGrantingPhaseNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

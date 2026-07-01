@@ -77,6 +77,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleDeactivateShufflePowerUpNetEventsCommand _handleDeactivateShufflePowerUpNetEventsCommand;
         private readonly HandleShuffleSwapPlayerPositionNetEventsCommand _handleShuffleSwapPlayerPositionNetEventsCommand;
         private readonly HandleActivateShuffleNetEventsCommand _handleActivateShuffleNetEventsCommand;
+        private readonly HandleStartPowerUpGrantingPhaseNetEventsCommand _handleStartPowerUpGrantingPhaseNetEventsCommand;
+        private readonly HandleEndPowerUpGrantingPhaseNetEventsCommand _handleEndPowerUpGrantingPhaseNetEventsCommand;
         private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
@@ -140,6 +142,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateShufflePowerUpNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateShufflePowerUpNetEventsCommand>();
             _handleShuffleSwapPlayerPositionNetEventsCommand = commandFactory.CreateCommandVoid<HandleShuffleSwapPlayerPositionNetEventsCommand>();
             _handleActivateShuffleNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateShuffleNetEventsCommand>();
+            _handleStartPowerUpGrantingPhaseNetEventsCommand = commandFactory.CreateCommandVoid<HandleStartPowerUpGrantingPhaseNetEventsCommand>();
+            _handleEndPowerUpGrantingPhaseNetEventsCommand = commandFactory.CreateCommandVoid<HandleEndPowerUpGrantingPhaseNetEventsCommand>();
             _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
         }
         
@@ -214,6 +218,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateShufflePowerUpNetEventsCommand.Execute();
             _handleShuffleSwapPlayerPositionNetEventsCommand.Execute();
             _handleActivateShuffleNetEventsCommand.Execute();
+            _handleStartPowerUpGrantingPhaseNetEventsCommand.Execute();
+            _handleEndPowerUpGrantingPhaseNetEventsCommand.Execute();
             _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
             _fullTickPacketsHandler.ClearUnprocessedPacketsByView();
         }

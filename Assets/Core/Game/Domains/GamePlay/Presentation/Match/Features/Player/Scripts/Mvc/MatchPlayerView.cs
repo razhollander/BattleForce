@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
@@ -252,6 +253,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public async Awaitable ShowActivatePowerUpEffect(CancellationToken cancellationToken)
         {
             await _activatePowerUpEffectView.PlayAnimation(cancellationToken);
+        }
+
+        public async Awaitable StartPowerUpGrantingPhaseReel(IReadOnlyList<Sprite> reelSprites, CancellationToken cancellationToken)
+        {
+            await _powerUpHudView.PlayGrantingPhaseReel(reelSprites, cancellationToken);
+        }
+
+        public async Awaitable EndPowerUpGrantingPhaseReel(Sprite grantedSprite, CancellationToken cancellationToken)
+        {
+            await _powerUpHudView.StopGrantingPhaseReelAndShowGranted(grantedSprite, cancellationToken);
         }
     }
 }

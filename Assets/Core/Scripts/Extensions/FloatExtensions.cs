@@ -24,7 +24,7 @@ namespace Core.Scripts.Extensions
             var tolerance = 0.001f;
             return Mathf.Abs(a - b) < tolerance;
 
-            // return Mathf.Approximately(a, b);
+            //return Mathf.Approximately(a, b);
         }
     }
 }

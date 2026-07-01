@@ -72,6 +72,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>> DeactivateShufflePowerUpNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>> ShuffleSwapPlayerPositionNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>> ActivateShuffleNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>> StartPowerUpGrantingPhaseNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>> EndPowerUpGrantingPhaseNetEventsPerClient { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -127,6 +129,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>> _activateShufflePowerUpNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>> _shuffleSwapPlayerPositionNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateShuffleNetEventS2C>> _activateShuffleNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>> _startPowerUpGrantingPhaseNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>> _endPowerUpGrantingPhaseNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -185,6 +189,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             DeactivateShufflePowerUpNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>>(maxConcurrentPlayers);
             ShuffleSwapPlayerPositionNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>>(maxConcurrentPlayers);
             ActivateShuffleNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>>(maxConcurrentPlayers);
+            StartPowerUpGrantingPhaseNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>>(maxConcurrentPlayers);
+            EndPowerUpGrantingPhaseNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>>(maxConcurrentPlayers);
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -267,6 +273,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _activateShufflePowerUpNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>>(() => new FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents), maxConcurrentPlayers);
             _shuffleSwapPlayerPositionNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>>(() => new FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>(networkConfig.MaxCap.ShuffleSwapPlayerPositionNetEvents), maxConcurrentPlayers);
             _activateShuffleNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateShuffleNetEventS2C>>(() => new FixedUnorderedList<ActivateShuffleNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents), maxConcurrentPlayers);
+            _startPowerUpGrantingPhaseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>>(() => new FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>(networkConfig.MaxCap.StartPowerUpGrantingPhaseNetEvents), maxConcurrentPlayers);
+            _endPowerUpGrantingPhaseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>>(() => new FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>(networkConfig.MaxCap.EndPowerUpGrantingPhaseNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingClientEvents(long clientId)
@@ -629,6 +637,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 ActivateShuffleNetEventsPerClient.Add(clientId, _activateShuffleNetEventsListPool.Get());
             }
+            if (!StartPowerUpGrantingPhaseNetEventsPerClient.ContainsKey(clientId))
+            {
+                StartPowerUpGrantingPhaseNetEventsPerClient.Add(clientId, _startPowerUpGrantingPhaseNetEventsListPool.Get());
+            }
+            if (!EndPowerUpGrantingPhaseNetEventsPerClient.ContainsKey(clientId))
+            {
+                EndPowerUpGrantingPhaseNetEventsPerClient.Add(clientId, _endPowerUpGrantingPhaseNetEventsListPool.Get());
+            }
         }
 
         public void StopSavingClientEvents(long clientId)
@@ -812,6 +828,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var activateShufflePowerUpNetEventsList = DeactivateShufflePowerUpNetEventsPerClient[clientId];
             activateShufflePowerUpNetEventsList.Clear();
             _activateShufflePowerUpNetEventsListPool.Return(activateShufflePowerUpNetEventsList);
+
+            var startPowerUpGrantingPhaseNetEventsList = StartPowerUpGrantingPhaseNetEventsPerClient[clientId];
+            startPowerUpGrantingPhaseNetEventsList.Clear();
+            _startPowerUpGrantingPhaseNetEventsListPool.Return(startPowerUpGrantingPhaseNetEventsList);
+            StartPowerUpGrantingPhaseNetEventsPerClient.Remove(clientId);
+
+            var endPowerUpGrantingPhaseNetEventsList = EndPowerUpGrantingPhaseNetEventsPerClient[clientId];
+            endPowerUpGrantingPhaseNetEventsList.Clear();
+            _endPowerUpGrantingPhaseNetEventsListPool.Return(endPowerUpGrantingPhaseNetEventsList);
+            EndPowerUpGrantingPhaseNetEventsPerClient.Remove(clientId);
 
             BulletSpawnNetEventsPerClient.Remove(clientId);
             PlayerRejoinAcceptNetEventsPerClient.Remove(clientId);
@@ -1160,6 +1186,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 ref var netEvent = ref kvp.Value.AddAndGet();
                 netEvent.OccuredOnTick = onTick;
                 netEvent.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddStartPowerUpGrantingPhaseNetEvent(int onTick, ushort playerId)
+        {
+            foreach (var kvp in StartPowerUpGrantingPhaseNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.PlayerId = playerId;
+            }
+        }
+
+        public void AddEndPowerUpGrantingPhaseNetEvent(int onTick, ushort playerId, PowerUpType grantedPowerUp)
+        {
+            foreach (var kvp in EndPowerUpGrantingPhaseNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.PlayerId = playerId;
+                netEvent.GrantedPowerUp = grantedPowerUp;
             }
         }
 
@@ -1746,6 +1793,28 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                     if (activateShuffleNetEvents[i].OccuredOnTick < tick)
                     {
                         activateShuffleNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (StartPowerUpGrantingPhaseNetEventsPerClient.TryGetValue(clientId, out var startPowerUpGrantingPhaseNetEvents))
+            {
+                for (int i = startPowerUpGrantingPhaseNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (startPowerUpGrantingPhaseNetEvents[i].OccuredOnTick < tick)
+                    {
+                        startPowerUpGrantingPhaseNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (EndPowerUpGrantingPhaseNetEventsPerClient.TryGetValue(clientId, out var endPowerUpGrantingPhaseNetEvents))
+            {
+                for (int i = endPowerUpGrantingPhaseNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (endPowerUpGrantingPhaseNetEvents[i].OccuredOnTick < tick)
+                    {
+                        endPowerUpGrantingPhaseNetEvents.RemoveAt(i);
                     }
                 }
             }

@@ -88,6 +88,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<DeactivateShufflePowerUpNetEventS2C> _cachedUnprocessedDeactivateShufflePowerUpNetEvents;
         private readonly CapacityList<ShuffleSwapPlayerPositionNetEventS2C> _cachedUnprocessedShuffleSwapPlayerPositionNetEvents;
         private readonly CapacityList<ActivateShuffleNetEventS2C> _cachedUnprocessedActivateShuffleNetEvents;
+        private readonly CapacityList<StartPowerUpGrantingPhaseNetEventS2C> _cachedUnprocessedStartPowerUpGrantingPhaseNetEvents;
+        private readonly CapacityList<EndPowerUpGrantingPhaseNetEventS2C> _cachedUnprocessedEndPowerUpGrantingPhaseNetEvents;
         private readonly ConcurrentPool<MatchFullTickPacketS2C> _fullTickPacketsPool;
 
         private int _largestPacketSizeInLast5Seconds;
@@ -163,6 +165,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedDeactivateShufflePowerUpNetEvents = new CapacityList<DeactivateShufflePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents);
             _cachedUnprocessedShuffleSwapPlayerPositionNetEvents = new CapacityList<ShuffleSwapPlayerPositionNetEventS2C>(networkConfig.MaxCap.ShuffleSwapPlayerPositionNetEvents);
             _cachedUnprocessedActivateShuffleNetEvents = new CapacityList<ActivateShuffleNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents);
+            _cachedUnprocessedStartPowerUpGrantingPhaseNetEvents = new CapacityList<StartPowerUpGrantingPhaseNetEventS2C>(networkConfig.MaxCap.StartPowerUpGrantingPhaseNetEvents);
+            _cachedUnprocessedEndPowerUpGrantingPhaseNetEvents = new CapacityList<EndPowerUpGrantingPhaseNetEventS2C>(networkConfig.MaxCap.EndPowerUpGrantingPhaseNetEvents);
             _fullTickPacketsPool = new ConcurrentPool<MatchFullTickPacketS2C>(() => new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig), networkConfig.MaxCap.FullTickPacketsNetEvents);
         }
 
@@ -262,6 +266,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessActivateShufflePowerUpNetEvents(latestFullTickPacket.DeactivateShufflePowerUpNetEvents, ignoreEventsNotAboveTick);
             ProcessShuffleSwapPlayerPositionNetEvents(latestFullTickPacket.ShuffleSwapPlayerPositionNetEvents, ignoreEventsNotAboveTick);
             ProcessActivateShuffleNetEvents(latestFullTickPacket.ActivateShuffleNetEvents, ignoreEventsNotAboveTick);
+            ProcessStartPowerUpGrantingPhaseNetEvents(latestFullTickPacket.StartPowerUpGrantingPhaseNetEvents, ignoreEventsNotAboveTick);
+            ProcessEndPowerUpGrantingPhaseNetEvents(latestFullTickPacket.EndPowerUpGrantingPhaseNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -1123,6 +1129,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedSonicSlapActivatedNetEvents.Sort();
                 _presentationNetEventsHandler.ProcessSonicSlapActivatedEvents(_cachedUnprocessedSonicSlapActivatedNetEvents);
+            }
+        }
+
+        private void ProcessStartPowerUpGrantingPhaseNetEvents(FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedStartPowerUpGrantingPhaseNetEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedStartPowerUpGrantingPhaseNetEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedStartPowerUpGrantingPhaseNetEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedStartPowerUpGrantingPhaseNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessStartPowerUpGrantingPhaseEvents(_cachedUnprocessedStartPowerUpGrantingPhaseNetEvents);
+            }
+        }
+
+        private void ProcessEndPowerUpGrantingPhaseNetEvents(FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedEndPowerUpGrantingPhaseNetEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedEndPowerUpGrantingPhaseNetEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedEndPowerUpGrantingPhaseNetEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedEndPowerUpGrantingPhaseNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessEndPowerUpGrantingPhaseEvents(_cachedUnprocessedEndPowerUpGrantingPhaseNetEvents);
             }
         }
 

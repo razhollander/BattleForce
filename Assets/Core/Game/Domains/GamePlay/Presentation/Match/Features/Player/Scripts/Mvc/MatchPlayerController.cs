@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
+using System.Linq;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
@@ -9,6 +10,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
@@ -26,9 +28,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public readonly ushort PlayerId;
         private MatchPlayerView _playerView;
         private readonly MatchPlayerViewPool _playerPool;
+        private readonly Sprite[] _powerUpReelSpritesArray;
 
         public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider) 
+            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
@@ -37,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _parent = parent;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
             PlayerId = playerId;
+            _powerUpReelSpritesArray = gamePlayConfig.PowerUps.PowerUpSprites.Values.ToArray();
         }
 
         public void CreatePlayerView()
@@ -118,7 +122,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
             _playerView.SetCurrentPowerUp(hasPowerUp, icon);
         }
-        
+
+        public async Awaitable StartPowerUpGrantingPhase(CancellationToken cancellationToken)
+        {
+            await _playerView.StartPowerUpGrantingPhaseReel(_powerUpReelSpritesArray, cancellationToken);
+        }
+
+        public async Awaitable EndPowerUpGrantingPhase(PowerUpType grantedPowerUp, CancellationToken cancellationToken)
+        {
+            _gamePlayConfig.PowerUps.PowerUpSprites.TryGetValue(grantedPowerUp, out var grantedSprite);
+            await _playerView.EndPowerUpGrantingPhaseReel(grantedSprite, cancellationToken);
+        }
+
         public void SetSelectedTalent(int talentIndex)
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);

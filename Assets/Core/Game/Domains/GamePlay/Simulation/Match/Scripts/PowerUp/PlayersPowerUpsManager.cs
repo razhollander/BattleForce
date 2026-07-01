@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
@@ -15,17 +16,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
         private readonly IMatchDataService _matchDataService;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
+        private readonly NetworkConfig _networkConfig;
         private readonly Dictionary<int, PlayerPowerUpControllers> _powerUpControllersPerPlayer;
         private readonly ConcurrentPool<PlayerPowerUpControllers> _powerUpControllersPool;
+        private readonly Dictionary<int, int> _grantingPhaseEndTickPerPlayer;
+        private readonly Dictionary<int, PowerUpType> _pendingGrantedPowerUpPerPlayer;
 
         public PlayersPowerUpsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, INetEventsDataService netEventsDataService,
-            ISimulationGamePlayConfigService gamePlayConfigService, ICommandFactory commandFactory)
+            ISimulationGamePlayConfigService gamePlayConfigService, SharedGamePlayConfig sharedGamePlayConfig, ICommandFactory commandFactory)
         {
             _matchDataService = matchDataService;
             _netEventsDataService = netEventsDataService;
             _gamePlayConfigService = gamePlayConfigService;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
+            _networkConfig = networkConfig;
             _powerUpControllersPerPlayer = new Dictionary<int, PlayerPowerUpControllers>(networkConfig.MaxCap.ConcurrentPlayers);
             _powerUpControllersPool = new ConcurrentPool<PlayerPowerUpControllers>(() => new PlayerPowerUpControllers(matchDataService, netEventsDataService, networkConfig, gamePlayConfigService, commandFactory), networkConfig.MaxCap.ConcurrentPlayers);
+            _grantingPhaseEndTickPerPlayer = new Dictionary<int, int>(networkConfig.MaxCap.ConcurrentPlayers);
+            _pendingGrantedPowerUpPerPlayer = new Dictionary<int, PowerUpType>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)
@@ -39,20 +48,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
         {
             _powerUpControllersPool.Return(_powerUpControllersPerPlayer[playerId]);
             _powerUpControllersPerPlayer.Remove(playerId);
+            _grantingPhaseEndTickPerPlayer.Remove(playerId);
+            _pendingGrantedPowerUpPerPlayer.Remove(playerId);
         }
 
         public bool TryGrantRandomPowerUp(ushort playerId, int tick)
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-            var doesAlreadyHavePowerUp = playerState.Spaceship.CurrentPowerUp != PowerUpType.None;
+            var spaceship = playerState.Spaceship;
+            var doesAlreadyHavePowerUp = spaceship.CurrentPowerUp != PowerUpType.None || spaceship.IsCurrentlyInGrantingPowerUpPhase;
             if (doesAlreadyHavePowerUp)
             {
                 return false;
             }
 
             var grantedPowerUp = GetRandomObtainablePowerUp();
-            playerState.Spaceship.CurrentPowerUp = grantedPowerUp;
-            _netEventsDataService.AddPlayerPowerUpChangedNetEvent(tick, playerId, grantedPowerUp);
+            var grantingPhaseEndTick = TickUtils.GetTickPassedAfterDuration(tick, _sharedGamePlayConfig.PowerUps.PowerUpObtainDelayInSeconds, _networkConfig.DeltaTime);
+
+            spaceship.IsCurrentlyInGrantingPowerUpPhase = true;
+            _grantingPhaseEndTickPerPlayer[playerId] = grantingPhaseEndTick;
+            _pendingGrantedPowerUpPerPlayer[playerId] = grantedPowerUp;
+            _netEventsDataService.AddStartPowerUpGrantingPhaseNetEvent(tick, playerId);
             return true;
         }
 
@@ -92,12 +108,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
             {
                 var playerId = (ushort)kvp.Key;
                 var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-                var wasActive = playerState.Spaceship.IsPowerUpCurrentlyActive;
+                var spaceship = playerState.Spaceship;
+
+                var shouldFinalizeGrantingPhase = spaceship.IsCurrentlyInGrantingPowerUpPhase && tick >= _grantingPhaseEndTickPerPlayer[playerId];
+                if (shouldFinalizeGrantingPhase)
+                {
+                    var grantedPowerUp = _pendingGrantedPowerUpPerPlayer[playerId];
+                    spaceship.IsCurrentlyInGrantingPowerUpPhase = false;
+                    spaceship.CurrentPowerUp = grantedPowerUp;
+                    _netEventsDataService.AddEndPowerUpGrantingPhaseNetEvent(tick, playerId, grantedPowerUp);
+                    _netEventsDataService.AddPlayerPowerUpChangedNetEvent(tick, playerId, grantedPowerUp);
+                }
+
+                var wasActive = spaceship.IsPowerUpCurrentlyActive;
                 kvp.Value.OnTick(tick);
 
-                if (wasActive && !playerState.Spaceship.IsPowerUpCurrentlyActive)
+                if (wasActive && !spaceship.IsPowerUpCurrentlyActive)
                 {
-                    playerState.Spaceship.CurrentPowerUp = PowerUpType.None;
+                    spaceship.CurrentPowerUp = PowerUpType.None;
                     _netEventsDataService.AddPlayerPowerUpChangedNetEvent(tick, playerId, PowerUpType.None);
                 }
             }
@@ -116,7 +144,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
                 playerState.Spaceship.CurrentPowerUp = PowerUpType.None;
+                playerState.Spaceship.IsCurrentlyInGrantingPowerUpPhase = false;
             }
+
+            _grantingPhaseEndTickPerPlayer.Clear();
+            _pendingGrantedPowerUpPerPlayer.Clear();
         }
 
         public bool IsPlayerAimingPowerUp(ushort playerId)
