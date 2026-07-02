@@ -38,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private PlayerHitCommand _playerHitCommand;
         private SpinPlayerCommand _spinPlayerCommand;
         private ObtainPowerUpBallCommand _obtainPowerUpBallCommand;
+        private AddForceToPlayerCommand _addForceToPlayerCommand;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
         {
@@ -53,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
             _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
             _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
@@ -371,17 +373,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var forceMagnitude = environmentSpringsConfig.Force * _matchDataService.SimulationState.MapSizeMultiplier;
             var force = pushDirection * forceMagnitude;
             var randomSpin = RNG.NextFloat(environmentSpringsConfig.MinSpin, environmentSpringsConfig.MaxSpin);
-
-            playerState.Spaceship.Transform.Velocity += force;
-            playerState.Spaceship.Transform.Direction = force.NormalizeSafe();
-            playerState.Spaceship.IsEngineOn = false;
-
             _spinPlayerCommand
                 .SetPlayer(playerId)
                 .SetSpinAmount(randomSpin)
                 .SetTick(_processedTick)
                 .Execute();
-
+            
+            playerState.Spaceship.Transform.Direction = force.NormalizeSafe();
+            _addForceToPlayerCommand.SetPlayerId(playerId).SetForce(force).ShouldTurnOffEngine(true).Execute();
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
         }
 

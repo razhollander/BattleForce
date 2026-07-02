@@ -26,7 +26,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
         private readonly GalacticPullStarEffectPool _pool;
         private readonly List<GalacticPullStarEffectController> _controllers = new();
         private Transform _starsParent;
-        private int _nextVisualDataIndex;
         private int _nextSortingOrder;
 
         public GalacticPullStarEffectControllers(GalacticPullStarEffectView prefab, GalacticStarsVisualData starsVisualData,
@@ -75,7 +74,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
         public void ShowStar(ushort fieldId, ushort casterTeamId)
         {
             var outlineColor = _gamePlayConfig.ColorPerTeamId[casterTeamId];
-            var visualData = GetNextVisualData();
+            var visualData = _starsVisualData.GetByTeamId(casterTeamId);
             var controller = new GalacticPullStarEffectController(fieldId, _pool, _starsParent);
             controller.CreateView(outlineColor, visualData);
             controller.SetSortingOrder(_nextSortingOrder);
@@ -141,13 +140,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
         {
             var slotsFromBottom = _controllers.Count - 1 - index;
             return slotsFromBottom * SPACE_BETWEEN_STARS;
-        }
-
-        private GalacticStarVisualData GetNextVisualData()
-        {
-            var visualData = _starsVisualData.Get(_nextVisualDataIndex);
-            _nextVisualDataIndex = (_nextVisualDataIndex + 1) % _starsVisualData.Count;
-            return visualData;
         }
 
         private GalacticPullStarEffectController GetStar(ushort fieldId)

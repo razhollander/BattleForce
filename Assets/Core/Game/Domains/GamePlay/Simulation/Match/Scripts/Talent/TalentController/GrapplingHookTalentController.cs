@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedConfig;
         private readonly ICommandFactory _commandFactory;
-        private readonly SpinPlayerCommand _spinPlayerCommand;
+        private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
 
         public TalentType TalentType => TalentType.GrapplingHook;
         private bool IsCurrentlyActive
@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         }
 
         public GrapplingHookTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedConfig)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
@@ -67,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _sharedConfig = sharedConfig;
+            _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -196,11 +197,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                         else
                         {
                             var directionToHook = (projectile.Position - casterPlayerState.Spaceship.Transform.Position).NormalizeSafe();
-                            casterPlayerState.Spaceship.Transform.Velocity += directionToHook * config.PlayerPullForceWhileHooked * deltaTime;
-
-                            // casterPlayerState.Spaceship.Transform.Direction = MathUtils.RotateTowards(casterPlayerState.Spaceship.Transform.Direction,
-                            //     casterPlayerState.Spaceship.Transform.Velocity, config.PlayerRotateSpeedWhileHooked * deltaTime);
-
+                            var force = directionToHook * config.PlayerPullForceWhileHooked * deltaTime;
+                            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
                         }
                     }
                 }

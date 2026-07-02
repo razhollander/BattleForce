@@ -1,3 +1,4 @@
+using CoreDomain.Scripts.Helpers.SerializableDictionary;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts
@@ -5,13 +6,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
     [CreateAssetMenu(fileName = "GalacticStarsVisualData", menuName = "BF/Presentation/Galactic Stars Visual Data")]
     public class GalacticStarsVisualData : ScriptableObject
     {
-        [SerializeField] private GalacticStarVisualData[] _visualDatas;
+        [SerializeField] private SerializableDictionary<int, GalacticStarVisualData> _visualDataPerTeamId;
 
-        public int Count => _visualDatas.Length;
-
-        public GalacticStarVisualData Get(int index)
+        public GalacticStarVisualData GetByTeamId(int teamId)
         {
-            return _visualDatas[index];
+            return _visualDataPerTeamId[teamId];
         }
     }
 }

@@ -1,6 +1,8 @@
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -8,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     {
         private INetEventsDataService _netEventsDataService;
         private IMatchDataService _matchDataService;
+        private IPlayersTalentsManager _playersTalentsManager;
         
         private ushort _playerId;
         private float _spinAmount;
@@ -35,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
         }
 
         public void Execute()
@@ -45,6 +49,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             var isPlayerAlreadySpinned = playerSpaceship.IsSpinned;
             var didPlayerStartSpinning = !isPlayerAlreadySpinned && isSpinningNow;
+
+            if (playerSpaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) && selectedTalent.IsCurrentlyActive &&
+                selectedTalent.TalentType != TalentType.Chicken && selectedTalent.TalentType != TalentType.Rock)
+            {
+                _playersTalentsManager.StopTalentIfActive(selectedTalent.TalentType, _playerId, _tick);
+            }
+            
             if (!didPlayerStartSpinning)
             {
                 return;

@@ -142,7 +142,7 @@ MonoBehaviour:
       Size: {x: 4.1362, y: 1.663131}
     DeafultEnvironmentId: 11
     ShouldChooseRandomStage: 0
-    ShouldChooseRandomTalentsForPlayer: 1
+    ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 1
     ShootCooldownMultiplierWhenDead: 1

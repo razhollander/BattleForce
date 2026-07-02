@@ -4,7 +4,6 @@ using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.Pools;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts
 {

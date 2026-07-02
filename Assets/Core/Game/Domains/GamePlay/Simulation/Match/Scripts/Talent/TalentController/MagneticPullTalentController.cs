@@ -1,16 +1,12 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
-using System;
-using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -27,7 +23,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private readonly SpinPlayerCommand _spinPlayerCommand;
+        private SpinPlayerCommand _spinPlayerCommand;
+        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private readonly ICommandFactory _commandFactory;
 
         public TalentType TalentType => TalentType.MagneticPull;
 
@@ -52,9 +50,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _sharedGamePlayConfig = sharedGamePlayConfig;
-            _spinPlayerCommand = commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _commandFactory = commandFactory;
         }
 
+        public void InitEntryPoint()
+        {
+            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+        }
+        
         public void SetCasterId(ushort casterPlayerId)
         {
             _casterPlayerId = casterPlayerId;
@@ -121,13 +125,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var directionToEnemy = (hitEnemyPlayer.Spaceship.Transform.Position - casterPlayerState.Spaceship.Transform.Position).NormalizeSafe();
 
             var forceToEnemy = -directionToEnemy * pullForce;
-            hitEnemyPlayer.Spaceship.Transform.Velocity += forceToEnemy;
-            
-            //var forceToPlayer = directionToEnemy * pullForce;
-            //casterPlayerState.Spaceship.Transform.Velocity += forceToPlayer;
-                
             var randomSpin = RNG.NextFloat(config.MinSpin, config.MaxSpin);
             _spinPlayerCommand.SetPlayer(hitEnemyPlayer.Id).SetSpinAmount(randomSpin).SetTick(tick).Execute();
+            _addForceToPlayerCommand.SetForce(forceToEnemy).SetPlayerId(enemyId).ShouldTurnOffEngine(true).Execute();
         }
 
         public void StopIfActive(int tick)

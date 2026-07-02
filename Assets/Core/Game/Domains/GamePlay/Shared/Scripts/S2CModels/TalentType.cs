@@ -12,5 +12,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         Umbrella = 8,
         MagneticPull = 9,
         Chicken = 10,
+        Rock = 11,
     }
 }

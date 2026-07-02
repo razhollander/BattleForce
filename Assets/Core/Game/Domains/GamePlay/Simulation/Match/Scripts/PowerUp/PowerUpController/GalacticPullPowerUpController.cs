@@ -35,14 +35,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
 
         public void Perform(int tick)
         {
-            _matchDataService.SimulationState.SetIsPowerUpCurrentlyActiveForPlayer(_casterPlayerId, true);
-            var casterTeamId = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId).TeamId;
+            // var casterTeamId = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId).TeamId;
+            // var durationSeconds = _gamePlayConfigService.GamePlayConfig.PowerUps.GalacticPullDurationSeconds;
+            // var endTick = TickUtils.GetTickPassedAfterDuration(tick, durationSeconds, _networkConfig.DeltaTime);
+            // var field = _matchDataService.AddGalacticForceField(_casterPlayerId, casterTeamId, endTick);
+            // _netEventsDataService.AddPerformGalacticPullNetEvent(tick, field.Id, _casterPlayerId, casterTeamId, endTick);
+            CreateGalacticForceFieldForTeam(1, tick);
+            CreateGalacticForceFieldForTeam(2, tick);
+            CreateGalacticForceFieldForTeam(3, tick);
+            CreateGalacticForceFieldForTeam(4, tick);
+        }
+
+        private void CreateGalacticForceFieldForTeam(ushort casterTeamId, int tick)
+        {
             var durationSeconds = _gamePlayConfigService.GamePlayConfig.PowerUps.GalacticPullDurationSeconds;
             var endTick = TickUtils.GetTickPassedAfterDuration(tick, durationSeconds, _networkConfig.DeltaTime);
-
             var field = _matchDataService.AddGalacticForceField(_casterPlayerId, casterTeamId, endTick);
             _netEventsDataService.AddPerformGalacticPullNetEvent(tick, field.Id, _casterPlayerId, casterTeamId, endTick);
-            _matchDataService.SimulationState.SetIsPowerUpCurrentlyActiveForPlayer(_casterPlayerId, false);
         }
     }
 }

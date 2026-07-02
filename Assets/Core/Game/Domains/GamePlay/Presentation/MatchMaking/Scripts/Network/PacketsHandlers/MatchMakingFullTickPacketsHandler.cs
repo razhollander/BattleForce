@@ -269,10 +269,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
         private void ProcessPlayerLockOnTargetsChangedEvents(FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C> events, int ignoreEventsNotAboveTick)
         {
-            for (int i = 0; i < _cachedUnprocessedPlayerLockOnTargetsChangedEvents.Count; i++)
-            {
-                _cachedUnprocessedPlayerLockOnTargetsChangedEvents[i].LockedOnTargetObjects.Clear();
-            }
             _cachedUnprocessedPlayerLockOnTargetsChangedEvents.Clear();
 
             foreach (var netEvent in events.AsSpan())

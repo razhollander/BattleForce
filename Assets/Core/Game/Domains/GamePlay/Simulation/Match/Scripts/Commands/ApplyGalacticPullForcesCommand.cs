@@ -14,6 +14,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private INetEventsDataService _netEventsDataService;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private NetworkConfig _networkConfig;
+        private ICommandFactory _commandFactory;
+        private AddForceToPlayerCommand _addForceToPlayerCommand;
 
         private int _tick;
 
@@ -28,7 +30,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
+            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
 
         public void Execute()
@@ -62,7 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         continue;
                     }
 
-                    playerState.Spaceship.Transform.Velocity += pullDelta;
+                    _addForceToPlayerCommand.SetPlayerId(playerState.Id).SetForce(pullDelta).Execute();
                 }
             }
         }

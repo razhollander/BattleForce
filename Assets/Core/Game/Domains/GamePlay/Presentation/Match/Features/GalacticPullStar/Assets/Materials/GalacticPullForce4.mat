@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: GalacticPullForce
+  m_Name: GalacticPullForce4
   m_Shader: {fileID: 4800000, guid: fda7119904b5b45cba75441bf75a8ac5, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -51,8 +51,8 @@ Material:
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EndColor: {r: 0.1, g: 0.2, b: 1, a: 0}
+    - _EndColor: {r: 1, g: 0.40034053, b: 0.10196078, a: 0}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
-    - _StartColor: {r: 0.3, g: 0.7, b: 1, a: 1}
+    - _StartColor: {r: 1, g: 0.76585954, b: 0.2980392, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
