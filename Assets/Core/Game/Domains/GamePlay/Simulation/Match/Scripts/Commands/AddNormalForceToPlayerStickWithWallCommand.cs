@@ -6,7 +6,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    public class ProvideNormalForceToPlayerStickWithWallCommand : BaseCommand, ICommandVoid
+    public class AddNormalForceToPlayerStickWithWallCommand : BaseCommand, ICommandVoid
     {
         // For how many ticks a player must keep touching a wall before we start cancelling the velocity it pushes into it.
         private const int STICK_TO_WALL_TICKS_THRESHOLD = 6;
@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private int _tick;
 
-        public ProvideNormalForceToPlayerStickWithWallCommand SetTick(int tick)
+        public AddNormalForceToPlayerStickWithWallCommand SetTick(int tick)
         {
             _tick = tick;
             return this;
@@ -41,7 +41,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var stickData = playersStickToWall[i];
                 var playerState = _matchDataService.SimulationState.GetPlayerById(stickData.PlayerId);
                 var velocity = playerState.Spaceship.Transform.Velocity;
-                var wallNormal = stickData.WallNormal;
+
+                // Recompute from the wall's current rotation rather than trusting the normal cached at first contact,
+                // since the wall may be attached to a rotating wheel and keep turning while the player stays stuck to it.
+                var wallRotationDegrees = _matchDataService.EnvironmentData.GetWall(stickData.WallId).Transform.WorldRotationDegrees;
+                var wallNormal = stickData.WallLocalNormal.Rotate(wallRotationDegrees);
 
                 if (!velocity.IsFacingWall(wallNormal))
                 {

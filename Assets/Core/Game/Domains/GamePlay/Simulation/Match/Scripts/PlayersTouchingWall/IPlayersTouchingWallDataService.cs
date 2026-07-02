@@ -5,7 +5,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
 {
     public interface IPlayersTouchingWallDataService
     {
-        void OnPlayerBeginTouchWall(ushort playerId, ushort wallId, Vector2 wallNormal, int tick);
+        void OnPlayerBeginTouchWall(ushort playerId, ushort wallId, Vector2 wallNormalWhenTouchBegin, float wallRotationDegreesWhenTouchBegin, int tick);
         void OnPlayerEndTouchWall(ushort playerId, ushort wallId);
 
         /// <summary>

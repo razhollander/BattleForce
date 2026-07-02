@@ -519,7 +519,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             if (eventType == PhysicsEventEventType.Begin)
             {
                 contact.GetWorldManifold(out var worldManifold);
-                _playersTouchingWallDataService.OnPlayerBeginTouchWall(playerId, wallId, worldManifold.normal, _processedTick);
+                // Box2D's manifold normal always points from fixture A to fixture B. Downstream code expects the wall's
+                // outward normal (pointing from the wall toward the player), so flip it when the player is fixture A.
+                var wallNormal = isPlayerToWall ? -worldManifold.normal : worldManifold.normal;
+                var wallRotationDegrees = _matchDataService.EnvironmentData.GetWall(wallId).Transform.WorldRotationDegrees;
+                _playersTouchingWallDataService.OnPlayerBeginTouchWall(playerId, wallId, wallNormal, wallRotationDegrees, _processedTick);
             }
             else if (eventType == PhysicsEventEventType.End)
             {

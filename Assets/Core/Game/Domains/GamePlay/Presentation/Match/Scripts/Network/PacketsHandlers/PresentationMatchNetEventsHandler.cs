@@ -347,7 +347,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var preparationPhaseEndedNetEvent in preparationPhaseEndedNetEvents)
             {
-                _matchDataService.StartPhaseInitialTick = preparationPhaseEndedNetEvent.OccuredOnTick;
+                _matchDataService.PreperationPhaseEndedOnTick = preparationPhaseEndedNetEvent.OccuredOnTick;
                 _matchDataService.IsInPreparationPhase = false;
                 _cachedPresentationEventsService.PreparationPhaseEndedNetEvents.Add(preparationPhaseEndedNetEvent);
             }

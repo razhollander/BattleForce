@@ -54,9 +54,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _playerControllers.SetPlayerHealth(playerTakeDamageId, currentHealth, maxHealth);
                 _matchPlayerUIControllers.SetPlayerHealth(playerTakeDamageId, currentHealth, maxHealth);
 
-                var playerTransform = _playerControllers.GetPlayerTransform(playerTakeDamageId);
-                var effectSpawnPosition = playerTransform.position.ToVector2XY() + playerModel.Spaceship.Transform.Radius * Vector2.up;
-                _hitDamageIndicatorEffectController.PlayEffect(playerTakeDamageEvent.HitDamage, effectSpawnPosition, playerTransform);
+                var playerHeartTransform = _playerControllers.GetPlayerHeartTransform(playerTakeDamageId);
+                var effectSpawnPosition = playerHeartTransform.position;
+                _hitDamageIndicatorEffectController.PlayEffect(playerTakeDamageEvent.HitDamage, effectSpawnPosition);
             }
             
             _audioService.PlayAudio(AudioClipType.PlayerTakeDamage);

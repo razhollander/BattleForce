@@ -4,12 +4,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhas
 {
     public class PreparationPhaseCountdownView : MonoBehaviour
     {
-        [SerializeField] private Animation _animation; 
+        [SerializeField] private Animation _animation;
+        [SerializeField] private Canvas _canvas;
         [SerializeField] private string _countdownAnimationClipName = "PreparationPhaseCountdown";
 
-        public void Play(float elapsedTimeInSeconds)
+        public void SetCountdownTime(float elapsedTimeInSeconds)
         {
-            gameObject.SetActive(true);
+            SetIsShown(true);
             AnimationState state = _animation[_countdownAnimationClipName];
             _animation.Play(_countdownAnimationClipName);
             state.time = elapsedTimeInSeconds;
@@ -18,8 +19,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhas
 
         public void Stop()
         {
-            _animation.Stop(); 
-            gameObject.SetActive(false);
+            _animation.Stop();
+            SetIsShown(false);
+        }
+
+        private void SetIsShown(bool isShown)
+        {
+            _canvas.enabled = isShown;
         }
     }
 }

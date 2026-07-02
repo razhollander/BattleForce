@@ -645,7 +645,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 return;
             }
             
-            var calculationTick = tick - _matchDataService.StartPhaseInitialTick;
+            var calculationTick = tick - _matchDataService.PreperationPhaseEndedOnTick;
             var deltaTime = _networkConfig.DeltaTime;
 
             foreach (var wheelModel in _matchDataService.RotatingWheels)

@@ -23,7 +23,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; }
         List<MatchSwapFieldModel> SwapFields { get; }
         HashSet<ushort> TeamIds {get; }
-        int StartPhaseInitialTick { get; set; }
+        int PreperationPhaseStartedOnTick { get; set; }
+        int PreperationPhaseEndedOnTick { get; set; }
         bool IsInPreparationPhase { get; set; }
         public bool IsInShowoffWinners { get; set; }
         public ushort CurrentStageWinnerTeamId { get; set; }

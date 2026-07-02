@@ -2,7 +2,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhas
 {
     public interface IPreparationPhaseCountdownController
     {
-        void PlayCountdown(int elapsedTicks);
+        bool IsCountdownPlaying { get; }
+        void SetCountdownTime(float elapsedSeconds);
         void StopCountdown();
     }
 }

@@ -26,7 +26,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedOrderedList<ushort> FieldBarriersOrderedByTeamId;
         public int EnvironmentLayoutId;
         public StageType StageType;
-        public int StartPhaseInitialTick;
+        public int PreperationPhaseStartedOnTick;
+        public int PreperationPhaseEndedOnTick;
         public bool IsInPreparationPhase;
         public bool IsInShowoffWinners;
         public ushort CurrentStageWinnerTeamId;
@@ -135,7 +136,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             writer.Put((byte)EnvironmentLayoutId);
             writer.Put((byte)StageType);
-            writer.Put(StartPhaseInitialTick);
+            writer.Put(PreperationPhaseStartedOnTick);
+            writer.Put(PreperationPhaseEndedOnTick);
             writer.Put(IsInPreparationPhase);
             writer.Put(IsInShowoffWinners);
             writer.Put((byte)CurrentStageWinnerTeamId);
@@ -243,7 +245,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             EnvironmentLayoutId = reader.GetByte();
             StageType = (StageType)reader.GetByte();
-            StartPhaseInitialTick = reader.GetInt();
+            PreperationPhaseStartedOnTick = reader.GetInt();
+            PreperationPhaseEndedOnTick = reader.GetInt();
             IsInPreparationPhase = reader.GetBool();
             IsInShowoffWinners = reader.GetBool();
             CurrentStageWinnerTeamId = reader.GetByte();

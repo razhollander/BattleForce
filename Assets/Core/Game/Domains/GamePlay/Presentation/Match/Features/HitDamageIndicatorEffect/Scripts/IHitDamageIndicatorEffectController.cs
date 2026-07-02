@@ -4,7 +4,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndica
 {
     public interface IHitDamageIndicatorEffectController
     {
-        void PlayEffect(ushort damage, Vector2 position, Transform parent);
+        void PlayEffect(ushort damage, Vector2 position);
         void InitEntryPoint();
     }
 }

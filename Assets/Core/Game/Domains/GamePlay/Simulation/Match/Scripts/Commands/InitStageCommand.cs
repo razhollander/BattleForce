@@ -19,6 +19,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions.Linq;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
@@ -45,7 +46,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersTouchingWallDataService _playersTouchingWallDataService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
         private List<ushort> _cachedShuffledTeamIds;
-        
+        private ITickService _tickService;
+
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
@@ -66,13 +68,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
             _playersTouchingWallDataService = _diContainer.Resolve<IPlayersTouchingWallDataService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
+            _tickService = _diContainer.Resolve<ITickService>();
             _cachedShuffledTeamIds = new List<ushort>(_sharedGamePlayConfig.MaxTeamsAmount);
         }
 
         public void Execute()
         {
             LogService.LogTopic("init stage on server side", LogTopicType.ClientNetwork);
-            ClearStageData();
+            RestartStageData();
             var mapSizeMultiplier = _matchDataService.SimulationState.MapSizeMultiplier = _gamePlayConfigService.GamePlayConfig.StageSizeMultiplier;
             CreateEnvironmentLayout(mapSizeMultiplier);
             SetupPlayers(mapSizeMultiplier);
@@ -126,14 +129,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             return environmentLayoutId;
         }
 
-        private void ClearStageData()
+        private void RestartStageData()
         {
             _physicsSimulator.ClearAllData();
             _playersInLavaTrackerService.ClearAllData();
             _teleportGateService.ClearData();
             ClearStageObjectsInSimulationState();
             _matchDataService.SimulationState.IsInPreparationPhase = true;
-            _matchDataService.SimulationState.StartPhaseInitialTick = 0;
+            _matchDataService.SimulationState.PreperationPhaseStartedOnTick = _tickService.CurrentTick;
+            _matchDataService.SimulationState.PreperationPhaseEndedOnTick = 0;
             _matchDataService.SimulationState.IsInShowoffWinners = false;
             _matchDataService.SimulationState.CurrentStageWinnerTeamId = 0;
             _playersTalentsManager.ResetAllTalentsData();

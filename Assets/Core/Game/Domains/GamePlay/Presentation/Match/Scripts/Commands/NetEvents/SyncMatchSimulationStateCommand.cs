@@ -33,6 +33,7 @@ using Core.Scripts.Extensions;
 using Core.Scripts.Mvc.WorldCamera;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -118,28 +119,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            _matchDataService.StartPhaseInitialTick = _simulationState.StartPhaseInitialTick;
+            _matchDataService.PreperationPhaseStartedOnTick = _simulationState.PreperationPhaseStartedOnTick;
+            _matchDataService.PreperationPhaseEndedOnTick = _simulationState.PreperationPhaseEndedOnTick;
             _matchDataService.IsInPreparationPhase = _simulationState.IsInPreparationPhase;
             _matchDataService.IsInShowoffWinners = _simulationState.IsInShowoffWinners;
             _matchDataService.CurrentStageWinnerTeamId = _simulationState.CurrentStageWinnerTeamId;
             _stageCancellationTokenProvider.CancelAndRegenarateStageToken();
             DestroyAll();
             CreateAll();
-            UpdateCountdown();
         }
-
-        private void UpdateCountdown()
-        {
-            if (!_simulationState.IsInPreparationPhase)
-            {
-                _preparationPhaseCountdownController.StopCountdown();
-                return;
-            }
-
-            var elapsedTicks = _fullTickPacketsHandler.LastProcessedTickFromServer - _stateOccouredOnTick;
-            _preparationPhaseCountdownController.PlayCountdown(elapsedTicks);
-        }
-
+        
         private void DestroyAll()
         {
             _worldCameraController.ClearTargets();
@@ -264,7 +253,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
 
             var wheelsDict = GetRotatingWheelsDictionary(layout);
-            var calculationTick = GetCalculationTick();
+            var calculationTick = GetTicksPassedSincePreparationPhaseEneded();
             var deltaTime = _networkConfig.DeltaTime;
             var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size;
 
@@ -307,13 +296,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             return wheelsDict;
         }
 
-        private int GetCalculationTick()
+        private int GetTicksPassedSincePreparationPhaseEneded()
         {
             if (_matchDataService.IsInPreparationPhase)
             {
                 return 0;
             }
-            return _fullTickPacketsHandler.LastProcessedTickFromServer - _matchDataService.StartPhaseInitialTick;
+            return _fullTickPacketsHandler.LastProcessedTickFromServer - _matchDataService.PreperationPhaseEndedOnTick;
         }
 
         private void TryAttachTeleportGateToRotatingWheel(
@@ -438,7 +427,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 return;
             }
-            var calculationTick = GetCalculationTick();
+            var calculationTick = GetTicksPassedSincePreparationPhaseEneded();
             var deltaTime = _networkConfig.DeltaTime;
 
             foreach (var wheelConfig in wheels)

@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _matchDataService.SimulationState.IsInPreparationPhase = false;
-            _matchDataService.SimulationState.StartPhaseInitialTick = _tick;
+            _matchDataService.SimulationState.PreperationPhaseEndedOnTick = _tick;
             _matchDataService.EnvironmentData.RemoveAllFieldBarriers();
             _netEventsDataService.AddPreparationPhaseEndedNetEvent(_tick);
         }

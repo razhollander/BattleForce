@@ -80,6 +80,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleStartPowerUpGrantingPhaseNetEventsCommand _handleStartPowerUpGrantingPhaseNetEventsCommand;
         private readonly HandleEndPowerUpGrantingPhaseNetEventsCommand _handleEndPowerUpGrantingPhaseNetEventsCommand;
         private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
+        private readonly UpdatePreperationPhaseCountdownCommand _updatePreperationPhaseCountdownCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -145,6 +146,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleStartPowerUpGrantingPhaseNetEventsCommand = commandFactory.CreateCommandVoid<HandleStartPowerUpGrantingPhaseNetEventsCommand>();
             _handleEndPowerUpGrantingPhaseNetEventsCommand = commandFactory.CreateCommandVoid<HandleEndPowerUpGrantingPhaseNetEventsCommand>();
             _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
+            _updatePreperationPhaseCountdownCommand = commandFactory.CreateCommandVoid<UpdatePreperationPhaseCountdownCommand>();
         }
         
         public void InitEntryPoint()
@@ -186,6 +188,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateSwapTalentNetEventsCommand.Execute();
             _updateSwapFieldsTransformCommand.SetTick(lastProcessedTickFromServer).Execute();// must be after _playerControllers.UpdatePlayersTickDeltas();
             _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTickDeltas();
+            _updatePreperationPhaseCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();
             _handleDeactivateKOTalentNetEventsCommand.Execute();
             _handleCreateGrapplingHookProjecitleNetEventsCommand.Execute();

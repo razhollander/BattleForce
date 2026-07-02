@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -53,6 +54,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             _preparationPhaseTimerService.StepPreperationPhaseTimer(deltaTime);
         }
+
+        private int _debugLastLoggedElapsedSecond = -1;
         
         private void StepPlayersShootCooldown(float deltaTime)
         {

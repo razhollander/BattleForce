@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private float _deltaTime;
         private int _tick;
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
-        private ProvideNormalForceToPlayerStickWithWallCommand _provideNormalForceToPlayerStickWithWallCommand;
+        private AddNormalForceToPlayerStickWithWallCommand _addNormalForceToPlayerStickWithWallCommand;
 
         public StepPhysiscsSimulationCommand SetTick(int tick)
         {
@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _stepAllWheelsRotationCommand = _commandFactory.CreateCommandVoid<StepAllWheelsRotationCommand>();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
-            _provideNormalForceToPlayerStickWithWallCommand = _commandFactory.CreateCommandVoid<ProvideNormalForceToPlayerStickWithWallCommand>();
+            _addNormalForceToPlayerStickWithWallCommand = _commandFactory.CreateCommandVoid<AddNormalForceToPlayerStickWithWallCommand>();
             _enforceFieldBarriersCommand = _commandFactory.CreateCommandVoid<EnforceFieldBarriersCommand>();
             _enforceStageBarriersCommand = _commandFactory.CreateCommandVoid<EnforceStageBarriersCommand>();
         }
@@ -81,7 +81,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ApplyPhysicsSimulationToMatchModel();
             
             _processCachedCollisionsCommand.SetProcessedTick(_tick).Execute();
-            _provideNormalForceToPlayerStickWithWallCommand.SetTick(_tick).Execute();
+            _addNormalForceToPlayerStickWithWallCommand.SetTick(_tick).Execute();
             _enforceFieldBarriersCommand.SetTick(_tick).Execute();
         }
 

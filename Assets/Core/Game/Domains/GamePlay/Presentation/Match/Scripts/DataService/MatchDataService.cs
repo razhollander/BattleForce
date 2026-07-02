@@ -33,7 +33,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchChickenEggModel> ChickenEggs { get; private set; }
 
         public HashSet<ushort> TeamIds  {get; private set; }
-        public int StartPhaseInitialTick { get; set; }
+        public int PreperationPhaseStartedOnTick { get; set; }
+        public int PreperationPhaseEndedOnTick { get; set; }
         public bool IsInPreparationPhase { get; set; }
         public bool IsInShowoffWinners { get; set; }
         public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }

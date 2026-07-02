@@ -22,15 +22,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndica
             _effectsPool.InitPool();
         }
 
-        public void PlayEffect(ushort damage, Vector2 position, Transform parent)
+        public void PlayEffect(ushort damage, Vector2 position)
         {
-            PlayEffectAsync(damage, position, parent, _stageCancellationTokenProvider.CancellationTokenSource).Forget();
+            PlayEffectAsync(damage, position, _stageCancellationTokenProvider.CancellationTokenSource).Forget();
         }
 
-        private async Awaitable PlayEffectAsync(ushort damage, Vector2 position, Transform parent, CancellationTokenSource cancellationTokenSource)
+        private async Awaitable PlayEffectAsync(ushort damage, Vector2 position, CancellationTokenSource cancellationTokenSource)
         {
             var view = _effectsPool.Spawn();
-            await view.PlayAndDespawn(damage, position, parent, cancellationTokenSource);
+            await view.PlayAndDespawn(damage, position, cancellationTokenSource);
         }
     }
 }

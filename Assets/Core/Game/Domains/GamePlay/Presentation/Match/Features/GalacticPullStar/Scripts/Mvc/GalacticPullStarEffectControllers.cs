@@ -51,6 +51,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
             _updateSubscriptionService.RegisterLateUpdatable(this);
         }
 
+        public void InitExitPoint()
+        {
+            _updateSubscriptionService.UnregisterLateUpdatable(this);
+            DestroyAll();
+            Object.Destroy(_starsParent.gameObject);
+            _starsParent = null;
+        }
+
         public void ManagedLateUpdate()
         {
             var localPosition = _starsParent.localPosition;

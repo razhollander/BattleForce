@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
@@ -23,14 +24,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
             _cachedPlayersStickToWall = new List<PlayerStickToWallData>(maxPlayers * MAX_WALLS_PER_PLAYER);
         }
 
-        public void OnPlayerBeginTouchWall(ushort playerId, ushort wallId, Vector2 wallNormal, int tick)
+        public void OnPlayerBeginTouchWall(ushort playerId, ushort wallId, Vector2 wallNormalWhenTouchBegin, float wallRotationDegreesWhenTouchBegin, int tick)
         {
             if (!_playersTouchingWall.ContainsKey(playerId))
             {
                 _playersTouchingWall.Add(playerId, _playerDataPool.Get());
             }
 
-            _playersTouchingWall[playerId].OnBeginTouchWall(wallId, wallNormal, tick);
+            _playersTouchingWall[playerId].OnBeginTouchWall(wallId, wallNormalWhenTouchBegin, wallRotationDegreesWhenTouchBegin, tick);
         }
 
         public void OnPlayerEndTouchWall(ushort playerId, ushort wallId)
@@ -88,13 +89,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
                 _wallDataPool = new ConcurrentPool<WallTouchData>(() => new WallTouchData(), maxWalls);
             }
 
-            public void OnBeginTouchWall(ushort wallId, Vector2 wallNormal, int tick)
+            public void OnBeginTouchWall(ushort wallId, Vector2 wallNormalWhenTouchBegin, float wallRotationDegreesWhenTouchBegin, int tick)
             {
                 if (!_walls.ContainsKey(wallId))
                 {
                     var data = _wallDataPool.Get();
                     data.WallId = wallId;
-                    data.WallNormal = wallNormal;
+                    data.WallLocalNormal = wallNormalWhenTouchBegin.Rotate(-wallRotationDegreesWhenTouchBegin);
                     data.BeginTick = tick;
                     data.ContactCount = 0;
                     _walls.Add(wallId, data);
@@ -129,7 +130,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
                     var ticksTouching = currentTick - data.BeginTick;
                     if (ticksTouching >= minTicksTouching)
                     {
-                        output.Add(new PlayerStickToWallData(playerId, data.WallNormal));
+                        output.Add(new PlayerStickToWallData(playerId, wallId, data.WallLocalNormal));
                     }
                 }
             }
@@ -149,14 +150,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
         private class WallTouchData
         {
             public ushort WallId;
-            public Vector2 WallNormal;
+            public Vector2 WallLocalNormal;
             public int BeginTick;
             public int ContactCount;
 
             public void Reset()
             {
                 WallId = 0;
-                WallNormal = Vector2.Zero;
+                WallLocalNormal = Vector2.Zero;
                 BeginTick = 0;
                 ContactCount = 0;
             }
