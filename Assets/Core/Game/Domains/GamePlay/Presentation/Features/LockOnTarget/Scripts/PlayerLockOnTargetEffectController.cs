@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             _cachedTargetsToRemove.Clear();
             foreach (var targetKey in _activeEffectsPerTarget.Keys)
             {
-                if (!ContainsTarget(playerIdsLockedOnTarget, targetKey))
+                if (!DoesListContainTarget(playerIdsLockedOnTarget, targetKey))
                 {
                     _cachedTargetsToRemove.Add(targetKey);
                 }
@@ -72,7 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             }
         }
 
-        private static bool ContainsTarget(FixedUnorderedList<ObjectLockedOnTargetS2C> targets, LockOnTargetKey targetKey)
+        private bool DoesListContainTarget(FixedUnorderedList<ObjectLockedOnTargetS2C> targets, LockOnTargetKey targetKey)
         {
             foreach (var target in targets.AsSpan())
             {

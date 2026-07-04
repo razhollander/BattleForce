@@ -21,8 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
         [SerializeField] private float _reflowDurationInSeconds = 0.2f;
 
         private Material _starMaterial;
-        private int _planetBaseSortingOrder;
-        private int _gravityForceBaseSortingOrder;
+        private CancellationTokenSource _localMoveCancellationTokenSource;
 
         public Action Despawn { get; set; }
 
@@ -32,13 +31,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
             _starSpriteRenderer.sprite = visualData.PlanetSprite;
             _gravityForceSpriteRenderer.sharedMaterial = visualData.GravityForceMaterial;
         }
-
-        // Draws this star (and its gravity force) above stars with a lower order, keeping each
-        // renderer's authored relative offset.
+        
         public void SetSortingOrder(int order)
         {
-            _starSpriteRenderer.sortingOrder = _planetBaseSortingOrder + order;
-            _gravityForceSpriteRenderer.sortingOrder = _gravityForceBaseSortingOrder + order;
+            _starSpriteRenderer.sortingOrder = order;
+            _gravityForceSpriteRenderer.sortingOrder = order;
         }
 
         public async Awaitable ScaleInAsync(float targetLocalY, CancellationToken cancellationToken)
@@ -52,18 +49,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
 
         public async Awaitable MoveToSlotAsync(float targetLocalY, CancellationToken cancellationToken)
         {
+            CancelLocalMoveCancellationTokenSource();
+            _localMoveCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             await transform.DOLocalMoveY(targetLocalY, _reflowDurationInSeconds)
                 .SetEase(Ease.OutQuad)
-                .WithCancellationSafe(cancellationToken);
+                .WithCancellationSafe(_localMoveCancellationTokenSource.Token);
         }
 
         public async Awaitable SlideOutAsync(CancellationToken cancellationToken)
         {
             try
             {
+                CancelLocalMoveCancellationTokenSource();
+                _localMoveCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 await transform.DOLocalMoveY(transform.localPosition.y - _slideOutOffsetY, _slideOutDurationInSeconds)
                     .SetEase(Ease.InBack)
-                    .WithCancellationSafe(cancellationToken);
+                    .WithCancellationSafe(_localMoveCancellationTokenSource.Token);
             }
             finally
             {
@@ -74,8 +75,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
         public void OnCreated()
         {
             _starMaterial = _starSpriteRenderer.material;
-            _planetBaseSortingOrder = _starSpriteRenderer.sortingOrder;
-            _gravityForceBaseSortingOrder = _gravityForceSpriteRenderer.sortingOrder;
         }
 
         public void OnSpawned()
@@ -83,6 +82,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
             gameObject.SetActive(true);
         }
 
+        private void CancelLocalMoveCancellationTokenSource()
+        {
+            _localMoveCancellationTokenSource?.Cancel();
+            _localMoveCancellationTokenSource?.Dispose();
+            _localMoveCancellationTokenSource = null;
+        }
+        
         public void OnDespawned()
         {
             gameObject.SetActive(false);

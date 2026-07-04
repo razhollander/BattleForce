@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using Core.Scripts.Extensions;
 using UnityEngine;

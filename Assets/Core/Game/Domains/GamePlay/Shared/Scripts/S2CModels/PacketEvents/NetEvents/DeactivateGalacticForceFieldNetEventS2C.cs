@@ -6,18 +6,18 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     public struct DeactivateGalacticForceFieldNetEventS2C : INetSerializable, IComparable<DeactivateGalacticForceFieldNetEventS2C>
     {
         public int OccuredOnTick;
-        public ushort FieldId;
+        public ushort GalacticForceFieldId;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put(FieldId);
+            writer.Put(GalacticForceFieldId);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            FieldId = reader.GetUShort();
+            GalacticForceFieldId = reader.GetUShort();
         }
 
         public int CompareTo(DeactivateGalacticForceFieldNetEventS2C other)

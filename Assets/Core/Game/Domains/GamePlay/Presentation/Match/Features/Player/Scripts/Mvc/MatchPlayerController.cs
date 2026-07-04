@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private MatchPlayerView _playerView;
         private readonly MatchPlayerViewPool _playerPool;
         private readonly Sprite[] _powerUpReelSpritesArray;
-        private int? _currentPowerupGrantingAudioPlayerId;
+        private int? _currentPowerupGrantingAudioId;
 
         public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
             NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
@@ -67,7 +67,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
             SetIsLockOnTargetSightShown(playerModel.Spaceship.IsPlayerLockOnTargetSightShown);
-            SetCurrentPowerUp(playerModel.Spaceship.CurrentPowerUp);
+
+            if (playerModel.Spaceship.IsCurrentlyInGrantingPowerUpPhase)
+            {
+                StartPowerUpGrantingPhase(_stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
+            }
+            else
+            {
+                SetCurrentPowerUp(playerModel.Spaceship.CurrentPowerUp);
+            }
             var isKinged = _matchDataService.TryGetKingedPlayers(out var kingedPlayers) && kingedPlayers.Exists(x => x.PlayerId == PlayerId);
             SetIsKinged(isKinged);
         }
@@ -129,7 +137,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public async Awaitable StartPowerUpGrantingPhase(CancellationToken cancellationToken)
         {
-            _currentPowerupGrantingAudioPlayerId = _audioService.PlayAudioLoopWithId(AudioClipType.PowerUpRandomReels);
+            _currentPowerupGrantingAudioId = _audioService.PlayAudioLoopWithId(AudioClipType.PowerUpRandomReels);
             await _playerView.StartPowerUpGrantingPhaseReel(_powerUpReelSpritesArray, cancellationToken);
         }
 
@@ -137,10 +145,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _gamePlayConfig.PowerUps.PowerUpSprites.TryGetValue(grantedPowerUp, out var grantedSprite);
 
-            if (_currentPowerupGrantingAudioPlayerId.HasValue)
+            if (_currentPowerupGrantingAudioId.HasValue)
             {
-                _audioService.StopLoopAudioById(_currentPowerupGrantingAudioPlayerId.Value);
-                _currentPowerupGrantingAudioPlayerId = null;
+                _audioService.StopLoopAudioById(_currentPowerupGrantingAudioId.Value);
+                _currentPowerupGrantingAudioId = null;
             }
             await _playerView.EndPowerUpGrantingPhaseReel(grantedSprite, cancellationToken);
         }

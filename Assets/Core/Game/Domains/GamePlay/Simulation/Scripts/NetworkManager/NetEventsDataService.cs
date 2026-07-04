@@ -1138,13 +1138,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddDeactivateGalacticForceFieldNetEvent(int onTick, ushort fieldId)
+        public void AddDeactivateGalacticForceFieldNetEvent(int onTick, ushort galacticForceFieldId)
         {
             foreach (var kvp in DeactivateGalacticForceFieldNetEventsPerClient)
             {
                 ref var netEvent = ref kvp.Value.AddAndGet();
                 netEvent.OccuredOnTick = onTick;
-                netEvent.FieldId = fieldId;
+                netEvent.GalacticForceFieldId = galacticForceFieldId;
             }
         }
 

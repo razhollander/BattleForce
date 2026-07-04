@@ -6,7 +6,6 @@ using Core.Scripts.Helpers;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Helpers.Pools;
 using DG.Tweening;
-using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -51,34 +50,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndica
             transform.position = position;
             _text.SetText($"-{damage}");
             
-            // Reset alpha and scale before starting the animation
             var textAlpha = 0f;
             _text.SetAlpha(textAlpha);
             transform.localScale = Vector3.zero; 
             
             _animationTasks.Clear();
 
-            // 1. Roll random values for this specific jump
-            float randomizedJumpX = Random.Range(_minJumpDistanceX, _maxJumpDistanceX);
-            float randomizedJumpPower = Random.Range(_minJumpPower, _maxJumpPower);
+            var randomizedJumpX = Random.Range(_minJumpDistanceX, _maxJumpDistanceX);
+            var randomizedJumpPower = Random.Range(_minJumpPower, _maxJumpPower);
 
-            // 2. Apply the randomized horizontal distance
             var endPosition = transform.localPosition + new Vector3(-randomizedJumpX, _verticalOffset, 0);
-
-            // 3. Apply the randomized arc height (power)
+            
             _animationTasks.Add(transform.DOLocalJump(endPosition, randomizedJumpPower, 1, _showDurationInSeconds)
                 .SetUpdate(true) 
                 .SetEase(Ease.OutCubic)
                 .WithCancellationSafe(cancellationTokenSource.Token));
-
-            // 4. Apply the scaling effect (with a slight 'pop' ease)
+            
             _animationTasks.Add(transform.DOScale(_targetScale, _scaleInDuration)
                 .SetEase(Ease.OutBack)
                 .SetUpdate(true)
                 .WithCancellationSafe(cancellationTokenSource.Token));
-
             
-            // 5. Apply the fade in/out
             _animationTasks.Add(DOTween.To(()=>textAlpha, (x) =>
             {
                 textAlpha = x;
@@ -119,35 +111,5 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndica
         {
             gameObject.SetActive(false);
         }
-
-#if UNITY_EDITOR
-        [ContextMenu("Test Play Animation")]
-        private async void TestPlayInEditor()
-        {
-            if (_editorTestCts != null)
-            {
-                _editorTestCts.Cancel();
-                _editorTestCts.Dispose();
-            }
-            
-            _editorTestCts = new CancellationTokenSource();
-            
-            transform.localPosition = Vector3.zero;
-            gameObject.SetActive(true);
-
-            try
-            {
-                await PlayAndDespawn(
-                    damage: 1, 
-                    position: transform.position, 
-                    cancellationTokenSource: _editorTestCts
-                );
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.Log("Previous test animation was cancelled.");
-            }
-        }
-#endif
     }
 }

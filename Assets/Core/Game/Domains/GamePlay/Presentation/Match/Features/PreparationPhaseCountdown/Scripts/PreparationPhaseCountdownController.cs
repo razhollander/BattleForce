@@ -5,11 +5,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhas
         private readonly PreparationPhaseCountdownView _view;
 
         public bool IsCountdownPlaying { private set; get; }
+
         public PreparationPhaseCountdownController(PreparationPhaseCountdownView view)
         {
             _view = view;
         }
-
 
         public void SetCountdownTime(float elapsedSeconds)
         {

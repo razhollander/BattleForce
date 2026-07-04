@@ -25,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in events)
             {
-                _galacticPullStarEffectControllers.HideStar(netEvent.FieldId);
+                _galacticPullStarEffectControllers.HideStarForceField(netEvent.GalacticForceFieldId);
             }
 
             events.Clear();

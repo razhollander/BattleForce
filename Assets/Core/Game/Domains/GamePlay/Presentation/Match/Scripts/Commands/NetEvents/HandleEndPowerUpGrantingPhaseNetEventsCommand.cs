@@ -18,7 +18,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         public void Execute()
         {
             if (_cachedPresentationEventsService.EndPowerUpGrantingPhaseNetEvents.Count == 0)
+            {
                 return;
+            }
 
             foreach (var netEvent in _cachedPresentationEventsService.EndPowerUpGrantingPhaseNetEvents)
             {

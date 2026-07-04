@@ -9,7 +9,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     {
         private IMatchDataService _matchDataService;
         private IPlayersTalentsManager _playersTalentsManager;
-        private IPlayersPowerUpsManager _playersPowerUpsManager;
 
         private int _tick;
         private float _deltaTime;
@@ -30,7 +29,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
-            _playersPowerUpsManager = _diContainer.Resolve<IPlayersPowerUpsManager>();
         }
 
         public void Execute()
@@ -43,11 +41,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
 
                 var playerId = playerState.Id;
-                if (_playersPowerUpsManager.IsPlayerAimingPowerUp(playerId))
-                {
-                    continue;
-                }
-
                 _playersTalentsManager.ProcessAllTalentsTickOfPlayer(playerId, _tick, _deltaTime);
             }
         }

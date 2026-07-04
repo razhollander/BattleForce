@@ -1,3 +1,4 @@
+using Core.Scripts.Extensions;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts
@@ -11,10 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhas
         public void SetCountdownTime(float elapsedTimeInSeconds)
         {
             SetIsShown(true);
-            AnimationState state = _animation[_countdownAnimationClipName];
-            _animation.Play(_countdownAnimationClipName);
-            state.time = elapsedTimeInSeconds;
-            _animation.Sample();
+            _animation.PlayFromAlapsedSeconds(_countdownAnimationClipName, elapsedTimeInSeconds);
         }
 
         public void Stop()

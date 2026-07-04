@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
+using Core.Scripts.Extensions;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,10 +11,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 {
     public class MatchPlayerPowerUpHudView : MonoBehaviour
     {
-        private const float REEL_FRAME_INTERVAL_SECONDS = 0.08f;
-        private const float GRANTED_GLOW_DURATION_SECONDS = 0.35f;
-        private const float GRANTED_GLOW_SCALE = 1.25f;
-
+        [SerializeField] float _reelFrameIntervalInSeconds = 0.08f;
+        [SerializeField] float _grantedGlowDurationInSeconds = 0.35f;
+        [SerializeField] float _grantedGlowScale = 1.25f;
         [SerializeField] private GameObject _container;
         [SerializeField] private Image _powerUpImage;
 
@@ -38,16 +40,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
             try
             {
-                var frameIndex = 0;
-                while (reelSprites.Count > 0)
-                {
-                    _powerUpImage.sprite = reelSprites[frameIndex % reelSprites.Count];
-                    frameIndex++;
-                    await Awaitable.WaitForSecondsAsync(REEL_FRAME_INTERVAL_SECONDS, token);
-                }
+                await SwapQuicklyReelSprites(reelSprites, token);
             }
             catch (OperationCanceledException)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    throw;
+                }
+            }
+        }
+
+        private async Awaitable SwapQuicklyReelSprites(IReadOnlyList<Sprite> reelSprites, CancellationToken token)
+        {
+            var frameIndex = 0;
+
+            while (reelSprites.Count > 0)
+            {
+                _powerUpImage.sprite = reelSprites[frameIndex % reelSprites.Count];
+                frameIndex++;
+                await Awaitable.WaitForSecondsAsync(_reelFrameIntervalInSeconds, token);
             }
         }
 
@@ -60,21 +72,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
             var grantedTransform = _powerUpImage.transform;
             var baseScale = grantedTransform.localScale;
-            var elapsed = 0f;
 
             try
             {
-                while (elapsed < GRANTED_GLOW_DURATION_SECONDS)
-                {
-                    var t = elapsed / GRANTED_GLOW_DURATION_SECONDS;
-                    var pulse = Mathf.Sin(t * Mathf.PI);
-                    grantedTransform.localScale = baseScale * (1f + pulse * (GRANTED_GLOW_SCALE - 1f));
-                    await Awaitable.NextFrameAsync(cancellationToken);
-                    elapsed += Time.deltaTime;
-                }
-            }
-            catch (OperationCanceledException)
-            {
+                await grantedTransform.DOScale(baseScale * _grantedGlowScale, _grantedGlowDurationInSeconds * 0.5f)
+                    .SetEase(Ease.InOutSine)
+                    .SetLoops(2, LoopType.Yoyo)
+                    .WithCancellationSafe(cancellationToken);
             }
             finally
             {

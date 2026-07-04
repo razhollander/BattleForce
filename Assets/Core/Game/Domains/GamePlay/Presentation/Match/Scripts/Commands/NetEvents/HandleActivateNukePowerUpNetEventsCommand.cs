@@ -10,6 +10,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 {
     public class HandleActivateNukePowerUpNetEventsCommand : BaseCommand, ICommandVoid
     {
+        private const float CAMERA_SHAKE_DURATION = 0.6f;
+        private const float CAMERA_SHAKE_INTENSITY = 1.5f;
+        
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private INukeShockwaveEffectController _nukeShockwaveEffectController;
         private IWorldCameraController _worldCameraController;
@@ -28,7 +31,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         public void Execute()
         {
             if (_cachedPresentationEventsService.ActivateNukePowerUpNetEvents.Count == 0)
+            {
                 return;
+            }
 
             foreach (var netEvent in _cachedPresentationEventsService.ActivateNukePowerUpNetEvents)
             {
@@ -38,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
 
             _audioService.PlayAudio(AudioClipType.Nuke);
-            _worldCameraController.ShakeCamera(15, 0.6f);
+            _worldCameraController.ShakeCamera(CAMERA_SHAKE_INTENSITY, CAMERA_SHAKE_DURATION);
             _cachedPresentationEventsService.ActivateNukePowerUpNetEvents.Clear();
         }
     }

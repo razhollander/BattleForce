@@ -5,7 +5,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
         void InitEntryPoint();
         void InitExitPoint();
         void ShowStar(ushort fieldId, ushort casterTeamId);
-        void HideStar(ushort fieldId);
+        void HideStarForceField(ushort starId);
         void DestroyAll();
     }
 }

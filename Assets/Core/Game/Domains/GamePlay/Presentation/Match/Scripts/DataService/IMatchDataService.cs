@@ -28,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         bool IsInPreparationPhase { get; set; }
         public bool IsInShowoffWinners { get; set; }
         public ushort CurrentStageWinnerTeamId { get; set; }
+        public StageType StageType { get; set; }
         List<MatchKOProjectileModel> KOProjectiles { get; }
         List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
         MatchPlayerModel GetPlayer(ushort playerId);

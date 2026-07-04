@@ -1,7 +1,10 @@
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -13,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPhysicsSimulator _physicsSimulator;
         private INetEventsDataService _netEventsDataService;
         private IPlayersPowerUpsManager _playersPowerUpsManager;
+        private ISimulationGamePlayConfigService _gamePlayConfigService;
 
         private int _processedTick;
         private ushort _powerUpBallId;
@@ -42,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersPowerUpsManager = _diContainer.Resolve<IPlayersPowerUpsManager>();
+            _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
         }
 
         public void Execute()
@@ -57,7 +62,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator.RemoveBody(powerUpBallBody);
 
             _netEventsDataService.AddPowerUpObtainedNetEvent(_processedTick, _powerUpBallId, _obtainedByPlayerId);
-            _playersPowerUpsManager.TryGrantRandomPowerUp(_obtainedByPlayerId, _processedTick);
+            var grantedPowerUp = GetRandomObtainablePowerUp();
+            _playersPowerUpsManager.TryGrantPowerUp(_obtainedByPlayerId, grantedPowerUp, _processedTick);
+        }
+        
+        private PowerUpType GetRandomObtainablePowerUp()
+        {
+            var obtainablePowerUps = _gamePlayConfigService.GamePlayConfig.PowerUps.ObtainablePowerUps;
+            var randomIndex = RNG.NextInt(0, obtainablePowerUps.Length);
+            return obtainablePowerUps[randomIndex];
         }
     }
 }

@@ -37,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public int PreperationPhaseEndedOnTick { get; set; }
         public bool IsInPreparationPhase { get; set; }
         public bool IsInShowoffWinners { get; set; }
+        public StageType StageType { get; set; }
         public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }
         public Dictionary<ushort, int> GemsPerTeam  {get; private set; }
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)

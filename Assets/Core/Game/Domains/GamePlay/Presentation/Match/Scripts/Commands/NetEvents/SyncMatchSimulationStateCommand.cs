@@ -124,6 +124,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService.IsInPreparationPhase = _simulationState.IsInPreparationPhase;
             _matchDataService.IsInShowoffWinners = _simulationState.IsInShowoffWinners;
             _matchDataService.CurrentStageWinnerTeamId = _simulationState.CurrentStageWinnerTeamId;
+            _matchDataService.StageType = _simulationState.StageType;
             _stageCancellationTokenProvider.CancelAndRegenarateStageToken();
             DestroyAll();
             CreateAll();
@@ -151,6 +152,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _chickenEggsControllers.DestroyAll();
             _galacticPullStarEffectControllers.DestroyAll();
             _lockOnTargetEffectController.DestroyAll();
+            _preparationPhaseCountdownController.StopCountdown();
         }
 
         private void CreateAll()

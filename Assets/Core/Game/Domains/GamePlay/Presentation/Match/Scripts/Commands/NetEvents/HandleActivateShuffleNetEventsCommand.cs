@@ -22,7 +22,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             var events = _cachedPresentationEventsService.ActivateShuffleNetEvents;
             if (events.Count == 0)
+            {
                 return;
+            }
 
             foreach (var netEvent in events)
             {

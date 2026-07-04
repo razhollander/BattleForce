@@ -124,7 +124,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddPlayerPowerUpChangedNetEvent(int onTick, ushort playerId, PowerUpType powerUp);
         void AddSonicSlapActivatedNetEvent(int onTick, ushort casterPlayerId, FixedUnorderedList<ushort> affectedPlayerIds);
         void AddPerformGalacticPullNetEvent(int onTick, ushort fieldId, ushort casterPlayerId, ushort casterTeamId, int endTick);
-        void AddDeactivateGalacticForceFieldNetEvent(int onTick, ushort fieldId);
+        void AddDeactivateGalacticForceFieldNetEvent(int onTick, ushort galacticForceFieldId);
         void AddActivateNukePowerUpNetEvent(int onTick, ushort casterPlayerId, Vector2 casterPosition);
         void AddDectivateShufflePowerUpNetEvent(int onTick, ushort casterPlayerId);
         void AddShuffleSwapPlayerPositionNetEvent(int onTick, ushort casterPlayerId);

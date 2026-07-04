@@ -15,7 +15,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
         private const float SPACE_BETWEEN_STARS = 2f;
         private const float DISTANCE_FROM_UI_CAMERA = 10f;
         private const float BOTTOM_PADDING_FRACTION = 0.12f;
-        // Leaves headroom between stars so each star's renderers never collide with another star's order.
         private const int SORTING_ORDER_PER_STAR = 10;
 
         private readonly PresentationGamePlayConfig _gamePlayConfig;
@@ -45,7 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
         {
             _starsParent = new GameObject("GalacticPullStarEffectsParent").transform;
             _starsParent.SetParent(_worldCameraController.CameraTransform, false);
-            _starsParent.localPosition = new Vector3(0f, GetBottomLocalY(), DISTANCE_FROM_UI_CAMERA);
+            _starsParent.localPosition = new Vector3(0f, GetCameraBottomLocalY(), DISTANCE_FROM_UI_CAMERA);
             _pool.InitPool();
             _updateSubscriptionService.RegisterLateUpdatable(this);
         }
@@ -60,12 +59,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
 
         public void ManagedLateUpdate()
         {
+            UpdateStarsParentPositionRelativeToCamera();
+        }
+
+        private void UpdateStarsParentPositionRelativeToCamera()
+        {
             var localPosition = _starsParent.localPosition;
-            localPosition.y = GetBottomLocalY();
+            localPosition.y = GetCameraBottomLocalY();
             _starsParent.localPosition = localPosition;
         }
 
-        private float GetBottomLocalY()
+        private float GetCameraBottomLocalY()
         {
             var orthographicSize = _worldCameraController.OrthographicSize;
             return -orthographicSize + orthographicSize * BOTTOM_PADDING_FRACTION;
@@ -83,9 +87,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
             ScaleInNewStarAndReflowExisting(controller);
         }
 
-        public void HideStar(ushort fieldId)
+        public void HideStarForceField(ushort starId)
         {
-            var controller = GetStar(fieldId);
+            var controller = GetStar(starId);
             if (controller == null)
             {
                 return;
@@ -133,9 +137,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullSta
                 _controllers[i].MoveToSlotAsync(GetSlotLocalY(i), cancellationToken).Forget();
             }
         }
-
-        // Stars stack vertically: the most recently added star sits at the base (localY 0)
-        // and each older star is pushed one step further up.
+        
         private float GetSlotLocalY(int index)
         {
             var slotsFromBottom = _controllers.Count - 1 - index;

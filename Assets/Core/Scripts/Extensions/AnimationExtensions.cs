@@ -8,6 +8,14 @@ namespace Core.Scripts.Extensions
 {
     public static class AnimationExtensions
     {
+        public static void PlayFromAlapsedSeconds(this Animation animation, string clipName, float elapsedSeconds)
+        {
+            AnimationState state = animation[clipName];
+            animation.Play(clipName);
+            state.time = elapsedSeconds;
+            animation.Sample();
+        }
+        
         public static async Awaitable PlayAsync(this Animation animation, string clipName, CancellationToken cancellationToken = default, AwaitableCompletionSource completionSource = null)
         {
             if (animation == null)

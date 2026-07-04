@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             var netEvents = _cachedPresentationEventsService.DeactivateShufflePowerUpNetEvents;
             if (netEvents.Count == 0)
                 return;
-            
+            // maybe will be used for a cool effect in the future
             netEvents.Clear();
         }
     }
