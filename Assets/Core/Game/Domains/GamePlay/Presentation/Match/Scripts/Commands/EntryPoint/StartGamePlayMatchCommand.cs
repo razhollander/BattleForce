@@ -17,6 +17,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scrip
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Nuke.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
@@ -75,6 +76,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ILocalPlayersDataService _localPlayersDataService;
         private IGameInputActionsController _gameInputActionsController;
         private IAudioService _audioService;
+        private INukeShockwaveEffectController _nukeShockwaveEffectController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -118,6 +120,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
             _audioService = _diContainer.Resolve<IAudioService>();
+            _nukeShockwaveEffectController = _diContainer.Resolve<INukeShockwaveEffectController>();
         }
 
         public void Execute()
@@ -137,6 +140,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
             _chickenEggsControllers.InitEntryPoint();
+            _nukeShockwaveEffectController.InitEntryPoint();
             _galacticPullStarEffectControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
             _environmentSpringControllers.InitEntryPoint();

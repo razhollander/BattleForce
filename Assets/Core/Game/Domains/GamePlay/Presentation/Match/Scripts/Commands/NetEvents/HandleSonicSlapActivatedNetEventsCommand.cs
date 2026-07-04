@@ -35,7 +35,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     _matchPlayerControllers.PlaySonicSnapEffectForPlayer(affectedPlayerId);
                 }
             }
-            _audioService.PlayAudio(AudioClipType.PowerUpActivated);
             _audioService.PlayAudio(AudioClipType.SonicSlap);
             netEvents.Clear();
         }

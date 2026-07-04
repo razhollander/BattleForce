@@ -14,14 +14,17 @@ namespace Core.Scripts.Services.AudioService
     {
         private const string POOLABLE_ONE_SHOT_AUDIO_OBJECT_NAME_FORMAT = "PoolableAudioSource-{0}";
         private const string POOLABLE_LOOP_AUDIO_OBJECT_NAME_FORMAT = "PoolableLoopAudioSource-{0}";
-        
+
         private const int INITIAL_POOL_SIZE = 10;
         private const int POOL_INCREASE_STEP = 5;
+        private const int INVALID_LOOP_ID = -1;
 
         private readonly List<AudioClipsScriptableObject> _audioClipsScriptableObjects = new();
         private readonly List<AudioSourcePoolable> _activeOneShotAudioSources = new();
         private readonly Dictionary<AudioClipType, AudioSourcePoolable> _activeLoopAudioSources = new();
+        private readonly Dictionary<int, AudioSourcePoolable> _activeLoopAudioSourcesByLoopId = new();
         private AudioSourcePool _audioSourcePool;
+        private int _nextLoopId;
 
         [Inject]
         private void Construct(DiContainer diContainer, AudioSourcePoolable audioSourcePrefab)
@@ -56,6 +59,8 @@ namespace Core.Scripts.Services.AudioService
                 {
                     DespawnLoopSource(audioClipId);
                 }
+
+                DespawnLoopSourcesByLoopIdOfClip(audioClip);
 
                 for (var i = _activeOneShotAudioSources.Count - 1; i >= 0; i--)
                 {
@@ -136,7 +141,35 @@ namespace Core.Scripts.Services.AudioService
         {
             DespawnLoopSource(audioClipType);
         }
-        
+
+        public int PlayAudioLoopWithId(AudioClipType audioClipType)
+        {
+            if (!TryGetAudioData(audioClipType, out var audioData))
+            {
+                return INVALID_LOOP_ID;
+            }
+
+            var poolable = _audioSourcePool.Spawn();
+            poolable.name = POOLABLE_LOOP_AUDIO_OBJECT_NAME_FORMAT.Format(audioClipType);
+            var source = poolable.AudioSource;
+            source.clip = audioData.Clip;
+            source.loop = true;
+            source.SetAudioSourceVolume(audioData.Volume);
+            source.Play();
+
+            var loopId = _nextLoopId++;
+            _activeLoopAudioSourcesByLoopId[loopId] = poolable;
+
+            LogService.LogTopic($"Played Audio {audioClipType} with loop id {loopId}", LogTopicType.Audio);
+
+            return loopId;
+        }
+
+        public void StopLoopAudioById(int loopId)
+        {
+            DespawnLoopSourceByLoopId(loopId);
+        }
+
         public void StopAllAudio()
         {
             LogService.LogTopic("Stop all audio", LogTopicType.Audio);
@@ -150,6 +183,12 @@ namespace Core.Scripts.Services.AudioService
             for (var i = activeLoopAudioSources.Count - 1; i >= 0; i--)
             {
                 DespawnLoopSource(activeLoopAudioSources[i]);
+            }
+
+            var activeLoopAudioSourceIds = _activeLoopAudioSourcesByLoopId.Keys.ToList();
+            for (var i = activeLoopAudioSourceIds.Count - 1; i >= 0; i--)
+            {
+                DespawnLoopSourceByLoopId(activeLoopAudioSourceIds[i]);
             }
         }
 
@@ -169,6 +208,33 @@ namespace Core.Scripts.Services.AudioService
         private void DespawnLoopSource(AudioClipType audioClipId)
         {
             if (!_activeLoopAudioSources.Remove(audioClipId, out var audioSource))
+            {
+                return;
+            }
+
+            var despawn = audioSource.Despawn;
+            audioSource.Despawn = null;
+            despawn.Invoke();
+        }
+
+        private void DespawnLoopSourcesByLoopIdOfClip(AudioClip audioClip)
+        {
+            var activeLoopAudioSourceIds = _activeLoopAudioSourcesByLoopId.Keys.ToList();
+            for (var i = activeLoopAudioSourceIds.Count - 1; i >= 0; i--)
+            {
+                var loopId = activeLoopAudioSourceIds[i];
+                if (_activeLoopAudioSourcesByLoopId[loopId].AudioSource.clip != audioClip)
+                {
+                    continue;
+                }
+
+                DespawnLoopSourceByLoopId(loopId);
+            }
+        }
+
+        private void DespawnLoopSourceByLoopId(int loopId)
+        {
+            if (!_activeLoopAudioSourcesByLoopId.Remove(loopId, out var audioSource))
             {
                 return;
             }

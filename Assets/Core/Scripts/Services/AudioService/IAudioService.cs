@@ -10,6 +10,8 @@ namespace Core.Scripts.Services.AudioService
         void PlayAudio(AudioClipType audioClipType);
         void PlayAudioLoop(AudioClipType audioClipType);
         void StopLoopAudio(AudioClipType audioClipType);
+        int PlayAudioLoopWithId(AudioClipType audioClipType);
+        void StopLoopAudioById(int loopId);
         Awaitable PlayAudioAsync(AudioClipType audioClipType, CancellationToken cancellationToken);
         void StopAllAudio();
         void AddAudioClips(AudioClipsScriptableObject audioClipsScriptableObject);

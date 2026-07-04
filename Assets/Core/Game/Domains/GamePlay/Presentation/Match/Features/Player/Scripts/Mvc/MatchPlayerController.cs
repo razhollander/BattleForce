@@ -10,6 +10,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Scripts.Services.AudioService;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -25,13 +26,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly NetworkConfig _networkConfig;
         private readonly Transform _parent;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
+        private readonly IAudioService _audioService;
         public readonly ushort PlayerId;
         private MatchPlayerView _playerView;
         private readonly MatchPlayerViewPool _playerPool;
         private readonly Sprite[] _powerUpReelSpritesArray;
+        private int? _currentPowerupGrantingAudioPlayerId;
 
         public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider)
+            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
@@ -39,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _networkConfig = networkConfig;
             _parent = parent;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
+            _audioService = audioService;
             PlayerId = playerId;
             _powerUpReelSpritesArray = gamePlayConfig.PowerUps.PowerUpSprites.Values.ToArray();
         }
@@ -125,12 +129,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public async Awaitable StartPowerUpGrantingPhase(CancellationToken cancellationToken)
         {
+            _currentPowerupGrantingAudioPlayerId = _audioService.PlayAudioLoopWithId(AudioClipType.PowerUpRandomReels);
             await _playerView.StartPowerUpGrantingPhaseReel(_powerUpReelSpritesArray, cancellationToken);
         }
 
         public async Awaitable EndPowerUpGrantingPhase(PowerUpType grantedPowerUp, CancellationToken cancellationToken)
         {
             _gamePlayConfig.PowerUps.PowerUpSprites.TryGetValue(grantedPowerUp, out var grantedSprite);
+
+            if (_currentPowerupGrantingAudioPlayerId.HasValue)
+            {
+                _audioService.StopLoopAudioById(_currentPowerupGrantingAudioPlayerId.Value);
+                _currentPowerupGrantingAudioPlayerId = null;
+            }
             await _playerView.EndPowerUpGrantingPhaseReel(grantedSprite, cancellationToken);
         }
 

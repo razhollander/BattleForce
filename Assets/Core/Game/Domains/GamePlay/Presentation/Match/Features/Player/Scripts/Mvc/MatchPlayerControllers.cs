@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
+using Core.Scripts.Services.AudioService;
 using Core.Scripts.Utils;
 using UnityEngine;
 using Zenject;
@@ -22,16 +23,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly List<MatchPlayerController> _playerControllers = new ();
         private Transform _playersParent;
-
+        private readonly IAudioService _audioService;
 
         public MatchPlayerControllers(IMatchDataService matchDataService, MatchPlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
+            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             _matchDataService = matchDataService;
             _playerPool = new MatchPlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
+            _audioService = audioService;
         }
 
         public void InitEntryPoint()
@@ -43,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void AddPlayer(ushort playerId)
         {
             var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform,
-                _stageCancellationTokenProvider);
+                _stageCancellationTokenProvider, _audioService);
             playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
         }

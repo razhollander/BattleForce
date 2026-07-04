@@ -37,5 +37,6 @@ namespace Core.Scripts.Services.AudioService
         Nuke = 34,
         SingleShufflePowerUp2 = 35,
         PowerUpActivated = 36,
+        PowerUpRandomReels = 37,
     }
 }
