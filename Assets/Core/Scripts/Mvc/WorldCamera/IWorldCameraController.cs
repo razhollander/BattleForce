@@ -1,3 +1,4 @@
+using System.Threading;
 using UnityEngine;
 
 namespace Core.Scripts.Mvc.WorldCamera
@@ -11,7 +12,8 @@ namespace Core.Scripts.Mvc.WorldCamera
         void ClearTargets();
         void ShakeCamera(float intensity, float durationInSeconds);
         void MultiplyOthographicSize(float multiplier);
-        void LerpOrthographicSizeMultiplier(float targetMultiplier, float durationSeconds);
+        public void SetisDampingEnabled(bool isEnabled);
+        Awaitable LerpOrthographicSizeMultiplier(float targetMultiplier, float durationSeconds, CancellationToken cancellationToken);
         void InitEntryPoint();
 
         void InitExitPoint();

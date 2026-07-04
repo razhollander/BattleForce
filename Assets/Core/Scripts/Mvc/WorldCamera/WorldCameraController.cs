@@ -1,3 +1,4 @@
+using System.Threading;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -42,9 +43,14 @@ namespace Core.Scripts.Mvc.WorldCamera
             _worldCameraView.MultiplyOthographicSize(multiplier);
         }
 
-        public void LerpOrthographicSizeMultiplier(float targetMultiplier, float durationSeconds)
+        public void SetisDampingEnabled(bool isEnabled)
         {
-            _worldCameraView.LerpOrthographicSize(targetMultiplier, durationSeconds, _stateMachineService.CurrentState().CancellationTokenSource);
+            _worldCameraView.SetIsDampingEnabled(isEnabled);
+        }
+        
+        public async Awaitable LerpOrthographicSizeMultiplier(float targetMultiplier, float durationSeconds, CancellationToken cancellationToken)
+        {
+            await _worldCameraView.LerpOrthographicSize(targetMultiplier, durationSeconds, cancellationToken);
         }
         
         public void AddFollowTarget(Transform target)

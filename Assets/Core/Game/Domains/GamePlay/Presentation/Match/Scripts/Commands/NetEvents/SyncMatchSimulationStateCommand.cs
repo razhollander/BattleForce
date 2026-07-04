@@ -158,7 +158,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private void CreateAll()
         {
             var mapSizeMultiplier = _simulationState.MapSizeMultiplier;
-            _worldCameraController.MultiplyOthographicSize(mapSizeMultiplier * CAMERA_ORTHOGRAPHIC_SIZE_TO_MAP_SIZE_RATIO);
+            if (_simulationState.IsInShowoffWinners)
+            {
+                // todo handle this
+            }
+            else
+            {
+                _worldCameraController.MultiplyOthographicSize(mapSizeMultiplier * CAMERA_ORTHOGRAPHIC_SIZE_TO_MAP_SIZE_RATIO);
+                _worldCameraController.SetisDampingEnabled(true);
+            }
+
             CreatePlayers();
             CreateBullets();
             CreateWalls(mapSizeMultiplier);
