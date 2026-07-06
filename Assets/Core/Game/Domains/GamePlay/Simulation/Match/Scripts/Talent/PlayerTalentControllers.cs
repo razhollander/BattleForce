@@ -54,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _koTalentController.InitEntryPoint();
             _magneticPullTalentController.InitEntryPoint();
             _yearsOfPainTalentController.InitEntryPoint();
+            _headbuttTalentController.InitEntryPoint();
         }
         
         public void SetCasterId(ushort casterPlayerId)

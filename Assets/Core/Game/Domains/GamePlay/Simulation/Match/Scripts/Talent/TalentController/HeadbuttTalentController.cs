@@ -20,7 +20,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
-        private readonly SpinPlayerCommand _spinPlayerCommand;
+        private readonly ICommandFactory _commandFactory;
+        private SpinPlayerCommand _spinPlayerCommand;
 
         private ushort _casterPlayerId;
         private bool _isCharging;
@@ -47,7 +48,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
-            _spinPlayerCommand = commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _commandFactory = commandFactory;
+        }
+
+        public void InitEntryPoint()
+        {
+            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
