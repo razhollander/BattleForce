@@ -33,5 +33,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public int EveryXStages = 2;
         public float StageSizeMultiplier = 1.0f;
         public float SpeedupSimulation = 2f;
+        public bool IsAutoShoot = false;
     }
 }

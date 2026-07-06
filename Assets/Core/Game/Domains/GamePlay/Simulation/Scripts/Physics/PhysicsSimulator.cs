@@ -1165,22 +1165,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             RemoveBody(body);
         }
 
-        public bool RayCast(Vector2 point1, Vector2 point2, out PhysicsBodyData hitBodyData, PhysicsBodyType[] bodyTypesRayCastCanHit = null, PhysicsBodyData? ignoredBody = null)
+        public bool RayCast(Vector2 originPoint, Vector2 endPoint, out PhysicsBodyData hitBodyData, PhysicsBodyType[] bodyTypesRayCastCanHit = null, PhysicsBodyData? ignoredBody = null)
         {
             // Box2D's RayCast ignores any fixture whose interior already contains the ray origin. Detect that case
             // explicitly and treat it as the closest possible hit (collision point == ray origin, fraction 0).
-            var didHit = TryGetBodyContainingPoint(point1, bodyTypesRayCastCanHit, ignoredBody, out var bodyHitData);
+            var isOriginPointInsideABody = TryGetBodyContainingPoint(originPoint, bodyTypesRayCastCanHit, ignoredBody, out var bodyHitData);
+            var didHit = false;
 
-            if (!didHit)
+            if (isOriginPointInsideABody)
+            {
+                didHit = true;
+            }
+            else
             {
                 var closestFraction = 1f;
-                _world.RayCast(OnRayCastHit, point1, point2);
+                _world.RayCast(OnRayCastHit, originPoint, endPoint);
 
                 void OnRayCastHit(Fixture fixture, Vector2 point, Vector2 normal, float fraction)
                 {
                     var body = fixture.Body;
                     var bodyData = (PhysicsBodyData) body.UserData;
-                    var didRayHitClosetBody = fraction <= closestFraction && !IsIgnoredBody(bodyData, ignoredBody) && CanRayCastHit(bodyTypesRayCastCanHit, bodyData.PhysicsBodyType);
+
+                    var didRayHitClosetBody = fraction <= closestFraction && !IsIgnoredBody(bodyData, ignoredBody) &&
+                                              CanRayCastHit(bodyTypesRayCastCanHit, bodyData.PhysicsBodyType);
+
                     if (didRayHitClosetBody)
                     {
                         didHit = true;
@@ -1190,7 +1198,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 }
             }
 
-            _unityMainThreadDispatcher.EnqueueDraw(() => DebugDrawUtils.DrawLine(point1.ToUnityVector2(), point2.ToUnityVector2(), didHit ? UnityEngine.Color.green : UnityEngine.Color.red));
+            _unityMainThreadDispatcher.EnqueueDraw(() => DebugDrawUtils.DrawLine(originPoint.ToUnityVector2(), endPoint.ToUnityVector2(), didHit ? UnityEngine.Color.green : UnityEngine.Color.red));
 
             hitBodyData = bodyHitData;
             return didHit;

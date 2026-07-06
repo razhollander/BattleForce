@@ -12,6 +12,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
@@ -31,7 +32,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly IMatchMakingDataService _matchDataService;
         private readonly PresentationMatchMakingNetEventsHandler _presentationNetEventsHandler;
         private readonly CapacityDict<int, MatchMakingFullTickPacketS2C> _fullTickPacketsUnprocessedByLogic;
-        private readonly CapacityDict<int, MatchMakingFullTickPacketS2C> _fullTickPacketsUnprocessedByView;        private readonly CapacityList<MatchMakingPlayerJoinAcceptPacketS2C> _cachedUnprocessedPlayerJoinedEvents;
+        private readonly CapacityDict<int, MatchMakingFullTickPacketS2C> _fullTickPacketsUnprocessedByView;       
+        private readonly CapacityList<MatchMakingPlayerJoinAcceptPacketS2C> _cachedUnprocessedPlayerJoinedEvents;
         private readonly CapacityList<BulletSpawnNetEventS2C> _cachedUnprocessedBulletSpawnedEvents;
         private readonly CapacityList<BulletDestroyedNetEventS2C> _cachedUnprocessedBulletDestroyedEvents;
         private readonly CapacityList<PlayerSwitchTeamNetEventS2C> _cachedUnprocessedPlayerSwitchTeamEvents;
@@ -39,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly CapacityList<StopMatchCountdownNetEventS2C> _cachedUnprocessedStopMatchCountdownEvents;
         private readonly CapacityList<StartMatchEligibleChangedNetEventS2C> _cachedUnprocessedStartMatchEligibleChangedEvents;
         private readonly CapacityList<PlayerLockOnTargetsChangedNetEventS2C> _cachedUnprocessedPlayerLockOnTargetsChangedEvents;
+        private readonly CapacityList<PlayerLockedOnTargetHitNetEventS2C> _cachedUnprocessedPlayerLockedOnTargetHitEvents;
         private readonly ConcurrentPool<MatchMakingFullTickPacketS2C> _fullTickPacketsPool;
         private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchMakingFullTick;
@@ -65,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             _cachedUnprocessedPlayerSwitchTeamEvents = new CapacityList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents);
             _cachedUnprocessedStartMatchEligibleChangedEvents = new CapacityList<StartMatchEligibleChangedNetEventS2C>(networkConfig.MaxCap.StartMatchEligibleChangedNetEvents);
             _cachedUnprocessedPlayerLockOnTargetsChangedEvents = new CapacityList<PlayerLockOnTargetsChangedNetEventS2C>(networkConfig.MaxCap.PlayerLockOnTargetsChangedNetEvents);
+            _cachedUnprocessedPlayerLockedOnTargetHitEvents = new CapacityList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.PlayerLockOnTargetHitNetEvents);
 
             _fullTickPacketsPool =
                 new ConcurrentPool<MatchMakingFullTickPacketS2C>(() => new MatchMakingFullTickPacketS2C(networkConfig.MaxCap), networkConfig.MaxCap.FullTickPacketsNetEvents);
@@ -125,6 +129,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             ProcessStopMatchCountdownEvents(latestFullTickPacket.StopMatchCountdownNetEvents, ignoreEventsNotAboveTick);
             ProcessStartMatchEligibleChangedEvents(latestFullTickPacket.StartMatchEligibleChangedNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerLockOnTargetsChangedEvents(latestFullTickPacket.PlayerLockOnTargetsChangedNetEvents, ignoreEventsNotAboveTick);
+            ProcessPlayerLockedOnTargetHitEvents(latestFullTickPacket.PlayerLockedOnTargetHitNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -283,6 +288,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             {
                 _cachedUnprocessedPlayerLockOnTargetsChangedEvents.Sort();
                 _presentationNetEventsHandler.ProcessPlayerLockOnTargetsChangedEvents(_cachedUnprocessedPlayerLockOnTargetsChangedEvents);
+            }
+        }
+
+        private void ProcessPlayerLockedOnTargetHitEvents(FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedPlayerLockedOnTargetHitEvents.Clear();
+
+            foreach (var netEvent in events.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedPlayerLockedOnTargetHitEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPlayerLockedOnTargetHitEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerLockedOnTargetHitEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerLockedOnTargetHitEvents(_cachedUnprocessedPlayerLockedOnTargetHitEvents);
             }
         }
 

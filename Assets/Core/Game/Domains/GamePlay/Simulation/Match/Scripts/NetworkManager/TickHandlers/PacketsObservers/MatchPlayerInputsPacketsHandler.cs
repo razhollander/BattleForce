@@ -317,15 +317,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, isShootInputPressed);
 
             var wasShootInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
-            // if (!wasShootInputDownThisTick)
-            // {
-            //     return;
-            // }
-            for (ushort i = 1; i < 5; i++)
+            if (!_gamePlayConfigService.GamePlayConfig.IsAutoShoot && !wasShootInputDownThisTick)
             {
-                _tryShootLockedOnTargetsCommand.SetCasterPlayerId(i).SetProcessedTick(processedTick).Execute();
+                return;
             }
-            //_tryShootLockedOnTargetsCommand.SetCasterPlayerId(playerId).SetProcessedTick(processedTick).Execute();
+
+            _tryShootLockedOnTargetsCommand.SetCasterPlayerId(playerId).SetProcessedTick(processedTick).Execute();
         }
 
         private void UpdatePlayerDirection(MatchLocalPlayerInputDataC2S playerInputData, PlayerStateS2C playerState)

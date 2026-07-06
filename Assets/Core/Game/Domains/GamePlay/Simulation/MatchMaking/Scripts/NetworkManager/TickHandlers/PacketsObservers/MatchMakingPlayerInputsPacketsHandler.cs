@@ -186,7 +186,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             //var shootState = playerModel.Spaceship.Shoot;
             //var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
 
-            if (!isShootInputPressed)
+            if (!_gamePlayConfigService.GamePlayConfig.IsAutoShoot && !isShootInputPressed)
             {
                 return;
             }

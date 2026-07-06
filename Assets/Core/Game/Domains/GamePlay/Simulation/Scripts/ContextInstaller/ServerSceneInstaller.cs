@@ -9,7 +9,6 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.ClientsNetworkDataService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationSpeedMultiplier;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
 using UnityEngine;
@@ -26,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         public override void InstallBindings()
         {
             Container.BindInstance(_sharedGamePlayConfig).AsSingle().NonLazy();
-            Container.Bind<ISimulationSpeedMultiplierDataService>().To<SimulationSpeedMultiplierDataService>().AsSingle().NonLazy();
+            Container.BindInstance(_gamePlayConfig).AsSingle().NonLazy();
             Container.Bind<ITickService>().To<TickService>().AsSingle().NonLazy();
             Container.Bind<IServerInitiator>().To<ServerInitiator>().AsSingle().NonLazy();
             Container.BindInstance(_powerUpsConfig).AsSingle().NonLazy();
@@ -38,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<IHeadLessQuitterController>().To<HeadLessQuitterController>().AsSingle().NonLazy();
             Container.Bind<ISimulationSpeedupController>().To<SimulationSpeedupController>().AsSingle().NonLazy();
             Container.Bind<IPlaybackRecorderService>().To<PlaybackRecorderService>().AsSingle().NonLazy();
-            Container.Bind<ISimulationGamePlayConfigService>().To<SimulationGamePlayConfigService>().AsSingle().WithArguments(_gamePlayConfig).NonLazy();
+            Container.Bind<ISimulationGamePlayConfigService>().To<SimulationGamePlayConfigService>().AsSingle().NonLazy();
             Container.Bind<IPlaybackIOService>().To<PlaybackIOService>().AsSingle().NonLazy();
             Container.Bind<ISimulationInputService>().To<SimulationInputService>().AsSingle();
             Container.Bind<IClientsNetworkDataService>().To<ClientsNetworkDataService>().AsSingle();

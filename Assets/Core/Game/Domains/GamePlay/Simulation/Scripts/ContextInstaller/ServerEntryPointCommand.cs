@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Playback;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationPersistentData;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.States;
@@ -24,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
         private ISimulationSpeedupController _simulationSpeedupController;
         private IPlaybackRecorderService _playbackRecorderService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
+        private ISimulationGamePlayConfigService _simulationGamePlayConfigService;
         
         private ServerInitiatorEnterData _serverInitiatorEnterData;
 
@@ -44,12 +46,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             _simulationSpeedupController = _diContainer.Resolve<ISimulationSpeedupController>();
             _playbackRecorderService = _diContainer.Resolve<IPlaybackRecorderService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
+            _simulationGamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
         }
 
         public void Execute()
         { 
             _simulationPersistentData.InitEntryPoint();
-            _tickService.StartTick();
+            _simulationGamePlayConfigService.InitEntryPoint();
+            _tickService.StartTick(_simulationGamePlayConfigService.GamePlayConfig.SpeedupSimulation);
             _tickService.RegisterObserver(this);
         }
 

@@ -60,7 +60,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C> PlayerLockOnTargetsChangedNetEvents;
         public FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents;
         public FixedUnorderedList<PlayerPowerUpChangedNetEventS2C> PlayerPowerUpChangedNetEvents;
-        public FixedClassUnorderedList<SonicSlapActivatedNetEventS2C> SonicSlapActivatedNetEvents;
+        public FixedClassUnorderedList<ActivateSonicSlapNetEventS2C> ActivateSonicSlapNetEvents;
         public FixedUnorderedList<PerformGalacticPullNetEventS2C> PerformGalacticPullNetEvents;
         public FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C> DeactivateGalacticForceFieldNetEvents;
         public FixedUnorderedList<ActivateNukePowerUpNetEventS2C> ActivateNukePowerUpNetEvents;
@@ -133,7 +133,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             PlayerLockOnTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>(maxCap.PlayerLockOnTargetsChangedNetEvents, () => new PlayerLockOnTargetsChangedNetEventS2C(maxCap.ConcurrentLockOnTargets));
             PlayerLockedOnTargetHitNetEvents = new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(maxCap.ConcurrentPlayers);
             PlayerPowerUpChangedNetEvents = new FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>(maxCap.PlayerPowerUpChangedNetEvents);
-            SonicSlapActivatedNetEvents = new FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>(maxCap.SonicSlapActivatedNetEvents, () => new SonicSlapActivatedNetEventS2C(maxCap.ConcurrentEnemyPlayers));
+            ActivateSonicSlapNetEvents = new FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>(maxCap.ActivateSonicSlapNetEvents, () => new ActivateSonicSlapNetEventS2C(maxCap.ConcurrentEnemyPlayers));
             PerformGalacticPullNetEvents = new FixedUnorderedList<PerformGalacticPullNetEventS2C>(maxCap.PerformGalacticPullNetEvents);
             DeactivateGalacticForceFieldNetEvents = new FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>(maxCap.DeactivateGalacticForceFieldNetEvents);
             ActivateNukePowerUpNetEvents = new FixedUnorderedList<ActivateNukePowerUpNetEventS2C>(maxCap.ActivateNukePowerUpNetEvents);
@@ -194,7 +194,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 39)) != 0) SerializedActivateYearsOfPainTalentNetEvents(writer);
             if ((eventMask & (1UL << 42)) != 0) SerializedEnvironmentSpikePlayerCollisionEvents(writer);
             if ((eventMask & (1UL << 40)) != 0) SerializedPlayerPowerUpChangedNetEvents(writer);
-            if ((eventMask & (1UL << 41)) != 0) SerializedSonicSlapActivatedNetEvents(writer);
+            if ((eventMask & (1UL << 41)) != 0) SerializedActivateSonicSlapNetEvents(writer);
             if ((eventMask & (1UL << 43)) != 0) SerializedPerformGalacticPullNetEvents(writer);
             if ((eventMask & (1UL << 44)) != 0) SerializedDeactivateGalacticForceFieldNetEvents(writer);
             if ((eventMask & (1UL << 45)) != 0) SerializedActivateNukePowerUpNetEvents(writer);
@@ -250,7 +250,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 39;
             if (EnvironmentSpikePlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 42;
             if (PlayerPowerUpChangedNetEvents.Count > 0) eventMask |= 1UL << 40;
-            if (SonicSlapActivatedNetEvents.Count > 0) eventMask |= 1UL << 41;
+            if (ActivateSonicSlapNetEvents.Count > 0) eventMask |= 1UL << 41;
             if (PerformGalacticPullNetEvents.Count > 0) eventMask |= 1UL << 43;
             if (DeactivateGalacticForceFieldNetEvents.Count > 0) eventMask |= 1UL << 44;
             if (ActivateNukePowerUpNetEvents.Count > 0) eventMask |= 1UL << 45;
@@ -403,13 +403,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask & (1UL << 41)) != 0)
             {
-                DeserializedSonicSlapActivatedNetEvents(reader);
+                DeserializedActivateSonicSlapNetEvents(reader);
             }
             else
             {
-                for (int i = 0; i < SonicSlapActivatedNetEvents.Count; i++)
-                    SonicSlapActivatedNetEvents[i].AffectedPlayerIds.Clear();
-                SonicSlapActivatedNetEvents.Clear();
+                for (int i = 0; i < ActivateSonicSlapNetEvents.Count; i++)
+                    ActivateSonicSlapNetEvents[i].AffectedPlayerIds.Clear();
+                ActivateSonicSlapNetEvents.Clear();
             }
 
             if ((eventMask & (1UL << 43)) != 0) DeserializedPerformGalacticPullNetEvents(reader);
@@ -1284,27 +1284,27 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
-        private void SerializedSonicSlapActivatedNetEvents(NetDataWriter writer)
+        private void SerializedActivateSonicSlapNetEvents(NetDataWriter writer)
         {
-            writer.Put((byte)SonicSlapActivatedNetEvents.Count);
-            foreach (var netEvent in SonicSlapActivatedNetEvents.AsSpan())
+            writer.Put((byte)ActivateSonicSlapNetEvents.Count);
+            foreach (var netEvent in ActivateSonicSlapNetEvents.AsSpan())
             {
                 netEvent.Serialize(writer);
             }
         }
 
-        private void DeserializedSonicSlapActivatedNetEvents(NetDataReader reader)
+        private void DeserializedActivateSonicSlapNetEvents(NetDataReader reader)
         {
-            for (int i = 0; i < SonicSlapActivatedNetEvents.Count; i++)
+            for (int i = 0; i < ActivateSonicSlapNetEvents.Count; i++)
             {
-                SonicSlapActivatedNetEvents[i].AffectedPlayerIds.Clear();
+                ActivateSonicSlapNetEvents[i].AffectedPlayerIds.Clear();
             }
 
-            SonicSlapActivatedNetEvents.Clear();
+            ActivateSonicSlapNetEvents.Clear();
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                var netEvent = SonicSlapActivatedNetEvents.AddAndGet();
+                var netEvent = ActivateSonicSlapNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

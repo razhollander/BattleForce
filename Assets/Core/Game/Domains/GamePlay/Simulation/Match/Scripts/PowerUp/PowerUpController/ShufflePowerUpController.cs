@@ -128,7 +128,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
 
             (spaceship1.Transform.Position, spaceship2.Transform.Position) = (spaceship2.Transform.Position, spaceship1.Transform.Position);
 
-            _netEventsDataService.AddShuffleSwapPlayerPositionNetEvent(tick, _casterPlayerId);
+            _netEventsDataService.AddShuffleSwapPlayerPositionNetEvent(tick);
         }
     }
 }

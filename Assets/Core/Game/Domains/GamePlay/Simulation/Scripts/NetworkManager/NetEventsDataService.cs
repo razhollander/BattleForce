@@ -8,7 +8,6 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
-using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
@@ -65,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>> PlayerLockOnTargetsChangedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> PlayerLockedOnTargetHitNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>> PlayerPowerUpChangedNetEventsPerClient { get; }
-        public CapacityDict<long, FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>> SonicSlapActivatedNetEventsPerClient { get; }
+        public CapacityDict<long, FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>> ActivateSonicSlapNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PerformGalacticPullNetEventS2C>> PerformGalacticPullNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>> DeactivateGalacticForceFieldNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> ActivateNukePowerUpNetEventsPerClient { get; }
@@ -96,7 +95,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>> _playerLockOnTargetsChangedNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> _playerLockOnTargetHitNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>> _playerPowerUpChangedNetEventsListPool;
-        private readonly ConcurrentPool<FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>> _sonicSlapActivatedNetEventsListPool;
+        private readonly ConcurrentPool<FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>> _sonicSlapActivatedNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>> _teamLostNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>> _talentSwitchNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>> _environmentSpringPlayerCollisionListPool;
@@ -156,7 +155,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerLockOnTargetsChangedNetEventsPerClient = new CapacityDict<long, FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>>(maxConcurrentPlayers);
             PlayerLockedOnTargetHitNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>>(maxConcurrentPlayers);
             PlayerPowerUpChangedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>>(maxConcurrentPlayers);
-            SonicSlapActivatedNetEventsPerClient = new CapacityDict<long, FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>>(maxConcurrentPlayers);
+            ActivateSonicSlapNetEventsPerClient = new CapacityDict<long, FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>>(maxConcurrentPlayers);
             TeamLostNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TeamLostNetEventS2C>>(maxConcurrentPlayers);
             TalentSwitchNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TalentSwitchNetEventS2C>>(maxConcurrentPlayers);
             EnvironmentSpringPlayerCollisionNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>>(maxConcurrentPlayers);
@@ -235,9 +234,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
             _playerLockOnTargetHitNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>>(() => new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.PlayerLockOnTargetHitNetEvents), maxConcurrentPlayers);
             _playerPowerUpChangedNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>>(() => new FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>(networkConfig.MaxCap.PlayerPowerUpChangedNetEvents), maxConcurrentPlayers);
-            _sonicSlapActivatedNetEventsListPool = new ConcurrentPool<FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>>(() =>
+            _sonicSlapActivatedNetEventsListPool = new ConcurrentPool<FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>>(() =>
             {
-                var list = new FixedClassUnorderedList<SonicSlapActivatedNetEventS2C>(networkConfig.MaxCap.SonicSlapActivatedNetEvents, () => new SonicSlapActivatedNetEventS2C(networkConfig.MaxCap.ConcurrentEnemyPlayers));
+                var list = new FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>(networkConfig.MaxCap.ActivateSonicSlapNetEvents, () => new ActivateSonicSlapNetEventS2C(networkConfig.MaxCap.ConcurrentEnemyPlayers));
                 list.Clear();
                 return list;
             }, maxConcurrentPlayers);
@@ -456,9 +455,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 LogService.LogError($"Player already exists! {clientId}");
             }
 
-            if (!SonicSlapActivatedNetEventsPerClient.ContainsKey(clientId))
+            if (!ActivateSonicSlapNetEventsPerClient.ContainsKey(clientId))
             {
-                SonicSlapActivatedNetEventsPerClient.Add(clientId, _sonicSlapActivatedNetEventsListPool.Get());
+                ActivateSonicSlapNetEventsPerClient.Add(clientId, _sonicSlapActivatedNetEventsListPool.Get());
             }
             else
             {
@@ -710,7 +709,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var playerPowerUpChangedList = PlayerPowerUpChangedNetEventsPerClient[clientId];
             playerPowerUpChangedList.Clear();
             _playerPowerUpChangedNetEventsListPool.Return(playerPowerUpChangedList);
-            var sonicSlapActivatedList = SonicSlapActivatedNetEventsPerClient[clientId];
+            var sonicSlapActivatedList = ActivateSonicSlapNetEventsPerClient[clientId];
             sonicSlapActivatedList.Clear();
             _sonicSlapActivatedNetEventsListPool.Return(sonicSlapActivatedList);
             var teamLostList = TeamLostNetEventsPerClient[clientId];
@@ -859,7 +858,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             PlayerLockOnTargetsChangedNetEventsPerClient.Remove(clientId);
             PlayerLockedOnTargetHitNetEventsPerClient.Remove(clientId);
             PlayerPowerUpChangedNetEventsPerClient.Remove(clientId);
-            SonicSlapActivatedNetEventsPerClient.Remove(clientId);
+            ActivateSonicSlapNetEventsPerClient.Remove(clientId);
             TeamLostNetEventsPerClient.Remove(clientId);
             TalentSwitchNetEventsPerClient.Remove(clientId);
             StartMatchEligibleChangedNetEventsPerClient.Remove(clientId);
@@ -1109,9 +1108,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddSonicSlapActivatedNetEvent(int onTick, ushort casterPlayerId, FixedUnorderedList<ushort> affectedPlayerIds)
+        public void AddActivateSonicSlapNetEvent(int onTick, ushort casterPlayerId, FixedUnorderedList<ushort> affectedPlayerIds)
         {
-            foreach (var kvp in SonicSlapActivatedNetEventsPerClient)
+            foreach (var kvp in ActivateSonicSlapNetEventsPerClient)
             {
                 var netEvent = kvp.Value.AddAndGet();
                 netEvent.OccuredOnTick = onTick;
@@ -1125,7 +1124,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddPerformGalacticPullNetEvent(int onTick, ushort fieldId, ushort casterPlayerId, ushort casterTeamId, int endTick)
+        public void AddPerformGalacticPullNetEvent(int onTick, ushort fieldId, ushort casterPlayerId, ushort casterTeamId)
         {
             foreach (var kvp in PerformGalacticPullNetEventsPerClient)
             {
@@ -1134,7 +1133,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 netEvent.FieldId = fieldId;
                 netEvent.CasterPlayerId = casterPlayerId;
                 netEvent.CasterTeamId = casterTeamId;
-                netEvent.EndTick = endTick;
             }
         }
 
@@ -1169,13 +1167,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
-        public void AddShuffleSwapPlayerPositionNetEvent(int onTick, ushort casterPlayerId)
+        public void AddShuffleSwapPlayerPositionNetEvent(int onTick)
         {
             foreach (var kvp in ShuffleSwapPlayerPositionNetEventsPerClient)
             {
                 ref var netEvent = ref kvp.Value.AddAndGet();
                 netEvent.OccuredOnTick = onTick;
-                netEvent.CasterPlayerId = casterPlayerId;
             }
         }
 
@@ -1431,7 +1428,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 }
             }
 
-            if (SonicSlapActivatedNetEventsPerClient.TryGetValue(clientId, out var sonicSlapActivatedNetEvents))
+            if (ActivateSonicSlapNetEventsPerClient.TryGetValue(clientId, out var sonicSlapActivatedNetEvents))
             {
                 for (int i = sonicSlapActivatedNetEvents.Count - 1; i >= 0; i--)
                 {

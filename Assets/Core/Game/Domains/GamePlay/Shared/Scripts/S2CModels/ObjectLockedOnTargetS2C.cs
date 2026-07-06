@@ -13,8 +13,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return new LockOnTargetKey(TargetId, TargetType);
         }
 
-        // A target is unique by (TargetType, TargetId), so ordering by both keeps the sort deterministic
-        // even when two different target types share the same TargetId.
         public int CompareTo(ObjectLockedOnTargetS2C other)
         {
             var targetTypeComparison = TargetType.CompareTo(other.TargetType);

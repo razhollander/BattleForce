@@ -29,7 +29,6 @@ namespace Core.Game.Domains.GamePlay.Shared
             _onTickAction = onTickAction ?? throw new ArgumentNullException(nameof(onTickAction));
         }
 
-        // Can be called while the timer thread is running; the loop picks up the new delta on its next iteration.
         public void SetTicksPerSecond(float ticksPerSecond)
         {
             _fixedDelta = ToFixedDelta(ticksPerSecond);

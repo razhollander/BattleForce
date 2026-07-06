@@ -81,7 +81,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PlayerLockOnTargetsChangedNetEventS2C> _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents;
         private readonly CapacityList<PlayerLockedOnTargetHitNetEventS2C> _cachedUnprocessedPlayerLockedOnTargetHitNetEvents;
         private readonly CapacityList<PlayerPowerUpChangedNetEventS2C> _cachedUnprocessedPlayerPowerUpChangedNetEvents;
-        private readonly CapacityList<SonicSlapActivatedNetEventS2C> _cachedUnprocessedSonicSlapActivatedNetEvents;
+        private readonly CapacityList<ActivateSonicSlapNetEventS2C> _cachedUnprocessedActivateSonicSlapNetEvents;
         private readonly CapacityList<PerformGalacticPullNetEventS2C> _cachedUnprocessedPerformGalacticPullNetEvents;
         private readonly CapacityList<DeactivateGalacticForceFieldNetEventS2C> _cachedUnprocessedDeactivateGalacticForceFieldNetEvents;
         private readonly CapacityList<ActivateNukePowerUpNetEventS2C> _cachedUnprocessedActivateNukePowerUpNetEvents;
@@ -158,7 +158,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPlayerLockOnTargetsChangedNetEvents = new CapacityList<PlayerLockOnTargetsChangedNetEventS2C>(networkConfig.MaxCap.PlayerLockOnTargetsChangedNetEvents);
             _cachedUnprocessedPlayerLockedOnTargetHitNetEvents = new CapacityList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.PlayerLockOnTargetHitNetEvents);
             _cachedUnprocessedPlayerPowerUpChangedNetEvents = new CapacityList<PlayerPowerUpChangedNetEventS2C>(networkConfig.MaxCap.PlayerPowerUpChangedNetEvents);
-            _cachedUnprocessedSonicSlapActivatedNetEvents = new CapacityList<SonicSlapActivatedNetEventS2C>(networkConfig.MaxCap.SonicSlapActivatedNetEvents);
+            _cachedUnprocessedActivateSonicSlapNetEvents = new CapacityList<ActivateSonicSlapNetEventS2C>(networkConfig.MaxCap.ActivateSonicSlapNetEvents);
             _cachedUnprocessedPerformGalacticPullNetEvents = new CapacityList<PerformGalacticPullNetEventS2C>(networkConfig.MaxCap.PerformGalacticPullNetEvents);
             _cachedUnprocessedDeactivateGalacticForceFieldNetEvents = new CapacityList<DeactivateGalacticForceFieldNetEventS2C>(networkConfig.MaxCap.DeactivateGalacticForceFieldNetEvents);
             _cachedUnprocessedActivateNukePowerUpNetEvents = new CapacityList<ActivateNukePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateNukePowerUpNetEvents);
@@ -259,7 +259,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPlayerLockOnTargetsChangedNetEvents(latestFullTickPacket.PlayerLockOnTargetsChangedNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerLockedOnTargetHitNetEvents(latestFullTickPacket.PlayerLockedOnTargetHitNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerPowerUpChangedNetEvents(latestFullTickPacket.PlayerPowerUpChangedNetEvents, ignoreEventsNotAboveTick);
-            ProcessSonicSlapActivatedNetEvents(latestFullTickPacket.SonicSlapActivatedNetEvents, ignoreEventsNotAboveTick);
+            ProcessActivateSonicSlapNetEvents(latestFullTickPacket.ActivateSonicSlapNetEvents, ignoreEventsNotAboveTick);
             ProcessPerformGalacticPullNetEvents(latestFullTickPacket.PerformGalacticPullNetEvents, ignoreEventsNotAboveTick);
             ProcessDeactivateGalacticForceFieldNetEvents(latestFullTickPacket.DeactivateGalacticForceFieldNetEvents, ignoreEventsNotAboveTick);
             ProcessActivateNukePowerUpNetEvents(latestFullTickPacket.ActivateNukePowerUpNetEvents, ignoreEventsNotAboveTick);
@@ -1113,22 +1113,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void ProcessSonicSlapActivatedNetEvents(FixedClassUnorderedList<SonicSlapActivatedNetEventS2C> events, int ignoreEventsNotAboveTick)
+        private void ProcessActivateSonicSlapNetEvents(FixedClassUnorderedList<ActivateSonicSlapNetEventS2C> events, int ignoreEventsNotAboveTick)
         {
-            _cachedUnprocessedSonicSlapActivatedNetEvents.Clear();
+            _cachedUnprocessedActivateSonicSlapNetEvents.Clear();
 
             foreach (var netEvent in events.AsSpan())
             {
                 if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
                 {
-                    _cachedUnprocessedSonicSlapActivatedNetEvents.Add(netEvent);
+                    _cachedUnprocessedActivateSonicSlapNetEvents.Add(netEvent);
                 }
             }
 
-            if (!_cachedUnprocessedSonicSlapActivatedNetEvents.IsNullOrEmpty())
+            if (!_cachedUnprocessedActivateSonicSlapNetEvents.IsNullOrEmpty())
             {
-                _cachedUnprocessedSonicSlapActivatedNetEvents.Sort();
-                _presentationNetEventsHandler.ProcessSonicSlapActivatedEvents(_cachedUnprocessedSonicSlapActivatedNetEvents);
+                _cachedUnprocessedActivateSonicSlapNetEvents.Sort();
+                _presentationNetEventsHandler.ProcessActivateSonicSlapEvents(_cachedUnprocessedActivateSonicSlapNetEvents);
             }
         }
 

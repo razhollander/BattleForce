@@ -70,7 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandlePlayerLockOnTargetsChangedNetEventsCommand _handlePlayerLockOnTargetsChangedNetEventsCommand;
         private readonly HandlePlayerLockedOnTargetHitNetEventsCommand _handlePlayerLockedOnTargetHitNetEventsCommand;
         private readonly HandlePlayerPowerUpChangedNetEventsCommand _handlePlayerPowerUpChangedNetEventsCommand;
-        private readonly HandleSonicSlapActivatedNetEventsCommand _handleSonicSlapActivatedNetEventsCommand;
+        private readonly HandleActivateSonicSlapNetEventsCommand _handleActivateSonicSlapNetEventsCommand;
         private readonly HandlePerformGalacticPullNetEventsCommand _handlePerformGalacticPullNetEventsCommand;
         private readonly HandleDeactivateGalacticForceFieldNetEventsCommand _handleDeactivateGalacticForceFieldNetEventsCommand;
         private readonly HandleActivateNukePowerUpNetEventsCommand _handleActivateNukePowerUpNetEventsCommand;
@@ -136,7 +136,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePlayerLockOnTargetsChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockOnTargetsChangedNetEventsCommand>();
             _handlePlayerLockedOnTargetHitNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerLockedOnTargetHitNetEventsCommand>();
             _handlePlayerPowerUpChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerPowerUpChangedNetEventsCommand>();
-            _handleSonicSlapActivatedNetEventsCommand = commandFactory.CreateCommandVoid<HandleSonicSlapActivatedNetEventsCommand>();
+            _handleActivateSonicSlapNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateSonicSlapNetEventsCommand>();
             _handlePerformGalacticPullNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformGalacticPullNetEventsCommand>();
             _handleDeactivateGalacticForceFieldNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateGalacticForceFieldNetEventsCommand>();
             _handleActivateNukePowerUpNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateNukePowerUpNetEventsCommand>();
@@ -214,7 +214,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute();
             _handlePlayerLockedOnTargetHitNetEventsCommand.Execute();
             _handlePlayerPowerUpChangedNetEventsCommand.Execute();
-            _handleSonicSlapActivatedNetEventsCommand.Execute();
+            _handleActivateSonicSlapNetEventsCommand.Execute();
             _handlePerformGalacticPullNetEventsCommand.Execute();
             _handleDeactivateGalacticForceFieldNetEventsCommand.Execute();
             _handleActivateNukePowerUpNetEventsCommand.Execute();

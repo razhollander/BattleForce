@@ -36,18 +36,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
         public void Perform(int tick)
         {
             var casterTeamId = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId).TeamId;
-            CreateGalacticForceFieldForTeam(1, tick);
-            CreateGalacticForceFieldForTeam(2, tick);
-            CreateGalacticForceFieldForTeam(3, tick);
-            CreateGalacticForceFieldForTeam(4, tick);
+            CreateGalacticForceFieldForTeam(casterTeamId, tick);
         }
 
         private void CreateGalacticForceFieldForTeam(ushort casterTeamId, int tick)
         {
             var durationSeconds = _gamePlayConfigService.GamePlayConfig.PowerUps.GalacticPullDurationSeconds;
             var endTick = TickUtils.GetTickPassedAfterDuration(tick, durationSeconds, _networkConfig.DeltaTime);
-            var field = _matchDataService.AddGalacticForceField(_casterPlayerId, casterTeamId, endTick);
-            _netEventsDataService.AddPerformGalacticPullNetEvent(tick, field.Id, _casterPlayerId, casterTeamId, endTick);
+            var field = _matchDataService.AddGalacticForceField(casterTeamId, endTick);
+            _netEventsDataService.AddPerformGalacticPullNetEvent(tick, field.Id, _casterPlayerId, casterTeamId);
         }
     }
 }

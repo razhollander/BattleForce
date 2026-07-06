@@ -6,18 +6,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     public struct ShuffleSwapPlayerPositionNetEventS2C : INetSerializable, IComparable<ShuffleSwapPlayerPositionNetEventS2C>
     {
         public int OccuredOnTick;
-        public ushort CasterPlayerId;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
-            writer.Put((byte)CasterPlayerId);
         }
 
         public void Deserialize(NetDataReader reader)
         {
             OccuredOnTick = reader.GetInt();
-            CasterPlayerId = reader.GetByte();
         }
 
         public int CompareTo(ShuffleSwapPlayerPositionNetEventS2C other)

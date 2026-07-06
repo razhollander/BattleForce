@@ -1,6 +1,7 @@
 using System;
 using LiteNetLib.Utils;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
@@ -22,6 +23,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             writer.Put((byte)LockedOnTargetObjects.Count);
             foreach (var target in LockedOnTargetObjects.AsSpan())
             {
+                if (target.TargetId > 255)
+                {
+                    LogService.LogError($"TargetId bigger than 255!, target type {target.TargetType}, id: {target.TargetId}");
+                }
                 writer.Put((byte)target.TargetId);
                 writer.Put(target.IsLockOnTargetShootable);
                 writer.Put((byte)target.TargetType);

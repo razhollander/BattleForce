@@ -4,13 +4,13 @@ using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
 {
-    public class SonicSlapActivatedNetEventS2C : INetSerializable, IComparable<SonicSlapActivatedNetEventS2C>
+    public class ActivateSonicSlapNetEventS2C : INetSerializable, IComparable<ActivateSonicSlapNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort CasterPlayerId;
         public FixedUnorderedList<ushort> AffectedPlayerIds;
 
-        public SonicSlapActivatedNetEventS2C(int maxAffectedPlayers)
+        public ActivateSonicSlapNetEventS2C(int maxAffectedPlayers)
         {
             AffectedPlayerIds = new FixedUnorderedList<ushort>(maxAffectedPlayers);
         }
@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
             }
         }
 
-        public int CompareTo(SonicSlapActivatedNetEventS2C other)
+        public int CompareTo(ActivateSonicSlapNetEventS2C other)
         {
             return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }

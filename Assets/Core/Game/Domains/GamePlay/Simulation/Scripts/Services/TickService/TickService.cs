@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Shared;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.SimulationSpeedMultiplier;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 
@@ -11,35 +10,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
     public class TickService : ITickService
     {
         private readonly NetworkConfig _networkConfig;
-        private readonly ISimulationSpeedMultiplierDataService _speedMultiplierDataService;
         private TimerFixedThreaded2 _fixedTimer;
         private readonly List<ITickObserver> _observers;
 
         public int CurrentTick { get; private set; }
 
-        public TickService(NetworkConfig networkConfig, ISimulationSpeedMultiplierDataService speedMultiplierDataService)
+        public TickService(NetworkConfig networkConfig)
         {
             _networkConfig = networkConfig;
-            _speedMultiplierDataService = speedMultiplierDataService;
             _observers = new List<ITickObserver>(2);
         }
 
-        public void StartTick()
+        public void StartTick(float speedMultiplier = 1)
         {
             var cancellationTokenSource = new CancellationTokenSource();
-            _fixedTimer = new TimerFixedThreaded2("Server Thread", GetTicksPerSecond(), OnTick);
-            _speedMultiplierDataService.OnMultiplierChangedEvent += OnSpeedMultiplierChanged;
+            _fixedTimer = new TimerFixedThreaded2("Server Thread", GetTicksPerSecond(speedMultiplier), OnTick);
             _fixedTimer.Start(cancellationTokenSource);
         }
 
-        private void OnSpeedMultiplierChanged()
+        public void SetSpeedMultiplier(float speedMultiplier)
         {
-            _fixedTimer.SetTicksPerSecond(GetTicksPerSecond());
+            _fixedTimer?.SetTicksPerSecond(GetTicksPerSecond(speedMultiplier));
         }
 
-        private float GetTicksPerSecond()
+        private float GetTicksPerSecond(float speedMultiplier)
         {
-            return _networkConfig.TicksPerSeconds * _speedMultiplierDataService.Multiplier;
+            return _networkConfig.TicksPerSeconds * speedMultiplier;
         }
 
         private void OnTick()
@@ -50,12 +46,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
                 {
                     LogService.LogError("No observers registered!");
                 }
-                
+
                 for (int i = _observers.Count - 1; i >= 0; i--)
                 {
                     _observers[i].OnTick(CurrentTick);
                 }
-                
+
                 CurrentTick++;
             }
             catch (Exception e)
@@ -68,7 +64,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
 
         public void StopTick()
         {
-            _speedMultiplierDataService.OnMultiplierChangedEvent -= OnSpeedMultiplierChanged;
             _fixedTimer.Stop();
         }
 

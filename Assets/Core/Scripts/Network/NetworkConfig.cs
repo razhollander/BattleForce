@@ -109,10 +109,10 @@ namespace Core.Scripts.Network
         public int PlayerLockOnTargetsChangedNetEvents = 128;
         public int PlayerLockOnTargetHitNetEvents = 128;
         public int PlayerPowerUpChangedNetEvents = 64;
-        public int SonicSlapActivatedNetEvents = 64;
-        public int ActivateNukePowerUpNetEvents = 16;
-        public int ActivateShufflePowerUpNetEvents = 16;
-        public int ShuffleSwapPlayerPositionNetEvents = 64;
+        public int ActivateSonicSlapNetEvents = 64;
+        public int ActivateNukePowerUpNetEvents = 64;
+        public int ActivateShufflePowerUpNetEvents = 64;
+        public int ShuffleSwapPlayerPositionNetEvents = 128;
         public int ConcurrentGalacticForceFields = 16;
         public int PerformGalacticPullNetEvents = 64;
         public int DeactivateGalacticForceFieldNetEvents = 64;

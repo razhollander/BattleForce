@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
         private readonly HandleBulletDestroyedNetEventsCommand _handleBulletDestroyedNetEventsCommand;
         private readonly HandlePlayerSwitchTeamNetEventsCommand _handlePlayerSwitchTeamNetEventsCommand;
         private readonly HandleMatchMakingPlayerLockOnTargetsChangedNetEventsCommand _handleMatchMakingPlayerLockOnTargetsChangedNetEventsCommand;
+        private readonly HandleMatchMakingPlayerLockedOnTargetHitNetEventsCommand _handleMatchMakingPlayerLockedOnTargetHitNetEventsCommand;
         private readonly UpdateMatchMakingLockOnWallEffectsCommand _updateMatchMakingLockOnWallEffectsCommand;
 
         public ClientMatchMakingPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchMakingPlayerControllers playerControllers, ICommandFactory commandFactory,
@@ -35,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
             _handleBulletDestroyedNetEventsCommand = commandFactory.CreateCommandVoid<HandleBulletDestroyedNetEventsCommand>();
             _handlePlayerSwitchTeamNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerSwitchTeamNetEventsCommand>();
             _handleMatchMakingPlayerLockOnTargetsChangedNetEventsCommand = commandFactory.CreateCommandVoid<HandleMatchMakingPlayerLockOnTargetsChangedNetEventsCommand>();
+            _handleMatchMakingPlayerLockedOnTargetHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleMatchMakingPlayerLockedOnTargetHitNetEventsCommand>();
             _updateMatchMakingLockOnWallEffectsCommand = commandFactory.CreateCommandVoid<UpdateMatchMakingLockOnWallEffectsCommand>();
         }
         
@@ -54,6 +56,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProces
             _handleBulletDestroyedNetEventsCommand.Execute();
             _handlePlayerSwitchTeamNetEventsCommand.Execute();
             _handleMatchMakingPlayerLockOnTargetsChangedNetEventsCommand.Execute();
+            _handleMatchMakingPlayerLockedOnTargetHitNetEventsCommand.Execute();
 
             _playerControllers.UpdatePlayersTransform();
             _playerControllers.UpdatePlayersBulletCooldowns();

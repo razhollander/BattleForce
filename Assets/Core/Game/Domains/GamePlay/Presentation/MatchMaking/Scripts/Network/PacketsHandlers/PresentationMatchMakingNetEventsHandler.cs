@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -150,6 +151,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 }
 
                 _cachedPresentationEventsService.PlayerLockOnTargetsChangedNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessPlayerLockedOnTargetHitEvents(CapacityList<PlayerLockedOnTargetHitNetEventS2C> playerLockedOnTargetHitNetEvents)
+        {
+            if (playerLockedOnTargetHitNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in playerLockedOnTargetHitNetEvents)
+            {
+                _cachedPresentationEventsService.PlayerLockedOnTargetHitNetEvents.Add(netEvent);
             }
         }
     }

@@ -192,6 +192,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _fullTickPacket.StopMatchCountdownNetEvents = _netEventsDataService.StopMatchCountdownNetEventsPerClient[clientId];
                 _fullTickPacket.StartMatchEligibleChangedNetEvents = _netEventsDataService.StartMatchEligibleChangedNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerLockOnTargetsChangedNetEvents = _netEventsDataService.PlayerLockOnTargetsChangedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerLockedOnTargetHitNetEvents = _netEventsDataService.PlayerLockedOnTargetHitNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchMakingFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

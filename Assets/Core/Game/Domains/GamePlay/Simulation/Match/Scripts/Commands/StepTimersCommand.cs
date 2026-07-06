@@ -55,8 +55,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _preparationPhaseTimerService.StepPreperationPhaseTimer(deltaTime);
         }
 
-        private int _debugLastLoggedElapsedSecond = -1;
-        
         private void StepPlayersShootCooldown(float deltaTime)
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())

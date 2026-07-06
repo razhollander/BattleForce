@@ -10,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public int MaxConcurrentPowerUpBalls = 5;
         public float MoveSpeed = 5f;
         public float Radius = 1.269f;
-        public PowerUpType[] ObtainablePowerUps = { PowerUpType.SonicSlap, PowerUpType.GalacticPull, PowerUpType.Nuke };
+        public PowerUpType[] ObtainablePowerUps;
         public float GalacticPullDurationSeconds = 5f;
         public float GalacticPullForce = 8f;
         public float NukeForce = 15f;

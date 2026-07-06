@@ -53,15 +53,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
                 var isSameTeam = playerState.TeamId == casterTeamId;
                 if (isSameTeam) continue;
 
-                var dir = playerState.Spaceship.Transform.Position - casterPosition;
-                var isAtSamePosition = dir.LengthSquared() == 0f;
-                var pushDirection = isAtSamePosition ? RNG.NextFloat(0f, 360f).AngleToVector() : dir.NormalizeSafe();
-                _addForceToPlayerCommand.SetPlayerId(playerState.Id).SetForce(pushDirection * nukeForce).ShouldTurnOffEngine(false).Execute();
-
                 var spinMagnitude = RNG.NextFloat(minSpin, maxSpin);
                 var spinSign = RNG.NextBool() ? 1f : -1f;
                 var signedSpin = spinMagnitude * spinSign;
                 _spinPlayerCommand.SetPlayer(playerState.Id).SetSpinAmount(signedSpin).SetTick(tick).Execute();
+                
+                var dir = playerState.Spaceship.Transform.Position - casterPosition;
+                var isAtSamePosition = dir.LengthSquared() == 0f;
+                var pushDirection = isAtSamePosition ? RNG.NextFloat(0f, 360f).AngleToVector() : dir.NormalizeSafe();
+                _addForceToPlayerCommand.SetPlayerId(playerState.Id).SetForce(pushDirection * nukeForce).ShouldTurnOffEngine(false).Execute();
             }
 
             _netEventsDataService.AddActivateNukePowerUpNetEvent(tick, _casterPlayerId, casterPosition);

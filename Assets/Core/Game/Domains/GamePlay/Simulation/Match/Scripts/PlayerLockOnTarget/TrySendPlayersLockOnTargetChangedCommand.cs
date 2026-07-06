@@ -1,16 +1,15 @@
+using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
-using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Utils;
-using UnityEngine;
+
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 {
@@ -53,8 +52,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
                 _cachedLockedOnObjects.Clear();
-                FindTargetedEnemyIdsOfCaster(playerState, _cachedLockedOnObjects);
-                FindTargetedPowerUpBallsOfCaster(playerState, _cachedLockedOnObjects);
+
+                var canPlayerFindTargets = !playerState.Spaceship.IsSpinned && playerState.Spaceship.IsAlive;
+                if (canPlayerFindTargets)
+                {
+                    var rayOriginPosition = playerState.Spaceship.Transform.GetHeadPosition();
+                    DebugDrawUtils.DrawArc2D(rayOriginPosition, playerState.Spaceship.Transform.Direction,
+                        _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange,
+                        _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees);
+                    FindTargetedEnemyIdsOfCaster(rayOriginPosition, playerState, _cachedLockedOnObjects);
+                    FindTargetedPowerUpBallsOfCaster(rayOriginPosition, playerState, _cachedLockedOnObjects);
+                }
+
                 _cachedLockedOnObjects.Sort();
 
                 var casterTargetedObjects = playerState.Spaceship.LockOnTargetObjects;
@@ -77,21 +86,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             }
         }
 
-        private void FindTargetedEnemyIdsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedEnemyIds)
+        private void FindTargetedEnemyIdsOfCaster(Vector2 rayOriginPosition, PlayerStateS2C casterPlayerState, FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedEnemyIds)
         {
-            if (casterPlayerState.Spaceship.IsSpinned || !casterPlayerState.Spaceship.IsAlive)
-            {
-                return;
-            }
-            
-            var rayOriginPosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
             var casterBody = new PhysicsBodyData(casterPlayerState.Id, PhysicsBodyType.PlayerSpaceship);
-            var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange;
-            var maxLockOnTargetRangeSquare = radius * radius;
-
-            DebugDrawUtils.DrawArc2D(rayOriginPosition, casterPlayerState.Spaceship.Transform.Direction, radius,
-                _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees);
-
             var players = _matchDataService.SimulationState.Players;
 
             for (int i = 0; i < players.Count; i++)
@@ -105,57 +102,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 }
 
                 var enemyHeartPos = targetedPlayerState.Spaceship.Transform.GetHeartPosition();
-                var rayOriginToEnemyHeartDistanceSquared = System.Numerics.Vector2.DistanceSquared(rayOriginPosition, enemyHeartPos);
-                var isEnemyHeartInRange = rayOriginToEnemyHeartDistanceSquared <= maxLockOnTargetRangeSquare;
-                
-                if (!isEnemyHeartInRange)
-                {
-                    continue;
-                }
-
-                var directionToEnemy = enemyHeartPos - rayOriginPosition;
-                var playerCasterDirection = casterPlayerState.Spaceship.Transform.Direction;
-                var deltaAngleRadians = MathUtils.DeltaAbsoluteAngleRadians(MathUtils.GetAngle(playerCasterDirection), MathUtils.GetAngle(directionToEnemy));
-                var deltaAngleDegrees = deltaAngleRadians * Mathf.Rad2Deg;
-                var maxLockOnTargetAngle = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees;
-                var isInAngleRange = deltaAngleDegrees <= maxLockOnTargetAngle;
-
-                if (!isInAngleRange)
+                if (!IsPositionInLockOnCone(casterPlayerState, rayOriginPosition, enemyHeartPos))
                 {
                     continue;
                 }
 
                 var isTargetSpinned = targetedPlayerState.Spaceship.IsSpinned;
                 var didRayTowardEnemyHeartHitAnything =_physicsSimulator.RayCast(rayOriginPosition, enemyHeartPos, out var hitBodyData, _cachedBodyTypesRayCastCanHit, casterBody);
-                var didHitValidBody = isTargetSpinned 
-                    ? hitBodyData.PhysicsBodyType is PhysicsBodyType.PlayerHeart or PhysicsBodyType.PlayerSpaceship 
+                var didHitValidBody = isTargetSpinned
+                    ? hitBodyData.PhysicsBodyType is PhysicsBodyType.PlayerHeart or PhysicsBodyType.PlayerSpaceship
                     : hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerHeart;
                 var didHitEnemyHeart = didRayTowardEnemyHeartHitAnything && didHitValidBody && hitBodyData.Id == targetedPlayerState.Id;
                 if (!didHitEnemyHeart)
                 {
                     continue;
                 }
-                
-                ref var targetedPlayer = ref outputTargetedEnemyIds.AddAndGet();
-                targetedPlayer.TargetId = targetedPlayerState.Id;
-                targetedPlayer.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterPlayerState.Id, targetedPlayerState.Id, LockOnTargetType.Heart);
-                targetedPlayer.TargetType = LockOnTargetType.Heart;
+
+                AddLockedOnTarget(outputTargetedEnemyIds, casterPlayerState.Id, targetedPlayerState.Id, LockOnTargetType.Heart);
             }
         }
 
-        private void FindTargetedPowerUpBallsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedEnemyIds)
+        private void FindTargetedPowerUpBallsOfCaster(Vector2 rayOriginPosition, PlayerStateS2C casterPlayerState, FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedEnemyIds)
         {
-            if (casterPlayerState.Spaceship.IsSpinned || !casterPlayerState.Spaceship.IsAlive)
-            {
-                return;
-            }
-
-            var rayOriginPosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
             var casterBody = new PhysicsBodyData(casterPlayerState.Id, PhysicsBodyType.PlayerSpaceship);
-            var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange;
-            var maxLockOnRangeSquare = radius * radius;
-            var maxLockOnAngle = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees;
-            var playerCasterDirection = casterPlayerState.Spaceship.Transform.Direction;
 
             var powerUpBalls = _matchDataService.SimulationState.PowerUpBalls;
 
@@ -163,20 +132,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             {
                 var powerUpBall = powerUpBalls.GetByIndex(i);
                 var ballPosition = powerUpBall.Position;
-                var rayOriginToBallDistanceSquared = System.Numerics.Vector2.DistanceSquared(rayOriginPosition, ballPosition);
-                var isBallInRange = rayOriginToBallDistanceSquared <= maxLockOnRangeSquare;
-
-                if (!isBallInRange)
-                {
-                    continue;
-                }
-
-                var directionToBall = ballPosition - rayOriginPosition;
-                var deltaAngleRadians = MathUtils.DeltaAbsoluteAngleRadians(MathUtils.GetAngle(playerCasterDirection), MathUtils.GetAngle(directionToBall));
-                var deltaAngleDegrees = deltaAngleRadians * Mathf.Rad2Deg;
-                var isInAngleRange = deltaAngleDegrees <= maxLockOnAngle;
-
-                if (!isInAngleRange)
+                if (!IsPositionInLockOnCone(casterPlayerState, rayOriginPosition, ballPosition))
                 {
                     continue;
                 }
@@ -188,11 +144,36 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                     continue;
                 }
 
-                ref var targetedBall = ref outputTargetedEnemyIds.AddAndGet();
-                targetedBall.TargetId = powerUpBall.Id;
-                targetedBall.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterPlayerState.Id, powerUpBall.Id, LockOnTargetType.PowerUpBall);
-                targetedBall.TargetType = LockOnTargetType.PowerUpBall;
+                AddLockedOnTarget(outputTargetedEnemyIds, casterPlayerState.Id, powerUpBall.Id, LockOnTargetType.PowerUpBall);
             }
+        }
+
+        private bool IsPositionInLockOnCone(PlayerStateS2C casterPlayerState, System.Numerics.Vector2 rayOriginPosition, System.Numerics.Vector2 targetPosition)
+        {
+            var maxRange = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange;
+            var rayOriginToTargetDistanceSquared = System.Numerics.Vector2.DistanceSquared(rayOriginPosition, targetPosition);
+            var isTargetInRange = rayOriginToTargetDistanceSquared <= maxRange * maxRange;
+
+            if (!isTargetInRange)
+            {
+                return false;
+            }
+
+            var directionToTarget = targetPosition - rayOriginPosition;
+            var playerCasterDirection = casterPlayerState.Spaceship.Transform.Direction;
+            var deltaAngleRadians = MathUtils.DeltaAbsoluteAngleRadians(MathUtils.GetAngle(playerCasterDirection), MathUtils.GetAngle(directionToTarget));
+            var deltaAngleDegrees = deltaAngleRadians * UnityEngine.Mathf.Rad2Deg;
+            var maxLockOnAngle = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees;
+
+            return deltaAngleDegrees <= maxLockOnAngle;
+        }
+
+        private void AddLockedOnTarget(FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedEnemyIds, ushort casterId, ushort targetId, LockOnTargetType targetType)
+        {
+            ref var targetedObject = ref outputTargetedEnemyIds.AddAndGet();
+            targetedObject.TargetId = targetId;
+            targetedObject.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterId, targetId, targetType);
+            targetedObject.TargetType = targetType;
         }
     }
 }

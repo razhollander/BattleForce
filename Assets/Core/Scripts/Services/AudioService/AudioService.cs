@@ -157,7 +157,7 @@ namespace Core.Scripts.Services.AudioService
             source.SetAudioSourceVolume(audioData.Volume);
             source.Play();
 
-            var loopId = _nextLoopId++;
+            var loopId = _nextLoopId++ % int.MaxValue;
             _activeLoopAudioSourcesByLoopId[loopId] = poolable;
 
             LogService.LogTopic($"Played Audio {audioClipType} with loop id {loopId}", LogTopicType.Audio);

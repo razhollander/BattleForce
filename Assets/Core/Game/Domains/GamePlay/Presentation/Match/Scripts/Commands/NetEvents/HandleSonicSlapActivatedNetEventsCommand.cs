@@ -5,7 +5,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
-    public class HandleSonicSlapActivatedNetEventsCommand : BaseCommand, ICommandVoid
+    public class HandleActivateSonicSlapNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchPlayerControllers _matchPlayerControllers;
@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            var netEvents = _cachedPresentationEventsService.SonicSlapActivatedNetEvents;
+            var netEvents = _cachedPresentationEventsService.ActivateSonicSlapNetEvents;
             if (netEvents.Count == 0)
             {
                 return;

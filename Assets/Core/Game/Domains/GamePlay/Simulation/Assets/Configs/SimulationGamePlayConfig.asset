@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SimulationAssembly::Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig
   InnerConfig:
     PlayerSpaceship:
-      StartHealth: 200
+      StartHealth: 1
       TargetMovementSpeed: 5
       RotationSpeed: 150
       ShootCooldown: 0.35
@@ -127,7 +127,7 @@ MonoBehaviour:
       Radius: 1.269
       ObtainablePowerUps: 02000000
       GalacticPullDurationSeconds: 4
-      GalacticPullForce: 80
+      GalacticPullForce: 70
       NukeForce: 50
       NukeMinSpinAmount: 200
       NukeMaxSpinAmount: 300
@@ -158,6 +158,7 @@ MonoBehaviour:
     EveryXStages: 2
     StageSizeMultiplier: 1
     SpeedupSimulation: 1
+    IsAutoShoot: 0
   references:
     version: 2
     RefIds:

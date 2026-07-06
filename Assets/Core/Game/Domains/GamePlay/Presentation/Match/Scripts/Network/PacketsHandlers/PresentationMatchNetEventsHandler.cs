@@ -731,7 +731,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        public void ProcessSonicSlapActivatedEvents(CapacityList<SonicSlapActivatedNetEventS2C> sonicSlapActivatedNetEvents)
+        public void ProcessActivateSonicSlapEvents(CapacityList<ActivateSonicSlapNetEventS2C> sonicSlapActivatedNetEvents)
         {
             if (sonicSlapActivatedNetEvents.IsNullOrEmpty())
             {
@@ -740,7 +740,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in sonicSlapActivatedNetEvents)
             {
-                _cachedPresentationEventsService.SonicSlapActivatedNetEvents.Add(netEvent);
+                _cachedPresentationEventsService.ActivateSonicSlapNetEvents.Add(netEvent);
             }
         }
 

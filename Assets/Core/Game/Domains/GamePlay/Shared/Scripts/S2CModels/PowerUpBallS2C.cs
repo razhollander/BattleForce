@@ -23,14 +23,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(Id);
+            writer.Put((byte)Id);
             writer.PutVector2Quantized(Position);
             writer.Put((byte)Type);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            Id = reader.GetUShort();
+            Id = reader.GetByte();
             Position = reader.GetVector2Quantized();
             Type = (PowerUpType)reader.GetByte();
         }

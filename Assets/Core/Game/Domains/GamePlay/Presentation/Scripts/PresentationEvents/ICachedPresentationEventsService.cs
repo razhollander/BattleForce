@@ -51,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<PlayerLockOnTargetsChangedNetEventS2C> PlayerLockOnTargetsChangedNetEvents { get; }
         List<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents { get; }
         List<PlayerPowerUpChangedNetEventS2C> PlayerPowerUpChangedNetEvents { get; }
-        List<SonicSlapActivatedNetEventS2C> SonicSlapActivatedNetEvents { get; }
+        List<ActivateSonicSlapNetEventS2C> ActivateSonicSlapNetEvents { get; }
         List<PerformGalacticPullNetEventS2C> PerformGalacticPullNetEvents { get; }
         List<DeactivateGalacticForceFieldNetEventS2C> DeactivateGalacticForceFieldNetEvents { get; }
         List<ActivateNukePowerUpNetEventS2C> ActivateNukePowerUpNetEvents { get; }

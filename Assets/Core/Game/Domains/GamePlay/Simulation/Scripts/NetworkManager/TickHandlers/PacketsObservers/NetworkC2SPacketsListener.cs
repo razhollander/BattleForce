@@ -20,7 +20,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         private readonly CapacityList<IRawPacketsObserver> _rawPacketsObservers;
 
         public event Action OnPacketReceivedEvent;
-        public event Action OnClientPeerConnectedEvent;
         public event Action<long> OnClientPeerDisconnectedEvent;
 
         public NetworkC2SPacketsListener(NetworkConfig networkConfig)
@@ -72,7 +71,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandl
         void INetEventListener.OnPeerConnected(NetPeer peer)
         {
             LogService.LogTopic("Player connected: " + peer.Address, LogTopicType.ServerNetwork);
-            OnClientPeerConnectedEvent?.Invoke();
         }
 
         void INetEventListener.OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)

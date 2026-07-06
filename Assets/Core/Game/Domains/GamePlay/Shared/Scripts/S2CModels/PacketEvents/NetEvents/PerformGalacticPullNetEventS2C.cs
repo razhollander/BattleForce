@@ -9,7 +9,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public ushort FieldId;
         public ushort CasterPlayerId;
         public ushort CasterTeamId;
-        public int EndTick;
 
         public void Serialize(NetDataWriter writer)
         {
@@ -17,7 +16,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             writer.Put(FieldId);
             writer.Put((byte)CasterPlayerId);
             writer.Put((byte)CasterTeamId);
-            writer.Put(EndTick);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -26,7 +24,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             FieldId = reader.GetUShort();
             CasterPlayerId = reader.GetByte();
             CasterTeamId = reader.GetByte();
-            EndTick = reader.GetInt();
         }
 
         public int CompareTo(PerformGalacticPullNetEventS2C other)

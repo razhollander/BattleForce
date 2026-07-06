@@ -65,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentsState.Serialize(writer);
             writer.Put(IsEngineOn);
             writer.Put(IsAlive);
-            writer.Put((ushort)AssistArrowType); // byte
+            writer.Put((byte)AssistArrowType);
             writer.Put(IsSpinned);
             writer.Put((byte)CurrentPowerUp);
             writer.Put(IsPowerUpCurrentlyActive);
@@ -90,7 +90,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             TalentsState.Deserialize(reader);
             IsEngineOn = reader.GetBool();
             IsAlive = reader.GetBool();
-            AssistArrowType = (PlayerAssistArrowType)reader.GetUShort(); // byte
+            AssistArrowType = (PlayerAssistArrowType) reader.GetByte();
             IsSpinned = reader.GetBool();
             CurrentPowerUp = (PowerUpType)reader.GetByte();
             IsPowerUpCurrentlyActive = reader.GetBool();

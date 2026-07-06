@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
 
             foreach (var playerId in _playersTouchingWall.Keys)
             {
-                _playersTouchingWall[playerId].CollectStickWalls(playerId, currentTick, minTicksTouching, _cachedPlayersStickToWall);
+                _playersTouchingWall[playerId].GetPlayersStickToWalls(playerId, currentTick, minTicksTouching, _cachedPlayersStickToWall);
             }
 
             return _cachedPlayersStickToWall;
@@ -122,7 +122,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
                 }
             }
 
-            public void CollectStickWalls(ushort playerId, int currentTick, int minTicksTouching, List<PlayerStickToWallData> output)
+            public void GetPlayersStickToWalls(ushort playerId, int currentTick, int minTicksTouching, List<PlayerStickToWallData> output)
             {
                 foreach (var wallId in _walls.Keys)
                 {

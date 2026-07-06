@@ -32,7 +32,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _lockOnTargetEffectController.RefreshTargetEffectsOfCaster(netEvent.PlayerId, netEvent.LockedOnTargetObjects);
             }
 
-
             _cachedPresentationEventsService.PlayerLockOnTargetsChangedNetEvents.Clear();
         }
     }

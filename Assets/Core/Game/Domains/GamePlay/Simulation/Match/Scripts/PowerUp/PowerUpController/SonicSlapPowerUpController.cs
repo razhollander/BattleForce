@@ -49,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
                 affectedPlayerId = playerState.Id;
             }
 
-            _netEventsDataService.AddSonicSlapActivatedNetEvent(tick, _casterPlayerId, _cachedAffectedPlayerIds);
+            _netEventsDataService.AddActivateSonicSlapNetEvent(tick, _casterPlayerId, _cachedAffectedPlayerIds);
         }
     }
 }
