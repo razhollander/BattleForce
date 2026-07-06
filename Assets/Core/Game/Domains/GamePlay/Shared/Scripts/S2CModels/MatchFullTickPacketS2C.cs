@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -62,9 +63,19 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<LayChickenEggNetEventS2C> LayChickenEggNetEvents;
         public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
         public FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C> ActivateYearsOfPainTalentNetEvents;
-        public FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents;
+        public FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C> PlayerLockOnTargetsChangedNetEvents;
         public FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents;
-        
+        public FixedUnorderedList<PlayerPowerUpChangedNetEventS2C> PlayerPowerUpChangedNetEvents;
+        public FixedClassUnorderedList<ActivateSonicSlapNetEventS2C> ActivateSonicSlapNetEvents;
+        public FixedUnorderedList<PerformGalacticPullNetEventS2C> PerformGalacticPullNetEvents;
+        public FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C> DeactivateGalacticForceFieldNetEvents;
+        public FixedUnorderedList<ActivateNukePowerUpNetEventS2C> ActivateNukePowerUpNetEvents;
+        public FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C> DeactivateShufflePowerUpNetEvents;
+        public FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C> ShuffleSwapPlayerPositionNetEvents;
+        public FixedUnorderedList<ActivateShuffleNetEventS2C> ActivateShuffleNetEvents;
+        public FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C> StartPowerUpGrantingPhaseNetEvents;
+        public FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C> EndPowerUpGrantingPhaseNetEvents;
+
         public MatchFullTickPacketS2C()
         {
             // use this from the server?
@@ -73,7 +84,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public MatchFullTickPacketS2C(MaxCap maxCap, SharedGamePlayConfig sharedGamePlayConfig)
         {
             CurrentSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
-                maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount, maxCap.ConcurrentChickenEggs);
+                maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount, maxCap.ConcurrentChickenEggs, maxCap.ConcurrentGalacticForceFields);
 
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
 
@@ -131,8 +142,18 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateHeadbuttTalentNetEvents = new FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>(maxCap.DeactivateHeadbuttTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
             ChickenEggHitNetEvents = new FixedUnorderedList<ChickenEggHitNetEventS2C>(maxCap.ChickenEggHitNetEvents);
-            PlayerLockOnHeartTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(maxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxCap.ConcurrentEnemyPlayers));
+            PlayerLockOnTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>(maxCap.PlayerLockOnTargetsChangedNetEvents, () => new PlayerLockOnTargetsChangedNetEventS2C(maxCap.ConcurrentLockOnTargets));
             PlayerLockedOnTargetHitNetEvents = new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(maxCap.ConcurrentPlayers);
+            PlayerPowerUpChangedNetEvents = new FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>(maxCap.PlayerPowerUpChangedNetEvents);
+            ActivateSonicSlapNetEvents = new FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>(maxCap.ActivateSonicSlapNetEvents, () => new ActivateSonicSlapNetEventS2C(maxCap.ConcurrentEnemyPlayers));
+            PerformGalacticPullNetEvents = new FixedUnorderedList<PerformGalacticPullNetEventS2C>(maxCap.PerformGalacticPullNetEvents);
+            DeactivateGalacticForceFieldNetEvents = new FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>(maxCap.DeactivateGalacticForceFieldNetEvents);
+            ActivateNukePowerUpNetEvents = new FixedUnorderedList<ActivateNukePowerUpNetEventS2C>(maxCap.ActivateNukePowerUpNetEvents);
+            DeactivateShufflePowerUpNetEvents = new FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>(maxCap.ActivateShufflePowerUpNetEvents);
+            ShuffleSwapPlayerPositionNetEvents = new FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>(maxCap.ShuffleSwapPlayerPositionNetEvents);
+            ActivateShuffleNetEvents = new FixedUnorderedList<ActivateShuffleNetEventS2C>(maxCap.ActivateShufflePowerUpNetEvents);
+            StartPowerUpGrantingPhaseNetEvents = new FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>(maxCap.StartPowerUpGrantingPhaseNetEvents);
+            EndPowerUpGrantingPhaseNetEvents = new FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>(maxCap.EndPowerUpGrantingPhaseNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -147,7 +168,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 1)) != 0) SerializedBulletSpawnedEvents(writer);
             if ((eventMask & (1UL << 2)) != 0) SerializedPlayerTakeDamageEvents(writer);
             if ((eventMask & (1UL << 3)) != 0) SerializedPlayerDiedEvents(writer);
-            if ((eventMask & (1UL << 4)) != 0) SerializedPlayerLockOnHeartTargetsChangedNetEvents(writer);
+            if ((eventMask & (1UL << 4)) != 0) SerializedPlayerLockOnTargetsChangedNetEvents(writer);
             if ((eventMask & (1UL << 5)) != 0) SerializedPlayerLockedOnTargetHitNetEvents(writer);
             if ((eventMask & (1UL << 6)) != 0) SerializedBulletDestroyedEvents(writer);
             if ((eventMask & (1UL << 7)) != 0) SerializedPlayerSwapEvents(writer);
@@ -184,12 +205,22 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 38)) != 0) SerializedChickenEggHitNetEvents(writer);
             if ((eventMask & (1UL << 39)) != 0) SerializedActivateYearsOfPainTalentNetEvents(writer);
             if ((eventMask & (1UL << 42)) != 0) SerializedEnvironmentSpikePlayerCollisionEvents(writer);
-            if ((eventMask & (1UL << 43)) != 0) SerializedActivateWaterGunTalentNetEvents(writer);
-            if ((eventMask & (1UL << 44)) != 0) SerializedDeactivateWaterGunTalentNetEvents(writer);
-            if ((eventMask & (1UL << 45)) != 0) SerializedActivateHeadbuttChargingNetEvents(writer);
-            if ((eventMask & (1UL << 46)) != 0) SerializedPerformHeadbuttDashNetEvents(writer);
-            if ((eventMask & (1UL << 47)) != 0) SerializedHeadbuttHitEnemyNetEvents(writer);
-            if ((eventMask & (1UL << 48)) != 0) SerializedDeactivateHeadbuttTalentNetEvents(writer);
+            if ((eventMask & (1UL << 40)) != 0) SerializedPlayerPowerUpChangedNetEvents(writer);
+            if ((eventMask & (1UL << 41)) != 0) SerializedActivateSonicSlapNetEvents(writer);
+            if ((eventMask & (1UL << 43)) != 0) SerializedPerformGalacticPullNetEvents(writer);
+            if ((eventMask & (1UL << 44)) != 0) SerializedDeactivateGalacticForceFieldNetEvents(writer);
+            if ((eventMask & (1UL << 45)) != 0) SerializedActivateNukePowerUpNetEvents(writer);
+            if ((eventMask & (1UL << 46)) != 0) SerializedDeactivateShufflePowerUpNetEvents(writer);
+            if ((eventMask & (1UL << 47)) != 0) SerializedShuffleSwapPlayerPositionNetEvents(writer);
+            if ((eventMask & (1UL << 48)) != 0) SerializedActivateShuffleNetEvents(writer);
+            if ((eventMask & (1UL << 49)) != 0) SerializedStartPowerUpGrantingPhaseNetEvents(writer);
+            if ((eventMask & (1UL << 50)) != 0) SerializedEndPowerUpGrantingPhaseNetEvents(writer);
+            if ((eventMask & (1UL << 51)) != 0) SerializedActivateWaterGunTalentNetEvents(writer);
+            if ((eventMask & (1UL << 52)) != 0) SerializedDeactivateWaterGunTalentNetEvents(writer);
+            if ((eventMask & (1UL << 53)) != 0) SerializedActivateHeadbuttChargingNetEvents(writer);
+            if ((eventMask & (1UL << 54)) != 0) SerializedPerformHeadbuttDashNetEvents(writer);
+            if ((eventMask & (1UL << 55)) != 0) SerializedHeadbuttHitEnemyNetEvents(writer);
+            if ((eventMask & (1UL << 56)) != 0) SerializedDeactivateHeadbuttTalentNetEvents(writer);
         }
 
         private ulong CalculateEventMask()
@@ -199,7 +230,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (BulletSpawnNetEvents.Count > 0) eventMask |= 1UL << 1;
             if (PlayerTakeDamageNetEvents.Count > 0) eventMask |= 1UL << 2;
             if (PlayerDiedNetEvents.Count > 0) eventMask |= 1UL << 3;
-            if (PlayerLockOnHeartTargetsChangedNetEvents.Count > 0) eventMask |= 1UL << 4;
+            if (PlayerLockOnTargetsChangedNetEvents.Count > 0) eventMask |= 1UL << 4;
             if (PlayerLockedOnTargetHitNetEvents.Count > 0) eventMask |= 1UL << 5;
             if (BulletDestroyedNetEvents.Count > 0) eventMask |= 1UL << 6;
             if (PlayerSwapNetEvents.Count > 0) eventMask |= 1UL << 7;
@@ -242,6 +273,16 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (ChickenEggHitNetEvents.Count > 0) eventMask |= 1UL << 38;
             if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 39;
             if (EnvironmentSpikePlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 42;
+            if (PlayerPowerUpChangedNetEvents.Count > 0) eventMask |= 1UL << 40;
+            if (ActivateSonicSlapNetEvents.Count > 0) eventMask |= 1UL << 41;
+            if (PerformGalacticPullNetEvents.Count > 0) eventMask |= 1UL << 43;
+            if (DeactivateGalacticForceFieldNetEvents.Count > 0) eventMask |= 1UL << 44;
+            if (ActivateNukePowerUpNetEvents.Count > 0) eventMask |= 1UL << 45;
+            if (DeactivateShufflePowerUpNetEvents.Count > 0) eventMask |= 1UL << 46;
+            if (ShuffleSwapPlayerPositionNetEvents.Count > 0) eventMask |= 1UL << 47;
+            if (ActivateShuffleNetEvents.Count > 0) eventMask |= 1UL << 48;
+            if (StartPowerUpGrantingPhaseNetEvents.Count > 0) eventMask |= 1UL << 49;
+            if (EndPowerUpGrantingPhaseNetEvents.Count > 0) eventMask |= 1UL << 50;
 
             return eventMask;
         }
@@ -265,12 +306,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 3)) != 0) DeserializedPlayerDiedEvents(reader);
             else PlayerDiedNetEvents.Clear();
 
-            if ((eventMask & (1UL << 4)) != 0) DeserializedPlayerLockOnHeartTargetsChangedNetEvents(reader);
+            if ((eventMask & (1UL << 4)) != 0) DeserializedPlayerLockOnTargetsChangedNetEvents(reader);
             else
             {
-                for (int i = 0; i < PlayerLockOnHeartTargetsChangedNetEvents.Count; i++)
-                    PlayerLockOnHeartTargetsChangedNetEvents[i].PlayerIdsLockedOnTarget.Clear();
-                PlayerLockOnHeartTargetsChangedNetEvents.Clear();
+                for (int i = 0; i < PlayerLockOnTargetsChangedNetEvents.Count; i++)
+                    PlayerLockOnTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();
+                PlayerLockOnTargetsChangedNetEvents.Clear();
             }
             
             if ((eventMask & (1UL << 5)) != 0) DeserializedPlayerLockedOnTargetHitNetEvents(reader);
@@ -381,22 +422,60 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 42)) != 0) DeserializedEnvironmentSpikePlayerCollisionEvents(reader);
             else EnvironmentSpikePlayerCollisionNetEvents.Clear();
 
-            if ((eventMask & (1UL << 43)) != 0) DeserializedActivateWaterGunTalentNetEvents(reader);
+            if ((eventMask & (1UL << 40)) != 0) DeserializedPlayerPowerUpChangedNetEvents(reader);
+            else PlayerPowerUpChangedNetEvents.Clear();
+
+            if ((eventMask & (1UL << 41)) != 0)
+            {
+                DeserializedActivateSonicSlapNetEvents(reader);
+            }
+            else
+            {
+                for (int i = 0; i < ActivateSonicSlapNetEvents.Count; i++)
+                    ActivateSonicSlapNetEvents[i].AffectedPlayerIds.Clear();
+                ActivateSonicSlapNetEvents.Clear();
+            }
+
+            if ((eventMask & (1UL << 43)) != 0) DeserializedPerformGalacticPullNetEvents(reader);
+            else PerformGalacticPullNetEvents.Clear();
+
+            if ((eventMask & (1UL << 44)) != 0) DeserializedDeactivateGalacticForceFieldNetEvents(reader);
+            else DeactivateGalacticForceFieldNetEvents.Clear();
+
+            if ((eventMask & (1UL << 45)) != 0) DeserializedActivateNukePowerUpNetEvents(reader);
+            else ActivateNukePowerUpNetEvents.Clear();
+
+            if ((eventMask & (1UL << 46)) != 0) DeserializedDeactivateShufflePowerUpNetEvents(reader);
+            else DeactivateShufflePowerUpNetEvents.Clear();
+
+            if ((eventMask & (1UL << 47)) != 0) DeserializedShuffleSwapPlayerPositionNetEvents(reader);
+            else ShuffleSwapPlayerPositionNetEvents.Clear();
+
+            if ((eventMask & (1UL << 48)) != 0) DeserializedActivateShuffleNetEvents(reader);
+            else ActivateShuffleNetEvents.Clear();
+
+            if ((eventMask & (1UL << 49)) != 0) DeserializedStartPowerUpGrantingPhaseNetEvents(reader);
+            else StartPowerUpGrantingPhaseNetEvents.Clear();
+
+            if ((eventMask & (1UL << 50)) != 0) DeserializedEndPowerUpGrantingPhaseNetEvents(reader);
+            else EndPowerUpGrantingPhaseNetEvents.Clear();
+
+            if ((eventMask & (1UL << 51)) != 0) DeserializedActivateWaterGunTalentNetEvents(reader);
             else ActivateWaterGunTalentNetEvents.Clear();
 
-            if ((eventMask & (1UL << 44)) != 0) DeserializedDeactivateWaterGunTalentNetEvents(reader);
+            if ((eventMask & (1UL << 52)) != 0) DeserializedDeactivateWaterGunTalentNetEvents(reader);
             else DeactivateWaterGunTalentNetEvents.Clear();
 
-            if ((eventMask & (1UL << 45)) != 0) DeserializedActivateHeadbuttChargingNetEvents(reader);
+            if ((eventMask & (1UL << 53)) != 0) DeserializedActivateHeadbuttChargingNetEvents(reader);
             else ActivateHeadbuttChargingNetEvents.Clear();
 
-            if ((eventMask & (1UL << 46)) != 0) DeserializedPerformHeadbuttDashNetEvents(reader);
+            if ((eventMask & (1UL << 54)) != 0) DeserializedPerformHeadbuttDashNetEvents(reader);
             else PerformHeadbuttDashNetEvents.Clear();
 
-            if ((eventMask & (1UL << 47)) != 0) DeserializedHeadbuttHitEnemyNetEvents(reader);
+            if ((eventMask & (1UL << 55)) != 0) DeserializedHeadbuttHitEnemyNetEvents(reader);
             else HeadbuttHitEnemyNetEvents.Clear();
 
-            if ((eventMask & (1UL << 48)) != 0) DeserializedDeactivateHeadbuttTalentNetEvents(reader);
+            if ((eventMask & (1UL << 56)) != 0) DeserializedDeactivateHeadbuttTalentNetEvents(reader);
             else DeactivateHeadbuttTalentNetEvents.Clear();
         }
 
@@ -1182,27 +1261,27 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
-        private void SerializedPlayerLockOnHeartTargetsChangedNetEvents(NetDataWriter writer)
+        private void SerializedPlayerLockOnTargetsChangedNetEvents(NetDataWriter writer)
         {
-            writer.Put((byte)PlayerLockOnHeartTargetsChangedNetEvents.Count);
-            foreach (var netEvent in PlayerLockOnHeartTargetsChangedNetEvents.AsSpan())
+            writer.Put((byte)PlayerLockOnTargetsChangedNetEvents.Count);
+            foreach (var netEvent in PlayerLockOnTargetsChangedNetEvents.AsSpan())
             {
                 netEvent.Serialize(writer);
             }
         }
 
-        private void DeserializedPlayerLockOnHeartTargetsChangedNetEvents(NetDataReader reader)
+        private void DeserializedPlayerLockOnTargetsChangedNetEvents(NetDataReader reader)
         {
-            for (int i = 0; i < PlayerLockOnHeartTargetsChangedNetEvents.Count; i++)
+            for (int i = 0; i < PlayerLockOnTargetsChangedNetEvents.Count; i++)
             {
-                PlayerLockOnHeartTargetsChangedNetEvents[i].PlayerIdsLockedOnTarget.Clear();
+                PlayerLockOnTargetsChangedNetEvents[i].LockedOnTargetObjects.Clear();
             }
             
-            PlayerLockOnHeartTargetsChangedNetEvents.Clear();
+            PlayerLockOnTargetsChangedNetEvents.Clear();
             var count = reader.GetByte();
             for (var i = 0; i < count; i++)
             {
-                var netEvent = PlayerLockOnHeartTargetsChangedNetEvents.AddAndGet();
+                var netEvent = PlayerLockOnTargetsChangedNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }
@@ -1223,6 +1302,195 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (var i = 0; i < count; i++)
             {
                 ref var netEvent = ref PlayerLockedOnTargetHitNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerPowerUpChangedNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerPowerUpChangedNetEvents.Count);
+            foreach (var netEvent in PlayerPowerUpChangedNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedPlayerPowerUpChangedNetEvents(NetDataReader reader)
+        {
+            PlayerPowerUpChangedNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PlayerPowerUpChangedNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateSonicSlapNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateSonicSlapNetEvents.Count);
+            foreach (var netEvent in ActivateSonicSlapNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedActivateSonicSlapNetEvents(NetDataReader reader)
+        {
+            for (int i = 0; i < ActivateSonicSlapNetEvents.Count; i++)
+            {
+                ActivateSonicSlapNetEvents[i].AffectedPlayerIds.Clear();
+            }
+
+            ActivateSonicSlapNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                var netEvent = ActivateSonicSlapNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPerformGalacticPullNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PerformGalacticPullNetEvents.Count);
+            foreach (var netEvent in PerformGalacticPullNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedPerformGalacticPullNetEvents(NetDataReader reader)
+        {
+            PerformGalacticPullNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PerformGalacticPullNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateGalacticForceFieldNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateGalacticForceFieldNetEvents.Count);
+            foreach (var netEvent in DeactivateGalacticForceFieldNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateGalacticForceFieldNetEvents(NetDataReader reader)
+        {
+            DeactivateGalacticForceFieldNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateGalacticForceFieldNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateNukePowerUpNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateNukePowerUpNetEvents.Count);
+            foreach (var netEvent in ActivateNukePowerUpNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedActivateNukePowerUpNetEvents(NetDataReader reader)
+        {
+            ActivateNukePowerUpNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateNukePowerUpNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateShufflePowerUpNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateShufflePowerUpNetEvents.Count);
+            foreach (var netEvent in DeactivateShufflePowerUpNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateShufflePowerUpNetEvents(NetDataReader reader)
+        {
+            DeactivateShufflePowerUpNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateShufflePowerUpNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedShuffleSwapPlayerPositionNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ShuffleSwapPlayerPositionNetEvents.Count);
+            foreach (var netEvent in ShuffleSwapPlayerPositionNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedShuffleSwapPlayerPositionNetEvents(NetDataReader reader)
+        {
+            ShuffleSwapPlayerPositionNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ShuffleSwapPlayerPositionNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateShuffleNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateShuffleNetEvents.Count);
+            foreach (var netEvent in ActivateShuffleNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedActivateShuffleNetEvents(NetDataReader reader)
+        {
+            ActivateShuffleNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateShuffleNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedStartPowerUpGrantingPhaseNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)StartPowerUpGrantingPhaseNetEvents.Count);
+            foreach (var netEvent in StartPowerUpGrantingPhaseNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedStartPowerUpGrantingPhaseNetEvents(NetDataReader reader)
+        {
+            StartPowerUpGrantingPhaseNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref StartPowerUpGrantingPhaseNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedEndPowerUpGrantingPhaseNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)EndPowerUpGrantingPhaseNetEvents.Count);
+            foreach (var netEvent in EndPowerUpGrantingPhaseNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedEndPowerUpGrantingPhaseNetEvents(NetDataReader reader)
+        {
+            EndPowerUpGrantingPhaseNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var netEvent = ref EndPowerUpGrantingPhaseNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

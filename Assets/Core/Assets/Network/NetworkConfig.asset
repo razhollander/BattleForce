@@ -19,8 +19,9 @@ MonoBehaviour:
     ConcurrentEvironmentWalls: 256
     ConcurrentEvironmentLavaWalls: 16
     ConcurrentEvironmentStageBoundaries: 256
-    ConcurrentEvironmentTeleportPairs: 4
+    ConcurrentEvironmentTeleportPairs: 8
     ConcurrentEvironmentSprings: 32
+    ConcurrentEvironmentSpikes: 32
     ConcurrentChickenEggs: 128
     PacketTypes: 256
     ConcurrentEnvironmentRotatingWheels: 16
@@ -29,7 +30,8 @@ MonoBehaviour:
       MaxWalls: 32
       MaxLavaWalls: 16
       MaxSprings: 8
-      MaxTeleportGatePairs: 4
+      MaxSpikes: 16
+      MaxTeleportGates: 8
     ConcurrentTimeOfImpactContacts: 32
     ConcurrentBodyCount: 512
     ConcurrentContactCount: 256
@@ -63,6 +65,7 @@ MonoBehaviour:
     StartMatchEligibleChangedNetEvents: 32
     TalentSwitchNetEvents: 128
     EnvironmentSpringPlayerCollisionNetEvents: 64
+    EnvironmentSpikePlayerCollisionNetEvents: 64
     GainBoltsNetEvents: 128
     PlayerToEnvironmentTeleportGateCollisionNetEvents: 64
     PreparationPhaseEndedNetEvents: 32
@@ -91,6 +94,18 @@ MonoBehaviour:
     LayChickenEggNetEvents: 128
     ChickenEggHitNetEvents: 128
     ActivateYearsOfPainTalentNetEvents: 128
+    PlayerLockOnTargetsChangedNetEvents: 128
+    PlayerLockOnTargetHitNetEvents: 128
+    PlayerPowerUpChangedNetEvents: 64
+    SonicSlapActivatedNetEvents: 64
+    ActivateNukePowerUpNetEvents: 16
+    ActivateShufflePowerUpNetEvents: 16
+    ShuffleSwapPlayerPositionNetEvents: 64
+    ConcurrentGalacticForceFields: 16
+    PerformGalacticPullNetEvents: 64
+    DeactivateGalacticForceFieldNetEvents: 64
+    StartPowerUpGrantingPhaseNetEvents: 64
+    EndPowerUpGrantingPhaseNetEvents: 64
   TicksPerSeconds: 60
   DeltaTime: 0.01666667
   PhysicsVelocityIterations: 8

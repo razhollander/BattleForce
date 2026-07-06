@@ -21,6 +21,19 @@ namespace Core.Scripts.Extensions.Linq
             return default;
         }
         
+        public static bool ContainsWithId<T>(this FixedUnorderedList<T> source, ushort id) where T : IEquatable<ushort>
+        {
+            foreach (var item in source.AsSpan())
+            {
+                if (item.Equals(id))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
         public static T FindWithId<T>(this FixedOrderedList<T> source, ushort id) where T : IEquatable<ushort>
         {
             foreach (var item in source.AsSpan())

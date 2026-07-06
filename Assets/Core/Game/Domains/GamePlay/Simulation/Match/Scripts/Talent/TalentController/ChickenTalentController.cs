@@ -1,11 +1,13 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
@@ -19,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly NetworkConfig _networkConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
+        private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
 
         private ushort _casterPlayerId;
         private int _countdownEndTick;
@@ -26,13 +29,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         public ChickenTalentController(IMatchDataService matchDataService,
             INetEventsDataService netEventsDataService,
             ISimulationGamePlayConfigService gamePlayConfigService,
-            NetworkConfig networkConfig, IPhysicsSimulator physicsSimulator)
+            NetworkConfig networkConfig, IPhysicsSimulator physicsSimulator, ICommandFactory commandFactory)
         {
             _matchDataService = matchDataService;
             _netEventsDataService = netEventsDataService;
             _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
+            _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort id) { _casterPlayerId = id; }
@@ -70,8 +74,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var config = _gamePlayConfigService.GamePlayConfig.Talents.ChickenTalentConfig;
 
             var movementDirection = casterPlayerState.Spaceship.Transform.Direction;
-            casterPlayerState.Spaceship.Transform.Velocity += movementDirection * config.PushForce;
-
+            var force = movementDirection * config.PushForce;
+            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
             var egg = _matchDataService.AddChickenEgg(_casterPlayerId, casterPlayerState.Spaceship.Transform.Position);
             _physicsSimulator.AddChickenEgg(egg.Id, casterPlayerState.TeamId, egg.Position, casterPlayerState.Spaceship.Transform.Radius);
             _netEventsDataService.AddLayChickenEggNetEventS2C(tick, _casterPlayerId, egg.Id, egg.Position);

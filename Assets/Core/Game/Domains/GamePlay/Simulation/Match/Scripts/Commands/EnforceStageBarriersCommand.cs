@@ -2,6 +2,7 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Utils;
 
@@ -66,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     minDistanceSq = distSq;
                     closestPointOnAnyBoundary = closestPointOnEdge;
 
-                    var edgeDir = Vector2.Normalize(p2 - p1);
+                    var edgeDir = (p2 - p1).NormalizeSafe();
                     bestNormal = new Vector2(-edgeDir.Y, edgeDir.X);
                 }
             }

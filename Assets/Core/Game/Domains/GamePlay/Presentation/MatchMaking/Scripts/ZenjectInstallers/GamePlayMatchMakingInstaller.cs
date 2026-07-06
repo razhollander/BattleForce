@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Bullets;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Environment.TeamFloor.Scripts.Mvcs;
@@ -28,6 +29,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.ZenjectIns
         [SerializeField] private StartMatchButtonView _startMatchButtonViewPrefab;
         [SerializeField] private MatchMakingUiView _matchMakingUiViewPrefab;
         [SerializeField] private BackgroundParallaxView _backgroundParallaxView;
+        [SerializeField] private LockOnTargetEffectView _lockOnTargetEffectViewPrefab;
+        [SerializeField] private LockOnTargetShootEffectView _lockOnTargetShootEffectViewPrefab;
 
         public override void InstallBindings()
         {
@@ -54,6 +57,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.ZenjectIns
             Container.BindInterfacesTo<StartMatchButtonController>().AsSingle().WithArguments(_startMatchButtonViewPrefab).NonLazy();
             Container.Bind<IMatchMakingUiController>().To<MatchMakingUiController>().AsSingle().WithArguments(_matchMakingUiViewPrefab).NonLazy();
             Container.BindInterfacesTo<BackgroundParallaxController>().AsSingle().WithArguments(_backgroundParallaxView).NonLazy();
+            Container.BindInterfacesTo<PlayersLockOnTargetEffectControllers>().AsSingle().WithArguments(_lockOnTargetEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<LockOnTargetShootEffectController>().AsSingle().WithArguments(_lockOnTargetShootEffectViewPrefab).NonLazy();
         }
     }
 }

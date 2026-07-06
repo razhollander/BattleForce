@@ -14,5 +14,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
         UnityEngine.Vector2 GetPlayerPosition(ushort playerId);
         Transform GetPlayerTransform(ushort playerId);
         void UpdatePlayerColor(ushort playerId, Color color);
+        void SetIsLockOnTargetSightShownForPlayer(ushort playerId, bool isShown);
     }
 }

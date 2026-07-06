@@ -20,12 +20,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
             _networkConfig = networkConfig;
             _observers = new List<ITickObserver>(2);
         }
-        
-        public void StartTick()
+
+        public void StartTick(float speedMultiplier = 1)
         {
             var cancellationTokenSource = new CancellationTokenSource();
-            _fixedTimer = new TimerFixedThreaded2("Server Thread", _networkConfig.TicksPerSeconds, OnTick);
+            _fixedTimer = new TimerFixedThreaded2("Server Thread", GetTicksPerSecond(speedMultiplier), OnTick);
             _fixedTimer.Start(cancellationTokenSource);
+        }
+
+        public void SetSpeedMultiplier(float speedMultiplier)
+        {
+            _fixedTimer?.SetTicksPerSecond(GetTicksPerSecond(speedMultiplier));
+        }
+
+        private float GetTicksPerSecond(float speedMultiplier)
+        {
+            return _networkConfig.TicksPerSeconds * speedMultiplier;
         }
 
         private void OnTick()
@@ -36,12 +46,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService
                 {
                     LogService.LogError("No observers registered!");
                 }
-                
+
                 for (int i = _observers.Count - 1; i >= 0; i--)
                 {
                     _observers[i].OnTick(CurrentTick);
                 }
-                
+
                 CurrentTick++;
             }
             catch (Exception e)

@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(Id);
+            writer.Put((byte)Id);
             writer.Put(PlayerCasterId);
             writer.PutVector2Quantized(Position);
             writer.Put(IsHookAttached);
@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         public void Deserialize(NetDataReader reader)
         {
-            Id = reader.GetUShort();
+            Id = reader.GetByte();
             PlayerCasterId = reader.GetUShort();
             Position = reader.GetVector2Quantized();
             IsHookAttached = reader.GetBool();

@@ -1,7 +1,9 @@
 using Core.Scripts.Mvc.WorldCamera;
 using Core.Scripts.Network;
 using Core.Scripts.Services.ApplicationSubscriptionService;
+using Core.Scripts.Services.AudioService;
 using Core.Scripts.Services.DataPersistence;
+using Core.Scripts.Services.HapticsService;
 using Core.Scripts.Services.Timer.Scripts;
 using Core.Scripts.Services.UnityThreadDispatcher;
 using CoreDomain.Scripts.Audio;
@@ -9,7 +11,6 @@ using CoreDomain.Scripts.Mvc.LoadingScreen;
 using CoreDomain.Scripts.Mvc.UICamera;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.AddressablesLoader;
-using CoreDomain.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.InitiatorInvokerService;
 using CoreDomain.Scripts.Services.Logger;
@@ -28,11 +29,12 @@ namespace CoreDomain.Scripts.ZenjectInstallers
         [SerializeField] private CoreAudioClipsScriptableObject _coreAudioClipsScriptableObject;
         [SerializeField] private UpdateSubscriptionService _updateSubscriptionService;
         [SerializeField] private ApplicationSubscriptionService _applicationSubscriptionService;
-        [SerializeField] private AudioService _audioService;
         [SerializeField] private LoadingScreenView _loadingScreenView;
         [SerializeField] private UICameraView _uiCameraView;
         [SerializeField] private WorldCameraView _worldCameraView;
         [SerializeField] private NetworkConfig _networkConfig;
+        [SerializeField] private HapticsConfig _hapticsConfig;
+        [SerializeField] private AudioSourcePoolable _audioSourcePoolable;
 
         public override void InstallBindings()
         {
@@ -44,7 +46,6 @@ namespace CoreDomain.Scripts.ZenjectInstallers
             Container.BindInterfacesTo<StateMachineService>().AsSingle().NonLazy();
             Container.BindInterfacesTo<UpdateSubscriptionService>().FromInstance(_updateSubscriptionService).AsSingle().NonLazy();
             Container.BindInterfacesTo<ApplicationSubscriptionService>().FromInstance(_applicationSubscriptionService).AsSingle().NonLazy();
-            Container.BindInterfacesTo<AudioService>().FromInstance(_audioService).AsSingle().NonLazy();
             Container.BindInterfacesTo<SerializerService>().AsSingle().NonLazy();
             Container.BindInterfacesTo<PlayerPrefsDataPersistence>().AsSingle().NonLazy();
             Container.BindInterfacesTo<SceneInitiatorsService>().AsSingle().NonLazy();
@@ -53,6 +54,8 @@ namespace CoreDomain.Scripts.ZenjectInstallers
             Container.BindInterfacesTo<UICameraController>().AsSingle().WithArguments(_uiCameraView).NonLazy();
             Container.BindInterfacesTo<WorldCameraController>().AsSingle().WithArguments(_worldCameraView).NonLazy();
             Container.BindInterfacesTo<TimerService>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<AudioService>().AsSingle().WithArguments(_audioSourcePoolable).NonLazy();
+            Container.BindInterfacesTo<HapticsService>().AsSingle().WithArguments(_hapticsConfig).NonLazy();
             Container.Bind<IUnityMainThreadDispatcher>().To<UnityMainThreadDispatcher>().AsSingle().NonLazy();
             Container.Bind<CoreAudioClipsScriptableObject>().FromScriptableObject(_coreAudioClipsScriptableObject).AsSingle().NonLazy();
             Container.Bind<GameInputActions>().AsSingle().NonLazy();

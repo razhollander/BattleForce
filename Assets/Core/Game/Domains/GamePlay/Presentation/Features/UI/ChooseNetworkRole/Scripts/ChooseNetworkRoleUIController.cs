@@ -8,6 +8,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Playback;
 using Core.Scripts.Network;
+using Core.Scripts.Services.AudioService;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.DataPersistence;
@@ -37,12 +38,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         private readonly IDataPersistence _dataPersistence;
         private readonly IInputDeviceChangedListenerService _nativeInputDeviceService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IAudioService _audioService;
 
         private List<PlayerJoinedModel> _playerJoinedModels = new List<PlayerJoinedModel>();
-        
+
         public ChooseNetworkRoleUIController(ChooseNetworkRoleUIView uiView, ISceneLoaderService sceneLoaderService,
             IStateMachineService stateMachineService, NetworkConfig networkConfig, IPlaybackIOService playbackIOService,
-            ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig, IDataPersistence dataPersistence, IInputDeviceChangedListenerService nativeInputDeviceService, PresentationGamePlayConfig gamePlayConfig)
+            ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig, IDataPersistence dataPersistence,
+            IInputDeviceChangedListenerService nativeInputDeviceService, PresentationGamePlayConfig gamePlayConfig, IAudioService audioService)
         {
             _uiView = uiView;
             _sceneLoaderService = sceneLoaderService;
@@ -54,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             _dataPersistence = dataPersistence;
             _nativeInputDeviceService = nativeInputDeviceService;
             _gamePlayConfig = gamePlayConfig;
+            _audioService = audioService;
         }
 
         public void InitEntryPoint()
@@ -91,8 +95,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         public void InitExitPoint()
         {
+            RemoveListeners();
+        }
+
+        public void RemoveListeners()
+        {
             _nativeInputDeviceService.GamepadAddedEvent -= OnGamepadAdded;
-            _nativeInputDeviceService.GamepadRemovedEvent -= OnGamepadRemoved;
+            _nativeInputDeviceService.GamepadRemovedEvent -= OnGamepadRemoved; 
         }
 
         private List<PlayerJoinedModel> GetAllPlayerJoinedModels()
@@ -156,6 +165,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnPlayPlaybackClicked()
         {
+            _audioService.PlayAudio(AudioClipType.UiClick);
             _ = OnPlayPlaybackClickedAsync();
         }
 
@@ -178,6 +188,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnServerClicked()
         {
+            _audioService.PlayAudio(AudioClipType.UiClick);
             _ = OnServerClickedAsync();
         }
 
@@ -202,6 +213,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
 
         private void OnHostClicked()
         {
+            _audioService.PlayAudio(AudioClipType.UiClick);
             StartHost().Forget();
         }
 
@@ -231,6 +243,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
             var port = _uiView.Port;
             var playersJoinedModels = GetPlayersJoined(isPlaybackEnabled, playbackName);
             var clientId = _gamePlayConfig.ShouldOverrideClientId ? _gamePlayConfig.ClientIdOverride : NetworkUtils.GetDeviceUniqueId();
+            RemoveListeners();
             
             _commandFactory.CreateCommandAsync<StartClientCommand>()
                 .SetIsHost(isHost)
@@ -322,6 +335,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.UI.ChooseNetworkRole.
         
         private void OnClientClicked()
         {
+            _audioService.PlayAudio(AudioClipType.UiClick);
             SaveLocallyChosenParameters();
             var cancellationTokenSource = _stateMachineService.CurrentState().CancellationTokenSource;
             var ip = _uiView.IsLocalHost ? NetUtils.LOCAL_HOST_IP_ADDRESS : _uiView.IpAddress;

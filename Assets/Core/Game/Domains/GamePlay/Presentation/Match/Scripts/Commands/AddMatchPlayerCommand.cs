@@ -1,4 +1,4 @@
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
@@ -48,7 +48,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             _playerControllers.AddPlayer(playerId);
             _playerUIControllers.AddPlayer(playerId, _currentServerTick);
             _worldCameraController.AddFollowTarget(_playerControllers.GetPlayerSpaceshipTransform(playerId));
-            _lockOnTargetEffectController.AddPlayer(playerId, _playerState.Spaceship.TargetedEnemyIds);
+            _lockOnTargetEffectController.AddPlayer(playerId, _playerState.Spaceship.LockOnTargetObjects);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using TMPro;
+using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTargetSight;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.Pools;
@@ -18,7 +19,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private Transform _heart;
-        
+        [SerializeField] private LockOnTargetSightView _lockOnTargetSightView;
+
         private Transform _transform;
         
         public Action Despawn { get; set; }
@@ -87,8 +89,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             gameObject.SetActive(true);
         }
 
+        public void SetIsLockOnTargetSightShown(bool isShown)
+        {
+            _lockOnTargetSightView.SetIsShown(isShown);
+        }
+
         public void OnDespawned()
         {
+            SetIsLockOnTargetSightShown(false);
             gameObject.SetActive(false);
         }
 

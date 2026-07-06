@@ -347,7 +347,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var preparationPhaseEndedNetEvent in preparationPhaseEndedNetEvents)
             {
-                _matchDataService.StartPhaseInitialTick = preparationPhaseEndedNetEvent.OccuredOnTick;
+                _matchDataService.PreperationPhaseEndedOnTick = preparationPhaseEndedNetEvent.OccuredOnTick;
                 _matchDataService.IsInPreparationPhase = false;
                 _cachedPresentationEventsService.PreparationPhaseEndedNetEvents.Add(preparationPhaseEndedNetEvent);
             }
@@ -710,26 +710,138 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        public void ProcessPlayerLockOnHeartTargetsChangedEvents(CapacityList<PlayerLockOnHeartTargetsChangedNetEventS2C> playerLockOnHeartTargetsChangedNetEvents)
+        public void ProcessPlayerLockOnTargetsChangedEvents(CapacityList<PlayerLockOnTargetsChangedNetEventS2C> playerLockOnTargetsChangedNetEvents)
         {
-            if (playerLockOnHeartTargetsChangedNetEvents.IsNullOrEmpty())
+            if (playerLockOnTargetsChangedNetEvents.IsNullOrEmpty())
             {
                 return;
             }
             
-            foreach (var netEvent in playerLockOnHeartTargetsChangedNetEvents)
+            foreach (var netEvent in playerLockOnTargetsChangedNetEvents)
             {
                 var player = _matchDataService.GetPlayer(netEvent.PlayerId);
-                player.Spaceship.TargetedEnemyIds.Clear();
+                player.Spaceship.LockOnTargetObjects.Clear();
                 
-                for (int i = 0; i < netEvent.PlayerIdsLockedOnTarget.Count; i++)
+                for (int i = 0; i < netEvent.LockedOnTargetObjects.Count; i++)
                 {
-                    ref var playerId = ref player.Spaceship.TargetedEnemyIds.AddAndGet();
-                    playerId = netEvent.PlayerIdsLockedOnTarget[i];
+                    ref var objectLockedOnTarget = ref player.Spaceship.LockOnTargetObjects.AddAndGet();
+                    objectLockedOnTarget = netEvent.LockedOnTargetObjects[i];
                 }
                 
-                _cachedPresentationEventsService.PlayerLockOnHeartTargetsChangedNetEvents.Add(netEvent);
+                _cachedPresentationEventsService.PlayerLockOnTargetsChangedNetEvents.Add(netEvent);
             }
+        }
+
+        public void ProcessPlayerLockedOnTargetHitEvents(CapacityList<PlayerLockedOnTargetHitNetEventS2C> playerLockedOnTargetHitNetEvents)
+        {
+            if (playerLockedOnTargetHitNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in playerLockedOnTargetHitNetEvents)
+            {
+                _cachedPresentationEventsService.PlayerLockedOnTargetHitNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessPlayerPowerUpChangedEvents(CapacityList<PlayerPowerUpChangedNetEventS2C> playerPowerUpChangedNetEvents)
+        {
+            if (playerPowerUpChangedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in playerPowerUpChangedNetEvents)
+            {
+                _matchDataService.GetPlayer(netEvent.PlayerId).Spaceship.CurrentPowerUp = netEvent.PowerUp;
+                _cachedPresentationEventsService.PlayerPowerUpChangedNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessActivateSonicSlapEvents(CapacityList<ActivateSonicSlapNetEventS2C> sonicSlapActivatedNetEvents)
+        {
+            if (sonicSlapActivatedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in sonicSlapActivatedNetEvents)
+            {
+                _cachedPresentationEventsService.ActivateSonicSlapNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessStartPowerUpGrantingPhaseEvents(CapacityList<StartPowerUpGrantingPhaseNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                _matchDataService.GetPlayer(netEvent.PlayerId).Spaceship.IsCurrentlyInGrantingPowerUpPhase = true;
+                _cachedPresentationEventsService.StartPowerUpGrantingPhaseNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessEndPowerUpGrantingPhaseEvents(CapacityList<EndPowerUpGrantingPhaseNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                var spaceship = _matchDataService.GetPlayer(netEvent.PlayerId).Spaceship;
+                spaceship.IsCurrentlyInGrantingPowerUpPhase = false;
+                spaceship.CurrentPowerUp = netEvent.GrantedPowerUp;
+                _cachedPresentationEventsService.EndPowerUpGrantingPhaseNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessPerformGalacticPullEvents(CapacityList<PerformGalacticPullNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.PerformGalacticPullNetEvents.Add(netEvent);
+        }
+
+        public void ProcessDeactivateGalacticForceFieldEvents(CapacityList<DeactivateGalacticForceFieldNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.DeactivateGalacticForceFieldNetEvents.Add(netEvent);
+        }
+
+        public void ProcessActivateNukePowerUpEvents(CapacityList<ActivateNukePowerUpNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.ActivateNukePowerUpNetEvents.Add(netEvent);
+        }
+
+        public void ProcessDeactivateShufflePowerUpEvents(CapacityList<DeactivateShufflePowerUpNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.DeactivateShufflePowerUpNetEvents.Add(netEvent);
+        }
+
+        public void ProcessShuffleSwapPlayerPositionEvents(CapacityList<ShuffleSwapPlayerPositionNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.ShuffleSwapPlayerPositionNetEvents.Add(netEvent);
+        }
+
+        public void ProcessActivateShuffleEvents(CapacityList<ActivateShuffleNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty()) return;
+            foreach (var netEvent in events)
+                _cachedPresentationEventsService.ActivateShuffleNetEvents.Add(netEvent);
         }
 
         public void ProcessActivateHeadbuttChargingEvents(CapacityList<ActivateHeadbuttChargingNetEventS2C> netEvents)

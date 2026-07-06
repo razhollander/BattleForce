@@ -473,6 +473,8 @@ MonoBehaviour:
   _startMatchButtonViewPrefab: {fileID: 1429378958978371035, guid: 25939835ccd504a2baf2eb0978071404, type: 3}
   _matchMakingUiViewPrefab: {fileID: 35296560}
   _backgroundParallaxView: {fileID: 1399282822741727384}
+  _lockOnTargetEffectViewPrefab: {fileID: 7351513350059897862, guid: a6f337b7b848c4597bcb15c7faead624, type: 3}
+  _lockOnTargetShootEffectViewPrefab: {fileID: 2666207878272819854, guid: d39ed28c19d944da58dc6a8f4753a93c, type: 3}
 --- !u!1001 &1399282822741727383
 PrefabInstance:
   m_ObjectHideFlags: 0

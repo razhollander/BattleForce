@@ -23,7 +23,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
-        private readonly SpinPlayerCommand _spinPlayerCommand;
+        private SpinPlayerCommand _spinPlayerCommand;
+        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private readonly ICommandFactory _commandFactory;
 
         public TalentType TalentType => TalentType.YearsOfPain;
 
@@ -47,9 +49,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
-            _spinPlayerCommand = commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _commandFactory = commandFactory;
         }
 
+        public void InitEntryPoint()
+        {
+            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+        }
+        
         public void SetCasterId(ushort casterPlayerId)
         {
             _casterPlayerId = casterPlayerId;
@@ -119,10 +127,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
 
             var forceToEnemy = direction * pushForce;
-            hitEnemyPlayer.Spaceship.Transform.Velocity += forceToEnemy;
-
             var randomSpin = RNG.NextFloat(config.MinSpin, config.MaxSpin);
             _spinPlayerCommand.SetPlayer(hitEnemyPlayer.Id).SetSpinAmount(randomSpin).SetTick(tick).Execute();
+            _addForceToPlayerCommand.SetForce(forceToEnemy).SetPlayerId(enemyId).ShouldTurnOffEngine(true).Execute();
         }
 
         public void StopIfActive(int tick)

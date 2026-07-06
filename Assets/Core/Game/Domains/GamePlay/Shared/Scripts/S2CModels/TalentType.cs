@@ -14,5 +14,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         Chicken = 10,
         WaterGun = 11,
         Headbutt = 12,
+        Rock = 13,
     }
 }

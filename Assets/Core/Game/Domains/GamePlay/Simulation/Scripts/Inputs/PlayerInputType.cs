@@ -6,6 +6,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
         TalentAInput = 1,
         TalentBInput = 2,
         TalentCInput = 3,
-        Shoot = 4
+        Shoot = 4,
+        PowerUpInput = 5
     }
 }

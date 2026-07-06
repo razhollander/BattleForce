@@ -1,9 +1,13 @@
 using System.Collections.Generic;
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.InputBeingUsed;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Network;
+using Core.Scripts.Services.AudioService;
+using Core.Scripts.Utils;
 using UnityEngine;
 using Zenject;
 using Vector2 = System.Numerics.Vector2;
@@ -19,16 +23,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly List<MatchPlayerController> _playerControllers = new ();
         private Transform _playersParent;
-
+        private readonly IAudioService _audioService;
 
         public MatchPlayerControllers(IMatchDataService matchDataService, MatchPlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider)
+            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             _matchDataService = matchDataService;
             _playerPool = new MatchPlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
+            _audioService = audioService;
         }
 
         public void InitEntryPoint()
@@ -40,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void AddPlayer(ushort playerId)
         {
             var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform,
-                _stageCancellationTokenProvider);
+                _stageCancellationTokenProvider, _audioService);
             playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
         }
@@ -94,6 +99,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetUmbrellaState(isUmbrella);
         }
 
+        public void SetPlayerCurrentPowerUp(ushort playerId, PowerUpType powerUpType)
+        {
+            GetPlayer(playerId).SetCurrentPowerUp(powerUpType);
+        }
+
         public void SetPlayerWaterGunState(ushort playerId, bool isOn)
         {
             GetPlayer(playerId).SetWaterGunState(isOn);
@@ -119,14 +129,34 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).PlayerYearsOfPain(direction);
         }
 
+        public void PlaySonicSnapEffectForPlayer(ushort playerId)
+        {
+            GetPlayer(playerId).PlaySonicSnapEffect();
+        }
+
+        public void ShowPowerUpEffect(ushort playerId)
+        {
+            GetPlayer(playerId).ShowActivatePowerUpEffect(_stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
+        }
+
+        public void StartPowerUpGrantingPhase(ushort playerId)
+        {
+            GetPlayer(playerId).StartPowerUpGrantingPhase(_stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
+        }
+
+        public void EndPowerUpGrantingPhase(ushort playerId, PowerUpType grantedPowerUp)
+        {
+            GetPlayer(playerId).EndPowerUpGrantingPhase(grantedPowerUp, _stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
+        }
+
         public void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled)
         {
             GetPlayer(playerId).SetIsDeadEffectEnabled(isEnabled);
         }
 
-        public void SetPlayerIsLockOnHeartSightShown(ushort playerId, bool isShown)
+        public void SetPlayerIsLockOnTargetSightShown(ushort playerId, bool isShown)
         {
-            GetPlayer(playerId).SetIsLockOnHeartSightShown(isShown);
+            GetPlayer(playerId).SetIsLockOnTargetSightShown(isShown);
         }
 
         public void SetIsPlayerKinged(ushort playerId, bool isKinged)

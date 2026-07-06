@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.LockOnHeartSights.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.WaterGunStream.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Scripts.Extensions;
@@ -31,12 +32,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private WaterGunStreamView _waterGunStreamView;
         [SerializeField] private PlayerChickenView _playerChickenView;
         [SerializeField] private YearsOfPainView _yearsOfPainView;
+        [SerializeField] private SonicSnapEffectView _sonicSnapEffectView;
         [SerializeField] private GameObject _deadAura;
         [SerializeField] private PlayerEyesView _playerEyesView;
         [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
-        [SerializeField] private LockOnHeartSightView _lockOnHeartSightView;
+        [SerializeField] private MatchPlayerPowerUpHudView _powerUpHudView;
         [SerializeField] private GameObject _crownGameObject;
         [SerializeField] private DeadTombstoneView _deadTombstoneView;
+        [SerializeField] private ActivatePowerUpEffectView _activatePowerUpEffectView;
         public Action Despawn { get; set; }
         
         public PlayerView Base => _playerView;
@@ -95,9 +98,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _moveAssistArrowSpriteRenderer.color = color.Darken(0.3f);
         }
         
-        public void UpdateHealthBar(int health, int maxHealth)
+        public void UpdateHealthBar(int health, int maxHealth, CancellationToken cancellationToken)
         {
-            _healthBar.UpdateBar(health, maxHealth);
+            _healthBar.UpdateBar(health, maxHealth, cancellationToken);
         }
         
         public void SetIsSpinned(bool isSpinned, CancellationTokenSource cancellationTokenSource)
@@ -113,6 +116,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void PlayYearsOfPainAnimation(Vector2 direction, CancellationTokenSource cancellationTokenSource)
         {
             _yearsOfPainView.PlayAndHide(direction, cancellationTokenSource).Forget();
+        }
+
+        public void PlaySonicSnapEffect(CancellationToken cancellationToken)
+        {
+            _sonicSnapEffectView.PlaySnapEffect(cancellationToken).Forget();
         }
 
         public void SetUmbrellaState(bool isOn)
@@ -151,7 +159,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void InterpolateAimRotation(System.Numerics.Vector2 direction, float decay)
         {
-            if (direction.LengthSquared() < 0.0001f)
+            if (direction.LengthSquared().IsAlmostEqual(0))
             {
                 LogService.LogError("Direction is too small (0) to interpolate");
 
@@ -177,7 +185,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerChickenView.SetChickenState(false);
             DisableUmbrellaState();
             _waterGunStreamView.Hide();
-            SetIsLockOnHeartSightShown(false);
             Base.OnDespawned();
         }
 
@@ -194,7 +201,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void InterpolateUmbrellaRotation(System.Numerics.Vector2 rotation, float decay)
         {
-            if (rotation.LengthSquared() < 0.0001f)
+            if (rotation.LengthSquared().IsAlmostEqual(0))
             {
                 LogService.LogError("Direction is too small (0) to interpolate");
                 return;
@@ -209,20 +216,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 Time.deltaTime
             ));
 
-            _playerEyesView.UpdateEyesToLookAtDirection(rotation);
+            //_playerEyesView.UpdateEyesToLookAtDirection(rotation);
         }
 
         public void InterpolateWaterGunRotation(System.Numerics.Vector2 aimDirection, float decay)
         {
-            if (aimDirection.LengthSquared() < 0.0001f)
+            if (aimDirection.LengthSquared().IsAlmostEqual(0))
             {
                 LogService.LogError("Direction is too small (0) to interpolate");
                 return;
             }
 
             _waterGunStreamView.UpdateStream(aimDirection, 0f);
-            _playerEyesView.UpdateEyesToLookAtDirection(aimDirection);
+           // _playerEyesView.UpdateEyesToLookAtDirection(aimDirection);
         }
+        
         public void SetIsDeadEffectEnabled(bool isEnabled, CancellationToken cancellationToken)
         {
             _deadTombstoneView.SetIsShown(isEnabled);
@@ -255,18 +263,39 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void OnSpawned()
         {
             SetIsHealthBarShown(true);
+            _sonicSnapEffectView.Hide();
             Base.OnSpawned();
         }
 
-        public void SetIsLockOnHeartSightShown(bool isShown)
+        public void SetIsLockOnTargetSightShown(bool isShown)
         {
-            _lockOnHeartSightView.SetIsShown(isShown);
+            Base.SetIsLockOnTargetSightShown(isShown);
             _playerEyesView.UpdateEyesAccordingToIsSightShown(isShown);
         }
 
         public void SetIsKinged(bool isKinged)
         {
             _crownGameObject.SetActive(isKinged);
+        }
+
+        public void SetCurrentPowerUp(bool shouldShowPowerUp, Sprite powerUpIcon)
+        {
+            _powerUpHudView.SetPowerUp(shouldShowPowerUp, powerUpIcon);
+        }
+        
+        public async Awaitable ShowActivatePowerUpEffect(CancellationToken cancellationToken)
+        {
+            await _activatePowerUpEffectView.PlayAnimation(cancellationToken);
+        }
+
+        public async Awaitable StartPowerUpGrantingPhaseReel(IReadOnlyList<Sprite> reelSprites, CancellationToken cancellationToken)
+        {
+            await _powerUpHudView.PlayGrantingPhaseReel(reelSprites, cancellationToken);
+        }
+
+        public async Awaitable EndPowerUpGrantingPhaseReel(Sprite grantedSprite, CancellationToken cancellationToken)
+        {
+            await _powerUpHudView.StopGrantingPhaseReelAndShowGranted(grantedSprite, cancellationToken);
         }
     }
 }

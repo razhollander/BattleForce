@@ -15,8 +15,11 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
 using Core.Scripts.Extensions.Linq;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
@@ -35,13 +38,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         private IPlayersTalentsManager _playersTalentsManager;
+        private IPlayersPowerUpsManager _playersPowerUpsManager;
         private ICommandFactory _commandFactory;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
         private TryAddARandomTalentForPlayerCommand _tryAddARandomTalentForPlayerCommand;
         private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
+        private IPlayersTouchingWallDataService _playersTouchingWallDataService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
         private List<ushort> _cachedShuffledTeamIds;
-        
+        private ITickService _tickService;
+
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
@@ -55,18 +61,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
+            _playersPowerUpsManager = _diContainer.Resolve<IPlayersPowerUpsManager>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
             _tryAddARandomTalentForPlayerCommand = _commandFactory.CreateCommandVoid<TryAddARandomTalentForPlayerCommand>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
+            _playersTouchingWallDataService = _diContainer.Resolve<IPlayersTouchingWallDataService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
+            _tickService = _diContainer.Resolve<ITickService>();
             _cachedShuffledTeamIds = new List<ushort>(_sharedGamePlayConfig.MaxTeamsAmount);
         }
 
         public void Execute()
         {
             LogService.LogTopic("init stage on server side", LogTopicType.ClientNetwork);
-            ClearStageData();
+            RestartStageData();
             var mapSizeMultiplier = _matchDataService.SimulationState.MapSizeMultiplier = _gamePlayConfigService.GamePlayConfig.StageSizeMultiplier;
             CreateEnvironmentLayout(mapSizeMultiplier);
             SetupPlayers(mapSizeMultiplier);
@@ -120,19 +129,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             return environmentLayoutId;
         }
 
-        private void ClearStageData()
+        private void RestartStageData()
         {
             _physicsSimulator.ClearAllData();
             _playersInLavaTrackerService.ClearAllData();
             _teleportGateService.ClearData();
             ClearStageObjectsInSimulationState();
             _matchDataService.SimulationState.IsInPreparationPhase = true;
-            _matchDataService.SimulationState.StartPhaseInitialTick = 0;
+            _matchDataService.SimulationState.PreperationPhaseStartedOnTick = _tickService.CurrentTick;
+            _matchDataService.SimulationState.PreperationPhaseEndedOnTick = 0;
             _matchDataService.SimulationState.IsInShowoffWinners = false;
             _matchDataService.SimulationState.CurrentStageWinnerTeamId = 0;
             _playersTalentsManager.ResetAllTalentsData();
+            _playersPowerUpsManager.RemoveAllPowerUps();
             _preparationPhaseTimerService.RestartTimer();
             _playersOutsideStageTrackerService.ClearAllData();
+            _playersTouchingWallDataService.ClearAllData();
             _lockOnTargetTimerService.ResetAllTimers();
             _stageDataService.ClearData();
         }
@@ -175,7 +187,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.IsEngineOn = true;
                 player.Spaceship.IsAlive = true;
                 player.Spaceship.IsSpinned = false;
-                player.Spaceship.TargetedEnemyIds.Clear();
+                player.Spaceship.LockOnTargetObjects.Clear();
                 
                 if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                 {
@@ -235,6 +247,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
                 var barrierConfig = barrierConfigs[barrierIndex];
                 _matchDataService.EnvironmentData.AddFieldBarrier((ushort)barrierIndex, teamId, barrierConfig.Position * mapSizeMultiplier, barrierConfig.Size * mapSizeMultiplier, barrierConfig.Shape);
+                ref var refTeamId = ref _matchDataService.SimulationState.FieldBarriersOrderedByTeamId.AddAndGet();
+                refTeamId = teamId;
                 barrierIndex++;
             }
         }

@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
@@ -17,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IStartStagePacketHandler _startStagePacketHandler;
         private IBackgroundParallaxController _backgroundParallaxController;
         private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
+        private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
 
         public override void ResolveDependencies()
         {
@@ -26,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
             _talentCardObtainedEffectController = _diContainer.Resolve<ITalentCardObtainedEffectController>();
+            _galacticPullStarEffectControllers = _diContainer.Resolve<IGalacticPullStarEffectControllers>();
         }
 
         public void Execute()
@@ -36,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _fullTickPacketsHandler.InitExitPoint();
             _startStagePacketHandler.InitExitPoint();
             _talentCardObtainedEffectController.InitExitPoint();
+            _galacticPullStarEffectControllers.InitExitPoint();
         }
     }
 }

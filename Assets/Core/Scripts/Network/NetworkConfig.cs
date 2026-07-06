@@ -24,6 +24,7 @@ namespace Core.Scripts.Network
     {
         public int ConcurrentPlayers = 8;
         public int ConcurrentEnemyPlayers => ConcurrentPlayers - 1;
+        public int ConcurrentLockOnTargets => ConcurrentEnemyPlayers + ConcurrentPowerUpBalls;
         public int ConcurrentBullets = 256;
         public int ConcurrentTalentCards = 128;
         public int ConcurrentEvironmentWalls = 256;
@@ -111,8 +112,18 @@ namespace Core.Scripts.Network
         public int LayChickenEggNetEvents = 128;
         public int ChickenEggHitNetEvents = 128;
         public int ActivateYearsOfPainTalentNetEvents = 128;
-        public int PlayerLockOnHeartTargetsChangedNetEvents = 128;
-        public int PlayerLockOnHeartTargetHitNetEvents = 128;
+        public int PlayerLockOnTargetsChangedNetEvents = 128;
+        public int PlayerLockOnTargetHitNetEvents = 128;
+        public int PlayerPowerUpChangedNetEvents = 64;
+        public int ActivateSonicSlapNetEvents = 64;
+        public int ActivateNukePowerUpNetEvents = 64;
+        public int ActivateShufflePowerUpNetEvents = 64;
+        public int ShuffleSwapPlayerPositionNetEvents = 128;
+        public int ConcurrentGalacticForceFields = 16;
+        public int PerformGalacticPullNetEvents = 64;
+        public int DeactivateGalacticForceFieldNetEvents = 64;
+        public int StartPowerUpGrantingPhaseNetEvents = 64;
+        public int EndPowerUpGrantingPhaseNetEvents = 64;
 
         [Serializable]
         public class EnvironmentRotatingWheel

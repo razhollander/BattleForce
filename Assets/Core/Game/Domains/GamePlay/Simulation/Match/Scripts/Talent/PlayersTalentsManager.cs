@@ -36,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         {
             var playerTalentControllers = _talentControllersPool.Get();
             playerTalentControllers.SetCasterId(playerId);
+            playerTalentControllers.InitEntryPoint();
             _talentControllersPerPlayer.Add(playerId, playerTalentControllers);
         }
 
@@ -199,11 +200,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             }
         }
 
+        public void StopTalentIfActive(TalentType talentType, ushort playerId, int tick)
+        {
+            _talentControllersPerPlayer[playerId].StopTalentIfActive(talentType, tick);
+        }
+
         public void TryHeadbuttHitEnemy(ushort potentialCasterId, ushort potentialEnemyId, int tick)
         {
             var casterState = _matchDataService.SimulationState.GetPlayerById(potentialCasterId);
             var enemyState = _matchDataService.SimulationState.GetPlayerById(potentialEnemyId);
-            if (casterState.TeamId == enemyState.TeamId) return;
+            var arePlayersEnemies = casterState.TeamId != enemyState.TeamId;
+
+            if (!arePlayersEnemies)
+            {
+                return;
+            }
 
             if (_talentControllersPerPlayer.TryGetValue(potentialCasterId, out var controllers))
             {

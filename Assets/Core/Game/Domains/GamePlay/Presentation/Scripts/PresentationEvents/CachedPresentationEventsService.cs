@@ -53,6 +53,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<LayChickenEggNetEventS2C> LayChickenEggNetEvents { get; } = new();
         public List<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents { get; } = new();
         public List<ActivateYearsOfPainTalentNetEventS2C> ActivateYearsOfPainTalentNetEvents { get; } = new();
-        public List<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents { get; } = new();
+        public List<PlayerLockOnTargetsChangedNetEventS2C> PlayerLockOnTargetsChangedNetEvents { get; } = new();
+        public List<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents { get; } = new();
+        public List<PlayerPowerUpChangedNetEventS2C> PlayerPowerUpChangedNetEvents { get; } = new();
+        public List<ActivateSonicSlapNetEventS2C> ActivateSonicSlapNetEvents { get; } = new();
+        public List<PerformGalacticPullNetEventS2C> PerformGalacticPullNetEvents { get; } = new();
+        public List<DeactivateGalacticForceFieldNetEventS2C> DeactivateGalacticForceFieldNetEvents { get; } = new();
+        public List<ActivateNukePowerUpNetEventS2C> ActivateNukePowerUpNetEvents { get; } = new();
+        public List<DeactivateShufflePowerUpNetEventS2C> DeactivateShufflePowerUpNetEvents { get; } = new();
+        public List<ShuffleSwapPlayerPositionNetEventS2C> ShuffleSwapPlayerPositionNetEvents { get; } = new();
+        public List<ActivateShuffleNetEventS2C> ActivateShuffleNetEvents { get; } = new();
+        public List<StartPowerUpGrantingPhaseNetEventS2C> StartPowerUpGrantingPhaseNetEvents { get; } = new();
+        public List<EndPowerUpGrantingPhaseNetEventS2C> EndPowerUpGrantingPhaseNetEvents { get; } = new();
     }
 }

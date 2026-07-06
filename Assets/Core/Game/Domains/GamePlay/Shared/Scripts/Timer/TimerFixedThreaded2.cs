@@ -8,7 +8,7 @@ namespace Core.Game.Domains.GamePlay.Shared
 {
     public sealed class TimerFixedThreaded2
     {
-        private readonly float _fixedDelta;
+        private float _fixedDelta;
         private double _accumulator;
         private long _lastTime;
 
@@ -21,12 +21,22 @@ namespace Core.Game.Domains.GamePlay.Shared
         private readonly object _lock = new object();
         private readonly string _threadName;
 
-        public TimerFixedThreaded2(string threadName, int ticksPerSecond, Action onTickAction)
+        public TimerFixedThreaded2(string threadName, float ticksPerSecond, Action onTickAction)
         {
             _threadName = threadName;
-            _fixedDelta = ticksPerSecond < 0 ? 0 : 1.0f / ticksPerSecond;
+            _fixedDelta = ToFixedDelta(ticksPerSecond);
             _stopwatch = new Stopwatch();
             _onTickAction = onTickAction ?? throw new ArgumentNullException(nameof(onTickAction));
+        }
+
+        public void SetTicksPerSecond(float ticksPerSecond)
+        {
+            _fixedDelta = ToFixedDelta(ticksPerSecond);
+        }
+
+        private static float ToFixedDelta(float ticksPerSecond)
+        {
+            return ticksPerSecond <= 0 ? 0 : 1.0f / ticksPerSecond;
         }
 
         public void Start(CancellationTokenSource cancellationTokenSource)
@@ -144,7 +154,7 @@ namespace Core.Game.Domains.GamePlay.Shared
             [Conditional("WINDOWS")]
             public static void Begin1ms()
             {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || WINDOWS
+#if WINDOWS // UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN ||
             if (Interlocked.Increment(ref _refCount) == 1)
                 timeBeginPeriod(1);
 #endif
@@ -152,7 +162,7 @@ namespace Core.Game.Domains.GamePlay.Shared
 
             public static void End1ms()
             {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || WINDOWS
+#if WINDOWS // UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN ||
             int count = Interlocked.Decrement(ref _refCount);
             if (count == 0)
                 timeEndPeriod(1);
@@ -163,7 +173,7 @@ namespace Core.Game.Domains.GamePlay.Shared
 #endif
             }
 
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || WINDOWS
+#if WINDOWS // UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN ||
         [DllImport("winmm.dll", EntryPoint = "timeBeginPeriod", ExactSpelling = true)]
         private static extern uint timeBeginPeriod(uint uMilliseconds);
 

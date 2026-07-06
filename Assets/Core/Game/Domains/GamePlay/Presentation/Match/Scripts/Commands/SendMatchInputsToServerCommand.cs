@@ -70,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 playerInputDataC2S.IsTalentAInputPressed = calculatedInputs.IsTalentAInputPressed;
                 playerInputDataC2S.IsTalentBInputPressed = calculatedInputs.IsTalentBInputPressed;
                 playerInputDataC2S.IsTalentCInputPressed = calculatedInputs.IsTalentCInputPressed;
+                playerInputDataC2S.IsPowerUpInputPressed = calculatedInputs.IsPowerUpInputPressed;
                 playerInputDataC2S.AimDirection = calculatedInputs.AimDirection;
             }
 

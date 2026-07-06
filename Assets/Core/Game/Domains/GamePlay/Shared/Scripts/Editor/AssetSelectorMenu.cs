@@ -9,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Editor
         private const string NETWORK_CONFIG_ASSET_PATH = "Assets/Core/Assets/Network/NetworkConfig.asset";
         private const string PRESENTATION_GAMEPLAY_CONFIG_ASSET_PATH = "Assets/Core/Game/Domains/GamePlay/Presentation/Assets/Configs/PresentationGamePlayConfig.asset";
         private const string SHARED_GAMEPLAY_CONFIG_ASSET_PATH = "Assets/Core/Game/Domains/GamePlay/Shared/Assets/SharedGamePlayConfig.asset";
+        private const string CORE_AUDIO_CLIPS_ASSET_PATH = "Assets/Core/Assets/Audio/ScriptableObjects/CoreAudioClips.asset";
             
         [MenuItem("PracticAPI/Select Asset/Network Config", false, 1)]
         private static void SelectNetworkConfig()
@@ -39,6 +40,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Editor
         {
             var sharedGamePlayConfig = AssetDatabase.LoadAssetAtPath<SharedGamePlayConfig>(SHARED_GAMEPLAY_CONFIG_ASSET_PATH);
             SelectAsset(sharedGamePlayConfig.Environment);
+        }
+
+        [MenuItem("PracticAPI/Select Asset/Core Audio Clips", false, 6)]
+        private static void SelectCoreAudioClips()
+        {
+            SelectAssetAtPath(CORE_AUDIO_CLIPS_ASSET_PATH);
         }
         
         private static void SelectAssetAtPath(string assetPath)

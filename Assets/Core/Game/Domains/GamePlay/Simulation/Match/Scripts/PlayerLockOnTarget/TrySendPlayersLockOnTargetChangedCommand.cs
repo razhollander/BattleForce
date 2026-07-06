@@ -1,16 +1,15 @@
+using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
-using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Utils;
-using UnityEngine;
+
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 {
@@ -20,9 +19,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         private IPhysicsSimulator _physicsSimulator;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private INetEventsDataService _netEventsDataService;
-        
-        private FixedUnorderedList<ushort> _cachedLockedOnHeartIds;
-        private readonly PhysicsBodyType[] _cachedBodyTypesRayCastCanHit = {PhysicsBodyType.PlayerHeart, PhysicsBodyType.Wall, PhysicsBodyType.PlayerSpaceship, PhysicsBodyType.StartMatchWall};
+        private ILockOnTargetTimerService _lockOnTargetTimerService;
+
+        private FixedUnorderedList<ObjectLockedOnTargetS2C> _cachedLockedOnObjects;
+        private readonly PhysicsBodyType[] _cachedBodyTypesRayCastCanHit = {PhysicsBodyType.PlayerHeart, PhysicsBodyType.Wall, PhysicsBodyType.PlayerSpaceship, PhysicsBodyType.StartMatchWall, PhysicsBodyType.PowerUpBall};
         private int _processedTick;
 
         public TrySendPlayersLockOnTargetChangedCommand SetProcessedTick(int processedTick)
@@ -30,15 +30,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _processedTick = processedTick;
             return this;
         }
-        
+
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
+            _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
             var networkConfig = _diContainer.Resolve<NetworkConfig>();
-            _cachedLockedOnHeartIds = new FixedUnorderedList<ushort>(networkConfig.MaxCap.ConcurrentPlayers - 1);
+            _cachedLockedOnObjects = new FixedUnorderedList<ObjectLockedOnTargetS2C>(networkConfig.MaxCap.ConcurrentLockOnTargets);
         }
 
         public void Execute()
@@ -50,44 +51,44 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
-                _cachedLockedOnHeartIds.Clear();
-                FindTargetedEnemyIdsOfCaster(playerState, _cachedLockedOnHeartIds);
-                _cachedLockedOnHeartIds.Sort();
+                _cachedLockedOnObjects.Clear();
 
-                var casterTargetedEnemyIds = playerState.Spaceship.TargetedEnemyIds;
-                var areIdentical = _cachedLockedOnHeartIds.IsIdentical(casterTargetedEnemyIds);
+                var canPlayerFindTargets = !playerState.Spaceship.IsSpinned && playerState.Spaceship.IsAlive;
+                if (canPlayerFindTargets)
+                {
+                    var rayOriginPosition = playerState.Spaceship.Transform.GetHeadPosition();
+                    DebugDrawUtils.DrawArc2D(rayOriginPosition, playerState.Spaceship.Transform.Direction,
+                        _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange,
+                        _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees);
+                    FindTargetedEnemyIdsOfCaster(rayOriginPosition, playerState, _cachedLockedOnObjects);
+                    FindTargetedPowerUpBallsOfCaster(rayOriginPosition, playerState, _cachedLockedOnObjects);
+                }
+
+                _cachedLockedOnObjects.Sort();
+
+                var casterTargetedObjects = playerState.Spaceship.LockOnTargetObjects;
+                var areIdentical = _cachedLockedOnObjects.IsIdentical(casterTargetedObjects);
 
                 if (areIdentical)
                 {
                     continue;
                 }
 
-                casterTargetedEnemyIds.Clear();
+                casterTargetedObjects.Clear();
 
-                for (int i = 0; i < _cachedLockedOnHeartIds.Count; i++)
+                for (int i = 0; i < _cachedLockedOnObjects.Count; i++)
                 {
-                    ref var targetedEnemyId = ref casterTargetedEnemyIds.AddAndGet();
-                    targetedEnemyId = _cachedLockedOnHeartIds[i];
+                    ref var targetedEnemy = ref casterTargetedObjects.AddAndGet();
+                    targetedEnemy = _cachedLockedOnObjects[i];
                 }
 
-                _netEventsDataService.AddPlayerLockOnHeartTargetsChangedNetEvent(_processedTick, playerState.Id, casterTargetedEnemyIds);
+                _netEventsDataService.AddPlayerLockOnTargetsChangedNetEvent(_processedTick, playerState.Id, casterTargetedObjects);
             }
         }
 
-        private void FindTargetedEnemyIdsOfCaster(PlayerStateS2C casterPlayerState, FixedUnorderedList<ushort> outputTargetedEnemyIds)
+        private void FindTargetedEnemyIdsOfCaster(Vector2 rayOriginPosition, PlayerStateS2C casterPlayerState, FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedEnemyIds)
         {
-            if (casterPlayerState.Spaceship.IsSpinned)
-            {
-                return;
-            }
-            
-            var rayOriginPosition = casterPlayerState.Spaceship.Transform.GetHeadPosition();
-            var radius = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartMaxRange;
-            var maxLockOnHeartRangeSquare = radius * radius;
-            
-            DebugDrawUtils.DrawArc2D(rayOriginPosition, casterPlayerState.Spaceship.Transform.Direction, radius,
-                _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees);
-
+            var casterBody = new PhysicsBodyData(casterPlayerState.Id, PhysicsBodyType.PlayerSpaceship);
             var players = _matchDataService.SimulationState.Players;
 
             for (int i = 0; i < players.Count; i++)
@@ -101,40 +102,78 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 }
 
                 var enemyHeartPos = targetedPlayerState.Spaceship.Transform.GetHeartPosition();
-                var rayOriginToEnemyHeartDistanceSquared = System.Numerics.Vector2.DistanceSquared(rayOriginPosition, enemyHeartPos);
-                var isEnemyHeartInRange = rayOriginToEnemyHeartDistanceSquared <= maxLockOnHeartRangeSquare;
-                
-                if (!isEnemyHeartInRange)
-                {
-                    continue;
-                }
-
-                var directionToEnemy = enemyHeartPos - rayOriginPosition;
-                var playerCasterDirection = casterPlayerState.Spaceship.Transform.Direction;
-                var deltaAngleRadians = MathUtils.DeltaAbsoluteAngleRadians(MathUtils.GetAngle(playerCasterDirection), MathUtils.GetAngle(directionToEnemy));
-                var deltaAngleDegrees = deltaAngleRadians * Mathf.Rad2Deg;
-                var maxLockOnHeartAngle = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnHeartHalfArcAngleDegrees;
-                var isInAngleRange = deltaAngleDegrees <= maxLockOnHeartAngle;
-
-                if (!isInAngleRange)
+                if (!IsPositionInLockOnCone(casterPlayerState, rayOriginPosition, enemyHeartPos))
                 {
                     continue;
                 }
 
                 var isTargetSpinned = targetedPlayerState.Spaceship.IsSpinned;
-                if (!isTargetSpinned)
+                var didRayTowardEnemyHeartHitAnything =_physicsSimulator.RayCast(rayOriginPosition, enemyHeartPos, out var hitBodyData, _cachedBodyTypesRayCastCanHit, casterBody);
+                var didHitValidBody = isTargetSpinned
+                    ? hitBodyData.PhysicsBodyType is PhysicsBodyType.PlayerHeart or PhysicsBodyType.PlayerSpaceship
+                    : hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerHeart;
+                var didHitEnemyHeart = didRayTowardEnemyHeartHitAnything && didHitValidBody && hitBodyData.Id == targetedPlayerState.Id;
+                if (!didHitEnemyHeart)
                 {
-                    var didRayTowardEnemyHeartHitAnything =_physicsSimulator.RayCast(rayOriginPosition, enemyHeartPos, out var hitBodyData, _cachedBodyTypesRayCastCanHit);
-                    var didHitEnemyHeart = didRayTowardEnemyHeartHitAnything && hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerHeart && hitBodyData.Id == targetedPlayerState.Id;
-                    if (!didHitEnemyHeart)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
-                
-                ref var targetedPlayerId = ref outputTargetedEnemyIds.AddAndGet();
-                targetedPlayerId = targetedPlayerState.Id;
+
+                AddLockedOnTarget(outputTargetedEnemyIds, casterPlayerState.Id, targetedPlayerState.Id, LockOnTargetType.Heart);
             }
+        }
+
+        private void FindTargetedPowerUpBallsOfCaster(Vector2 rayOriginPosition, PlayerStateS2C casterPlayerState, FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedEnemyIds)
+        {
+            var casterBody = new PhysicsBodyData(casterPlayerState.Id, PhysicsBodyType.PlayerSpaceship);
+
+            var powerUpBalls = _matchDataService.SimulationState.PowerUpBalls;
+
+            for (int i = 0; i < powerUpBalls.Count; i++)
+            {
+                var powerUpBall = powerUpBalls.GetByIndex(i);
+                var ballPosition = powerUpBall.Position;
+                if (!IsPositionInLockOnCone(casterPlayerState, rayOriginPosition, ballPosition))
+                {
+                    continue;
+                }
+
+                var didRayTowardBallHitAnything = _physicsSimulator.RayCast(rayOriginPosition, ballPosition, out var hitBodyData, _cachedBodyTypesRayCastCanHit, casterBody);
+                var didHitBall = didRayTowardBallHitAnything && hitBodyData.PhysicsBodyType == PhysicsBodyType.PowerUpBall && hitBodyData.Id == powerUpBall.Id;
+                if (!didHitBall)
+                {
+                    continue;
+                }
+
+                AddLockedOnTarget(outputTargetedEnemyIds, casterPlayerState.Id, powerUpBall.Id, LockOnTargetType.PowerUpBall);
+            }
+        }
+
+        private bool IsPositionInLockOnCone(PlayerStateS2C casterPlayerState, System.Numerics.Vector2 rayOriginPosition, System.Numerics.Vector2 targetPosition)
+        {
+            var maxRange = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange;
+            var rayOriginToTargetDistanceSquared = System.Numerics.Vector2.DistanceSquared(rayOriginPosition, targetPosition);
+            var isTargetInRange = rayOriginToTargetDistanceSquared <= maxRange * maxRange;
+
+            if (!isTargetInRange)
+            {
+                return false;
+            }
+
+            var directionToTarget = targetPosition - rayOriginPosition;
+            var playerCasterDirection = casterPlayerState.Spaceship.Transform.Direction;
+            var deltaAngleRadians = MathUtils.DeltaAbsoluteAngleRadians(MathUtils.GetAngle(playerCasterDirection), MathUtils.GetAngle(directionToTarget));
+            var deltaAngleDegrees = deltaAngleRadians * UnityEngine.Mathf.Rad2Deg;
+            var maxLockOnAngle = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees;
+
+            return deltaAngleDegrees <= maxLockOnAngle;
+        }
+
+        private void AddLockedOnTarget(FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedEnemyIds, ushort casterId, ushort targetId, LockOnTargetType targetType)
+        {
+            ref var targetedObject = ref outputTargetedEnemyIds.AddAndGet();
+            targetedObject.TargetId = targetId;
+            targetedObject.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterId, targetId, targetType);
+            targetedObject.TargetType = targetType;
         }
     }
 }

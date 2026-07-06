@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(Id);
+            writer.Put((byte)Id);
             writer.Put(PlayerCasterId);
             writer.Put(CreatedOnTick);
             writer.Put(EndTick);
@@ -38,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         public void Deserialize(NetDataReader reader)
         {
-            Id = reader.GetUShort();
+            Id = reader.GetByte();
             PlayerCasterId = reader.GetUShort();
             CreatedOnTick = reader.GetInt();
             EndTick = reader.GetInt();

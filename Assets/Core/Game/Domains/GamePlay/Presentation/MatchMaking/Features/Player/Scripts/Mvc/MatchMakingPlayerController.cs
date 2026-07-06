@@ -38,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
             _playerView.SetColor(_gamePlayConfig.ColorPerTeamId[playerModel.TeamId]);
             _playerView.SetPositionAndRotation(playerTransform.Position.ToUnityVector2(),
                 playerTransform.Direction.ToUnityVector2().ToQuaternion());
+            _playerView.SetIsLockOnTargetSightShown(playerModel.Spaceship.IsLockingOnWall);
         }
 
         public void UpdateTransform()
@@ -93,6 +94,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
         public void SetColor(Color color)
         {
             _playerView.SetColor(color);
+        }
+
+        public void SetIsLockOnTargetSightShown(bool isShown)
+        {
+            _playerView.SetIsLockOnTargetSightShown(isShown);
         }
     }
 }

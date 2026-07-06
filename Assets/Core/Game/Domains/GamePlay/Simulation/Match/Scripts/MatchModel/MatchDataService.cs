@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Scripts.Network;
-using CoreDomain.Scripts.Services.Logger.Base;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
@@ -19,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastKOProjectileCreatedId = 0;
         private ushort _lastGrapplingHookProjectileCreatedId = 0;
         private ushort _lastChickenEggCreatedId = 0;
+        private ushort _lastGalacticForceFieldCreatedId = 0;
         public List<int> DidntPlayYetStageIndexes { get; } = new List<int>();
         public MatchEnvironmentDataService EnvironmentData { get; private set; }
         public HashSet<ushort> TeamIds { get; private set; }
@@ -35,7 +34,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
                 maxCap.ConcurrentTalentCards,
                 maxCap.ConcurrentPowerUpBalls,
                 sharedGamePlayConfig.MaxTeamsAmount,
-                maxCap.ConcurrentChickenEggs);
+                maxCap.ConcurrentChickenEggs,
+                maxCap.ConcurrentGalacticForceFields);
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
@@ -90,7 +90,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public PowerUpBallS2C AddPowerUpBall(Vector2 position, Vector2 velocity, PowerUpType powerUpType)
         {
             ref var powerUpBall = ref _simulationState.PowerUpBalls.AddAndGet();
-            var powerUpBallId =(ushort) (++_lastPowerUpBallCreatedId % ushort.MaxValue);
+            var powerUpBallId =(ushort) (++_lastPowerUpBallCreatedId % byte.MaxValue);
             powerUpBall.Id = powerUpBallId;
             powerUpBall.Position = position;
             powerUpBall.Velocity = velocity;
@@ -100,7 +100,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public TalentSwapFieldS2C AddSwapField(ushort casterPlayerId, int tick, int fieldEndTick)
         {
             ref var swapField = ref _simulationState.SwapFields.AddAndGet();
-            var swapFieldId =(ushort) (++_lastSwapFieldCreatedId % ushort.MaxValue);
+            var swapFieldId =(ushort) (++_lastSwapFieldCreatedId % byte.MaxValue);
             swapField.Id = swapFieldId;
             swapField.PlayerCasterId = casterPlayerId;
             swapField.CreatedOnTick = tick;
@@ -111,7 +111,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public TalentKOProjectileS2C AddKOProjectile(int tick, ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 velocity, float size)
         {
             ref var koProjectile = ref _simulationState.KOProjectiles.AddAndGet();
-            var koProjectileId = (ushort)(++_lastKOProjectileCreatedId % ushort.MaxValue);
+            var koProjectileId = (ushort)(++_lastKOProjectileCreatedId % byte.MaxValue);
             koProjectile.CreatedOnTick = tick;
             koProjectile.Id = koProjectileId;
             koProjectile.PlayerCasterId = casterPlayerId;
@@ -125,7 +125,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public TalentGrapplingHookProjectileStateS2C AddGrapplingHookProjectile(ushort casterPlayerId, Vector2 position, Vector2 velocity)
         {
             ref var grapplingHookProjectile = ref _simulationState.GrapplingHookProjectiles.AddAndGet();
-            var projectileId = (ushort)(++_lastGrapplingHookProjectileCreatedId % ushort.MaxValue); 
+            var projectileId = (ushort)(++_lastGrapplingHookProjectileCreatedId % byte.MaxValue); 
             grapplingHookProjectile.Id = projectileId;
             grapplingHookProjectile.PlayerCasterId = casterPlayerId;
             grapplingHookProjectile.StartPosition = position;
@@ -144,6 +144,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             egg.Position = position;
 
             return egg;
+        }
+
+        public GalacticForceFieldS2C AddGalacticForceField(ushort casterTeamId, int endTick)
+        {
+            ref var field = ref SimulationState.GalacticForceFields.AddAndGet();
+            var fieldId = (ushort)(++_lastGalacticForceFieldCreatedId % byte.MaxValue);
+            field.Id = fieldId;
+            field.CasterTeamId = casterTeamId;
+            field.EndTick = endTick;
+            return field;
         }
     }
 }

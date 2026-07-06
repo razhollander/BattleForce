@@ -1,6 +1,7 @@
 ﻿/* Written by Kaz Crowe */
 /* SimpleHealthBarEditor.cs */
 
+using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using UnityEditor;
 using UnityEditor.AnimatedValues;
@@ -146,7 +147,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Edi
 					barColor.colorValue = targ.barImage.color;
 					serializedObject.ApplyModifiedProperties();
 				}
-				targ.UpdateBar( testValue, 100.0f );
+				targ.UpdateBar( testValue, 100.0f, CancellationToken.None );
 
 				ImageFilledWarning.target = GetBarImageWarning();
 				ImageAssigned.target = GetImageAssigned();
@@ -264,7 +265,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Edi
 					serializedObject.ApplyModifiedProperties();
 					DisplayTextOption.target = targ.displayText != SimpleHealthBar.DisplayText.Disabled;
 
-					targ.UpdateBar( testValue, 100.0f );
+					targ.UpdateBar( testValue, 100.0f , CancellationToken.None);
 					if( barText.objectReferenceValue != null )
 						EditorUtility.SetDirty( targ.barText );
 				}
@@ -279,7 +280,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Edi
 					{
 						serializedObject.ApplyModifiedProperties();
 						targ.UpdateTextColor( textColor );
-						targ.UpdateBar( testValue, 100.0f );
+						targ.UpdateBar( testValue, 100.0f , CancellationToken.None);
 						if( barText.objectReferenceValue != null )
 							EditorUtility.SetDirty( targ.barText );
 					}
@@ -299,7 +300,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Edi
 					if( EditorGUI.EndChangeCheck() )
 					{
 						serializedObject.ApplyModifiedProperties();
-						targ.UpdateBar( testValue, 100.0f );
+						targ.UpdateBar( testValue, 100.0f, CancellationToken.None );
 						if( barText.objectReferenceValue != null )
 							EditorUtility.SetDirty( targ.barText );
 					}
@@ -343,7 +344,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Edi
 					if( targ.barImage != null )
 					{
 						targ.barImage.enabled = false;
-						targ.UpdateBar( testValue, 100.0f );
+						targ.UpdateBar( testValue, 100.0f , CancellationToken.None);
 						targ.barImage.enabled = true;
 						EditorUtility.SetDirty( targ.barImage );
 					}

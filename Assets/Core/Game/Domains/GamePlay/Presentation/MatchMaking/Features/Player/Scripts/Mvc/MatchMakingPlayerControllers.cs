@@ -86,5 +86,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
                 player.SetColor(color);
             }
         }
+
+        public void SetIsLockOnTargetSightShownForPlayer(ushort playerId, bool isShown)
+        {
+            GetPlayer(playerId).SetIsLockOnTargetSightShown(isShown);
+        }
     }
 }

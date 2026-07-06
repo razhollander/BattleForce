@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Core.Scripts.Extensions.Linq;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
@@ -7,26 +7,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
     public class PlayerLockOnTargetTimers
     {
         public ushort CasterId { get; }
-        
-        private readonly Dictionary<ushort, float> _targetTimers;
-        private readonly List<ushort> _cachedTargetsToRemoveBuffer;
+
+        private readonly Dictionary<LockOnTargetKey, float> _targetTimers;
+        private readonly List<LockOnTargetKey> _cachedTargetsToRemoveBuffer;
 
         public PlayerLockOnTargetTimers(ushort casterId)
         {
             CasterId = casterId;
-            _targetTimers = new Dictionary<ushort, float>();
-            _cachedTargetsToRemoveBuffer = new List<ushort>();
+            _targetTimers = new Dictionary<LockOnTargetKey, float>();
+            _cachedTargetsToRemoveBuffer = new List<LockOnTargetKey>();
         }
 
-        public void StepTimers(FixedUnorderedList<ushort> targetedIds, float deltaTime)
+        public void StepTimers(FixedUnorderedList<ObjectLockedOnTargetS2C> targetedIds, float deltaTime)
         {
             _cachedTargetsToRemoveBuffer.Clear();
 
-            foreach (var targetId in _targetTimers.Keys)
+            foreach (var targetKey in _targetTimers.Keys)
             {
-                if (!targetedIds.Contains(targetId))
+                if (!ContainsTarget(targetedIds, targetKey))
                 {
-                    _cachedTargetsToRemoveBuffer.Add(targetId);
+                    _cachedTargetsToRemoveBuffer.Add(targetKey);
                 }
             }
 
@@ -37,34 +37,41 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
             for (int i = 0; i < targetedIds.Count; i++)
             {
-                var targetId = targetedIds[i];
-                if (_targetTimers.TryGetValue(targetId, out var timer))
+                var targetKey = targetedIds[i].GetKey();
+                if (_targetTimers.TryGetValue(targetKey, out var timer))
                 {
-                    _targetTimers[targetId] = timer + deltaTime;
+                    _targetTimers[targetKey] = timer + deltaTime;
                 }
                 else
                 {
-                    _targetTimers[targetId] = deltaTime;
+                    _targetTimers[targetKey] = deltaTime;
                 }
             }
         }
 
-        public void CollectPlayersToDamage(float durationLimit, List<(ushort CasterId, ushort TargetId)> outputList)
+        public bool IsTargetShootable(LockOnTargetKey targetKey, float durationLimit)
         {
-            foreach (var kvp in _targetTimers)
+            return _targetTimers.TryGetValue(targetKey, out var timer) && timer >= durationLimit;
+        }
+
+        private static bool ContainsTarget(FixedUnorderedList<ObjectLockedOnTargetS2C> targetedIds, LockOnTargetKey targetKey)
+        {
+            for (int i = 0; i < targetedIds.Count; i++)
             {
-                if (kvp.Value >= durationLimit)
+                if (targetedIds[i].GetKey().Equals(targetKey))
                 {
-                    outputList.Add((CasterId, kvp.Key));
+                    return true;
                 }
             }
+
+            return false;
         }
 
-        public void ResetTimer(ushort targetId)
+        public void ResetTimer(LockOnTargetKey targetKey)
         {
-            if (_targetTimers.ContainsKey(targetId))
+            if (_targetTimers.ContainsKey(targetKey))
             {
-                _targetTimers[targetId] = 0f;
+                _targetTimers[targetKey] = 0f;
             }
         }
 

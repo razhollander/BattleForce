@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
@@ -49,8 +50,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly ConcurrentPool<FixedClassUnorderedList<MatchPlayersInputPacketC2S>> _inputsListsPool;
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         private readonly IPlayersTalentsManager _playersTalentsManager;
+        private readonly IPlayersPowerUpsManager _playersPowerUpsManager;
         private readonly IPlaybackRecorderService _playerbackRecorderService;
-        private readonly TryPerformShootForPlayerIfNotOnCooldownCommand _tryPerformShootForPlayerIfNotOnCooldownCommand;
+        private TryShootLockedOnTargetsCommand _tryShootLockedOnTargetsCommand;
 
         public bool DidReceiveAnyInputFromClient(long clientId)
         {
@@ -59,7 +61,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, INetEventsDataService netEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
-            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, ISimulationInputService simulationInputService, IClientsNetworkDataService clientsNetworkDataService)
+            IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, ISimulationInputService simulationInputService, IClientsNetworkDataService clientsNetworkDataService,
+            IPlayersPowerUpsManager playersPowerUpsManager)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -70,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _updateSubscriptionService = updateSubscriptionService;
             _commandFactory = commandFactory;
             _playersTalentsManager = playersTalentsManager;
+            _playersPowerUpsManager = playersPowerUpsManager;
             _playerbackRecorderService = playerbackRecorderService;
             _simulationInputService = simulationInputService;
             _clientsNetworkDataService = clientsNetworkDataService;
@@ -82,13 +86,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _playerInputPacketsPool = new ConcurrentPool<MatchPlayersInputPacketC2S>(() => new MatchPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers), maxAmountOfInputPacketsPlusMaxClientsAmount);
             _earliestInputPacketsPool = new ConcurrentPool<MatchPlayersInputPacketC2S>(() => new MatchPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers), networkConfig.MaxCap.ConcurrentPlayers);
             _heighestProcessedTickPerClient = new CapacityDict<long, int>(networkConfig.MaxCap.ConcurrentPlayers);
-            _tryPerformShootForPlayerIfNotOnCooldownCommand = _commandFactory.CreateCommandVoid<TryPerformShootForPlayerIfNotOnCooldownCommand>();
         }
 
         public void InitEntryPoint()
         {
             _networkManager.RegisterPacketsObserver(this);
             _updateSubscriptionService.RegisterGuiUpdatable(this);
+            _tryShootLockedOnTargetsCommand = _commandFactory.CreateCommandVoid<TryShootLockedOnTargetsCommand>();
         }
 
         public void InitExitPoint()
@@ -155,7 +159,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     }
 
                     var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-                    UpdatePlayerShoot(processedTick, true, playerState);
+                    UpdatePlayerShoot(processedTick, playerInput.IsShootInputPressed, playerState);
 
                     playerState.Spaceship.TalentsState.AimDirection = playerInput.AimDirection;
                     UpdatePlayerDirection(playerInput, playerState);
@@ -166,13 +170,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentAInput, isTalentAInputPressed);
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentBInput, isTalentBInputPressed);
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentCInput, isTalentCInputPressed);
+                    _simulationInputService.SetPlayerInput(playerId, PlayerInputType.PowerUpInput, playerInput.IsPowerUpInputPressed);
 
                     TrySwitchTalent(processedTick, playerState);
                     ProcessPlayerTalentInput(processedTick, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, playerState, deltaTime);
+                    ProcessPlayerPowerUpInput(processedTick, playerState);
                 }
             }
 
             return earliestInputsPerClient;
+        }
+
+        private void ProcessPlayerPowerUpInput(int processedTick, PlayerStateS2C playerState)
+        {
+            var playerId = playerState.Id;
+            var wasPowerUpInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.PowerUpInput);
+            _playersPowerUpsManager.ProcessPowerUpInput(playerId, processedTick, wasPowerUpInputDownThisTick);
         }
 
         private void ProcessPlayerTalentInput(int processedTick, bool isTalentAInputPressed, bool isTalentBInputPressed, bool isTalentCInputPressed, PlayerStateS2C playerState, float deltaTime)
@@ -183,8 +196,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
 
             var playerId = playerState.Id;
-            _playersTalentsManager.ProcessAllTalentsTickOfPlayer(playerId, processedTick, deltaTime); // not sure should be here
-            
+
+            if (_playersPowerUpsManager.IsPowerUpActiveForPlayer(playerId))
+                return;
+
             if (currentSelectedTalent.IsOnCooldown())
             {
                 return;
@@ -300,39 +315,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         {
             var playerId = playerModel.Id;
             _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, isShootInputPressed);
-            var shootState = playerModel.Spaceship.Shoot;
-            var isReadyToShoot = false;//shootState.CooldownSecondsLeft == shootState.MaxCooldown;
 
-            if (!isReadyToShoot)
+            var wasShootInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
+            if (!_gamePlayConfigService.GamePlayConfig.IsAutoShoot && !wasShootInputDownThisTick)
             {
                 return;
             }
 
-            var isEnemyInfrontOfPlayer = _physicsSimulator.ArcCastOnPlayers(
-                playerModel.Spaceship.Transform.Position,
-                _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.AutoShootRange,
-                playerModel.Spaceship.Transform.Direction,
-                _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.AutoShootAngleDegrees,
-                (short)playerModel.TeamId,
-                out var hitBodyData);
-
-            if (!isEnemyInfrontOfPlayer)
-            {
-                return;
-            }
-
-            var enemyId = hitBodyData.Id;
-            var enemyPlayerModel = _matchDataService.SimulationState.GetPlayerById(enemyId);
-            var doesPlayersLookAtSameDirection = System.Numerics.Vector2.Dot(playerModel.Spaceship.Transform.Direction, enemyPlayerModel.Spaceship.Transform.Direction) > 0;
-            if (doesPlayersLookAtSameDirection)
-            {
-                _tryPerformShootForPlayerIfNotOnCooldownCommand.SetPlayerId(playerId).SetTick(processedTick).Execute();
-            }
+            _tryShootLockedOnTargetsCommand.SetCasterPlayerId(playerId).SetProcessedTick(processedTick).Execute();
         }
 
         private void UpdatePlayerDirection(MatchLocalPlayerInputDataC2S playerInputData, PlayerStateS2C playerState)
         {
-            if (playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) && selectedTalent.IsCurrentlyAiming)
+            if (playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) && selectedTalent.IsCurrentlyAiming
+                || selectedTalent is {TalentType: TalentType.Umbrella, IsCurrentlyActive: true})
             {
                 return;
             }
@@ -393,16 +389,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             newPacket.Deserialize(reader);
     
             var shouldIgnorePacket = !isReceivedFromPlayback && _playerbackRecorderService.IsPlaybackEnabled;
+            var clientId = (long)peer.Tag;
+            
             if (!shouldIgnorePacket)
             {
-                var clientId = (long)peer.Tag;
+                OnClientInputsReceived(newPacket, clientId);
+            }
+            
+            if(!isReceivedFromPlayback)
+            {
                 var heighestProcessedTickOfClient = _heighestProcessedTickPerClient.TryGetValue(clientId, out int value) ? value : -1;
                 if (newPacket.HeighestProcessedTickFromServer > heighestProcessedTickOfClient)
                 {
                     _heighestProcessedTickPerClient[clientId] = newPacket.HeighestProcessedTickFromServer;
                 }
-    
-                OnClientInputsReceived(newPacket, clientId);
             }
             
             _playerInputPacketsPool.Return(newPacket);

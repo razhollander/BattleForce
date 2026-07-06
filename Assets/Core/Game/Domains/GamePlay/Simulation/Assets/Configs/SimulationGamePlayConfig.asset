@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SimulationAssembly::Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig
   InnerConfig:
     PlayerSpaceship:
-      StartHealth: 2
+      StartHealth: 1
       TargetMovementSpeed: 5
       RotationSpeed: 150
       ShootCooldown: 0.35
@@ -28,9 +28,9 @@ MonoBehaviour:
       MinVelocity: 0.01
       TurnEngineOnWhenReachVelocity: 0.25
       DefaultHeartRadius: 0.64
-      LockOnHeartMaxRange: 13
-      LockOnHeartHalfArcAngleDegrees: 45
-      LockOnHeartHitDamage: 1
+      LockOnTargetMaxRange: 13
+      LockOnTargetHalfArcAngleDegrees: 45
+      LockOnTargetHitDamage: 1
     PlayerBullet:
       MoveSpeed: 10
       Radius: 0.14154
@@ -113,7 +113,7 @@ MonoBehaviour:
         SpinAmount: 50
       YearsOfPainTalentConfig:
         RectangleColliderSize: {x: 3, y: 1.5}
-        PushForce: 100
+        PushForce: 60
         MaxSpin: 200
         MinSpin: 180
       WaterGunTalentConfig:
@@ -136,11 +136,18 @@ MonoBehaviour:
       DamageAmount: 1
       DamageIntervalInSeconds: 1
     PowerUps:
-      SpawnMinSecondsInterval: 5
-      SpawnMaxSecondsInterval: 10
+      SpawnMinSecondsInterval: 1
+      SpawnMaxSecondsInterval: 2
       MaxConcurrentPowerUpBalls: 5
       MoveSpeed: 5
       Radius: 1.269
+      ObtainablePowerUps: 02000000
+      GalacticPullDurationSeconds: 4
+      GalacticPullForce: 70
+      NukeForce: 50
+      NukeMinSpinAmount: 200
+      NukeMaxSpinAmount: 300
+      ShuffleSwapIntervalInSeconds: 0.25
     EnvironmentSprings:
       Force: 40
       MaxSpin: 65
@@ -149,7 +156,7 @@ MonoBehaviour:
     EnvironmentSpikes:
       Damage: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 10
+    DeafultEnvironmentId: 11
     ShouldChooseRandomStage: 0
     ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3
@@ -166,6 +173,8 @@ MonoBehaviour:
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
     StageSizeMultiplier: 1
+    SpeedupSimulation: 1
+    IsAutoShoot: 0
   references:
     version: 2
     RefIds:

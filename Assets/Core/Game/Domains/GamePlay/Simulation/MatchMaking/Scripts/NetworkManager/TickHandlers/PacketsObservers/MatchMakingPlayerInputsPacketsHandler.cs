@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOnWall;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -10,6 +11,7 @@ using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib;
@@ -31,6 +33,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly IClientsNetworkDataService _clientsNetworkDataService;
+        private readonly ICommandFactory _commandFactory;
+        private TryShootLockedOnWallCommand _tryShootLockedOnWallCommand;
 
         private readonly CapacityDict<long, FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>> _inputsPerClient;
         private readonly CapacityDict<long, int> _heighestProcessedTickPerClient;
@@ -41,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly ConcurrentPool<MatchMakingPlayersInputPacketC2S> _earliestInputPacketsPool;
 
         public MatchMakingPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
-            ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, INetEventsDataService netEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, IClientsNetworkDataService clientsNetworkDataService)
+            ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, INetEventsDataService netEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, IClientsNetworkDataService clientsNetworkDataService, ICommandFactory commandFactory)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -51,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _physicsSimulator = physicsSimulator;
             _updateSubscriptionService = updateSubscriptionService;
             _clientsNetworkDataService = clientsNetworkDataService;
+            _commandFactory = commandFactory;
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerClient = new CapacityDict<long, MatchMakingPlayersInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _inputsPerClient = new CapacityDict<long, FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -66,6 +71,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         {
             _networkManager.RegisterPacketsObserver(this);
             _updateSubscriptionService.RegisterGuiUpdatable(this);
+            _tryShootLockedOnWallCommand = _commandFactory.CreateCommandVoid<TryShootLockedOnWallCommand>();
         }
 
         public void InitExitPoint()
@@ -177,24 +183,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
 
         private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, MatchMakingPlayerStateS2C playerModel)
         {
-            var shootState = playerModel.Spaceship.Shoot;
-            var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
+            //var shootState = playerModel.Spaceship.Shoot;
+            //var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
 
-            if (shouldShoot)
+            if (!_gamePlayConfigService.GamePlayConfig.IsAutoShoot && !isShootInputPressed)
             {
-                shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
-                playerModel.Spaceship.Shoot = shootState;
-                CreateBulletForPlayer(processedTick, playerModel);
+                return;
             }
-        }
 
-        private void CreateBulletForPlayer(int processedTick, MatchMakingPlayerStateS2C playerModel)
-        {
-            var bullet = _matchDataService.AddBullet(playerModel.Id, playerModel.Spaceship.Transform.GetHeadPosition(),
-                playerModel.Spaceship.Transform.Direction, _gamePlayConfigService.GamePlayConfig.PlayerBullet.MoveSpeed, _gamePlayConfigService.GamePlayConfig.PlayerBullet.Radius);
-            _netEventsDataService.AddBulletSpawnNetEvent(processedTick, bullet.Id, bullet.BelongToPlayerId, bullet.Position, bullet.Radius, bullet.Velocity);
-            _physicsSimulator.AddPlayerBullet(bullet.Id, playerModel.TeamId, bullet.Position, bullet.Velocity, bullet.Radius);
-            LogService.LogTopic($"CreateBulletForPlayer {bullet.ToJson()}", LogTopicType.ServerNetwork);
+            // shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
+            // playerModel.Spaceship.Shoot = shootState;
+            _tryShootLockedOnWallCommand.SetCasterPlayerId(playerModel.Id).SetTick(processedTick).Execute();
         }
 
         private void UpdatePlayerDirection(MatchMakingLocalPlayerInputDataC2S playerInputData, MatchMakingPlayerStateS2C playerModel)

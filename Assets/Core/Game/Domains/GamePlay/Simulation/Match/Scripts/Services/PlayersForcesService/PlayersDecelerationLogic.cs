@@ -47,7 +47,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
                 newSpeed = 0;
             }
             
-            playerSpaceshipState.Transform.Velocity = playerSpaceshipState.Transform.Velocity.Normalize() * newSpeed;
+            var normalized = playerSpaceshipState.Transform.Velocity.NormalizeSafe();
+            playerSpaceshipState.Transform.Velocity = normalized * newSpeed;
         }
     }
 }

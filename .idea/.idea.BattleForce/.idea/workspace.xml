@@ -5,28 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c1e12e0-c131-4b63-94f5-2f0c8aa9c131" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/.claude/skills/add-net-event/SKILL.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/.claude/skills/add-talent/SKILL.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/.claude/skills/coding-guidlines/SKILL.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/PlayerHapticsForPlayerCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/PlayerHapticsForPlayerCommand.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticProfileType.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticProfileType.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsProfile.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsProfile.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsProfileScriptableObject.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsProfileScriptableObject.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsService.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/HapticsService.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/IHapticsService.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Core/Scripts/Services/HapticsService/IHapticsService.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BattleForce/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerTakeDamangeNetEventsCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerTakeDamangeNetEventsCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Services/DataService/ILocalPlayersDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Services/DataService/ILocalPlayersDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Services/DataService/LocalPlayersDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Services/DataService/LocalPlayersDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Plugins/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Plugins/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Core/Scripts/ZenjectInstallers/CoreInstaller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Core/Scripts/ZenjectInstallers/CoreInstaller.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,9 +76,12 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/57f88a49909d457c8449f3caf1d3207a1fbe00/84/15d6ffb5/LayoutDataStore.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/e7/f521e831/IObserver`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/f5/40a4e2b9/Func`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5ddb5fa70dfe40d2818192400111b9ec2aa00/f9/76a34f5a/DOTween.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6688cf2f56e0467ba611d5473d7a57c49be000/90/0500e43a/Editor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6688cf2f56e0467ba611d5473d7a57c49be000/e6/2330c7cf/GameObjectInspector.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6db092d11a2c42b684a7eb3cc9c0740e71000/32/24232bec/Stack`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/be7a35f94d68404291ffa5e965675dc1212a00/18/09287005/CreateAssetMenuAttribute.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/be7a35f94d68404291ffa5e965675dc1212a00/80/fab1d209/Awaitable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c1a70634a79d406bb4527b41a813f1561c000/9d/77e5ec65/Enumerable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c26969b5c90c4d9e97105dcd995362fa2f200/7f/03c36fe1/BoxCollider2D.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c26969b5c90c4d9e97105dcd995362fa2f200/fc/11e92cbb/Collider2D.cs" root0="SKIP_HIGHLIGHTING" />
@@ -132,15 +114,23 @@
     <setting file="file://$PROJECT_DIR$/../../../../../../Documents/a/Archive/c/Archive/ArchiveC/Assets/EPF/Game/Domains/3-Gameplay/Subdomains/Bot/Scripts/Goals/AtomicGoals/ThinkOnShot/ThinkOnBreakShotGoal.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../../../Documents/a/Archive/c/Archive/ArchiveC/Assets/EPF/Game/Domains/3-Gameplay/Subdomains/Bot/Scripts/Goals/EvaluatorsPresets/FoulShotStrategy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIView.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/Raz/Raz/Work/Dev/Unity/BattleForce/Dev/BattleForce/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerTakeDamangeNetEventsCommand.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/Raz/Raz/Work/Dev/Unity/BattleForce/Dev/BattleForce/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/HandlePlayerTakeDamangeNetEventsCommand.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/MatchMaking/Scripts/Commands/AddMatchMakingPlayerCommand.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/MatchMaking/Scripts/Network/PacketsHandlers/MatchMakingFullTickPacketsHandler.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Commands/Inputs/ShootInputInvokedCommand.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/GamePlayInitiator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/TickProcessors/ITickProcessor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/Scripts/Configs/EnvironmentConfig.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Shared/Scripts/Configs/SharedGamePlayConfig.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/Raz/Raz/Work/Dev/Unity/BattleForce/Dev/BattleForce/Assets/Core/Game/Domains/GamePlay/Simulation/Assets/Configs/SimulationGamePlayConfig.asset" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/Raz/Raz/Work/Dev/Unity/BattleForce/Dev/BattleForce/Assets/Core/Game/Domains/GamePlay/Simulation/Assets/Configs/SimulationGamePlayConfig.asset" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/Raz/Raz/Work/Dev/Unity/BattleForce/Dev/BattleForce/Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Initiator/ServerMatchEntryPointCommand.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/Raz/Raz/Work/Dev/Unity/BattleForce/Dev/BattleForce/Assets/Core/Game/Domains/GamePlay/Simulation/Match/Scripts/Initiator/ServerMatchEntryPointCommand.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/MatchMaking/Scripts/StartMatchWall/IStartMatchWallController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/MatchMaking/Scripts/State/SimulationMatchMakingState.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/NetworkManager/TickHandlers/PacketsObservers/NetworkC2SPacketsListener.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Simulation/Scripts/Physics/PhysicsSimulator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Scripts/GameInitiator/GameInitiator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Game/Scripts/ZenjectInstallers/GameInstaller.cs" root0="FORCE_HIGHLIGHTING" />
@@ -148,10 +138,15 @@
     <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/Extensions/GameObjectExtensions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/Network/NetworkConfig.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/ReferenceFieldTweaker/Editor/EditableRefAttributePropertyDrawer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/Raz/Raz/Work/Dev/Unity/BattleForce/Dev/BattleForce/Assets/Core/Scripts/Services/AudioService/AudioClipType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/Raz/Raz/Work/Dev/Unity/BattleForce/Dev/BattleForce/Assets/Core/Scripts/Services/AudioService/AudioClipType.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/Services/Logger/EmptyLogger.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/Services/Logger/UnityLogger.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Core/Scripts/Utils/CustomCollections/FixedClassUnorderedList.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.inputsystem@21a28c3a6c83/InputSystem/Devices/Gamepad.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.inputsystem@21a28c3a6c83/InputSystem/Utilities/ReadOnlyArray.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.memoryprofiler@485b5ba42ef5/Editor/MemorySnapshot/Cached/NativeAllocationEntriesCache.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../BattleForceWindows/Assets/Core/Game/Domains/GamePlay/Presentation/MatchMaking/Scripts/Commands/EntryPoint/StartGamePlayMatchMakingCommand.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../NetGameExample/Assets/Code/Shared/Collisions.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -169,27 +164,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Attach to Unity Editor.Attach to Unity Editor.executor&quot;: &quot;Debug&quot;,
-    &quot;Attach to Unity Player.Unity (AssetImportWorker0).executor&quot;: &quot;Debug&quot;,
-    &quot;Attach to Unity Player.Unity (AssetImportWorker1).executor&quot;: &quot;Debug&quot;,
-    &quot;Attach to Unity Player.Unity (AssetImportWorker3).executor&quot;: &quot;Debug&quot;,
-    &quot;Attach to Unity Player.Unity (AssetImportWorker4).executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.38791734&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;#159 on fix/teleport-gate-rotating-wheels…07236&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.AIAssistantPromptsLibrary&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Attach to Unity Editor.Attach to Unity Editor.executor": "Debug",
+    "Attach to Unity Player.Unity (AssetImportWorker0).executor": "Debug",
+    "Attach to Unity Player.Unity (AssetImportWorker1).executor": "Debug",
+    "Attach to Unity Player.Unity (AssetImportWorker3).executor": "Debug",
+    "Attach to Unity Player.Unity (AssetImportWorker4).executor": "Debug",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "XThreadsFramesViewSplitterKey": "0.38791734",
+    "git-widget-placeholder": "feat/ShootAfterLockOnTarget-RayCastFix",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ml.llm.AIAssistantPromptsLibrary",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="$PROJECT_DIR$/../Builds/mac/1/PlaytestChen.app/Contents/MacOS/BattleForce2" />
@@ -342,58 +337,6 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Scripts/ZenjectInstallers/GameInstaller.cs</url>
-          <line>13</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Scripts/ZenjectInstallers/GameInstaller.cs" containingFunctionPresentation="Method 'InstallBindings'">
-            <startOffsets>
-              <option value="475" />
-            </startOffsets>
-            <endOffsets>
-              <option value="565" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs</url>
-          <line>53</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" containingFunctionPresentation="Method 'InitEntryPoint'">
-            <startOffsets>
-              <option value="2213" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2265" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs</url>
-          <line>57</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" containingFunctionPresentation="Method 'InitEntryPoint'">
-            <startOffsets>
-              <option value="2342" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2373" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs</url>
-          <line>81</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" containingFunctionPresentation="Method 'LoadGameScene'">
-            <startOffsets>
-              <option value="3126" />
-            </startOffsets>
-            <endOffsets>
-              <option value="3241" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs</url>
           <line>30</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Both/Scripts/Commands/EntryPoint/LoadGamePlayStateCommand.cs" containingFunctionPresentation="Method 'Execute'" />
@@ -417,32 +360,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="14" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs</url>
-          <line>47</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" containingFunctionPresentation="Method 'InitEntryPoint'">
-            <startOffsets>
-              <option value="1954" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1999" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="15" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs</url>
-          <line>49</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Scripts/CoreInitiator/CoreInitiator.cs" containingFunctionPresentation="Method 'InitEntryPoint'">
-            <startOffsets>
-              <option value="2111" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2121" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Scripts/States/GamePlayState/GamePlayState.cs</url>
@@ -753,19 +670,6 @@
           <option name="timeStamp" value="70" />
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs</url>
-          <line>76</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" containingFunctionPresentation="Method 'InitEntryPoint'">
-            <startOffsets>
-              <option value="4161" />
-            </startOffsets>
-            <endOffsets>
-              <option value="4162" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="71" />
-        </line-breakpoint>
-        <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/GamePlayInitiator.cs</url>
           <line>23</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Scripts/Initiator/GamePlayInitiator.cs" containingFunctionPresentation="Constructor 'GamePlayInitiator'">
@@ -799,13 +703,13 @@
         </line-breakpoint>
         <line-breakpoint type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerView.cs</url>
-          <line>19</line>
+          <line>18</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/Player/Scripts/Mvc/PlayerView.cs" containingFunctionPresentation="Method 'InterpolateBulletLoading'">
             <startOffsets>
-              <option value="839" />
+              <option value="840" />
             </startOffsets>
             <endOffsets>
-              <option value="909" />
+              <option value="910" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="126" />
@@ -875,7 +779,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/EntryPoint/StartGamePlayMatchCommand.cs</url>
-          <line>66</line>
+          <line>68</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/EntryPoint/StartGamePlayMatchCommand.cs" containingFunctionPresentation="Method 'Execute'">
             <startOffsets>
               <option value="4112" />
@@ -888,7 +792,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/EntryPoint/StartGamePlayMatchCommand.cs</url>
-          <line>77</line>
+          <line>79</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/EntryPoint/StartGamePlayMatchCommand.cs" containingFunctionPresentation="Method 'Execute'">
             <startOffsets>
               <option value="4756" />
@@ -901,7 +805,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/SyncMatchSimulationStateCommand.cs</url>
-          <line>49</line>
+          <line>50</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/NetEvents/SyncMatchSimulationStateCommand.cs" containingFunctionPresentation="Method 'Execute'">
             <startOffsets>
               <option value="2777" />
@@ -924,19 +828,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="171" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/EntryPoint/LoadGamePlayMatchCommand.cs</url>
-          <line>16</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Commands/EntryPoint/LoadGamePlayMatchCommand.cs" containingFunctionPresentation="Method 'SetEnterData'">
-            <startOffsets>
-              <option value="649" />
-            </startOffsets>
-            <endOffsets>
-              <option value="672" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="172" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Match/Scripts/Initiator/GamePlayMatchInitiator.cs</url>
@@ -1002,19 +893,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="178" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs</url>
-          <line>319</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Core/Game/Domains/GamePlay/Presentation/Features/UI/ChooseNetworkRole/Scripts/ChooseNetworkRoleUIController.cs" containingFunctionPresentation="Method 'OnPlayerNameChanged'">
-            <startOffsets>
-              <option value="14634" />
-            </startOffsets>
-            <endOffsets>
-              <option value="14718" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="179" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -31,10 +32,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersTalentsManager _playersTalentsManager;
         private ITeleportGateService _teleportGateService;
         private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
-        
+        private IPlayersTouchingWallDataService _playersTouchingWallDataService;
+
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
         private SpinPlayerCommand _spinPlayerCommand;
+        private ObtainPowerUpBallCommand _obtainPowerUpBallCommand;
+        private AddForceToPlayerCommand _addForceToPlayerCommand;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
         {
@@ -50,9 +54,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
             _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
+            _playersTouchingWallDataService = _diContainer.Resolve<IPlayersTouchingWallDataService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
         }
@@ -72,9 +79,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
                 var objectA = collisionEvent.BodyDataA;
                 var objectB = collisionEvent.BodyDataB;
-
+                
                 HandlePlayerLavaCollision(objectA, objectB, collisionEvent.Type);
                 HandlePlayerStageBoundaryCollision(objectA, objectB, collisionEvent.Type);
+                HandlePlayerWallStickTracking(objectA, objectB, collisionEvent.Type, collisionEvent.Contact);
 
                 if (collisionEvent.Type != PhysicsEventEventType.Begin)
                 {
@@ -375,17 +383,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var forceMagnitude = environmentSpringsConfig.Force * _matchDataService.SimulationState.MapSizeMultiplier;
             var force = pushDirection * forceMagnitude;
             var randomSpin = RNG.NextFloat(environmentSpringsConfig.MinSpin, environmentSpringsConfig.MaxSpin);
-
-            playerState.Spaceship.Transform.Velocity += force;
-            playerState.Spaceship.Transform.Direction = force.Normalize();
-            playerState.Spaceship.IsEngineOn = false;
-
             _spinPlayerCommand
                 .SetPlayer(playerId)
                 .SetSpinAmount(randomSpin)
                 .SetTick(_processedTick)
                 .Execute();
-
+            
+            playerState.Spaceship.Transform.Direction = force.NormalizeSafe();
+            _addForceToPlayerCommand.SetPlayerId(playerId).SetForce(force).ShouldTurnOffEngine(true).Execute();
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
         }
 
@@ -417,7 +422,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 return;
             }
-            
+
             var damage = _gamePlayConfigService.GamePlayConfig.EnvironmentSpikes.Damage;
             _playerHitCommand
                 .SetPlayerIdGotHit(playerId)
@@ -504,6 +509,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             else if (eventType == PhysicsEventEventType.End)
             {
                 _playersOutsideStageTrackerService.OnPlayerExitStageBoundary(playerId);
+            }
+        }
+
+        private void HandlePlayerWallStickTracking(PhysicsBodyData objectA, PhysicsBodyData objectB, PhysicsEventEventType eventType, Contact contact)
+        {
+            var isPlayerToWall = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
+            var isWallToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerToWall && !isWallToPlayer)
+            {
+                return;
+            }
+
+            var playerId = isPlayerToWall ? objectA.Id : objectB.Id;
+            var wallId = isPlayerToWall ? objectB.Id : objectA.Id;
+
+            if (eventType == PhysicsEventEventType.Begin)
+            {
+                contact.GetWorldManifold(out var worldManifold);
+                // Box2D's manifold normal always points from fixture A to fixture B. Downstream code expects the wall's
+                // outward normal (pointing from the wall toward the player), so flip it when the player is fixture A.
+                var wallNormal = isPlayerToWall ? -worldManifold.normal : worldManifold.normal;
+                var wallRotationDegrees = _matchDataService.EnvironmentData.GetWall(wallId).Transform.WorldRotationDegrees;
+                _playersTouchingWallDataService.OnPlayerBeginTouchWall(playerId, wallId, wallNormal, wallRotationDegrees, _processedTick);
+            }
+            else if (eventType == PhysicsEventEventType.End)
+            {
+                _playersTouchingWallDataService.OnPlayerEndTouchWall(playerId, wallId);
             }
         }
 
@@ -724,9 +757,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
             LogService.LogTopic($"new pos {_physicsSimulator.GetPlayer(playerModel.Id).Position}, prev pos: {playerModel.Spaceship.Transform.Position} ", LogTopicType.ServerNetwork);
-            playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0
-                ? System.Numerics.Vector2.Normalize(reflectedVelocity)
-                : System.Numerics.Vector2.Zero;
+            var currentDirection = playerModel.Spaceship.Transform.Direction;
+            var reflectedDirection = currentDirection.ReflectFromWall(collisionNormal);
+            playerModel.Spaceship.Transform.Direction = reflectedDirection.Length() > 0
+                ? reflectedDirection.NormalizeSafe()
+                : currentDirection;
         }
 
         private PlayerStateS2C GetPlayerFromCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, bool isPlayerToWallCollision, bool isWallToPlayerCollision)
@@ -762,14 +797,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ref var powerUpBall = ref _matchDataService.SimulationState.PowerUpBalls.GetByIndex(powerUpBallIndex);
             var powerUpBallId = powerUpBall.Id;
             DestroyBullet(bulletModel, bulletBody);
-            DestroyPowerUpBall(powerUpBallId, powerUpBody);
-            _netEventsDataService.AddPowerUpObtainedNetEvent(_processedTick, powerUpBallId, bulletModel.BelongToPlayerId);
-        }
-
-        private void DestroyPowerUpBall(ushort powerUpBallId, Body powerUpBallBody)
-        {
-            _matchDataService.SimulationState.RemovePowerUpBallById(powerUpBallId);
-            _physicsSimulator.RemoveBody(powerUpBallBody);
+            _obtainPowerUpBallCommand
+                .SetProcessedTick(_processedTick)
+                .SetPowerUpBallId(powerUpBallId)
+                .SetObtainedByPlayerId(bulletModel.BelongToPlayerId)
+                .Execute();
         }
 
         private bool TryGetPowerUpBallToBulletCollisionData(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact, bool isBulletToPowerUpCollision, out PlayerBulletS2C bulletModel, out int powerUpBallIndex, out Body bulletBody, out Body powerUpBallBody)
