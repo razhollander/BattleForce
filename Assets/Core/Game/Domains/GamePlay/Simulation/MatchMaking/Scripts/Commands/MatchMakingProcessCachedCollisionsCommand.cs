@@ -98,7 +98,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
                 LogTopicType.ServerNetwork);
 
             playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0
-                ? System.Numerics.Vector2.Normalize(reflectedVelocity)
+                ? reflectedVelocity.NormalizeSafe()
                 : System.Numerics.Vector2.Zero;
         }
 
@@ -241,7 +241,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.Command
                 LogTopicType.ServerNetwork);
 
             playerModel.Spaceship.Transform.Direction = reflectedVelocity.Length() > 0
-                ? System.Numerics.Vector2.Normalize(reflectedVelocity)
+                ? reflectedVelocity.NormalizeSafe()
                 : System.Numerics.Vector2.Zero;
         }
 

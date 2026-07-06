@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public JoinResponsePacketS2C(MaxCap maxCap, int maxTalentsPerPlayer, int maxTeams)
         {
             MatchMakingSimulationState = new MatchMakingSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets);
-            MatchSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, maxTeams, maxCap.ConcurrentChickenEggs);
+            MatchSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, maxTeams, maxCap.ConcurrentChickenEggs, maxCap.ConcurrentGalacticForceFields);
             PlayerIdToDeviceIdDictionary = new Dictionary<ushort, int>(maxCap.ConcurrentPlayers);
         }
         

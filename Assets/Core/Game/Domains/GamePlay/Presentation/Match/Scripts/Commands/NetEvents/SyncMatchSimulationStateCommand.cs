@@ -9,10 +9,12 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
@@ -31,6 +33,7 @@ using Core.Scripts.Extensions;
 using Core.Scripts.Mvc.WorldCamera;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -64,7 +67,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
-        
+        private IPreparationPhaseCountdownController _preparationPhaseCountdownController;
+        private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
+
         private MatchSimulationStateS2C _simulationState;
         private int _stateOccouredOnTick;
 
@@ -86,7 +91,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
-            _environmentSpikeControllers = _diContainer.Resolve<Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc.IEnvironmentSpikeControllers>();
+            _environmentSpikeControllers = _diContainer.Resolve<IEnvironmentSpikeControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
@@ -108,19 +113,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
+            _preparationPhaseCountdownController = _diContainer.Resolve<IPreparationPhaseCountdownController>();
+            _galacticPullStarEffectControllers = _diContainer.Resolve<IGalacticPullStarEffectControllers>();
         }
 
         public void Execute()
         {
-            _matchDataService.StartPhaseInitialTick = _simulationState.StartPhaseInitialTick;
+            _matchDataService.PreperationPhaseStartedOnTick = _simulationState.PreperationPhaseStartedOnTick;
+            _matchDataService.PreperationPhaseEndedOnTick = _simulationState.PreperationPhaseEndedOnTick;
             _matchDataService.IsInPreparationPhase = _simulationState.IsInPreparationPhase;
             _matchDataService.IsInShowoffWinners = _simulationState.IsInShowoffWinners;
             _matchDataService.CurrentStageWinnerTeamId = _simulationState.CurrentStageWinnerTeamId;
+            _matchDataService.StageType = _simulationState.StageType;
             _stageCancellationTokenProvider.CancelAndRegenarateStageToken();
             DestroyAll();
             CreateAll();
         }
-
+        
         private void DestroyAll()
         {
             _worldCameraController.ClearTargets();
@@ -141,13 +150,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers.DestroyAll();
             _grapplingHookProjectilesControllers.DestroyAll();
             _chickenEggsControllers.DestroyAll();
+            _galacticPullStarEffectControllers.DestroyAll();
             _lockOnTargetEffectController.DestroyAll();
+            _preparationPhaseCountdownController.StopCountdown();
         }
 
         private void CreateAll()
         {
             var mapSizeMultiplier = _simulationState.MapSizeMultiplier;
-            _worldCameraController.MultiplyOthographicSize(mapSizeMultiplier * CAMERA_ORTHOGRAPHIC_SIZE_TO_MAP_SIZE_RATIO);
+            if (_simulationState.IsInShowoffWinners)
+            {
+                // todo handle this
+            }
+            else
+            {
+                _worldCameraController.MultiplyOthographicSize(mapSizeMultiplier * CAMERA_ORTHOGRAPHIC_SIZE_TO_MAP_SIZE_RATIO);
+                _worldCameraController.SetisDampingEnabled(true);
+            }
+
             CreatePlayers();
             CreateBullets();
             CreateWalls(mapSizeMultiplier);
@@ -164,6 +184,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateKOPRojectiles();
             CreateGrapplingHookPRojectiles();
             CreateChickenEggs();
+            CreateGalacticPullStars();
         }
 
         private void CreateFieldBarriers(float mapSizeMultiplier)
@@ -243,7 +264,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
 
             var wheelsDict = GetRotatingWheelsDictionary(layout);
-            var calculationTick = GetCalculationTick();
+            var calculationTick = GetTicksPassedSincePreparationPhaseEneded();
             var deltaTime = _networkConfig.DeltaTime;
             var gateSize = _sharedGamePlayConfig.EnvironmentTeleport.Size;
 
@@ -286,13 +307,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             return wheelsDict;
         }
 
-        private int GetCalculationTick()
+        private int GetTicksPassedSincePreparationPhaseEneded()
         {
             if (_matchDataService.IsInPreparationPhase)
             {
                 return 0;
             }
-            return _fullTickPacketsHandler.LastProcessedTickFromServer - _matchDataService.StartPhaseInitialTick;
+            return _fullTickPacketsHandler.LastProcessedTickFromServer - _matchDataService.PreperationPhaseEndedOnTick;
         }
 
         private void TryAttachTeleportGateToRotatingWheel(
@@ -347,7 +368,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             foreach (var talentCard in _simulationState.TalentCards.AsSpan())
             {
-                _matchDataService.AddTalentCard(talentCard.Id, talentCard.Position.ToUnityVector2(), talentCard.TalentType, talentCard.Health);
+                _matchDataService.AddTalentCard(talentCard.Id, talentCard.Position.ToUnityVector2()*mapSizeMultiplier, talentCard.TalentType, talentCard.Health);
                 _talentCardControllers.CreateTalentCard(talentCard.Id);
             }
         }
@@ -417,7 +438,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 return;
             }
-            var calculationTick = GetCalculationTick();
+            var calculationTick = GetTicksPassedSincePreparationPhaseEneded();
             var deltaTime = _networkConfig.DeltaTime;
 
             foreach (var wheelConfig in wheels)
@@ -546,6 +567,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _matchDataService.AddChickenEgg(egg.Id, casterPlayerId, egg.Position.ToUnityVector2());
                 var playerCasterTeamId = _matchDataService.GetPlayerTeamId(casterPlayerId);
                 _chickenEggsControllers.CreateEgg(egg.Id, egg.Position, playerCasterTeamId);
+            }
+        }
+
+        private void CreateGalacticPullStars()
+        {
+            foreach (var field in _simulationState.GalacticForceFields.AsSpan())
+            {
+                _galacticPullStarEffectControllers.ShowStar(field.Id, field.CasterTeamId);
             }
         }
 

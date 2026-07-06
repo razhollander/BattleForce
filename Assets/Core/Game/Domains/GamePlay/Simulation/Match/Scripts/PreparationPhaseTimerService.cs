@@ -14,6 +14,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts
 
         public float PreparationPhaseTimer { get; set; }
 
+        public float PreparationPhaseSecondsElapsed => _gamePlayConfigService.GamePlayConfig.PreparationPhaseDuration - PreparationPhaseTimer;
+
         public void StepPreperationPhaseTimer(float deltaTime)
         {
             PreparationPhaseTimer -= deltaTime;

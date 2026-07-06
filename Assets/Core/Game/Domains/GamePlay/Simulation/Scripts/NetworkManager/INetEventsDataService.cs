@@ -9,6 +9,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Utils.CustomCollections;
+using System.Numerics;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 {
@@ -57,10 +58,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<ChickenEggHitNetEventS2C>> ChickenEggHitNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>> CreateMagneticPullFieldNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> ActivateYearsOfPainTalentNetEventsPerClient { get; }
-        CapacityDict<long, FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>> PlayerLockOnHeartTargetsChangedNetEventsPerClient { get; }
+        CapacityDict<long, FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>> PlayerLockOnTargetsChangedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> PlayerLockedOnTargetHitNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>> PlayerPowerUpChangedNetEventsPerClient { get; }
+        CapacityDict<long, FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>> ActivateSonicSlapNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<EnvironmentSpikePlayerCollisionNetEventS2C>> EnvironmentSpikePlayerCollisionNetEventsPerClient { get; }
-        
+        CapacityDict<long, FixedUnorderedList<PerformGalacticPullNetEventS2C>> PerformGalacticPullNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>> DeactivateGalacticForceFieldNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> ActivateNukePowerUpNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>> DeactivateShufflePowerUpNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>> ShuffleSwapPlayerPositionNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>> ActivateShuffleNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>> StartPowerUpGrantingPhaseNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>> EndPowerUpGrantingPhaseNetEventsPerClient { get; }
+
         void StartSavingClientEvents(long clientId);
         void StopSavingClientEvents(long clientId);
         void AddBulletSpawnNetEvent(int onTick, ushort bulletId, ushort belongToPlayerId, Vector2 position, float bulletRadius, Vector2 velocity);
@@ -108,7 +119,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddLayChickenEggNetEventS2C(int tick, ushort casterId, ushort eggId, Vector2 position);
         void AddChickenEggHitNetEventS2C(int tick, ushort eggId);
         void AddActivateYearsOfPainTalentNetEventS2C(int tick, ushort casterPlayerId, Vector2 direction, int cooldownEndTick, bool didHitEnemy, ushort hitEnemyId);
-        void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget);
+        void AddPlayerLockOnTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<ObjectLockedOnTargetS2C> playerIdsLockedOnTarget);
         void AddPlayerLockedOnTargetHitNetEvent(int onTick, ushort casterPlayId, ushort hitPlayerId);
+        void AddPlayerPowerUpChangedNetEvent(int onTick, ushort playerId, PowerUpType powerUp);
+        void AddActivateSonicSlapNetEvent(int onTick, ushort casterPlayerId, FixedUnorderedList<ushort> affectedPlayerIds);
+        void AddPerformGalacticPullNetEvent(int onTick, ushort fieldId, ushort casterPlayerId, ushort casterTeamId);
+        void AddDeactivateGalacticForceFieldNetEvent(int onTick, ushort galacticForceFieldId);
+        void AddActivateNukePowerUpNetEvent(int onTick, ushort casterPlayerId, Vector2 casterPosition);
+        void AddDectivateShufflePowerUpNetEvent(int onTick, ushort casterPlayerId);
+        void AddShuffleSwapPlayerPositionNetEvent(int onTick);
+        void AddActivateShuffleNetEvent(int onTick, ushort casterPlayerId);
+        void AddStartPowerUpGrantingPhaseNetEvent(int onTick, ushort playerId);
+        void AddEndPowerUpGrantingPhaseNetEvent(int onTick, ushort playerId, PowerUpType grantedPowerUp);
     }
 }

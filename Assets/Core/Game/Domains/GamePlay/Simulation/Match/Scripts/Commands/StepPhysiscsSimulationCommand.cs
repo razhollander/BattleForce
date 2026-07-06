@@ -1,9 +1,13 @@
+using System.Diagnostics;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
+using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
@@ -22,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private float _deltaTime;
         private int _tick;
         private ProcessCachedCollisionsCommand _processCachedCollisionsCommand;
+        private AddNormalForceToPlayerStickWithWallCommand _addNormalForceToPlayerStickWithWallCommand;
 
         public StepPhysiscsSimulationCommand SetTick(int tick)
         {
@@ -45,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _stepAllWheelsRotationCommand = _commandFactory.CreateCommandVoid<StepAllWheelsRotationCommand>();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
+            _addNormalForceToPlayerStickWithWallCommand = _commandFactory.CreateCommandVoid<AddNormalForceToPlayerStickWithWallCommand>();
             _enforceFieldBarriersCommand = _commandFactory.CreateCommandVoid<EnforceFieldBarriersCommand>();
             _enforceStageBarriersCommand = _commandFactory.CreateCommandVoid<EnforceStageBarriersCommand>();
         }
@@ -69,12 +75,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 _stepAllWheelsRotationCommand.SetTime(_tick, stepDeltaTime).Execute();
             }
 
+            GuardAgainstNonFinitePlayerState();
             ApplyMatchModelToPhysicsSimulation();
             _physicsSimulator.Step(stepDeltaTime, _networkConfig.PhysicsVelocityIterations, _networkConfig.PositionIterations);
             ApplyPhysicsSimulationToMatchModel();
             
             _processCachedCollisionsCommand.SetProcessedTick(_tick).Execute();
+            _addNormalForceToPlayerStickWithWallCommand.SetTick(_tick).Execute();
             _enforceFieldBarriersCommand.SetTick(_tick).Execute();
+        }
+
+        [Conditional("ERROR_LOGS_ENABLED")]
+        private void GuardAgainstNonFinitePlayerState()
+        {
+            foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                ref var transform = ref playerState.Spaceship.Transform;
+
+                if (!transform.Velocity.IsFinite())
+                {
+                    LogService.LogError($"[NaNGuard] Player {playerState.Id} non-finite Velocity={transform.Velocity} (Position={transform.Position}, Direction={transform.Direction}, tick={_tick}). Resetting to zero.");
+                    transform.Velocity = Vector2.Zero;
+                }
+
+                if (!transform.Direction.IsFinite())
+                {
+                    LogService.LogError($"[NaNGuard] Player {playerState.Id} non-finite Direction={transform.Direction} (Position={transform.Position}, Velocity={transform.Velocity}, tick={_tick}). Resetting to UnitX.");
+                    transform.Direction = Vector2.UnitX;
+                }
+
+                if (!transform.Position.IsFinite())
+                {
+                    LogService.LogError($"[NaNGuard] Player {playerState.Id} non-finite Position={transform.Position} (Velocity={transform.Velocity}, Direction={transform.Direction}, tick={_tick}).");
+                }
+            }
         }
 
         private void ApplyMatchModelToPhysicsSimulation()

@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -38,14 +39,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IStageDataService _stageDataService;
         private readonly IOverrideableNetEventsService _overrideableNetEventsService;
         private readonly IClientsNetworkDataService _clientsNetworkDataService;
+        private readonly IPlayersPowerUpsManager _playersPowerUpsManager;
 
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
+        private ApplyGalacticPullForcesCommand _applyGalacticPullForcesCommand;
+        private TryDeactivateEndedGalacticFieldsCommand _tryDeactivateEndedGalacticFieldsCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private StepTimersCommand _stepTimersCommand;
         private TryEndPlayersSpinCommand _tryEndPlayersSpinCommand;
         private TryEndStagePreparationPhaseCommand _tryEndStagePreparationPhaseCommand;
         private StepAllPlayersTalentsCooldownsCommand _stepAllPlayersTalentsCooldownsCommand;
+        private StepAllPlayersTalentsCommand _stepAllPlayersTalentsCommand;
         private TrySendPlayersLockOnTargetChangedCommand _trySendPlayersLockOnTargetChangedCommand;
         
         private readonly MatchFullTickPacketS2C _fullTickPacket;
@@ -55,7 +60,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public ServerMatchNetworkTickProcessor(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IServerNetworkManager networkManager,
             IMatchPlayerInputsPacketsHandler playerInputsPacketsHandler, IMatchDataService matchDataService,
             IMatchPlayerJoinPacketsHandler iIMatchPlayerJoinPacketsHandler, INetEventsDataService netEventsDataService,
-            ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController, IStageDataService stageDataService, IOverrideableNetEventsService overrideableNetEventsService, IClientsNetworkDataService clientsNetworkDataService)
+            ICommandFactory commandFactory, ITickService tickService, IHeadLessQuitterController headLessQuitterController, IStageDataService stageDataService, IOverrideableNetEventsService overrideableNetEventsService, IClientsNetworkDataService clientsNetworkDataService,
+            IPlayersPowerUpsManager playersPowerUpsManager)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -69,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _stageDataService = stageDataService;
             _overrideableNetEventsService = overrideableNetEventsService;
             _clientsNetworkDataService = clientsNetworkDataService;
+            _playersPowerUpsManager = playersPowerUpsManager;
             _fullTickPacket = new MatchFullTickPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig);
             _cachedStartMatchPacket = new StartMatchPacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount);
             _startStagePacket = new StartStagePacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount);
@@ -83,7 +90,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
             _tryEndStagePreparationPhaseCommand = _commandFactory.CreateCommandVoid<TryEndStagePreparationPhaseCommand>();
             _stepAllPlayersTalentsCooldownsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCooldownsCommand>();
+            _stepAllPlayersTalentsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCommand>();
             _trySendPlayersLockOnTargetChangedCommand = _commandFactory.CreateCommandVoid<TrySendPlayersLockOnTargetChangedCommand>();
+            _applyGalacticPullForcesCommand = _commandFactory.CreateCommandVoid<ApplyGalacticPullForcesCommand>();
+            _tryDeactivateEndedGalacticFieldsCommand = _commandFactory.CreateCommandVoid<TryDeactivateEndedGalacticFieldsCommand>();
             _tickService.RegisterObserver(this);
         }
 
@@ -107,7 +117,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 _stepAllPlayersTalentsCooldownsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick, stepDeltaTime);
+                _playersPowerUpsManager.OnTick(currentTick);
+                _stepAllPlayersTalentsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
+                _tryDeactivateEndedGalacticFieldsCommand.SetTick(currentTick).Execute();
+                _applyGalacticPullForcesCommand.Execute();
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
                 _tryEndPlayersSpinCommand.SetTick(currentTick).Execute();
@@ -265,8 +279,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.LayChickenEggNetEvents = _netEventsDataService.LayChickenEggNetEventsPerClient[clientId];
                 _fullTickPacket.ChickenEggHitNetEvents = _netEventsDataService.ChickenEggHitNetEventsPerClient[clientId];
                 _fullTickPacket.ActivateYearsOfPainTalentNetEvents = _netEventsDataService.ActivateYearsOfPainTalentNetEventsPerClient[clientId];
-                _fullTickPacket.PlayerLockOnHeartTargetsChangedNetEvents = _netEventsDataService.PlayerLockOnHeartTargetsChangedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerLockOnTargetsChangedNetEvents = _netEventsDataService.PlayerLockOnTargetsChangedNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerLockedOnTargetHitNetEvents = _netEventsDataService.PlayerLockedOnTargetHitNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerPowerUpChangedNetEvents = _netEventsDataService.PlayerPowerUpChangedNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateSonicSlapNetEvents = _netEventsDataService.ActivateSonicSlapNetEventsPerClient[clientId];
+                _fullTickPacket.PerformGalacticPullNetEvents = _netEventsDataService.PerformGalacticPullNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateGalacticForceFieldNetEvents = _netEventsDataService.DeactivateGalacticForceFieldNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateNukePowerUpNetEvents = _netEventsDataService.ActivateNukePowerUpNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateShufflePowerUpNetEvents = _netEventsDataService.DeactivateShufflePowerUpNetEventsPerClient[clientId];
+                _fullTickPacket.ShuffleSwapPlayerPositionNetEvents = _netEventsDataService.ShuffleSwapPlayerPositionNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateShuffleNetEvents = _netEventsDataService.ActivateShuffleNetEventsPerClient[clientId];
+                _fullTickPacket.StartPowerUpGrantingPhaseNetEvents = _netEventsDataService.StartPowerUpGrantingPhaseNetEventsPerClient[clientId];
+                _fullTickPacket.EndPowerUpGrantingPhaseNetEvents = _netEventsDataService.EndPowerUpGrantingPhaseNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

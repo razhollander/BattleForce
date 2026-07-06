@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
         public bool IsTalentAInputPressed;
         public bool IsTalentBInputPressed;
         public bool IsTalentCInputPressed;
+        public bool IsPowerUpInputPressed;
         public Vector2 AimDirection;
 
         public void Serialize(NetDataWriter writer)
@@ -25,7 +26,8 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
                 (IsShootInputPressed     ? 1 << 2 : 0) |
                 (IsTalentAInputPressed   ? 1 << 3 : 0) |
                 (IsTalentBInputPressed   ? 1 << 4 : 0) |
-                (IsTalentCInputPressed   ? 1 << 5 : 0)
+                (IsTalentCInputPressed   ? 1 << 5 : 0) |
+                (IsPowerUpInputPressed   ? 1 << 6 : 0)
             );
             
             writer.Put(inputByte);
@@ -43,7 +45,8 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
             IsTalentAInputPressed   = (data & (1 << 3)) != 0;
             IsTalentBInputPressed   = (data & (1 << 4)) != 0;
             IsTalentCInputPressed   = (data & (1 << 5)) != 0;
-            
+            IsPowerUpInputPressed   = (data & (1 << 6)) != 0;
+
             AimDirection = reader.GetVector2FromAngle16();
         }
     }

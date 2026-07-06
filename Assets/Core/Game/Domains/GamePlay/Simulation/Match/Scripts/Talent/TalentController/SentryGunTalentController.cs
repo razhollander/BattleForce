@@ -106,12 +106,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
             
             _tryPerformShootForPlayerIfNotOnCooldownCommand.SetPlayerId(_casterPlayerId).SetTick(tick).Execute();
-            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            var isSpinned = casterPlayerState.Spaceship.IsSpinned;
             var elapsedSeconds = (tick - _startTick) * deltaTime;
             var didSentryGunTimeEnded = elapsedSeconds >= _gamePlayConfigService.GamePlayConfig.Talents.SentryGunTalentConfig.DurationInSeconds;
             
-            if (isSpinned || didSentryGunTimeEnded)
+            if (didSentryGunTimeEnded)
             {
                 DeactivateTalent(tick);
             }

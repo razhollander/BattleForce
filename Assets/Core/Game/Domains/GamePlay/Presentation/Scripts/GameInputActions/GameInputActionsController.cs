@@ -209,8 +209,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             {
                 return false;
             }
-            
+
             return actions.GamePlay.TalentC.IsPressed();
+        }
+
+        public bool IsPlayerPowerUpInputPressed(ushort playerId)
+        {
+            if (!TryGetPlayerInputActions(playerId, out var actions))
+            {
+                return false;
+            }
+
+            return actions.GamePlay.PowerUp.IsPressed();
         }
 
         public async Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui = false)

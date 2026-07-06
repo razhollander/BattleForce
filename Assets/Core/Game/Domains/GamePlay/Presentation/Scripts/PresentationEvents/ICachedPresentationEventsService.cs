@@ -48,7 +48,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<LayChickenEggNetEventS2C> LayChickenEggNetEvents { get; }
         List<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents { get; }
         List<ActivateYearsOfPainTalentNetEventS2C> ActivateYearsOfPainTalentNetEvents { get; }
-        List<PlayerLockOnHeartTargetsChangedNetEventS2C> PlayerLockOnHeartTargetsChangedNetEvents { get; }
+        List<PlayerLockOnTargetsChangedNetEventS2C> PlayerLockOnTargetsChangedNetEvents { get; }
         List<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents { get; }
+        List<PlayerPowerUpChangedNetEventS2C> PlayerPowerUpChangedNetEvents { get; }
+        List<ActivateSonicSlapNetEventS2C> ActivateSonicSlapNetEvents { get; }
+        List<PerformGalacticPullNetEventS2C> PerformGalacticPullNetEvents { get; }
+        List<DeactivateGalacticForceFieldNetEventS2C> DeactivateGalacticForceFieldNetEvents { get; }
+        List<ActivateNukePowerUpNetEventS2C> ActivateNukePowerUpNetEvents { get; }
+        List<DeactivateShufflePowerUpNetEventS2C> DeactivateShufflePowerUpNetEvents { get; }
+        List<ShuffleSwapPlayerPositionNetEventS2C> ShuffleSwapPlayerPositionNetEvents { get; }
+        List<ActivateShuffleNetEventS2C> ActivateShuffleNetEvents { get; }
+        List<StartPowerUpGrantingPhaseNetEventS2C> StartPowerUpGrantingPhaseNetEvents { get; }
+        List<EndPowerUpGrantingPhaseNetEventS2C> EndPowerUpGrantingPhaseNetEvents { get; }
     }
 }

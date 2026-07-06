@@ -162,8 +162,8 @@ namespace CoreDomain.Scripts.Utils
                 }
 
                 // 2. Normalize to treat these as pure directions
-                var v1 = System.Numerics.Vector2.Normalize(currentMovementDirection);
-                var v2 = System.Numerics.Vector2.Normalize(desiredMovementDiretion);
+                var v1 = currentMovementDirection.NormalizeSafe();
+                var v2 = desiredMovementDiretion.NormalizeSafe();
 
                 // 3. The Math:
                 // Dot product = cos(theta)

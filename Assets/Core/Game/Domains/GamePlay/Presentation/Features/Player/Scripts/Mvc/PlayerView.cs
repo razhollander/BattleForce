@@ -1,6 +1,6 @@
 using System;
 using TMPro;
-using Core.Game.Domains.GamePlay.Presentation.Features.LockOnHeartSight;
+using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTargetSight;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.LoadingRing;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.Pools;
@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private PlayerTailView _tailView;
         [SerializeField] private Transform _heart;
-        [SerializeField] private LockOnHeartSightView _lockOnHeartSightView;
+        [SerializeField] private LockOnTargetSightView _lockOnTargetSightView;
 
         private Transform _transform;
         
@@ -89,14 +89,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             gameObject.SetActive(true);
         }
 
-        public void SetIsLockOnHeartSightShown(bool isShown)
+        public void SetIsLockOnTargetSightShown(bool isShown)
         {
-            _lockOnHeartSightView.SetIsShown(isShown);
+            _lockOnTargetSightView.SetIsShown(isShown);
         }
 
         public void OnDespawned()
         {
-            SetIsLockOnHeartSightShown(false);
+            SetIsLockOnTargetSightShown(false);
             gameObject.SetActive(false);
         }
 

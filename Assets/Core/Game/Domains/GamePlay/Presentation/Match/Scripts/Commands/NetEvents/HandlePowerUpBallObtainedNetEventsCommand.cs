@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var playerPosition = _playerControllers.GetPlayerPosition(powerUpBallObtainedEvent.ObtainedByPlayerId);
                 _powerUpBallObtainedEffectController.PlayEffect(powerUpBallPosition, playerPosition);
                 _powerUpBallControllers.DestroyPowerUpBall(powerUpBallId);
-                _audioService.PlayAudio(AudioClipType.PowerUpBallObtained);
+                _audioService.PlayAudio(AudioClipType.PlayerTakeDamage);
             }
             
             powerUpBallObtainedNetEvents.Clear();

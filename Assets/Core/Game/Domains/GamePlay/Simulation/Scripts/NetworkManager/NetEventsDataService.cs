@@ -8,7 +8,6 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
-using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
@@ -48,9 +47,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<CreateKOProjectileNetEventS2C>> CreateKOProjectileNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> KOProjectHitPlayerNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateKOTalentNetEventS2C>> DeactivateKOTalentNetEventsPerClient { get; }
-        public CapacityDict<long, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> PlayerGrapplingHookShotNetEventsPerClient { get; }
-        public CapacityDict<long, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> PlayerGrapplingHookHitNetEventsPerClient { get; }
-        public CapacityDict<long, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> PlayerGrapplingHookDeactivatedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PerformDashPulseNetEventS2C>> PerformDashPulseNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>> ActivateSentryGunTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>> DeactivateSentryGunTalentNetEventsPerClient { get; }
@@ -65,8 +61,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ChickenEggHitNetEventS2C>> ChickenEggHitNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> ActivateYearsOfPainTalentNetEventsPerClient { get; }
-        public CapacityDict<long, FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>> PlayerLockOnHeartTargetsChangedNetEventsPerClient { get; }
+        public CapacityDict<long, FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>> PlayerLockOnTargetsChangedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> PlayerLockedOnTargetHitNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>> PlayerPowerUpChangedNetEventsPerClient { get; }
+        public CapacityDict<long, FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>> ActivateSonicSlapNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PerformGalacticPullNetEventS2C>> PerformGalacticPullNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>> DeactivateGalacticForceFieldNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> ActivateNukePowerUpNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>> DeactivateShufflePowerUpNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>> ShuffleSwapPlayerPositionNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>> ActivateShuffleNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>> StartPowerUpGrantingPhaseNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>> EndPowerUpGrantingPhaseNetEventsPerClient { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -86,8 +92,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<StopMatchCountdownNetEventS2C>> _stopMatchCountdownListPool;
         private readonly ConcurrentPool<FixedUnorderedList<StartMatchEligibleChangedNetEventS2C>> _startMatchEligibleChangedListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<StageEndNetEventS2C>> _stageEndNetEventsListPool;
-        private readonly ConcurrentPool<FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>> _playerLockOnHeartTargetsChangedNetEventsListPool;
-        private readonly ConcurrentPool<FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> _playerLockOnHeartTargetHitNetEventsListPool;
+        private readonly ConcurrentPool<FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>> _playerLockOnTargetsChangedNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>> _playerLockOnTargetHitNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>> _playerPowerUpChangedNetEventsListPool;
+        private readonly ConcurrentPool<FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>> _sonicSlapActivatedNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>> _teamLostNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>> _talentSwitchNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>> _environmentSpringPlayerCollisionListPool;
@@ -100,9 +108,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<CreateKOProjectileNetEventS2C>> _createKOProjectileNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<KOProjectHitPlayerNetEventS2C>> _koProjectHitPlayerNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateKOTalentNetEventS2C>> _deactivateKOTalentNetEventsListPool;
-        private readonly ConcurrentPool<FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> _playerGrapplingHookShotNetEventsListPool;
-        private readonly ConcurrentPool<FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> _playerGrapplingHookHitNetEventsListPool;
-        private readonly ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> _playerGrapplingHookDeactivatedNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PerformDashPulseNetEventS2C>> _performDashPulseNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>> _activateSentryGunTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>> _deactivateSentryGunTalentNetEventsListPool;
@@ -117,6 +122,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>> _layChickenEggNetEventsPool;
         private readonly ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>> _chickenEggHitNetEventsPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> _activateYearsOfPainTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PerformGalacticPullNetEventS2C>> _performGalacticPullNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>> _deactivateGalacticForceFieldNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateNukePowerUpNetEventS2C>> _activateNukePowerUpNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>> _activateShufflePowerUpNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>> _shuffleSwapPlayerPositionNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateShuffleNetEventS2C>> _activateShuffleNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>> _startPowerUpGrantingPhaseNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>> _endPowerUpGrantingPhaseNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -139,8 +152,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             StopMatchCountdownNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<StopMatchCountdownNetEventS2C>>(maxConcurrentPlayers);
             StartMatchEligibleChangedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<StartMatchEligibleChangedNetEventS2C>>(maxConcurrentPlayers);
             StageEndNetEventsPerClient = new CapacityDict<long, FixedClassUnorderedList<StageEndNetEventS2C>>(maxConcurrentPlayers);
-            PlayerLockOnHeartTargetsChangedNetEventsPerClient = new CapacityDict<long, FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>>(maxConcurrentPlayers);
+            PlayerLockOnTargetsChangedNetEventsPerClient = new CapacityDict<long, FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>>(maxConcurrentPlayers);
             PlayerLockedOnTargetHitNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>>(maxConcurrentPlayers);
+            PlayerPowerUpChangedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>>(maxConcurrentPlayers);
+            ActivateSonicSlapNetEventsPerClient = new CapacityDict<long, FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>>(maxConcurrentPlayers);
             TeamLostNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TeamLostNetEventS2C>>(maxConcurrentPlayers);
             TalentSwitchNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TalentSwitchNetEventS2C>>(maxConcurrentPlayers);
             EnvironmentSpringPlayerCollisionNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>>(maxConcurrentPlayers);
@@ -153,9 +168,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             CreateKOProjectileNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateKOProjectileNetEventS2C>>(maxConcurrentPlayers);
             KOProjectHitPlayerNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(maxConcurrentPlayers);
             DeactivateKOTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(maxConcurrentPlayers);
-            PlayerGrapplingHookShotNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>>(maxConcurrentPlayers);
-            PlayerGrapplingHookHitNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>>(maxConcurrentPlayers);
-            PlayerGrapplingHookDeactivatedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(maxConcurrentPlayers);
             ActivateSentryGunTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateSentryGunTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>>(maxConcurrentPlayers);
             PerformDashPulseNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PerformDashPulseNetEventS2C>>(maxConcurrentPlayers);
@@ -170,6 +182,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             LayChickenEggNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>>(maxConcurrentPlayers);
             ChickenEggHitNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ChickenEggHitNetEventS2C>>(maxConcurrentPlayers);
             ActivateYearsOfPainTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(maxConcurrentPlayers);
+            PerformGalacticPullNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PerformGalacticPullNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateGalacticForceFieldNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>>(maxConcurrentPlayers);
+            ActivateNukePowerUpNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateNukePowerUpNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateShufflePowerUpNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>>(maxConcurrentPlayers);
+            ShuffleSwapPlayerPositionNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>>(maxConcurrentPlayers);
+            ActivateShuffleNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>>(maxConcurrentPlayers);
+            StartPowerUpGrantingPhaseNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>>(maxConcurrentPlayers);
+            EndPowerUpGrantingPhaseNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>>(maxConcurrentPlayers);
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -205,14 +225,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 list.Clear();
                 return list;
             }, maxConcurrentPlayers);
-            _playerLockOnHeartTargetsChangedNetEventsListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>>(() =>
+            _playerLockOnTargetsChangedNetEventsListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>>(() =>
             {
-                var list = new FixedClassUnorderedList<PlayerLockOnHeartTargetsChangedNetEventS2C>(networkConfig.MaxCap.PlayerLockOnHeartTargetsChangedNetEvents, () => new PlayerLockOnHeartTargetsChangedNetEventS2C(maxConcurrentPlayers-1));
+                var list = new FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>(networkConfig.MaxCap.PlayerLockOnTargetsChangedNetEvents, () => new PlayerLockOnTargetsChangedNetEventS2C(networkConfig.MaxCap.ConcurrentLockOnTargets));
                 list.Clear();
                 return list;
             }, maxConcurrentPlayers);
 
-            _playerLockOnHeartTargetHitNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>>(() => new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.PlayerLockOnHeartTargetHitNetEvents), maxConcurrentPlayers);
+            _playerLockOnTargetHitNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>>(() => new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(networkConfig.MaxCap.PlayerLockOnTargetHitNetEvents), maxConcurrentPlayers);
+            _playerPowerUpChangedNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>>(() => new FixedUnorderedList<PlayerPowerUpChangedNetEventS2C>(networkConfig.MaxCap.PlayerPowerUpChangedNetEvents), maxConcurrentPlayers);
+            _sonicSlapActivatedNetEventsListPool = new ConcurrentPool<FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>>(() =>
+            {
+                var list = new FixedClassUnorderedList<ActivateSonicSlapNetEventS2C>(networkConfig.MaxCap.ActivateSonicSlapNetEvents, () => new ActivateSonicSlapNetEventS2C(networkConfig.MaxCap.ConcurrentEnemyPlayers));
+                list.Clear();
+                return list;
+            }, maxConcurrentPlayers);
             _teamLostNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TeamLostNetEventS2C>>(() => new FixedUnorderedList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount), maxConcurrentPlayers);
             _talentSwitchNetEventsListPool = new ConcurrentPool<FixedUnorderedList<TalentSwitchNetEventS2C>>(() => new FixedUnorderedList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
             _environmentSpringPlayerCollisionListPool = new ConcurrentPool<FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>>(() => new FixedUnorderedList<EnvironmentSpringPlayerCollisionNetEventS2C>(networkConfig.MaxCap.EnvironmentSpringPlayerCollisionNetEvents), maxConcurrentPlayers);
@@ -225,9 +252,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _createKOProjectileNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateKOProjectileNetEventS2C>>(() => new FixedUnorderedList<CreateKOProjectileNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents), maxConcurrentPlayers);
             _koProjectHitPlayerNetEventsListPool = new ConcurrentPool<FixedUnorderedList<KOProjectHitPlayerNetEventS2C>>(() => new FixedUnorderedList<KOProjectHitPlayerNetEventS2C>(networkConfig.MaxCap.KOProjectHitPlayerNetEvents), maxConcurrentPlayers);
             _deactivateKOTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateKOTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateKOTalentNetEventS2C>(networkConfig.MaxCap.DeactivateKOTalentNetEvents), maxConcurrentPlayers);
-            _playerGrapplingHookShotNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>>(() => new FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookShotNetEvents), maxConcurrentPlayers);
-            _playerGrapplingHookHitNetEventsListPool = new ConcurrentPool<FixedUnorderedList<GrapplingHookHitWallNetEventS2C>>(() => new FixedUnorderedList<GrapplingHookHitWallNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookHitNetEvents), maxConcurrentPlayers);
-            _playerGrapplingHookDeactivatedNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookDeactivatedNetEvents), maxConcurrentPlayers);
             _performDashPulseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformDashPulseNetEventS2C>>(() => new FixedUnorderedList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents), maxConcurrentPlayers);
             _activateSentryGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateSentryGunTalentNetEvents), maxConcurrentPlayers);
             _deactivateSentryGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSentryGunTalentNetEvents), maxConcurrentPlayers);
@@ -242,6 +266,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _layChickenEggNetEventsPool = new ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>>(() => new FixedUnorderedList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents), maxConcurrentPlayers);
             _chickenEggHitNetEventsPool = new ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>>(() => new FixedUnorderedList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents), maxConcurrentPlayers);
             _activateYearsOfPainTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents), maxConcurrentPlayers);
+            _performGalacticPullNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformGalacticPullNetEventS2C>>(() => new FixedUnorderedList<PerformGalacticPullNetEventS2C>(networkConfig.MaxCap.PerformGalacticPullNetEvents), maxConcurrentPlayers);
+            _deactivateGalacticForceFieldNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>>(() => new FixedUnorderedList<DeactivateGalacticForceFieldNetEventS2C>(networkConfig.MaxCap.DeactivateGalacticForceFieldNetEvents), maxConcurrentPlayers);
+            _activateNukePowerUpNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateNukePowerUpNetEventS2C>>(() => new FixedUnorderedList<ActivateNukePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateNukePowerUpNetEvents), maxConcurrentPlayers);
+            _activateShufflePowerUpNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>>(() => new FixedUnorderedList<DeactivateShufflePowerUpNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents), maxConcurrentPlayers);
+            _shuffleSwapPlayerPositionNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>>(() => new FixedUnorderedList<ShuffleSwapPlayerPositionNetEventS2C>(networkConfig.MaxCap.ShuffleSwapPlayerPositionNetEvents), maxConcurrentPlayers);
+            _activateShuffleNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateShuffleNetEventS2C>>(() => new FixedUnorderedList<ActivateShuffleNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents), maxConcurrentPlayers);
+            _startPowerUpGrantingPhaseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>>(() => new FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>(networkConfig.MaxCap.StartPowerUpGrantingPhaseNetEvents), maxConcurrentPlayers);
+            _endPowerUpGrantingPhaseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>>(() => new FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>(networkConfig.MaxCap.EndPowerUpGrantingPhaseNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingClientEvents(long clientId)
@@ -396,9 +428,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
 
             
-            if (!PlayerLockOnHeartTargetsChangedNetEventsPerClient.ContainsKey(clientId))
+            if (!PlayerLockOnTargetsChangedNetEventsPerClient.ContainsKey(clientId))
             {
-                PlayerLockOnHeartTargetsChangedNetEventsPerClient.Add(clientId, _playerLockOnHeartTargetsChangedNetEventsListPool.Get());
+                PlayerLockOnTargetsChangedNetEventsPerClient.Add(clientId, _playerLockOnTargetsChangedNetEventsListPool.Get());
             }
             else
             {
@@ -407,13 +439,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             
             if (!PlayerLockedOnTargetHitNetEventsPerClient.ContainsKey(clientId))
             {
-                PlayerLockedOnTargetHitNetEventsPerClient.Add(clientId, _playerLockOnHeartTargetHitNetEventsListPool.Get());
+                PlayerLockedOnTargetHitNetEventsPerClient.Add(clientId, _playerLockOnTargetHitNetEventsListPool.Get());
             }
             else
             {
                 LogService.LogError($"Player already exists! {clientId}");
             }
-            
+
+            if (!PlayerPowerUpChangedNetEventsPerClient.ContainsKey(clientId))
+            {
+                PlayerPowerUpChangedNetEventsPerClient.Add(clientId, _playerPowerUpChangedNetEventsListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {clientId}");
+            }
+
+            if (!ActivateSonicSlapNetEventsPerClient.ContainsKey(clientId))
+            {
+                ActivateSonicSlapNetEventsPerClient.Add(clientId, _sonicSlapActivatedNetEventsListPool.Get());
+            }
+            else
+            {
+                LogService.LogError($"Player already exists! {clientId}");
+            }
+
             if (!TeamLostNetEventsPerClient.ContainsKey(clientId))
             {
                 TeamLostNetEventsPerClient.Add(clientId, _teamLostNetEventsListPool.Get());
@@ -502,18 +552,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 KOProjectHitPlayerNetEventsPerClient.Add(clientId, _koProjectHitPlayerNetEventsListPool.Get());
             }
-            if (!PlayerGrapplingHookShotNetEventsPerClient.ContainsKey(clientId))
-            {
-                PlayerGrapplingHookShotNetEventsPerClient.Add(clientId, _playerGrapplingHookShotNetEventsListPool.Get());
-            }
-            if (!PlayerGrapplingHookHitNetEventsPerClient.ContainsKey(clientId))
-            {
-                PlayerGrapplingHookHitNetEventsPerClient.Add(clientId, _playerGrapplingHookHitNetEventsListPool.Get());
-            }
-            if (!PlayerGrapplingHookDeactivatedNetEventsPerClient.ContainsKey(clientId))
-            {
-                PlayerGrapplingHookDeactivatedNetEventsPerClient.Add(clientId, _playerGrapplingHookDeactivatedNetEventsListPool.Get());
-            }
             if (!DeactivateKOTalentNetEventsPerClient.ContainsKey(clientId))
             {
                 DeactivateKOTalentNetEventsPerClient.Add(clientId, _deactivateKOTalentNetEventsListPool.Get());
@@ -574,8 +612,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 ActivateYearsOfPainTalentNetEventsPerClient.Add(clientId, _activateYearsOfPainTalentNetEventsListPool.Get());
             }
+            if (!PerformGalacticPullNetEventsPerClient.ContainsKey(clientId))
+            {
+                PerformGalacticPullNetEventsPerClient.Add(clientId, _performGalacticPullNetEventsListPool.Get());
+            }
+            if (!DeactivateGalacticForceFieldNetEventsPerClient.ContainsKey(clientId))
+            {
+                DeactivateGalacticForceFieldNetEventsPerClient.Add(clientId, _deactivateGalacticForceFieldNetEventsListPool.Get());
+            }
+            if (!ActivateNukePowerUpNetEventsPerClient.ContainsKey(clientId))
+            {
+                ActivateNukePowerUpNetEventsPerClient.Add(clientId, _activateNukePowerUpNetEventsListPool.Get());
+            }
+            if (!DeactivateShufflePowerUpNetEventsPerClient.ContainsKey(clientId))
+            {
+                DeactivateShufflePowerUpNetEventsPerClient.Add(clientId, _activateShufflePowerUpNetEventsListPool.Get());
+            }
+            if (!ShuffleSwapPlayerPositionNetEventsPerClient.ContainsKey(clientId))
+            {
+                ShuffleSwapPlayerPositionNetEventsPerClient.Add(clientId, _shuffleSwapPlayerPositionNetEventsListPool.Get());
+            }
+            if (!ActivateShuffleNetEventsPerClient.ContainsKey(clientId))
+            {
+                ActivateShuffleNetEventsPerClient.Add(clientId, _activateShuffleNetEventsListPool.Get());
+            }
+            if (!StartPowerUpGrantingPhaseNetEventsPerClient.ContainsKey(clientId))
+            {
+                StartPowerUpGrantingPhaseNetEventsPerClient.Add(clientId, _startPowerUpGrantingPhaseNetEventsListPool.Get());
+            }
+            if (!EndPowerUpGrantingPhaseNetEventsPerClient.ContainsKey(clientId))
+            {
+                EndPowerUpGrantingPhaseNetEventsPerClient.Add(clientId, _endPowerUpGrantingPhaseNetEventsListPool.Get());
+            }
         }
-        
+
         public void StopSavingClientEvents(long clientId)
         {
             var bulletSpawnedList = BulletSpawnNetEventsPerClient[clientId];
@@ -630,12 +700,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var stageEndList = StageEndNetEventsPerClient[clientId];
             stageEndList.Clear();
             _stageEndNetEventsListPool.Return(stageEndList);
-            var playerLockOnHeartTargetsChangedList = PlayerLockOnHeartTargetsChangedNetEventsPerClient[clientId];
-            playerLockOnHeartTargetsChangedList.Clear();
-            _playerLockOnHeartTargetsChangedNetEventsListPool.Return(playerLockOnHeartTargetsChangedList);
+            var playerLockOnTargetsChangedList = PlayerLockOnTargetsChangedNetEventsPerClient[clientId];
+            playerLockOnTargetsChangedList.Clear();
+            _playerLockOnTargetsChangedNetEventsListPool.Return(playerLockOnTargetsChangedList);
             var playerLockOnTargetHitList = PlayerLockedOnTargetHitNetEventsPerClient[clientId];
             playerLockOnTargetHitList.Clear();
-            _playerLockOnHeartTargetHitNetEventsListPool.Return(playerLockOnTargetHitList);
+            _playerLockOnTargetHitNetEventsListPool.Return(playerLockOnTargetHitList);
+            var playerPowerUpChangedList = PlayerPowerUpChangedNetEventsPerClient[clientId];
+            playerPowerUpChangedList.Clear();
+            _playerPowerUpChangedNetEventsListPool.Return(playerPowerUpChangedList);
+            var sonicSlapActivatedList = ActivateSonicSlapNetEventsPerClient[clientId];
+            sonicSlapActivatedList.Clear();
+            _sonicSlapActivatedNetEventsListPool.Return(sonicSlapActivatedList);
             var teamLostList = TeamLostNetEventsPerClient[clientId];
             teamLostList.Clear();
             _teamLostNetEventsListPool.Return(teamLostList);
@@ -676,17 +752,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _koProjectHitPlayerNetEventsListPool.Return(koProjectHitPlayerNetEventsList);
 
             var deactivateKOTalentNetEventsList = DeactivateKOTalentNetEventsPerClient[clientId];
-            var playerGrapplingHookShotNetEventsList = PlayerGrapplingHookShotNetEventsPerClient[clientId];
-            var playerGrapplingHookHitNetEventsList = PlayerGrapplingHookHitNetEventsPerClient[clientId];
-            var playerGrapplingHookDeactivatedNetEventsList = PlayerGrapplingHookDeactivatedNetEventsPerClient[clientId];
             deactivateKOTalentNetEventsList.Clear();
-            playerGrapplingHookShotNetEventsList.Clear();
-            playerGrapplingHookHitNetEventsList.Clear();
-            playerGrapplingHookDeactivatedNetEventsList.Clear();
             _deactivateKOTalentNetEventsListPool.Return(deactivateKOTalentNetEventsList);
-            _playerGrapplingHookShotNetEventsListPool.Return(playerGrapplingHookShotNetEventsList);
-            _playerGrapplingHookHitNetEventsListPool.Return(playerGrapplingHookHitNetEventsList);
-            _playerGrapplingHookDeactivatedNetEventsListPool.Return(playerGrapplingHookDeactivatedNetEventsList);
             
             var performDashPulseNetEventsList = PerformDashPulseNetEventsPerClient[clientId];
             performDashPulseNetEventsList.Clear();
@@ -745,6 +812,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             activateYearsOfPainTalentNetEventsList.Clear();
             _activateYearsOfPainTalentNetEventsListPool.Return(activateYearsOfPainTalentNetEventsList);
 
+            var performGalacticPullNetEventsList = PerformGalacticPullNetEventsPerClient[clientId];
+            performGalacticPullNetEventsList.Clear();
+            _performGalacticPullNetEventsListPool.Return(performGalacticPullNetEventsList);
+
+            var deactivateGalacticForceFieldNetEventsList = DeactivateGalacticForceFieldNetEventsPerClient[clientId];
+            deactivateGalacticForceFieldNetEventsList.Clear();
+            _deactivateGalacticForceFieldNetEventsListPool.Return(deactivateGalacticForceFieldNetEventsList);
+
+            var activateNukePowerUpNetEventsList = ActivateNukePowerUpNetEventsPerClient[clientId];
+            activateNukePowerUpNetEventsList.Clear();
+            _activateNukePowerUpNetEventsListPool.Return(activateNukePowerUpNetEventsList);
+
+            var activateShufflePowerUpNetEventsList = DeactivateShufflePowerUpNetEventsPerClient[clientId];
+            activateShufflePowerUpNetEventsList.Clear();
+            _activateShufflePowerUpNetEventsListPool.Return(activateShufflePowerUpNetEventsList);
+
+            var startPowerUpGrantingPhaseNetEventsList = StartPowerUpGrantingPhaseNetEventsPerClient[clientId];
+            startPowerUpGrantingPhaseNetEventsList.Clear();
+            _startPowerUpGrantingPhaseNetEventsListPool.Return(startPowerUpGrantingPhaseNetEventsList);
+            StartPowerUpGrantingPhaseNetEventsPerClient.Remove(clientId);
+
+            var endPowerUpGrantingPhaseNetEventsList = EndPowerUpGrantingPhaseNetEventsPerClient[clientId];
+            endPowerUpGrantingPhaseNetEventsList.Clear();
+            _endPowerUpGrantingPhaseNetEventsListPool.Return(endPowerUpGrantingPhaseNetEventsList);
+            EndPowerUpGrantingPhaseNetEventsPerClient.Remove(clientId);
+
             BulletSpawnNetEventsPerClient.Remove(clientId);
             PlayerRejoinAcceptNetEventsPerClient.Remove(clientId);
             MatchMakingPlayerJoinAcceptNetEventsPerClient.Remove(clientId);
@@ -762,8 +855,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             StartMatchCountdownNetEventsPerClient.Remove(clientId);
             StopMatchCountdownNetEventsPerClient.Remove(clientId);
             StageEndNetEventsPerClient.Remove(clientId);
-            PlayerLockOnHeartTargetsChangedNetEventsPerClient.Remove(clientId);
+            PlayerLockOnTargetsChangedNetEventsPerClient.Remove(clientId);
             PlayerLockedOnTargetHitNetEventsPerClient.Remove(clientId);
+            PlayerPowerUpChangedNetEventsPerClient.Remove(clientId);
+            ActivateSonicSlapNetEventsPerClient.Remove(clientId);
             TeamLostNetEventsPerClient.Remove(clientId);
             TalentSwitchNetEventsPerClient.Remove(clientId);
             StartMatchEligibleChangedNetEventsPerClient.Remove(clientId);
@@ -777,19 +872,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             CreateKOProjectileNetEventsPerClient.Remove(clientId);
             KOProjectHitPlayerNetEventsPerClient.Remove(clientId);
             DeactivateKOTalentNetEventsPerClient.Remove(clientId);
-            PlayerGrapplingHookShotNetEventsPerClient.Remove(clientId);
-            PlayerGrapplingHookHitNetEventsPerClient.Remove(clientId);
-            PlayerGrapplingHookDeactivatedNetEventsPerClient.Remove(clientId);
             PerformDashPulseNetEventsPerClient.Remove(clientId);
             ActivateSentryGunTalentNetEventsPerClient.Remove(clientId);
             DeactivateSentryGunTalentNetEventsPerClient.Remove(clientId);
             UpdatePlayerTalentStocksNetEventsPerClient.Remove(clientId);
             PlayerMaxShootCooldownChangedNetEventsPerClient.Remove(clientId);
+            CreateGrapplingHookProjectileNetEventsPerClient.Remove(clientId);
+            GrapplingHookHitWallNetEventsPerClient.Remove(clientId);
+            DeactivateGrapplingHookTalentNetEventsPerClient.Remove(clientId);
             ActivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
             DeactivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
             LayChickenEggNetEventsPerClient.Remove(clientId);
             ChickenEggHitNetEventsPerClient.Remove(clientId);
             ActivateYearsOfPainTalentNetEventsPerClient.Remove(clientId);
+            PerformGalacticPullNetEventsPerClient.Remove(clientId);
+            DeactivateGalacticForceFieldNetEventsPerClient.Remove(clientId);
+            ActivateNukePowerUpNetEventsPerClient.Remove(clientId);
+            DeactivateShufflePowerUpNetEventsPerClient.Remove(clientId);
+
+            var shuffleSwapPlayerPositionNetEventsList = ShuffleSwapPlayerPositionNetEventsPerClient[clientId];
+            shuffleSwapPlayerPositionNetEventsList.Clear();
+            _shuffleSwapPlayerPositionNetEventsListPool.Return(shuffleSwapPlayerPositionNetEventsList);
+            ShuffleSwapPlayerPositionNetEventsPerClient.Remove(clientId);
+
+            var activateShuffleNetEventsList = ActivateShuffleNetEventsPerClient[clientId];
+            activateShuffleNetEventsList.Clear();
+            _activateShuffleNetEventsListPool.Return(activateShuffleNetEventsList);
+            ActivateShuffleNetEventsPerClient.Remove(clientId);
         }
         
         public void AddPlayerTakeDamageNetEvent(int onTick, ushort damagedPlayerId, ushort playerHealth, ushort hitDamage, bool isAlive)
@@ -961,17 +1070,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
         
-        public void AddPlayerLockOnHeartTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)
+        public void AddPlayerLockOnTargetsChangedNetEvent(int onTick, ushort playerId, FixedUnorderedList<ObjectLockedOnTargetS2C> playerIdsLockedOnTarget)
         {
-            foreach (var kvp in PlayerLockOnHeartTargetsChangedNetEventsPerClient)
+            foreach (var kvp in PlayerLockOnTargetsChangedNetEventsPerClient)
             {
                 var packet = kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.PlayerId = playerId;
-                packet.PlayerIdsLockedOnTarget.Clear();
+                packet.LockedOnTargetObjects.Clear();
                 foreach (var playerLockedOnTarget in playerIdsLockedOnTarget.AsSpan())
                 {
-                    ref var playerlockOnId = ref packet.PlayerIdsLockedOnTarget.AddAndGet();
+                    ref var playerlockOnId = ref packet.LockedOnTargetObjects.AddAndGet();
                     playerlockOnId = playerLockedOnTarget;
                 }
             }
@@ -985,6 +1094,116 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 netEvent.OccuredOnTick = onTick;
                 netEvent.CasterPlayerId = casterPlayId;
                 netEvent.HitPlayerId = hitPlayerId;
+            }
+        }
+
+        public void AddPlayerPowerUpChangedNetEvent(int onTick, ushort playerId, PowerUpType powerUp)
+        {
+            foreach (var kvp in PlayerPowerUpChangedNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.PlayerId = playerId;
+                netEvent.PowerUp = powerUp;
+            }
+        }
+
+        public void AddActivateSonicSlapNetEvent(int onTick, ushort casterPlayerId, FixedUnorderedList<ushort> affectedPlayerIds)
+        {
+            foreach (var kvp in ActivateSonicSlapNetEventsPerClient)
+            {
+                var netEvent = kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.CasterPlayerId = casterPlayerId;
+                netEvent.AffectedPlayerIds.Clear();
+                foreach (var affectedPlayerId in affectedPlayerIds.AsSpan())
+                {
+                    ref var affectedId = ref netEvent.AffectedPlayerIds.AddAndGet();
+                    affectedId = affectedPlayerId;
+                }
+            }
+        }
+
+        public void AddPerformGalacticPullNetEvent(int onTick, ushort fieldId, ushort casterPlayerId, ushort casterTeamId)
+        {
+            foreach (var kvp in PerformGalacticPullNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.FieldId = fieldId;
+                netEvent.CasterPlayerId = casterPlayerId;
+                netEvent.CasterTeamId = casterTeamId;
+            }
+        }
+
+        public void AddDeactivateGalacticForceFieldNetEvent(int onTick, ushort galacticForceFieldId)
+        {
+            foreach (var kvp in DeactivateGalacticForceFieldNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.GalacticForceFieldId = galacticForceFieldId;
+            }
+        }
+
+        public void AddActivateNukePowerUpNetEvent(int onTick, ushort casterPlayerId, Vector2 casterPosition)
+        {
+            foreach (var kvp in ActivateNukePowerUpNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.CasterPlayerId = casterPlayerId;
+                netEvent.CasterPosition = casterPosition;
+            }
+        }
+
+        public void AddDectivateShufflePowerUpNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in DeactivateShufflePowerUpNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddShuffleSwapPlayerPositionNetEvent(int onTick)
+        {
+            foreach (var kvp in ShuffleSwapPlayerPositionNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+            }
+        }
+
+        public void AddActivateShuffleNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in ActivateShuffleNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddStartPowerUpGrantingPhaseNetEvent(int onTick, ushort playerId)
+        {
+            foreach (var kvp in StartPowerUpGrantingPhaseNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.PlayerId = playerId;
+            }
+        }
+
+        public void AddEndPowerUpGrantingPhaseNetEvent(int onTick, ushort playerId, PowerUpType grantedPowerUp)
+        {
+            foreach (var kvp in EndPowerUpGrantingPhaseNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.PlayerId = playerId;
+                netEvent.GrantedPowerUp = grantedPowerUp;
             }
         }
 
@@ -1176,13 +1395,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 }
             }
             
-            if (PlayerLockOnHeartTargetsChangedNetEventsPerClient.TryGetValue(clientId, out var playerLockOnHeartTargetsChangedNetEvents))
+            if (PlayerLockOnTargetsChangedNetEventsPerClient.TryGetValue(clientId, out var playerLockOnTargetsChangedNetEvents))
             {
-                for (int i = playerLockOnHeartTargetsChangedNetEvents.Count - 1; i >= 0; i--)
+                for (int i = playerLockOnTargetsChangedNetEvents.Count - 1; i >= 0; i--)
                 {
-                    if (playerLockOnHeartTargetsChangedNetEvents[i].OccuredOnTick < tick)
+                    if (playerLockOnTargetsChangedNetEvents[i].OccuredOnTick < tick)
                     {
-                        playerLockOnHeartTargetsChangedNetEvents.RemoveAt(i);
+                        playerLockOnTargetsChangedNetEvents.RemoveAt(i);
                     }
                 }
             }
@@ -1194,6 +1413,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     if (playerLockedOnTargetHitNetEvents[i].OccuredOnTick < tick)
                     {
                         playerLockedOnTargetHitNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PlayerPowerUpChangedNetEventsPerClient.TryGetValue(clientId, out var playerPowerUpChangedNetEvents))
+            {
+                for (int i = playerPowerUpChangedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerPowerUpChangedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerPowerUpChangedNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (ActivateSonicSlapNetEventsPerClient.TryGetValue(clientId, out var sonicSlapActivatedNetEvents))
+            {
+                for (int i = sonicSlapActivatedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (sonicSlapActivatedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        sonicSlapActivatedNetEvents[i].AffectedPlayerIds.Clear();
+                        sonicSlapActivatedNetEvents.RemoveAt(i);
                     }
                 }
             }
@@ -1482,6 +1724,94 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                     if (activateYearsOfPainTalentNetEvents[i].OccuredOnTick < tick)
                     {
                         activateYearsOfPainTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PerformGalacticPullNetEventsPerClient.TryGetValue(clientId, out var performGalacticPullNetEvents))
+            {
+                for (int i = performGalacticPullNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (performGalacticPullNetEvents[i].OccuredOnTick < tick)
+                    {
+                        performGalacticPullNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateGalacticForceFieldNetEventsPerClient.TryGetValue(clientId, out var deactivateGalacticForceFieldNetEvents))
+            {
+                for (int i = deactivateGalacticForceFieldNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateGalacticForceFieldNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateGalacticForceFieldNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+            
+            if (ActivateNukePowerUpNetEventsPerClient.TryGetValue(clientId, out var activateNukePowerUpNetEvents))
+            {
+                for (int i = activateNukePowerUpNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateNukePowerUpNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateNukePowerUpNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+            
+            if (DeactivateShufflePowerUpNetEventsPerClient.TryGetValue(clientId, out var activateShufflePowerUpNetEvents))
+            {
+                for (int i = activateShufflePowerUpNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateShufflePowerUpNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateShufflePowerUpNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+            
+            if (ShuffleSwapPlayerPositionNetEventsPerClient.TryGetValue(clientId, out var shuffleSwapPlayerPositionNetEvents))
+            {
+                for (int i = shuffleSwapPlayerPositionNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (shuffleSwapPlayerPositionNetEvents[i].OccuredOnTick < tick)
+                    {
+                        shuffleSwapPlayerPositionNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (ActivateShuffleNetEventsPerClient.TryGetValue(clientId, out var activateShuffleNetEvents))
+            {
+                for (int i = activateShuffleNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateShuffleNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateShuffleNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (StartPowerUpGrantingPhaseNetEventsPerClient.TryGetValue(clientId, out var startPowerUpGrantingPhaseNetEvents))
+            {
+                for (int i = startPowerUpGrantingPhaseNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (startPowerUpGrantingPhaseNetEvents[i].OccuredOnTick < tick)
+                    {
+                        startPowerUpGrantingPhaseNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (EndPowerUpGrantingPhaseNetEventsPerClient.TryGetValue(clientId, out var endPowerUpGrantingPhaseNetEvents))
+            {
+                for (int i = endPowerUpGrantingPhaseNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (endPowerUpGrantingPhaseNetEvents[i].OccuredOnTick < tick)
+                    {
+                        endPowerUpGrantingPhaseNetEvents.RemoveAt(i);
                     }
                 }
             }

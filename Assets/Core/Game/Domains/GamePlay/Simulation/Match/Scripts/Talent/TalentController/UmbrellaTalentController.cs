@@ -2,10 +2,12 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
@@ -16,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IMatchDataService _matchDataService;
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly NetworkConfig _networkConfig;
+        private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
         
         private ushort _casterPlayerId;
         private int _startTick;
@@ -45,12 +48,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
         }
 
-        public UmbrellaTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig)
+        public UmbrellaTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfigService = gamePlayConfigService;
             _networkConfig = networkConfig;
+            _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -120,19 +124,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            var isSpinned = casterPlayerState.Spaceship.IsSpinned;
             var elapsedSeconds = (tick - _startTick) * deltaTime;
             var didTimeEnded = elapsedSeconds >= _gamePlayConfigService.GamePlayConfig.Talents.UmbrellaTalentConfig.DurationInSeconds;
 
-            if (isSpinned || didTimeEnded)
+            if (didTimeEnded)
             {
                 DeactivateTalent(tick);
-
                 return;
             }
 
             var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
-            casterPlayerState.Spaceship.Transform.Velocity += aimDirection * _gamePlayConfigService.GamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick * deltaTime;
+            var force = aimDirection * _gamePlayConfigService.GamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick * deltaTime;
+            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
         }
 
         private void DeactivateTalent(int tick)

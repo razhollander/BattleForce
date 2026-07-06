@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Scripts.Extensions;
 using Core.Scripts.Helpers;
@@ -28,11 +30,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
         [SerializeField] private PlayerChickenView _playerChickenView;
         [SerializeField] private YearsOfPainView _yearsOfPainView;
+        [SerializeField] private SonicSnapEffectView _sonicSnapEffectView;
         [SerializeField] private GameObject _deadAura;
         [SerializeField] private PlayerEyesView _playerEyesView;
         [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
+        [SerializeField] private MatchPlayerPowerUpHudView _powerUpHudView;
         [SerializeField] private GameObject _crownGameObject;
         [SerializeField] private DeadTombstoneView _deadTombstoneView;
+        [SerializeField] private ActivatePowerUpEffectView _activatePowerUpEffectView;
         public Action Despawn { get; set; }
         
         public PlayerView Base => _playerView;
@@ -109,6 +114,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void PlayYearsOfPainAnimation(Vector2 direction, CancellationTokenSource cancellationTokenSource)
         {
             _yearsOfPainView.PlayAndHide(direction, cancellationTokenSource).Forget();
+        }
+
+        public void PlaySonicSnapEffect(CancellationToken cancellationToken)
+        {
+            _sonicSnapEffectView.PlaySnapEffect(cancellationToken).Forget();
         }
 
         public void SetUmbrellaState(bool isOn)
@@ -220,18 +230,39 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void OnSpawned()
         {
             SetIsHealthBarShown(true);
+            _sonicSnapEffectView.Hide();
             Base.OnSpawned();
         }
 
-        public void SetIsLockOnHeartSightShown(bool isShown)
+        public void SetIsLockOnTargetSightShown(bool isShown)
         {
-            Base.SetIsLockOnHeartSightShown(isShown);
+            Base.SetIsLockOnTargetSightShown(isShown);
             _playerEyesView.UpdateEyesAccordingToIsSightShown(isShown);
         }
 
         public void SetIsKinged(bool isKinged)
         {
             _crownGameObject.SetActive(isKinged);
+        }
+
+        public void SetCurrentPowerUp(bool shouldShowPowerUp, Sprite powerUpIcon)
+        {
+            _powerUpHudView.SetPowerUp(shouldShowPowerUp, powerUpIcon);
+        }
+        
+        public async Awaitable ShowActivatePowerUpEffect(CancellationToken cancellationToken)
+        {
+            await _activatePowerUpEffectView.PlayAnimation(cancellationToken);
+        }
+
+        public async Awaitable StartPowerUpGrantingPhaseReel(IReadOnlyList<Sprite> reelSprites, CancellationToken cancellationToken)
+        {
+            await _powerUpHudView.PlayGrantingPhaseReel(reelSprites, cancellationToken);
+        }
+
+        public async Awaitable EndPowerUpGrantingPhaseReel(Sprite grantedSprite, CancellationToken cancellationToken)
+        {
+            await _powerUpHudView.StopGrantingPhaseReelAndShowGranted(grantedSprite, cancellationToken);
         }
     }
 }

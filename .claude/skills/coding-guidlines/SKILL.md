@@ -57,6 +57,10 @@ description: Supersonic Genesis code-review conventions and architecture rules.
 
 * No overkill. Do not burn down house to kill spider. (E.g., Do not hide all popups just to hide one active popup).
 
+### **Garbage**
+
+* No garbage allocation in the simulation domain! everything should be pre-allocated!
+
 ### **Single Responsibility**
 
 * One class, one job, one reason to change.  
@@ -176,5 +180,7 @@ Must follow strict MVC. No break rule.
   * Never use destroyCancellationToken.
   * Never check if(gameObject.activeInHierarchy/activeSelf)
   * A method that gets a CancellationToken as a parameter is always async.
+  * Use v.NormalizeSafe() instead of Vector2.Normalize(v)
+  * For every Register should also be Unregister, same fore events/listeners.
 * **Reflection**: Never at runtime\!
 

@@ -1,3 +1,5 @@
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
+
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
     [System.Serializable]
@@ -8,5 +10,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public int MaxConcurrentPowerUpBalls = 5;
         public float MoveSpeed = 5f;
         public float Radius = 1.269f;
+        public PowerUpType[] ObtainablePowerUps;
+        public float GalacticPullDurationSeconds = 5f;
+        public float GalacticPullForce = 8f;
+        public float NukeForce = 15f;
+        public float NukeMinSpinAmount = 180f;
+        public float NukeMaxSpinAmount = 720f;
+        public float ShuffleSwapIntervalInSeconds = 0.35f;
     }
 }

@@ -56,11 +56,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             if (shouldSpawnPowerUpBall)
             {
-                SpawnPowerUp();
+                SpawnPowerUpBall();
             }
         }
 
-        private void SpawnPowerUp()
+        private void SpawnPowerUpBall()
         {
             if (!TryGenerateRandomPowerUpBall(out var position, out var velocity, out var powerUpType))
             {

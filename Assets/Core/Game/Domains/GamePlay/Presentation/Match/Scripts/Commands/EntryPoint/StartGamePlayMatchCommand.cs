@@ -11,10 +11,13 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Telepor
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.PlayerTeleportEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Nuke.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
@@ -47,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IMatchPlayerControllers _playerControllers;
         private IMatchBulletControllers _bulletControllers;
         private IMatchChickenEggsControllers _chickenEggsControllers;
+        private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
         private ITickProcessor _tickProcessor;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
@@ -57,6 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IClientMatchPresentationTickProcessor _clientMatchPresentationTickProcessor;
         private IStartStagePacketHandler _startStagePacketHandler;
         private IGainBoltEffectController _gainBoltEffectController;
+        private IHitDamageIndicatorEffectController _hitDamageIndicatorEffectController;
         private IPlayerTeleportEffectController _playerTeleportEffectController;
         private IEnvironmentTeleportGateControllers _environmentTeleportGateControllers;
         private IEnvironmentFieldBarrierControllers _environmentFieldBarrierControllers;
@@ -71,6 +76,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ILocalPlayersDataService _localPlayersDataService;
         private IGameInputActionsController _gameInputActionsController;
         private IAudioService _audioService;
+        private INukeShockwaveEffectController _nukeShockwaveEffectController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
         {
@@ -88,6 +94,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
+            _galacticPullStarEffectControllers = _diContainer.Resolve<IGalacticPullStarEffectControllers>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
@@ -98,6 +105,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _clientMatchPresentationTickProcessor = _diContainer.Resolve<IClientMatchPresentationTickProcessor>();
             _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
             _gainBoltEffectController = _diContainer.Resolve<IGainBoltEffectController>();
+            _hitDamageIndicatorEffectController = _diContainer.Resolve<IHitDamageIndicatorEffectController>();
             _playerTeleportEffectController = _diContainer.Resolve<IPlayerTeleportEffectController>();
             _environmentTeleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
             _environmentFieldBarrierControllers = _diContainer.Resolve<IEnvironmentFieldBarrierControllers>();
@@ -112,6 +120,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
             _audioService = _diContainer.Resolve<IAudioService>();
+            _nukeShockwaveEffectController = _diContainer.Resolve<INukeShockwaveEffectController>();
         }
 
         public void Execute()
@@ -131,6 +140,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
             _chickenEggsControllers.InitEntryPoint();
+            _nukeShockwaveEffectController.InitEntryPoint();
+            _galacticPullStarEffectControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
             _environmentSpringControllers.InitEntryPoint();
             _environmentSpikeControllers.InitEntryPoint();
@@ -145,6 +156,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
                  .Execute();
             AddPlayersDevicesNotAddedDuringMatchMaking(); // in case we entered from playback
             _gainBoltEffectController.InitEntryPoint();
+            _hitDamageIndicatorEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();

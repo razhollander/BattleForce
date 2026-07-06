@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(Id);
+            writer.Put((byte)Id);
             writer.Put(PlayerCasterId);
             writer.PutVector2Quantized(Position);
             writer.PutVector2AsAngle16(Rotation);
@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         public void Deserialize(NetDataReader reader)
         {
-            Id = reader.GetUShort();
+            Id = reader.GetByte();
             PlayerCasterId = reader.GetUShort();
             Position = reader.GetVector2Quantized();
             Rotation = reader.GetVector2FromAngle16();

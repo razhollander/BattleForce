@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -10,8 +11,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     public class AddForceToPlayerCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
-        private IPlayersDecelerationLogic _iIIPlayersDecelerationLogic;
-        private INetEventsDataService _netEventsDataService;
         
         private Vector2 _force;
         private bool _shouldTurnOffEngine;
@@ -38,15 +37,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
-            _iIIPlayersDecelerationLogic = _diContainer.Resolve<IPlayersDecelerationLogic>();
-            _netEventsDataService  = _diContainer.Resolve<INetEventsDataService>();
         }
 
         public void Execute()
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(_playerId);
+            if(playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentTalent) && currentTalent.IsCurrentlyActive && 
+               currentTalent.TalentType == TalentType.SentryGun)
+            {
+                return;
+            }
             playerState.Spaceship.Transform.Velocity += _force;
-
+            
             if (_shouldTurnOffEngine)
             {
                 playerState.Spaceship.IsEngineOn = false;

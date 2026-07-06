@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
@@ -16,8 +15,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
         private readonly IStateMachineService _stateMachineService;
         private readonly LockOnTargetEffectPool _effectsPool;
 
-        private readonly Dictionary<ushort, LockOnTargetEffectView> _activeEffectsPerEnemy;
-        private readonly List<ushort> _cachedEnemyIdsToRemove;
+        private readonly Dictionary<LockOnTargetKey, LockOnTargetEffectView> _activeEffectsPerTarget;
+        private readonly List<LockOnTargetKey> _cachedTargetsToRemove;
         private readonly ushort _casterPlayerId;
 
         public PlayerLockOnTargetEffectController(ushort casterPlayerId, LockOnTargetEffectPool effectsPool,
@@ -27,11 +26,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _stateMachineService = stateMachineService;
             _effectsPool = effectsPool;
-            _activeEffectsPerEnemy = new Dictionary<ushort, LockOnTargetEffectView>(networkConfig.MaxCap.ConcurrentPlayers - 1);
-            _cachedEnemyIdsToRemove = new List<ushort>(networkConfig.MaxCap.ConcurrentPlayers - 1);
+            _activeEffectsPerTarget = new Dictionary<LockOnTargetKey, LockOnTargetEffectView>(networkConfig.MaxCap.ConcurrentPlayers - 1);
+            _cachedTargetsToRemove = new List<LockOnTargetKey>(networkConfig.MaxCap.ConcurrentPlayers - 1);
         }
 
-        public void RefreshTargetEffectsOfCaster(FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)
+        public void RefreshTargetEffectsOfCaster(FixedUnorderedList<ObjectLockedOnTargetS2C> playerIdsLockedOnTarget)
         {
             DespawnTargetsWhichArentShownAnymore(playerIdsLockedOnTarget);
 
@@ -41,36 +40,49 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             }
         }
 
-        private void UpdateLockOnTargetEffectForTarget(PlayerOnTargetS2C target)
+        private void UpdateLockOnTargetEffectForTarget(ObjectLockedOnTargetS2C target)
         {
-            var enemyId = target.PlayerTargetId;
+            var targetKey = target.GetKey();
             var isShootable = target.IsLockOnTargetShootable;
 
-            if (!_activeEffectsPerEnemy.TryGetValue(enemyId, out var _))
+            if (!_activeEffectsPerTarget.TryGetValue(targetKey, out var _))
             {
                 var newTargetEffectView = _effectsPool.Spawn();
                 newTargetEffectView.Setup(_sharedGamePlayConfig.LockOnTargetDurationInSeconds);
-                _activeEffectsPerEnemy[enemyId] = newTargetEffectView;
+                _activeEffectsPerTarget[targetKey] = newTargetEffectView;
             }
-            PlayAnimationForState(_activeEffectsPerEnemy[enemyId], isShootable);
+            PlayAnimationForState(_activeEffectsPerTarget[targetKey], isShootable);
         }
 
-        private void DespawnTargetsWhichArentShownAnymore(FixedUnorderedList<PlayerOnTargetS2C> playerIdsLockedOnTarget)
+        private void DespawnTargetsWhichArentShownAnymore(FixedUnorderedList<ObjectLockedOnTargetS2C> playerIdsLockedOnTarget)
         {
-            _cachedEnemyIdsToRemove.Clear();
-            foreach (var enemyId in _activeEffectsPerEnemy.Keys)
+            _cachedTargetsToRemove.Clear();
+            foreach (var targetKey in _activeEffectsPerTarget.Keys)
             {
-                if (!playerIdsLockedOnTarget.ContainsWithId(enemyId))
+                if (!DoesListContainTarget(playerIdsLockedOnTarget, targetKey))
                 {
-                    _cachedEnemyIdsToRemove.Add(enemyId);
+                    _cachedTargetsToRemove.Add(targetKey);
                 }
             }
 
-            foreach (var enemyId in _cachedEnemyIdsToRemove)
+            foreach (var targetKey in _cachedTargetsToRemove)
             {
-                _activeEffectsPerEnemy[enemyId].Despawn();
-                _activeEffectsPerEnemy.Remove(enemyId);
+                _activeEffectsPerTarget[targetKey].Despawn();
+                _activeEffectsPerTarget.Remove(targetKey);
             }
+        }
+
+        private bool DoesListContainTarget(FixedUnorderedList<ObjectLockedOnTargetS2C> targets, LockOnTargetKey targetKey)
+        {
+            foreach (var target in targets.AsSpan())
+            {
+                if (target.GetKey().Equals(targetKey))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void PlayAnimationForState(LockOnTargetEffectView view, bool isShootable)
@@ -86,11 +98,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             }
         }
 
-        public void UpdateTargetsPositionOnPlayer(ushort targetPlayerId, Vector2 startPoint, Vector2 endPoint)
+        public void UpdateTargetsPositionOnPlayer(LockOnTargetKey targetKey, Vector2 startPoint, Vector2 endPoint)
         {
-            if (!_activeEffectsPerEnemy.TryGetValue(targetPlayerId, out var activeEffect))
+            if (!_activeEffectsPerTarget.TryGetValue(targetKey, out var activeEffect))
             {
-                LogService.LogError($"No effect for caster player id: {_casterPlayerId} on target player id: {targetPlayerId}");
+                LogService.LogError($"No effect for caster player id: {_casterPlayerId} on target id: {targetKey.TargetId} type: {targetKey.TargetType}");
                 return;
             }
 
@@ -99,12 +111,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
 
         public void DestroyAll()
         {
-            foreach (var activeEffect in _activeEffectsPerEnemy.Values)
+            foreach (var activeEffect in _activeEffectsPerTarget.Values)
             {
                 activeEffect.Despawn();
             }
 
-            _activeEffectsPerEnemy.Clear();
+            _activeEffectsPerTarget.Clear();
         }
     }
 }

@@ -69,7 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     if (isPlayerOutsideBarrier)
                     {
                         var barrierCenter = barrier.Position;
-                        player.Spaceship.Transform.Position = barrierPosition + Vector2.Normalize(offsetVector) * maxAllowedDistance;
+                        player.Spaceship.Transform.Position = barrierPosition + offsetVector.NormalizeSafe() * maxAllowedDistance;
                         player.Spaceship.Transform.Velocity = GetPlayerSlidingVeclocityAlongBarrier(player.Spaceship.Transform.Velocity, barrierCenter, playerPosition);
                     }
 
@@ -107,7 +107,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         
         private Vector2 GetPlayerSlidingVeclocityAlongBarrier(Vector2 playerVelocity, Vector2 barrierCenter, Vector2 playerPosition)
         {
-            var normal = (playerPosition - barrierCenter).Normalize();
+            var normal = (playerPosition - barrierCenter).NormalizeSafe();
             var projection = Vector2.Dot(playerVelocity, normal);
             var slidingDirection = playerVelocity - (normal * projection);
             return slidingDirection;

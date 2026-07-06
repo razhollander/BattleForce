@@ -51,11 +51,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             var isTalentAInputPressed = _gameInputActionsController.IsPlayerTalentAInputPressed(_playerId);
             var isTalentBInputPressed = _gameInputActionsController.IsPlayerTalentBInputPressed(_playerId);
             var isTalentCInputPressed = _gameInputActionsController.IsPlayerTalentCInputPressed(_playerId);
+            var isPowerUpInputPressed = _gameInputActionsController.IsPlayerPowerUpInputPressed(_playerId);
             var isMoveForawrdInputPressed = _gameInputActionsController.IsPlayerMoveForwardInputPressed(_playerId);
-            
+
             CalculateRightAndLeftInputs(_playerDirection, out var isMoveRightInputPressed, out var isMoveLeftInputPressed);
             var aimDirection = CalculateAimDirection();
-            return new Result(isShootInputPressed, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, isMoveLeftInputPressed, isMoveRightInputPressed, isMoveForawrdInputPressed, aimDirection);
+            return new Result(isShootInputPressed, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, isPowerUpInputPressed, isMoveLeftInputPressed, isMoveRightInputPressed, isMoveForawrdInputPressed, aimDirection);
         }
 
         private void CalculateRightAndLeftInputs(Vector2 playerDirection, out bool isMoveRightInputPressed, out bool isMoveLeftInputPressed)
@@ -92,12 +93,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             public bool IsShootInputPressed;
             public bool IsTalentBInputPressed;
             public bool IsTalentCInputPressed;
+            public bool IsPowerUpInputPressed;
             public bool IsMoveLeftInputPressed;
             public bool IsMoveRightInputPressed;
             public bool IsMoveForawrdInputPressed;
             public Vector2 AimDirection;
 
-            public Result(bool isShootInputPressed, bool isTalentAInputPressed, bool isTalentBInputPressed, bool isTalentCInputPressed, bool isMoveLeftInputPressed,
+            public Result(bool isShootInputPressed, bool isTalentAInputPressed, bool isTalentBInputPressed, bool isTalentCInputPressed, bool isPowerUpInputPressed, bool isMoveLeftInputPressed,
                 bool isMoveRightInputPressed, bool isMoveForawrdInputPressed, Vector2 aimDirection)
 
             {
@@ -105,6 +107,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
                 IsShootInputPressed = isShootInputPressed;
                 IsTalentBInputPressed = isTalentBInputPressed;
                 IsTalentCInputPressed = isTalentCInputPressed;
+                IsPowerUpInputPressed = isPowerUpInputPressed;
                 IsMoveLeftInputPressed = isMoveLeftInputPressed;
                 IsMoveRightInputPressed = isMoveRightInputPressed;
                 IsMoveForawrdInputPressed = isMoveForawrdInputPressed;

@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
+using System.Linq;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
@@ -9,6 +10,8 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Scripts.Services.AudioService;
+using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
@@ -23,12 +26,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly NetworkConfig _networkConfig;
         private readonly Transform _parent;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
+        private readonly IAudioService _audioService;
         public readonly ushort PlayerId;
         private MatchPlayerView _playerView;
         private readonly MatchPlayerViewPool _playerPool;
+        private readonly Sprite[] _powerUpReelSpritesArray;
+        private int? _currentPowerupGrantingAudioId;
 
         public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider) 
+            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
@@ -36,7 +42,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _networkConfig = networkConfig;
             _parent = parent;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
+            _audioService = audioService;
             PlayerId = playerId;
+            _powerUpReelSpritesArray = gamePlayConfig.PowerUps.PowerUpSprites.Values.ToArray();
         }
 
         public void CreatePlayerView()
@@ -58,7 +66,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             UpdateTalents(playerModel.Spaceship.TalentsState.Talents, playerModel.Spaceship.TalentsState.SelectedTalentIndex, 0);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
-            SetIsLockOnHeartSightShown(playerModel.Spaceship.IsPlayerLockOnTargetSightShown);
+            SetIsLockOnTargetSightShown(playerModel.Spaceship.IsPlayerLockOnTargetSightShown);
+
+            if (playerModel.Spaceship.IsCurrentlyInGrantingPowerUpPhase)
+            {
+                StartPowerUpGrantingPhase(_stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
+            }
+            else
+            {
+                SetCurrentPowerUp(playerModel.Spaceship.CurrentPowerUp);
+            }
             var isKinged = _matchDataService.TryGetKingedPlayers(out var kingedPlayers) && kingedPlayers.Exists(x => x.PlayerId == PlayerId);
             SetIsKinged(isKinged);
         }
@@ -105,7 +122,37 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _playerView.SetUmbrellaState(isUmbrellaActive);
         }
-        
+
+        public void SetCurrentPowerUp(PowerUpType powerUpType)
+        {
+            var hasPowerUp = powerUpType != PowerUpType.None;
+            Sprite icon = null;
+            if (hasPowerUp && _gamePlayConfig.PowerUps.PowerUpSprites.TryGetValue(powerUpType, out var powerUpSprite))
+            {
+                icon = powerUpSprite;
+            }
+
+            _playerView.SetCurrentPowerUp(hasPowerUp, icon);
+        }
+
+        public async Awaitable StartPowerUpGrantingPhase(CancellationToken cancellationToken)
+        {
+            _currentPowerupGrantingAudioId = _audioService.PlayAudioLoopWithId(AudioClipType.PowerUpRandomReels);
+            await _playerView.StartPowerUpGrantingPhaseReel(_powerUpReelSpritesArray, cancellationToken);
+        }
+
+        public async Awaitable EndPowerUpGrantingPhase(PowerUpType grantedPowerUp, CancellationToken cancellationToken)
+        {
+            _gamePlayConfig.PowerUps.PowerUpSprites.TryGetValue(grantedPowerUp, out var grantedSprite);
+
+            if (_currentPowerupGrantingAudioId.HasValue)
+            {
+                _audioService.StopLoopAudioById(_currentPowerupGrantingAudioId.Value);
+                _currentPowerupGrantingAudioId = null;
+            }
+            await _playerView.EndPowerUpGrantingPhaseReel(grantedSprite, cancellationToken);
+        }
+
         public void SetSelectedTalent(int talentIndex)
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);
@@ -298,6 +345,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.PlayYearsOfPainAnimation(direction.ToUnityVector2(), _stageCancellationTokenProvider.CancellationTokenSource);
         }
 
+        public void PlaySonicSnapEffect()
+        {
+            _playerView.PlaySonicSnapEffect(_stageCancellationTokenProvider.CancellationTokenSource.Token);
+        }
+
+        public async Awaitable ShowActivatePowerUpEffect(CancellationToken cancellationToken)
+        {
+            await _playerView.ShowActivatePowerUpEffect(cancellationToken);
+        }
+
         public void SetIsDeadEffectEnabled(bool isEnabled)
         {
             _playerView.SetIsDeadEffectEnabled(isEnabled, _stageCancellationTokenProvider.CancellationTokenSource.Token);
@@ -351,9 +408,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetSelectedTalent(selectedTalentIndex, _stageCancellationTokenProvider.CancellationTokenSource.Token);
         }
 
-        public void SetIsLockOnHeartSightShown(bool isShown)
+        public void SetIsLockOnTargetSightShown(bool isShown)
         {
-            _playerView.SetIsLockOnHeartSightShown(isShown);
+            _playerView.SetIsLockOnTargetSightShown(isShown);
         }
 
         public Transform GetHeadTransform()

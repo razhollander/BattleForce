@@ -112,9 +112,20 @@ All network types implement `INetSerializable` with `Serialize(NetDataWriter)` /
 
 ---
 
+## Common simulation patterns
+
+**Spinning a player:** Always use `SpinPlayerCommand` — never write to `AngularVelocity` directly. It handles the `IsSpinned` flag and fires `AddPlayerSpinnedStartedNetEvent` internally. Create it in the constructor via `commandFactory.CreateCommandVoid<SpinPlayerCommand>()`, call as `.SetPlayer(id).SetSpinAmount(signedAmount).SetTick(tick).Execute()`. The spin amount is signed — positive and negative values spin in opposite directions.
+
+**Applying force to a player:** Use `AddForceToPlayerCommand` — never write to `Velocity` directly. It adds to the player's current velocity (`Velocity +=`) and optionally turns off the engine. Create in constructor via `commandFactory.CreateCommandVoid<AddForceToPlayerCommand>()`, call as `.SetPlayerId(id).SetForce(direction * magnitude).ShouldTurnOffEngine(false).Execute()`.
+
+**Random direction (Vector2):** `RNG.NextFloat(0f, 360f).AngleToVector()` — `AngleToVector` is a `float` extension in `Core/Scripts/Extensions/FloatExtensions.cs` that returns `System.Numerics.Vector2`. Passing 0–360 produces a uniformly distributed random direction (same pattern used by `InitStageCommand`).
+
+---
+
 ## Skills available
 
 - `/add-net-event` — add a new S2C net event (7-file checklist, bitmask registration)
-- `/add-talent` — add a new talent (enum, config, controller, registration + per-talent net events
+- `/add-talent` — add a new talent (enum, config, controller, registration + per-talent net events)
+- `/add-power-up` — add a new PowerUp type (enum, controller, PlayerPowerUpControllers registration, config + optional activation net event)
 - `/coding-guidlines` — coding rules to follow when writing code
 

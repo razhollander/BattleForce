@@ -81,7 +81,7 @@ namespace Core.Scripts.Utils
             {
                 if (color == default) color = Color.white;
         
-                var dir = direction.Normalize();
+                var dir = direction.NormalizeSafe();
                 var drawDurationInSeconds = 0.02f;
                 // Find the base angle of the direction vector in degrees
                 var baseAngle = Mathf.Atan2(dir.Y, dir.X) * Mathf.Rad2Deg;

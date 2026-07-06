@@ -164,7 +164,7 @@ namespace Core.Scripts.Editor
                 var newIndex = keysProp.arraySize;
                 keysProp.InsertArrayElementAtIndex(newIndex);
                 valuesProp.InsertArrayElementAtIndex(newIndex);
-                keysProp.GetArrayElementAtIndex(newIndex).enumValueIndex = (int)newType;
+                keysProp.GetArrayElementAtIndex(newIndex).intValue = (int)newType;
                 var newValueProp = valuesProp.GetArrayElementAtIndex(newIndex);
                 newValueProp.FindPropertyRelative("Clip").objectReferenceValue = null;
                 newValueProp.FindPropertyRelative("Volume").floatValue = 0f;
@@ -266,7 +266,7 @@ namespace Core.Scripts.Editor
             var used = new HashSet<int>();
             for (var i = 0; i < keysProp.arraySize; i++)
             {
-                used.Add(keysProp.GetArrayElementAtIndex(i).enumValueIndex);
+                used.Add(keysProp.GetArrayElementAtIndex(i).intValue);
             }
 
             var result = new List<AudioClipType>();

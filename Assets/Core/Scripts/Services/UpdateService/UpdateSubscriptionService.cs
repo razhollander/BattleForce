@@ -6,18 +6,18 @@ namespace CoreDomain.Scripts.Services.UpdateService
 {
     public class UpdateSubscriptionService : MonoBehaviour, IUpdateSubscriptionService
     {
-        private static readonly List<IUpdatable> _updateObservers = new List<IUpdatable>();
-        private static readonly List<IGUIUpdatable> _guiUpdateObservers = new List<IGUIUpdatable>();
+        private readonly List<IUpdatable> _updateObservers = new List<IUpdatable>();
+        private readonly List<IGUIUpdatable> _guiUpdateObservers = new List<IGUIUpdatable>();
 
-        private static readonly List<IFixedUpdatable> _fixedUpdateObservers = new List<IFixedUpdatable>();
-        private static readonly List<IFixedUpdatable> _pendingAddFixedUpdateObservers = new List<IFixedUpdatable>();
-        private static readonly List<IFixedUpdatable> _pendingRemoveFixedUpdateObservers = new List<IFixedUpdatable>();
+        private readonly List<IFixedUpdatable> _fixedUpdateObservers = new List<IFixedUpdatable>();
+        private readonly List<IFixedUpdatable> _pendingAddFixedUpdateObservers = new List<IFixedUpdatable>();
+        private readonly List<IFixedUpdatable> _pendingRemoveFixedUpdateObservers = new List<IFixedUpdatable>();
         
-        private static readonly List<ILateUpdatable> _lateUpdateObservers = new List<ILateUpdatable>();
-        private static readonly List<ILateUpdatable> _pendingAddLateUpdateObservers = new List<ILateUpdatable>();
-        private static readonly List<ILateUpdatable> _pendingRemoveLateUpdateObservers = new List<ILateUpdatable>();
-        private static int _currentUpdateIndex;
-        private static int _currentGuiUpdateIndex;
+        private readonly List<ILateUpdatable> _lateUpdateObservers = new List<ILateUpdatable>();
+        private readonly List<ILateUpdatable> _pendingAddLateUpdateObservers = new List<ILateUpdatable>();
+        private readonly List<ILateUpdatable> _pendingRemoveLateUpdateObservers = new List<ILateUpdatable>();
+        private int _currentUpdateIndex;
+        private int _currentGuiUpdateIndex;
         
         private void Update()
         {

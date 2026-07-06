@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: EnvironmentTeleportConfig
   m_EditorClassIdentifier: 
   TeleportSpritesPerId:
-    m_keys: 0100020003000400
+    m_keys: 01000200030004000500
     m_values:
     - {fileID: 21300000, guid: 22609bf38c3f34b4b90032686b2e2f64, type: 3}
     - {fileID: 21300000, guid: 70611ff2ec6e149d5a04ce6a8f14727b, type: 3}
     - {fileID: 21300000, guid: 42c3594d6baa04634b9675b78afaa3fe, type: 3}
     - {fileID: 21300000, guid: cce47f1ac10304692852f89119b64605, type: 3}
+    - {fileID: 21300000, guid: 22609bf38c3f34b4b90032686b2e2f64, type: 3}

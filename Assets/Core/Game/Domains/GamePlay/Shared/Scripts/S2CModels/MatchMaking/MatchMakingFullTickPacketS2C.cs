@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Network;
 using Core.Scripts.Utils.CustomCollections;
 using LiteNetLib.Utils;
@@ -20,6 +21,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
         public FixedUnorderedList<StartMatchCountdownNetEventS2C> StartMatchCountdownNetEvents;
         public FixedUnorderedList<StopMatchCountdownNetEventS2C> StopMatchCountdownNetEvents;
         public FixedUnorderedList<StartMatchEligibleChangedNetEventS2C> StartMatchEligibleChangedNetEvents;
+        public FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C> PlayerLockOnTargetsChangedNetEvents;
+        public FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C> PlayerLockedOnTargetHitNetEvents;
 
         public MatchMakingFullTickPacketS2C()
         {
@@ -35,6 +38,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             StartMatchCountdownNetEvents = new FixedUnorderedList<StartMatchCountdownNetEventS2C>(maxCap.StartMatchCountdownNetEvents);
             StopMatchCountdownNetEvents = new FixedUnorderedList<StopMatchCountdownNetEventS2C>(maxCap.StopMatchCountdownNetEvents);
             StartMatchEligibleChangedNetEvents = new FixedUnorderedList<StartMatchEligibleChangedNetEventS2C>(maxCap.StartMatchEligibleChangedNetEvents);
+            PlayerLockOnTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>(maxCap.PlayerLockOnTargetsChangedNetEvents, () => new PlayerLockOnTargetsChangedNetEventS2C(maxCap.ConcurrentLockOnTargets));
+            PlayerLockedOnTargetHitNetEvents = new FixedUnorderedList<PlayerLockedOnTargetHitNetEventS2C>(maxCap.PlayerLockOnTargetHitNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -48,6 +53,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             SerializedStartMatchCountdownEvents(writer);
             SerializedStopMatchCountdownEvents(writer);
             SerializedStartMatchEligibleChangedEvents(writer);
+            SerializedPlayerLockOnTargetsChangedEvents(writer);
+            SerializedPlayerLockedOnTargetHitEvents(writer);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -61,6 +68,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             DeserializedStartMatchCountdownEvents(reader);
             DeserializedStopMatchCountdownEvents(reader);
             DeserializedStartMatchEligibleChangedEvents(reader);
+            DeserializedPlayerLockOnTargetsChangedEvents(reader);
+            DeserializedPlayerLockedOnTargetHitEvents(reader);
         }
         
         private void SerializedBulletDestroyedEvents(NetDataWriter writer)
@@ -200,6 +209,46 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             for (var i = 0; i < count; i++)
             {
                 ref var evt = ref StartMatchEligibleChangedNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerLockOnTargetsChangedEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerLockOnTargetsChangedNetEvents.Count);
+            foreach (var evt in PlayerLockOnTargetsChangedNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void DeserializedPlayerLockOnTargetsChangedEvents(NetDataReader reader)
+        {
+            PlayerLockOnTargetsChangedNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                var evt = PlayerLockOnTargetsChangedNetEvents.AddAndGet();
+                evt.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerLockedOnTargetHitEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerLockedOnTargetHitNetEvents.Count);
+            foreach (var evt in PlayerLockedOnTargetHitNetEvents.AsSpan())
+            {
+                evt.Serialize(writer);
+            }
+        }
+
+        private void DeserializedPlayerLockedOnTargetHitEvents(NetDataReader reader)
+        {
+            PlayerLockedOnTargetHitNetEvents.Clear();
+            var count = reader.GetByte();
+            for (var i = 0; i < count; i++)
+            {
+                ref var evt = ref PlayerLockedOnTargetHitNetEvents.AddAndGet();
                 evt.Deserialize(reader);
             }
         }

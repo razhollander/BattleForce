@@ -26,7 +26,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
-        private readonly SpinPlayerCommand _spinPlayerCommand;
+        private readonly ICommandFactory _commandFactory;
+        private SpinPlayerCommand _spinPlayerCommand;
+        private AddForceToPlayerCommand _addForceToPlayerCommand;
 
         public TalentType TalentType => TalentType.KO;
         private bool IsCurrentlyActive
@@ -63,9 +65,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
-            _spinPlayerCommand = commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _commandFactory = commandFactory;
         }
 
+        public void InitEntryPoint()
+        {
+            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+        }
+        
         public void SetCasterId(ushort casterPlayerId)
         {
             _casterPlayerId = casterPlayerId;
@@ -146,7 +154,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 }
                 else
                 {
-                    var directionToCaster = Vector2.Normalize(casterPlayerState.Spaceship.Transform.Position - projectile.Position);
+                    var directionToCaster = (casterPlayerState.Spaceship.Transform.Position - projectile.Position).NormalizeSafe();
                     projectile.Velocity = directionToCaster * koConfig.ProjectileSpeed * koConfig.ReturnSpeedMultiplier;
                     projectile.Rotation = directionToCaster * -1;
                 }
@@ -178,20 +186,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var koConfig = _gamePlayConfigService.GamePlayConfig.Talents.KOTalentConfig;
             ref var projectile = ref _matchDataService.SimulationState.GetKOProjectileById(_projectileId);
             var enemyPlayerState = _matchDataService.SimulationState.GetPlayerById(enemyPlayerId);
-            var pushDirection = projectile.Velocity.Normalize();
+            var pushDirection = projectile.Velocity.NormalizeSafe();
             var pushForce = pushDirection * koConfig.PushForce;
             var randomSpin = RNG.NextFloat(koConfig.MinSpin, koConfig.MaxSpin);
-
-            enemyPlayerState.Spaceship.Transform.Velocity += pushForce;
             enemyPlayerState.Spaceship.Transform.Direction = pushDirection;
-            enemyPlayerState.Spaceship.IsEngineOn = false;
-
             _spinPlayerCommand
                 .SetPlayer(enemyPlayerId)
                 .SetSpinAmount(randomSpin)
                 .SetTick(tick)
                 .Execute();
-
+            _addForceToPlayerCommand.SetForce(pushForce).SetPlayerId(enemyPlayerId).ShouldTurnOffEngine(true).Execute();
             _netEventsDataService.AddKOProjectHitPlayerNetEvent(tick, _projectileId, enemyPlayerState.Id, projectile.Position);
             StartReturnPhase();
         }

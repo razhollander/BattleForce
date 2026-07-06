@@ -36,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         {
             var playerTalentControllers = _talentControllersPool.Get();
             playerTalentControllers.SetCasterId(playerId);
+            playerTalentControllers.InitEntryPoint();
             _talentControllersPerPlayer.Add(playerId, playerTalentControllers);
         }
 
@@ -197,6 +198,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             {
                 LogService.LogError($"No caster found for player id {casterId}");
             }
+        }
+
+        public void StopTalentIfActive(TalentType talentType, ushort playerId, int tick)
+        {
+            _talentControllersPerPlayer[playerId].StopTalentIfActive(talentType, tick);
         }
 
         private TalentStateS2C AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)

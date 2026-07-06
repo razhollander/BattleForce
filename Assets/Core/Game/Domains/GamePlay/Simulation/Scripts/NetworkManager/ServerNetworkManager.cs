@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _packetsListener.OnPacketReceivedEvent += OnPacketReceived;
             _packetsListener.OnClientPeerDisconnectedEvent += OnClientPeerDisconnected;
         }
-        
+
         private void OnPacketReceived()
         {
             OnPacketReceivedEvent?.Invoke();
@@ -61,12 +61,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         
         private void StartServer(int port)
         {
-            // if (_netManager.IsRunning)
-            // {
-            //     LogService.LogError("Server already running!");
-            //     return;
-            // }
-            
             _netManager.Start(port);
         }
 
@@ -81,11 +75,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _packetsListener.OnPacketReceivedEvent -= OnPacketReceived;
             _packetsListener.OnClientPeerDisconnectedEvent -= OnClientPeerDisconnected;
         }
-
-        // public void SendToAllPlayersPacketSerialized<T>(PacketTypeS2C type, T packet, DeliveryMethod deliveryMethod) where T : INetSerializable
-        // {
-        //     _packetsSender.SendPacketToAllPlayersSerialized(type, packet, deliveryMethod);
-        // }
 
         public void SendPacketToClientSerialized<T>(long clientId, PacketTypeS2C type, T packet,
             DeliveryMethod deliveryMethod) where T : INetSerializable

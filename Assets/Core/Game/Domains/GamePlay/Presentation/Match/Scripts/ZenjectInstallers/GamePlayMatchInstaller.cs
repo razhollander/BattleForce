@@ -15,6 +15,10 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Telepor
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.PlayerTeleportEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
@@ -22,6 +26,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Nuke.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
@@ -57,18 +62,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private StageEndedUiView _stageEndedUiView;
         [SerializeField] private TeamsBoardContainerView _teamsBoardContainerView;
         [SerializeField] private GainBoltEffectView gainBoltEffectViewPrefab;
+        [SerializeField] private HitDamageIndicatorEffectView _hitDamageIndicatorEffectViewPrefab;
+        [SerializeField] private PreparationPhaseCountdownView _preparationPhaseCountdownView;
         [SerializeField] private PlayerTeleportEffectView playerTeleportEffectViewPrefab;
         [SerializeField] private EnvironmentFieldBarrierView _environmentFieldBarrierViewPrefab;
         [SerializeField] private SwapFieldView _swapFieldViewPrefab;
         [SerializeField] private KOProjectileView _koProjectileViewPrefab;
         [SerializeField] private GrapplingHookProjectileView _grapplingHookProjectileViewPrefab;
         [SerializeField] private DashPulseGustEffectView _dashPulseGustEffectViewPrefab;
+        [SerializeField] private NukeShockwaveEffectView _nukeShockwaveEffectViewPrefab;
         [SerializeField] private MagneticPullFieldView _magneticPullFieldViewPrefab;
         [SerializeField] private MagneticPullHitEffectView _magneticPullHitEffectViewPrefab;
         [SerializeField] private LockOnTargetEffectView lockOnTargetEffectViewPrefab;
         [SerializeField] private LockOnTargetShootEffectView lockOnTargetShootEffectViewPrefab;
 
         [SerializeField] private ChickenEggView _chickenEggViewPrefab;
+        [SerializeField] private GalacticPullStarEffectView _galacticPullStarEffectViewPrefab;
+        [SerializeField] private GalacticStarsVisualData _galacticStarsVisualData;
         [SerializeField] private BackgroundParallaxView _backgroundParallaxView;
 
         public override void InstallBindings()
@@ -100,18 +110,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<MatchPlayerUIControllers>().AsSingle().WithArguments(_matchPlayerUIControllersView).NonLazy();
             Container.BindInterfacesTo<MatchBulletControllers>().AsSingle().WithArguments(_bulletViewPrefab).NonLazy();
             Container.BindInterfacesTo<MatchChickenEggsControllers>().AsSingle().WithArguments(_chickenEggViewPrefab).NonLazy();
+            Container.BindInterfacesTo<GalacticPullStarEffectControllers>().AsSingle().WithArguments(_galacticPullStarEffectViewPrefab, _galacticStarsVisualData).NonLazy();
             Container.BindInterfacesTo<MatchEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpringControllers>().AsSingle().WithArguments(_environmentSpringViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpikeControllers>().AsSingle().WithArguments(_environmentSpikeViewPrefab).NonLazy();
             Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();
             Container.BindInterfacesTo<TeamsBoardUIController>().AsSingle().WithArguments(_teamsBoardContainerView).NonLazy();
             Container.BindInterfacesTo<GainBoltEffectController>().AsSingle().WithArguments(gainBoltEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<HitDamageIndicatorEffectController>().AsSingle().WithArguments(_hitDamageIndicatorEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<PreparationPhaseCountdownController>().AsSingle().WithArguments(_preparationPhaseCountdownView).NonLazy();
             Container.BindInterfacesTo<EnvironmentTeleportGateControllers>().AsSingle().WithArguments(_environmentTeleportGateViewPrefab).NonLazy();
             Container.BindInterfacesTo<PlayerTeleportEffectController>().AsSingle().WithArguments(playerTeleportEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentFieldBarrierControllers>().AsSingle().WithArguments(_environmentFieldBarrierViewPrefab).NonLazy();
             Container.BindInterfacesTo<KOProjectilesControllers>().AsSingle().WithArguments(_koProjectileViewPrefab).NonLazy();
             Container.BindInterfacesTo<GrapplingHookProjectilesControllers>().AsSingle().WithArguments(_grapplingHookProjectileViewPrefab).NonLazy();
             Container.BindInterfacesTo<DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<NukeShockwaveEffectController>().AsSingle().WithArguments(_nukeShockwaveEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<MagneticPullEffectController>().AsSingle().WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<BackgroundParallaxController>().AsSingle().WithArguments(_backgroundParallaxView).NonLazy();
             Container.BindInterfacesTo<PlayersLockOnTargetEffectControllers>().AsSingle().WithArguments(lockOnTargetEffectViewPrefab).NonLazy();
