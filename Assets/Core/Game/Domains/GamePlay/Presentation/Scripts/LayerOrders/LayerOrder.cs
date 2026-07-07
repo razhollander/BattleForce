@@ -2,6 +2,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.LayerOrders
 {
     public static class LayerOrder
     {
+        public const float Effects = -3f;
         public const int SwapField = 1;
         public const float ChickenEgg = 1.5f;
         public const float EnvironmentWall = 2;

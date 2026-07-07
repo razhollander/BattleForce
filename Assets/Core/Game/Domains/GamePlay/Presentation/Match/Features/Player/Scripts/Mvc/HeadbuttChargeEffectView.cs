@@ -1,4 +1,3 @@
-using DG.Tweening;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
@@ -8,6 +7,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private static readonly int SPAWN_INTERVAL_SHADER_PROPERTY = Shader.PropertyToID("_SpawnInterval");
         private static readonly int SHRINK_SPEED_SHADER_PROPERTY = Shader.PropertyToID("_ShrinkSpeed");
         private static readonly int RADIUS_OUTER_SHADER_PROPERTY = Shader.PropertyToID("_RadiusOuter");
+        private static readonly int START_COLOR_SHADER_PROPERTY = Shader.PropertyToID("_StartColor");
+        private static readonly int END_COLOR_SHADER_PROPERTY = Shader.PropertyToID("_EndColor");
+        private static readonly int USE_MANUAL_TIME_SHADER_PROPERTY = Shader.PropertyToID("_UseManualTime");
+        private static readonly int ANIM_TIME_SHADER_PROPERTY = Shader.PropertyToID("_AnimTime");
 
         [SerializeField] private SpriteRenderer _ringsSpriteRenderer;
         [SerializeField] private float _chargeStartSpawnIntervalInSeconds = 0.5f;
@@ -16,30 +19,55 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private float _maxChargeShrinkSpeed = 0.7f;
         [SerializeField] private float _chargeStartOuterRadius = 0.9f;
         [SerializeField] private float _maxChargeOuterRadius = 0.5f;
+        [SerializeField] private Color _chargeStartColor;
+        [SerializeField] private Color _chargeEndColor;
+        [SerializeField] private Color _maxStartColor;
+        [SerializeField] private Color _maxEndColor;
 
         private Material _ringsMaterial;
-        private Tween _chargeRampTween;
+        private bool _isCharging;
+        private float _elapsedInSeconds;
+        private float _maxChargeDurationInSeconds;
 
         public void StartCharging(float maxChargeDurationInSeconds)
         {
             EnsureMaterialInstance();
-            KillChargeRampTween();
+            _maxChargeDurationInSeconds = Mathf.Max(maxChargeDurationInSeconds, 0.0001f);
+            _elapsedInSeconds = 0f;
+            _isCharging = true;
+            // Ramp the timing params live, so drive the shader from _AnimTime (restarts at 0 each
+            // charge) instead of the global _Time — keeps the speed-up reproducible. See shader.
+            _ringsMaterial.SetFloat(USE_MANUAL_TIME_SHADER_PROPERTY, 1f);
             gameObject.SetActive(true);
-            ApplyChargeFraction(0f);
-            _chargeRampTween = DOVirtual.Float(0f, 1f, maxChargeDurationInSeconds, ApplyChargeFraction).SetEase(Ease.Linear);
+            ApplyCharge();
         }
 
         public void StopCharging()
         {
-            KillChargeRampTween();
+            _isCharging = false;
             gameObject.SetActive(false);
         }
 
-        private void ApplyChargeFraction(float chargeFraction)
+        private void Update()
         {
+            if (!_isCharging)
+            {
+                return;
+            }
+
+            _elapsedInSeconds += Time.deltaTime;
+            ApplyCharge();
+        }
+
+        private void ApplyCharge()
+        {
+            float chargeFraction = Mathf.Clamp01(_elapsedInSeconds / _maxChargeDurationInSeconds);
+            _ringsMaterial.SetFloat(ANIM_TIME_SHADER_PROPERTY, _elapsedInSeconds);
             _ringsMaterial.SetFloat(SPAWN_INTERVAL_SHADER_PROPERTY, Mathf.Lerp(_chargeStartSpawnIntervalInSeconds, _maxChargeSpawnIntervalInSeconds, chargeFraction));
             _ringsMaterial.SetFloat(SHRINK_SPEED_SHADER_PROPERTY, Mathf.Lerp(_chargeStartShrinkSpeed, _maxChargeShrinkSpeed, chargeFraction));
             _ringsMaterial.SetFloat(RADIUS_OUTER_SHADER_PROPERTY, Mathf.Lerp(_chargeStartOuterRadius, _maxChargeOuterRadius, chargeFraction));
+            _ringsMaterial.SetColor(START_COLOR_SHADER_PROPERTY, Color.Lerp(_chargeStartColor, _maxStartColor, chargeFraction));
+            _ringsMaterial.SetColor(END_COLOR_SHADER_PROPERTY, Color.Lerp(_chargeEndColor, _maxEndColor, chargeFraction));
         }
 
         private void EnsureMaterialInstance()
@@ -48,12 +76,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             {
                 _ringsMaterial = _ringsSpriteRenderer.material;
             }
-        }
-
-        private void KillChargeRampTween()
-        {
-            _chargeRampTween?.Kill();
-            _chargeRampTween = null;
         }
     }
 }

@@ -1,3 +1,5 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.LayerOrders;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
@@ -7,12 +9,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffe
 {
     public class HeadbuttHitEffectController : IHeadbuttHitEffectController
     {
-        private readonly IStateMachineService _stateMachineService;
         private readonly HeadbuttHitEffectPool _pool;
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
 
-        public HeadbuttHitEffectController(HeadbuttHitEffectView prefab, DiContainer container, IStateMachineService stateMachineService)
+        public HeadbuttHitEffectController(HeadbuttHitEffectView prefab, DiContainer container, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
-            _stateMachineService = stateMachineService;
+            _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _pool = new HeadbuttHitEffectPool(prefab, container);
         }
 
@@ -24,8 +26,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffe
         public void PlayEffect(Vector2 position)
         {
             var view = _pool.Spawn();
-            view.transform.position = position;
-            view.PlayAndDespawn(_stateMachineService.CurrentState().CancellationTokenSource).Forget();
+            view.transform.position = new Vector3(position.x, position.y, LayerOrder.Effects);
+            view.PlayAndDespawn(_stageCancellationTokenProvider.CancellationTokenSource).Forget();
         }
     }
 }

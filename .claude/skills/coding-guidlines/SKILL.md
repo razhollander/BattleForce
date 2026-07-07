@@ -182,5 +182,7 @@ Must follow strict MVC. No break rule.
   * A method that gets a CancellationToken as a parameter is always async.
   * Use v.NormalizeSafe() instead of Vector2.Normalize(v)
   * For every Register should also be Unregister, same fore events/listeners.
+  * Don't use _Time in shaders, instead update the shader from the outside in an Update/Tween
+  * In the presentation domain, use _stageCancellationTokenProvider to get a cancellation token
 * **Reflection**: Never at runtime\!
 

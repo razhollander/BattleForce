@@ -103,6 +103,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandleKOProjectilePlayerCollision(objectA, objectB);
                 HandleKOProjectileWallCollision(objectA, objectB);
                 HandleGrapplingHookWallCollision(objectA, objectB);
+                HandleGrapplingHookCasterEnemyCollision(objectA, objectB);
                 HandleChickenEggPlayerCollision(objectA, objectB);
                 HandleChickenEggKOProjectileCollision(objectA, objectB);
                 HandleHeadbuttPlayerCollision(objectA, objectB);
@@ -176,6 +177,37 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _playersTalentsManager.HitGrapplingHookWithWall(projectile.PlayerCasterId, projectileId, wallId, _processedTick);
+        }
+
+        private void HandleGrapplingHookCasterEnemyCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            bool isPlayerToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            if (!isPlayerToPlayer)
+            {
+                return;
+            }
+
+            TrySpinEnemyHitByGrapplingHookCaster(objectA.Id, objectB.Id);
+            TrySpinEnemyHitByGrapplingHookCaster(objectB.Id, objectA.Id);
+        }
+
+        private void TrySpinEnemyHitByGrapplingHookCaster(ushort casterId, ushort enemyId)
+        {
+            if (!_matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(casterId, TalentType.GrapplingHook))
+            {
+                return;
+            }
+
+            var caster = _matchDataService.SimulationState.GetPlayerById(casterId);
+            var enemy = _matchDataService.SimulationState.GetPlayerById(enemyId);
+
+            if (caster.TeamId == enemy.TeamId)
+            {
+                return;
+            }
+
+            var config = _gamePlayConfigService.GamePlayConfig.Talents.GrapplingHookTalentConfig;
+            _spinPlayerCommand.SetPlayer(enemyId).SetSpinAmount(config.EnemyHitSpinAmount).SetTick(_processedTick).Execute();
         }
 
         private void HandleChickenEggPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
