@@ -54,6 +54,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleGrapplingHookHitWallNetEventsCommand _handleGrapplingHookHitWallNetEventsCommand;
         private readonly HandleDeactivateGrapplingHookTalentNetEventsCommand _handleDeactivateGrapplingHookTalentNetEventsCommand;
         private readonly UpdateGrapplingHookProjectilesTransformCommand _updateGrapplingHookProjectilesTransformCommand;
+        private readonly HandleShootFrigidBlockNetEventsCommand _handleShootFrigidBlockNetEventsCommand;
+        private readonly HandleDestroyFrigidBlockNetEventsCommand _handleDestroyFrigidBlockNetEventsCommand;
+        private readonly UpdateFrigidBlocksTransformCommand _updateFrigidBlocksTransformCommand;
         private readonly HandleActivateSentryGunTalentNetEventsCommand _handleActivateSentryGunTalentNetEventsCommand;
         private readonly HandleDeactivateSentryGunTalentNetEventsCommand _handleDeactivateSentryGunTalentNetEventsCommand;
         private readonly HandleKOProjectHitPlayerNetEventsCommand _handleKOProjectHitPlayerNetEventsCommand;
@@ -126,6 +129,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleGrapplingHookHitWallNetEventsCommand = commandFactory.CreateCommandVoid<HandleGrapplingHookHitWallNetEventsCommand>();
             _handleDeactivateGrapplingHookTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateGrapplingHookTalentNetEventsCommand>();
             _updateGrapplingHookProjectilesTransformCommand = commandFactory.CreateCommandVoid<UpdateGrapplingHookProjectilesTransformCommand>();
+            _handleShootFrigidBlockNetEventsCommand = commandFactory.CreateCommandVoid<HandleShootFrigidBlockNetEventsCommand>();
+            _handleDestroyFrigidBlockNetEventsCommand = commandFactory.CreateCommandVoid<HandleDestroyFrigidBlockNetEventsCommand>();
+            _updateFrigidBlocksTransformCommand = commandFactory.CreateCommandVoid<UpdateFrigidBlocksTransformCommand>();
             _handleActivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateSentryGunTalentNetEventsCommand>();
             _handleDeactivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSentryGunTalentNetEventsCommand>();
             _handleActivateUmbrellaTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateUmbrellaTalentNetEventsCommand>();
@@ -206,6 +212,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleCreateGrapplingHookProjecitleNetEventsCommand.Execute();
             _handleGrapplingHookHitWallNetEventsCommand.Execute();
             _handleDeactivateGrapplingHookTalentNetEventsCommand.Execute();
+            _handleShootFrigidBlockNetEventsCommand.Execute();
+            _handleDestroyFrigidBlockNetEventsCommand.Execute();
             _handleActivateSentryGunTalentNetEventsCommand.Execute();
             _handleDeactivateSentryGunTalentNetEventsCommand.Execute();
             _handleActivateUmbrellaTalentNetEventsCommand.Execute();
@@ -224,6 +232,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleActivateYearsOfPainTalentNetEventsCommand.Execute();
             _updateKOProjectilesTransformCommand.Execute(); // must be after _handleDeactivateKOTalentNetEventsCommand.Execute();
             _updateGrapplingHookProjectilesTransformCommand.Execute();
+            _updateFrigidBlocksTransformCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();

@@ -107,9 +107,77 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandleChickenEggPlayerCollision(objectA, objectB);
                 HandleChickenEggKOProjectileCollision(objectA, objectB);
                 HandleHeadbuttPlayerCollision(objectA, objectB);
+                HandlePlayerFrigidBlockCollision(objectA, objectB, collisionEvent.Contact);
+                HandleBulletFrigidBlockCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePowerUpBallFrigidBlockCollision(objectA, objectB, collisionEvent.Contact);
             }
 
             _physicsSimulator.ClearCachedCollisions();
+        }
+
+        private void HandlePlayerFrigidBlockCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isPlayerToBlock = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.FrigidBlock;
+            var isBlockToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.FrigidBlock && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            if (!isPlayerToBlock && !isBlockToPlayer)
+            {
+                return;
+            }
+
+            var playerId = isPlayerToBlock ? objectA.Id : objectB.Id;
+            var playerModel = _matchDataService.SimulationState.GetPlayerById(playerId);
+
+            contact.GetWorldManifold(out var worldManifold);
+            // The manifold normal points from fixture A to fixture B. Orient it to point from the block toward the player.
+            var blockNormal = isPlayerToBlock ? -worldManifold.normal : worldManifold.normal;
+
+            var relativeVelocity = playerModel.Spaceship.Transform.Velocity;
+            if (!relativeVelocity.IsFacingWall(blockNormal))
+            {
+                return;
+            }
+
+            playerModel.Spaceship.Transform.Velocity = relativeVelocity.ReflectFromWall(blockNormal);
+            var currentDirection = playerModel.Spaceship.Transform.Direction;
+            var reflectedDirection = currentDirection.ReflectFromWall(blockNormal);
+            playerModel.Spaceship.Transform.Direction = reflectedDirection.Length() > 0
+                ? reflectedDirection.NormalizeSafe()
+                : currentDirection;
+        }
+
+        private void HandleBulletFrigidBlockCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBulletToBlock = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.FrigidBlock;
+            var isBlockToBullet = objectA.PhysicsBodyType == PhysicsBodyType.FrigidBlock && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+            if (!isBulletToBlock && !isBlockToBullet)
+            {
+                return;
+            }
+
+            var bulletId = isBulletToBlock ? objectA.Id : objectB.Id;
+            var bulletBody = isBulletToBlock ? contact.FixtureA.Body : contact.FixtureB.Body;
+
+            if (!_matchDataService.SimulationState.TryGetBulletById(bulletId, out var bulletModel))
+            {
+                LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            DestroyBullet(bulletModel, bulletBody);
+        }
+
+        private void HandlePowerUpBallFrigidBlockCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isPowerUpToBlock = objectA.PhysicsBodyType == PhysicsBodyType.PowerUpBall && objectB.PhysicsBodyType == PhysicsBodyType.FrigidBlock;
+            var isBlockToPowerUp = objectA.PhysicsBodyType == PhysicsBodyType.FrigidBlock && objectB.PhysicsBodyType == PhysicsBodyType.PowerUpBall;
+            if (!isPowerUpToBlock && !isBlockToPowerUp)
+            {
+                return;
+            }
+
+            ref var powerUpBallModel = ref _matchDataService.SimulationState.GetPowerUpBallById(isPowerUpToBlock ? objectA.Id : objectB.Id);
+            contact.GetWorldManifold(out var worldManifold);
+            powerUpBallModel.Velocity = powerUpBallModel.Velocity.ReflectFromWall(worldManifold.normal);
         }
 
         private void HandleHeadbuttPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)

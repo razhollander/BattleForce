@@ -21,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         StageBoundary = 14,
         PlayerHeart = 15,
         ChickenEgg = 16,
+        FrigidBlock = 18,
     }
     
     public enum PhysicsCollisionType
@@ -37,5 +38,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         GrapplingHookProjectile = 9,
         PlayerHeart = 10,
         ChickenEgg = 11,
+        FrigidBlock = 12,
     }
 }

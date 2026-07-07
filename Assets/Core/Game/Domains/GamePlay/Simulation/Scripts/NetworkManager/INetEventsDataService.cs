@@ -77,6 +77,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>> ActivateShuffleNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>> StartPowerUpGrantingPhaseNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>> EndPowerUpGrantingPhaseNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<ShootFrigidBlockNetEventS2C>> ShootFrigidBlockNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<DestroyFrigidBlockNetEventS2C>> DestroyFrigidBlockNetEventsPerClient { get; }
 
         void StartSavingClientEvents(long clientId);
         void StopSavingClientEvents(long clientId);
@@ -139,6 +141,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddActivateShuffleNetEvent(int onTick, ushort casterPlayerId);
         void AddStartPowerUpGrantingPhaseNetEvent(int onTick, ushort playerId);
         void AddEndPowerUpGrantingPhaseNetEvent(int onTick, ushort playerId, PowerUpType grantedPowerUp);
+        void AddShootFrigidBlockNetEvent(int onTick, TalentFrigidBlockStateS2C frigidBlock, int cooldownEndTick);
+        void AddDestroyFrigidBlockNetEvent(int onTick, ushort blockId);
         void AddActivateHeadbuttChargingNetEvent(int onTick, ushort casterPlayerId);
         void AddPerformHeadbuttDashNetEvent(int onTick, ushort casterPlayerId);
         void AddHeadbuttHitEnemyNetEvent(int onTick, ushort casterPlayerId, ushort enemyPlayerId);

@@ -37,6 +37,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<CreateGrapplingHookProjectileNetEventS2C> CreateGrapplingHookProjectileNetEvents { get; }
         List<GrapplingHookHitWallNetEventS2C> GrapplingHookHitWallNetEvents { get; }
         List<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents { get; }
+        List<ShootFrigidBlockNetEventS2C> ShootFrigidBlockNetEvents { get; }
+        List<DestroyFrigidBlockNetEventS2C> DestroyFrigidBlockNetEvents { get; }
         List<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents { get; }
         List<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents { get; }
         List<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents { get; }

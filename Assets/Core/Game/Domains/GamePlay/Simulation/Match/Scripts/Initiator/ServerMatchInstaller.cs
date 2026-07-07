@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<IPreparationPhaseTimerService>().To<PreparationPhaseTimerService>().AsSingle();
             _diContainer.Bind<ITickProcessor>().To<ServerMatchNetworkTickProcessor>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersTalentsManager>().To<PlayersTalentsManager>().AsSingle().NonLazy();
+            _diContainer.Bind<FrigidBlock.IFrigidBlocksController>().To<FrigidBlock.FrigidBlocksController>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersPowerUpsManager>().To<PlayersPowerUpsManager>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersInLavaTrackerService>().To<PlayersInLavaTrackerService>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersOutsideStageTrackerService>().To<PlayersOutsideStageTrackerService>().AsSingle().NonLazy();

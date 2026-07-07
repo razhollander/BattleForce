@@ -15,5 +15,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         WaterGun = 11,
         Headbutt = 12,
         Rock = 13,
+        FrigidBlock = 14,
     }
 }

@@ -50,6 +50,7 @@ MonoBehaviour:
         - rid: 2200602851054190755
         - rid: 1717594783917015173
         - rid: 1717594787500785824
+        - rid: 2200602851054190760
       TalentsArrowConfigs:
         TalentCooldownConfigs:
         - TalentType: 1
@@ -73,6 +74,8 @@ MonoBehaviour:
         - TalentType: 11
           IsArrowShownOnlyWhilePressed: 0
         - TalentType: 12
+          IsArrowShownOnlyWhilePressed: 0
+        - TalentType: 14
           IsArrowShownOnlyWhilePressed: 0
       HammerTalentConfig:
         HammerSpeed: 10
@@ -133,6 +136,16 @@ MonoBehaviour:
         EnemyPushForce: 25
         EnemySpinAmount: 15
         CasterVelocityDamping: 0.05
+      FrigidBlockTalentConfig:
+        ProjectileSpeed: 30
+        SpawnGapFromCaster: 0.5
+        LinearDamping: 1.2
+        AngularDamping: 1.5
+        Density: 25
+        Restitution: 0.1
+        IdleLinearVelocityThreshold: 0.15
+        IdleAngularVelocityThreshold: 0.15
+        SecondsIdleUntilDestroy: 3
       TalentCardWidth: 1.602175
       TalentCardHeight: 2.382844
     Lava:
@@ -236,3 +249,8 @@ MonoBehaviour:
       data:
         TalentType: 2
         CooldownInSeconds: 6
+    - rid: 2200602851054190760
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 14
+        CooldownInSeconds: 8

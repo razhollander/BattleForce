@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastSwapFieldCreatedId = 0;
         private ushort _lastKOProjectileCreatedId = 0;
         private ushort _lastGrapplingHookProjectileCreatedId = 0;
+        private ushort _lastFrigidBlockCreatedId = 0;
         private ushort _lastChickenEggCreatedId = 0;
         private ushort _lastGalacticForceFieldCreatedId = 0;
         public List<int> DidntPlayYetStageIndexes { get; } = new List<int>();
@@ -35,7 +36,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
                 maxCap.ConcurrentPowerUpBalls,
                 sharedGamePlayConfig.MaxTeamsAmount,
                 maxCap.ConcurrentChickenEggs,
-                maxCap.ConcurrentGalacticForceFields);
+                maxCap.ConcurrentGalacticForceFields,
+                maxCap.ConcurrentFrigidBlocks);
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
@@ -133,6 +135,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             grapplingHookProjectile.Velocity = velocity;
             grapplingHookProjectile.IsHookAttached = false;
             return grapplingHookProjectile;
+        }
+
+        public TalentFrigidBlockStateS2C AddFrigidBlock(ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 velocity)
+        {
+            ref var frigidBlock = ref _simulationState.FrigidBlocks.AddAndGet();
+            var blockId = (ushort)(++_lastFrigidBlockCreatedId % byte.MaxValue);
+            frigidBlock.Id = blockId;
+            frigidBlock.PlayerCasterId = casterPlayerId;
+            frigidBlock.Position = position;
+            frigidBlock.Rotation = rotation;
+            frigidBlock.Velocity = velocity;
+            frigidBlock.AngularVelocity = 0f;
+            return frigidBlock;
         }
 
         public TalentChickenEggStateS2C AddChickenEgg(ushort casterPlayerId, Vector2 position)

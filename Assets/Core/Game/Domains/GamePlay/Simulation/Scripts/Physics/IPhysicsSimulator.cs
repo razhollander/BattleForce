@@ -43,6 +43,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void RemoveSwapField(ushort id);
         void AddKOProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
         void RemoveKOProjectile(ushort id);
+        void AddFrigidBlock(ushort id, Vector2 position, Vector2 rotation, Vector2 size, Vector2 velocity, float density, float restitution, float linearDamping, float angularDamping);
+        Body GetFrigidBlock(ushort id);
+        void RemoveFrigidBlock(ushort id);
         void AddGrapplingHookProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
         void UpdateGrapplingHookProjectile(ushort id, Vector2 position, Vector2 velocity);
         void RemoveGrapplingHookProjectile(ushort id);

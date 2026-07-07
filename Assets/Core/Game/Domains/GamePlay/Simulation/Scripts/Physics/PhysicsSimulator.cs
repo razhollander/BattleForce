@@ -1003,6 +1003,48 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             RemoveBody(body);
         }
 
+        public void AddFrigidBlock(ushort id, Vector2 position, Vector2 rotation, Vector2 size, Vector2 velocity, float density, float restitution, float linearDamping, float angularDamping)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.angle = rotation.ToAngleRadians();
+            bodyDef.linearVelocity = velocity;
+            bodyDef.linearDamping = linearDamping;
+            bodyDef.angularDamping = angularDamping;
+            bodyDef.bullet = true; // continuous collision detection so the fast-moving block can't tunnel through walls
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.FrigidBlock);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var boxShape = GetPolygonShape();
+            boxShape.SetAsBox(size.X * 0.5f, size.Y * 0.5f);
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = boxShape;
+            fixtureDef.density = density;
+            fixtureDef.friction = 0;
+            fixtureDef.restitution = restitution;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.FrigidBlock.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.FrigidBlock.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(boxShape);
+        }
+
+        public Body GetFrigidBlock(ushort id)
+        {
+            return GetBody(PhysicsBodyType.FrigidBlock, id);
+        }
+
+        public void RemoveFrigidBlock(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.FrigidBlock, id);
+            RemoveBody(body);
+        }
+
         public void AddGrapplingHookProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity)
         {
             var bodyDef = GetBodyDef();

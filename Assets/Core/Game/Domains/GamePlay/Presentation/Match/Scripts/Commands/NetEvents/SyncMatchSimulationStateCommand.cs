@@ -10,6 +10,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
@@ -66,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IKOProjectilesControllers _kOProjectilesControllers;
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
+        private IFrigidBlocksControllers _frigidBlocksControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private IPreparationPhaseCountdownController _preparationPhaseCountdownController;
         private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
@@ -111,6 +113,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
+            _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
             _preparationPhaseCountdownController = _diContainer.Resolve<IPreparationPhaseCountdownController>();
@@ -149,6 +152,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _swapFieldControllers.DestroyAll();
             _kOProjectilesControllers.DestroyAll();
             _grapplingHookProjectilesControllers.DestroyAll();
+            _frigidBlocksControllers.DestroyAll();
             _chickenEggsControllers.DestroyAll();
             _galacticPullStarEffectControllers.DestroyAll();
             _lockOnTargetEffectController.DestroyAll();
@@ -183,6 +187,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateSwapField();
             CreateKOPRojectiles();
             CreateGrapplingHookPRojectiles();
+            CreateFrigidBlocks();
             CreateChickenEggs();
             CreateGalacticPullStars();
         }
@@ -556,6 +561,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 
                 _matchDataService.AddKOProjectile(koProjectile.Id, casterId, koProjectile.CreatedOnTick, koProjectile.Size);
                 _kOProjectilesControllers.CreateKOProjectile(koProjectile.Id, position, rotation, casterPosition, koProjectile.Size);
+            }
+        }
+
+        private void CreateFrigidBlocks()
+        {
+            foreach (var frigidBlock in _simulationState.FrigidBlocks.AsSpan())
+            {
+                _matchDataService.AddFrigidBlock(frigidBlock.Id, frigidBlock.PlayerCasterId, frigidBlock.Position, frigidBlock.Rotation);
+                _frigidBlocksControllers.CreateFrigidBlock(frigidBlock.Id, frigidBlock.Position.ToUnityVector2(), frigidBlock.Rotation.ToUnityVector2());
             }
         }
 
