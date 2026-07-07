@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffect.S
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Mvc.WorldCamera;
 using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IHeadbuttHitEffectController _headbuttHitEffectController;
         private IMatchPlayerControllers _playerControllers;
         private IAudioService _audioService;
+        private IWorldCameraController _worldCameraController;
 
         public override void ResolveDependencies()
         {
@@ -20,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _headbuttHitEffectController = _diContainer.Resolve<IHeadbuttHitEffectController>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _audioService = _diContainer.Resolve<IAudioService>();
+            _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
         }
 
         public void Execute()
@@ -37,9 +40,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var hitPosition = (casterPosition + enemyPosition) * 0.5f;
                 _headbuttHitEffectController.PlayEffect(hitPosition);
                 _playerControllers.HidePlayerHeadbuttHelmet(hitEvent.CasterPlayerId);
-                _audioService.PlayAudio(AudioClipType.HeadbuttHit);
             }
-
+            
+            _audioService.PlayAudio(AudioClipType.HeadbuttHit);
+            _worldCameraController.ShakeCamera(10,0.25f);
             _cachedPresentationEventsService.HeadbuttHitEnemyNetEvents.Clear();
         }
     }

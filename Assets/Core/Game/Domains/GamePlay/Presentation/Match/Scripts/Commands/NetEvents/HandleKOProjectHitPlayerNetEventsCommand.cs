@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
+using Core.Scripts.Mvc.WorldCamera;
 using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
@@ -9,11 +10,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IAudioService _audioService;
+        private IWorldCameraController _worldCameraController;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _audioService = _diContainer.Resolve<IAudioService>();
+            _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
         }
 
         public void Execute()
@@ -24,11 +27,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
-            foreach (var evt in events)
-            {
-                _audioService.PlayAudio(AudioClipType.KOHit);
-            }
-            
+            _worldCameraController.ShakeCamera(10,0.25f);
+            _audioService.PlayAudio(AudioClipType.KOHit);
             _cachedPresentationEventsService.KOProjectHitPlayerNetEvents.Clear();
         }
     }
