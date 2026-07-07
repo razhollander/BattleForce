@@ -265,6 +265,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 projectile.AttachedLocalPosition = localPositionOfWall;
             }
             
+            _physicsSimulator.EnablePlayerToCollideWithPlayers(_casterPlayerId);
             _netEventsDataService.AddGrapplingHookHitWallNetEvent(tick, _projectileId, wallId, projectile.Position);
         }
 
@@ -313,6 +314,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             _physicsSimulator.RemoveGrapplingHookProjectile(_projectileId);
+            _physicsSimulator.DisablePlayerToCollideWithPlayers(_casterPlayerId);
             _matchDataService.SimulationState.RemoveGrapplingHookProjectileById(_projectileId);
             _netEventsDataService.AddDeactivateGrapplingHookTalentNetEvent(tick, _casterPlayerId, _projectileId, cooldownEndTick);
         }

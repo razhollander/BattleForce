@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         TalentCard = 4,
         PowerUpBall = 5,
         StartMatchWall = 6,
-        CollideOnlyWithPlayer = 7,
+        AnyObjectThatCollidesOnlyWithPlayer = 7,
         KOProjectile = 8,
         GrapplingHookProjectile = 9,
         PlayerHeart = 10,

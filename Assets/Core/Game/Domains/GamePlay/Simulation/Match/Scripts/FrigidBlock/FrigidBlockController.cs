@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock
             }
 
             var config = _gamePlayConfigService.GamePlayConfig.Talents.FrigidBlockTalentConfig;
-            var isLinearIdle = block.Velocity.LengthSquared() <= config.IdleLinearVelocityThreshold * config.IdleLinearVelocityThreshold;
+            var isLinearIdle = block.Velocity.LengthSquared() <= config.IdleLinearVelocityThreshold;
             var isAngularIdle = System.MathF.Abs(block.AngularVelocity) <= config.IdleAngularVelocityThreshold;
             var isIdle = isLinearIdle && isAngularIdle;
 
@@ -63,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock
                 return false;
             }
 
-            var destroyTick = TickUtils.GetTickPassedAfterDuration(_idleStartTick, config.SecondsIdleUntilDestroy, _networkConfig.DeltaTime);
+            var destroyTick = TickUtils.GetTickPassedAfterDuration(_idleStartTick, config.SecondsIdleUntilDestroy, deltaTime);
             return tick >= destroyTick;
         }
     }

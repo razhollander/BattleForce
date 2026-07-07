@@ -338,7 +338,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = PhysicsBodyType.Lava.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -364,7 +364,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = PhysicsBodyType.StageBoundary.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -390,7 +390,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = PhysicsBodyType.TeamFloor.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -899,7 +899,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.isSensor = true;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentSpring.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -927,7 +927,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.isSensor = true;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentSpike.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -955,7 +955,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.isSensor = true;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentTeleportGate.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -1107,7 +1107,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.filter.groupIndex = (short)-teamId;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.SwapField.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
 
@@ -1157,20 +1157,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.SetAwake(true); // not sure needed
         }
 
-        public void EnablePlayerDashCollision(ushort playerId)
+        public void EnablePlayerToCollideWithPlayers(ushort playerId)
         {
             var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
             var fixture = body.GetFixtureList();
             var filter = fixture.FilterData;
             // Add CollideOnlyWithPlayer to maskBits so caster.mask & enemy.category != 0
-            filter.maskBits |= PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            filter.maskBits |= PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
             // Add PlayerSpaceship collision bit to categoryBits so enemy.mask & caster.category != 0
             filter.categoryBits |= PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
             fixture.FilterData = filter;
             body.SetAwake(true);
         }
 
-        public void DisablePlayerDashCollision(ushort playerId)
+        public void DisablePlayerToCollideWithPlayers(ushort playerId)
         {
             var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
             var fixture = body.GetFixtureList();

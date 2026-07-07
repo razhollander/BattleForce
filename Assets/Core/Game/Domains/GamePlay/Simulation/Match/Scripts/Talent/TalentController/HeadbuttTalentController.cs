@@ -99,7 +99,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 _dashStartTick = tick;
                 _hasHitEnemy = false;
 
-                _physicsSimulator.EnablePlayerDashCollision(_casterPlayerId);
+                _physicsSimulator.EnablePlayerToCollideWithPlayers(_casterPlayerId);
                 _netEventsDataService.AddPerformHeadbuttDashNetEvent(tick, _casterPlayerId);
             }
         }
@@ -136,8 +136,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var config = _gamePlayConfigService.GamePlayConfig.Talents.HeadbuttTalentConfig;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
-            _addForceToPlayerCommand.SetPlayerId(enemyId).SetForce(_dashDirection * config.EnemyPushForce).ShouldTurnOffEngine(false).Execute();
             _spinPlayerCommand.SetPlayer(enemyId).SetSpinAmount(config.EnemySpinAmount).SetTick(tick).Execute();
+            _addForceToPlayerCommand.SetPlayerId(enemyId).SetForce(_dashDirection * config.EnemyPushForce).ShouldTurnOffEngine(true).Execute();
 
             // Velocity += velocity * (damping - 1) is equivalent to velocity *= damping
             var casterDampingForce = casterPlayerState.Spaceship.Transform.Velocity * (config.CasterVelocityDamping - 1f);
@@ -171,7 +171,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             _isCharging = false;
             IsDashing = false;
-            _physicsSimulator.DisablePlayerDashCollision(_casterPlayerId);
+            _physicsSimulator.DisablePlayerToCollideWithPlayers(_casterPlayerId);
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             if (!casterPlayerState.Spaceship.TalentsState.TryGetTalentIndexByType(TalentType.Headbutt, out int talentIndex))
