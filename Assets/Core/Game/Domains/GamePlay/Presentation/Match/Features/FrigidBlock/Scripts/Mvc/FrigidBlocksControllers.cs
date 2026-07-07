@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions;
-using CoreDomain.Scripts.Utils;
 using UnityEngine;
 using Zenject;
 

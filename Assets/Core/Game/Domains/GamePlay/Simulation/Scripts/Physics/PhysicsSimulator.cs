@@ -1012,6 +1012,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.linearVelocity = velocity;
             bodyDef.linearDamping = linearDamping;
             bodyDef.angularDamping = angularDamping;
+            bodyDef.bullet = true; // continuous collision detection so the fast-moving block can't tunnel through walls
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.FrigidBlock);
 
             var body = _world.CreateBody(bodyDef);
