@@ -277,6 +277,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.DeactivateUmbrellaTalentNetEvents = _netEventsDataService.DeactivateUmbrellaTalentNetEventsPerClient[clientId];
                 _fullTickPacket.ActivateWaterGunTalentNetEvents = _netEventsDataService.ActivateWaterGunTalentNetEventsPerClient[clientId];
                 _fullTickPacket.DeactivateWaterGunTalentNetEvents = _netEventsDataService.DeactivateWaterGunTalentNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateHeadbuttChargingNetEvents = _netEventsDataService.ActivateHeadbuttChargingNetEventsPerClient[clientId];
+                _fullTickPacket.PerformHeadbuttDashNetEvents = _netEventsDataService.PerformHeadbuttDashNetEventsPerClient[clientId];
+                _fullTickPacket.HeadbuttHitEnemyNetEvents = _netEventsDataService.HeadbuttHitEnemyNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateHeadbuttTalentNetEvents = _netEventsDataService.DeactivateHeadbuttTalentNetEventsPerClient[clientId];
                 _fullTickPacket.CreateMagneticPullFieldNetEvents = _netEventsDataService.CreateMagneticPullFieldNetEventsPerClient[clientId];
                 _fullTickPacket.LayChickenEggNetEvents = _netEventsDataService.LayChickenEggNetEventsPerClient[clientId];
                 _fullTickPacket.ChickenEggHitNetEvents = _netEventsDataService.ChickenEggHitNetEventsPerClient[clientId];

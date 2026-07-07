@@ -1,12 +1,14 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
@@ -18,6 +20,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
+        private readonly ICommandFactory _commandFactory;
+        private AddForceToPlayerCommand _addForceToPlayerCommand;
 
         private ushort _casterPlayerId;
         private int _startTick;
@@ -31,13 +35,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         }
 
         public WaterGunTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService,
-            ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig)
+            ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig,
+            ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
+            _commandFactory = commandFactory;
+        }
+
+        public void InitEntryPoint()
+        {
+            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -109,11 +120,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             if (didHitEnemy)
             {
-                var hitEnemy = _matchDataService.SimulationState.GetPlayerById(hitBodyData.Id);
-                hitEnemy.Spaceship.Transform.Velocity += aimDirection * config.EnemyPushForcePerTick * deltaTime;
+                _addForceToPlayerCommand.SetPlayerId(hitBodyData.Id).SetForce(aimDirection * config.EnemyPushForcePerTick * deltaTime).ShouldTurnOffEngine(false).Execute();
             }
 
-            casterPlayerState.Spaceship.Transform.Velocity -= aimDirection * config.CasterRecoilForcePerTick * deltaTime;
+            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(-aimDirection * config.CasterRecoilForcePerTick * deltaTime).ShouldTurnOffEngine(false).Execute();
         }
 
         private void DeactivateTalent(int tick)

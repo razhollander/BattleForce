@@ -32,3 +32,4 @@ MonoBehaviour:
   GrapplingHookProjectileMaxDistance: 30
   MagneticPullFieldRadius: 10
   LockOnTargetDurationInSeconds: 0.8
+  HeadbuttMaxChargeDurationSeconds: 2

@@ -7,7 +7,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.WaterGunStream.
     {
         [SerializeField] private MeshFilter _meshFilter;
         [SerializeField] private MeshRenderer _meshRenderer;
-        [SerializeField] private ParticleSystem _splashParticles;
 
         private static readonly int BendAmountProperty = Shader.PropertyToID("_BendAmount");
 
@@ -19,10 +18,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.WaterGunStream.
         public void Hide()
         {
             gameObject.TrySetActive(false);
-            if (_splashParticles != null)
-            {
-                _splashParticles.Stop();
-            }
         }
 
         public void UpdateStream(System.Numerics.Vector2 aimDirection, float angularVelocity)

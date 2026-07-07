@@ -1800,7 +1800,9 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 for (int i = activateHeadbuttChargingNetEvents.Count - 1; i >= 0; i--)
                 {
                     if (activateHeadbuttChargingNetEvents[i].OccuredOnTick < tick)
+                    {
                         activateHeadbuttChargingNetEvents.RemoveAt(i);
+                    }
                 }
             }
 
@@ -1809,7 +1811,9 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 for (int i = performHeadbuttDashNetEvents.Count - 1; i >= 0; i--)
                 {
                     if (performHeadbuttDashNetEvents[i].OccuredOnTick < tick)
+                    {
                         performHeadbuttDashNetEvents.RemoveAt(i);
+                    }
                 }
             }
 
@@ -1818,7 +1822,9 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 for (int i = headbuttHitEnemyNetEvents.Count - 1; i >= 0; i--)
                 {
                     if (headbuttHitEnemyNetEvents[i].OccuredOnTick < tick)
+                    {
                         headbuttHitEnemyNetEvents.RemoveAt(i);
+                    }
                 }
             }
 
@@ -1827,7 +1833,9 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 for (int i = deactivateHeadbuttTalentNetEvents.Count - 1; i >= 0; i--)
                 {
                     if (deactivateHeadbuttTalentNetEvents[i].OccuredOnTick < tick)
+                    {
                         deactivateHeadbuttTalentNetEvents.RemoveAt(i);
+                    }
                 }
             }
 

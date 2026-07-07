@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private PlayerChickenView _playerChickenView;
         [SerializeField] private YearsOfPainView _yearsOfPainView;
         [SerializeField] private SonicSnapEffectView _sonicSnapEffectView;
+        [SerializeField] private HeadbuttChargeEffectView _headbuttChargeEffectView;
         [SerializeField] private GameObject _deadAura;
         [SerializeField] private PlayerEyesView _playerEyesView;
         [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
@@ -40,6 +41,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private GameObject _crownGameObject;
         [SerializeField] private DeadTombstoneView _deadTombstoneView;
         [SerializeField] private ActivatePowerUpEffectView _activatePowerUpEffectView;
+        [SerializeField] private GameObject _headbuttHelmet;
+        [SerializeField] private float _headbuttHelmetDashHideSeconds = 1f;
+        private CancellationTokenSource _headbuttHelmetHideCancellationTokenSource;
+        private bool _isHeadbuttDashing;
         public Action Despawn { get; set; }
         
         public PlayerView Base => _playerView;
@@ -135,9 +140,70 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
         }
 
-        public void SetHeadbuttChargingState(bool isCharging)
+        public void SetHeadbuttChargingState(bool isCharging, float maxChargeDurationInSeconds)
         {
-            // VFX hookup: play/stop charging particle system once prefab is assigned
+            if (isCharging)
+            {
+                _headbuttChargeEffectView.StartCharging(maxChargeDurationInSeconds);
+            }
+            else
+            {
+                _headbuttChargeEffectView.StopCharging();
+            }
+        }
+
+        public void ShowHeadbuttHelmet()
+        {
+            CancelHeadbuttHelmetHideTimer();
+            _isHeadbuttDashing = false;
+            _headbuttHelmet.SetActive(true);
+        }
+
+        public void StartHeadbuttDashHelmetHideTimer(CancellationToken stageCancellationToken)
+        {
+            CancelHeadbuttHelmetHideTimer();
+            _isHeadbuttDashing = true;
+            _headbuttHelmetHideCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stageCancellationToken);
+            HideHeadbuttHelmetAfterDelay(_headbuttHelmetDashHideSeconds, _headbuttHelmetHideCancellationTokenSource.Token).Forget();
+        }
+
+        public void HideHeadbuttHelmet()
+        {
+            CancelHeadbuttHelmetHideTimer();
+            _isHeadbuttDashing = false;
+            _headbuttHelmet.SetActive(false);
+        }
+
+        public void OnHeadbuttTalentDeactivated()
+        {
+            // A dash hides the helmet via its own timer so it stays for the full second;
+            // only hide here when the charge was interrupted before any dash started.
+            if (!_isHeadbuttDashing)
+            {
+                HideHeadbuttHelmet();
+            }
+        }
+
+        private async Awaitable HideHeadbuttHelmetAfterDelay(float delaySeconds, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await Awaitable.WaitForSecondsAsync(delaySeconds, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            _isHeadbuttDashing = false;
+            _headbuttHelmet.SetActive(false);
+        }
+
+        private void CancelHeadbuttHelmetHideTimer()
+        {
+            _headbuttHelmetHideCancellationTokenSource?.Cancel();
+            _headbuttHelmetHideCancellationTokenSource?.Dispose();
+            _headbuttHelmetHideCancellationTokenSource = null;
         }
 
         public void SetWaterGunState(bool isOn)
@@ -185,6 +251,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerChickenView.SetChickenState(false);
             DisableUmbrellaState();
             _waterGunStreamView.Hide();
+            _headbuttChargeEffectView.StopCharging();
+            HideHeadbuttHelmet();
             Base.OnDespawned();
         }
 
@@ -215,8 +283,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 decay,
                 Time.deltaTime
             ));
-
-            //_playerEyesView.UpdateEyesToLookAtDirection(rotation);
         }
 
         public void InterpolateWaterGunRotation(System.Numerics.Vector2 aimDirection, float decay)
@@ -228,9 +294,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
 
             _waterGunStreamView.UpdateStream(aimDirection, 0f);
-           // _playerEyesView.UpdateEyesToLookAtDirection(aimDirection);
         }
-        
+
+
         public void SetIsDeadEffectEnabled(bool isEnabled, CancellationToken cancellationToken)
         {
             _deadTombstoneView.SetIsShown(isEnabled);

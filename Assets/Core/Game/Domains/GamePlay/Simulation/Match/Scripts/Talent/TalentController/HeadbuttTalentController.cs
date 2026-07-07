@@ -20,8 +20,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly ICommandFactory _commandFactory;
         private SpinPlayerCommand _spinPlayerCommand;
+        private AddForceToPlayerCommand _addForceToPlayerCommand;
 
         private ushort _casterPlayerId;
         private bool _isCharging;
@@ -41,19 +43,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public HeadbuttTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService,
             ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator,
-            NetworkConfig networkConfig, ICommandFactory commandFactory)
+            NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _commandFactory = commandFactory;
         }
 
         public void InitEntryPoint()
         {
             _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -84,10 +88,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             {
                 var config = _gamePlayConfigService.GamePlayConfig.Talents.HeadbuttTalentConfig;
                 var chargedSeconds = (tick - _chargeStartTick) * deltaTime;
-                _chargeFraction = Mathf.Clamp01(chargedSeconds / config.MaxChargeDurationSeconds);
+                _chargeFraction = Mathf.Clamp01(chargedSeconds / _sharedGamePlayConfig.HeadbuttMaxChargeDurationSeconds);
                 _dashDirection = casterPlayerState.Spaceship.Transform.Direction;
 
-                casterPlayerState.Spaceship.Transform.Velocity += _dashDirection * config.MaxChargeForce * _chargeFraction;
+                _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(_dashDirection * config.MaxChargeForce * _chargeFraction).ShouldTurnOffEngine(false).Execute();
                 casterPlayerState.Spaceship.IsEngineOn = true;
 
                 _isCharging = false;
@@ -131,11 +135,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _hasHitEnemy = true;
             var config = _gamePlayConfigService.GamePlayConfig.Talents.HeadbuttTalentConfig;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            var enemyPlayerState = _matchDataService.SimulationState.GetPlayerById(enemyId);
 
-            enemyPlayerState.Spaceship.Transform.Velocity += _dashDirection * config.EnemyPushForce;
+            _addForceToPlayerCommand.SetPlayerId(enemyId).SetForce(_dashDirection * config.EnemyPushForce).ShouldTurnOffEngine(false).Execute();
             _spinPlayerCommand.SetPlayer(enemyId).SetSpinAmount(config.EnemySpinAmount).SetTick(tick).Execute();
-            casterPlayerState.Spaceship.Transform.Velocity *= config.CasterVelocityDamping;
+
+            // Velocity += velocity * (damping - 1) is equivalent to velocity *= damping
+            var casterDampingForce = casterPlayerState.Spaceship.Transform.Velocity * (config.CasterVelocityDamping - 1f);
+            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(casterDampingForce).ShouldTurnOffEngine(false).Execute();
 
             _netEventsDataService.AddHeadbuttHitEnemyNetEvent(tick, _casterPlayerId, enemyId);
             DeactivateTalent(tick);
@@ -148,7 +154,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 _isCharging = false;
                 var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
                 if (casterPlayerState.Spaceship.IsAlive)
+                {
                     casterPlayerState.Spaceship.IsEngineOn = true;
+                }
                 DeactivateTalent(tick);
                 return;
             }

@@ -124,7 +124,6 @@ MonoBehaviour:
         CasterRecoilForcePerTick: 100
       HeadbuttTalentConfig:
         MaxChargeForce: 30
-        MaxChargeDurationSeconds: 2
         MaxDashWindowSeconds: 1.5
         MinDashWindowSeconds: 0.3
         EnemyPushForce: 25

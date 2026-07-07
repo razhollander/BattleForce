@@ -1119,7 +1119,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
             var fixture = body.GetFixtureList();
-            // fixture.Sensor = true;
             var filter = fixture.FilterData;
             // Add CollideOnlyWithPlayer to maskBits so caster.mask & enemy.category != 0
             filter.maskBits |= PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
@@ -1133,7 +1132,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
             var fixture = body.GetFixtureList();
-            // fixture.Sensor = false;
             var filter = fixture.FilterData;
             filter.maskBits = PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
             filter.categoryBits = PhysicsBodyType.PlayerSpaceship.GetCollisionsCategory();

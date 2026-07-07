@@ -32,6 +32,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void SetPlayerCurrentPowerUp(ushort playerId, PowerUpType powerUpType);
         void SetPlayerWaterGunState(ushort playerId, bool isOn);
         void SetPlayerHeadbuttChargingState(ushort playerId, bool isCharging);
+        void ShowPlayerHeadbuttHelmet(ushort playerId);
+        void StartPlayerHeadbuttDashHelmetHideTimer(ushort playerId);
+        void HidePlayerHeadbuttHelmet(ushort playerId);
+        void OnPlayerHeadbuttTalentDeactivated(ushort playerId);
         void SetPlayerChickenState(ushort playerId, bool isOn);
         void PlayLayEggAnimation(ushort playerId);
         void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction);

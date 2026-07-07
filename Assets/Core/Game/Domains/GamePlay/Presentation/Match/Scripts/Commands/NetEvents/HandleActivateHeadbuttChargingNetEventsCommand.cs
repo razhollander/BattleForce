@@ -27,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var evt in events)
             {
                 _playerControllers.SetPlayerHeadbuttChargingState(evt.CasterPlayerId, true);
+                _playerControllers.ShowPlayerHeadbuttHelmet(evt.CasterPlayerId);
             }
 
             _cachedPresentationEventsService.ActivateHeadbuttChargingNetEvents.Clear();

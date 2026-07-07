@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly IMatchDataService _matchDataService;
         private readonly MatchPlayerViewPool _playerPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly List<MatchPlayerController> _playerControllers = new ();
@@ -26,11 +27,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly IAudioService _audioService;
 
         public MatchPlayerControllers(IMatchDataService matchDataService, MatchPlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
+            SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             _matchDataService = matchDataService;
             _playerPool = new MatchPlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _audioService = audioService;
@@ -44,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void AddPlayer(ushort playerId)
         {
-            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform,
+            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _sharedGamePlayConfig, _networkConfig, _playersParent.transform,
                 _stageCancellationTokenProvider, _audioService);
             playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
@@ -112,6 +114,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetPlayerHeadbuttChargingState(ushort playerId, bool isCharging)
         {
             GetPlayer(playerId).SetHeadbuttChargingState(isCharging);
+        }
+
+        public void ShowPlayerHeadbuttHelmet(ushort playerId)
+        {
+            GetPlayer(playerId).ShowHeadbuttHelmet();
+        }
+
+        public void StartPlayerHeadbuttDashHelmetHideTimer(ushort playerId)
+        {
+            GetPlayer(playerId).StartHeadbuttDashHelmetHideTimer();
+        }
+
+        public void HidePlayerHeadbuttHelmet(ushort playerId)
+        {
+            GetPlayer(playerId).HideHeadbuttHelmet();
+        }
+
+        public void OnPlayerHeadbuttTalentDeactivated(ushort playerId)
+        {
+            GetPlayer(playerId).OnHeadbuttTalentDeactivated();
         }
 
         public void SetPlayerChickenState(ushort playerId, bool isChicken)

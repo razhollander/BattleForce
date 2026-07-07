@@ -1535,7 +1535,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var netEvent in netEvents.AsSpan())
             {
                 if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
                     _cachedUnprocessedActivateHeadbuttChargingEvents.Add(netEvent);
+                }
             }
             if (!_cachedUnprocessedActivateHeadbuttChargingEvents.IsNullOrEmpty())
             {
@@ -1550,7 +1552,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var netEvent in netEvents.AsSpan())
             {
                 if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
                     _cachedUnprocessedPerformHeadbuttDashEvents.Add(netEvent);
+                }
             }
             if (!_cachedUnprocessedPerformHeadbuttDashEvents.IsNullOrEmpty())
             {
@@ -1565,7 +1569,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var netEvent in netEvents.AsSpan())
             {
                 if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
                     _cachedUnprocessedHeadbuttHitEnemyEvents.Add(netEvent);
+                }
             }
             if (!_cachedUnprocessedHeadbuttHitEnemyEvents.IsNullOrEmpty())
             {
@@ -1580,7 +1586,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var netEvent in netEvents.AsSpan())
             {
                 if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
                     _cachedUnprocessedDeactivateHeadbuttTalentEvents.Add(netEvent);
+                }
             }
             if (!_cachedUnprocessedDeactivateHeadbuttTalentEvents.IsNullOrEmpty())
             {

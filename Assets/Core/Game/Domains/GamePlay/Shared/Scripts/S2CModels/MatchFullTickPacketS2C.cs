@@ -264,12 +264,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (ActivateUmbrellaTalentNetEvents.Count > 0) eventMask |= 1UL << 35;
             if (DeactivateUmbrellaTalentNetEvents.Count > 0) eventMask |= 1UL << 36;
             if (LayChickenEggNetEvents.Count > 0) eventMask |= 1UL << 37;
-            if (ActivateWaterGunTalentNetEvents.Count > 0) eventMask |= 1UL << 43;
-            if (DeactivateWaterGunTalentNetEvents.Count > 0) eventMask |= 1UL << 44;
-            if (ActivateHeadbuttChargingNetEvents.Count > 0) eventMask |= 1UL << 45;
-            if (PerformHeadbuttDashNetEvents.Count > 0) eventMask |= 1UL << 46;
-            if (HeadbuttHitEnemyNetEvents.Count > 0) eventMask |= 1UL << 47;
-            if (DeactivateHeadbuttTalentNetEvents.Count > 0) eventMask |= 1UL << 48;
             if (ChickenEggHitNetEvents.Count > 0) eventMask |= 1UL << 38;
             if (ActivateYearsOfPainTalentNetEvents.Count > 0) eventMask |= 1UL << 39;
             if (EnvironmentSpikePlayerCollisionNetEvents.Count > 0) eventMask |= 1UL << 42;
@@ -283,7 +277,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (ActivateShuffleNetEvents.Count > 0) eventMask |= 1UL << 48;
             if (StartPowerUpGrantingPhaseNetEvents.Count > 0) eventMask |= 1UL << 49;
             if (EndPowerUpGrantingPhaseNetEvents.Count > 0) eventMask |= 1UL << 50;
-
+            if (ActivateWaterGunTalentNetEvents.Count > 0) eventMask |= 1UL << 51;
+            if (DeactivateWaterGunTalentNetEvents.Count > 0) eventMask |= 1UL << 52;
+            if (ActivateHeadbuttChargingNetEvents.Count > 0) eventMask |= 1UL << 53;
+            if (PerformHeadbuttDashNetEvents.Count > 0) eventMask |= 1UL << 54;
+            if (HeadbuttHitEnemyNetEvents.Count > 0) eventMask |= 1UL << 55;
+            if (DeactivateHeadbuttTalentNetEvents.Count > 0) eventMask |= 1UL << 56;
             return eventMask;
         }
 

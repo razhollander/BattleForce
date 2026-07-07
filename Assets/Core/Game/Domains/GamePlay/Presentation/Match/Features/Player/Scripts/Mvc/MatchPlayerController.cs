@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
     {
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly Transform _parent;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
@@ -34,11 +35,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private int? _currentPowerupGrantingAudioId;
 
         public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
+            SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkConfig = networkConfig;
             _parent = parent;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
@@ -165,7 +167,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetHeadbuttChargingState(bool isCharging)
         {
-            _playerView.SetHeadbuttChargingState(isCharging);
+            _playerView.SetHeadbuttChargingState(isCharging, _sharedGamePlayConfig.HeadbuttMaxChargeDurationSeconds);
+        }
+
+        public void ShowHeadbuttHelmet()
+        {
+            _playerView.ShowHeadbuttHelmet();
+        }
+
+        public void StartHeadbuttDashHelmetHideTimer()
+        {
+            _playerView.StartHeadbuttDashHelmetHideTimer(_stageCancellationTokenProvider.CancellationTokenSource.Token);
+        }
+
+        public void HideHeadbuttHelmet()
+        {
+            _playerView.HideHeadbuttHelmet();
+        }
+
+        public void OnHeadbuttTalentDeactivated()
+        {
+            _playerView.OnHeadbuttTalentDeactivated();
         }
         
         public void SetSelectedTalent(int talentIndex)

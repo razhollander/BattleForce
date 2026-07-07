@@ -847,27 +847,37 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public void ProcessActivateHeadbuttChargingEvents(CapacityList<ActivateHeadbuttChargingNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty()) return;
+
             foreach (var netEvent in netEvents)
+            {
                 _cachedPresentationEventsService.ActivateHeadbuttChargingNetEvents.Add(netEvent);
+            }
         }
 
         public void ProcessPerformHeadbuttDashEvents(CapacityList<PerformHeadbuttDashNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty()) return;
+
             foreach (var netEvent in netEvents)
+            {
                 _cachedPresentationEventsService.PerformHeadbuttDashNetEvents.Add(netEvent);
+            }
         }
 
         public void ProcessHeadbuttHitEnemyEvents(CapacityList<HeadbuttHitEnemyNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty()) return;
+
             foreach (var netEvent in netEvents)
+            {
                 _cachedPresentationEventsService.HeadbuttHitEnemyNetEvents.Add(netEvent);
+            }
         }
 
         public void ProcessDeactivateHeadbuttTalentEvents(CapacityList<DeactivateHeadbuttTalentNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty()) return;
+
             foreach (var netEvent in netEvents)
             {
                 SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Headbutt, netEvent.TalentCooldownEndTick);

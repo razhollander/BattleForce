@@ -6,7 +6,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
     public class HeadbuttTalentConfig
     {
         public float MaxChargeForce = 30f;
-        public float MaxChargeDurationSeconds = 2f;
         public float MaxDashWindowSeconds = 1.5f;
         public float MinDashWindowSeconds = 0.3f;
         public float EnemyPushForce = 25f;
