@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public YearsOfPainTalentConfig YearsOfPainTalentConfig;
         public WaterGunTalentConfig WaterGunTalentConfig;
         public HeadbuttTalentConfig HeadbuttTalentConfig;
+        public FrigidBlockTalentConfig FrigidBlockTalentConfig;
         public float TalentCardWidth = 1.602175f;
         public float TalentCardHeight = 2.382844f;
     }

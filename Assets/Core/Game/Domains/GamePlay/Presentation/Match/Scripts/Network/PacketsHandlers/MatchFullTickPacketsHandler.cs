@@ -65,6 +65,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<CreateGrapplingHookProjectileNetEventS2C> _cachedUnprocessedCreateGrapplingHookProjectileEvents;
         private readonly CapacityList<GrapplingHookHitWallNetEventS2C> _cachedUnprocessedGrapplingHookHitWallEvents;
         private readonly CapacityList<DeactivateGrapplingHookTalentNetEventS2C> _cachedUnprocessedDeactivateGrapplingHookTalentEvents;
+        private readonly CapacityList<ShootFrigidBlockNetEventS2C> _cachedUnprocessedShootFrigidBlockEvents;
+        private readonly CapacityList<DestroyFrigidBlockNetEventS2C> _cachedUnprocessedDestroyFrigidBlockEvents;
         private readonly CapacityList<ActivateSentryGunTalentNetEventS2C> _cachedUnprocessedActivateSentryGunTalentEvents;
         private readonly CapacityList<DeactivateSentryGunTalentNetEventS2C> _cachedUnprocessedDeactivateSentryGunTalentEvents;
         private readonly CapacityList<PerformDashPulseNetEventS2C> _cachedUnprocessedPerformDashPulseEvents;
@@ -148,6 +150,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedCreateGrapplingHookProjectileEvents = new CapacityList<CreateGrapplingHookProjectileNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookShotNetEvents);
             _cachedUnprocessedGrapplingHookHitWallEvents = new CapacityList<GrapplingHookHitWallNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookHitNetEvents);
             _cachedUnprocessedDeactivateGrapplingHookTalentEvents = new CapacityList<DeactivateGrapplingHookTalentNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookDeactivatedNetEvents);
+            _cachedUnprocessedShootFrigidBlockEvents = new CapacityList<ShootFrigidBlockNetEventS2C>(networkConfig.MaxCap.ShootFrigidBlockNetEvents);
+            _cachedUnprocessedDestroyFrigidBlockEvents = new CapacityList<DestroyFrigidBlockNetEventS2C>(networkConfig.MaxCap.DestroyFrigidBlockNetEvents);
             _cachedUnprocessedActivateSentryGunTalentEvents = new CapacityList<ActivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateSentryGunTalentNetEvents);
             _cachedUnprocessedDeactivateSentryGunTalentEvents = new CapacityList<DeactivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSentryGunTalentNetEvents);
             _cachedUnprocessedPerformDashPulseEvents = new CapacityList<PerformDashPulseNetEventS2C>(networkConfig.MaxCap.PerformDashPulseNetEvents);
@@ -286,6 +290,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessActivateShuffleNetEvents(latestFullTickPacket.ActivateShuffleNetEvents, ignoreEventsNotAboveTick);
             ProcessStartPowerUpGrantingPhaseNetEvents(latestFullTickPacket.StartPowerUpGrantingPhaseNetEvents, ignoreEventsNotAboveTick);
             ProcessEndPowerUpGrantingPhaseNetEvents(latestFullTickPacket.EndPowerUpGrantingPhaseNetEvents, ignoreEventsNotAboveTick);
+            ProcessShootFrigidBlockEvents(latestFullTickPacket.ShootFrigidBlockNetEvents, ignoreEventsNotAboveTick);
+            ProcessDestroyFrigidBlockEvents(latestFullTickPacket.DestroyFrigidBlockNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -293,6 +299,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdateRotatingWheels(latestTickReceivedFromServer);
             UpdateKOProjectilesTransform(simulationState);
             UpdateGrapplingHookProjectilesTransform(simulationState);
+            UpdateFrigidBlocksTransform(simulationState);
         }
 
         /// <summary>
@@ -484,6 +491,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedCreateGrapplingHookProjectileEvents.Sort();
                 _presentationNetEventsHandler.ProcessCreatePlayerGrapplingHookProjectileEvents(_cachedUnprocessedCreateGrapplingHookProjectileEvents);
+            }
+        }
+
+        private void ProcessShootFrigidBlockEvents(FixedUnorderedList<ShootFrigidBlockNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedShootFrigidBlockEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedShootFrigidBlockEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedShootFrigidBlockEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedShootFrigidBlockEvents.Sort();
+                _presentationNetEventsHandler.ProcessShootFrigidBlockEvents(_cachedUnprocessedShootFrigidBlockEvents);
+            }
+        }
+
+        private void ProcessDestroyFrigidBlockEvents(FixedUnorderedList<DestroyFrigidBlockNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedDestroyFrigidBlockEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedDestroyFrigidBlockEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedDestroyFrigidBlockEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDestroyFrigidBlockEvents.Sort();
+                _presentationNetEventsHandler.ProcessDestroyFrigidBlockEvents(_cachedUnprocessedDestroyFrigidBlockEvents);
             }
         }
 
@@ -1284,6 +1327,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 var koProjectileState = simulationState.GetKOProjectileById(koProjectile.Id);
                 koProjectile.Position = koProjectileState.Position.ToUnityVector2();
                 koProjectile.Rotation = koProjectileState.Rotation.ToUnityVector2();
+            }
+        }
+
+        private void UpdateFrigidBlocksTransform(MatchSimulationStateS2C simulationState)
+        {
+            foreach (var frigidBlock in _matchDataService.FrigidBlocks)
+            {
+                if (simulationState.TryGetFrigidBlockById(frigidBlock.Id, out var state))
+                {
+                    frigidBlock.Position = state.Position.ToUnityVector2();
+                    frigidBlock.Rotation = state.Rotation.ToUnityVector2();
+                }
             }
         }
         

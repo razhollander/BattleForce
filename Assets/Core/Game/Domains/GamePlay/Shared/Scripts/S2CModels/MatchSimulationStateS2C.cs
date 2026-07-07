@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentSwapFieldS2C> SwapFields;
         public FixedUnorderedList<TalentKOProjectileS2C> KOProjectiles;
         public FixedUnorderedList<TalentGrapplingHookProjectileStateS2C> GrapplingHookProjectiles;
+        public FixedUnorderedList<TalentFrigidBlockStateS2C> FrigidBlocks;
         public FixedUnorderedList<TalentChickenEggStateS2C> ChickenEggs;
         public FixedUnorderedList<GalacticForceFieldS2C> GalacticForceFields;
         public Dictionary<ushort, int> GemsPerTeamId;
@@ -33,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public ushort CurrentStageWinnerTeamId;
         public float MapSizeMultiplier;
         
-        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs, int maxGalacticForceFields)
+        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs, int maxGalacticForceFields, int maxFrigidBlocks)
         {
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer, maxPlayers - 1 + maxPowerUpBalls));
             Bullets = new FixedOrderedList<PlayerBulletS2C>(maxBullets);
@@ -42,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             SwapFields = new FixedUnorderedList<TalentSwapFieldS2C>(maxPlayers);
             KOProjectiles = new FixedUnorderedList<TalentKOProjectileS2C>(maxPlayers);
             GrapplingHookProjectiles = new FixedUnorderedList<TalentGrapplingHookProjectileStateS2C>(maxPlayers);
+            FrigidBlocks = new FixedUnorderedList<TalentFrigidBlockStateS2C>(maxFrigidBlocks);
             ChickenEggs = new FixedUnorderedList<TalentChickenEggStateS2C>(maxChickenEggs);
             GalacticForceFields = new FixedUnorderedList<GalacticForceFieldS2C>(maxGalacticForceFields);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
@@ -113,6 +115,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var grapplingHookProjectile in GrapplingHookProjectiles.AsSpan())
             {
                 grapplingHookProjectile.Serialize(writer);
+            }
+
+            var frigidBlocksCount = FrigidBlocks.Count;
+            writer.Put((byte)frigidBlocksCount);
+            foreach (var frigidBlock in FrigidBlocks.AsSpan())
+            {
+                frigidBlock.Serialize(writer);
             }
 
             var chickenEggsCount = ChickenEggs.Count;
@@ -218,6 +227,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var grapplingHookProjectile = ref GrapplingHookProjectiles.AddAndGet();
                 grapplingHookProjectile.Deserialize(reader);
+            }
+
+            var frigidBlocksCount = reader.GetByte();
+            FrigidBlocks.Clear();
+            for (var i = 0; i < frigidBlocksCount; i++)
+            {
+                ref var frigidBlock = ref FrigidBlocks.AddAndGet();
+                frigidBlock.Deserialize(reader);
             }
 
             var chickenEggsCount = reader.GetByte();
@@ -556,6 +573,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 grapplingHookProjectile.SerializeDelta(writer);
             }
+
+            var frigidBlocksCount = FrigidBlocks.Count;
+            writer.Put((byte)frigidBlocksCount);
+            foreach (var frigidBlock in FrigidBlocks.AsSpan())
+            {
+                frigidBlock.SerializeDelta(writer);
+            }
         }
         
         private void PutBulletTransformsBatched(NetDataWriter writer) // maybe one day this will be used
@@ -656,6 +680,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 ref var grapplingHookProjectile = ref GrapplingHookProjectiles.AddAndGet();
                 grapplingHookProjectile.DeserializeDelta(reader);
             }
+
+            var frigidBlocksCount = reader.GetByte();
+            FrigidBlocks.Clear();
+            for (int i = 0; i < frigidBlocksCount; i++)
+            {
+                ref var frigidBlock = ref FrigidBlocks.AddAndGet();
+                frigidBlock.DeserializeDelta(reader);
+            }
         }
 
         public ref PowerUpBallS2C GetPowerUpBallById(ushort powerUpBallId)
@@ -742,6 +774,48 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             throw new System.Exception($"No grappling hook projectile for id {projectileId}!");
         }
 
+        public bool TryGetFrigidBlockById(ushort blockId, out TalentFrigidBlockStateS2C frigidBlock)
+        {
+            for (int i = 0; i < FrigidBlocks.Count; i++)
+            {
+                if (FrigidBlocks[i].Id == blockId)
+                {
+                    frigidBlock = FrigidBlocks.GetByIndex(i);
+                    return true;
+                }
+            }
+
+            frigidBlock = default;
+            return false;
+        }
+
+        public ref TalentFrigidBlockStateS2C GetFrigidBlockById(ushort blockId)
+        {
+            for (int i = 0; i < FrigidBlocks.Count; i++)
+            {
+                if (FrigidBlocks[i].Id == blockId)
+                {
+                    return ref FrigidBlocks.GetByIndex(i);
+                }
+            }
+
+            throw new System.Exception($"No frigid block for id {blockId}!");
+        }
+
+        public void RemoveFrigidBlockById(ushort blockId)
+        {
+            for (int i = 0; i < FrigidBlocks.Count; i++)
+            {
+                if (FrigidBlocks[i].Id == blockId)
+                {
+                    FrigidBlocks.RemoveAt(i);
+                    return;
+                }
+            }
+
+            throw new System.Exception($"No frigid block for id {blockId}!");
+        }
+
 
         public bool TryGetChickenEggById(ushort eggId, out TalentChickenEggStateS2C egg)
         {
@@ -816,6 +890,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             SwapFields.Clear();
             KOProjectiles.Clear();
             GrapplingHookProjectiles.Clear();
+            FrigidBlocks.Clear();
             ChickenEggs.Clear();
             GalacticForceFields.Clear();
             FieldBarriersOrderedByTeamId.Clear();

@@ -24,7 +24,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly YearsOfPainTalentController _yearsOfPainTalentController;
         private readonly WaterGunTalentController _waterGunTalentController;
         private readonly HeadbuttTalentController _headbuttTalentController;
-        
+        private readonly FrigidBlockTalentController _frigidBlockTalentController;
+
         private ushort _casterPlayerId;
         private bool _isInitialized = false;
         public PlayerTalentControllers(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
@@ -41,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
             _waterGunTalentController = new WaterGunTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
             _headbuttTalentController = new HeadbuttTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
+            _frigidBlockTalentController = new FrigidBlockTalentController(matchDataService, gamePlayConfigService, networkConfig, sharedGamePlayConfig, commandFactory);
         }
 
         public void InitEntryPoint()
@@ -56,6 +58,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _yearsOfPainTalentController.InitEntryPoint();
             _waterGunTalentController.InitEntryPoint();
             _headbuttTalentController.InitEntryPoint();
+            _frigidBlockTalentController.InitEntryPoint();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -72,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _yearsOfPainTalentController.SetCasterId(casterPlayerId);
             _waterGunTalentController.SetCasterId(casterPlayerId);
             _headbuttTalentController.SetCasterId(casterPlayerId);
+            _frigidBlockTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)
@@ -89,6 +93,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.YearsOfPain: return _yearsOfPainTalentController;
                 case TalentType.WaterGun: return _waterGunTalentController;
                 case TalentType.Headbutt: return _headbuttTalentController;
+                case TalentType.FrigidBlock: return _frigidBlockTalentController;
                 default: return default;
             }
         }
@@ -111,6 +116,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _yearsOfPainTalentController?.OnTick(tick, deltaTime);
             _waterGunTalentController?.OnTick(tick, deltaTime);
             _headbuttTalentController?.OnTick(tick, deltaTime);
+            _frigidBlockTalentController?.OnTick(tick, deltaTime);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)
@@ -157,6 +163,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _yearsOfPainTalentController.ResetData();
             _waterGunTalentController.ResetData();
             _headbuttTalentController.ResetData();
+            _frigidBlockTalentController.ResetData();
         }
     }
 }

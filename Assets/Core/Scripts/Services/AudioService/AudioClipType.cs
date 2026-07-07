@@ -39,5 +39,6 @@ namespace Core.Scripts.Services.AudioService
         PowerUpActivated = 36,
         PowerUpRandomReels = 37,
         HeadbuttHit = 38,
+        HeadbuttDash = 39,
     }
 }

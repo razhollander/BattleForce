@@ -28,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public ushort CurrentStageWinnerTeamId { get; set; }
         public List<MatchKOProjectileModel> KOProjectiles { get; private set; }
         public List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; private set; }
+        public List<MatchFrigidBlockModel> FrigidBlocks { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
         public List<MatchChickenEggModel> ChickenEggs { get; private set; }
@@ -59,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             SwapFields = new List<MatchSwapFieldModel>(networkConfig.MaxCap.ConcurrentPlayers);
             KOProjectiles = new List<MatchKOProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
             GrapplingHookProjectiles = new List<MatchGrapplingHookProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
+            FrigidBlocks = new List<MatchFrigidBlockModel>(networkConfig.MaxCap.ConcurrentFrigidBlocks);
             ChickenEggs = new List<MatchChickenEggModel>(networkConfig.MaxCap.ConcurrentChickenEggs);
         }
 
@@ -243,6 +245,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             SwapFields.Clear();
             KOProjectiles.Clear();
             GrapplingHookProjectiles.Clear();
+            FrigidBlocks.Clear();
             ChickenEggs.Clear();
         }
 
@@ -340,6 +343,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 if (GrapplingHookProjectiles[i].Id == id)
                 {
                     GrapplingHookProjectiles.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        public MatchFrigidBlockModel AddFrigidBlock(ushort id, ushort casterPlayerId, Vector2 position, Vector2 rotation)
+        {
+            var model = new MatchFrigidBlockModel(id, casterPlayerId, position.ToUnityVector2(), rotation.ToUnityVector2());
+            FrigidBlocks.Add(model);
+            return model;
+        }
+
+        public void RemoveFrigidBlock(ushort id)
+        {
+            for (int i = 0; i < FrigidBlocks.Count; i++)
+            {
+                if (FrigidBlocks[i].Id == id)
+                {
+                    FrigidBlocks.RemoveAt(i);
                     return;
                 }
             }

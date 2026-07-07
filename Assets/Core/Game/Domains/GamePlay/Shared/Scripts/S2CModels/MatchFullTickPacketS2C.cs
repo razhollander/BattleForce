@@ -75,6 +75,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<ActivateShuffleNetEventS2C> ActivateShuffleNetEvents;
         public FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C> StartPowerUpGrantingPhaseNetEvents;
         public FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C> EndPowerUpGrantingPhaseNetEvents;
+        public FixedUnorderedList<ShootFrigidBlockNetEventS2C> ShootFrigidBlockNetEvents;
+        public FixedUnorderedList<DestroyFrigidBlockNetEventS2C> DestroyFrigidBlockNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -84,7 +86,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public MatchFullTickPacketS2C(MaxCap maxCap, SharedGamePlayConfig sharedGamePlayConfig)
         {
             CurrentSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
-                maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount, maxCap.ConcurrentChickenEggs, maxCap.ConcurrentGalacticForceFields);
+                maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount, maxCap.ConcurrentChickenEggs, maxCap.ConcurrentGalacticForceFields, maxCap.ConcurrentFrigidBlocks);
 
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
 
@@ -154,6 +156,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             ActivateShuffleNetEvents = new FixedUnorderedList<ActivateShuffleNetEventS2C>(maxCap.ActivateShufflePowerUpNetEvents);
             StartPowerUpGrantingPhaseNetEvents = new FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>(maxCap.StartPowerUpGrantingPhaseNetEvents);
             EndPowerUpGrantingPhaseNetEvents = new FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>(maxCap.EndPowerUpGrantingPhaseNetEvents);
+            ShootFrigidBlockNetEvents = new FixedUnorderedList<ShootFrigidBlockNetEventS2C>(maxCap.ShootFrigidBlockNetEvents);
+            DestroyFrigidBlockNetEvents = new FixedUnorderedList<DestroyFrigidBlockNetEventS2C>(maxCap.DestroyFrigidBlockNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -221,6 +225,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 54)) != 0) SerializedPerformHeadbuttDashNetEvents(writer);
             if ((eventMask & (1UL << 55)) != 0) SerializedHeadbuttHitEnemyNetEvents(writer);
             if ((eventMask & (1UL << 56)) != 0) SerializedDeactivateHeadbuttTalentNetEvents(writer);
+            if ((eventMask & (1UL << 57)) != 0) SerializedShootFrigidBlockNetEvents(writer);
+            if ((eventMask & (1UL << 58)) != 0) SerializedDestroyFrigidBlockNetEvents(writer);
         }
 
         private ulong CalculateEventMask()
@@ -283,6 +289,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (PerformHeadbuttDashNetEvents.Count > 0) eventMask |= 1UL << 54;
             if (HeadbuttHitEnemyNetEvents.Count > 0) eventMask |= 1UL << 55;
             if (DeactivateHeadbuttTalentNetEvents.Count > 0) eventMask |= 1UL << 56;
+            if (ShootFrigidBlockNetEvents.Count > 0) eventMask |= 1UL << 57;
+            if (DestroyFrigidBlockNetEvents.Count > 0) eventMask |= 1UL << 58;
             return eventMask;
         }
 
@@ -476,6 +484,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask & (1UL << 56)) != 0) DeserializedDeactivateHeadbuttTalentNetEvents(reader);
             else DeactivateHeadbuttTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 57)) != 0) DeserializedShootFrigidBlockNetEvents(reader);
+            else ShootFrigidBlockNetEvents.Clear();
+
+            if ((eventMask & (1UL << 58)) != 0) DeserializedDestroyFrigidBlockNetEvents(reader);
+            else DestroyFrigidBlockNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1602,6 +1616,42 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref DeactivateHeadbuttTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedShootFrigidBlockNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ShootFrigidBlockNetEvents.Count);
+            foreach (var netEvent in ShootFrigidBlockNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedShootFrigidBlockNetEvents(NetDataReader reader)
+        {
+            ShootFrigidBlockNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ShootFrigidBlockNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDestroyFrigidBlockNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DestroyFrigidBlockNetEvents.Count);
+            foreach (var netEvent in DestroyFrigidBlockNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDestroyFrigidBlockNetEvents(NetDataReader reader)
+        {
+            DestroyFrigidBlockNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DestroyFrigidBlockNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

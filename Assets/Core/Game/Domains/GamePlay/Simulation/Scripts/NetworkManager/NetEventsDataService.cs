@@ -79,6 +79,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>> ActivateShuffleNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>> StartPowerUpGrantingPhaseNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>> EndPowerUpGrantingPhaseNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ShootFrigidBlockNetEventS2C>> ShootFrigidBlockNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DestroyFrigidBlockNetEventS2C>> DestroyFrigidBlockNetEventsPerClient { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -142,6 +144,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<ActivateShuffleNetEventS2C>> _activateShuffleNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>> _startPowerUpGrantingPhaseNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>> _endPowerUpGrantingPhaseNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ShootFrigidBlockNetEventS2C>> _shootFrigidBlockNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DestroyFrigidBlockNetEventS2C>> _destroyFrigidBlockNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -208,6 +212,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             ActivateShuffleNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>>(maxConcurrentPlayers);
             StartPowerUpGrantingPhaseNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>>(maxConcurrentPlayers);
             EndPowerUpGrantingPhaseNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>>(maxConcurrentPlayers);
+            ShootFrigidBlockNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ShootFrigidBlockNetEventS2C>>(maxConcurrentPlayers);
+            DestroyFrigidBlockNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DestroyFrigidBlockNetEventS2C>>(maxConcurrentPlayers);
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -298,6 +304,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _activateShuffleNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateShuffleNetEventS2C>>(() => new FixedUnorderedList<ActivateShuffleNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents), maxConcurrentPlayers);
             _startPowerUpGrantingPhaseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>>(() => new FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>(networkConfig.MaxCap.StartPowerUpGrantingPhaseNetEvents), maxConcurrentPlayers);
             _endPowerUpGrantingPhaseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>>(() => new FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>(networkConfig.MaxCap.EndPowerUpGrantingPhaseNetEvents), maxConcurrentPlayers);
+            _shootFrigidBlockNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ShootFrigidBlockNetEventS2C>>(() => new FixedUnorderedList<ShootFrigidBlockNetEventS2C>(networkConfig.MaxCap.ShootFrigidBlockNetEvents), maxConcurrentPlayers);
+            _destroyFrigidBlockNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DestroyFrigidBlockNetEventS2C>>(() => new FixedUnorderedList<DestroyFrigidBlockNetEventS2C>(networkConfig.MaxCap.DestroyFrigidBlockNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingClientEvents(long clientId)
@@ -692,6 +700,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 EndPowerUpGrantingPhaseNetEventsPerClient.Add(clientId, _endPowerUpGrantingPhaseNetEventsListPool.Get());
             }
+            if (!ShootFrigidBlockNetEventsPerClient.ContainsKey(clientId))
+            {
+                ShootFrigidBlockNetEventsPerClient.Add(clientId, _shootFrigidBlockNetEventsListPool.Get());
+            }
+            if (!DestroyFrigidBlockNetEventsPerClient.ContainsKey(clientId))
+            {
+                DestroyFrigidBlockNetEventsPerClient.Add(clientId, _destroyFrigidBlockNetEventsListPool.Get());
+            }
         }
 
         public void StopSavingClientEvents(long clientId)
@@ -909,6 +925,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             endPowerUpGrantingPhaseNetEventsList.Clear();
             _endPowerUpGrantingPhaseNetEventsListPool.Return(endPowerUpGrantingPhaseNetEventsList);
             EndPowerUpGrantingPhaseNetEventsPerClient.Remove(clientId);
+
+            var shootFrigidBlockNetEventsList = ShootFrigidBlockNetEventsPerClient[clientId];
+            shootFrigidBlockNetEventsList.Clear();
+            _shootFrigidBlockNetEventsListPool.Return(shootFrigidBlockNetEventsList);
+            ShootFrigidBlockNetEventsPerClient.Remove(clientId);
+
+            var destroyFrigidBlockNetEventsList = DestroyFrigidBlockNetEventsPerClient[clientId];
+            destroyFrigidBlockNetEventsList.Clear();
+            _destroyFrigidBlockNetEventsListPool.Return(destroyFrigidBlockNetEventsList);
+            DestroyFrigidBlockNetEventsPerClient.Remove(clientId);
 
             BulletSpawnNetEventsPerClient.Remove(clientId);
             PlayerRejoinAcceptNetEventsPerClient.Remove(clientId);
@@ -1282,6 +1308,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 netEvent.OccuredOnTick = onTick;
                 netEvent.PlayerId = playerId;
                 netEvent.GrantedPowerUp = grantedPowerUp;
+            }
+        }
+
+        public void AddShootFrigidBlockNetEvent(int onTick, TalentFrigidBlockStateS2C frigidBlock, int cooldownEndTick)
+        {
+            foreach (var kvp in ShootFrigidBlockNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.FrigidBlock = frigidBlock;
+                netEvent.CooldownEndTick = cooldownEndTick;
+            }
+        }
+
+        public void AddDestroyFrigidBlockNetEvent(int onTick, ushort blockId)
+        {
+            foreach (var kvp in DestroyFrigidBlockNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.BlockId = blockId;
             }
         }
 
@@ -1956,6 +2003,28 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                     if (endPowerUpGrantingPhaseNetEvents[i].OccuredOnTick < tick)
                     {
                         endPowerUpGrantingPhaseNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (ShootFrigidBlockNetEventsPerClient.TryGetValue(clientId, out var shootFrigidBlockNetEvents))
+            {
+                for (int i = shootFrigidBlockNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (shootFrigidBlockNetEvents[i].OccuredOnTick < tick)
+                    {
+                        shootFrigidBlockNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DestroyFrigidBlockNetEventsPerClient.TryGetValue(clientId, out var destroyFrigidBlockNetEvents))
+            {
+                for (int i = destroyFrigidBlockNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (destroyFrigidBlockNetEvents[i].OccuredOnTick < tick)
+                    {
+                        destroyFrigidBlockNetEvents.RemoveAt(i);
                     }
                 }
             }

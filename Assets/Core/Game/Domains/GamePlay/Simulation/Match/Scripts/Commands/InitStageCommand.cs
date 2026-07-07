@@ -39,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         private IPlayersTalentsManager _playersTalentsManager;
         private IPlayersPowerUpsManager _playersPowerUpsManager;
+        private FrigidBlock.IFrigidBlocksController _frigidBlocksController;
         private ICommandFactory _commandFactory;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
         private TryAddARandomTalentForPlayerCommand _tryAddARandomTalentForPlayerCommand;
@@ -62,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _playersPowerUpsManager = _diContainer.Resolve<IPlayersPowerUpsManager>();
+            _frigidBlocksController = _diContainer.Resolve<FrigidBlock.IFrigidBlocksController>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
             _tryAddARandomTalentForPlayerCommand = _commandFactory.CreateCommandVoid<TryAddARandomTalentForPlayerCommand>();
@@ -141,6 +143,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.IsInShowoffWinners = false;
             _matchDataService.SimulationState.CurrentStageWinnerTeamId = 0;
             _playersTalentsManager.ResetAllTalentsData();
+            _frigidBlocksController.ResetData();
             _playersPowerUpsManager.RemoveAllPowerUps();
             _preparationPhaseTimerService.RestartTimer();
             _playersOutsideStageTrackerService.ClearAllData();

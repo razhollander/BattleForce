@@ -446,11 +446,40 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 return;
             }
-            
+
             foreach (var netEvent in events)
             {
                 SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.GrapplingHook, netEvent.TalentCooldownEndTick);
                 _cachedPresentationEventsService.DeactivateGrapplingHookTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessShootFrigidBlockEvents(CapacityList<ShootFrigidBlockNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                var block = netEvent.FrigidBlock;
+                SetPlayerTalentDeactive(block.PlayerCasterId, TalentType.FrigidBlock, netEvent.CooldownEndTick);
+                _matchDataService.AddFrigidBlock(block.Id, block.PlayerCasterId, block.Position, block.Rotation);
+                _cachedPresentationEventsService.ShootFrigidBlockNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDestroyFrigidBlockEvents(CapacityList<DestroyFrigidBlockNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                _cachedPresentationEventsService.DestroyFrigidBlockNetEvents.Add(netEvent);
             }
         }
 

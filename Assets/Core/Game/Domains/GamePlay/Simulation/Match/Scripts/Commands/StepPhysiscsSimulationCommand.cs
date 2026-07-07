@@ -147,6 +147,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 ref var grapplingHookProjectileId = ref _matchDataService.SimulationState.GrapplingHookProjectiles.GetByIndex(i);
                 grapplingHookProjectileId.Position = _physicsSimulator.GetGrapplingHookProjectile(grapplingHookProjectileId.Id).Position;
             }
+
+            for (int i = 0; i < _matchDataService.SimulationState.FrigidBlocks.Count; i++)
+            {
+                ref var frigidBlock = ref _matchDataService.SimulationState.FrigidBlocks.GetByIndex(i);
+                var body = _physicsSimulator.GetFrigidBlock(frigidBlock.Id);
+                frigidBlock.Position = body.Position;
+                frigidBlock.Rotation = body.GetAngle().FromAngleRadians();
+                frigidBlock.Velocity = body.GetLinearVelocity();
+                frigidBlock.AngularVelocity = body.GetAngularVelocity();
+            }
         }
     }
 }

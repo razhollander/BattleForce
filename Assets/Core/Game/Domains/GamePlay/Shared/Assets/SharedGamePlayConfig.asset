@@ -28,6 +28,7 @@ MonoBehaviour:
   NoTeamId: 5
   TeamIds: 0100020003000400
   MinEntityId: 1
+  FrigidBlockSize: {x: 6, y: 1.5}
   GrapplingHookProjectileSize: 1
   GrapplingHookProjectileMaxDistance: 30
   MagneticPullFieldRadius: 10
