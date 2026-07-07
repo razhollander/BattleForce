@@ -70,6 +70,10 @@ MonoBehaviour:
           IsArrowShownOnlyWhilePressed: 1
         - TalentType: 10
           IsArrowShownOnlyWhilePressed: 0
+        - TalentType: 11
+          IsArrowShownOnlyWhilePressed: 0
+        - TalentType: 12
+          IsArrowShownOnlyWhilePressed: 0
       HammerTalentConfig:
         HammerSpeed: 10
         HammerSize: 1
