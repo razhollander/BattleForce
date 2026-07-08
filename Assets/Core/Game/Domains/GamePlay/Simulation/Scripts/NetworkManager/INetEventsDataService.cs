@@ -57,6 +57,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<FishingRodTipHitWallNetEventS2C>> FishingRodTipHitWallNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<FishingRodThrowNetEventS2C>> FishingRodThrowNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>> DeactivateFishingRodTalentNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<CreateSoulGhostNetEventS2C>> CreateSoulGhostNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<DeactivateSoulTalentNetEventS2C>> DeactivateSoulTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>> ActivateWaterGunTalentNetEventsPerClient { get; }
@@ -131,6 +133,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddFishingRodTipHitWallNetEvent(int onTick, ushort projectileId, Vector2 hitPosition);
         void AddFishingRodThrowNetEvent(int onTick, ushort casterPlayerId, ushort thrownEnemyId, Vector2 throwDirection);
         void AddDeactivateFishingRodTalentNetEvent(int onTick, ushort casterPlayerId, ushort projectileId, int talentCooldownEndTick);
+        void AddCreateSoulGhostNetEvent(int onTick, ushort ghostId, ushort playerCasterId, Vector2 position, Vector2 direction);
+        void AddDeactivateSoulTalentNetEvent(int onTick, ushort ghostId, ushort casterPlayerId, int talentCooldownEndTick, bool didTeleport, Vector2 teleportPosition, Vector2 teleportDirection);
         void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddActivateWaterGunTalentNetEvent(int onTick, ushort casterPlayerId);

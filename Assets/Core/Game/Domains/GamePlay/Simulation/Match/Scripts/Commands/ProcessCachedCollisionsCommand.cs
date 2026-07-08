@@ -106,6 +106,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandleGrapplingHookCasterEnemyCollision(objectA, objectB);
                 HandleFishingRodTipWallCollision(objectA, objectB);
                 HandleFishingRodTipEnemyCollision(objectA, objectB);
+                HandleSoulGhostWallCollision(objectA, objectB);
                 HandleChickenEggPlayerCollision(objectA, objectB);
                 HandleChickenEggKOProjectileCollision(objectA, objectB);
                 HandleHeadbuttPlayerCollision(objectA, objectB);
@@ -269,6 +270,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _playersTalentsManager.HitFishingRodWithWall(projectile.PlayerCasterId, projectileId, _processedTick);
+        }
+
+        private void HandleSoulGhostWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isGhostToWall = objectA.PhysicsBodyType == PhysicsBodyType.SoulGhost &&
+                                (objectB.PhysicsBodyType == PhysicsBodyType.Wall || objectB.PhysicsBodyType == PhysicsBodyType.FrigidBlock);
+            var isWallToGhost = objectB.PhysicsBodyType == PhysicsBodyType.SoulGhost &&
+                                (objectA.PhysicsBodyType == PhysicsBodyType.Wall || objectA.PhysicsBodyType == PhysicsBodyType.FrigidBlock);
+
+            if (!isGhostToWall && !isWallToGhost)
+            {
+                return;
+            }
+
+            var ghostId = isGhostToWall ? objectA.Id : objectB.Id;
+
+            if (!_matchDataService.SimulationState.TryGetSoulGhostById(ghostId, out var ghost))
+            {
+                return;
+            }
+
+            _playersTalentsManager.HitSoulGhostWithWall(ghost.PlayerCasterId, ghostId, _processedTick);
         }
 
         private void HandleFishingRodTipEnemyCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)

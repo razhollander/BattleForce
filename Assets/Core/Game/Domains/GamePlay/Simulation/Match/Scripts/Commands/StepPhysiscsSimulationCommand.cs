@@ -158,6 +158,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
             }
 
+            for (int i = 0; i < _matchDataService.SimulationState.SoulGhosts.Count; i++)
+            {
+                ref var soulGhost = ref _matchDataService.SimulationState.SoulGhosts.GetByIndex(i);
+                soulGhost.Position = _physicsSimulator.GetSoulGhost(soulGhost.Id).Position;
+            }
+
             for (int i = 0; i < _matchDataService.SimulationState.FrigidBlocks.Count; i++)
             {
                 ref var frigidBlock = ref _matchDataService.SimulationState.FrigidBlocks.GetByIndex(i);

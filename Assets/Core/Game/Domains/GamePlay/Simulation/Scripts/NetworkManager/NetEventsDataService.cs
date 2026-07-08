@@ -60,6 +60,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<FishingRodTipHitWallNetEventS2C>> FishingRodTipHitWallNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<FishingRodThrowNetEventS2C>> FishingRodThrowNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>> DeactivateFishingRodTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<CreateSoulGhostNetEventS2C>> CreateSoulGhostNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateSoulTalentNetEventS2C>> DeactivateSoulTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>> CreateMagneticPullFieldNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerClient { get; }
@@ -134,6 +136,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<FishingRodTipHitWallNetEventS2C>> _fishingRodTipHitWallNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<FishingRodThrowNetEventS2C>> _fishingRodThrowNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>> _deactivateFishingRodTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<CreateSoulGhostNetEventS2C>> _createSoulGhostNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateSoulTalentNetEventS2C>> _deactivateSoulTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>> _createMagneticPullFieldNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> _activateUmbrellaTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> _deactivateUmbrellaTalentNetEventsListPool;
@@ -207,6 +211,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             FishingRodTipHitWallNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<FishingRodTipHitWallNetEventS2C>>(maxConcurrentPlayers);
             FishingRodThrowNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<FishingRodThrowNetEventS2C>>(maxConcurrentPlayers);
             DeactivateFishingRodTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>>(maxConcurrentPlayers);
+            CreateSoulGhostNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateSoulGhostNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateSoulTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateSoulTalentNetEventS2C>>(maxConcurrentPlayers);
             CreateMagneticPullFieldNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>>(maxConcurrentPlayers);
             ActivateUmbrellaTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateUmbrellaTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
@@ -304,6 +310,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _fishingRodTipHitWallNetEventsListPool = new ConcurrentPool<FixedUnorderedList<FishingRodTipHitWallNetEventS2C>>(() => new FixedUnorderedList<FishingRodTipHitWallNetEventS2C>(networkConfig.MaxCap.FishingRodTipHitWallNetEvents), maxConcurrentPlayers);
             _fishingRodThrowNetEventsListPool = new ConcurrentPool<FixedUnorderedList<FishingRodThrowNetEventS2C>>(() => new FixedUnorderedList<FishingRodThrowNetEventS2C>(networkConfig.MaxCap.FishingRodThrowNetEvents), maxConcurrentPlayers);
             _deactivateFishingRodTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>(networkConfig.MaxCap.DeactivateFishingRodTalentNetEvents), maxConcurrentPlayers);
+            _createSoulGhostNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateSoulGhostNetEventS2C>>(() => new FixedUnorderedList<CreateSoulGhostNetEventS2C>(networkConfig.MaxCap.CreateSoulGhostNetEvents), maxConcurrentPlayers);
+            _deactivateSoulTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateSoulTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateSoulTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSoulTalentNetEvents), maxConcurrentPlayers);
             _createMagneticPullFieldNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>>(() => new FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents), maxConcurrentPlayers);
             _activateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
             _deactivateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
@@ -660,6 +668,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 DeactivateFishingRodTalentNetEventsPerClient.Add(clientId, _deactivateFishingRodTalentNetEventsListPool.Get());
             }
+            if (!CreateSoulGhostNetEventsPerClient.ContainsKey(clientId))
+            {
+                CreateSoulGhostNetEventsPerClient.Add(clientId, _createSoulGhostNetEventsListPool.Get());
+            }
+            if (!DeactivateSoulTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                DeactivateSoulTalentNetEventsPerClient.Add(clientId, _deactivateSoulTalentNetEventsListPool.Get());
+            }
             if (!CreateMagneticPullFieldNetEventsPerClient.ContainsKey(clientId))
             {
                 CreateMagneticPullFieldNetEventsPerClient.Add(clientId, _createMagneticPullFieldNetEventsListPool.Get());
@@ -911,6 +927,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             deactivateFishingRodTalentNetEventsList.Clear();
             _deactivateFishingRodTalentNetEventsListPool.Return(deactivateFishingRodTalentNetEventsList);
 
+            var createSoulGhostNetEventsList = CreateSoulGhostNetEventsPerClient[clientId];
+            createSoulGhostNetEventsList.Clear();
+            _createSoulGhostNetEventsListPool.Return(createSoulGhostNetEventsList);
+
+            var deactivateSoulTalentNetEventsList = DeactivateSoulTalentNetEventsPerClient[clientId];
+            deactivateSoulTalentNetEventsList.Clear();
+            _deactivateSoulTalentNetEventsListPool.Return(deactivateSoulTalentNetEventsList);
+
             var createMagneticPullFieldNetEventsList = CreateMagneticPullFieldNetEventsPerClient[clientId];
             createMagneticPullFieldNetEventsList.Clear();
             _createMagneticPullFieldNetEventsListPool.Return(createMagneticPullFieldNetEventsList);
@@ -1043,6 +1067,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             FishingRodTipHitWallNetEventsPerClient.Remove(clientId);
             FishingRodThrowNetEventsPerClient.Remove(clientId);
             DeactivateFishingRodTalentNetEventsPerClient.Remove(clientId);
+            CreateSoulGhostNetEventsPerClient.Remove(clientId);
+            DeactivateSoulTalentNetEventsPerClient.Remove(clientId);
             ActivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
             DeactivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
             ActivateWaterGunTalentNetEventsPerClient.Remove(clientId);
@@ -1907,6 +1933,28 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 }
             }
 
+            if (CreateSoulGhostNetEventsPerClient.TryGetValue(clientId, out var createSoulGhostNetEvents))
+            {
+                for (int i = createSoulGhostNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (createSoulGhostNetEvents[i].OccuredOnTick < tick)
+                    {
+                        createSoulGhostNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateSoulTalentNetEventsPerClient.TryGetValue(clientId, out var deactivateSoulTalentNetEvents))
+            {
+                for (int i = deactivateSoulTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateSoulTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateSoulTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
             if (CreateMagneticPullFieldNetEventsPerClient.TryGetValue(clientId, out var createMagneticPullFieldNetEvents))
             {
                 for (int i = createMagneticPullFieldNetEvents.Count - 1; i >= 0; i--)
@@ -2500,6 +2548,36 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.CasterPlayerId = casterPlayerId;
                 packet.ProjectileId = projectileId;
                 packet.TalentCooldownEndTick = talentCooldownEndTick;
+            }
+        }
+
+        public void AddCreateSoulGhostNetEvent(int onTick, ushort ghostId, ushort playerCasterId, Vector2 position, Vector2 direction)
+        {
+            foreach (var kvp in CreateSoulGhostNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.SoulGhost.Id = ghostId;
+                packet.SoulGhost.PlayerCasterId = playerCasterId;
+                packet.SoulGhost.Position = position;
+                packet.SoulGhost.Direction = direction;
+                packet.SoulGhost.Velocity = Vector2.Zero;
+            }
+        }
+
+        public void AddDeactivateSoulTalentNetEvent(int onTick, ushort ghostId, ushort casterPlayerId, int talentCooldownEndTick, bool didTeleport, Vector2 teleportPosition,
+            Vector2 teleportDirection)
+        {
+            foreach (var kvp in DeactivateSoulTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.GhostId = ghostId;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+                packet.DidTeleport = didTeleport;
+                packet.TeleportPosition = teleportPosition;
+                packet.TeleportDirection = teleportDirection;
             }
         }
 

@@ -27,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         Body GetKOProjectile(ushort koProjectileId);
         Body GetGrapplingHookProjectile(ushort grapplingHookProjectileId);
         Body GetFishingRodTip(ushort fishingRodTipId);
+        Body GetSoulGhost(ushort soulGhostId);
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
         void AddTalentCard(ushort id, Vector2 position, float length, float height);
         void AddPowerUpBall(ushort id, Vector2 position, Vector2 velocity, float radius);
@@ -53,6 +54,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void AddFishingRodTip(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
         void UpdateFishingRodTip(ushort id, Vector2 position, Vector2 velocity);
         void RemoveFishingRodTip(ushort id);
+        void AddSoulGhost(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
+        void RemoveSoulGhost(ushort id);
         void ClearAllData();
         void DisableBodyCollider(PhysicsBodyType koProjectile, ushort projectileId);
         bool ArcCastOnPlayers(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ingoredTeamId, out PhysicsBodyData hitBodyData);

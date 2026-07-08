@@ -224,6 +224,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             }
         }
 
+        public void HitSoulGhostWithWall(ushort casterId, ushort ghostId, int tick)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.HitSoulGhostWithWall(tick);
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
+            }
+        }
+
         public void StopTalentIfActive(TalentType talentType, ushort playerId, int tick)
         {
             _talentControllersPerPlayer[playerId].StopTalentIfActive(talentType, tick);

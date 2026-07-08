@@ -52,6 +52,7 @@ MonoBehaviour:
         - rid: 1717594787500785824
         - rid: 2200602851054190760
         - rid: 1595758794195075078
+        - rid: 1595758799730769926
       TalentsArrowConfigs:
         TalentCooldownConfigs:
         - TalentType: 1
@@ -156,6 +157,8 @@ MonoBehaviour:
         ThrowPushForce: 250
         ThrowMinSpin: 20
         ThrowMaxSpin: 35
+      SoulTalentConfig:
+        GhostSpeed: 15
       TalentCardWidth: 1.602175
       TalentCardHeight: 2.382844
     Lava:
@@ -208,6 +211,11 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 15
+        CooldownInSeconds: 1
+    - rid: 1595758799730769926
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 16
         CooldownInSeconds: 1
     - rid: 1717594783917015173
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}

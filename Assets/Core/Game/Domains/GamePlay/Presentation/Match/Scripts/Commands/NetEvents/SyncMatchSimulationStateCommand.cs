@@ -13,6 +13,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Sc
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
@@ -69,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
         private IFishingRodTipControllers _fishingRodTipControllers;
+        private ISoulGhostControllers _soulGhostControllers;
         private IFrigidBlocksControllers _frigidBlocksControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private IPreparationPhaseCountdownController _preparationPhaseCountdownController;
@@ -116,6 +118,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
             _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
+            _soulGhostControllers = _diContainer.Resolve<ISoulGhostControllers>();
             _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
@@ -156,6 +159,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers.DestroyAll();
             _grapplingHookProjectilesControllers.DestroyAll();
             _fishingRodTipControllers.DestroyAll();
+            _soulGhostControllers.DestroyAll();
             _frigidBlocksControllers.DestroyAll();
             _chickenEggsControllers.DestroyAll();
             _galacticPullStarEffectControllers.DestroyAll();
@@ -192,6 +196,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateKOPRojectiles();
             CreateGrapplingHookPRojectiles();
             CreateFishingRodTips();
+            CreateSoulGhosts();
             CreateFrigidBlocks();
             CreateChickenEggs();
             CreateGalacticPullStars();
@@ -609,6 +614,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                 _matchDataService.AddGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position);
                 _grapplingHookProjectilesControllers.CreateGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, grapplingHookProjectile.IsHookAttached);
+            }
+        }
+
+        private void CreateSoulGhosts()
+        {
+            foreach (var soulGhost in _simulationState.SoulGhosts.AsSpan())
+            {
+                var casterId = soulGhost.PlayerCasterId;
+                var casterState = _simulationState.GetPlayerById(casterId);
+                _matchDataService.AddSoulGhost(soulGhost.Id, casterId, soulGhost.Position, soulGhost.Direction);
+                _soulGhostControllers.CreateSoulGhost(soulGhost.Id, casterId, casterState.TeamId, soulGhost.Position.ToUnityVector2(), soulGhost.Direction.ToUnityVector2());
             }
         }
 

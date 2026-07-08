@@ -523,6 +523,36 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessCreateSoulGhostEvents(CapacityList<CreateSoulGhostNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                var ghostState = netEvent.SoulGhost;
+                SetPlayerTalentActive(ghostState.PlayerCasterId, TalentType.Soul);
+                _matchDataService.AddSoulGhost(ghostState.Id, ghostState.PlayerCasterId, ghostState.Position, ghostState.Direction);
+                _cachedPresentationEventsService.CreateSoulGhostNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateSoulTalentEvents(CapacityList<DeactivateSoulTalentNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Soul, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateSoulTalentNetEvents.Add(netEvent);
+            }
+        }
+
         public void ProcessShootFrigidBlockEvents(CapacityList<ShootFrigidBlockNetEventS2C> events)
         {
             if (events.IsNullOrEmpty())

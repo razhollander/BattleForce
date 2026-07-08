@@ -70,6 +70,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<FishingRodTipHitWallNetEventS2C> _cachedUnprocessedFishingRodTipHitWallEvents;
         private readonly CapacityList<FishingRodThrowNetEventS2C> _cachedUnprocessedFishingRodThrowEvents;
         private readonly CapacityList<DeactivateFishingRodTalentNetEventS2C> _cachedUnprocessedDeactivateFishingRodTalentEvents;
+        private readonly CapacityList<CreateSoulGhostNetEventS2C> _cachedUnprocessedCreateSoulGhostEvents;
+        private readonly CapacityList<DeactivateSoulTalentNetEventS2C> _cachedUnprocessedDeactivateSoulTalentEvents;
         private readonly CapacityList<ShootFrigidBlockNetEventS2C> _cachedUnprocessedShootFrigidBlockEvents;
         private readonly CapacityList<DestroyFrigidBlockNetEventS2C> _cachedUnprocessedDestroyFrigidBlockEvents;
         private readonly CapacityList<ActivateSentryGunTalentNetEventS2C> _cachedUnprocessedActivateSentryGunTalentEvents;
@@ -160,6 +162,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedFishingRodTipHitWallEvents = new CapacityList<FishingRodTipHitWallNetEventS2C>(networkConfig.MaxCap.FishingRodTipHitWallNetEvents);
             _cachedUnprocessedFishingRodThrowEvents = new CapacityList<FishingRodThrowNetEventS2C>(networkConfig.MaxCap.FishingRodThrowNetEvents);
             _cachedUnprocessedDeactivateFishingRodTalentEvents = new CapacityList<DeactivateFishingRodTalentNetEventS2C>(networkConfig.MaxCap.DeactivateFishingRodTalentNetEvents);
+            _cachedUnprocessedCreateSoulGhostEvents = new CapacityList<CreateSoulGhostNetEventS2C>(networkConfig.MaxCap.CreateSoulGhostNetEvents);
+            _cachedUnprocessedDeactivateSoulTalentEvents = new CapacityList<DeactivateSoulTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSoulTalentNetEvents);
             _cachedUnprocessedShootFrigidBlockEvents = new CapacityList<ShootFrigidBlockNetEventS2C>(networkConfig.MaxCap.ShootFrigidBlockNetEvents);
             _cachedUnprocessedDestroyFrigidBlockEvents = new CapacityList<DestroyFrigidBlockNetEventS2C>(networkConfig.MaxCap.DestroyFrigidBlockNetEvents);
             _cachedUnprocessedActivateSentryGunTalentEvents = new CapacityList<ActivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateSentryGunTalentNetEvents);
@@ -307,6 +311,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessFishingRodTipHitWallEvents(latestFullTickPacket.FishingRodTipHitWallNetEvents, ignoreEventsNotAboveTick);
             ProcessFishingRodThrowEvents(latestFullTickPacket.FishingRodThrowNetEvents, ignoreEventsNotAboveTick);
             ProcessDeactivateFishingRodTalentEvents(latestFullTickPacket.DeactivateFishingRodTalentNetEvents, ignoreEventsNotAboveTick);
+            ProcessCreateSoulGhostEvents(latestFullTickPacket.CreateSoulGhostNetEvents, ignoreEventsNotAboveTick);
+            ProcessDeactivateSoulTalentEvents(latestFullTickPacket.DeactivateSoulTalentNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -315,6 +321,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdateKOProjectilesTransform(simulationState);
             UpdateGrapplingHookProjectilesTransform(simulationState);
             UpdateFishingRodTipsTransform(simulationState);
+            UpdateSoulGhostsTransform(simulationState);
             UpdateFrigidBlocksTransform(simulationState);
         }
 
@@ -669,6 +676,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedDeactivateFishingRodTalentEvents.Sort();
                 _presentationNetEventsHandler.ProcessDeactivateFishingRodTalentEvents(_cachedUnprocessedDeactivateFishingRodTalentEvents);
+            }
+        }
+
+        private void ProcessCreateSoulGhostEvents(FixedUnorderedList<CreateSoulGhostNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedCreateSoulGhostEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedCreateSoulGhostEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedCreateSoulGhostEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedCreateSoulGhostEvents.Sort();
+                _presentationNetEventsHandler.ProcessCreateSoulGhostEvents(_cachedUnprocessedCreateSoulGhostEvents);
+            }
+        }
+
+        private void ProcessDeactivateSoulTalentEvents(FixedUnorderedList<DeactivateSoulTalentNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedDeactivateSoulTalentEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedDeactivateSoulTalentEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedDeactivateSoulTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDeactivateSoulTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateSoulTalentEvents(_cachedUnprocessedDeactivateSoulTalentEvents);
             }
         }
 
@@ -1434,6 +1477,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 if (simulationState.TryGetFishingRodProjectileById(tip.Id, out var state))
                 {
                     tip.Position = state.Position.ToUnityVector2();
+                }
+            }
+        }
+
+        private void UpdateSoulGhostsTransform(MatchSimulationStateS2C simulationState)
+        {
+            foreach (var ghost in _matchDataService.SoulGhosts)
+            {
+                if (simulationState.TryGetSoulGhostById(ghost.Id, out var state))
+                {
+                    ghost.Position = state.Position.ToUnityVector2();
                 }
             }
         }

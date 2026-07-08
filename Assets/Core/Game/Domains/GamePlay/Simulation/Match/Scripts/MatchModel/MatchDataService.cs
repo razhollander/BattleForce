@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastKOProjectileCreatedId = 0;
         private ushort _lastGrapplingHookProjectileCreatedId = 0;
         private ushort _lastFishingRodProjectileCreatedId = 0;
+        private ushort _lastSoulGhostCreatedId = 0;
         private ushort _lastFrigidBlockCreatedId = 0;
         private ushort _lastChickenEggCreatedId = 0;
         private ushort _lastGalacticForceFieldCreatedId = 0;
@@ -150,6 +151,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             fishingRodProjectile.Phase = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.Flying;
             fishingRodProjectile.CaughtEnemyId = 0;
             return fishingRodProjectile;
+        }
+
+        public TalentSoulGhostStateS2C AddSoulGhost(ushort casterPlayerId, Vector2 position, Vector2 direction, Vector2 velocity)
+        {
+            ref var soulGhost = ref _simulationState.SoulGhosts.AddAndGet();
+            var ghostId = (ushort)(++_lastSoulGhostCreatedId % byte.MaxValue);
+            soulGhost.Id = ghostId;
+            soulGhost.PlayerCasterId = casterPlayerId;
+            soulGhost.Position = position;
+            soulGhost.Direction = direction;
+            soulGhost.Velocity = velocity;
+            return soulGhost;
         }
 
         public TalentFrigidBlockStateS2C AddFrigidBlock(ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 velocity)

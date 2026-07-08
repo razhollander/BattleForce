@@ -41,6 +41,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<FishingRodTipHitWallNetEventS2C> FishingRodTipHitWallNetEvents { get; } = new();
         public List<FishingRodThrowNetEventS2C> FishingRodThrowNetEvents { get; } = new();
         public List<DeactivateFishingRodTalentNetEventS2C> DeactivateFishingRodTalentNetEvents { get; } = new();
+        public List<CreateSoulGhostNetEventS2C> CreateSoulGhostNetEvents { get; } = new();
+        public List<DeactivateSoulTalentNetEventS2C> DeactivateSoulTalentNetEvents { get; } = new();
         public List<ShootFrigidBlockNetEventS2C> ShootFrigidBlockNetEvents { get; } = new();
         public List<DestroyFrigidBlockNetEventS2C> DestroyFrigidBlockNetEvents { get; } = new();
         public List<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents { get; } = new();

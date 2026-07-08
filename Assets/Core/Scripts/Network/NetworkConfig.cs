@@ -132,6 +132,8 @@ namespace Core.Scripts.Network
         public int FishingRodTipHitWallNetEvents = 128;
         public int FishingRodThrowNetEvents = 128;
         public int DeactivateFishingRodTalentNetEvents = 128;
+        public int CreateSoulGhostNetEvents = 128;
+        public int DeactivateSoulTalentNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel

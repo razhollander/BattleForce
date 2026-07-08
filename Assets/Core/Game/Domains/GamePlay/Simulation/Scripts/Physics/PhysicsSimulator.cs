@@ -91,6 +91,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     case PhysicsBodyType.KOProjectile: CopyKOProjectileToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.GrapplingHookProjectile: CopyGrapplingHookProjectileToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.FishingRodTip: CopyFishingRodTipToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.SoulGhost: CopySoulGhostToBody(currentBody, bodyData.Id, simulationState); break;
                 }
 
                 currentBody = currentBody.GetNext();
@@ -116,6 +117,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var fishingRodTipState = simulationState.FishingRodProjectiles.FindWithId(fishingRodTipId);
             fishingRodTipBody.SetTransform(fishingRodTipState.Position, 0);
             fishingRodTipBody.SetLinearVelocity(fishingRodTipState.Velocity);
+        }
+
+        private void CopySoulGhostToBody(Body soulGhostBody, ushort soulGhostId, MatchSimulationStateS2C simulationState)
+        {
+            var soulGhostState = simulationState.SoulGhosts.FindWithId(soulGhostId);
+            soulGhostBody.SetTransform(soulGhostState.Position, 0);
+            soulGhostBody.SetLinearVelocity(soulGhostState.Velocity);
         }
 
         private void CopySwapFieldToBody(Body swapFieldBody, ushort swapFieldId, MatchSimulationStateS2C simulationState)
@@ -1135,6 +1143,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             RemoveBody(body);
         }
 
+        public void AddSoulGhost(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.SoulGhost);
+            bodyDef.bullet = true;
+            bodyDef.linearVelocity = velocity;
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var shape = GetCircleShape();
+            shape.Radius = radius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0.3f;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.SoulGhost.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.SoulGhost.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(shape);
+        }
+
+        public void RemoveSoulGhost(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.SoulGhost, id);
+            RemoveBody(body);
+        }
+
         public void AddSwapField(ushort id, ushort teamId, Vector2 position)
         {
             var bodyDef = GetBodyDef();
@@ -1267,6 +1309,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public Body GetGrapplingHookProjectile(ushort grapplingHookProjectileId)
         {
             return GetBody(PhysicsBodyType.GrapplingHookProjectile, grapplingHookProjectileId);
+        }
+
+        public Body GetSoulGhost(ushort soulGhostId)
+        {
+            return GetBody(PhysicsBodyType.SoulGhost, soulGhostId);
         }
 
         public Body GetFishingRodTip(ushort fishingRodTipId)

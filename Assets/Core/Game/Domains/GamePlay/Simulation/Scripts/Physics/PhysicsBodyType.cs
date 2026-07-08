@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         ChickenEgg = 16,
         FrigidBlock = 18,
         FishingRodTip = 19,
+        SoulGhost = 20,
     }
     
     public enum PhysicsCollisionType
@@ -41,5 +42,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         ChickenEgg = 11,
         FrigidBlock = 12,
         FishingRodTip = 13,
+        SoulGhost = 14,
     }
 }

@@ -17,5 +17,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         Rock = 13,
         FrigidBlock = 14,
         FishingRod = 15,
+        Soul = 16,
     }
 }

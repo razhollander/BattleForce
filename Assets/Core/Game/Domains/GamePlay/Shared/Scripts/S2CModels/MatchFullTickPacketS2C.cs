@@ -82,6 +82,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<FishingRodTipHitWallNetEventS2C> FishingRodTipHitWallNetEvents;
         public FixedUnorderedList<FishingRodThrowNetEventS2C> FishingRodThrowNetEvents;
         public FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C> DeactivateFishingRodTalentNetEvents;
+        public FixedUnorderedList<CreateSoulGhostNetEventS2C> CreateSoulGhostNetEvents;
+        public FixedUnorderedList<DeactivateSoulTalentNetEventS2C> DeactivateSoulTalentNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -168,6 +170,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             FishingRodTipHitWallNetEvents = new FixedUnorderedList<FishingRodTipHitWallNetEventS2C>(maxCap.FishingRodTipHitWallNetEvents);
             FishingRodThrowNetEvents = new FixedUnorderedList<FishingRodThrowNetEventS2C>(maxCap.FishingRodThrowNetEvents);
             DeactivateFishingRodTalentNetEvents = new FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>(maxCap.DeactivateFishingRodTalentNetEvents);
+            CreateSoulGhostNetEvents = new FixedUnorderedList<CreateSoulGhostNetEventS2C>(maxCap.CreateSoulGhostNetEvents);
+            DeactivateSoulTalentNetEvents = new FixedUnorderedList<DeactivateSoulTalentNetEventS2C>(maxCap.DeactivateSoulTalentNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -177,7 +181,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             
             var eventMask = CalculateEventMask();
             writer.Put(eventMask);
-            
+
+            // The primary 64-bit mask is fully used (bits 0-63). eventMask2 carries overflow events (bit 64+).
+            var eventMask2 = CalculateEventMask2();
+            writer.Put(eventMask2);
+
             if ((eventMask & (1UL << 0)) != 0) SerializedPlayerJoinedEvents(writer);
             if ((eventMask & (1UL << 1)) != 0) SerializedBulletSpawnedEvents(writer);
             if ((eventMask & (1UL << 2)) != 0) SerializedPlayerTakeDamageEvents(writer);
@@ -242,6 +250,17 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 61)) != 0) SerializedFishingRodTipHitWallNetEvents(writer);
             if ((eventMask & (1UL << 62)) != 0) SerializedFishingRodThrowNetEvents(writer);
             if ((eventMask & (1UL << 63)) != 0) SerializedDeactivateFishingRodTalentNetEvents(writer);
+
+            if ((eventMask2 & (1UL << 0)) != 0) SerializedCreateSoulGhostNetEvents(writer);
+            if ((eventMask2 & (1UL << 1)) != 0) SerializedDeactivateSoulTalentNetEvents(writer);
+        }
+
+        private ulong CalculateEventMask2()
+        {
+            ulong eventMask2 = 0;
+            if (CreateSoulGhostNetEvents.Count > 0) eventMask2 |= 1UL << 0;
+            if (DeactivateSoulTalentNetEvents.Count > 0) eventMask2 |= 1UL << 1;
+            return eventMask2;
         }
 
         private ulong CalculateEventMask()
@@ -320,7 +339,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             CurrentSimulationState.DeserializeTransforms(reader);
             
             ulong eventMask = reader.GetULong();
-            
+            ulong eventMask2 = reader.GetULong();
+
             if ((eventMask & (1UL << 0)) != 0) DeserializedPlayerJoinedEvents(reader);
             else PlayerJoinAcceptNetEvents.Clear();
 
@@ -525,6 +545,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask & (1UL << 63)) != 0) DeserializedDeactivateFishingRodTalentNetEvents(reader);
             else DeactivateFishingRodTalentNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 0)) != 0) DeserializedCreateSoulGhostNetEvents(reader);
+            else CreateSoulGhostNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 1)) != 0) DeserializedDeactivateSoulTalentNetEvents(reader);
+            else DeactivateSoulTalentNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1777,6 +1803,42 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref DeactivateFishingRodTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedCreateSoulGhostNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)CreateSoulGhostNetEvents.Count);
+            foreach (var netEvent in CreateSoulGhostNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedCreateSoulGhostNetEvents(NetDataReader reader)
+        {
+            CreateSoulGhostNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref CreateSoulGhostNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateSoulTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateSoulTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateSoulTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateSoulTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateSoulTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateSoulTalentNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

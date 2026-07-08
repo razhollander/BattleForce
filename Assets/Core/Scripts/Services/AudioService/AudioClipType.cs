@@ -40,5 +40,7 @@ namespace Core.Scripts.Services.AudioService
         PowerUpRandomReels = 37,
         HeadbuttHit = 38,
         HeadbuttDash = 39,
+        SoulCast = 40,
+        SoulTeleport = 41,
     }
 }

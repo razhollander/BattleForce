@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchKOProjectileModel> KOProjectiles { get; private set; }
         public List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; private set; }
         public List<MatchFishingRodTipModel> FishingRodTips { get; private set; }
+        public List<MatchSoulGhostModel> SoulGhosts { get; private set; }
         public List<MatchFrigidBlockModel> FrigidBlocks { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
@@ -62,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             KOProjectiles = new List<MatchKOProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
             GrapplingHookProjectiles = new List<MatchGrapplingHookProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
             FishingRodTips = new List<MatchFishingRodTipModel>(networkConfig.MaxCap.ConcurrentPlayers);
+            SoulGhosts = new List<MatchSoulGhostModel>(networkConfig.MaxCap.ConcurrentPlayers);
             FrigidBlocks = new List<MatchFrigidBlockModel>(networkConfig.MaxCap.ConcurrentFrigidBlocks);
             ChickenEggs = new List<MatchChickenEggModel>(networkConfig.MaxCap.ConcurrentChickenEggs);
         }
@@ -248,6 +250,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             KOProjectiles.Clear();
             GrapplingHookProjectiles.Clear();
             FishingRodTips.Clear();
+            SoulGhosts.Clear();
             FrigidBlocks.Clear();
             ChickenEggs.Clear();
         }
@@ -375,6 +378,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 if (FishingRodTips[i].Id == id)
                 {
                     FishingRodTips.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        public MatchSoulGhostModel AddSoulGhost(ushort id, ushort casterPlayerId, Vector2 position, Vector2 direction)
+        {
+            var model = new MatchSoulGhostModel(id, casterPlayerId, position.ToUnityVector2(), direction.ToUnityVector2());
+            SoulGhosts.Add(model);
+            return model;
+        }
+
+        public MatchSoulGhostModel GetSoulGhost(ushort id)
+        {
+            var model = SoulGhosts.Find(x => x.Id == id);
+            if (model == null)
+            {
+                LogService.LogError($"Couldn't find soul ghost with id {id}");
+            }
+            return model;
+        }
+
+        public void RemoveSoulGhost(ushort id)
+        {
+            for (int i = 0; i < SoulGhosts.Count; i++)
+            {
+                if (SoulGhosts[i].Id == id)
+                {
+                    SoulGhosts.RemoveAt(i);
                     return;
                 }
             }

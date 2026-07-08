@@ -60,6 +60,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleFishingRodThrowNetEventsCommand _handleFishingRodThrowNetEventsCommand;
         private readonly HandleDeactivateFishingRodTalentNetEventsCommand _handleDeactivateFishingRodTalentNetEventsCommand;
         private readonly UpdateFishingRodTipsTransformCommand _updateFishingRodTipsTransformCommand;
+        private readonly HandleCreateSoulGhostNetEventsCommand _handleCreateSoulGhostNetEventsCommand;
+        private readonly HandleDeactivateSoulTalentNetEventsCommand _handleDeactivateSoulTalentNetEventsCommand;
+        private readonly UpdateSoulGhostsTransformCommand _updateSoulGhostsTransformCommand;
         private readonly HandleShootFrigidBlockNetEventsCommand _handleShootFrigidBlockNetEventsCommand;
         private readonly HandleDestroyFrigidBlockNetEventsCommand _handleDestroyFrigidBlockNetEventsCommand;
         private readonly UpdateFrigidBlocksTransformCommand _updateFrigidBlocksTransformCommand;
@@ -141,6 +144,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleFishingRodThrowNetEventsCommand = commandFactory.CreateCommandVoid<HandleFishingRodThrowNetEventsCommand>();
             _handleDeactivateFishingRodTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateFishingRodTalentNetEventsCommand>();
             _updateFishingRodTipsTransformCommand = commandFactory.CreateCommandVoid<UpdateFishingRodTipsTransformCommand>();
+            _handleCreateSoulGhostNetEventsCommand = commandFactory.CreateCommandVoid<HandleCreateSoulGhostNetEventsCommand>();
+            _handleDeactivateSoulTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSoulTalentNetEventsCommand>();
+            _updateSoulGhostsTransformCommand = commandFactory.CreateCommandVoid<UpdateSoulGhostsTransformCommand>();
             _handleShootFrigidBlockNetEventsCommand = commandFactory.CreateCommandVoid<HandleShootFrigidBlockNetEventsCommand>();
             _handleDestroyFrigidBlockNetEventsCommand = commandFactory.CreateCommandVoid<HandleDestroyFrigidBlockNetEventsCommand>();
             _updateFrigidBlocksTransformCommand = commandFactory.CreateCommandVoid<UpdateFrigidBlocksTransformCommand>();
@@ -229,6 +235,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleFishingRodTipHitWallNetEventsCommand.Execute();
             _handleFishingRodThrowNetEventsCommand.Execute();
             _handleDeactivateFishingRodTalentNetEventsCommand.Execute();
+            _handleCreateSoulGhostNetEventsCommand.Execute();
+            _handleDeactivateSoulTalentNetEventsCommand.Execute();
             _handleShootFrigidBlockNetEventsCommand.Execute();
             _handleDestroyFrigidBlockNetEventsCommand.Execute();
             _handleActivateSentryGunTalentNetEventsCommand.Execute();
@@ -250,6 +258,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateKOProjectilesTransformCommand.Execute(); // must be after _handleDeactivateKOTalentNetEventsCommand.Execute();
             _updateGrapplingHookProjectilesTransformCommand.Execute();
             _updateFishingRodTipsTransformCommand.Execute();
+            _updateSoulGhostsTransformCommand.Execute();
             _updateFrigidBlocksTransformCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();

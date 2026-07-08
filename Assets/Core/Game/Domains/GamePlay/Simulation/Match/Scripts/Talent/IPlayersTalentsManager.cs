@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         void HitGrapplingHookWithWall(ushort casterId, ushort projectileId, ushort wallId, int tick);
         void CatchFishingRodWithEnemy(ushort casterId, ushort enemyPlayerId, int tick);
         void HitFishingRodWithWall(ushort casterId, ushort projectileId, int tick);
+        void HitSoulGhostWithWall(ushort casterId, ushort ghostId, int tick);
         void StopTalentIfActive(TalentType talentType, ushort playerId, int tick);
         void TryHeadbuttHitEnemy(ushort potentialCasterId, ushort potentialEnemyId, int tick);
     }
