@@ -180,6 +180,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _worldCameraController.SetisDampingEnabled(true);
             }
 
+            SetTeamsData();
             CreatePlayers();
             CreateBullets();
             CreateWalls(mapSizeMultiplier);
@@ -200,6 +201,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateFrigidBlocks();
             CreateChickenEggs();
             CreateGalacticPullStars();
+        }
+
+        private void SetTeamsData()
+        {
+            foreach (var player in _simulationState.Players.AsSpan())
+            {
+                var playerTeamId = player.TeamId;
+                _matchDataService.AddTeamIdIdDoesntExist(playerTeamId);
+                var teamGems = _simulationState.GemsPerTeamId[playerTeamId];
+                var teamBolts = _simulationState.BoltsPerTeam[playerTeamId];
+                _matchDataService.SetTeamBolts(playerTeamId, teamBolts);
+                _matchDataService.SetTeamGems(playerTeamId, teamGems);
+            }
         }
 
         private void CreateFieldBarriers(float mapSizeMultiplier)
@@ -229,10 +243,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             foreach (ushort teamId in _matchDataService.TeamIds)
             {
-                var teamGems = _simulationState.GemsPerTeamId[teamId];
-                var teamBolts = _simulationState.BoltsPerTeam[teamId];
-                _matchDataService.SetTeamBolts(teamId, teamBolts);
-                _matchDataService.SetTeamGems(teamId, teamGems);
+                var teamGems = _matchDataService.GemsPerTeam[teamId];
+                var teamBolts = _matchDataService.BoltsPerTeam[teamId];
                 _teamsBoardUIController.CreateTeamBoard(teamId, teamGems, teamBolts);
             }
         }

@@ -34,6 +34,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchFishingRodTipModel> FishingRodTips { get; }
         List<MatchSoulGhostModel> SoulGhosts { get; }
         List<MatchFrigidBlockModel> FrigidBlocks { get; }
+        Dictionary<ushort, int> BoltsPerTeam  {get; }
+        Dictionary<ushort, int> GemsPerTeam  {get; }
+        void AddTeamIdIdDoesntExist(ushort teamId);
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);

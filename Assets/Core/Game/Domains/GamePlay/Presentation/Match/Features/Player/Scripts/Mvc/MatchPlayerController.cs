@@ -234,6 +234,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                     _playerView.InterpolateWaterGunRotation(aimDirection, decay);
                 }
             }
+
+            UpdateLeaderFlagAccordingToDirection(playerTransformState.Direction);
         }
 
         private void UpdateAim(PlayerAssistArrowType arrowType, Vector2 aimDirection, float decay)
@@ -361,7 +363,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetTransform(Vector2 position, Vector2 direction)
         {
             _playerView.Base.SetPositionAndRotation(position.ToUnityVector2(), direction.ToUnityVector2().ToQuaternion());
+            UpdateLeaderFlagAccordingToDirection(direction);
+        }
 
+        private void UpdateLeaderFlagAccordingToDirection(Vector2 direction)
+        {
             if (_isFlagActive)
             {
                 var isDirectionRight = direction.ToUnityVector2().x > 0;
@@ -494,6 +500,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetIsLeader(bool isLeader)
         {
+            LogService.LogError("SetIsLeader: " + isLeader);
             _isFlagActive = isLeader;
             _playerView.SetIsLeader(isLeader);
         }

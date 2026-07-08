@@ -171,10 +171,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             var playerTeamId = playerState.TeamId;
             var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, playerState.Spaceship);
             Players.Add(newPlayer);
-            TeamIds.Add(playerTeamId);
-            BoltsPerTeam.TryAdd(playerTeamId, 0);
-            GemsPerTeam.TryAdd(playerTeamId, 0);
             return newPlayer;
+        }
+
+        public void AddTeamIdIdDoesntExist(ushort teamId)
+        {
+            TeamIds.Add(teamId);
+            BoltsPerTeam.TryAdd(teamId, 0);
+            GemsPerTeam.TryAdd(teamId, 0);
         }
 
         public MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle)

@@ -1390,15 +1390,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3094723818759940492}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -4}
-  m_LocalScale: {x: 1.4154, y: 1.4154, z: 1.4154}
+  m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: -0.69, z: -6.3492064}
+  m_LocalScale: {x: 1.4041663, y: 1.4041663, z: 2.2466667}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 214693896468132004}
   - {fileID: 6788119806039736108}
   - {fileID: 781944127579960217}
-  m_Father: {fileID: 5159149218154844799}
+  m_Father: {fileID: 2710058749945998088}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3134305507004060623
 MonoBehaviour:
@@ -4617,9 +4617,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1541767573961622650, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3129163800657712885}
-    - targetCorrespondingSourceObject: {fileID: 1541767573961622650, guid: 62780855e77504170a719c539f4d7be9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3183575733559036986}
     - targetCorrespondingSourceObject: {fileID: 1218084602524261265, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       insertIndex: 0
       addedObject: {fileID: 7362873474621591369}
@@ -4671,6 +4668,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6367321170785206256, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4876948551484141553}
+    - targetCorrespondingSourceObject: {fileID: 8602332146659507469, guid: 62780855e77504170a719c539f4d7be9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3183575733559036986}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8218143705077051413, guid: 62780855e77504170a719c539f4d7be9, type: 3}
       insertIndex: 1
@@ -4762,6 +4762,11 @@ MonoBehaviour:
   _headbuttHelmet: {fileID: 6533295921666363857}
   _headbuttHelmetDashHideSeconds: 1
   _rockGameObject: {fileID: 3043897360353170082}
+--- !u!4 &2710058749945998088 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8602332146659507469, guid: 62780855e77504170a719c539f4d7be9, type: 3}
+  m_PrefabInstance: {fileID: 5980093736227984901}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3673364497760119067 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6919752368278847262, guid: 62780855e77504170a719c539f4d7be9, type: 3}
