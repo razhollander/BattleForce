@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastSwapFieldCreatedId = 0;
         private ushort _lastKOProjectileCreatedId = 0;
         private ushort _lastGrapplingHookProjectileCreatedId = 0;
+        private ushort _lastFishingRodProjectileCreatedId = 0;
         private ushort _lastFrigidBlockCreatedId = 0;
         private ushort _lastChickenEggCreatedId = 0;
         private ushort _lastGalacticForceFieldCreatedId = 0;
@@ -135,6 +136,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             grapplingHookProjectile.Velocity = velocity;
             grapplingHookProjectile.IsHookAttached = false;
             return grapplingHookProjectile;
+        }
+
+        public TalentFishingRodProjectileStateS2C AddFishingRodProjectile(ushort casterPlayerId, Vector2 position, Vector2 velocity)
+        {
+            ref var fishingRodProjectile = ref _simulationState.FishingRodProjectiles.AddAndGet();
+            var projectileId = (ushort)(++_lastFishingRodProjectileCreatedId % byte.MaxValue);
+            fishingRodProjectile.Id = projectileId;
+            fishingRodProjectile.PlayerCasterId = casterPlayerId;
+            fishingRodProjectile.StartPosition = position;
+            fishingRodProjectile.Position = position;
+            fishingRodProjectile.Velocity = velocity;
+            fishingRodProjectile.Phase = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.Flying;
+            fishingRodProjectile.CaughtEnemyId = 0;
+            return fishingRodProjectile;
         }
 
         public TalentFrigidBlockStateS2C AddFrigidBlock(ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 velocity)

@@ -200,6 +200,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             }
         }
 
+        public void CatchFishingRodWithEnemy(ushort casterId, ushort enemyPlayerId, int tick)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.CatchFishingRodEnemy(enemyPlayerId, tick);
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
+            }
+        }
+
+        public void HitFishingRodWithWall(ushort casterId, ushort projectileId, int tick)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.HitFishingRodWithWall(tick);
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
+            }
+        }
+
         public void StopTalentIfActive(TalentType talentType, ushort playerId, int tick)
         {
             _talentControllersPerPlayer[playerId].StopTalentIfActive(talentType, tick);

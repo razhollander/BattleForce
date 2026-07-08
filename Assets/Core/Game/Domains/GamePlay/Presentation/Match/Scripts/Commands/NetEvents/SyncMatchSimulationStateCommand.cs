@@ -12,6 +12,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.S
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
@@ -67,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IKOProjectilesControllers _kOProjectilesControllers;
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
+        private IFishingRodTipControllers _fishingRodTipControllers;
         private IFrigidBlocksControllers _frigidBlocksControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private IPreparationPhaseCountdownController _preparationPhaseCountdownController;
@@ -113,6 +115,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
+            _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
             _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
@@ -152,6 +155,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _swapFieldControllers.DestroyAll();
             _kOProjectilesControllers.DestroyAll();
             _grapplingHookProjectilesControllers.DestroyAll();
+            _fishingRodTipControllers.DestroyAll();
             _frigidBlocksControllers.DestroyAll();
             _chickenEggsControllers.DestroyAll();
             _galacticPullStarEffectControllers.DestroyAll();
@@ -187,6 +191,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateSwapField();
             CreateKOPRojectiles();
             CreateGrapplingHookPRojectiles();
+            CreateFishingRodTips();
             CreateFrigidBlocks();
             CreateChickenEggs();
             CreateGalacticPullStars();
@@ -604,6 +609,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                 _matchDataService.AddGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position);
                 _grapplingHookProjectilesControllers.CreateGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, grapplingHookProjectile.IsHookAttached);
+            }
+        }
+
+        private void CreateFishingRodTips()
+        {
+            foreach (var fishingRodTip in _simulationState.FishingRodProjectiles.AsSpan())
+            {
+                var casterId = fishingRodTip.PlayerCasterId;
+                var casterState = _simulationState.GetPlayerById(casterId);
+                var position = fishingRodTip.Position;
+                var casterPosition = casterState.Spaceship.Transform.Position.ToUnityVector2();
+                var rotation = fishingRodTip.Position - casterPosition.ToNumericsVector2();
+
+                _matchDataService.AddFishingRodTip(fishingRodTip.Id, casterId, position);
+                _fishingRodTipControllers.CreateFishingRodTip(fishingRodTip.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition);
             }
         }
     }

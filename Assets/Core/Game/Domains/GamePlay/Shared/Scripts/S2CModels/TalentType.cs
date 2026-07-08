@@ -16,5 +16,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         Headbutt = 12,
         Rock = 13,
         FrigidBlock = 14,
+        FishingRod = 15,
     }
 }

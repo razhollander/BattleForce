@@ -21,6 +21,7 @@ public class SharedGamePlayConfig : ScriptableObject
     public UnityEngine.Vector2 FrigidBlockSize = new UnityEngine.Vector2(6f, 1.5f);
     public float GrapplingHookProjectileSize = 1f;
     public float GrapplingHookProjectileMaxDistance = 30f;
+    public float FishingRodTipSize = 0.5f;
     public float MagneticPullFieldRadius = 10f;
     public float LockOnTargetDurationInSeconds = 1.5f;
     public float HeadbuttMaxChargeDurationSeconds = 2f;

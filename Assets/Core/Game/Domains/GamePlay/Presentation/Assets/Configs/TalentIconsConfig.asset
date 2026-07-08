@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TalentIconsConfig
   m_EditorClassIdentifier: 
   TalentSprites:
-    m_keys: 010000000700000005000000040000000600000008000000090000000a000000020000000b0000000c0000000e000000
+    m_keys: 010000000700000005000000040000000600000008000000090000000a000000020000000b0000000c0000000e0000000f000000
     m_values:
     - {fileID: 21300000, guid: 2746287099e6d4f679296cffec516a5d, type: 3}
     - {fileID: 21300000, guid: 9dbf864e054e04c35bc89dc71c950ddc, type: 3}
@@ -27,3 +27,4 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 19ab348ee15bd4894b5b7bfe0545647c, type: 3}
     - {fileID: 21300000, guid: 19ab348ee15bd4894b5b7bfe0545647c, type: 3}
     - {fileID: 21300000, guid: 19ab348ee15bd4894b5b7bfe0545647c, type: 3}
+    - {fileID: 21300000, guid: 5984111fe6e5f4a7298a9db3fc5e5caa, type: 3}

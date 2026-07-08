@@ -4,5 +4,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Enums
     {
         Hidden = 0,
         AimArrow = 1,
+        SecondCastAimArrow = 2,
     }
 }

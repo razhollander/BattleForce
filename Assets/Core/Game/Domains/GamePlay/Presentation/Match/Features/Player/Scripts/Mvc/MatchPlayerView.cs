@@ -21,10 +21,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private PlayerView _playerView;
         [SerializeField] private SimpleHealthBar _healthBar; 
         [SerializeField] private GameObject _healthBarGameObject; 
-        [SerializeField] private GameObject _aimArrowTransform; 
-        [SerializeField] private GameObject _moveAssistArrowTransform; 
-        [SerializeField] private SpriteRenderer _moveAssistArrowSpriteRenderer; 
-        [SerializeField] private Transform _assistArrowParentTransform; 
+        [SerializeField] private GameObject _aimArrowTransform;
+        [SerializeField] private GameObject _moveAssistArrowTransform;
+        [SerializeField] private SpriteRenderer _moveAssistArrowSpriteRenderer;
+        [SerializeField] private Transform _assistArrowParentTransform;
+        [SerializeField] private GameObject _secondCastAimArrowTransform;
+        [SerializeField] private Transform _secondCastAimArrowParentTransform;
         [SerializeField] private SpriteAnimator _sentryGunAnimator;
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
@@ -312,24 +314,56 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _aimArrowTransform.TrySetActive(false);
             _moveAssistArrowTransform.TrySetActive(true);
+            HideSecondCastAimArrow();
         }
 
         public void ShowAimAssistArrow()
         {
             _aimArrowTransform.TrySetActive(true);
             _moveAssistArrowTransform.TrySetActive(false);
+            HideSecondCastAimArrow();
         }
 
         public void HideAssistArrow()
         {
             _aimArrowTransform.TrySetActive(false);
             _moveAssistArrowTransform.TrySetActive(false);
+            HideSecondCastAimArrow();
+        }
+
+        public void ShowSecondCastAimArrow()
+        {
+            _aimArrowTransform.TrySetActive(false);
+            _moveAssistArrowTransform.TrySetActive(false);
+            _secondCastAimArrowTransform.TrySetActive(true);
+        }
+
+        public void HideSecondCastAimArrow()
+        {
+            _secondCastAimArrowTransform.TrySetActive(false);
+        }
+
+        public void InterpolateSecondCastAimRotation(System.Numerics.Vector2 direction, float decay)
+        {
+            if (direction.LengthSquared().IsAlmostEqual(0))
+            {
+                return;
+            }
+
+            var targetRotation = direction.ToQuaternion();
+            _secondCastAimArrowParentTransform.rotation = MathUtils.ExpDecay(
+                _secondCastAimArrowParentTransform.rotation,
+                targetRotation,
+                decay,
+                Time.deltaTime
+            );
         }
 
         public void OnSpawned()
         {
             SetIsHealthBarShown(true);
             _sonicSnapEffectView.Hide();
+            HideSecondCastAimArrow();
             Base.OnSpawned();
         }
 

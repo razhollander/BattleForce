@@ -454,6 +454,75 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessCreateFishingRodProjectileEvents(CapacityList<CreateFishingRodProjectileNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                var tipState = netEvent.FishingRodProjectile;
+                SetPlayerTalentActive(tipState.PlayerCasterId, TalentType.FishingRod);
+                _matchDataService.AddFishingRodTip(tipState.Id, tipState.PlayerCasterId, tipState.Position);
+                _cachedPresentationEventsService.CreateFishingRodProjectileNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessFishingRodCaughtEnemyEvents(CapacityList<FishingRodCaughtEnemyNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                _cachedPresentationEventsService.FishingRodCaughtEnemyNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessFishingRodTipHitWallEvents(CapacityList<FishingRodTipHitWallNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                _cachedPresentationEventsService.FishingRodTipHitWallNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessFishingRodThrowEvents(CapacityList<FishingRodThrowNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                _cachedPresentationEventsService.FishingRodThrowNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateFishingRodTalentEvents(CapacityList<DeactivateFishingRodTalentNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.FishingRod, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateFishingRodTalentNetEvents.Add(netEvent);
+            }
+        }
+
         public void ProcessShootFrigidBlockEvents(CapacityList<ShootFrigidBlockNetEventS2C> events)
         {
             if (events.IsNullOrEmpty())

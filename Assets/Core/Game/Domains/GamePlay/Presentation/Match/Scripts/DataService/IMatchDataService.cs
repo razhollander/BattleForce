@@ -31,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public StageType StageType { get; set; }
         List<MatchKOProjectileModel> KOProjectiles { get; }
         List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
+        List<MatchFishingRodTipModel> FishingRodTips { get; }
         List<MatchFrigidBlockModel> FrigidBlocks { get; }
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
@@ -68,6 +69,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchGrapplingHookProjectileModel AddGrapplingHookProjectile(ushort id, ushort casterPlayerId, Vector2 position);
         MatchGrapplingHookProjectileModel GetGrapplingHookProjectile(ushort id);
         void RemoveGrapplingHookProjectile(ushort id);
+        MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position);
+        MatchFishingRodTipModel GetFishingRodTip(ushort id);
+        void RemoveFishingRodTip(ushort id);
         MatchFrigidBlockModel AddFrigidBlock(ushort id, ushort casterPlayerId, Vector2 position, Vector2 rotation);
         void RemoveFrigidBlock(ushort id);
         MatchKOProjectileModel GetKOProjectile(ushort id);

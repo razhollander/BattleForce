@@ -229,6 +229,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _playerView.InterpolateAimRotation(aimDirection, decay);
 
+            var shouldShowSecondCastAimArrow = arrowType == PlayerAssistArrowType.SecondCastAimArrow;
+            if (shouldShowSecondCastAimArrow)
+            {
+                var secondCastAimDirection = _matchDataService.GetPlayer(PlayerId).Spaceship.SecondCastAimDirection;
+                _playerView.ShowSecondCastAimArrow();
+                _playerView.InterpolateSecondCastAimRotation(secondCastAimDirection, decay);
+                return;
+            }
+
             var shouldShowMoveAssistArrow = arrowType == PlayerAssistArrowType.Hidden /*&& _inputBeingUsedService.InputTypeBeingUsed == SupportedInputType.GamePad*/;
 
             if (shouldShowMoveAssistArrow)

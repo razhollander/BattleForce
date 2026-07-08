@@ -302,6 +302,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.EndPowerUpGrantingPhaseNetEvents = _netEventsDataService.EndPowerUpGrantingPhaseNetEventsPerClient[clientId];
                 _fullTickPacket.ShootFrigidBlockNetEvents = _netEventsDataService.ShootFrigidBlockNetEventsPerClient[clientId];
                 _fullTickPacket.DestroyFrigidBlockNetEvents = _netEventsDataService.DestroyFrigidBlockNetEventsPerClient[clientId];
+                _fullTickPacket.FishingRodThrowNetEvents = _netEventsDataService.FishingRodThrowNetEventsPerClient[clientId];
+                _fullTickPacket.FishingRodCaughtEnemyNetEvents = _netEventsDataService.FishingRodCaughtEnemyNetEventsPerClient[clientId];
+                _fullTickPacket.FishingRodTipHitWallNetEvents = _netEventsDataService.FishingRodTipHitWallNetEventsPerClient[clientId];
+                _fullTickPacket.CreateFishingRodProjectileNetEvents = _netEventsDataService.CreateFishingRodProjectileNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateFishingRodTalentNetEvents = _netEventsDataService.DeactivateFishingRodTalentNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

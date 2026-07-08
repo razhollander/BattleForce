@@ -15,6 +15,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Sc
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
@@ -71,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ISwapFieldControllers _swapFieldControllers;
         private IKOProjectilesControllers _koProjectilesControllers;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
+        private IFishingRodTipControllers _fishingRodTipControllers;
         private IFrigidBlocksControllers _frigidBlocksControllers;
         private IDashPulseGustEffectController _dashPulseGustEffectController;
         private IMagneticPullEffectController _magneticPullEffectController;
@@ -117,6 +119,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _swapFieldControllers = _diContainer.Resolve<ISwapFieldControllers>();
             _koProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
+            _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
             _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
             _magneticPullEffectController = _diContainer.Resolve<IMagneticPullEffectController>();
@@ -142,6 +145,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _swapFieldControllers.InitEntryPoint();
             _koProjectilesControllers.InitEntryPoint();
             _grapplingHookProjectilesControllers.InitEntryPoint();
+            _fishingRodTipControllers.InitEntryPoint();
             _frigidBlocksControllers.InitEntryPoint();
             _powerUpBallObtainedEffectController.InitEntryPoint();
             _playerControllers.InitEntryPoint();

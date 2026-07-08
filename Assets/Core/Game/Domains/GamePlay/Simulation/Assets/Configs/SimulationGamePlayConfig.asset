@@ -51,6 +51,7 @@ MonoBehaviour:
         - rid: 1717594783917015173
         - rid: 1717594787500785824
         - rid: 2200602851054190760
+        - rid: 1595758794195075078
       TalentsArrowConfigs:
         TalentCooldownConfigs:
         - TalentType: 1
@@ -105,7 +106,7 @@ MonoBehaviour:
         PlayerPullForceWhileHooked: 200
         PlayerVelocitySquaredThresholdToDeactivateHook: 0.1
         GraceTicksUntilCheckIfVelocityIsBelowThreshold: 5
-        PlayerRotateSpeedWhileHooked: 500
+        EnemyHitSpinAmount: 30
       UmbrellaTalentConfig:
         DurationInSeconds: 4
         VelocityGainPerTick: 80
@@ -146,6 +147,15 @@ MonoBehaviour:
         IdleLinearVelocityThreshold: 0.15
         IdleAngularVelocityThreshold: 0.15
         SecondsIdleUntilDestroy: 3
+      FishingRodTalentConfig:
+        TipSpeed: 45
+        ReturnSpeedMultiplier: 2
+        ArriveDistance: 2
+        TipMaxLifetimeSeconds: 1.5
+        ThrowWindowSeconds: 3
+        ThrowPushForce: 250
+        ThrowMinSpin: 20
+        ThrowMaxSpin: 35
       TalentCardWidth: 1.602175
       TalentCardHeight: 2.382844
     Lava:
@@ -194,6 +204,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 1595758794195075078
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 15
+        CooldownInSeconds: 1
     - rid: 1717594783917015173
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:

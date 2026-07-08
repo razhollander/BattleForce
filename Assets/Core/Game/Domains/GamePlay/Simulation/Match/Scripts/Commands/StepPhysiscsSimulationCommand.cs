@@ -148,6 +148,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 grapplingHookProjectileId.Position = _physicsSimulator.GetGrapplingHookProjectile(grapplingHookProjectileId.Id).Position;
             }
 
+            for (int i = 0; i < _matchDataService.SimulationState.FishingRodProjectiles.Count; i++)
+            {
+                ref var fishingRodProjectile = ref _matchDataService.SimulationState.FishingRodProjectiles.GetByIndex(i);
+                // The tip only has a physics body while flying; caught/returning tips are moved by the controller.
+                if (fishingRodProjectile.Phase == Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.Flying)
+                {
+                    fishingRodProjectile.Position = _physicsSimulator.GetFishingRodTip(fishingRodProjectile.Id).Position;
+                }
+            }
+
             for (int i = 0; i < _matchDataService.SimulationState.FrigidBlocks.Count; i++)
             {
                 ref var frigidBlock = ref _matchDataService.SimulationState.FrigidBlocks.GetByIndex(i);

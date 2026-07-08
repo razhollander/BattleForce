@@ -65,6 +65,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<CreateGrapplingHookProjectileNetEventS2C> _cachedUnprocessedCreateGrapplingHookProjectileEvents;
         private readonly CapacityList<GrapplingHookHitWallNetEventS2C> _cachedUnprocessedGrapplingHookHitWallEvents;
         private readonly CapacityList<DeactivateGrapplingHookTalentNetEventS2C> _cachedUnprocessedDeactivateGrapplingHookTalentEvents;
+        private readonly CapacityList<CreateFishingRodProjectileNetEventS2C> _cachedUnprocessedCreateFishingRodProjectileEvents;
+        private readonly CapacityList<FishingRodCaughtEnemyNetEventS2C> _cachedUnprocessedFishingRodCaughtEnemyEvents;
+        private readonly CapacityList<FishingRodTipHitWallNetEventS2C> _cachedUnprocessedFishingRodTipHitWallEvents;
+        private readonly CapacityList<FishingRodThrowNetEventS2C> _cachedUnprocessedFishingRodThrowEvents;
+        private readonly CapacityList<DeactivateFishingRodTalentNetEventS2C> _cachedUnprocessedDeactivateFishingRodTalentEvents;
         private readonly CapacityList<ShootFrigidBlockNetEventS2C> _cachedUnprocessedShootFrigidBlockEvents;
         private readonly CapacityList<DestroyFrigidBlockNetEventS2C> _cachedUnprocessedDestroyFrigidBlockEvents;
         private readonly CapacityList<ActivateSentryGunTalentNetEventS2C> _cachedUnprocessedActivateSentryGunTalentEvents;
@@ -150,6 +155,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedCreateGrapplingHookProjectileEvents = new CapacityList<CreateGrapplingHookProjectileNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookShotNetEvents);
             _cachedUnprocessedGrapplingHookHitWallEvents = new CapacityList<GrapplingHookHitWallNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookHitNetEvents);
             _cachedUnprocessedDeactivateGrapplingHookTalentEvents = new CapacityList<DeactivateGrapplingHookTalentNetEventS2C>(networkConfig.MaxCap.PlayerGrapplingHookDeactivatedNetEvents);
+            _cachedUnprocessedCreateFishingRodProjectileEvents = new CapacityList<CreateFishingRodProjectileNetEventS2C>(networkConfig.MaxCap.CreateFishingRodProjectileNetEvents);
+            _cachedUnprocessedFishingRodCaughtEnemyEvents = new CapacityList<FishingRodCaughtEnemyNetEventS2C>(networkConfig.MaxCap.FishingRodCaughtEnemyNetEvents);
+            _cachedUnprocessedFishingRodTipHitWallEvents = new CapacityList<FishingRodTipHitWallNetEventS2C>(networkConfig.MaxCap.FishingRodTipHitWallNetEvents);
+            _cachedUnprocessedFishingRodThrowEvents = new CapacityList<FishingRodThrowNetEventS2C>(networkConfig.MaxCap.FishingRodThrowNetEvents);
+            _cachedUnprocessedDeactivateFishingRodTalentEvents = new CapacityList<DeactivateFishingRodTalentNetEventS2C>(networkConfig.MaxCap.DeactivateFishingRodTalentNetEvents);
             _cachedUnprocessedShootFrigidBlockEvents = new CapacityList<ShootFrigidBlockNetEventS2C>(networkConfig.MaxCap.ShootFrigidBlockNetEvents);
             _cachedUnprocessedDestroyFrigidBlockEvents = new CapacityList<DestroyFrigidBlockNetEventS2C>(networkConfig.MaxCap.DestroyFrigidBlockNetEvents);
             _cachedUnprocessedActivateSentryGunTalentEvents = new CapacityList<ActivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateSentryGunTalentNetEvents);
@@ -292,6 +302,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessEndPowerUpGrantingPhaseNetEvents(latestFullTickPacket.EndPowerUpGrantingPhaseNetEvents, ignoreEventsNotAboveTick);
             ProcessShootFrigidBlockEvents(latestFullTickPacket.ShootFrigidBlockNetEvents, ignoreEventsNotAboveTick);
             ProcessDestroyFrigidBlockEvents(latestFullTickPacket.DestroyFrigidBlockNetEvents, ignoreEventsNotAboveTick);
+            ProcessCreateFishingRodProjectileEvents(latestFullTickPacket.CreateFishingRodProjectileNetEvents, ignoreEventsNotAboveTick);
+            ProcessFishingRodCaughtEnemyEvents(latestFullTickPacket.FishingRodCaughtEnemyNetEvents, ignoreEventsNotAboveTick);
+            ProcessFishingRodTipHitWallEvents(latestFullTickPacket.FishingRodTipHitWallNetEvents, ignoreEventsNotAboveTick);
+            ProcessFishingRodThrowEvents(latestFullTickPacket.FishingRodThrowNetEvents, ignoreEventsNotAboveTick);
+            ProcessDeactivateFishingRodTalentEvents(latestFullTickPacket.DeactivateFishingRodTalentNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -299,6 +314,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdateRotatingWheels(latestTickReceivedFromServer);
             UpdateKOProjectilesTransform(simulationState);
             UpdateGrapplingHookProjectilesTransform(simulationState);
+            UpdateFishingRodTipsTransform(simulationState);
             UpdateFrigidBlocksTransform(simulationState);
         }
 
@@ -563,6 +579,96 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedDeactivateGrapplingHookTalentEvents.Sort();
                 _presentationNetEventsHandler.ProcessDeactivateGrapplingHookTalentEvents(_cachedUnprocessedDeactivateGrapplingHookTalentEvents);
+            }
+        }
+
+        private void ProcessCreateFishingRodProjectileEvents(FixedUnorderedList<CreateFishingRodProjectileNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedCreateFishingRodProjectileEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedCreateFishingRodProjectileEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedCreateFishingRodProjectileEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedCreateFishingRodProjectileEvents.Sort();
+                _presentationNetEventsHandler.ProcessCreateFishingRodProjectileEvents(_cachedUnprocessedCreateFishingRodProjectileEvents);
+            }
+        }
+
+        private void ProcessFishingRodCaughtEnemyEvents(FixedUnorderedList<FishingRodCaughtEnemyNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedFishingRodCaughtEnemyEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedFishingRodCaughtEnemyEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedFishingRodCaughtEnemyEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedFishingRodCaughtEnemyEvents.Sort();
+                _presentationNetEventsHandler.ProcessFishingRodCaughtEnemyEvents(_cachedUnprocessedFishingRodCaughtEnemyEvents);
+            }
+        }
+
+        private void ProcessFishingRodTipHitWallEvents(FixedUnorderedList<FishingRodTipHitWallNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedFishingRodTipHitWallEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedFishingRodTipHitWallEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedFishingRodTipHitWallEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedFishingRodTipHitWallEvents.Sort();
+                _presentationNetEventsHandler.ProcessFishingRodTipHitWallEvents(_cachedUnprocessedFishingRodTipHitWallEvents);
+            }
+        }
+
+        private void ProcessFishingRodThrowEvents(FixedUnorderedList<FishingRodThrowNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedFishingRodThrowEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedFishingRodThrowEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedFishingRodThrowEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedFishingRodThrowEvents.Sort();
+                _presentationNetEventsHandler.ProcessFishingRodThrowEvents(_cachedUnprocessedFishingRodThrowEvents);
+            }
+        }
+
+        private void ProcessDeactivateFishingRodTalentEvents(FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedDeactivateFishingRodTalentEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedDeactivateFishingRodTalentEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedDeactivateFishingRodTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDeactivateFishingRodTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateFishingRodTalentEvents(_cachedUnprocessedDeactivateFishingRodTalentEvents);
             }
         }
 
@@ -1298,6 +1404,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 playerModel.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
                 playerModel.Spaceship.TalentsState.AimDirection = playerState.Spaceship.TalentsState.AimDirection;
                 playerModel.Spaceship.AssistArrowType = playerState.Spaceship.AssistArrowType;
+                playerModel.Spaceship.SecondCastAimDirection = playerState.Spaceship.SecondCastAimDirection;
             }
         }
 
@@ -1316,6 +1423,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 if (simulationState.TryGetGrapplingHookProjectileById(hook.Id, out var state))
                 {
                     hook.Position = state.Position.ToUnityVector2();
+                }
+            }
+        }
+
+        private void UpdateFishingRodTipsTransform(MatchSimulationStateS2C simulationState)
+        {
+            foreach (var tip in _matchDataService.FishingRodTips)
+            {
+                if (simulationState.TryGetFishingRodProjectileById(tip.Id, out var state))
+                {
+                    tip.Position = state.Position.ToUnityVector2();
                 }
             }
         }

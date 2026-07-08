@@ -21,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.KOProjectile)
                                     | GetCollisionMask(PhysicsCollisionType.ChickenEgg)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
+                                    | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerBullet);
                     break;
                 case PhysicsBodyType.PlayerHeart:
@@ -41,7 +42,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.PowerUpBall)
                                     | GetCollisionMask(PhysicsCollisionType.KOProjectile)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
-                                    | GetCollisionMask(PhysicsCollisionType.GrapplingHookProjectile);
+                                    | GetCollisionMask(PhysicsCollisionType.GrapplingHookProjectile)
+                                    | GetCollisionMask(PhysicsCollisionType.FishingRodTip);
                     break;
                 case PhysicsBodyType.FrigidBlock:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
@@ -49,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.PowerUpBall)
                                     | GetCollisionMask(PhysicsCollisionType.KOProjectile)
                                     | GetCollisionMask(PhysicsCollisionType.GrapplingHookProjectile)
+                                    | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
                                     | GetCollisionMask(PhysicsCollisionType.Wall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock);
                     break;
@@ -92,6 +95,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 case PhysicsBodyType.GrapplingHookProjectile:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock);
+                    break;
+                case PhysicsBodyType.FishingRodTip:
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
+                                    | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.ChickenEgg:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)

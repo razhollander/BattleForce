@@ -25,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly WaterGunTalentController _waterGunTalentController;
         private readonly HeadbuttTalentController _headbuttTalentController;
         private readonly FrigidBlockTalentController _frigidBlockTalentController;
+        private readonly FishingRodTalentController _fishingRodTalentController;
 
         private ushort _casterPlayerId;
         private bool _isInitialized = false;
@@ -43,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _waterGunTalentController = new WaterGunTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
             _headbuttTalentController = new HeadbuttTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
             _frigidBlockTalentController = new FrigidBlockTalentController(matchDataService, gamePlayConfigService, networkConfig, sharedGamePlayConfig, commandFactory);
+            _fishingRodTalentController = new FishingRodTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
         }
 
         public void InitEntryPoint()
@@ -59,6 +61,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _waterGunTalentController.InitEntryPoint();
             _headbuttTalentController.InitEntryPoint();
             _frigidBlockTalentController.InitEntryPoint();
+            _fishingRodTalentController.InitEntryPoint();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -76,6 +79,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _waterGunTalentController.SetCasterId(casterPlayerId);
             _headbuttTalentController.SetCasterId(casterPlayerId);
             _frigidBlockTalentController.SetCasterId(casterPlayerId);
+            _fishingRodTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)
@@ -94,6 +98,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.WaterGun: return _waterGunTalentController;
                 case TalentType.Headbutt: return _headbuttTalentController;
                 case TalentType.FrigidBlock: return _frigidBlockTalentController;
+                case TalentType.FishingRod: return _fishingRodTalentController;
                 default: return default;
             }
         }
@@ -117,6 +122,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _waterGunTalentController?.OnTick(tick, deltaTime);
             _headbuttTalentController?.OnTick(tick, deltaTime);
             _frigidBlockTalentController?.OnTick(tick, deltaTime);
+            _fishingRodTalentController?.OnTick(tick, deltaTime);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)
@@ -144,6 +150,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _grapplingHookTalentController.HitWall(wallId, tick);
         }
 
+        public void CatchFishingRodEnemy(ushort enemyPlayerId, int tick)
+        {
+            _fishingRodTalentController.CatchEnemy(enemyPlayerId, tick);
+        }
+
+        public void HitFishingRodWithWall(int tick)
+        {
+            _fishingRodTalentController.HitWall(tick);
+        }
+
         public void TryHeadbuttHitEnemy(ushort potentialCasterId, ushort potentialEnemyId, int tick)
         {
             if (potentialCasterId != _casterPlayerId) return;
@@ -164,6 +180,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _waterGunTalentController.ResetData();
             _headbuttTalentController.ResetData();
             _frigidBlockTalentController.ResetData();
+            _fishingRodTalentController.ResetData();
         }
     }
 }

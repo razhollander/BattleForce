@@ -28,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public ushort CurrentStageWinnerTeamId { get; set; }
         public List<MatchKOProjectileModel> KOProjectiles { get; private set; }
         public List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; private set; }
+        public List<MatchFishingRodTipModel> FishingRodTips { get; private set; }
         public List<MatchFrigidBlockModel> FrigidBlocks { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
@@ -60,6 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             SwapFields = new List<MatchSwapFieldModel>(networkConfig.MaxCap.ConcurrentPlayers);
             KOProjectiles = new List<MatchKOProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
             GrapplingHookProjectiles = new List<MatchGrapplingHookProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
+            FishingRodTips = new List<MatchFishingRodTipModel>(networkConfig.MaxCap.ConcurrentPlayers);
             FrigidBlocks = new List<MatchFrigidBlockModel>(networkConfig.MaxCap.ConcurrentFrigidBlocks);
             ChickenEggs = new List<MatchChickenEggModel>(networkConfig.MaxCap.ConcurrentChickenEggs);
         }
@@ -245,6 +247,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             SwapFields.Clear();
             KOProjectiles.Clear();
             GrapplingHookProjectiles.Clear();
+            FishingRodTips.Clear();
             FrigidBlocks.Clear();
             ChickenEggs.Clear();
         }
@@ -343,6 +346,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 if (GrapplingHookProjectiles[i].Id == id)
                 {
                     GrapplingHookProjectiles.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        public MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position)
+        {
+            var model = new MatchFishingRodTipModel(id, casterPlayerId, position.ToUnityVector2());
+            FishingRodTips.Add(model);
+            return model;
+        }
+
+        public MatchFishingRodTipModel GetFishingRodTip(ushort id)
+        {
+            var model = FishingRodTips.Find(x => x.Id == id);
+            if (model == null)
+            {
+                LogService.LogError($"Couldn't find fishing rod tip with id {id}");
+            }
+            return model;
+        }
+
+        public void RemoveFishingRodTip(ushort id)
+        {
+            for (int i = 0; i < FishingRodTips.Count; i++)
+            {
+                if (FishingRodTips[i].Id == id)
+                {
+                    FishingRodTips.RemoveAt(i);
                     return;
                 }
             }

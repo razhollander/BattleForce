@@ -77,6 +77,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C> EndPowerUpGrantingPhaseNetEvents;
         public FixedUnorderedList<ShootFrigidBlockNetEventS2C> ShootFrigidBlockNetEvents;
         public FixedUnorderedList<DestroyFrigidBlockNetEventS2C> DestroyFrigidBlockNetEvents;
+        public FixedUnorderedList<CreateFishingRodProjectileNetEventS2C> CreateFishingRodProjectileNetEvents;
+        public FixedUnorderedList<FishingRodCaughtEnemyNetEventS2C> FishingRodCaughtEnemyNetEvents;
+        public FixedUnorderedList<FishingRodTipHitWallNetEventS2C> FishingRodTipHitWallNetEvents;
+        public FixedUnorderedList<FishingRodThrowNetEventS2C> FishingRodThrowNetEvents;
+        public FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C> DeactivateFishingRodTalentNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -158,6 +163,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             EndPowerUpGrantingPhaseNetEvents = new FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>(maxCap.EndPowerUpGrantingPhaseNetEvents);
             ShootFrigidBlockNetEvents = new FixedUnorderedList<ShootFrigidBlockNetEventS2C>(maxCap.ShootFrigidBlockNetEvents);
             DestroyFrigidBlockNetEvents = new FixedUnorderedList<DestroyFrigidBlockNetEventS2C>(maxCap.DestroyFrigidBlockNetEvents);
+            CreateFishingRodProjectileNetEvents = new FixedUnorderedList<CreateFishingRodProjectileNetEventS2C>(maxCap.CreateFishingRodProjectileNetEvents);
+            FishingRodCaughtEnemyNetEvents = new FixedUnorderedList<FishingRodCaughtEnemyNetEventS2C>(maxCap.FishingRodCaughtEnemyNetEvents);
+            FishingRodTipHitWallNetEvents = new FixedUnorderedList<FishingRodTipHitWallNetEventS2C>(maxCap.FishingRodTipHitWallNetEvents);
+            FishingRodThrowNetEvents = new FixedUnorderedList<FishingRodThrowNetEventS2C>(maxCap.FishingRodThrowNetEvents);
+            DeactivateFishingRodTalentNetEvents = new FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>(maxCap.DeactivateFishingRodTalentNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -227,6 +237,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 56)) != 0) SerializedDeactivateHeadbuttTalentNetEvents(writer);
             if ((eventMask & (1UL << 57)) != 0) SerializedShootFrigidBlockNetEvents(writer);
             if ((eventMask & (1UL << 58)) != 0) SerializedDestroyFrigidBlockNetEvents(writer);
+            if ((eventMask & (1UL << 59)) != 0) SerializedCreateFishingRodProjectileNetEvents(writer);
+            if ((eventMask & (1UL << 60)) != 0) SerializedFishingRodCaughtEnemyNetEvents(writer);
+            if ((eventMask & (1UL << 61)) != 0) SerializedFishingRodTipHitWallNetEvents(writer);
+            if ((eventMask & (1UL << 62)) != 0) SerializedFishingRodThrowNetEvents(writer);
+            if ((eventMask & (1UL << 63)) != 0) SerializedDeactivateFishingRodTalentNetEvents(writer);
         }
 
         private ulong CalculateEventMask()
@@ -291,6 +306,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (DeactivateHeadbuttTalentNetEvents.Count > 0) eventMask |= 1UL << 56;
             if (ShootFrigidBlockNetEvents.Count > 0) eventMask |= 1UL << 57;
             if (DestroyFrigidBlockNetEvents.Count > 0) eventMask |= 1UL << 58;
+            if (CreateFishingRodProjectileNetEvents.Count > 0) eventMask |= 1UL << 59;
+            if (FishingRodCaughtEnemyNetEvents.Count > 0) eventMask |= 1UL << 60;
+            if (FishingRodTipHitWallNetEvents.Count > 0) eventMask |= 1UL << 61;
+            if (FishingRodThrowNetEvents.Count > 0) eventMask |= 1UL << 62;
+            if (DeactivateFishingRodTalentNetEvents.Count > 0) eventMask |= 1UL << 63;
             return eventMask;
         }
 
@@ -490,6 +510,21 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask & (1UL << 58)) != 0) DeserializedDestroyFrigidBlockNetEvents(reader);
             else DestroyFrigidBlockNetEvents.Clear();
+
+            if ((eventMask & (1UL << 59)) != 0) DeserializedCreateFishingRodProjectileNetEvents(reader);
+            else CreateFishingRodProjectileNetEvents.Clear();
+
+            if ((eventMask & (1UL << 60)) != 0) DeserializedFishingRodCaughtEnemyNetEvents(reader);
+            else FishingRodCaughtEnemyNetEvents.Clear();
+
+            if ((eventMask & (1UL << 61)) != 0) DeserializedFishingRodTipHitWallNetEvents(reader);
+            else FishingRodTipHitWallNetEvents.Clear();
+
+            if ((eventMask & (1UL << 62)) != 0) DeserializedFishingRodThrowNetEvents(reader);
+            else FishingRodThrowNetEvents.Clear();
+
+            if ((eventMask & (1UL << 63)) != 0) DeserializedDeactivateFishingRodTalentNetEvents(reader);
+            else DeactivateFishingRodTalentNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1652,6 +1687,96 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref DestroyFrigidBlockNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedCreateFishingRodProjectileNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)CreateFishingRodProjectileNetEvents.Count);
+            foreach (var netEvent in CreateFishingRodProjectileNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedCreateFishingRodProjectileNetEvents(NetDataReader reader)
+        {
+            CreateFishingRodProjectileNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref CreateFishingRodProjectileNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedFishingRodCaughtEnemyNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)FishingRodCaughtEnemyNetEvents.Count);
+            foreach (var netEvent in FishingRodCaughtEnemyNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedFishingRodCaughtEnemyNetEvents(NetDataReader reader)
+        {
+            FishingRodCaughtEnemyNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref FishingRodCaughtEnemyNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedFishingRodTipHitWallNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)FishingRodTipHitWallNetEvents.Count);
+            foreach (var netEvent in FishingRodTipHitWallNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedFishingRodTipHitWallNetEvents(NetDataReader reader)
+        {
+            FishingRodTipHitWallNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref FishingRodTipHitWallNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedFishingRodThrowNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)FishingRodThrowNetEvents.Count);
+            foreach (var netEvent in FishingRodThrowNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedFishingRodThrowNetEvents(NetDataReader reader)
+        {
+            FishingRodThrowNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref FishingRodThrowNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateFishingRodTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateFishingRodTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateFishingRodTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateFishingRodTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateFishingRodTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateFishingRodTalentNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

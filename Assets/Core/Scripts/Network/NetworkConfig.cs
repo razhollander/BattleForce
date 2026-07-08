@@ -127,6 +127,11 @@ namespace Core.Scripts.Network
         public int EndPowerUpGrantingPhaseNetEvents = 64;
         public int ShootFrigidBlockNetEvents = 128;
         public int DestroyFrigidBlockNetEvents = 128;
+        public int CreateFishingRodProjectileNetEvents = 128;
+        public int FishingRodCaughtEnemyNetEvents = 128;
+        public int FishingRodTipHitWallNetEvents = 128;
+        public int FishingRodThrowNetEvents = 128;
+        public int DeactivateFishingRodTalentNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel

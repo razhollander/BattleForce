@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentSwapFieldS2C> SwapFields;
         public FixedUnorderedList<TalentKOProjectileS2C> KOProjectiles;
         public FixedUnorderedList<TalentGrapplingHookProjectileStateS2C> GrapplingHookProjectiles;
+        public FixedUnorderedList<TalentFishingRodProjectileStateS2C> FishingRodProjectiles;
         public FixedUnorderedList<TalentFrigidBlockStateS2C> FrigidBlocks;
         public FixedUnorderedList<TalentChickenEggStateS2C> ChickenEggs;
         public FixedUnorderedList<GalacticForceFieldS2C> GalacticForceFields;
@@ -43,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             SwapFields = new FixedUnorderedList<TalentSwapFieldS2C>(maxPlayers);
             KOProjectiles = new FixedUnorderedList<TalentKOProjectileS2C>(maxPlayers);
             GrapplingHookProjectiles = new FixedUnorderedList<TalentGrapplingHookProjectileStateS2C>(maxPlayers);
+            FishingRodProjectiles = new FixedUnorderedList<TalentFishingRodProjectileStateS2C>(maxPlayers);
             FrigidBlocks = new FixedUnorderedList<TalentFrigidBlockStateS2C>(maxFrigidBlocks);
             ChickenEggs = new FixedUnorderedList<TalentChickenEggStateS2C>(maxChickenEggs);
             GalacticForceFields = new FixedUnorderedList<GalacticForceFieldS2C>(maxGalacticForceFields);
@@ -115,6 +117,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var grapplingHookProjectile in GrapplingHookProjectiles.AsSpan())
             {
                 grapplingHookProjectile.Serialize(writer);
+            }
+
+            var fishingRodProjectilesCount = FishingRodProjectiles.Count;
+            writer.Put((byte)fishingRodProjectilesCount);
+            foreach (var fishingRodProjectile in FishingRodProjectiles.AsSpan())
+            {
+                fishingRodProjectile.Serialize(writer);
             }
 
             var frigidBlocksCount = FrigidBlocks.Count;
@@ -227,6 +236,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var grapplingHookProjectile = ref GrapplingHookProjectiles.AddAndGet();
                 grapplingHookProjectile.Deserialize(reader);
+            }
+
+            var fishingRodProjectilesCount = reader.GetByte();
+            FishingRodProjectiles.Clear();
+            for (var i = 0; i < fishingRodProjectilesCount; i++)
+            {
+                ref var fishingRodProjectile = ref FishingRodProjectiles.AddAndGet();
+                fishingRodProjectile.Deserialize(reader);
             }
 
             var frigidBlocksCount = reader.GetByte();
@@ -513,7 +530,35 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No grappling hook projectile for id {projectileId}!");
         }
-        
+
+        public bool TryGetFishingRodProjectileById(ushort projectileId, out TalentFishingRodProjectileStateS2C projectile)
+        {
+            for (int i = 0; i < FishingRodProjectiles.Count; i++)
+            {
+                if (FishingRodProjectiles[i].Id == projectileId)
+                {
+                    projectile = FishingRodProjectiles.GetByIndex(i);
+                    return true;
+                }
+            }
+
+            projectile = default;
+            return false;
+        }
+
+        public ref TalentFishingRodProjectileStateS2C GetFishingRodProjectileById(ushort projectileId)
+        {
+            for (int i = 0; i < FishingRodProjectiles.Count; i++)
+            {
+                if (FishingRodProjectiles[i].Id == projectileId)
+                {
+                    return ref FishingRodProjectiles.GetByIndex(i);
+                }
+            }
+
+            throw new System.Exception($"No fishing rod projectile for id {projectileId}!");
+        }
+
         public bool TryGetTalentCardById(ushort cardId, out TalentCardS2C talentCard)
         {
             for (int i = 0; i < TalentCards.Count; i++)
@@ -572,6 +617,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var grapplingHookProjectile in GrapplingHookProjectiles.AsSpan())
             {
                 grapplingHookProjectile.SerializeDelta(writer);
+            }
+
+            var fishingRodProjectilesCount = FishingRodProjectiles.Count;
+            writer.Put((byte)fishingRodProjectilesCount);
+            foreach (var fishingRodProjectile in FishingRodProjectiles.AsSpan())
+            {
+                fishingRodProjectile.SerializeDelta(writer);
             }
 
             var frigidBlocksCount = FrigidBlocks.Count;
@@ -681,6 +733,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 grapplingHookProjectile.DeserializeDelta(reader);
             }
 
+            var fishingRodProjectilesCount = reader.GetByte();
+            FishingRodProjectiles.Clear();
+            for (int i = 0; i < fishingRodProjectilesCount; i++)
+            {
+                ref var fishingRodProjectile = ref FishingRodProjectiles.AddAndGet();
+                fishingRodProjectile.DeserializeDelta(reader);
+            }
+
             var frigidBlocksCount = reader.GetByte();
             FrigidBlocks.Clear();
             for (int i = 0; i < frigidBlocksCount; i++)
@@ -772,6 +832,20 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
 
             throw new System.Exception($"No grappling hook projectile for id {projectileId}!");
+        }
+
+        public void RemoveFishingRodProjectileById(ushort projectileId)
+        {
+            for (int i = 0; i < FishingRodProjectiles.Count; i++)
+            {
+                if (FishingRodProjectiles[i].Id == projectileId)
+                {
+                    FishingRodProjectiles.RemoveAt(i);
+                    return;
+                }
+            }
+
+            throw new System.Exception($"No fishing rod projectile for id {projectileId}!");
         }
 
         public bool TryGetFrigidBlockById(ushort blockId, out TalentFrigidBlockStateS2C frigidBlock)
@@ -890,6 +964,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             SwapFields.Clear();
             KOProjectiles.Clear();
             GrapplingHookProjectiles.Clear();
+            FishingRodProjectiles.Clear();
             FrigidBlocks.Clear();
             ChickenEggs.Clear();
             GalacticForceFields.Clear();

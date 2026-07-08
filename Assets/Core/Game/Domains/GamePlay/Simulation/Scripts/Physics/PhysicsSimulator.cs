@@ -90,6 +90,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     case PhysicsBodyType.SwapField: CopySwapFieldToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.KOProjectile: CopyKOProjectileToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.GrapplingHookProjectile: CopyGrapplingHookProjectileToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.FishingRodTip: CopyFishingRodTipToBody(currentBody, bodyData.Id, simulationState); break;
                 }
 
                 currentBody = currentBody.GetNext();
@@ -108,6 +109,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var grapplingHookProjectileState = simulationState.GrapplingHookProjectiles.FindWithId(grapplingHookProjectileId);
             grapplingHookProjectileBody.SetTransform(grapplingHookProjectileState.Position, 0);
             grapplingHookProjectileBody.SetLinearVelocity(grapplingHookProjectileState.Velocity);
+        }
+
+        private void CopyFishingRodTipToBody(Body fishingRodTipBody, ushort fishingRodTipId, MatchSimulationStateS2C simulationState)
+        {
+            var fishingRodTipState = simulationState.FishingRodProjectiles.FindWithId(fishingRodTipId);
+            fishingRodTipBody.SetTransform(fishingRodTipState.Position, 0);
+            fishingRodTipBody.SetLinearVelocity(fishingRodTipState.Velocity);
         }
 
         private void CopySwapFieldToBody(Body swapFieldBody, ushort swapFieldId, MatchSimulationStateS2C simulationState)
@@ -1086,6 +1094,47 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             RemoveBody(body);
         }
 
+        public void AddFishingRodTip(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.FishingRodTip);
+            bodyDef.bullet = true;
+            bodyDef.linearVelocity = velocity;
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var shape = GetCircleShape();
+            shape.Radius = radius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0.3f;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.FishingRodTip.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.FishingRodTip.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(shape);
+        }
+
+        public void UpdateFishingRodTip(ushort id, Vector2 position, Vector2 velocity)
+        {
+            var body = GetBody(PhysicsBodyType.FishingRodTip, id);
+            body.SetTransform(position, 0);
+            body.SetLinearVelocity(velocity);
+        }
+
+        public void RemoveFishingRodTip(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.FishingRodTip, id);
+            RemoveBody(body);
+        }
+
         public void AddSwapField(ushort id, ushort teamId, Vector2 position)
         {
             var bodyDef = GetBodyDef();
@@ -1218,6 +1267,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public Body GetGrapplingHookProjectile(ushort grapplingHookProjectileId)
         {
             return GetBody(PhysicsBodyType.GrapplingHookProjectile, grapplingHookProjectileId);
+        }
+
+        public Body GetFishingRodTip(ushort fishingRodTipId)
+        {
+            return GetBody(PhysicsBodyType.FishingRodTip, fishingRodTipId);
         }
         
         public Body GetChickenEgg(ushort chieckEggId)

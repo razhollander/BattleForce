@@ -104,6 +104,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandleKOProjectileWallCollision(objectA, objectB);
                 HandleGrapplingHookWallCollision(objectA, objectB);
                 HandleGrapplingHookCasterEnemyCollision(objectA, objectB);
+                HandleFishingRodTipWallCollision(objectA, objectB);
+                HandleFishingRodTipEnemyCollision(objectA, objectB);
                 HandleChickenEggPlayerCollision(objectA, objectB);
                 HandleChickenEggKOProjectileCollision(objectA, objectB);
                 HandleHeadbuttPlayerCollision(objectA, objectB);
@@ -245,6 +247,57 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _playersTalentsManager.HitGrapplingHookWithWall(projectile.PlayerCasterId, projectileId, wallId, _processedTick);
+        }
+
+        private void HandleFishingRodTipWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isTipToWall = objectA.PhysicsBodyType == PhysicsBodyType.FishingRodTip &&
+                              (objectB.PhysicsBodyType == PhysicsBodyType.Wall || objectB.PhysicsBodyType == PhysicsBodyType.FrigidBlock);
+            var isWallToTip = objectB.PhysicsBodyType == PhysicsBodyType.FishingRodTip &&
+                              (objectA.PhysicsBodyType == PhysicsBodyType.Wall || objectA.PhysicsBodyType == PhysicsBodyType.FrigidBlock);
+
+            if (!isTipToWall && !isWallToTip)
+            {
+                return;
+            }
+
+            var projectileId = isTipToWall ? objectA.Id : objectB.Id;
+
+            if (!_matchDataService.SimulationState.TryGetFishingRodProjectileById(projectileId, out var projectile))
+            {
+                return;
+            }
+
+            _playersTalentsManager.HitFishingRodWithWall(projectile.PlayerCasterId, projectileId, _processedTick);
+        }
+
+        private void HandleFishingRodTipEnemyCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isTipToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.FishingRodTip && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            var isPlayerToTip = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.FishingRodTip;
+
+            if (!isTipToPlayer && !isPlayerToTip)
+            {
+                return;
+            }
+
+            var projectileId = isTipToPlayer ? objectA.Id : objectB.Id;
+            var playerId = isTipToPlayer ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetFishingRodProjectileById(projectileId, out var projectile))
+            {
+                return;
+            }
+
+            var caster = _matchDataService.SimulationState.GetPlayerById(projectile.PlayerCasterId);
+            var hitPlayer = _matchDataService.SimulationState.GetPlayerById(playerId);
+
+            if (caster.TeamId == hitPlayer.TeamId)
+            {
+                return;
+            }
+
+            _playersTalentsManager.CatchFishingRodWithEnemy(projectile.PlayerCasterId, hitPlayer.Id, _processedTick);
         }
 
         private void HandleGrapplingHookCasterEnemyCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
