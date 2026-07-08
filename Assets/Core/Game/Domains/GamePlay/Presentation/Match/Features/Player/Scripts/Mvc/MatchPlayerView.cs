@@ -41,10 +41,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
         [SerializeField] private MatchPlayerPowerUpHudView _powerUpHudView;
         [SerializeField] private GameObject _crownGameObject;
+        [SerializeField] private LeaderFlagView _leaderFlagView;
         [SerializeField] private DeadTombstoneView _deadTombstoneView;
         [SerializeField] private ActivatePowerUpEffectView _activatePowerUpEffectView;
         [SerializeField] private GameObject _headbuttHelmet;
         [SerializeField] private float _headbuttHelmetDashHideSeconds = 1f;
+        [SerializeField] private GameObject _rockGameObject;
+
         private CancellationTokenSource _headbuttHelmetHideCancellationTokenSource;
         private bool _isHeadbuttDashing;
         public Action Despawn { get; set; }
@@ -59,7 +62,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _talentsHudView.UpdateTalentCooldown(talentIndex, maxCooldown, cooldownLeft, isOnCooldown);
         }
-
+        
+        public void SetRockState(bool isOn)
+        {
+            _rockGameObject.TrySetActive(isOn);
+        }
+        
         public void UpdateTalentStocks(int talentIndex, int stockAmount)
         {
             _talentsHudView.UpdateTalentStocks(talentIndex, stockAmount);
@@ -362,6 +370,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void OnSpawned()
         {
             SetIsHealthBarShown(true);
+            SetIsLeader(false);
             _sonicSnapEffectView.Hide();
             HideSecondCastAimArrow();
             Base.OnSpawned();
@@ -376,6 +385,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsKinged(bool isKinged)
         {
             _crownGameObject.SetActive(isKinged);
+        }
+
+        public void SetIsLeader(bool isLeader)
+        {
+            _leaderFlagView.SetIsShown(isLeader);
         }
 
         public void SetCurrentPowerUp(bool shouldShowPowerUp, Sprite powerUpIcon)
@@ -396,6 +410,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public async Awaitable EndPowerUpGrantingPhaseReel(Sprite grantedSprite, CancellationToken cancellationToken)
         {
             await _powerUpHudView.StopGrantingPhaseReelAndShowGranted(grantedSprite, cancellationToken);
+        }
+
+        public void SetIsFlagRight(bool isRight)
+        {
+            _leaderFlagView.SetIsRight(isRight);
         }
     }
 }

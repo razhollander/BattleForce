@@ -53,6 +53,7 @@ MonoBehaviour:
         - rid: 2200602851054190760
         - rid: 1595758794195075078
         - rid: 1595758799730769926
+        - rid: 1595758799730770084
       TalentsArrowConfigs:
         TalentCooldownConfigs:
         - TalentType: 1
@@ -137,7 +138,14 @@ MonoBehaviour:
         MinDashWindowSeconds: 0.3
         EnemyPushForce: 25
         EnemySpinAmount: 15
-        CasterVelocityDamping: 0.05
+      RockTalentConfig:
+        DurationInSeconds: 4
+        ColliderRadiusMultiplier: 2.6
+        BodyDensity: 1000
+        Restitution: 1
+        EnemyPushRadius: 4
+        EnemyPushForce: 20
+        EnemySpinAmount: 50
       FrigidBlockTalentConfig:
         ProjectileSpeed: 30
         SpawnGapFromCaster: 0.5
@@ -159,6 +167,7 @@ MonoBehaviour:
         ThrowMaxSpin: 35
       SoulTalentConfig:
         GhostSpeed: 15
+        SpawnForwardOffset: 2
       TalentCardWidth: 1.602175
       TalentCardHeight: 2.382844
     Lava:
@@ -216,6 +225,11 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 16
+        CooldownInSeconds: 1
+    - rid: 1595758799730770084
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 13
         CooldownInSeconds: 1
     - rid: 1717594783917015173
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}

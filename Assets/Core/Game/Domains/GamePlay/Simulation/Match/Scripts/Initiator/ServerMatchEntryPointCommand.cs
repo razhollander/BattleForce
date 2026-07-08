@@ -165,7 +165,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                     _lockOnTargetTimerService.AddPlayer(playerId);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.Soul, playerId, 0, out _, out _);
                     _playersTalentsManager.TryAddTalentToPlayer(TalentType.FishingRod, playerId, 0, out _, out _);
-                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.SentryGun, playerId, 0, out _, out _);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Rock, playerId, 0, out _, out _);
                 
                     if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                     {

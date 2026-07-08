@@ -97,6 +97,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 return;
             }
+
+            // A player in Rock state is invulnerable to all damage sources.
+            if (_matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerIdGotHit, TalentType.Rock))
+            {
+                return;
+            }
             
             var newHealth = (ushort)Math.Max(DEAD_HEALTH_AMOUNT, playerState.Spaceship.Health.CurrentHealth - _hitDamage);
             playerState.Spaceship.Health.CurrentHealth = newHealth;

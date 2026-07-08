@@ -265,6 +265,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             GemsPerTeam[teamId] = totalTeamGems;
         }
 
+        public bool IsTeamLeadingInGems(ushort teamId)
+        {
+            if (!GemsPerTeam.TryGetValue(teamId, out var teamGems) || teamGems <= 0)
+            {
+                return false;
+            }
+
+            foreach (var gemsPerTeam in GemsPerTeam)
+            {
+                if (gemsPerTeam.Value > teamGems)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition, float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation, Vector2 size)
         {
             var teleportPairModel = new MatchEnvironmentTeleportPairModel(teleportPairId, gateAId, gateAPosition, gateANormalRotation, gateBId, gateBPosition, gateBNormalRotation, gateAWorldPosition, gateAWorldRotation, gateBWorldPosition, gateBWorldRotation, size);

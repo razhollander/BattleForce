@@ -141,6 +141,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetChickenState(isChicken);
         }
 
+        public void SetPlayerRockState(ushort playerId, bool isRock)
+        {
+            GetPlayer(playerId).SetRockState(isRock);
+        }
+
         public void PlayLayEggAnimation(ushort playerId)
         {
             GetPlayer(playerId).PlayLayEggAnimation(_stageCancellationTokenProvider.CancellationTokenSource);
@@ -184,6 +189,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsPlayerKinged(ushort playerId, bool isKinged)
         {
             GetPlayer(playerId).SetIsKinged(isKinged);
+        }
+
+        public void RefreshLeaderFlags()
+        {
+            foreach (var playerController in _playerControllers)
+            {
+                var teamId = _matchDataService.GetPlayerTeamId(playerController.PlayerId);
+                playerController.SetIsLeader(_matchDataService.IsTeamLeadingInGems(teamId));
+            }
         }
 
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)

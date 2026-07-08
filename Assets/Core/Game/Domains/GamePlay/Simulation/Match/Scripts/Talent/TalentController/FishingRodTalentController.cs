@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
@@ -30,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedConfig;
         private readonly ICommandFactory _commandFactory;
+        private readonly IPlayersMouseDataService _playersMouseDataService;
         private SpinPlayerCommand _spinPlayerCommand;
         private AddForceToPlayerCommand _addForceToPlayerCommand;
 
@@ -48,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         }
 
         public FishingRodTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedConfig, ICommandFactory commandFactory)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedConfig, ICommandFactory commandFactory, IPlayersMouseDataService playersMouseDataService)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
@@ -57,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _networkConfig = networkConfig;
             _sharedConfig = sharedConfig;
             _commandFactory = commandFactory;
+            _playersMouseDataService = playersMouseDataService;
         }
 
         public void InitEntryPoint()
@@ -202,7 +205,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             if (IsCurrentlyAiming)
             {
                 caughtEnemy.Spaceship.AssistArrowType = PlayerAssistArrowType.SecondCastAimArrow;
-                caughtEnemy.Spaceship.SecondCastAimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
+                caughtEnemy.Spaceship.SecondCastAimDirection = GetThrowDirection(casterPlayerState, caughtEnemy);
             }
             else
             {
@@ -272,7 +275,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             var config = _gamePlayConfigService.GamePlayConfig.Talents.FishingRodTalentConfig;
             var caughtEnemy = _matchDataService.SimulationState.GetPlayerById(projectile.CaughtEnemyId);
-            var throwDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var throwDirection = GetThrowDirection(casterPlayerState, caughtEnemy);
             var force = throwDirection * config.ThrowPushForce;
             var spinAmount = RNG.NextFloat(config.ThrowMinSpin, config.ThrowMaxSpin);
 
@@ -282,6 +285,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             ClearCaughtEnemyAim(caughtEnemy);
             _netEventsDataService.AddFishingRodThrowNetEvent(tick, _casterPlayerId, caughtEnemy.Id, throwDirection);
             DeactivateTalent(tick);
+        }
+
+        private Vector2 GetThrowDirection(PlayerStateS2C casterPlayerState, PlayerStateS2C caughtEnemy)
+        {
+            var mouseData = _playersMouseDataService.GetPlayerMouseData(_casterPlayerId);
+
+            // Keyboard/mouse players throw from the enemy towards the mouse world position; gamepad players fall back to the caster's aim direction.
+            if (mouseData.IsUsingMouseAim)
+            {
+                var enemyPosition = caughtEnemy.Spaceship.Transform.Position;
+                return (mouseData.MouseWorldPosition - enemyPosition).NormalizeSafe();
+            }
+
+            return casterPlayerState.Spaceship.TalentsState.AimDirection;
         }
 
         private void StartReturnPhase(ref TalentFishingRodProjectileStateS2C projectile)

@@ -37,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void HidePlayerHeadbuttHelmet(ushort playerId);
         void OnPlayerHeadbuttTalentDeactivated(ushort playerId);
         void SetPlayerChickenState(ushort playerId, bool isOn);
+        void SetPlayerRockState(ushort playerId, bool isRock);
         void PlayLayEggAnimation(ushort playerId);
         void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction);
         void PlaySonicSnapEffectForPlayer(ushort playerId);
@@ -46,5 +47,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled);
         void SetPlayerIsLockOnTargetSightShown(ushort playerId, bool isShown);
         void SetIsPlayerKinged(ushort playerId, bool isKinged);
+        void RefreshLeaderFlags();
     }
 }

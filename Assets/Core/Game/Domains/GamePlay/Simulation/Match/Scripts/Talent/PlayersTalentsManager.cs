@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
@@ -23,13 +24,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 
         public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig,
             INetEventsDataService netEventsDataService, ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator,
-            IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory)
+            IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, IPlayersMouseDataService playersMouseDataService)
         {
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _gamePlayConfigService = gamePlayConfigService;
             _talentControllersPerPlayer = new Dictionary<int, PlayerTalentControllers>(networkConfig.MaxCap.ConcurrentPlayers);
-            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, overrideableNetEventsService, commandFactory, sharedGamePlayConfig),networkConfig.MaxCap.ConcurrentPlayers);
+            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, overrideableNetEventsService, commandFactory, sharedGamePlayConfig, playersMouseDataService),networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)
@@ -108,7 +109,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             return true;
         }
 
-        public bool TrySwitchToTalent(ushort playerId, int talentIndex)
+        public bool TrySwitchToTalent(ushort playerId, int talentIndex, int tick)
         {
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
             var talents = playerState.Spaceship.TalentsState;
@@ -118,14 +119,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 return false;
             }
 
-            if (selectedTalent.IsCurrentlyActive)
-            {
-                return false;
-            }
-
             if (talentIndex >= talents.Talents.Count)
             {
                 LogService.LogError($"Tryed to switch to talent index {talentIndex} which is out of range of {talents.Talents.Count} talents");
+                return false;
+            }
+
+            if (selectedTalent.TalentType == TalentType.Headbutt)
+            {
+                // A charging or dashing Headbutt is interrupted (and put on cooldown) so the player can switch to and perform another talent.
+                _talentControllersPerPlayer[playerId].StopTalentIfActive(TalentType.Headbutt, tick);
+            }
+            else if (selectedTalent.IsCurrentlyActive)
+            {
+                // Any other active talent blocks switching.
                 return false;
             }
 

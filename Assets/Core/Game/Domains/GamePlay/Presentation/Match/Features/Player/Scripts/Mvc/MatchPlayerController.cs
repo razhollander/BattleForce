@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly MatchPlayerViewPool _playerPool;
         private readonly Sprite[] _powerUpReelSpritesArray;
         private int? _currentPowerupGrantingAudioId;
+        private bool _isFlagActive;
 
         public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
             SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
@@ -80,6 +81,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
             var isKinged = _matchDataService.TryGetKingedPlayers(out var kingedPlayers) && kingedPlayers.Exists(x => x.PlayerId == PlayerId);
             SetIsKinged(isKinged);
+            SetIsLeader(_matchDataService.IsTeamLeadingInGems(playerModel.TeamId));
         }
 
         private void SetupPlayerAccordingToHisSelectedTalent(MatchPlayerModel playerModel)
@@ -107,6 +109,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             {
                 SetChickenState(true);
             }
+            else if (currentSelectedTalentState.TalentType == TalentType.Rock)
+            {
+                SetRockState(currentSelectedTalentState.IsCurrentlyActive);
+            }
+        }
+
+        public void SetRockState(bool isRockActive)
+        {
+            _playerView.SetRockState(isRockActive);
         }
 
         public void SetSentryGunState(bool isSentryGun, CancellationTokenSource cancellationTokenSource)
@@ -350,6 +361,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetTransform(Vector2 position, Vector2 direction)
         {
             _playerView.Base.SetPositionAndRotation(position.ToUnityVector2(), direction.ToUnityVector2().ToQuaternion());
+
+            if (_isFlagActive)
+            {
+                var isDirectionRight = direction.ToUnityVector2().x > 0;
+                _playerView.SetIsFlagRight(isDirectionRight);
+            }
         }
 
         public UnityEngine.Vector2 GetPosition()
@@ -473,6 +490,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsKinged(bool isKinged)
         {
             _playerView.SetIsKinged(isKinged);
+        }
+
+        public void SetIsLeader(bool isLeader)
+        {
+            _isFlagActive = isLeader;
+            _playerView.SetIsLeader(isLeader);
         }
     }
 }

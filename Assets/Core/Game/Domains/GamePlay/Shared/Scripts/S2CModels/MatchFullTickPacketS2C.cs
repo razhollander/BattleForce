@@ -84,6 +84,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C> DeactivateFishingRodTalentNetEvents;
         public FixedUnorderedList<CreateSoulGhostNetEventS2C> CreateSoulGhostNetEvents;
         public FixedUnorderedList<DeactivateSoulTalentNetEventS2C> DeactivateSoulTalentNetEvents;
+        public FixedUnorderedList<ActivateRockTalentNetEventS2C> ActivateRockTalentNetEvents;
+        public FixedUnorderedList<DeactivateRockTalentNetEventS2C> DeactivateRockTalentNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -172,6 +174,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateFishingRodTalentNetEvents = new FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>(maxCap.DeactivateFishingRodTalentNetEvents);
             CreateSoulGhostNetEvents = new FixedUnorderedList<CreateSoulGhostNetEventS2C>(maxCap.CreateSoulGhostNetEvents);
             DeactivateSoulTalentNetEvents = new FixedUnorderedList<DeactivateSoulTalentNetEventS2C>(maxCap.DeactivateSoulTalentNetEvents);
+            ActivateRockTalentNetEvents = new FixedUnorderedList<ActivateRockTalentNetEventS2C>(maxCap.ActivateRockTalentNetEvents);
+            DeactivateRockTalentNetEvents = new FixedUnorderedList<DeactivateRockTalentNetEventS2C>(maxCap.DeactivateRockTalentNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -253,6 +257,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask2 & (1UL << 0)) != 0) SerializedCreateSoulGhostNetEvents(writer);
             if ((eventMask2 & (1UL << 1)) != 0) SerializedDeactivateSoulTalentNetEvents(writer);
+            if ((eventMask2 & (1UL << 2)) != 0) SerializedActivateRockTalentNetEvents(writer);
+            if ((eventMask2 & (1UL << 3)) != 0) SerializedDeactivateRockTalentNetEvents(writer);
         }
 
         private ulong CalculateEventMask2()
@@ -260,6 +266,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             ulong eventMask2 = 0;
             if (CreateSoulGhostNetEvents.Count > 0) eventMask2 |= 1UL << 0;
             if (DeactivateSoulTalentNetEvents.Count > 0) eventMask2 |= 1UL << 1;
+            if (ActivateRockTalentNetEvents.Count > 0) eventMask2 |= 1UL << 2;
+            if (DeactivateRockTalentNetEvents.Count > 0) eventMask2 |= 1UL << 3;
             return eventMask2;
         }
 
@@ -551,6 +559,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask2 & (1UL << 1)) != 0) DeserializedDeactivateSoulTalentNetEvents(reader);
             else DeactivateSoulTalentNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 2)) != 0) DeserializedActivateRockTalentNetEvents(reader);
+            else ActivateRockTalentNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 3)) != 0) DeserializedDeactivateRockTalentNetEvents(reader);
+            else DeactivateRockTalentNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1839,6 +1853,42 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref DeactivateSoulTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateRockTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateRockTalentNetEvents.Count);
+            foreach (var netEvent in ActivateRockTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedActivateRockTalentNetEvents(NetDataReader reader)
+        {
+            ActivateRockTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateRockTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateRockTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateRockTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateRockTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateRockTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateRockTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateRockTalentNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

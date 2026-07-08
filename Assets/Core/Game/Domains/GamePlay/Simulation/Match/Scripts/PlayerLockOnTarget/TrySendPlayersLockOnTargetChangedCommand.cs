@@ -53,7 +53,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             {
                 _cachedLockedOnObjects.Clear();
 
-                var canPlayerFindTargets = !playerState.Spaceship.IsSpinned && playerState.Spaceship.IsAlive;
+                var isRock = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerState.Id, TalentType.Rock);
+                var canPlayerFindTargets = !playerState.Spaceship.IsSpinned && playerState.Spaceship.IsAlive && !isRock;
                 if (canPlayerFindTargets)
                 {
                     var rayOriginPosition = playerState.Spaceship.Transform.GetHeadPosition();
@@ -94,7 +95,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             for (int i = 0; i < players.Count; i++)
             {
                 var targetedPlayerState = players[i];
-                var shouldTryTargetPlayer = targetedPlayerState.TeamId != casterPlayerState.TeamId && targetedPlayerState.Spaceship.IsAlive;
+                // A player in Rock state can't be locked on (its heart is un-targetable).
+                var isTargetRock = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(targetedPlayerState.Id, TalentType.Rock);
+                var shouldTryTargetPlayer = targetedPlayerState.TeamId != casterPlayerState.TeamId && targetedPlayerState.Spaceship.IsAlive && !isTargetRock;
 
                 if (!shouldTryTargetPlayer)
                 {

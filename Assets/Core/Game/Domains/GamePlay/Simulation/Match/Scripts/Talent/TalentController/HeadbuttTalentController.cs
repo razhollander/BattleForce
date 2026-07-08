@@ -139,9 +139,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _spinPlayerCommand.SetPlayer(enemyId).SetSpinAmount(config.EnemySpinAmount).SetTick(tick).Execute();
             _addForceToPlayerCommand.SetPlayerId(enemyId).SetForce(_dashDirection * config.EnemyPushForce).ShouldTurnOffEngine(true).Execute();
 
-            // Velocity += velocity * (damping - 1) is equivalent to velocity *= damping
-            var casterDampingForce = casterPlayerState.Spaceship.Transform.Velocity * (config.CasterVelocityDamping - 1f);
-            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(casterDampingForce).ShouldTurnOffEngine(false).Execute();
+            // Keep the caster's momentum but stop powering forward through the enemy.
+            casterPlayerState.Spaceship.IsEngineOn = false;
 
             _netEventsDataService.AddHeadbuttHitEnemyNetEvent(tick, _casterPlayerId, enemyId);
             DeactivateTalent(tick);

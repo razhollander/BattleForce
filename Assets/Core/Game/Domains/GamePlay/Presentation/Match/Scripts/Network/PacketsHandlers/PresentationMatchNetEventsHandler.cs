@@ -807,6 +807,34 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessActivateRockTalentEvents(CapacityList<ActivateRockTalentNetEventS2C> activateRockTalentNetEvents)
+        {
+            if (activateRockTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in activateRockTalentNetEvents)
+            {
+                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.Rock);
+                _cachedPresentationEventsService.ActivateRockTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateRockTalentEvents(CapacityList<DeactivateRockTalentNetEventS2C> deactivateRockTalentNetEvents)
+        {
+            if (deactivateRockTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in deactivateRockTalentNetEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Rock, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateRockTalentNetEvents.Add(netEvent);
+            }
+        }
+
         private void SetPlayerTalentActive(ushort playerId, TalentType talentType)
         {
             var casterPlayer = _matchDataService.GetPlayer(playerId);

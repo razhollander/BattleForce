@@ -309,6 +309,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.DeactivateFishingRodTalentNetEvents = _netEventsDataService.DeactivateFishingRodTalentNetEventsPerClient[clientId];
                 _fullTickPacket.CreateSoulGhostNetEvents = _netEventsDataService.CreateSoulGhostNetEventsPerClient[clientId];
                 _fullTickPacket.DeactivateSoulTalentNetEvents = _netEventsDataService.DeactivateSoulTalentNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateRockTalentNetEvents = _netEventsDataService.ActivateRockTalentNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateRockTalentNetEvents = _netEventsDataService.DeactivateRockTalentNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

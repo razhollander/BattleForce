@@ -66,5 +66,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         bool RayCast(Vector2 originPoint, Vector2 endPoint, out PhysicsBodyData hitBodyData, PhysicsBodyType[] bodyTypesRayCastCanHit = null, PhysicsBodyData? ignoredBody = null);
         void EnablePlayerToCollideWithPlayers(ushort playerId);
         void DisablePlayerToCollideWithPlayers(ushort playerId);
+        void EnableRockBody(ushort playerId, float radiusMultiplier, float density, float restitution);
+        void DisableRockBody(ushort playerId, float baseRadius, ushort teamId);
+        void EnablePlayerHeartCollider(ushort playerId);
+        void DisablePlayerHeartCollider(ushort playerId);
     }
 }

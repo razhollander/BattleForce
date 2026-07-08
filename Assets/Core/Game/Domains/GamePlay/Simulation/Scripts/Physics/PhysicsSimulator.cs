@@ -1272,6 +1272,74 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             body.SetAwake(true);
         }
 
+        private const float DEFAULT_PLAYER_DENSITY = 1.0f;
+        private const float DEFAULT_PLAYER_RESTITUTION = 0f;
+
+        // Turns the player's spaceship body into a "rock": a bigger, wall-like, immovable obstacle.
+        // The huge density makes static (rotating) walls still shove it out fully while dynamic bodies bounce off it,
+        // and the filter changes make it physically collide with all players (incl. teammates), bullets and power-up balls.
+        public void EnableRockBody(ushort playerId, float radiusMultiplier, float density, float restitution)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
+            var fixture = body.GetFixtureList();
+
+            var circleShape = (CircleShape) fixture.Shape;
+            circleShape.Radius *= radiusMultiplier;
+
+            var filter = fixture.FilterData;
+            filter.groupIndex = 0; // clear team grouping so it collides with teammates too; category/mask below decide the rest
+            filter.categoryBits |= PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
+            filter.categoryBits |= PhysicsCollisionType.PowerUpBall.GetCollisionMask();
+            filter.maskBits |= PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
+            filter.maskBits |= PhysicsCollisionType.Wall.GetCollisionMask();
+            fixture.FilterData = filter;
+
+            fixture.Density = density;
+            fixture.Restitution = restitution;
+            body.ResetMassData();
+            body.SetAwake(true);
+        }
+
+        public void DisableRockBody(ushort playerId, float baseRadius, ushort teamId)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
+            var fixture = body.GetFixtureList();
+
+            var circleShape = (CircleShape) fixture.Shape;
+            circleShape.Radius = baseRadius;
+
+            var filter = fixture.FilterData;
+            filter.categoryBits = PhysicsBodyType.PlayerSpaceship.GetCollisionsCategory();
+            filter.maskBits = PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
+            filter.groupIndex = (short)-teamId;
+            fixture.FilterData = filter;
+
+            fixture.Density = DEFAULT_PLAYER_DENSITY;
+            fixture.Restitution = DEFAULT_PLAYER_RESTITUTION;
+            body.ResetMassData();
+            body.SetAwake(true);
+        }
+
+        public void EnablePlayerHeartCollider(ushort playerId)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerHeart, playerId);
+            var fixture = body.GetFixtureList();
+            var filter = fixture.FilterData;
+            filter.maskBits = PhysicsCollisionType.PlayerHeart.GetCollisionMask();
+            fixture.FilterData = filter;
+            body.SetAwake(true);
+        }
+
+        public void DisablePlayerHeartCollider(ushort playerId)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerHeart, playerId);
+            var fixture = body.GetFixtureList();
+            var filter = fixture.FilterData;
+            filter.maskBits = 0x0000;
+            fixture.FilterData = filter;
+            body.SetAwake(true);
+        }
+
         public void AddChickenEgg(ushort eggId, ushort teamId, Vector2 position, float eggRadius)
         {
             var bodyDef = GetBodyDef();

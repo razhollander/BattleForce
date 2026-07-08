@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
@@ -24,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly YearsOfPainTalentController _yearsOfPainTalentController;
         private readonly WaterGunTalentController _waterGunTalentController;
         private readonly HeadbuttTalentController _headbuttTalentController;
+        private readonly RockTalentController _rockTalentController;
         private readonly FrigidBlockTalentController _frigidBlockTalentController;
         private readonly FishingRodTalentController _fishingRodTalentController;
         private readonly SoulTalentController _soulTalentController;
@@ -31,7 +33,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private ushort _casterPlayerId;
         private bool _isInitialized = false;
         public PlayerTalentControllers(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig,
+            IPlayersMouseDataService playersMouseDataService)
         {
             _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig);
             _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
@@ -44,8 +47,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
             _waterGunTalentController = new WaterGunTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
             _headbuttTalentController = new HeadbuttTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
+            _rockTalentController = new RockTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
             _frigidBlockTalentController = new FrigidBlockTalentController(matchDataService, gamePlayConfigService, networkConfig, sharedGamePlayConfig, commandFactory);
-            _fishingRodTalentController = new FishingRodTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
+            _fishingRodTalentController = new FishingRodTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory, playersMouseDataService);
             _soulTalentController = new SoulTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig);
         }
 
@@ -62,6 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _yearsOfPainTalentController.InitEntryPoint();
             _waterGunTalentController.InitEntryPoint();
             _headbuttTalentController.InitEntryPoint();
+            _rockTalentController.InitEntryPoint();
             _frigidBlockTalentController.InitEntryPoint();
             _fishingRodTalentController.InitEntryPoint();
         }
@@ -80,6 +85,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _yearsOfPainTalentController.SetCasterId(casterPlayerId);
             _waterGunTalentController.SetCasterId(casterPlayerId);
             _headbuttTalentController.SetCasterId(casterPlayerId);
+            _rockTalentController.SetCasterId(casterPlayerId);
             _frigidBlockTalentController.SetCasterId(casterPlayerId);
             _fishingRodTalentController.SetCasterId(casterPlayerId);
             _soulTalentController.SetCasterId(casterPlayerId);
@@ -100,6 +106,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.YearsOfPain: return _yearsOfPainTalentController;
                 case TalentType.WaterGun: return _waterGunTalentController;
                 case TalentType.Headbutt: return _headbuttTalentController;
+                case TalentType.Rock: return _rockTalentController;
                 case TalentType.FrigidBlock: return _frigidBlockTalentController;
                 case TalentType.FishingRod: return _fishingRodTalentController;
                 case TalentType.Soul: return _soulTalentController;
@@ -125,6 +132,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _yearsOfPainTalentController?.OnTick(tick, deltaTime);
             _waterGunTalentController?.OnTick(tick, deltaTime);
             _headbuttTalentController?.OnTick(tick, deltaTime);
+            _rockTalentController?.OnTick(tick, deltaTime);
             _frigidBlockTalentController?.OnTick(tick, deltaTime);
             _fishingRodTalentController?.OnTick(tick, deltaTime);
             _soulTalentController?.OnTick(tick, deltaTime);
@@ -189,6 +197,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _yearsOfPainTalentController.ResetData();
             _waterGunTalentController.ResetData();
             _headbuttTalentController.ResetData();
+            _rockTalentController.ResetData();
             _frigidBlockTalentController.ResetData();
             _fishingRodTalentController.ResetData();
             _soulTalentController.ResetData();

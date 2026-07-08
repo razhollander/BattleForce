@@ -72,6 +72,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<DeactivateFishingRodTalentNetEventS2C> _cachedUnprocessedDeactivateFishingRodTalentEvents;
         private readonly CapacityList<CreateSoulGhostNetEventS2C> _cachedUnprocessedCreateSoulGhostEvents;
         private readonly CapacityList<DeactivateSoulTalentNetEventS2C> _cachedUnprocessedDeactivateSoulTalentEvents;
+        private readonly CapacityList<ActivateRockTalentNetEventS2C> _cachedUnprocessedActivateRockTalentEvents;
+        private readonly CapacityList<DeactivateRockTalentNetEventS2C> _cachedUnprocessedDeactivateRockTalentEvents;
         private readonly CapacityList<ShootFrigidBlockNetEventS2C> _cachedUnprocessedShootFrigidBlockEvents;
         private readonly CapacityList<DestroyFrigidBlockNetEventS2C> _cachedUnprocessedDestroyFrigidBlockEvents;
         private readonly CapacityList<ActivateSentryGunTalentNetEventS2C> _cachedUnprocessedActivateSentryGunTalentEvents;
@@ -164,6 +166,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedDeactivateFishingRodTalentEvents = new CapacityList<DeactivateFishingRodTalentNetEventS2C>(networkConfig.MaxCap.DeactivateFishingRodTalentNetEvents);
             _cachedUnprocessedCreateSoulGhostEvents = new CapacityList<CreateSoulGhostNetEventS2C>(networkConfig.MaxCap.CreateSoulGhostNetEvents);
             _cachedUnprocessedDeactivateSoulTalentEvents = new CapacityList<DeactivateSoulTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSoulTalentNetEvents);
+            _cachedUnprocessedActivateRockTalentEvents = new CapacityList<ActivateRockTalentNetEventS2C>(networkConfig.MaxCap.ActivateRockTalentNetEvents);
+            _cachedUnprocessedDeactivateRockTalentEvents = new CapacityList<DeactivateRockTalentNetEventS2C>(networkConfig.MaxCap.DeactivateRockTalentNetEvents);
             _cachedUnprocessedShootFrigidBlockEvents = new CapacityList<ShootFrigidBlockNetEventS2C>(networkConfig.MaxCap.ShootFrigidBlockNetEvents);
             _cachedUnprocessedDestroyFrigidBlockEvents = new CapacityList<DestroyFrigidBlockNetEventS2C>(networkConfig.MaxCap.DestroyFrigidBlockNetEvents);
             _cachedUnprocessedActivateSentryGunTalentEvents = new CapacityList<ActivateSentryGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateSentryGunTalentNetEvents);
@@ -313,6 +317,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessDeactivateFishingRodTalentEvents(latestFullTickPacket.DeactivateFishingRodTalentNetEvents, ignoreEventsNotAboveTick);
             ProcessCreateSoulGhostEvents(latestFullTickPacket.CreateSoulGhostNetEvents, ignoreEventsNotAboveTick);
             ProcessDeactivateSoulTalentEvents(latestFullTickPacket.DeactivateSoulTalentNetEvents, ignoreEventsNotAboveTick);
+            ProcessActivateRockTalentEvents(latestFullTickPacket.ActivateRockTalentNetEvents, ignoreEventsNotAboveTick);
+            ProcessDeactivateRockTalentEvents(latestFullTickPacket.DeactivateRockTalentNetEvents, ignoreEventsNotAboveTick);
             var simulationState = latestFullTickPacket.CurrentSimulationState;
             UpdatePlayersDeltas(simulationState);
             UpdateBulletsTransform();
@@ -712,6 +718,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedDeactivateSoulTalentEvents.Sort();
                 _presentationNetEventsHandler.ProcessDeactivateSoulTalentEvents(_cachedUnprocessedDeactivateSoulTalentEvents);
+            }
+        }
+
+        private void ProcessActivateRockTalentEvents(FixedUnorderedList<ActivateRockTalentNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedActivateRockTalentEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedActivateRockTalentEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedActivateRockTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedActivateRockTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessActivateRockTalentEvents(_cachedUnprocessedActivateRockTalentEvents);
+            }
+        }
+
+        private void ProcessDeactivateRockTalentEvents(FixedUnorderedList<DeactivateRockTalentNetEventS2C> events, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedDeactivateRockTalentEvents.Clear();
+            var span = events.AsSpan();
+            foreach (var netEvent in span)
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedDeactivateRockTalentEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedDeactivateRockTalentEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedDeactivateRockTalentEvents.Sort();
+                _presentationNetEventsHandler.ProcessDeactivateRockTalentEvents(_cachedUnprocessedDeactivateRockTalentEvents);
             }
         }
 

@@ -113,6 +113,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerFrigidBlockCollision(objectA, objectB, collisionEvent.Contact);
                 HandleBulletFrigidBlockCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePowerUpBallFrigidBlockCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerRockCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePowerUpBallRockCollision(objectA, objectB, collisionEvent.Contact);
             }
 
             _physicsSimulator.ClearCachedCollisions();
@@ -179,6 +181,72 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             ref var powerUpBallModel = ref _matchDataService.SimulationState.GetPowerUpBallById(isPowerUpToBlock ? objectA.Id : objectB.Id);
+            contact.GetWorldManifold(out var worldManifold);
+            powerUpBallModel.Velocity = powerUpBallModel.Velocity.ReflectFromWall(worldManifold.normal);
+        }
+
+        private bool IsRockActive(ushort playerId)
+        {
+            return _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.Rock);
+        }
+
+        // A player colliding with an active Rock is reflected like it hit a wall; the rock itself never moves.
+        private void HandlePlayerRockCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isPlayerToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            if (!isPlayerToPlayer)
+            {
+                return;
+            }
+
+            var isARock = IsRockActive(objectA.Id);
+            var isBRock = IsRockActive(objectB.Id);
+            // Reflect only when exactly one of the two is a rock (two rocks: neither moves anyway).
+            if (isARock == isBRock)
+            {
+                return;
+            }
+
+            var otherPlayerId = isARock ? objectB.Id : objectA.Id;
+            var isOtherPlayerObjectA = !isARock;
+            var otherPlayerModel = _matchDataService.SimulationState.GetPlayerById(otherPlayerId);
+
+            contact.GetWorldManifold(out var worldManifold);
+            // The manifold normal points from fixture A to fixture B. Orient it to point from the rock toward the player.
+            var rockNormal = isOtherPlayerObjectA ? -worldManifold.normal : worldManifold.normal;
+
+            var relativeVelocity = otherPlayerModel.Spaceship.Transform.Velocity;
+            if (!relativeVelocity.IsFacingWall(rockNormal))
+            {
+                return;
+            }
+
+            otherPlayerModel.Spaceship.Transform.Velocity = relativeVelocity.ReflectFromWall(rockNormal);
+            var currentDirection = otherPlayerModel.Spaceship.Transform.Direction;
+            var reflectedDirection = currentDirection.ReflectFromWall(rockNormal);
+            otherPlayerModel.Spaceship.Transform.Direction = reflectedDirection.Length() > 0
+                ? reflectedDirection.NormalizeSafe()
+                : currentDirection;
+        }
+
+        // A power-up ball bounces off an active Rock like it bounces off a wall.
+        private void HandlePowerUpBallRockCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBallToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.PowerUpBall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            var isPlayerToBall = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.PowerUpBall;
+            if (!isBallToPlayer && !isPlayerToBall)
+            {
+                return;
+            }
+
+            var playerId = isBallToPlayer ? objectB.Id : objectA.Id;
+            if (!IsRockActive(playerId))
+            {
+                return;
+            }
+
+            var ballId = isBallToPlayer ? objectA.Id : objectB.Id;
+            ref var powerUpBallModel = ref _matchDataService.SimulationState.GetPowerUpBallById(ballId);
             contact.GetWorldManifold(out var worldManifold);
             powerUpBallModel.Velocity = powerUpBallModel.Velocity.ReflectFromWall(worldManifold.normal);
         }

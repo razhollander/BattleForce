@@ -40,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ICommandFactory _commandFactory;
         private readonly ISimulationInputService _simulationInputService;
+        private readonly IPlayersMouseDataService _playersMouseDataService;
         private readonly IClientsNetworkDataService _clientsNetworkDataService;
 
         private readonly CapacityDict<long, FixedClassUnorderedList<MatchPlayersInputPacketC2S>> _inputsPerClient;
@@ -62,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, INetEventsDataService netEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
             IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, ISimulationInputService simulationInputService, IClientsNetworkDataService clientsNetworkDataService,
-            IPlayersPowerUpsManager playersPowerUpsManager)
+            IPlayersPowerUpsManager playersPowerUpsManager, IPlayersMouseDataService playersMouseDataService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -76,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _playersPowerUpsManager = playersPowerUpsManager;
             _playerbackRecorderService = playerbackRecorderService;
             _simulationInputService = simulationInputService;
+            _playersMouseDataService = playersMouseDataService;
             _clientsNetworkDataService = clientsNetworkDataService;
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerClient = new CapacityDict<long, MatchPlayersInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -162,6 +164,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     UpdatePlayerShoot(processedTick, playerInput.IsShootInputPressed, playerState);
 
                     playerState.Spaceship.TalentsState.AimDirection = playerInput.AimDirection;
+                    _playersMouseDataService.SetPlayerMouseData(playerId, playerInput.IsUsingMouseAim, playerInput.MouseWorldPosition);
                     UpdatePlayerDirection(playerInput, playerState);
                     bool isTalentAInputPressed = playerInput.IsTalentAInputPressed;
                     bool isTalentBInputPressed = playerInput.IsTalentBInputPressed;
@@ -184,6 +187,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private void ProcessPlayerPowerUpInput(int processedTick, PlayerStateS2C playerState)
         {
             var playerId = playerState.Id;
+
+            // While in Rock state the player can't perform any power-up.
+            // if (_matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.Rock))
+            // {
+            //     return;
+            // }
+
             var wasPowerUpInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.PowerUpInput);
             _playersPowerUpsManager.ProcessPowerUpInput(playerId, processedTick, wasPowerUpInputDownThisTick);
         }
@@ -251,7 +261,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             
             if (wasTalentAInputDownThisTick && currentSelectedTalentIndex != talentAIndex)
             {
-                if (_playersTalentsManager.TrySwitchToTalent(playerId, talentAIndex))
+                if (_playersTalentsManager.TrySwitchToTalent(playerId, talentAIndex, processedTick))
                 {
                     didSwitchToAnyTalent = true;
                     switchedTalentIndex = talentAIndex;
@@ -259,7 +269,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
             if (wasTalentBInputDownThisTick && currentSelectedTalentIndex != talentBIndex)
             {
-                if (_playersTalentsManager.TrySwitchToTalent(playerId, talentBIndex))
+                if (_playersTalentsManager.TrySwitchToTalent(playerId, talentBIndex, processedTick))
                 {
                     didSwitchToAnyTalent = true;
                     switchedTalentIndex = talentBIndex;
@@ -267,7 +277,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             }
             if (wasTalentCInputDownThisTick && currentSelectedTalentIndex != talentCIndex)
             {
-                if (_playersTalentsManager.TrySwitchToTalent(playerId, talentCIndex))
+                if (_playersTalentsManager.TrySwitchToTalent(playerId, talentCIndex, processedTick))
                 {
                     didSwitchToAnyTalent = true;
                     switchedTalentIndex = talentCIndex;
@@ -328,7 +338,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private void UpdatePlayerDirection(MatchLocalPlayerInputDataC2S playerInputData, PlayerStateS2C playerState)
         {
             if (playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) && selectedTalent.IsCurrentlyAiming
-                || selectedTalent is {TalentType: TalentType.Umbrella, IsCurrentlyActive: true})
+                || selectedTalent is {TalentType: TalentType.Umbrella, IsCurrentlyActive: true} || selectedTalent is {TalentType: TalentType.Rock, IsCurrentlyActive: true})
             {
                 return;
             }

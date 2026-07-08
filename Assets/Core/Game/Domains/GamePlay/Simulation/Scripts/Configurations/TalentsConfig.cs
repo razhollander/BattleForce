@@ -26,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public YearsOfPainTalentConfig YearsOfPainTalentConfig;
         public WaterGunTalentConfig WaterGunTalentConfig;
         public HeadbuttTalentConfig HeadbuttTalentConfig;
+        public RockTalentConfig RockTalentConfig;
         public FrigidBlockTalentConfig FrigidBlockTalentConfig;
         public FishingRodTalentConfig FishingRodTalentConfig;
         public SoulTalentConfig SoulTalentConfig;

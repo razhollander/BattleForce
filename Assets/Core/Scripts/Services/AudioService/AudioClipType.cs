@@ -42,5 +42,7 @@ namespace Core.Scripts.Services.AudioService
         HeadbuttDash = 39,
         SoulCast = 40,
         SoulTeleport = 41,
+        RockStart = 42,
+        RockEnd = 43,
     }
 }

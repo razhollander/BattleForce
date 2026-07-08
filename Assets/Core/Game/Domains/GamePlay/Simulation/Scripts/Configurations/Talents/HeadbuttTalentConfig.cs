@@ -10,6 +10,5 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
         public float MinDashWindowSeconds = 0.3f;
         public float EnemyPushForce = 25f;
         public float EnemySpinAmount = 15f;
-        public float CasterVelocityDamping = 0.05f;
     }
 }
