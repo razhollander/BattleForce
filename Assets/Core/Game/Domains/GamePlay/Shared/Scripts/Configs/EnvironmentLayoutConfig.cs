@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [TextArea(1, 5)] [SerializeField] private string _rotatingWheelsJson;
         [TextArea(1, 5)] [SerializeField] private string _fieldBarriersJson;
         [TextArea(1, 5)] [SerializeField] private string _stageBoundriesWallsJson;
+        [TextArea(1, 5)] [SerializeField] private string _powerUpSpawnPointsJson;
 
         public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
         {
@@ -86,6 +87,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             _fieldBarriersJson = fieldBarriersJson;
         }
 
+        public void SetPowerUpSpawnPointsJson(string powerUpSpawnPointsJson)
+        {
+            _powerUpSpawnPointsJson = powerUpSpawnPointsJson;
+        }
+
         public TalentCardConfig[] GetTalentCards()
         {
             return _talentCardsJson.FromJson<TalentCardConfig[]>();
@@ -118,6 +124,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public EnvironmentFieldBarrierConfig[] GetFieldBarriers()
         {
             return _fieldBarriersJson.FromJson<EnvironmentFieldBarrierConfig[]>();
+        }
+
+        public PowerUpSpawnPointConfig[] GetPowerUpSpawnPoints()
+        {
+            if (string.IsNullOrEmpty(_powerUpSpawnPointsJson))
+            {
+                return default;
+            }
+            return _powerUpSpawnPointsJson.FromJson<PowerUpSpawnPointConfig[]>();
         }
     }
 }

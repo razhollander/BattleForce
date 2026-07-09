@@ -181,8 +181,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             ref var powerUpBallModel = ref _matchDataService.SimulationState.GetPowerUpBallById(isPowerUpToBlock ? objectA.Id : objectB.Id);
+            var relativeVelocity = powerUpBallModel.Velocity;
             contact.GetWorldManifold(out var worldManifold);
-            powerUpBallModel.Velocity = powerUpBallModel.Velocity.ReflectFromWall(worldManifold.normal);
+            var collisionNormal = worldManifold.normal;
+            if (!relativeVelocity.IsFacingWall(collisionNormal))
+            {
+                return;
+            }
+
+            powerUpBallModel.Velocity = relativeVelocity.ReflectFromWall(collisionNormal);
         }
 
         private bool IsRockActive(ushort playerId)
@@ -247,8 +254,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             var ballId = isBallToPlayer ? objectA.Id : objectB.Id;
             ref var powerUpBallModel = ref _matchDataService.SimulationState.GetPowerUpBallById(ballId);
+            var relativeVelocity = powerUpBallModel.Velocity;
             contact.GetWorldManifold(out var worldManifold);
-            powerUpBallModel.Velocity = powerUpBallModel.Velocity.ReflectFromWall(worldManifold.normal);
+            var collisionNormal = worldManifold.normal;
+            if (!relativeVelocity.IsFacingWall(collisionNormal))
+            {
+                return;
+            }
+
+            powerUpBallModel.Velocity = relativeVelocity.ReflectFromWall(collisionNormal);
         }
 
         private void HandleHeadbuttPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -1002,8 +1016,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var relativeVelocity = powerUpBallModel.Velocity;
             contact.GetWorldManifold(out var worldManifold);
             var collisionNormal = worldManifold.normal;
-            var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
-            powerUpBallModel.Velocity = reflectedVelocity;
+            if (!relativeVelocity.IsFacingWall(collisionNormal))
+            {
+                return;
+            }
+
+            powerUpBallModel.Velocity = relativeVelocity.ReflectFromWall(collisionNormal);
         }
         
         private void HandlePlayerWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

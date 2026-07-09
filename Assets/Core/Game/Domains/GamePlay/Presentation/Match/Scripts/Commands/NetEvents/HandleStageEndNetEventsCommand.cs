@@ -75,7 +75,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     }
 
                     SetPlayersInTeamKinged(kingedPlayers);
-                    ZoomCameraOnPlayer(kingedPlayers[0]);
+                    ZoomCameraOnPlayer(stageEndEvent.PlayerIdToFocusOn);
                 }
             }
 
@@ -90,10 +90,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
 
-        private void ZoomCameraOnPlayer(MatchPlayerModel playerModel)
+        private void ZoomCameraOnPlayer(ushort playerId)
         {
             _worldCameraController.ClearTargets();
-            _worldCameraController.AddFollowTarget(_matchPlayerControllers.GetPlayerTransform(playerModel.PlayerId));
+            _worldCameraController.AddFollowTarget(_matchPlayerControllers.GetPlayerTransform(playerId));
             _worldCameraController.LerpOrthographicSizeMultiplier(WINNER_ZOOM_MULTIPLIER, WINNER_ZOOM_DURATION_SECONDS, _stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
             _worldCameraController.SetisDampingEnabled(false);
         }

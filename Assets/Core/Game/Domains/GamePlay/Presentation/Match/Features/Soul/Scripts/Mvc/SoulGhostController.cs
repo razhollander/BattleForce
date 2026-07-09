@@ -13,6 +13,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mv
 
         public ushort CasterPlayerId { get; private set; }
 
+        public Transform Transform => _view.Transform;
+
         public SoulGhostController(ushort ghostId, ushort casterPlayerId, SoulGhostPool pool, Transform parent)
         {
             _ghostId = ghostId;

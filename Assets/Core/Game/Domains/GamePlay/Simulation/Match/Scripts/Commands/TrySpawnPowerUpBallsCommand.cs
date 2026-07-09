@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
@@ -94,10 +95,43 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private bool TryFindAvailablePosition(out Vector2 position)
         {
+            var mapSizeMultiplier = _matchDataService.SimulationState.MapSizeMultiplier;
+            var powerUpsRadius = _gamePlayConfigService.GamePlayConfig.PowerUps.Radius;
+            var spawnPoints = _matchEnvironmentConfigDataService.PowerUpSpawnPoints;
+
+            if (!spawnPoints.IsNullOrEmpty())
+            {
+                return TryFindAvailableSpawnPointPosition(spawnPoints, mapSizeMultiplier, powerUpsRadius, out position);
+            }
+
+            return TryFindAvailableRandomPosition(mapSizeMultiplier, powerUpsRadius, out position);
+        }
+
+        private bool TryFindAvailableSpawnPointPosition(PowerUpSpawnPointConfig[] spawnPoints, float mapSizeMultiplier, float powerUpsRadius, out Vector2 position)
+        {
+            position = Vector2.Zero;
+            var startIndex = RNG.NextInt(spawnPoints.Length);
+
+            for (var i = 0; i < spawnPoints.Length; i++)
+            {
+                var candidatePosition = spawnPoints[(startIndex + i) % spawnPoints.Length].Position * mapSizeMultiplier;
+
+                if (!_physicsSimulator.IsSquareHitAnyBodyTypes(candidatePosition, powerUpsRadius, PhysicsBodyType.Wall, PhysicsBodyType.PlayerBullet))
+                {
+                    position = candidatePosition;
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool TryFindAvailableRandomPosition(float mapSizeMultiplier, float powerUpsRadius, out Vector2 position)
+        {
             position = Vector2.Zero;
             var maxAttempts = MAX_ATTEMPTS_TO_FIND_FREE_SPAWN_POSITION;
-            var environmentHalfSize = _matchEnvironmentConfigDataService.EnvironmentHalfSize * _matchDataService.SimulationState.MapSizeMultiplier;
-            var powerUpsRadius = _gamePlayConfigService.GamePlayConfig.PowerUps.Radius;
+            var environmentHalfSize = _matchEnvironmentConfigDataService.EnvironmentHalfSize * mapSizeMultiplier;
 
             for (var i = 0; i < maxAttempts; i++)
             {

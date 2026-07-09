@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Scripts.Mvc.WorldCamera;
 using UnityEngine;
 using Zenject;
 using Core.Scripts.Extensions;
@@ -9,13 +10,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mv
     public class SoulGhostControllers : ISoulGhostControllers
     {
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IWorldCameraController _worldCameraController;
         private readonly SoulGhostPool _pool;
         private readonly Dictionary<ushort, SoulGhostController> _controllers = new();
         private Transform _parentTransform;
 
-        public SoulGhostControllers(SoulGhostView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
+        public SoulGhostControllers(SoulGhostView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IWorldCameraController worldCameraController)
         {
             _gamePlayConfig = gamePlayConfig;
+            _worldCameraController = worldCameraController;
             _pool = new SoulGhostPool(prefab, diContainer);
         }
 
@@ -31,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mv
             var controller = new SoulGhostController(ghostId, casterPlayerId, _pool, _parentTransform);
             controller.CreateView(position, rotation.ToQuaternion(), teamColor);
             _controllers[ghostId] = controller;
+            _worldCameraController.AddFollowTarget(controller.Transform);
         }
 
         public void InterpolateSoulGhostTransform(ushort ghostId, Vector2 position, Quaternion rotation)
@@ -45,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mv
         {
             if (_controllers.TryGetValue(ghostId, out var controller))
             {
+                _worldCameraController.RemoveFollowTarget(controller.Transform);
                 controller.Destroy();
                 _controllers.Remove(ghostId);
             }
@@ -58,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mv
         {
             foreach (var controller in _controllers.Values)
             {
+                _worldCameraController.RemoveFollowTarget(controller.Transform);
                 controller.Destroy();
             }
             _controllers.Clear();

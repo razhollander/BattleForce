@@ -55,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
                 }
 
                 inputActions.Enable();
-                inputActions.GamePlay.MoveRight.performed += OnShootInput;
+                //inputActions.GamePlay.MoveRight.performed += OnShootInput;
                 _gameInputActionsByPlayer[playerId] = inputActions;
             }
         }
@@ -86,7 +86,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             LogService.LogTopic("Register all input listeners", LogTopicType.Inputs);
              foreach (var actions in _gameInputActionsByPlayer.Values)
             {
-                actions.GamePlay.MoveRight.performed += OnShootInput;
+              //  actions.GamePlay.Shoot.performed += OnShootInput;
             }
         }
 
@@ -95,14 +95,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             LogService.LogTopic("Unregister all input listeners", LogTopicType.Inputs);
              foreach (var actions in _gameInputActionsByPlayer.Values)
             {
-                actions.GamePlay.MoveRight.performed -= OnShootInput;
+//                actions.GamePlay.MoveRight.performed -= OnShootInput;
             }
-        }
-
-        private void OnShootInput(InputAction.CallbackContext obj)
-        {
-            LogService.LogTopic("Shoot input was triggered", LogTopicType.Inputs);
-            _commandFactory.CreateCommandVoid<ShootInputInvokedCommand>().Execute();
         }
 
         public bool IsPlayerMoveLeftInputPressed(ushort playerId = 0)

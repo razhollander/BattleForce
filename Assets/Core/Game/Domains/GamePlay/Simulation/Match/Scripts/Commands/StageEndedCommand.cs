@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
@@ -50,9 +51,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             LogService.LogTopic($"Match Ended! Winning Team: {_winningTeamId}", LogTopicType.ServerNetwork);
             _matchDataService.SimulationState.CurrentStageWinnerTeamId = _winningTeamId;
             _matchDataService.SimulationState.IsInShowoffWinners = true;
-            _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, _stageDataService.GemsCollectedPerTeam, _matchDataService.SimulationState.GemsPerTeamId, _playerIdDoingWinningBlow);
+            var playerToFocusOn = GetPlayerToFocusOn();
+            _netEventsDataService.AddStageEndNetEvent(_processedTick, _winningTeamId, _stageDataService.GemsCollectedPerTeam, _matchDataService.SimulationState.GemsPerTeamId, playerToFocusOn.Id);
             _stageDataService.IsStageEnded = true;
             _stageDataService.StageRestartTimer = _gamePlayConfigService.GamePlayConfig.StageRestartDelaySeconds;
+        }
+
+        private PlayerStateS2C GetPlayerToFocusOn()
+        {
+            foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                if (player.Spaceship.IsAlive && player.TeamId == _winningTeamId && _playerIdDoingWinningBlow == player.Id)
+                {
+                    return player;
+                }
+            }
+            
+            foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                if (player.Spaceship.IsAlive && player.TeamId == _winningTeamId)
+                {
+                    return player;
+                }
+            }
+
+            foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                if (player.TeamId == _winningTeamId)
+                {
+                    return player;
+                }
+            }
+
+            LogService.LogError("Somehow didnt find player to focus on");
+            return null;
         }
     }
 }
