@@ -843,7 +843,7 @@ MonoBehaviour:
       _environmentSpikesJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: 
-      _fieldBarriersJson: 
+      _fieldBarriersJson: '[{"Position":{"x":-38,"y":-20},"Size":{"x":4,"y":4},"Shape":"Circle"},{"Position":{"x":38,"y":20},"Size":{"x":4,"y":4},"Shape":"Circle"},{"Position":{"x":-38,"y":20},"Size":{"x":4,"y":4},"Shape":"Circle"},{"Position":{"x":38,"y":-20},"Size":{"x":4,"y":4},"Shape":"Circle"}]'
       _stageBoundriesWallsJson: 
       _powerUpSpawnPointsJson: '[{"Position":{"X":-30.5,"Y":15.1}},{"Position":{"X":-13.0,"Y":-21.2}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":24.6,"Y":16.9}},{"Position":{"X":-32.2,"Y":-15.3}},{"Position":{"X":19.5,"Y":-14.1}},{"Position":{"X":-8.2,"Y":-3.3}},{"Position":{"X":30.6,"Y":1.0}}]'
     - _environmentName: Crazy Eyes
