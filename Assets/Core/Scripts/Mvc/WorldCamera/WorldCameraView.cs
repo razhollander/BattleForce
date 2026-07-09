@@ -1,72 +1,77 @@
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using Core.Scripts.Extensions;
 using Core.Scripts.Utils;
 using DG.Tweening;
-using Unity.Cinemachine;
 using UnityEngine;
 
 namespace CoreDomain.Scripts.Mvc.WorldCamera
 {
-    [RequireComponent(typeof(CinemachineTargetGroup))]
     public class WorldCameraView : MonoBehaviour
     {
-        [SerializeField] private CinemachineTargetGroup _targetGroup;
-        [SerializeField] private CinemachineBasicMultiChannelPerlin _perlin;
+        private const int ShakeVibrato = 10;
+        private const float ShakeRandomness = 90f;
+        private const float MaxEdgePercentage = 30f;
+        private const float PercentToFraction = 0.01f;
+
         [SerializeField] private Camera _camera;
         [SerializeField] private Camera _baseCamera;
-        [SerializeField] private CinemachineCamera _cinemachineCamera;
-        [SerializeField] private CinemachineGroupFraming _cinemachineGroupFraming;
-        [SerializeField] private CinemachinePositionComposer _cinemachinePositionComposer;
         [SerializeField] private float _deafultOrthographicSize = 30f;
-        [SerializeField] private float _deafultGroupFramingDamping = 8;
-        [SerializeField] private Vector3 _deafultPositionComposerDamping = new Vector3(10,10,10);
+        // Percentage of the screen kept as empty margin between the targets bounding box and the screen edge.
+        // 0 = the bounding box's bigger dimension touches the screen edges exactly; 30 = 30% of the screen is left as margin.
+        [Range(0f, MaxEdgePercentage)]
+        [SerializeField] private float _percentageKeptFromScreenEdges = 10f;
+        // Closest the framing is allowed to zoom in, even when the targets are tightly clustered.
+        [SerializeField] private float _minOrthographicSize = 10f;
+        // Extra empty space reserved at the bottom of the screen only, as a percentage of screen height,
+        // on top of the uniform edge margin above. Shifts the framed targets upward.
+        [Range(0f, MaxEdgePercentage)]
+        [SerializeField] private float _extraPercentageKeptFromScreenBottom;
+        [SerializeField] private Vector3 _deafultPositionDamping = new Vector3(10, 10, 10);
+        [SerializeField] private float _deafultFramingDamping = 8f;
         [SerializeField] private Ease _zoomEase = Ease.OutCubic;
 
-        private CancellationTokenSource _shakeCancellationTokenSource;
+        private readonly List<CameraTarget> _targets = new List<CameraTarget>();
         private CancellationTokenSource _zoomCancellationTokenSource;
+        private Tween _shakeTween;
+        private Vector3 _shakeOffset;
+        private Vector3 _framedPosition;
+        private Vector3 _positionDamping;
+        private float _framingDamping;
+
         public Camera Camera => _camera;
         public Camera BaseCamera => _baseCamera;
+
+        public void Setup()
+        {
+            _framedPosition = transform.position;
+            _positionDamping = _deafultPositionDamping;
+            _framingDamping = _deafultFramingDamping;
+        }
+
+        public void Cleanup()
+        {
+            _zoomCancellationTokenSource?.Cancel();
+            _zoomCancellationTokenSource = null;
+            _shakeTween?.Kill();
+            _shakeTween = null;
+            _shakeOffset = Vector3.zero;
+        }
 
         public void MultiplyOthographicSize(float multiplier)
         {
             _zoomCancellationTokenSource?.Cancel();
             _zoomCancellationTokenSource = null;
-            // Only the max is set here so the group-framing extension can still dynamically zoom in
-            // (down to OrthoSizeRange.x) to frame clustered players during gameplay.
-            var range = _cinemachineGroupFraming.OrthoSizeRange;
-            range.y = _deafultOrthographicSize * multiplier;
-            _cinemachineGroupFraming.OrthoSizeRange = range;
-            _cinemachineCamera.Lens.OrthographicSize = _deafultOrthographicSize * multiplier;
-        }
-
-        // Locks the camera to an exact orthographic size. The CinemachineGroupFraming extension re-drives
-        // Lens.OrthographicSize every frame toward clamp(groupFramedHeight, OrthoSizeRange.x, OrthoSizeRange.y),
-        // so we pin both ends of the range to the same value; otherwise the extension re-frames the group and drifts.
-        private void SetOrthographicSize(float size)
-        {
-            var range = _cinemachineGroupFraming.OrthoSizeRange;
-            range.x = size;
-            range.y = size;
-            _cinemachineGroupFraming.OrthoSizeRange = range;
-            _cinemachineCamera.Lens.OrthographicSize = size;
+            _camera.orthographicSize = _deafultOrthographicSize * multiplier;
         }
 
         public void SetIsDampingEnabled(bool isEnabled)
         {
-            if (isEnabled)
-            {
-                _cinemachinePositionComposer.Damping = _deafultPositionComposerDamping;
-                _cinemachineGroupFraming.Damping = _deafultGroupFramingDamping;
-            }
-            else
-            {
-                _cinemachinePositionComposer.Damping = Vector3.zero;
-                _cinemachineGroupFraming.Damping = 0f;
-            }
+            _positionDamping = isEnabled ? _deafultPositionDamping : Vector3.zero;
+            _framingDamping = isEnabled ? _deafultFramingDamping : 0f;
         }
-        
+
         public async Awaitable LerpOrthographicSize(float targetMultiplier, float durationSeconds, CancellationToken cancellationToken)
         {
             _zoomCancellationTokenSource?.Cancel();
@@ -86,13 +91,77 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             }
         }
 
+        public void AddFollowTarget(Transform target, float radius)
+        {
+            _targets.Add(new CameraTarget(target, radius));
+        }
+
+        public void RemoveFollowTarget(Transform target)
+        {
+            for (var index = _targets.Count - 1; index >= 0; index--)
+            {
+                if (_targets[index].Transform == target)
+                {
+                    _targets.RemoveAt(index);
+                    return;
+                }
+            }
+        }
+
+        public void ClearTargets()
+        {
+            _targets.Clear();
+        }
+
+        public void ShakeCamera(float intensity, float durationInSeconds)
+        {
+            _shakeTween?.Kill();
+            _shakeOffset = Vector3.zero;
+            _shakeTween = DOTween.Shake(() => _shakeOffset, offset => _shakeOffset = offset, durationInSeconds, intensity, ShakeVibrato, ShakeRandomness, true, true)
+                .SetEase(Ease.Linear)
+                .OnKill(() => _shakeOffset = Vector3.zero);
+        }
+
+        // Frames all follow targets: centres the camera on their combined bounds and zooms to fit them,
+        // then applies the current shake offset. Called every late update by the controller.
+        public void UpdateFraming(float deltaTime)
+        {
+            if (_targets.Count == 0)
+            {
+                transform.position = _framedPosition + _shakeOffset;
+                return;
+            }
+
+            GetTargetsBounds(out var center, out var extents);
+
+            var targetSize = GetFramedOrthographicSize(extents);
+            _camera.orthographicSize = Damp(_camera.orthographicSize, targetSize, _framingDamping, deltaTime);
+
+            // Move the camera down so the reserved space ends up at the bottom instead of split evenly.
+            var bottomOffset = _camera.orthographicSize * _extraPercentageKeptFromScreenBottom * PercentToFraction;
+            _framedPosition.x = Damp(_framedPosition.x, center.x, _positionDamping.x, deltaTime);
+            _framedPosition.y = Damp(_framedPosition.y, center.y - bottomOffset, _positionDamping.y, deltaTime);
+            transform.position = _framedPosition + _shakeOffset;
+        }
+
+        public Vector3 ScreenToWorldPoint(Vector3 position)
+        {
+            return _camera.ScreenToWorldPoint(position);
+        }
+
+        // Locks the camera to an exact orthographic size by pinning both ends of the range,
+        // otherwise the framing re-frames the group and drifts.
+        private void SetOrthographicSize(float size)
+        {
+            _camera.orthographicSize = size;
+        }
+
         private async Awaitable LerpOrthographicSizeAsync(float targetMultiplier, float durationSeconds, CancellationTokenSource cancellationTokenSource)
         {
             var cancellationToken = cancellationTokenSource.Token;
-            var startSize = _cinemachineGroupFraming.OrthoSizeRange.y;
             var targetSize = _deafultOrthographicSize * targetMultiplier;
 
-            await DOTween.To(() => startSize, SetOrthographicSize, targetSize, durationSeconds)
+            await DOTween.To(() => _camera.orthographicSize, SetOrthographicSize, targetSize, durationSeconds)
                 .SetEase(_zoomEase)
                 .WithCancellationSafe(cancellationToken);
 
@@ -103,37 +172,59 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
                 _zoomCancellationTokenSource = null;
             }
         }
-        
-        public void AddFollowTarget(Transform target, float weight, float radius)
+
+        private void GetTargetsBounds(out Vector2 center, out Vector2 extents)
         {
-            _targetGroup.AddMember(target, weight, radius);
+            var min = new Vector2(float.MaxValue, float.MaxValue);
+            var max = new Vector2(float.MinValue, float.MinValue);
+
+            foreach (var target in _targets)
+            {
+                var position = target.Transform.position;
+                var radius = target.Radius;
+                min.x = Mathf.Min(min.x, position.x - radius);
+                min.y = Mathf.Min(min.y, position.y - radius);
+                max.x = Mathf.Max(max.x, position.x + radius);
+                max.y = Mathf.Max(max.y, position.y + radius);
+            }
+
+            center = (min + max) * 0.5f;
+            extents = (max - min) * 0.5f;
         }
 
-        public void RemoveFollowTarget(Transform target)
+        private float GetFramedOrthographicSize(Vector2 extents)
         {
-            _targetGroup.RemoveMember(target);
+            // The bounding box should occupy this fraction of the screen; the rest is the requested edge margin.
+            var boundingBoxScreenFraction = 1f - _percentageKeptFromScreenEdges * PercentToFraction;
+            // Vertically, reserve the extra bottom margin too, so the box shrinks to leave room for it.
+            var boundingBoxHeightFraction = boundingBoxScreenFraction - _extraPercentageKeptFromScreenBottom * PercentToFraction;
+            var sizeForHeight = extents.y / boundingBoxHeightFraction;
+            var sizeForWidth = extents.x / _camera.aspect / boundingBoxScreenFraction;
+            var desiredSize = Mathf.Max(sizeForHeight, sizeForWidth);
+            return Mathf.Max(desiredSize, _minOrthographicSize);
         }
 
-        public void ClearTargets()
+        private static float Damp(float current, float target, float damping, float deltaTime)
         {
-            _targetGroup.Targets.Clear();
+            if (damping <= 0f)
+            {
+                return target;
+            }
+
+            var lerpFactor = 1f - Mathf.Exp(-deltaTime / damping);
+            return Mathf.Lerp(current, target, lerpFactor);
         }
 
-        public async Awaitable ShakeCamera(float intensity, float durationInSeconds, CancellationTokenSource cancellationTokenSource)
+        private readonly struct CameraTarget
         {
-            _shakeCancellationTokenSource?.Cancel();
-            _shakeCancellationTokenSource = new CancellationTokenSource();
-            _shakeCancellationTokenSource.CancelWhenTokenCancelled(cancellationTokenSource.Token);
-            _perlin.AmplitudeGain = intensity;
-            await Awaitable.WaitForSecondsAsync(durationInSeconds);
-            _perlin.AmplitudeGain = 0f;
-            transform.rotation = Quaternion.identity;
-            _shakeCancellationTokenSource = null;        
-        }
+            public readonly Transform Transform;
+            public readonly float Radius;
 
-        public Vector3 ScreenToWorldPoint(Vector3 position)
-        {
-            return _camera.ScreenToWorldPoint(position);
+            public CameraTarget(Transform transform, float radius)
+            {
+                Transform = transform;
+                Radius = radius;
+            }
         }
     }
 }

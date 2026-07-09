@@ -1,8 +1,6 @@
 using System.Threading;
-using Core.Scripts.Utils;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.Logger.Base;
-using CoreDomain.Scripts.Services.StateMachineService;
 using CoreDomain.Scripts.Services.UpdateService;
 using UnityEngine;
 
@@ -10,17 +8,14 @@ namespace Core.Scripts.Mvc.WorldCamera
 {
     public class WorldCameraController : IWorldCameraController, ILateUpdatable
     {
-        private const float CameraTargetWeight = 1f;
         private const float CameraTargetRadius = 5f;
-        
+
         private readonly WorldCameraView _worldCameraView;
-        private readonly IStateMachineService _stateMachineService;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
 
-        public WorldCameraController(WorldCameraView worldCameraView, IStateMachineService stateMachineService, IUpdateSubscriptionService updateSubscriptionService)
+        public WorldCameraController(WorldCameraView worldCameraView, IUpdateSubscriptionService updateSubscriptionService)
         {
             _worldCameraView = worldCameraView;
-            _stateMachineService = stateMachineService;
             _updateSubscriptionService = updateSubscriptionService;
         }
 
@@ -30,12 +25,14 @@ namespace Core.Scripts.Mvc.WorldCamera
 
         public void InitEntryPoint()
         {
+            _worldCameraView.Setup();
             _updateSubscriptionService.RegisterLateUpdatable(this);
         }
-        
+
         public void InitExitPoint()
         {
             _updateSubscriptionService.UnregisterLateUpdatable(this);
+            _worldCameraView.Cleanup();
         }
 
         public void MultiplyOthographicSize(float multiplier)
@@ -56,7 +53,7 @@ namespace Core.Scripts.Mvc.WorldCamera
         public void AddFollowTarget(Transform target)
         {
             LogService.LogTopic($"Add camera target {target.gameObject.name}", LogTopicType.Camera);
-            _worldCameraView.AddFollowTarget(target, CameraTargetWeight, CameraTargetRadius);
+            _worldCameraView.AddFollowTarget(target, CameraTargetRadius);
         }
 
         public void RemoveFollowTarget(Transform target)
@@ -74,7 +71,7 @@ namespace Core.Scripts.Mvc.WorldCamera
         public void ShakeCamera(float intensity, float duration)
         {
             LogService.LogTopic($"Shake camera with intensity {intensity} for {duration} seconds", LogTopicType.Camera);
-            _worldCameraView.ShakeCamera(intensity, duration, _stateMachineService.CurrentState().CancellationTokenSource).Forget();
+            _worldCameraView.ShakeCamera(intensity, duration);
         }
 
         public Vector3 ScreenToWorldPoint(Vector3 position)
@@ -84,6 +81,7 @@ namespace Core.Scripts.Mvc.WorldCamera
 
         public void ManagedLateUpdate()
         {
+            _worldCameraView.UpdateFraming(Time.deltaTime);
             _worldCameraView.BaseCamera.orthographicSize = _worldCameraView.Camera.orthographicSize;
         }
     }
