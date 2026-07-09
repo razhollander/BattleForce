@@ -135,7 +135,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             grapplingHookProjectile.StartPosition = position;
             grapplingHookProjectile.Position = position;
             grapplingHookProjectile.Velocity = velocity;
-            grapplingHookProjectile.IsHookAttached = false;
+            grapplingHookProjectile.HitData = default;
             return grapplingHookProjectile;
         }
 

@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
@@ -159,9 +160,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _koTalentController.HitWall();
         }
 
-        public void HitGrapplingHookWithWall(ushort wallId, int tick)
+        public void HitGrapplingHook(GrapplingHookHitType hitType, ushort attachedEntityId, int tick)
         {
-            _grapplingHookTalentController.HitWall(wallId, tick);
+            _grapplingHookTalentController.Hit(hitType, attachedEntityId, tick);
         }
 
         public void CatchFishingRodEnemy(ushort enemyPlayerId, int tick)

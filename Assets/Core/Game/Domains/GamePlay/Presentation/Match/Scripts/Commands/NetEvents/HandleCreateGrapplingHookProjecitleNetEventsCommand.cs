@@ -44,7 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var rotation = hookModel.Position - casterPosition.ToNumericsVector2();
 
                 _hookProjectilesControllers.CreateGrapplingHookProjectile(hookModel.Id, casterPlayerId, hookModel.Position.ToUnityVector2(), rotation.ToUnityVector2(),
-                    casterPosition, hookModel.IsHookAttached);
+                    casterPosition, hookModel.HitData.IsHookAttached);
             }
 
             _cachedPresentationEventsService.CreateGrapplingHookProjectileNetEvents.Clear();

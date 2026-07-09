@@ -102,7 +102,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandleSwapFieldPlayerCollision(objectA, objectB);
                 HandleKOProjectilePlayerCollision(objectA, objectB);
                 HandleKOProjectileWallCollision(objectA, objectB);
-                HandleGrapplingHookWallCollision(objectA, objectB);
+                HandleGrapplingHookCollision(objectA, objectB);
                 HandleGrapplingHookCasterEnemyCollision(objectA, objectB);
                 HandleFishingRodTipWallCollision(objectA, objectB);
                 HandleFishingRodTipEnemyCollision(objectA, objectB);
@@ -297,25 +297,52 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService.SimulationState.RemoveChickenEggById(egg.Id);
         }
 
-        private void HandleGrapplingHookWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        // The grappling hook attaches to walls, frigid blocks, and players that are currently in Rock state.
+        private void HandleGrapplingHookCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
-            var isWallToProjectile = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.GrapplingHookProjectile;
-            var isProjectileToWall = objectA.PhysicsBodyType == PhysicsBodyType.GrapplingHookProjectile && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
+            var isProjectileA = objectA.PhysicsBodyType == PhysicsBodyType.GrapplingHookProjectile;
+            var isProjectileB = objectB.PhysicsBodyType == PhysicsBodyType.GrapplingHookProjectile;
 
-            if (!isWallToProjectile && !isProjectileToWall)
+            // Exactly one of the two bodies must be the projectile.
+            if (isProjectileA == isProjectileB)
             {
                 return;
             }
 
-            var projectileId = isProjectileToWall ? objectA.Id : objectB.Id;
-            var wallId = isProjectileToWall ? objectB.Id : objectA.Id;
+            var projectileObject = isProjectileA ? objectA : objectB;
+            var attachedObject = isProjectileA ? objectB : objectA;
 
+            if (!TryGetGrapplingHookHitType(attachedObject, out var hitType))
+            {
+                return;
+            }
+
+            var projectileId = projectileObject.Id;
             if (!_matchDataService.SimulationState.TryGetGrapplingHookProjectileById(projectileId, out var projectile))
             {
                 return;
             }
 
-            _playersTalentsManager.HitGrapplingHookWithWall(projectile.PlayerCasterId, projectileId, wallId, _processedTick);
+            _playersTalentsManager.HitGrapplingHook(projectile.PlayerCasterId, projectileId, hitType, attachedObject.Id, _processedTick);
+        }
+
+        private bool TryGetGrapplingHookHitType(PhysicsBodyData attachedObject, out GrapplingHookHitType hitType)
+        {
+            switch (attachedObject.PhysicsBodyType)
+            {
+                case PhysicsBodyType.Wall:
+                    hitType = GrapplingHookHitType.Wall;
+                    return true;
+                case PhysicsBodyType.FrigidBlock:
+                    hitType = GrapplingHookHitType.FrigidBlock;
+                    return true;
+                case PhysicsBodyType.PlayerSpaceship when IsRockActive(attachedObject.Id):
+                    hitType = GrapplingHookHitType.RockPlayer;
+                    return true;
+                default:
+                    hitType = default;
+                    return false;
+            }
         }
 
         private void HandleFishingRodTipWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)

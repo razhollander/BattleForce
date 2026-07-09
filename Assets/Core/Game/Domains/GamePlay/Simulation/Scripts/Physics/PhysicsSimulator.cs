@@ -1289,9 +1289,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var filter = fixture.FilterData;
             filter.groupIndex = 0; // clear team grouping so it collides with teammates too; category/mask below decide the rest
             filter.categoryBits |= PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
+            filter.categoryBits |= PhysicsCollisionType.Wall.GetCollisionMask();
             filter.categoryBits |= PhysicsCollisionType.PowerUpBall.GetCollisionMask();
+            // Expose the GrapplingHookProjectile category so a hook (mask = GrapplingHookProjectile) can attach to a rock.
+            filter.categoryBits |= PhysicsCollisionType.GrapplingHookProjectile.GetCollisionMask();
             filter.maskBits |= PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
             filter.maskBits |= PhysicsCollisionType.Wall.GetCollisionMask();
+            filter.maskBits |= PhysicsCollisionType.GrapplingHookProjectile.GetCollisionMask();
             fixture.FilterData = filter;
 
             fixture.Density = density;

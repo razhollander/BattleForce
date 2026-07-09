@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
@@ -199,11 +200,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             }
         }
 
-        public void HitGrapplingHookWithWall(ushort casterId, ushort projectileId, ushort wallId, int tick)
+        public void HitGrapplingHook(ushort casterId, ushort projectileId, GrapplingHookHitType hitType, ushort attachedEntityId, int tick)
         {
             if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
             {
-                controllers.HitGrapplingHookWithWall(wallId, tick);
+                controllers.HitGrapplingHook(hitType, attachedEntityId, tick);
             }
             else
             {

@@ -625,7 +625,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var rotation = grapplingHookProjectile.Position - casterPosition.ToNumericsVector2();
 
                 _matchDataService.AddGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position);
-                _grapplingHookProjectilesControllers.CreateGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, grapplingHookProjectile.IsHookAttached);
+                _grapplingHookProjectilesControllers.CreateGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, grapplingHookProjectile.HitData.IsHookAttached);
             }
         }
 
