@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -24,13 +25,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 
         public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig,
             INetEventsDataService netEventsDataService, ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator,
-            IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, IPlayersMouseDataService playersMouseDataService)
+            IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, IPlayersMouseDataService playersMouseDataService, IPlayersInLavaTrackerService playersInLavaTrackerService)
         {
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _gamePlayConfigService = gamePlayConfigService;
             _talentControllersPerPlayer = new Dictionary<int, PlayerTalentControllers>(networkConfig.MaxCap.ConcurrentPlayers);
-            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(()=> new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, overrideableNetEventsService, commandFactory, sharedGamePlayConfig, playersMouseDataService),networkConfig.MaxCap.ConcurrentPlayers);
+
+            _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(
+                () => new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, overrideableNetEventsService,
+                    commandFactory, sharedGamePlayConfig, playersMouseDataService, playersInLavaTrackerService), networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)

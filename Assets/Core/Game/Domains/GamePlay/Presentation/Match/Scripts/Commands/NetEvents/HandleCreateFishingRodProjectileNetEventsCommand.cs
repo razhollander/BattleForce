@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 return;
             }
-            LogService.LogError("got event!");
+
             foreach (var netEvent in netEvents)
             {
                 var tipModel = netEvent.FishingRodProjectile;

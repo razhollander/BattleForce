@@ -47,12 +47,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private GameObject _headbuttHelmet;
         [SerializeField] private float _headbuttHelmetDashHideSeconds = 1f;
         [SerializeField] private GameObject _rockGameObject;
+        [field: SerializeField] public Transform LeaderFlagPivot { get; private set; }
 
         private CancellationTokenSource _headbuttHelmetHideCancellationTokenSource;
         private bool _isHeadbuttDashing;
         public Action Despawn { get; set; }
         
         public PlayerView Base => _playerView;
+
         public void UpdateTalents(TalentVisualData[] talents)
         {
             _talentsHudView.UpdateTalents(talents);
@@ -412,9 +414,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             await _powerUpHudView.StopGrantingPhaseReelAndShowGranted(grantedSprite, cancellationToken);
         }
 
-        public void SetIsFlagRight(bool isRight)
+        public void UpdateLeaderFlag(bool isRight, Vector2 position)
         {
             _leaderFlagView.SetIsRight(isRight);
+            _leaderFlagView.SetPosition(position);
         }
     }
 }

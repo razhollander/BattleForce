@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
             _cachedPlayersToDamage = new List<ushort>(networkConfig.MaxCap.ConcurrentPlayers);
             _playerInLavaDataPool = new ConcurrentPool<PlayerInLavaData>(() => new PlayerInLavaData(), networkConfig.MaxCap.ConcurrentPlayers);
         }
-
+        
         public void OnPlayerEnterLava(ushort playerId)
         {
             if (!_playersInLava.ContainsKey(playerId))
@@ -53,10 +53,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
             }
         }
 
-        public void StepTimePassedSinceLastDamageTaken(float deltaTime)
+        public void StepTimePassedSinceLastDamageTaken(FixedUnorderedList<ushort> playerIdsNotToIncrementTimerInLava, float deltaTime)
         {
             foreach (var playerId in _playersInLava.Keys)
             {
+                if (playerIdsNotToIncrementTimerInLava.Contains(playerId))
+                {
+                    continue;
+                }
+                
                 _playersInLava[playerId].TimePassSinceLastDamageTaken += deltaTime;
             }
         }
@@ -91,7 +96,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
         
         public void ResetPlayerTimePassedSinceLastDamageTaken(ushort playerId)
         {
-            _playersInLava[playerId].TimePassSinceLastDamageTaken = 0;
+            if (_playersInLava.TryGetValue(playerId, out var playerInLava))
+            {
+                playerInLava.TimePassSinceLastDamageTaken = 0;
+            }
         }
         
         private class PlayerInLavaData

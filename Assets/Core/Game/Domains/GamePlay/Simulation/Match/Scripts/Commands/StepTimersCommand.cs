@@ -1,9 +1,13 @@
+using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
+using Core.Scripts.Network;
+using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
@@ -18,7 +22,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ILockOnTargetTimerService _lockOnTargetTimerService;
         
         private float _deltaTime;
-   
+        private FixedUnorderedList<ushort> _cachedPlayerIdsNotToIncrementTimerInLavaList;
+
         public StepTimersCommand SetStepDeltaTime(float deltaTime)
         {
             _deltaTime = deltaTime;
@@ -33,16 +38,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
+            var networkConfig = _diContainer.Resolve<NetworkConfig>();
+            _cachedPlayerIdsNotToIncrementTimerInLavaList = new FixedUnorderedList<ushort>(networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void Execute()
         {
             StepPlayersShootCooldown(_deltaTime);
             _powerUpsSpawnerService.StepTimer(_deltaTime);
-            _playersInLavaTrackerService.StepTimePassedSinceLastDamageTaken(_deltaTime);
+            StepPlayersInLavaTimer(_deltaTime);
             _headLessQuitterController.StepTimer(_deltaTime);
             StepPreperationPhaseTimer(_deltaTime);
             _lockOnTargetTimerService.StepTimers(_deltaTime);
+        }
+
+        private void StepPlayersInLavaTimer(float deltaTime)
+        {
+            var playerIdsNotToIncrementTimerInLava = GetPlayerIdsNotToIncrementTimerInLava();
+            _playersInLavaTrackerService.StepTimePassedSinceLastDamageTaken(playerIdsNotToIncrementTimerInLava, deltaTime);
+        }
+
+        private FixedUnorderedList<ushort> GetPlayerIdsNotToIncrementTimerInLava()
+        {
+            _cachedPlayerIdsNotToIncrementTimerInLavaList.Clear();
+            foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                if (playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) &&
+                    selectedTalent is {IsCurrentlyActive: true, TalentType: TalentType.Rock})
+                {
+                    ref var playerId = ref _cachedPlayerIdsNotToIncrementTimerInLavaList.AddAndGet();
+                    playerId = playerState.Id;
+                }
+            }
+
+            return _cachedPlayerIdsNotToIncrementTimerInLavaList;
         }
 
         private void StepPreperationPhaseTimer(float deltaTime)

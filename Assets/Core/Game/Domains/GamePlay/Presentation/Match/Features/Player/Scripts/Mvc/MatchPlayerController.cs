@@ -371,7 +371,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             if (_isFlagActive)
             {
                 var isDirectionRight = direction.ToUnityVector2().x > 0;
-                _playerView.SetIsFlagRight(isDirectionRight);
+                _playerView.UpdateLeaderFlag(isDirectionRight, _playerView.LeaderFlagPivot.position);
             }
         }
 
@@ -500,7 +500,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetIsLeader(bool isLeader)
         {
-            LogService.LogError("SetIsLeader: " + isLeader);
             _isFlagActive = isLeader;
             _playerView.SetIsLeader(isLeader);
         }

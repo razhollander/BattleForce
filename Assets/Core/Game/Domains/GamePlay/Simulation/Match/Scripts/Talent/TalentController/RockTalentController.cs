@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
@@ -25,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly ICommandFactory _commandFactory;
+        private readonly IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private AddForceToPlayerCommand _addForceToPlayerCommand;
         private SpinPlayerCommand _spinPlayerCommand;
 
@@ -37,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         }
 
         public RockTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService,
-            ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, ICommandFactory commandFactory)
+            ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, ICommandFactory commandFactory, IPlayersInLavaTrackerService playersInLavaTrackerService)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
@@ -45,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _commandFactory = commandFactory;
+            _playersInLavaTrackerService = playersInLavaTrackerService;
         }
 
         public void InitEntryPoint()
@@ -179,6 +182,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             _netEventsDataService.AddDeactivateRockTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);
+            _playersInLavaTrackerService.ResetPlayerTimePassedSinceLastDamageTaken(_casterPlayerId);
         }
 
         public void ResetData()

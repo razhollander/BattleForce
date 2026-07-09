@@ -5,6 +5,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
     public class LeaderFlagView : MonoBehaviour
     {
         [SerializeField] private GameObject _flagRoot;
+        [SerializeField] private Transform _flagRootTransform;
         [SerializeField] private GameObject _rightFlag;
         [SerializeField] private GameObject _leftFlag;
 
@@ -17,6 +18,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _rightFlag.SetActive(isRight);
             _leftFlag.SetActive(!isRight);
+        }
+
+        public void SetPosition(Vector2 position)
+        {
+            _flagRootTransform.position = position;
         }
     }
 }
