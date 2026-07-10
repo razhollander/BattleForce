@@ -144,12 +144,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _camera: {fileID: 5516514484391682885}
   _baseCamera: {fileID: 6136589543999935624}
-  _deafultOrthographicSize: 30
-  _percentageKeptFromScreenEdges: 10
-  _minOrthographicSize: 15
-  _extraPercentageKeptFromScreenBottom: 5
-  _deafultPositionDamping: {x: 0.5, y: 0.5, z: 0.5}
-  _deafultFramingDamping: 0.5
+  _deafultOrthographicSize: 25
+  _percentageKeptFromScreenEdges: 15
+  _minOrthographicSize: 20
+  _extraPercentageKeptFromScreenBottom: 10
+  _deafultPositionDamping: {x: 0.7, y: 0.7, z: 0.7}
+  _deafultZoomOutDamping: 0.1
+  _deafultZoomInDamping: 2
   _zoomEase: 9
 --- !u!1 &4204904456553402841
 GameObject:

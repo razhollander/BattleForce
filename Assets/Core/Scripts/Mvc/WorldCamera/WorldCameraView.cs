@@ -13,7 +13,6 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         private const int ShakeVibrato = 10;
         private const float ShakeRandomness = 90f;
         private const float MaxEdgePercentage = 30f;
-        private const float PercentToFraction = 0.01f;
 
         [SerializeField] private Camera _camera;
         [SerializeField] private Camera _baseCamera;
@@ -29,7 +28,9 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         [Range(0f, MaxEdgePercentage)]
         [SerializeField] private float _extraPercentageKeptFromScreenBottom;
         [SerializeField] private Vector3 _deafultPositionDamping = new Vector3(10, 10, 10);
-        [SerializeField] private float _deafultFramingDamping = 8f;
+        // Framing (orthographic size) damping, kept separate for zooming out (target grows) and zooming in (target shrinks).
+        [SerializeField] private float _deafultZoomOutDamping = 8f;
+        [SerializeField] private float _deafultZoomInDamping = 8f;
         [SerializeField] private Ease _zoomEase = Ease.OutCubic;
 
         private readonly List<CameraTarget> _targets = new List<CameraTarget>();
@@ -38,7 +39,10 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         private Vector3 _shakeOffset;
         private Vector3 _framedPosition;
         private Vector3 _positionDamping;
-        private float _framingDamping;
+        private float _zoomOutDamping;
+        private float _zoomInDamping;
+        // While true an external zoom animation (LerpOrthographicSize) owns the lens size, so framing leaves it alone.
+        private bool _isOrthographicSizeLockedByZoom;
 
         public Camera Camera => _camera;
         public Camera BaseCamera => _baseCamera;
@@ -47,7 +51,8 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         {
             _framedPosition = transform.position;
             _positionDamping = _deafultPositionDamping;
-            _framingDamping = _deafultFramingDamping;
+            _zoomOutDamping = _deafultZoomOutDamping;
+            _zoomInDamping = _deafultZoomInDamping;
         }
 
         public void Cleanup()
@@ -63,13 +68,16 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         {
             _zoomCancellationTokenSource?.Cancel();
             _zoomCancellationTokenSource = null;
+            // Hands the lens back to the framing and seeds a starting zoom for this map.
+            _isOrthographicSizeLockedByZoom = false;
             _camera.orthographicSize = _deafultOrthographicSize * multiplier;
         }
 
         public void SetIsDampingEnabled(bool isEnabled)
         {
             _positionDamping = isEnabled ? _deafultPositionDamping : Vector3.zero;
-            _framingDamping = isEnabled ? _deafultFramingDamping : 0f;
+            _zoomOutDamping = isEnabled ? _deafultZoomOutDamping : 0f;
+            _zoomInDamping = isEnabled ? _deafultZoomInDamping : 0f;
         }
 
         public async Awaitable LerpOrthographicSize(float targetMultiplier, float durationSeconds, CancellationToken cancellationToken)
@@ -132,15 +140,21 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
                 return;
             }
 
-            GetTargetsBounds(out var center, out var extents);
+            CameraFramingUtils.CalculateTargetsBounds(_targets, out var center, out var extents);
 
-            var targetSize = GetFramedOrthographicSize(extents);
-            _camera.orthographicSize = Damp(_camera.orthographicSize, targetSize, _framingDamping, deltaTime);
+            if (!_isOrthographicSizeLockedByZoom)
+            {
+                var currentSize = _camera.orthographicSize;
+                var targetSize = CameraFramingUtils.CalculateFramedOrthographicSize(extents, _camera.aspect, _percentageKeptFromScreenEdges, _extraPercentageKeptFromScreenBottom, _minOrthographicSize);
+                var isZoomingOut = targetSize > currentSize;
+                var zoomDamping = isZoomingOut ? _zoomOutDamping : _zoomInDamping;
+                _camera.orthographicSize = CameraFramingUtils.Damp(currentSize, targetSize, zoomDamping, deltaTime);
+            }
 
             // Move the camera down so the reserved space ends up at the bottom instead of split evenly.
-            var bottomOffset = _camera.orthographicSize * _extraPercentageKeptFromScreenBottom * PercentToFraction;
-            _framedPosition.x = Damp(_framedPosition.x, center.x, _positionDamping.x, deltaTime);
-            _framedPosition.y = Damp(_framedPosition.y, center.y - bottomOffset, _positionDamping.y, deltaTime);
+            var bottomOffset = CameraFramingUtils.CalculateBottomWorldOffset(_camera.orthographicSize, _extraPercentageKeptFromScreenBottom);
+            _framedPosition.x = CameraFramingUtils.Damp(_framedPosition.x, center.x, _positionDamping.x, deltaTime);
+            _framedPosition.y = CameraFramingUtils.Damp(_framedPosition.y, center.y - bottomOffset, _positionDamping.y, deltaTime);
             transform.position = _framedPosition + _shakeOffset;
         }
 
@@ -149,8 +163,7 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             return _camera.ScreenToWorldPoint(position);
         }
 
-        // Locks the camera to an exact orthographic size by pinning both ends of the range,
-        // otherwise the framing re-frames the group and drifts.
+        // Setter target for the zoom tween in LerpOrthographicSizeAsync.
         private void SetOrthographicSize(float size)
         {
             _camera.orthographicSize = size;
@@ -161,6 +174,8 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             var cancellationToken = cancellationTokenSource.Token;
             var targetSize = _deafultOrthographicSize * targetMultiplier;
 
+            // Take ownership of the lens size so framing stops driving it while we animate; released on the next MultiplyOthographicSize.
+            _isOrthographicSizeLockedByZoom = true;
             await DOTween.To(() => _camera.orthographicSize, SetOrthographicSize, targetSize, durationSeconds)
                 .SetEase(_zoomEase)
                 .WithCancellationSafe(cancellationToken);
@@ -170,60 +185,6 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             if (_zoomCancellationTokenSource == cancellationTokenSource)
             {
                 _zoomCancellationTokenSource = null;
-            }
-        }
-
-        private void GetTargetsBounds(out Vector2 center, out Vector2 extents)
-        {
-            var min = new Vector2(float.MaxValue, float.MaxValue);
-            var max = new Vector2(float.MinValue, float.MinValue);
-
-            foreach (var target in _targets)
-            {
-                var position = target.Transform.position;
-                var radius = target.Radius;
-                min.x = Mathf.Min(min.x, position.x - radius);
-                min.y = Mathf.Min(min.y, position.y - radius);
-                max.x = Mathf.Max(max.x, position.x + radius);
-                max.y = Mathf.Max(max.y, position.y + radius);
-            }
-
-            center = (min + max) * 0.5f;
-            extents = (max - min) * 0.5f;
-        }
-
-        private float GetFramedOrthographicSize(Vector2 extents)
-        {
-            // The bounding box should occupy this fraction of the screen; the rest is the requested edge margin.
-            var boundingBoxScreenFraction = 1f - _percentageKeptFromScreenEdges * PercentToFraction;
-            // Vertically, reserve the extra bottom margin too, so the box shrinks to leave room for it.
-            var boundingBoxHeightFraction = boundingBoxScreenFraction - _extraPercentageKeptFromScreenBottom * PercentToFraction;
-            var sizeForHeight = extents.y / boundingBoxHeightFraction;
-            var sizeForWidth = extents.x / _camera.aspect / boundingBoxScreenFraction;
-            var desiredSize = Mathf.Max(sizeForHeight, sizeForWidth);
-            return Mathf.Max(desiredSize, _minOrthographicSize);
-        }
-
-        private static float Damp(float current, float target, float damping, float deltaTime)
-        {
-            if (damping <= 0f)
-            {
-                return target;
-            }
-
-            var lerpFactor = 1f - Mathf.Exp(-deltaTime / damping);
-            return Mathf.Lerp(current, target, lerpFactor);
-        }
-
-        private readonly struct CameraTarget
-        {
-            public readonly Transform Transform;
-            public readonly float Radius;
-
-            public CameraTarget(Transform transform, float radius)
-            {
-                Transform = transform;
-                Radius = radius;
             }
         }
     }
