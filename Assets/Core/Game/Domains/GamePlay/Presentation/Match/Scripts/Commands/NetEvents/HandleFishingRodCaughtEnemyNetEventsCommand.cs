@@ -22,7 +22,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
 
             // The caught tip is pinned to the enemy via the synced projectile position, so the line follows automatically.
-            // This command exists so the cached events are consumed each frame (hook point for future catch VFX/SFX).
+            // The throw-aim arrow is driven per-tick from each projectile's EnemyCaughtArrowDirection by the
+            // FinishingSecondCastEffectController, so nothing to do here beyond consuming the event.
             _cachedPresentationEventsService.FishingRodCaughtEnemyNetEvents.Clear();
         }
     }

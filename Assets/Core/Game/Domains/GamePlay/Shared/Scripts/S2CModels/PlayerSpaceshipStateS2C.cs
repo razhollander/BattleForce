@@ -18,7 +18,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsAlive = true;
         public bool IsSpinned;
         public PlayerAssistArrowType AssistArrowType;
-        public Vector2 SecondCastAimDirection;
         public PowerUpType CurrentPowerUp;
         public bool IsPowerUpCurrentlyActive;
         public bool IsCurrentlyInGrantingPowerUpPhase;
@@ -43,7 +42,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 IsAlive = this.IsAlive,
                 IsSpinned = this.IsSpinned,
                 AssistArrowType = this.AssistArrowType,
-                SecondCastAimDirection = this.SecondCastAimDirection,
                 CurrentPowerUp = this.CurrentPowerUp,
                 IsPowerUpCurrentlyActive = this.IsPowerUpCurrentlyActive,
                 IsCurrentlyInGrantingPowerUpPhase = this.IsCurrentlyInGrantingPowerUpPhase,
@@ -69,7 +67,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put(IsEngineOn);
             writer.Put(IsAlive);
             writer.Put((byte)AssistArrowType);
-            writer.PutVector2AsAngle16(SecondCastAimDirection);
             writer.Put(IsSpinned);
             writer.Put((byte)CurrentPowerUp);
             writer.Put(IsPowerUpCurrentlyActive);
@@ -95,7 +92,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             IsEngineOn = reader.GetBool();
             IsAlive = reader.GetBool();
             AssistArrowType = (PlayerAssistArrowType) reader.GetByte();
-            SecondCastAimDirection = reader.GetVector2FromAngle16();
             IsSpinned = reader.GetBool();
             CurrentPowerUp = (PowerUpType)reader.GetByte();
             IsPowerUpCurrentlyActive = reader.GetBool();
@@ -118,7 +114,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Shoot.SerializeDeltas(writer);
             TalentsState.SerializeDeltas(writer);
             writer.Put((ushort)AssistArrowType);
-            writer.PutVector2AsAngle16(SecondCastAimDirection);
         }
 
         public void DeserializeDeltas(NetDataReader reader)
@@ -127,7 +122,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Shoot.DeserializeDeltas(reader);
             TalentsState.DeserializeDeltas(reader);
             AssistArrowType = (PlayerAssistArrowType)reader.GetUShort();
-            SecondCastAimDirection = reader.GetVector2FromAngle16();
         }
     }
 }

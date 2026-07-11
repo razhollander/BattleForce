@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1866360971573727914}
   - component: {fileID: 2403652232341299280}
   m_Layer: 0
-  m_Name: LockOnHeartSight
+  m_Name: LockOnTargetSight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -20,6 +20,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimArrowEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
@@ -70,6 +71,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
         private IFishingRodTipControllers _fishingRodTipControllers;
+        private ISecondCastEffectController _secondCastEffectController;
         private ISoulGhostControllers _soulGhostControllers;
         private IFrigidBlocksControllers _frigidBlocksControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
@@ -118,6 +120,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
             _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
+            _secondCastEffectController = _diContainer.Resolve<ISecondCastEffectController>();
             _soulGhostControllers = _diContainer.Resolve<ISoulGhostControllers>();
             _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
@@ -159,6 +162,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers.DestroyAll();
             _grapplingHookProjectilesControllers.DestroyAll();
             _fishingRodTipControllers.DestroyAll();
+            _secondCastEffectController.DestroyAll();
             _soulGhostControllers.DestroyAll();
             _frigidBlocksControllers.DestroyAll();
             _chickenEggsControllers.DestroyAll();

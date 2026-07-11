@@ -16,6 +16,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public Vector2 Velocity;
         public FishingRodTipPhase Phase;
         public ushort CaughtEnemyId;
+        // Direction of the throw-aim arrow shown on the caught enemy. Vector2.Zero means no arrow is shown for this projectile.
+        public Vector2 EnemyCaughtArrowDirection;
 
         public void Serialize(NetDataWriter writer)
         {
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             writer.PutVector2Quantized(Position);
             writer.Put((byte)Phase);
             writer.Put(CaughtEnemyId);
+            writer.PutVector2Quantized(EnemyCaughtArrowDirection);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -33,18 +36,21 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             Position = reader.GetVector2Quantized();
             Phase = (FishingRodTipPhase)reader.GetByte();
             CaughtEnemyId = reader.GetUShort();
+            EnemyCaughtArrowDirection = reader.GetVector2Quantized();
         }
 
         public void SerializeDelta(NetDataWriter writer)
         {
             writer.Put(Id);
             writer.PutVector2Quantized(Position);
+            writer.PutVector2Quantized(EnemyCaughtArrowDirection);
         }
 
         public void DeserializeDelta(NetDataReader reader)
         {
             Id = reader.GetUShort();
             Position = reader.GetVector2Quantized();
+            EnemyCaughtArrowDirection = reader.GetVector2Quantized();
         }
 
         public bool Equals(ushort otherId)

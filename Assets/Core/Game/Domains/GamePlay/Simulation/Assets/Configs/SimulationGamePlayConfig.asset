@@ -157,14 +157,14 @@ MonoBehaviour:
         IdleAngularVelocityThreshold: 0.15
         SecondsIdleUntilDestroy: 3
       FishingRodTalentConfig:
-        TipSpeed: 45
-        ReturnSpeedMultiplier: 2
+        TipSpeed: 20
+        ReturnSpeedMultiplier: 3
         ArriveDistance: 2
         TipMaxLifetimeSeconds: 1.5
         ThrowWindowSeconds: 3
-        ThrowPushForce: 250
-        ThrowMinSpin: 20
-        ThrowMaxSpin: 35
+        ThrowPushForce: 60
+        ThrowMinSpin: 40
+        ThrowMaxSpin: 60
       SoulTalentConfig:
         GhostSpeed: 15
         SpawnForwardOffset: 2

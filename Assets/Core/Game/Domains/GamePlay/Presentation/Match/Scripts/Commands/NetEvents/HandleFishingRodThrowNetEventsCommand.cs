@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
 
             // The thrown enemy's spin/push is reflected through the state snapshot and the spin net-event.
-            // Hook point for future throw VFX/SFX. The tip is removed by the deactivate event.
+            // The caught enemy's aim arrow is hidden by the deactivate event that always follows a throw.
             _cachedPresentationEventsService.FishingRodThrowNetEvents.Clear();
         }
     }

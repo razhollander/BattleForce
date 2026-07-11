@@ -1489,7 +1489,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 playerModel.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
                 playerModel.Spaceship.TalentsState.AimDirection = playerState.Spaceship.TalentsState.AimDirection;
                 playerModel.Spaceship.AssistArrowType = playerState.Spaceship.AssistArrowType;
-                playerModel.Spaceship.SecondCastAimDirection = playerState.Spaceship.SecondCastAimDirection;
             }
         }
 
@@ -1519,6 +1518,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 if (simulationState.TryGetFishingRodProjectileById(tip.Id, out var state))
                 {
                     tip.Position = state.Position.ToUnityVector2();
+                    tip.EnemyCaughtArrowDirection = state.EnemyCaughtArrowDirection.ToUnityVector2();
                 }
             }
         }

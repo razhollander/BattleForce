@@ -197,20 +197,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             if (didThrowWindowEnd)
             {
-                ClearCaughtEnemyAim(caughtEnemy);
+                // The projectile (and its arrow) is removed by DeactivateTalent, so no explicit arrow clear is needed.
                 DeactivateTalent(tick);
                 return;
             }
 
-            if (IsCurrentlyAiming)
-            {
-                caughtEnemy.Spaceship.AssistArrowType = PlayerAssistArrowType.SecondCastAimArrow;
-                caughtEnemy.Spaceship.SecondCastAimDirection = GetThrowDirection(casterPlayerState, caughtEnemy);
-            }
-            else
-            {
-                ClearCaughtEnemyAim(caughtEnemy);
-            }
+            // The throw-aim arrow lives on the projectile so multiple rods catching the same enemy each show their own arrow.
+            projectile.EnemyCaughtArrowDirection = IsCurrentlyAiming
+                ? GetThrowDirection(casterPlayerState, caughtEnemy)
+                : Vector2.Zero;
         }
 
         private void UpdateReturnPhase(int tick, float deltaTime, PlayerStateS2C casterPlayerState, ref TalentFishingRodProjectileStateS2C projectile)
@@ -282,7 +277,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _spinPlayerCommand.SetPlayer(caughtEnemy.Id).SetSpinAmount(spinAmount).SetTick(tick).Execute();
             _addForceToPlayerCommand.SetPlayerId(caughtEnemy.Id).SetForce(force).ShouldTurnOffEngine(true).Execute();
 
-            ClearCaughtEnemyAim(caughtEnemy);
+            // The projectile (and its arrow) is removed by DeactivateTalent below, so no explicit arrow clear is needed.
             _netEventsDataService.AddFishingRodThrowNetEvent(tick, _casterPlayerId, caughtEnemy.Id, throwDirection);
             DeactivateTalent(tick);
         }
@@ -308,16 +303,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator.RemoveFishingRodTip(_projectileId);
         }
 
-        private void ClearCaughtEnemyAim(PlayerStateS2C caughtEnemy)
-        {
-            if (caughtEnemy.Spaceship.AssistArrowType == PlayerAssistArrowType.SecondCastAimArrow)
-            {
-                caughtEnemy.Spaceship.AssistArrowType = PlayerAssistArrowType.Hidden;
-            }
-
-            caughtEnemy.Spaceship.SecondCastAimDirection = Vector2.Zero;
-        }
-
         public void StopIfActive(int tick)
         {
             if (!IsCurrentlyActive)
@@ -333,7 +318,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
             ref var projectile = ref _matchDataService.SimulationState.GetFishingRodProjectileById(_projectileId);
             var phase = projectile.Phase;
-            var caughtEnemyId = projectile.CaughtEnemyId;
 
             IsCurrentlyActive = false;
             IsCurrentlyAiming = false;
@@ -353,10 +337,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             if (phase == FishingRodTipPhase.Flying)
             {
                 _physicsSimulator.RemoveFishingRodTip(_projectileId);
-            }
-            else if (phase == FishingRodTipPhase.CaughtEnemy)
-            {
-                ClearCaughtEnemyAim(_matchDataService.SimulationState.GetPlayerById(caughtEnemyId));
             }
 
             _matchDataService.SimulationState.RemoveFishingRodProjectileById(_projectileId);

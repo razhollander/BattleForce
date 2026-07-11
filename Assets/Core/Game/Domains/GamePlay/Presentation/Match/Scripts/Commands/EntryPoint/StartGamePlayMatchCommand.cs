@@ -25,6 +25,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Nuke.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimArrowEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
@@ -74,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IKOProjectilesControllers _koProjectilesControllers;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
         private IFishingRodTipControllers _fishingRodTipControllers;
+        private ISecondCastEffectController _secondCastEffectController;
         private ISoulGhostControllers _soulGhostControllers;
         private IFrigidBlocksControllers _frigidBlocksControllers;
         private IDashPulseGustEffectController _dashPulseGustEffectController;
@@ -122,6 +124,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _koProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
             _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
+            _secondCastEffectController = _diContainer.Resolve<ISecondCastEffectController>();
             _soulGhostControllers = _diContainer.Resolve<ISoulGhostControllers>();
             _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
@@ -149,6 +152,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _koProjectilesControllers.InitEntryPoint();
             _grapplingHookProjectilesControllers.InitEntryPoint();
             _fishingRodTipControllers.InitEntryPoint();
+            _secondCastEffectController.InitEntryPoint();
             _soulGhostControllers.InitEntryPoint();
             _frigidBlocksControllers.InitEntryPoint();
             _powerUpBallObtainedEffectController.InitEntryPoint();

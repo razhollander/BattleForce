@@ -33,7 +33,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffect.S
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Nuke.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
-
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimArrowEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
@@ -76,6 +76,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private KOProjectileView _koProjectileViewPrefab;
         [SerializeField] private GrapplingHookProjectileView _grapplingHookProjectileViewPrefab;
         [SerializeField] private FishingRodTipView _fishingRodTipViewPrefab;
+        [SerializeField] private SecondCastAimArrowView _secondCastAimArrowViewPrefab;
         [SerializeField] private SoulGhostView _soulGhostViewPrefab;
         [SerializeField] private FrigidBlockView _frigidBlockViewPrefab;
         [SerializeField] private DashPulseGustEffectView _dashPulseGustEffectViewPrefab;
@@ -134,6 +135,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<KOProjectilesControllers>().AsSingle().WithArguments(_koProjectileViewPrefab).NonLazy();
             Container.BindInterfacesTo<GrapplingHookProjectilesControllers>().AsSingle().WithArguments(_grapplingHookProjectileViewPrefab).NonLazy();
             Container.BindInterfacesTo<FishingRodTipControllers>().AsSingle().WithArguments(_fishingRodTipViewPrefab).NonLazy();
+            Container.BindInterfacesTo<SecondCastEffectController>().AsSingle().WithArguments(_secondCastAimArrowViewPrefab).NonLazy();
             Container.BindInterfacesTo<SoulGhostControllers>().AsSingle().WithArguments(_soulGhostViewPrefab).NonLazy();
             Container.BindInterfacesTo<FrigidBlocksControllers>().AsSingle().WithArguments(_frigidBlockViewPrefab).NonLazy();
             Container.BindInterfacesTo<DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();
