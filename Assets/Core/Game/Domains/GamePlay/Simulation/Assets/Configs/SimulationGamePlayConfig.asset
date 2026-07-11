@@ -162,9 +162,9 @@ MonoBehaviour:
         ArriveDistance: 2
         TipMaxLifetimeSeconds: 1.5
         ThrowWindowSeconds: 3
-        ThrowPushForce: 60
-        ThrowMinSpin: 40
-        ThrowMaxSpin: 60
+        ThrowPushForce: 40
+        ThrowMinSpin: 60
+        ThrowMaxSpin: 80
       SoulTalentConfig:
         GhostSpeed: 15
         SpawnForwardOffset: 2

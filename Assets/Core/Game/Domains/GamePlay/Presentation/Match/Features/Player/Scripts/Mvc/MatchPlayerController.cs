@@ -240,7 +240,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         private void UpdateAim(PlayerAssistArrowType arrowType, Vector2 aimDirection, float decay)
         {
-            _playerView.InterpolateAimRotation(aimDirection, decay);
+            // While aiming a fishing rod throw, the throw direction is shown by the arrow on the caught enemy,
+            // so keep the caster's own assist arrow still instead of rotating it toward the aim direction.
+            var isAimingFishingRodThrow = _matchDataService.IsPlayerAimingFishingRodThrow(PlayerId);
+            if (!isAimingFishingRodThrow)
+            {
+                _playerView.InterpolateAimRotation(aimDirection, decay);
+            }
 
             var shouldShowMoveAssistArrow = arrowType == PlayerAssistArrowType.Hidden /*&& _inputBeingUsedService.InputTypeBeingUsed == SupportedInputType.GamePad*/;
 

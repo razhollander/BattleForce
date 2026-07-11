@@ -95,7 +95,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            ProcessThrowCastInput(wasTalentInputDownThisTick, wasTalentInputReleasedThisTick, isCurrentlyAiming, tick, casterPlayerState, ref projectile);
+            ProcessThrowCastInput(wasTalentInputDownThisTick, tick, casterPlayerState, ref projectile);
         }
 
         private void ProcessInitialCastInput(bool wasTalentInputDownThisTick, bool wasTalentInputReleasedThisTick, bool isCurrentlyAiming, int tick, PlayerStateS2C casterPlayerState)
@@ -116,20 +116,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             ActivateTalent(tick, casterPlayerState);
         }
 
-        private void ProcessThrowCastInput(bool wasTalentInputDownThisTick, bool wasTalentInputReleasedThisTick, bool isCurrentlyAiming, int tick, PlayerStateS2C casterPlayerState,
+        private void ProcessThrowCastInput(bool wasTalentInputDownThisTick, int tick, PlayerStateS2C casterPlayerState,
             ref TalentFishingRodProjectileStateS2C projectile)
         {
-            if (wasTalentInputDownThisTick && !isCurrentlyAiming)
-            {
-                IsCurrentlyAiming = true;
-            }
-
-            if (!wasTalentInputReleasedThisTick || !isCurrentlyAiming)
+            // Aiming already started on catch, so a single talent press throws the caught enemy.
+            if (!wasTalentInputDownThisTick)
             {
                 return;
             }
 
-            IsCurrentlyAiming = false;
             PerformThrow(tick, casterPlayerState, ref projectile);
         }
 
@@ -244,6 +239,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             projectile.Velocity = Vector2.Zero;
             projectile.Position = _matchDataService.SimulationState.GetPlayerById(enemyPlayerId).Spaceship.Transform.Position;
             _caughtOnTick = tick;
+
+            // The caster starts aiming the throw immediately on catch, so a single talent press then throws the enemy.
+            IsCurrentlyAiming = true;
 
             _physicsSimulator.RemoveFishingRodTip(_projectileId);
             _netEventsDataService.AddFishingRodCaughtEnemyNetEvent(tick, _projectileId, _casterPlayerId, enemyPlayerId);

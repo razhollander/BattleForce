@@ -9,8 +9,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimAr
 {
     public class SecondCastEffectController : ISecondCastEffectController
     {
-        private const float ShownDirectionThresholdSqr = 0.0001f;
-
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly SecondCastAimArrowPool _pool;
         private readonly Dictionary<ushort, SecondCastAimArrowView> _arrowPerTipId = new();
@@ -30,13 +28,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimAr
 
         public void SetArrow(ushort tipId, Vector2 position, Vector2 direction)
         {
-            var isShown = direction.sqrMagnitude > ShownDirectionThresholdSqr;
-            if (!isShown)
-            {
-                RemoveArrow(tipId);
-                return;
-            }
-
             var rotation = direction.ToQuaternion();
 
             if (!_arrowPerTipId.TryGetValue(tipId, out var view))

@@ -654,7 +654,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var casterPosition = casterState.Spaceship.Transform.Position.ToUnityVector2();
                 var rotation = fishingRodTip.Position - casterPosition.ToNumericsVector2();
 
-                _matchDataService.AddFishingRodTip(fishingRodTip.Id, casterId, position);
+                // Phase is synced via net events, not deltas, so seed it from the full state here for rejoins.
+                var tipModel = _matchDataService.AddFishingRodTip(fishingRodTip.Id, casterId, position);
+                tipModel.Phase = fishingRodTip.Phase;
                 _fishingRodTipControllers.CreateFishingRodTip(fishingRodTip.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition);
             }
         }

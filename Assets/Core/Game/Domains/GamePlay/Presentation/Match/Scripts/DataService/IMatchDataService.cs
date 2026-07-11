@@ -77,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position);
         MatchFishingRodTipModel GetFishingRodTip(ushort id);
         void RemoveFishingRodTip(ushort id);
+        bool IsPlayerAimingFishingRodThrow(ushort casterPlayerId);
         MatchSoulGhostModel AddSoulGhost(ushort id, ushort casterPlayerId, Vector2 position, Vector2 direction);
         MatchSoulGhostModel GetSoulGhost(ushort id);
         void RemoveSoulGhost(ushort id);

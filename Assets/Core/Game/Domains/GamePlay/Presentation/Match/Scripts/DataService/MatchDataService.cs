@@ -43,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public StageType StageType { get; set; }
         public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }
         public Dictionary<ushort, int> GemsPerTeam  {get; private set; }
+
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             Players = new List<MatchPlayerModel>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -403,6 +404,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                     return;
                 }
             }
+        }
+
+        public bool IsPlayerAimingFishingRodThrow(ushort casterPlayerId)
+        {
+            for (int i = 0; i < FishingRodTips.Count; i++)
+            {
+                var tip = FishingRodTips[i];
+                var isTipAimingThrow = tip.Phase == FishingRodTipPhase.CaughtEnemy;
+                if (tip.CasterPlayerId == casterPlayerId && isTipAimingThrow)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public MatchSoulGhostModel AddSoulGhost(ushort id, ushort casterPlayerId, Vector2 position, Vector2 direction)

@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimArrowEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -31,8 +32,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 var rotation = directionFromCaster.ToQuaternion();
                 _tipControllers.InterpolateFishingRodTipTransform(tipModel.Id, tipModel.Position, rotation, casterPosition);
 
-                // The throw-aim arrow sits on the caught enemy (the tip position while caught) and points along the throw direction.
-                _secondCastEffectController.SetArrow(tipModel.Id, tipModel.Position, tipModel.EnemyCaughtArrowDirection);
+                // The throw-aim arrow is only shown while the tip holds a caught enemy; it sits on that enemy (the tip
+                // position) and points along the throw direction.
+                if (tipModel.Phase == FishingRodTipPhase.CaughtEnemy)
+                {
+                    _secondCastEffectController.SetArrow(tipModel.Id, tipModel.Position, tipModel.EnemyCaughtArrowDirection);
+                }
+                else
+                {
+                    _secondCastEffectController.RemoveArrow(tipModel.Id);
+                }
             }
         }
     }
