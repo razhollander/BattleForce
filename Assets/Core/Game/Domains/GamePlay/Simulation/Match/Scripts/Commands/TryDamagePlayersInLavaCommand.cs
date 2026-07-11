@@ -34,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var playerId in playerIdsToDamage)
             {
-                _playersInLavaTrackerService.ResetPlayerTimePassedSinceLastDamageTaken(playerId);
+                _playersInLavaTrackerService.TryResetPlayerTimePassedSinceLastDamageTaken(playerId);
                 _playerHitCommand
                     .SetPlayerIdGotHit(playerId)
                     .SetWasHitByAnotherPlayer(false)

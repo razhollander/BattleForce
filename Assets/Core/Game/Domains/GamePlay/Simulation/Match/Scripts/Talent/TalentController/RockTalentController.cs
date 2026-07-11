@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private AddForceToPlayerCommand _addForceToPlayerCommand;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
+        private UpdatePlayerLavaExposureCommand _updatePlayerLavaExposureCommand;
 
         public TalentType TalentType => TalentType.Rock;
 
@@ -54,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
+            _updatePlayerLavaExposureCommand = _commandFactory.CreateCommandVoid<UpdatePlayerLavaExposureCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -100,6 +102,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             casterSpaceship.IsSpinned = false;
             _netEventsDataService.AddPlayerSpinnedEndedNetEvent(tick, _casterPlayerId);
             _netEventsDataService.AddActivateRockTalentNetEvent(tick, _casterPlayerId);
+
+            // Rock grants lava immunity: if the player activated it while standing in lava, stop the exposed state.
+            _updatePlayerLavaExposureCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
         }
 
         private void PushAndSpinNearbyEnemies(int tick, PlayerStateS2C casterPlayerState, RockTalentConfig config)
@@ -184,7 +189,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             _netEventsDataService.AddDeactivateRockTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);
-            _playersInLavaTrackerService.ResetPlayerTimePassedSinceLastDamageTaken(_casterPlayerId);
+            _playersInLavaTrackerService.TryResetPlayerTimePassedSinceLastDamageTaken(_casterPlayerId);
+
+            // Immunity ends with Rock: if the player is still in lava, resume the exposed state.
+            _updatePlayerLavaExposureCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
         }
 
         public void ResetData()

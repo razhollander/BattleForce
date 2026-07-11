@@ -58,6 +58,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
             return false;
         }
 
+        public bool IsPlayerInLava(ushort playerId)
+        {
+            return _playersInLava.ContainsKey(playerId);
+        }
+
         public void StepTimePassedSinceLastDamageTaken(FixedUnorderedList<ushort> playerIdsNotToIncrementTimerInLava, float deltaTime)
         {
             foreach (var playerId in _playersInLava.Keys)
@@ -99,7 +104,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
             _playersInLava.Clear();
         }
         
-        public void ResetPlayerTimePassedSinceLastDamageTaken(ushort playerId)
+        public void TryResetPlayerTimePassedSinceLastDamageTaken(ushort playerId)
         {
             if (_playersInLava.TryGetValue(playerId, out var playerInLava))
             {

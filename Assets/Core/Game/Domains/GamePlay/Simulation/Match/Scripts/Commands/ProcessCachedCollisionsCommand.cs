@@ -39,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private ObtainPowerUpBallCommand _obtainPowerUpBallCommand;
         private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private UpdatePlayerLavaExposureCommand _updatePlayerLavaExposureCommand;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
         {
@@ -56,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
             _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
+            _updatePlayerLavaExposureCommand = _commandFactory.CreateCommandVoid<UpdatePlayerLavaExposureCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
@@ -767,20 +769,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             if (eventType == PhysicsEventEventType.Begin)
             {
-                if (_playersInLavaTrackerService.OnPlayerEnterLava(playerId))
-                {
-                    _matchDataService.SimulationState.GetPlayerById(playerId).Spaceship.IsExposedToLava = true;
-                    _netEventsDataService.AddPlayerStartedExposedToLavaNetEvent(_processedTick, playerId);
-                }
+                _playersInLavaTrackerService.OnPlayerEnterLava(playerId);
             }
             else if (eventType == PhysicsEventEventType.End)
             {
-                if (_playersInLavaTrackerService.OnPlayerExitLava(playerId))
-                {
-                    _matchDataService.SimulationState.GetPlayerById(playerId).Spaceship.IsExposedToLava = false;
-                    _netEventsDataService.AddPlayerEndedExposedToLavaNetEvent(_processedTick, playerId);
-                }
+                _playersInLavaTrackerService.OnPlayerExitLava(playerId);
             }
+
+            // A Rock player is immune to lava and must not show as exposed; the command reconciles that rule.
+            _updatePlayerLavaExposureCommand.SetPlayerId(playerId).SetProcessedTick(_processedTick).Execute();
         }
 
         private void HandlePlayerStageBoundaryCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, PhysicsEventEventType eventType)
