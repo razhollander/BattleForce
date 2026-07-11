@@ -25,8 +25,8 @@ RectTransform:
   m_GameObject: {fileID: 456908222489826422}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2618270271530390451}
   m_Father: {fileID: 4845709276333870003}
@@ -61,7 +61,7 @@ RectTransform:
   m_GameObject: {fileID: 597724942787439684}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4059431150256954472}
@@ -97,7 +97,7 @@ RectTransform:
   m_GameObject: {fileID: 4082078449754669981}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5373098185333020202}
@@ -162,8 +162,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scaleTweenDuration: 0.3
   _scaleTweenEase: 6
-  _unselectedScaleX: 0.6
-  _selectedScaleY: 1
+  _unselectedScaleX: 0.75
+  _selectedScaleY: 0.9
   _talentViews:
   - {fileID: 6878737021406154249}
   - {fileID: 3292911616950305867}

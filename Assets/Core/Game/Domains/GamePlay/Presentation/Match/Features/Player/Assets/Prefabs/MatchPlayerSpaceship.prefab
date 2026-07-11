@@ -4124,6 +4124,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1089922233196285840, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
+      propertyPath: _unselectedScaleX
+      value: 0.6
+      objectReference: {fileID: 0}
     - target: {fileID: 1441328618938244503, guid: 636376599e8814b62b6938e4d1bb9f4d, type: 3}
       propertyPath: m_Layer
       value: 0
