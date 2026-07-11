@@ -44,6 +44,12 @@ namespace Core.Scripts.Mvc.WorldCamera
         {
             _worldCameraView.SetIsDampingEnabled(isEnabled);
         }
+
+        public void SetWorldBoundaries(Vector2 topLeft, Vector2 bottomRight)
+        {
+            LogService.LogTopic($"Set camera world boundaries topLeft {topLeft} bottomRight {bottomRight}", LogTopicType.Camera);
+            _worldCameraView.SetWorldBoundaries(topLeft, bottomRight);
+        }
         
         public async Awaitable LerpOrthographicSizeMultiplier(float targetMultiplier, float durationSeconds, CancellationToken cancellationToken)
         {

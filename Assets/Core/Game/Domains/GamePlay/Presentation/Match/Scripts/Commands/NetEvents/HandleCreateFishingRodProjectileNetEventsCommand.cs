@@ -32,10 +32,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var tipModel = netEvent.FishingRodProjectile;
                 var casterPlayerId = tipModel.PlayerCasterId;
+
+                // The stick must be shown before we read its tip pivot, since the fishing line starts from that pivot.
+                _playerControllers.SetPlayerFishingRodStickState(casterPlayerId, true);
+
                 var casterPosition = _playerControllers.GetPlayerPosition(casterPlayerId);
+                var lineStartPosition = _playerControllers.GetPlayerFishingRodTipPivotPosition(casterPlayerId);
                 var rotation = tipModel.Position - casterPosition.ToNumericsVector2();
 
-                _fishingRodTipControllers.CreateFishingRodTip(tipModel.Id, casterPlayerId, tipModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition);
+                _fishingRodTipControllers.CreateFishingRodTip(tipModel.Id, casterPlayerId, tipModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), lineStartPosition);
             }
 
             _cachedPresentationEventsService.CreateFishingRodProjectileNetEvents.Clear();

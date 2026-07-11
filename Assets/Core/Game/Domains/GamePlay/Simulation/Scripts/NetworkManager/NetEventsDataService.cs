@@ -28,6 +28,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<TalentCardHitNetEventS2C>> TalentCardHitNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>> PlayerSpinnedStartedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>> PlayerSpinnedEndedNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>> PlayerStartedExposedToLavaNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>> PlayerEndedExposedToLavaNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> PowerUpBallSpawnedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> PowerUpBallObtainedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> PlayerSwitchTeamNetEventsPerClient { get; }
@@ -102,6 +104,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<TalentCardHitNetEventS2C>> _talentCardHitListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>> _playerSpinnedStartedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>> _playerSpinnedEndedListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>> _playerStartedExposedToLavaListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>> _playerEndedExposedToLavaListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> _powerUpBallsSpawnedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> _powerUpBallsObtainedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> _playerSwitchTeamListPool;
@@ -179,6 +183,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             TalentCardHitNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TalentCardHitNetEventS2C>>(maxConcurrentPlayers);
             PlayerSpinnedStartedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>>(maxConcurrentPlayers);
             PlayerSpinnedEndedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>>(maxConcurrentPlayers);
+            PlayerStartedExposedToLavaNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>>(maxConcurrentPlayers);
+            PlayerEndedExposedToLavaNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>>(maxConcurrentPlayers);
             PowerUpBallSpawnedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>>(maxConcurrentPlayers);
             PowerUpBallObtainedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>>(maxConcurrentPlayers);
             PlayerSwitchTeamNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(maxConcurrentPlayers);
@@ -264,6 +270,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _talentCardHitListPool = new ConcurrentPool<FixedUnorderedList<TalentCardHitNetEventS2C>>(() => new FixedUnorderedList<TalentCardHitNetEventS2C>(networkConfig.MaxCap.TalentCardHitNetEvents), maxConcurrentPlayers);
             _playerSpinnedStartedListPool = new ConcurrentPool<FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>>(() => new FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedStartedNetEvents), maxConcurrentPlayers);
             _playerSpinnedEndedListPool = new ConcurrentPool<FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>>(() => new FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedEndedNetEvents), maxConcurrentPlayers);
+            _playerStartedExposedToLavaListPool = new ConcurrentPool<FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>>(() => new FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>(networkConfig.MaxCap.PlayerStartedExposedToLavaNetEvents), maxConcurrentPlayers);
+            _playerEndedExposedToLavaListPool = new ConcurrentPool<FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>>(() => new FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>(networkConfig.MaxCap.PlayerEndedExposedToLavaNetEvents), maxConcurrentPlayers);
             _powerUpBallsSpawnedListPool = new ConcurrentPool<FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>>(() => new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents), maxConcurrentPlayers);
             _powerUpBallsObtainedListPool = new ConcurrentPool<FixedUnorderedList<PowerUpBallObtainedNetEventS2C>>(() => new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents), maxConcurrentPlayers);
             _playerSwitchTeamListPool = new ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(() => new FixedUnorderedList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents), maxConcurrentPlayers);
@@ -430,6 +438,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             else
             {
                 LogService.LogError($"Player already exists! {clientId}");
+            }
+
+            if (!PlayerStartedExposedToLavaNetEventsPerClient.ContainsKey(clientId))
+            {
+                PlayerStartedExposedToLavaNetEventsPerClient.Add(clientId, _playerStartedExposedToLavaListPool.Get());
+            }
+
+            if (!PlayerEndedExposedToLavaNetEventsPerClient.ContainsKey(clientId))
+            {
+                PlayerEndedExposedToLavaNetEventsPerClient.Add(clientId, _playerEndedExposedToLavaListPool.Get());
             }
 
             if (!PlayerSpinnedEndedNetEventsPerClient.ContainsKey(clientId))
@@ -818,6 +836,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var playerSpinnedEndedList = PlayerSpinnedEndedNetEventsPerClient[clientId];
             playerSpinnedEndedList.Clear();
             _playerSpinnedEndedListPool.Return(playerSpinnedEndedList);
+            var playerStartedExposedToLavaList = PlayerStartedExposedToLavaNetEventsPerClient[clientId];
+            playerStartedExposedToLavaList.Clear();
+            _playerStartedExposedToLavaListPool.Return(playerStartedExposedToLavaList);
+            var playerEndedExposedToLavaList = PlayerEndedExposedToLavaNetEventsPerClient[clientId];
+            playerEndedExposedToLavaList.Clear();
+            _playerEndedExposedToLavaListPool.Return(playerEndedExposedToLavaList);
             var powerUpBallsSpawnedList = PowerUpBallSpawnedNetEventsPerClient[clientId];
             powerUpBallsSpawnedList.Clear();
             _powerUpBallsSpawnedListPool.Return(powerUpBallsSpawnedList);
@@ -1055,6 +1079,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             TalentCardHitNetEventsPerClient.Remove(clientId);
             PlayerSpinnedStartedNetEventsPerClient.Remove(clientId);
             PlayerSpinnedEndedNetEventsPerClient.Remove(clientId);
+            PlayerStartedExposedToLavaNetEventsPerClient.Remove(clientId);
+            PlayerEndedExposedToLavaNetEventsPerClient.Remove(clientId);
             PowerUpBallSpawnedNetEventsPerClient.Remove(clientId);
             PowerUpBallObtainedNetEventsPerClient.Remove(clientId);
             PlayerSwitchTeamNetEventsPerClient.Remove(clientId);
@@ -1482,7 +1508,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
-            
+
+            if (PlayerStartedExposedToLavaNetEventsPerClient.TryGetValue(clientId, out var playerStartedExposedToLavaNetEvents))
+            {
+                for (var i = playerStartedExposedToLavaNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerStartedExposedToLavaNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerStartedExposedToLavaNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PlayerEndedExposedToLavaNetEventsPerClient.TryGetValue(clientId, out var playerEndedExposedToLavaNetEvents))
+            {
+                for (var i = playerEndedExposedToLavaNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerEndedExposedToLavaNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerEndedExposedToLavaNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
             if (PlayerRejoinAcceptNetEventsPerClient.TryGetValue(clientId, out var joinAcceptNetEvents))
             {
                 for (int i = joinAcceptNetEvents.Count - 1; i >= 0; i--)
@@ -2332,6 +2380,26 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
         public void AddPlayerSpinnedEndedNetEvent(int onTick, ushort playerId)
         {
             foreach (var kvp in PlayerSpinnedEndedNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
+            }
+        }
+
+        public void AddPlayerStartedExposedToLavaNetEvent(int onTick, ushort playerId)
+        {
+            foreach (var kvp in PlayerStartedExposedToLavaNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
+            }
+        }
+
+        public void AddPlayerEndedExposedToLavaNetEvent(int onTick, ushort playerId)
+        {
+            foreach (var kvp in PlayerEndedExposedToLavaNetEventsPerClient)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;

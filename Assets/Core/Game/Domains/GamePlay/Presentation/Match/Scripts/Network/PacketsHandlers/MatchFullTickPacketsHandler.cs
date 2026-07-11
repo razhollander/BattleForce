@@ -47,6 +47,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<TalentCardHitNetEventS2C> _cachedUnprocessedTalentCardHitEvents;
         private readonly CapacityList<PlayerSpinnedStartedNetEventS2C> _cachedUnprocessedPlayerSpinnedStartedEvents;
         private readonly CapacityList<PlayerSpinnedEndedNetEventS2C> _cachedUnprocessedPlayerSpinnedEndedEvents;
+        private readonly CapacityList<PlayerStartedExposedToLavaNetEventS2C> _cachedUnprocessedPlayerStartedExposedToLavaEvents;
+        private readonly CapacityList<PlayerEndedExposedToLavaNetEventS2C> _cachedUnprocessedPlayerEndedExposedToLavaEvents;
         private readonly CapacityList<PowerUpBallSpawnedNetEventS2C> _cachedUnprocessedPowerUpBallSpawnedEvents;
         private readonly CapacityList<PowerUpBallObtainedNetEventS2C> _cachedUnprocessedPowerUpBallObtainedEvents;
         private readonly CapacityList<StageEndNetEventS2C> _cachedUnprocessedStageEndEvents;
@@ -141,6 +143,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedTalentCardHitEvents = new CapacityList<TalentCardHitNetEventS2C>(networkConfig.MaxCap.TalentCardHitNetEvents);
             _cachedUnprocessedPlayerSpinnedStartedEvents = new CapacityList<PlayerSpinnedStartedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedStartedNetEvents);
             _cachedUnprocessedPlayerSpinnedEndedEvents = new CapacityList<PlayerSpinnedEndedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedEndedNetEvents);
+            _cachedUnprocessedPlayerStartedExposedToLavaEvents = new CapacityList<PlayerStartedExposedToLavaNetEventS2C>(networkConfig.MaxCap.PlayerStartedExposedToLavaNetEvents);
+            _cachedUnprocessedPlayerEndedExposedToLavaEvents = new CapacityList<PlayerEndedExposedToLavaNetEventS2C>(networkConfig.MaxCap.PlayerEndedExposedToLavaNetEvents);
             _cachedUnprocessedPowerUpBallSpawnedEvents = new CapacityList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents);
             _cachedUnprocessedPowerUpBallObtainedEvents = new CapacityList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents);
             _cachedUnprocessedStageEndEvents = new CapacityList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents);
@@ -259,6 +263,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessTalentCardHitEvents(latestFullTickPacket.TalentCardHitNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerSpinnedStartedEvents(latestFullTickPacket.PlayerSpinnedStartedNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerSpinnedEndedEvents(latestFullTickPacket.PlayerSpinnedEndedNetEvents, ignoreEventsNotAboveTick);
+            ProcessPlayerStartedExposedToLavaEvents(latestFullTickPacket.PlayerStartedExposedToLavaNetEvents, ignoreEventsNotAboveTick);
+            ProcessPlayerEndedExposedToLavaEvents(latestFullTickPacket.PlayerEndedExposedToLavaNetEvents, ignoreEventsNotAboveTick);
             ProcessTalentCardObtainedEvents(latestFullTickPacket.TalentCardObtainedNetEvents, ignoreEventsNotAboveTick);
             ProcessPowerUpBallSpawnedEvents(latestFullTickPacket.PowerUpSpawnedNetEvents, ignoreEventsNotAboveTick);
             ProcessPowerUpBallObtainedEvents(latestFullTickPacket.PowerUpObtainedNetEvents, ignoreEventsNotAboveTick);
@@ -1076,6 +1082,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedPlayerSpinnedEndedEvents.Sort();
                 _presentationNetEventsHandler.ProcessPlayerSpinnedEndedEvents(_cachedUnprocessedPlayerSpinnedEndedEvents);
+            }
+        }
+
+        private void ProcessPlayerStartedExposedToLavaEvents(FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C> playerStartedExposedToLavaNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedPlayerStartedExposedToLavaEvents.Clear();
+
+            foreach (var netEvent in playerStartedExposedToLavaNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedPlayerStartedExposedToLavaEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPlayerStartedExposedToLavaEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerStartedExposedToLavaEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerStartedExposedToLavaEvents(_cachedUnprocessedPlayerStartedExposedToLavaEvents);
+            }
+        }
+
+        private void ProcessPlayerEndedExposedToLavaEvents(FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C> playerEndedExposedToLavaNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedPlayerEndedExposedToLavaEvents.Clear();
+
+            foreach (var netEvent in playerEndedExposedToLavaNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedPlayerEndedExposedToLavaEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPlayerEndedExposedToLavaEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerEndedExposedToLavaEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerEndedExposedToLavaEvents(_cachedUnprocessedPlayerEndedExposedToLavaEvents);
             }
         }
 

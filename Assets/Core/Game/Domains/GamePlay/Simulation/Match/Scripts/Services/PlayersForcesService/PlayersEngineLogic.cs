@@ -9,14 +9,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
     public class PlayersEngineLogic : IPlayersEngineLogic
     {
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
+        private readonly IPlayersTalentsManager _playersTalentsManager;
 
-        public PlayersEngineLogic(ISimulationGamePlayConfigService gamePlayConfigService)
+        public PlayersEngineLogic(ISimulationGamePlayConfigService gamePlayConfigService, IPlayersTalentsManager playersTalentsManager)
         {
             _gamePlayConfigService = gamePlayConfigService;
+            _playersTalentsManager = playersTalentsManager;
         }
 
-        public void TurnOnEngineForPlayerIfPossible(PlayerSpaceshipStateS2C playerSpaceshipState)
+        public void TurnOnEngineForPlayerIfPossible(PlayerStateS2C playerState)
         {
+            var playerSpaceshipState = playerState.Spaceship;
             if (playerSpaceshipState.IsEngineOn || !playerSpaceshipState.IsAlive)
             {
                 return;
@@ -37,7 +40,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
             }
 
             var isPlayerHeadbuttCharging = selectedTalent is {TalentType: TalentType.Headbutt, IsCurrentlyActive: true};
-            if (isPlayerHeadbuttCharging)
+            var isChargingHeadbutt = isPlayerHeadbuttCharging && _playersTalentsManager.IsHeadbuttCharging(playerState.Id);
+            if (isChargingHeadbutt)
             {
                 return;
             }

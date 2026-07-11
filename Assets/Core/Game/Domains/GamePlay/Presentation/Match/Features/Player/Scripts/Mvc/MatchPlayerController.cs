@@ -1,3 +1,4 @@
+using System;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using System.Linq;
 using System.Threading;
@@ -34,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly Sprite[] _powerUpReelSpritesArray;
         private int? _currentPowerupGrantingAudioId;
         private bool _isFlagActive;
+        private bool _isFishingRodStickActive;
 
         public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
             SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
@@ -69,6 +71,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             UpdateTalents(playerModel.Spaceship.TalentsState.Talents, playerModel.Spaceship.TalentsState.SelectedTalentIndex, 0);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
+            SetOnLavaEffectState(playerModel.Spaceship.IsExposedToLava);
             SetIsLockOnTargetSightShown(playerModel.Spaceship.IsPlayerLockOnTargetSightShown);
 
             if (playerModel.Spaceship.IsCurrentlyInGrantingPowerUpPhase)
@@ -86,38 +89,63 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         private void SetupPlayerAccordingToHisSelectedTalent(MatchPlayerModel playerModel)
         {
-            if (!playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
+            var currentSelectedTalentType = TalentType.None;
+            var isCurrentSelectedTalentActive = false;
+            if (playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
             {
-                return;
+                currentSelectedTalentType = currentSelectedTalentState.TalentType;
+                isCurrentSelectedTalentActive = currentSelectedTalentState.IsCurrentlyActive;
             }
 
             SetSelectedTalent(playerModel.Spaceship.TalentsState.SelectedTalentIndex);
+            SetSentryGunState(currentSelectedTalentType == TalentType.SentryGun && isCurrentSelectedTalentActive,
+                _stageCancellationTokenProvider.CancellationTokenSource);
+            SetUmbrellaState(currentSelectedTalentType == TalentType.Umbrella && isCurrentSelectedTalentActive);
+            SetWaterGunState(currentSelectedTalentType == TalentType.WaterGun && isCurrentSelectedTalentActive);
+            SetChickenState(currentSelectedTalentType == TalentType.Chicken);
+            SetRockState(currentSelectedTalentType == TalentType.Rock && isCurrentSelectedTalentActive);
+            SetFishingRodStickState(currentSelectedTalentState.TalentType == TalentType.FishingRod && isCurrentSelectedTalentActive);
+        }
 
-            if (currentSelectedTalentState.TalentType == TalentType.SentryGun)
+        public void SetFishingRodStickState(bool isActive)
+        {
+            _isFishingRodStickActive = isActive;
+            _playerView.SetFishingRodStickState(isActive);
+
+            if (isActive)
             {
-                SetSentryGunState(currentSelectedTalentState.IsCurrentlyActive, _stageCancellationTokenProvider.CancellationTokenSource);
+                UpdateFishingRodStickPosition();
             }
-            else if (currentSelectedTalentState.TalentType == TalentType.Umbrella)
+        }
+
+        public UnityEngine.Vector2 GetFishingRodTipPivotPosition()
+        {
+            return _playerView.GetFishingRodTipPivotPosition();
+        }
+
+        // The look direction is driven by the projectile position (see UpdateFishingRodTipsTransformCommand),
+        // not the caster's facing direction.
+        public void SetFishingRodStickDirection(bool isDirectionRight)
+        {
+            _playerView.SetFishingRodStickDirection(isDirectionRight);
+        }
+
+        private void UpdateFishingRodStickPosition()
+        {
+            if (_isFishingRodStickActive)
             {
-                SetUmbrellaState(currentSelectedTalentState.IsCurrentlyActive);
-            }
-            else if (currentSelectedTalentState.TalentType == TalentType.WaterGun)
-            {
-                SetWaterGunState(currentSelectedTalentState.IsCurrentlyActive);
-            }
-            else if (currentSelectedTalentState.TalentType == TalentType.Chicken)
-            {
-                SetChickenState(true);
-            }
-            else if (currentSelectedTalentState.TalentType == TalentType.Rock)
-            {
-                SetRockState(currentSelectedTalentState.IsCurrentlyActive);
+                _playerView.SetFishingRodStickPosition(_playerView.FishingRodPivot.position);
             }
         }
 
         public void SetRockState(bool isRockActive)
         {
             _playerView.SetRockState(isRockActive);
+        }
+
+        public void SetOnLavaEffectState(bool isExposedToLava)
+        {
+            _playerView.SetOnLavaEffectState(isExposedToLava);
         }
 
         public void SetSentryGunState(bool isSentryGun, CancellationTokenSource cancellationTokenSource)
@@ -203,12 +231,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         
         public void SetSelectedTalent(int talentIndex)
         {
-            var playerModel = _matchDataService.GetPlayer(PlayerId);
-            var talentState = playerModel.Spaceship.TalentsState.Talents[talentIndex];
-            var talentType = talentState.TalentType;
             _playerView.SetSelectedTalent(talentIndex, _stageCancellationTokenProvider.CancellationTokenSource.Token);
-            var isInChickenState = talentType == TalentType.Chicken;
-            SetChickenState(isInChickenState);
         }
 
         public void UpdateTickDeltas()
@@ -236,6 +259,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
 
             UpdateLeaderFlagAccordingToDirection(playerTransformState.Direction);
+            UpdateFishingRodStickPosition();
         }
 
         private void UpdateAim(PlayerAssistArrowType arrowType, Vector2 aimDirection, float decay)
@@ -361,6 +385,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _playerView.Base.SetPositionAndRotation(position.ToUnityVector2(), direction.ToUnityVector2().ToQuaternion());
             UpdateLeaderFlagAccordingToDirection(direction);
+            UpdateFishingRodStickPosition();
         }
 
         private void UpdateLeaderFlagAccordingToDirection(Vector2 direction)

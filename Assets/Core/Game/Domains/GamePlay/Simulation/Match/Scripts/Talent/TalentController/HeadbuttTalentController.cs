@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
@@ -22,11 +23,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly ICommandFactory _commandFactory;
-        private SpinPlayerCommand _spinPlayerCommand;
+        private TrySpinPlayerCommand _trySpinPlayerCommand;
         private AddForceToPlayerCommand _addForceToPlayerCommand;
 
         private ushort _casterPlayerId;
-        private bool _isCharging;
+        private HeadButtPhaseType _phase;
         private int _chargeStartTick;
         private float _chargeFraction;
         private Vector2 _dashDirection;
@@ -35,11 +36,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public TalentType TalentType => TalentType.Headbutt;
 
-        private bool IsDashing
+        // The talent counts as active from the first charging tick through the end of the dash.
+        private bool IsTalentActive
         {
             get => _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_casterPlayerId, TalentType);
             set => _matchDataService.SimulationState.SetIsTalentCurrentlyActiveForPlayer(_casterPlayerId, TalentType, value);
         }
+
+        public bool IsCharging => _phase == HeadButtPhaseType.Charging;
 
         public HeadbuttTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService,
             ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator,
@@ -56,7 +60,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void InitEntryPoint()
         {
-            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
 
@@ -70,21 +74,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
-            if (!_isCharging && !IsDashing)
+            if (_phase == HeadButtPhaseType.None)
             {
                 if (!wasTalentInputDownThisTick) return;
 
                 var isOnCooldown = casterPlayerState.Spaceship.TalentsState.GetCurrentSelectedTalent().IsOnCooldown();
                 if (isOnCooldown) return;
 
-                _isCharging = true;
+                _phase = HeadButtPhaseType.Charging;
+                IsTalentActive = true;
                 _chargeStartTick = tick;
                 casterPlayerState.Spaceship.IsEngineOn = false;
                 _netEventsDataService.AddActivateHeadbuttChargingNetEvent(tick, _casterPlayerId);
                 return;
             }
 
-            if (_isCharging && wasTalentInputReleasedThisTick)
+            if (_phase == HeadButtPhaseType.Charging && wasTalentInputReleasedThisTick)
             {
                 var config = _gamePlayConfigService.GamePlayConfig.Talents.HeadbuttTalentConfig;
                 var chargedSeconds = (tick - _chargeStartTick) * deltaTime;
@@ -94,8 +99,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(_dashDirection * config.MaxChargeForce * _chargeFraction).ShouldTurnOffEngine(false).Execute();
                 casterPlayerState.Spaceship.IsEngineOn = true;
 
-                _isCharging = false;
-                IsDashing = true;
+                _phase = HeadButtPhaseType.Dashing;
                 _dashStartTick = tick;
                 _hasHitEnemy = false;
 
@@ -106,17 +110,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void OnTick(int tick, float deltaTime)
         {
-            if (_isCharging)
+            if (_phase == HeadButtPhaseType.Charging)
             {
-                var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-                if (casterPlayerState.Spaceship.IsSpinned)
-                {
-                    StopIfActive(tick);
-                }
                 return;
             }
 
-            if (!IsDashing) return;
+            if (_phase != HeadButtPhaseType.Dashing) return;
 
             var config = _gamePlayConfigService.GamePlayConfig.Talents.HeadbuttTalentConfig;
             var dashWindow = Mathf.Lerp(config.MinDashWindowSeconds, config.MaxDashWindowSeconds, _chargeFraction);
@@ -130,17 +129,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void HitEnemy(ushort enemyId, int tick)
         {
-            if (!IsDashing || _hasHitEnemy) return;
+            if (_phase != HeadButtPhaseType.Dashing || _hasHitEnemy) return;
 
             _hasHitEnemy = true;
             var config = _gamePlayConfigService.GamePlayConfig.Talents.HeadbuttTalentConfig;
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
-            _spinPlayerCommand.SetPlayer(enemyId).SetSpinAmount(config.EnemySpinAmount).SetTick(tick).Execute();
+            _trySpinPlayerCommand.SetPlayer(enemyId).SetSpinAmount(config.EnemySpinAmount).SetTick(tick).Execute();
             _addForceToPlayerCommand.SetPlayerId(enemyId).SetForce(_dashDirection * config.EnemyPushForce).ShouldTurnOffEngine(true).Execute();
 
             // Keep the caster's momentum but stop powering forward through the enemy.
-            casterPlayerState.Spaceship.IsEngineOn = false;
+            //casterPlayerState.Spaceship.IsEngineOn = false;
+            casterPlayerState.Spaceship.Transform.Velocity = Vector2.Zero;
 
             _netEventsDataService.AddHeadbuttHitEnemyNetEvent(tick, _casterPlayerId, enemyId);
             DeactivateTalent(tick);
@@ -148,9 +148,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void StopIfActive(int tick)
         {
-            if (_isCharging)
+            if (_phase == HeadButtPhaseType.Charging)
             {
-                _isCharging = false;
+                _phase = HeadButtPhaseType.None;
                 var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
                 if (casterPlayerState.Spaceship.IsAlive)
                 {
@@ -160,7 +160,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            if (IsDashing)
+            if (_phase == HeadButtPhaseType.Dashing)
             {
                 DeactivateTalent(tick);
             }
@@ -168,8 +168,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private void DeactivateTalent(int tick)
         {
-            _isCharging = false;
-            IsDashing = false;
+            _phase = HeadButtPhaseType.None;
+            IsTalentActive = false;
             _physicsSimulator.DisablePlayerToCollideWithPlayers(_casterPlayerId);
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
@@ -188,8 +188,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void ResetData()
         {
-            _isCharging = false;
-            IsDashing = false;
+            _phase = HeadButtPhaseType.None;
+            IsTalentActive = false;
         }
     }
 }

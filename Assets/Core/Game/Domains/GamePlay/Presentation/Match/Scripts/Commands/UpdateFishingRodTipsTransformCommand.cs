@@ -30,7 +30,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 var casterPosition = _playerControllers.GetPlayerPosition(tipModel.CasterPlayerId);
                 var directionFromCaster = tipModel.Position - casterPosition;
                 var rotation = directionFromCaster.ToQuaternion();
-                _tipControllers.InterpolateFishingRodTipTransform(tipModel.Id, tipModel.Position, rotation, casterPosition);
+                // The rod looks toward whichever side the projectile currently sits relative to the caster.
+                _playerControllers.SetPlayerFishingRodStickDirection(tipModel.CasterPlayerId, directionFromCaster.x > 0);
+                // The fishing line starts from the stick's tip pivot rather than the caster's centre.
+                var lineStartPosition = _playerControllers.GetPlayerFishingRodTipPivotPosition(tipModel.CasterPlayerId);
+                _tipControllers.InterpolateFishingRodTipTransform(tipModel.Id, tipModel.Position, rotation, lineStartPosition);
 
                 // The throw-aim arrow is only shown while the tip holds a caught enemy; it sits on that enemy (the tip
                 // position) and points along the throw direction.

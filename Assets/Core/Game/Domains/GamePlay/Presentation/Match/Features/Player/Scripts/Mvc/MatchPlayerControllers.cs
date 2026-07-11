@@ -111,6 +111,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetWaterGunState(isOn);
         }
 
+        public void SetPlayerFishingRodStickState(ushort playerId, bool isOn)
+        {
+            GetPlayer(playerId).SetFishingRodStickState(isOn);
+        }
+
+        public void SetPlayerFishingRodStickDirection(ushort playerId, bool isDirectionRight)
+        {
+            GetPlayer(playerId).SetFishingRodStickDirection(isDirectionRight);
+        }
+
+        public UnityEngine.Vector2 GetPlayerFishingRodTipPivotPosition(ushort playerId)
+        {
+            return GetPlayer(playerId).GetFishingRodTipPivotPosition();
+        }
+
         public void SetPlayerHeadbuttChargingState(ushort playerId, bool isCharging)
         {
             GetPlayer(playerId).SetHeadbuttChargingState(isCharging);
@@ -144,6 +159,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetPlayerRockState(ushort playerId, bool isRock)
         {
             GetPlayer(playerId).SetRockState(isRock);
+        }
+
+        public void SetPlayerOnLavaEffectState(ushort playerId, bool isExposedToLava)
+        {
+            GetPlayer(playerId).SetOnLavaEffectState(isExposedToLava);
         }
 
         public void PlayLayEggAnimation(ushort playerId)

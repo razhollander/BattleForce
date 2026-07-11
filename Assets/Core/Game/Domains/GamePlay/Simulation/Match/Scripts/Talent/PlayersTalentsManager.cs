@@ -270,6 +270,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             }
         }
 
+        public bool IsHeadbuttCharging(ushort playerId)
+        {
+            return _talentControllersPerPlayer[playerId].IsHeadbuttCharging();
+        }
+
         private TalentStateS2C AddTalentToPlayer(TalentType talentType, PlayerStateS2C playerState)
         {
             ref var newTalent = ref playerState.Spaceship.TalentsState.Talents.AddAndGet();

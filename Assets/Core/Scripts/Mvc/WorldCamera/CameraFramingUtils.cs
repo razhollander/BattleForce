@@ -49,6 +49,25 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             return orthographicSize * extraBottomPercentage * PercentToFraction;
         }
 
+        // Largest orthographic size whose frustum still fits inside the given world bounds.
+        public static float CalculateMaxOrthographicSizeInBounds(Vector2 boundsMin, Vector2 boundsMax, float aspect)
+        {
+            var maxSizeByHeight = (boundsMax.y - boundsMin.y) * 0.5f;
+            var maxSizeByWidth = (boundsMax.x - boundsMin.x) * 0.5f / aspect;
+            return Mathf.Min(maxSizeByHeight, maxSizeByWidth);
+        }
+
+        // Clamps a camera centre so its orthographic frustum stays within the given world bounds.
+        // Assumes the frustum already fits (orthographic size clamped with CalculateMaxOrthographicSizeInBounds beforehand).
+        public static Vector2 ClampPositionToBounds(Vector2 position, float orthographicSize, float aspect, Vector2 boundsMin, Vector2 boundsMax)
+        {
+            var halfHeight = orthographicSize;
+            var halfWidth = orthographicSize * aspect;
+            position.x = Mathf.Clamp(position.x, boundsMin.x + halfWidth, boundsMax.x - halfWidth);
+            position.y = Mathf.Clamp(position.y, boundsMin.y + halfHeight, boundsMax.y - halfHeight);
+            return position;
+        }
+
         // Frame-rate independent exponential damping toward target. damping is roughly the time constant in seconds.
         public static float Damp(float current, float target, float damping, float deltaTime)
         {

@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [TextArea(1, 5)] [SerializeField] private string _fieldBarriersJson;
         [TextArea(1, 5)] [SerializeField] private string _stageBoundriesWallsJson;
         [TextArea(1, 5)] [SerializeField] private string _powerUpSpawnPointsJson;
+        [TextArea(1, 5)] [SerializeField] private string _cameraBoundariesJson;
 
         public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
         {
@@ -90,6 +91,20 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public void SetPowerUpSpawnPointsJson(string powerUpSpawnPointsJson)
         {
             _powerUpSpawnPointsJson = powerUpSpawnPointsJson;
+        }
+
+        public void SetCameraBoundariesJson(string cameraBoundariesJson)
+        {
+            _cameraBoundariesJson = cameraBoundariesJson;
+        }
+
+        public CameraBoundariesConfig GetCameraBoundaries()
+        {
+            if (string.IsNullOrEmpty(_cameraBoundariesJson))
+            {
+                return default;
+            }
+            return _cameraBoundariesJson.FromJson<CameraBoundariesConfig>();
         }
 
         public TalentCardConfig[] GetTalentCards()

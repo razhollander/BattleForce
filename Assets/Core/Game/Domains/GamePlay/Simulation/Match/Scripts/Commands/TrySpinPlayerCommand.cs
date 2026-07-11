@@ -6,7 +6,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    public class SpinPlayerCommand : BaseCommand, ICommandVoid
+    public class TrySpinPlayerCommand : BaseCommand, ICommandVoid
     {
         private INetEventsDataService _netEventsDataService;
         private IMatchDataService _matchDataService;
@@ -16,19 +16,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private float _spinAmount;
         private int _tick;
 
-        public SpinPlayerCommand SetPlayer(ushort playerId)
+        public TrySpinPlayerCommand SetPlayer(ushort playerId)
         {
             _playerId = playerId;
             return this;
         }
 
-        public SpinPlayerCommand SetSpinAmount(float spinAmount)
+        public TrySpinPlayerCommand SetSpinAmount(float spinAmount)
         {
             _spinAmount = spinAmount;
             return this;
         }
 
-        public SpinPlayerCommand SetTick(int tick)
+        public TrySpinPlayerCommand SetTick(int tick)
         {
             _tick = tick;
             return this;

@@ -4,14 +4,14 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    public class TryEndPlayersSpinCommand : BaseCommand, ICommandVoid
+    public class TryEndPlayersSpinIfReachedZeroAngularVecityCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
         private INetEventsDataService _netEventsDataService;
         
         private int _tick;
 
-        public TryEndPlayersSpinCommand SetTick(int tick)
+        public TryEndPlayersSpinIfReachedZeroAngularVecityCommand SetTick(int tick)
         {
             _tick = tick;
             return this;

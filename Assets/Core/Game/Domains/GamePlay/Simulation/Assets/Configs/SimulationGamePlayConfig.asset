@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SimulationAssembly::Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig
   InnerConfig:
     PlayerSpaceship:
-      StartHealth: 1
+      StartHealth: 100
       TargetMovementSpeed: 5
       RotationSpeed: 150
       ShootCooldown: 0.35
@@ -133,11 +133,11 @@ MonoBehaviour:
         EnemyPushForcePerTick: 400
         CasterRecoilForcePerTick: 100
       HeadbuttTalentConfig:
-        MaxChargeForce: 30
+        MaxChargeForce: 70
         MaxDashWindowSeconds: 1.5
         MinDashWindowSeconds: 0.3
-        EnemyPushForce: 25
-        EnemySpinAmount: 15
+        EnemyPushForce: 30
+        EnemySpinAmount: 50
       RockTalentConfig:
         DurationInSeconds: 4
         ColliderRadiusMultiplier: 2.6
@@ -194,7 +194,7 @@ MonoBehaviour:
     EnvironmentSpikes:
       Damage: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 7
+    DeafultEnvironmentId: 0
     ShouldChooseRandomStage: 0
     ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3
@@ -213,6 +213,7 @@ MonoBehaviour:
     StageSizeMultiplier: 1
     SpeedupSimulation: 1
     IsAutoShoot: 0
+    CanPlayersCollideWithEachOther: 0
   references:
     version: 2
     RefIds:
@@ -240,7 +241,7 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 12
-        CooldownInSeconds: 6
+        CooldownInSeconds: 1
     - rid: 2200602851054190747
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:

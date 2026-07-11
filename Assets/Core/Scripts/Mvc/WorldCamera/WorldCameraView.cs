@@ -43,6 +43,10 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         private float _zoomInDamping;
         // While true an external zoom animation (LerpOrthographicSize) owns the lens size, so framing leaves it alone.
         private bool _isOrthographicSizeLockedByZoom;
+        // When true the camera frustum is kept inside [_worldBoundariesMin, _worldBoundariesMax] every frame.
+        private bool _hasWorldBoundaries;
+        private Vector2 _worldBoundariesMin;
+        private Vector2 _worldBoundariesMax;
 
         public Camera Camera => _camera;
         public Camera BaseCamera => _baseCamera;
@@ -99,6 +103,14 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             }
         }
 
+        // Restricts the camera so its frustum never crosses the rectangle defined by the top-left and bottom-right world points.
+        public void SetWorldBoundaries(Vector2 topLeft, Vector2 bottomRight)
+        {
+            _worldBoundariesMin = new Vector2(topLeft.x, bottomRight.y);
+            _worldBoundariesMax = new Vector2(bottomRight.x, topLeft.y);
+            _hasWorldBoundaries = true;
+        }
+
         public void AddFollowTarget(Transform target, float radius)
         {
             _targets.Add(new CameraTarget(target, radius));
@@ -136,6 +148,8 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         {
             if (_targets.Count == 0)
             {
+                ClampOrthographicSizeToBoundaries();
+                _framedPosition = ClampFramedPositionToBoundaries(_framedPosition);
                 transform.position = _framedPosition + _shakeOffset;
                 return;
             }
@@ -151,11 +165,43 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
                 _camera.orthographicSize = CameraFramingUtils.Damp(currentSize, targetSize, zoomDamping, deltaTime);
             }
 
+            ClampOrthographicSizeToBoundaries();
+
             // Move the camera down so the reserved space ends up at the bottom instead of split evenly.
             var bottomOffset = CameraFramingUtils.CalculateBottomWorldOffset(_camera.orthographicSize, _extraPercentageKeptFromScreenBottom);
             _framedPosition.x = CameraFramingUtils.Damp(_framedPosition.x, center.x, _positionDamping.x, deltaTime);
             _framedPosition.y = CameraFramingUtils.Damp(_framedPosition.y, center.y - bottomOffset, _positionDamping.y, deltaTime);
+            _framedPosition = ClampFramedPositionToBoundaries(_framedPosition);
             transform.position = _framedPosition + _shakeOffset;
+        }
+
+        // Caps the lens so the frustum can never be wider or taller than the world boundaries rectangle.
+        private void ClampOrthographicSizeToBoundaries()
+        {
+            if (!_hasWorldBoundaries)
+            {
+                return;
+            }
+
+            var maxSize = CameraFramingUtils.CalculateMaxOrthographicSizeInBounds(_worldBoundariesMin, _worldBoundariesMax, _camera.aspect);
+            if (_camera.orthographicSize > maxSize)
+            {
+                _camera.orthographicSize = maxSize;
+            }
+        }
+
+        // Keeps the framed centre inside the world boundaries while preserving the camera's z depth.
+        private Vector3 ClampFramedPositionToBoundaries(Vector3 position)
+        {
+            if (!_hasWorldBoundaries)
+            {
+                return position;
+            }
+
+            var clamped = CameraFramingUtils.ClampPositionToBounds(position, _camera.orthographicSize, _camera.aspect, _worldBoundariesMin, _worldBoundariesMax);
+            position.x = clamped.x;
+            position.y = clamped.y;
+            return position;
         }
 
         public Vector3 ScreenToWorldPoint(Vector3 position)

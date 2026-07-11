@@ -66,7 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 _playersDecelerationLogic.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
                 _playersDecelerationLogic.DeceleratePlayerSpin(playerState.Spaceship, stepDeltaTime);
-                _playersEngineLogic.TurnOnEngineForPlayerIfPossible(playerState.Spaceship);
+                _playersEngineLogic.TurnOnEngineForPlayerIfPossible(playerState);
                 _playersEngineLogic.TryAddEngineForceToPlayer(playerState.Spaceship, stepDeltaTime);
             }
 

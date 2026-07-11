@@ -23,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private SpinPlayerCommand _spinPlayerCommand;
+        private TrySpinPlayerCommand _trySpinPlayerCommand;
         private AddForceToPlayerCommand _addForceToPlayerCommand;
         private readonly ICommandFactory _commandFactory;
 
@@ -55,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void InitEntryPoint()
         {
-            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
         
@@ -126,7 +126,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var forceToEnemy = -directionToEnemy * pullForce;
             var randomSpin = RNG.NextFloat(config.MinSpin, config.MaxSpin);
-            _spinPlayerCommand.SetPlayer(hitEnemyPlayer.Id).SetSpinAmount(randomSpin).SetTick(tick).Execute();
+            _trySpinPlayerCommand.SetPlayer(hitEnemyPlayer.Id).SetSpinAmount(randomSpin).SetTick(tick).Execute();
             _addForceToPlayerCommand.SetForce(forceToEnemy).SetPlayerId(enemyId).ShouldTurnOffEngine(true).Execute();
         }
 

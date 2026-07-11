@@ -28,6 +28,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<TalentCardHitNetEventS2C> TalentCardHitNetEvents;
         public FixedUnorderedList<PlayerSpinnedStartedNetEventS2C> PlayerSpinnedStartedNetEvents;
         public FixedUnorderedList<PlayerSpinnedEndedNetEventS2C> PlayerSpinnedEndedNetEvents;
+        public FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C> PlayerStartedExposedToLavaNetEvents;
+        public FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C> PlayerEndedExposedToLavaNetEvents;
         public FixedUnorderedList<PowerUpBallSpawnedNetEventS2C> PowerUpSpawnedNetEvents; // todo: remove events related to power up when bullet id destroyed
         public FixedUnorderedList<PowerUpBallObtainedNetEventS2C> PowerUpObtainedNetEvents;
         public FixedClassUnorderedList<StageEndNetEventS2C> StageEndNetEvents;
@@ -113,6 +115,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             TalentCardHitNetEvents = new FixedUnorderedList<TalentCardHitNetEventS2C>(maxCap.TalentCardHitNetEvents);
             PlayerSpinnedStartedNetEvents = new FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>(maxCap.PlayerSpinnedStartedNetEvents);
             PlayerSpinnedEndedNetEvents = new FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>(maxCap.PlayerSpinnedEndedNetEvents);
+            PlayerStartedExposedToLavaNetEvents = new FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>(maxCap.PlayerStartedExposedToLavaNetEvents);
+            PlayerEndedExposedToLavaNetEvents = new FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>(maxCap.PlayerEndedExposedToLavaNetEvents);
             PowerUpSpawnedNetEvents = new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(maxCap.PowerUpSpawnedNetEvents);
             PowerUpObtainedNetEvents = new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(maxCap.PowerUpObtainedNetEvents);
             StageEndNetEvents = new FixedClassUnorderedList<StageEndNetEventS2C>(maxCap.StageEndNetEvents, () => new StageEndNetEventS2C(sharedGamePlayConfig.MaxTeamsAmount));
@@ -259,6 +263,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask2 & (1UL << 1)) != 0) SerializedDeactivateSoulTalentNetEvents(writer);
             if ((eventMask2 & (1UL << 2)) != 0) SerializedActivateRockTalentNetEvents(writer);
             if ((eventMask2 & (1UL << 3)) != 0) SerializedDeactivateRockTalentNetEvents(writer);
+            if ((eventMask2 & (1UL << 4)) != 0) SerializedPlayerStartedExposedToLavaNetEvents(writer);
+            if ((eventMask2 & (1UL << 5)) != 0) SerializedPlayerEndedExposedToLavaNetEvents(writer);
         }
 
         private ulong CalculateEventMask2()
@@ -268,6 +274,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (DeactivateSoulTalentNetEvents.Count > 0) eventMask2 |= 1UL << 1;
             if (ActivateRockTalentNetEvents.Count > 0) eventMask2 |= 1UL << 2;
             if (DeactivateRockTalentNetEvents.Count > 0) eventMask2 |= 1UL << 3;
+            if (PlayerStartedExposedToLavaNetEvents.Count > 0) eventMask2 |= 1UL << 4;
+            if (PlayerEndedExposedToLavaNetEvents.Count > 0) eventMask2 |= 1UL << 5;
             return eventMask2;
         }
 
@@ -565,6 +573,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask2 & (1UL << 3)) != 0) DeserializedDeactivateRockTalentNetEvents(reader);
             else DeactivateRockTalentNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 4)) != 0) DeserializedPlayerStartedExposedToLavaNetEvents(reader);
+            else PlayerStartedExposedToLavaNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 5)) != 0) DeserializedPlayerEndedExposedToLavaNetEvents(reader);
+            else PlayerEndedExposedToLavaNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1889,6 +1903,42 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref DeactivateRockTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerStartedExposedToLavaNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerStartedExposedToLavaNetEvents.Count);
+            foreach (var netEvent in PlayerStartedExposedToLavaNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedPlayerStartedExposedToLavaNetEvents(NetDataReader reader)
+        {
+            PlayerStartedExposedToLavaNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PlayerStartedExposedToLavaNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerEndedExposedToLavaNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerEndedExposedToLavaNetEvents.Count);
+            foreach (var netEvent in PlayerEndedExposedToLavaNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedPlayerEndedExposedToLavaNetEvents(NetDataReader reader)
+        {
+            PlayerEndedExposedToLavaNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PlayerEndedExposedToLavaNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

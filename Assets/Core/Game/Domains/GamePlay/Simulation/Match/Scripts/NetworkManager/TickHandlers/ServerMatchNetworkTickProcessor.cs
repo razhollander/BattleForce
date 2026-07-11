@@ -48,7 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
         private StepFrigidBlocksCommand _stepFrigidBlocksCommand;
         private StepTimersCommand _stepTimersCommand;
-        private TryEndPlayersSpinCommand _tryEndPlayersSpinCommand;
+        private TryEndPlayersSpinIfReachedZeroAngularVecityCommand _tryEndPlayersSpinIfReachedZeroAngularVecityCommand;
         private TryEndStagePreparationPhaseCommand _tryEndStagePreparationPhaseCommand;
         private StepAllPlayersTalentsCooldownsCommand _stepAllPlayersTalentsCooldownsCommand;
         private StepAllPlayersTalentsCommand _stepAllPlayersTalentsCommand;
@@ -84,7 +84,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         public void InitEntryPoint()
         {
-            _tryEndPlayersSpinCommand = _commandFactory.CreateCommandVoid<TryEndPlayersSpinCommand>();
+            _tryEndPlayersSpinIfReachedZeroAngularVecityCommand = _commandFactory.CreateCommandVoid<TryEndPlayersSpinIfReachedZeroAngularVecityCommand>();
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
@@ -127,7 +127,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
                 _stepFrigidBlocksCommand.SetTick(currentTick).SetDeltaTime(stepDeltaTime).Execute();
-                _tryEndPlayersSpinCommand.SetTick(currentTick).Execute();
+                _tryEndPlayersSpinIfReachedZeroAngularVecityCommand.SetTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
                 _trySendPlayersLockOnTargetChangedCommand.SetProcessedTick(currentTick).Execute();
                 _overrideableNetEventsService.RegisterAllOverridableNetEvents();
@@ -253,6 +253,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.TalentCardHitNetEvents = _netEventsDataService.TalentCardHitNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerSpinnedStartedNetEvents = _netEventsDataService.PlayerSpinnedStartedNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerSpinnedEndedNetEvents = _netEventsDataService.PlayerSpinnedEndedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerStartedExposedToLavaNetEvents = _netEventsDataService.PlayerStartedExposedToLavaNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerEndedExposedToLavaNetEvents = _netEventsDataService.PlayerEndedExposedToLavaNetEventsPerClient[clientId];
                 _fullTickPacket.PowerUpSpawnedNetEvents = _netEventsDataService.PowerUpBallSpawnedNetEventsPerClient[clientId];
                 _fullTickPacket.PowerUpObtainedNetEvents = _netEventsDataService.PowerUpBallObtainedNetEventsPerClient[clientId];
                 _fullTickPacket.StageEndNetEvents = _netEventsDataService.StageEndNetEventsPerClient[clientId];

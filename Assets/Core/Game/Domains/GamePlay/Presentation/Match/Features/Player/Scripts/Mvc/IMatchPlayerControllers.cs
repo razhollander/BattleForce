@@ -31,6 +31,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void SetPlayerUmbrellaState(ushort playerId, bool isOn);
         void SetPlayerCurrentPowerUp(ushort playerId, PowerUpType powerUpType);
         void SetPlayerWaterGunState(ushort playerId, bool isOn);
+        void SetPlayerFishingRodStickState(ushort playerId, bool isOn);
+        void SetPlayerFishingRodStickDirection(ushort playerId, bool isDirectionRight);
+        UnityEngine.Vector2 GetPlayerFishingRodTipPivotPosition(ushort playerId);
         void SetPlayerHeadbuttChargingState(ushort playerId, bool isCharging);
         void ShowPlayerHeadbuttHelmet(ushort playerId);
         void StartPlayerHeadbuttDashHelmetHideTimer(ushort playerId);
@@ -38,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void OnPlayerHeadbuttTalentDeactivated(ushort playerId);
         void SetPlayerChickenState(ushort playerId, bool isOn);
         void SetPlayerRockState(ushort playerId, bool isRock);
+        void SetPlayerOnLavaEffectState(ushort playerId, bool isExposedToLava);
         void PlayLayEggAnimation(ushort playerId);
         void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction);
         void PlaySonicSnapEffectForPlayer(ushort playerId);

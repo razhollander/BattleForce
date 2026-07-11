@@ -27,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         private CancellationTokenSource _angryEyesCancellationTokenSource;
         private bool _isSightShown;
         private bool _isShortDurationAngry;
+        private bool _isHeadbuttActive;
 
         public void UpdateEyesAccordingToIsSightShown(bool isSightShown)
         {
@@ -34,9 +35,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             UpdateEyeState();
         }
 
+        public void SetHeadbuttActive(bool isActive)
+        {
+            _isHeadbuttActive = isActive;
+            UpdateEyeState();
+        }
+
         private void UpdateEyeState()
         {
-            var isAngry = _isSightShown || _isShortDurationAngry;
+            var isAngry = _isSightShown || _isShortDurationAngry || _isHeadbuttActive;
             _angryLeftEye.TrySetActive(isAngry);
             _angryRightEye.TrySetActive(isAngry);
             _leftEye.gameObject.TrySetActive(!isAngry);
@@ -103,6 +110,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             DisableSpinned();
             _isSightShown = false;
             _isShortDurationAngry = false;
+            _isHeadbuttActive = false;
             UpdateEyeState();
         }
 

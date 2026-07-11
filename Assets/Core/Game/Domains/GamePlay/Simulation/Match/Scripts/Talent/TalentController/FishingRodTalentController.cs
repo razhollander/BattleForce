@@ -32,7 +32,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly SharedGamePlayConfig _sharedConfig;
         private readonly ICommandFactory _commandFactory;
         private readonly IPlayersMouseDataService _playersMouseDataService;
-        private SpinPlayerCommand _spinPlayerCommand;
+        private TrySpinPlayerCommand _trySpinPlayerCommand;
         private AddForceToPlayerCommand _addForceToPlayerCommand;
 
         public TalentType TalentType => TalentType.FishingRod;
@@ -64,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void InitEntryPoint()
         {
-            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
 
@@ -272,7 +272,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var force = throwDirection * config.ThrowPushForce;
             var spinAmount = RNG.NextFloat(config.ThrowMinSpin, config.ThrowMaxSpin);
 
-            _spinPlayerCommand.SetPlayer(caughtEnemy.Id).SetSpinAmount(spinAmount).SetTick(tick).Execute();
+            _trySpinPlayerCommand.SetPlayer(caughtEnemy.Id).SetSpinAmount(spinAmount).SetTick(tick).Execute();
             _addForceToPlayerCommand.SetPlayerId(caughtEnemy.Id).SetForce(force).ShouldTurnOffEngine(true).Execute();
 
             // The projectile (and its arrow) is removed by DeactivateTalent below, so no explicit arrow clear is needed.

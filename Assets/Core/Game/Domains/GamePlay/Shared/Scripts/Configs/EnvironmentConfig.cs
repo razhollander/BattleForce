@@ -162,6 +162,25 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 #endif
         }
 
+        public void SetCameraBoundaries(S2CModels.CameraBoundariesConfig cameraBoundaries, int index)
+        {
+            var json = JsonConvert.SerializeObject(cameraBoundaries);
+
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetCameraBoundariesJson(json);
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetCameraBoundariesJson(json);
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
+
 #if UNITY_EDITOR
         private void OnValidate()
         {

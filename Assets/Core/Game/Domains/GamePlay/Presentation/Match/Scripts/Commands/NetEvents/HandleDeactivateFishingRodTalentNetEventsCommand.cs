@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimArrowEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Scripts.Extensions;
@@ -13,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IFishingRodTipControllers _fishingRodTipControllers;
         private ISecondCastEffectController _secondCastEffectController;
         private IMatchDataService _matchDataService;
+        private IMatchPlayerControllers _playerControllers;
 
         public override void ResolveDependencies()
         {
@@ -20,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
             _secondCastEffectController = _diContainer.Resolve<ISecondCastEffectController>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
         }
 
         public void Execute()
@@ -36,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _secondCastEffectController.RemoveArrow(netEvent.ProjectileId);
                 _fishingRodTipControllers.DestroyFishingRodTip(netEvent.ProjectileId);
                 _matchDataService.RemoveFishingRodTip(netEvent.ProjectileId);
+                _playerControllers.SetPlayerFishingRodStickState(netEvent.CasterPlayerId, false);
             }
 
             _cachedPresentationEventsService.DeactivateFishingRodTalentNetEvents.Clear();

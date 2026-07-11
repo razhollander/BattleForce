@@ -26,6 +26,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<TalentCardHitNetEventS2C>> TalentCardHitNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>> PlayerSpinnedStartedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>> PlayerSpinnedEndedNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>> PlayerStartedExposedToLavaNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>> PlayerEndedExposedToLavaNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> PowerUpBallSpawnedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> PowerUpBallObtainedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> PlayerSwitchTeamNetEventsPerClient { get; }
@@ -103,6 +105,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddTalentCardHitNetEvent(int processedTick, ushort talentCardId, ushort cardHealth);
         void AddPlayerSpinnedStartedNetEvent(int onTick, ushort playerId);
         void AddPlayerSpinnedEndedNetEvent(int onTick, ushort playerId);
+        void AddPlayerStartedExposedToLavaNetEvent(int onTick, ushort playerId);
+        void AddPlayerEndedExposedToLavaNetEvent(int onTick, ushort playerId);
         void AddPowerUpSpawnedNetEvent(int onTick, ushort powerUpBallId, Vector2 position);
         void AddPowerUpObtainedNetEvent(int onTick, ushort powerUpBallId, ushort byPlayerId);
         void AddPlayerSwitchTeamNetEvent(int onTick, ushort playerId, ushort teamId);

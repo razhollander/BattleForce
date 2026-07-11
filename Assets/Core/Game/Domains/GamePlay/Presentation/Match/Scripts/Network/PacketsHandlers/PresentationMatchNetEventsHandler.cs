@@ -203,8 +203,40 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 var player = _matchDataService.GetPlayer(playerSpinnedEndedNetEvent.PlayerId);
                 player.Spaceship.IsSpinned = false;
-                
+
                 _cachedPresentationEventsService.PlayerSpinnedEndedNetEvents.Add(playerSpinnedEndedNetEvent);
+            }
+        }
+
+        public void ProcessPlayerStartedExposedToLavaEvents(CapacityList<PlayerStartedExposedToLavaNetEventS2C> playerStartedExposedToLavaNetEvents)
+        {
+            if (playerStartedExposedToLavaNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerStartedExposedToLavaNetEvent in playerStartedExposedToLavaNetEvents)
+            {
+                var player = _matchDataService.GetPlayer(playerStartedExposedToLavaNetEvent.PlayerId);
+                player.Spaceship.IsExposedToLava = true;
+
+                _cachedPresentationEventsService.PlayerStartedExposedToLavaNetEvents.Add(playerStartedExposedToLavaNetEvent);
+            }
+        }
+
+        public void ProcessPlayerEndedExposedToLavaEvents(CapacityList<PlayerEndedExposedToLavaNetEventS2C> playerEndedExposedToLavaNetEvents)
+        {
+            if (playerEndedExposedToLavaNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerEndedExposedToLavaNetEvent in playerEndedExposedToLavaNetEvents)
+            {
+                var player = _matchDataService.GetPlayer(playerEndedExposedToLavaNetEvent.PlayerId);
+                player.Spaceship.IsExposedToLava = false;
+
+                _cachedPresentationEventsService.PlayerEndedExposedToLavaNetEvents.Add(playerEndedExposedToLavaNetEvent);
             }
         }
 

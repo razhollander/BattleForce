@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsEngineOn = true;
         public bool IsAlive = true;
         public bool IsSpinned;
+        public bool IsExposedToLava;
         public PlayerAssistArrowType AssistArrowType;
         public PowerUpType CurrentPowerUp;
         public bool IsPowerUpCurrentlyActive;
@@ -41,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 IsEngineOn = this.IsEngineOn,
                 IsAlive = this.IsAlive,
                 IsSpinned = this.IsSpinned,
+                IsExposedToLava = this.IsExposedToLava,
                 AssistArrowType = this.AssistArrowType,
                 CurrentPowerUp = this.CurrentPowerUp,
                 IsPowerUpCurrentlyActive = this.IsPowerUpCurrentlyActive,
@@ -68,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put(IsAlive);
             writer.Put((byte)AssistArrowType);
             writer.Put(IsSpinned);
+            writer.Put(IsExposedToLava);
             writer.Put((byte)CurrentPowerUp);
             writer.Put(IsPowerUpCurrentlyActive);
             writer.Put(IsCurrentlyInGrantingPowerUpPhase);
@@ -93,6 +96,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             IsAlive = reader.GetBool();
             AssistArrowType = (PlayerAssistArrowType) reader.GetByte();
             IsSpinned = reader.GetBool();
+            IsExposedToLava = reader.GetBool();
             CurrentPowerUp = (PowerUpType)reader.GetByte();
             IsPowerUpCurrentlyActive = reader.GetBool();
             IsCurrentlyInGrantingPowerUpPhase = reader.GetBool();

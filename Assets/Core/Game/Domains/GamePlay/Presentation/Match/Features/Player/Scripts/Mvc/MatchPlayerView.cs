@@ -31,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
         [SerializeField] private WaterGunStreamView _waterGunStreamView;
+        [SerializeField] private FishingRodStickView _fishingRodStickView;
         [SerializeField] private PlayerChickenView _playerChickenView;
         [SerializeField] private YearsOfPainView _yearsOfPainView;
         [SerializeField] private SonicSnapEffectView _sonicSnapEffectView;
@@ -46,7 +47,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private GameObject _headbuttHelmet;
         [SerializeField] private float _headbuttHelmetDashHideSeconds = 1f;
         [SerializeField] private GameObject _rockGameObject;
+        [SerializeField] private GameObject _onLavaEffect;
         [field: SerializeField] public Transform LeaderFlagPivot { get; private set; }
+        [field: SerializeField] public Transform FishingRodPivot { get; private set; }
 
         private CancellationTokenSource _headbuttHelmetHideCancellationTokenSource;
         private bool _isHeadbuttDashing;
@@ -67,6 +70,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetRockState(bool isOn)
         {
             _rockGameObject.TrySetActive(isOn);
+        }
+
+        public void SetOnLavaEffectState(bool isOn)
+        {
+            _onLavaEffect.TrySetActive(isOn);
         }
         
         public void UpdateTalentStocks(int talentIndex, int stockAmount)
@@ -168,6 +176,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             CancelHeadbuttHelmetHideTimer();
             _isHeadbuttDashing = false;
             _headbuttHelmet.SetActive(true);
+            _playerEyesView.SetHeadbuttActive(true);
         }
 
         public void StartHeadbuttDashHelmetHideTimer(CancellationToken stageCancellationToken)
@@ -183,6 +192,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             CancelHeadbuttHelmetHideTimer();
             _isHeadbuttDashing = false;
             _headbuttHelmet.SetActive(false);
+            _playerEyesView.SetHeadbuttActive(false);
         }
 
         public void OnHeadbuttTalentDeactivated()
@@ -208,6 +218,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
             _isHeadbuttDashing = false;
             _headbuttHelmet.SetActive(false);
+            _playerEyesView.SetHeadbuttActive(false);
         }
 
         private void CancelHeadbuttHelmetHideTimer()
@@ -229,6 +240,33 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
         }
         
+        public void SetFishingRodStickState(bool isOn)
+        {
+            if (isOn)
+            {
+                _fishingRodStickView.Show();
+            }
+            else
+            {
+                _fishingRodStickView.Hide();
+            }
+        }
+
+        public void SetFishingRodStickPosition(Vector2 position)
+        {
+            _fishingRodStickView.SetPosition(position);
+        }
+
+        public void SetFishingRodStickDirection(bool isDirectionRight)
+        {
+            _fishingRodStickView.SetDirection(isDirectionRight);
+        }
+
+        public Vector2 GetFishingRodTipPivotPosition()
+        {
+            return _fishingRodStickView.FishingRodTipPivot.position;
+        }
+
         public void SetIsHealthBarShown(bool isShown)
         {
             _healthBarGameObject.SetActive(isShown);
@@ -262,8 +300,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerChickenView.SetChickenState(false);
             DisableUmbrellaState();
             _waterGunStreamView.Hide();
+            _fishingRodStickView.Hide();
             _headbuttChargeEffectView.StopCharging();
             HideHeadbuttHelmet();
+            SetOnLavaEffectState(false);
             Base.OnDespawned();
         }
 

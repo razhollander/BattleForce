@@ -22,5 +22,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         void HitSoulGhostWithWall(ushort casterId, ushort ghostId, int tick);
         void StopTalentIfActive(TalentType talentType, ushort playerId, int tick);
         void TryHeadbuttHitEnemy(ushort potentialCasterId, ushort potentialEnemyId, int tick);
+        bool IsHeadbuttCharging(ushort playerId);
     }
 }

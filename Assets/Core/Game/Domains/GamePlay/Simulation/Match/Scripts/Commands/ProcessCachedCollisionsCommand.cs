@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private int _processedTick;
         private PlayerHitCommand _playerHitCommand;
-        private SpinPlayerCommand _spinPlayerCommand;
+        private TrySpinPlayerCommand _trySpinPlayerCommand;
         private ObtainPowerUpBallCommand _obtainPowerUpBallCommand;
         private AddForceToPlayerCommand _addForceToPlayerCommand;
 
@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
-            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
             _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
@@ -460,7 +460,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var config = _gamePlayConfigService.GamePlayConfig.Talents.GrapplingHookTalentConfig;
-            _spinPlayerCommand.SetPlayer(enemyId).SetSpinAmount(config.EnemyHitSpinAmount).SetTick(_processedTick).Execute();
+            _trySpinPlayerCommand.SetPlayer(enemyId).SetSpinAmount(config.EnemyHitSpinAmount).SetTick(_processedTick).Execute();
         }
 
         private void HandleChickenEggPlayerCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -490,7 +490,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var config = _gamePlayConfigService.GamePlayConfig.Talents.ChickenTalentConfig;
-            _spinPlayerCommand.SetPlayer(player.Id).SetSpinAmount(config.SpinAmount).SetTick(_processedTick).Execute();
+            _trySpinPlayerCommand.SetPlayer(player.Id).SetSpinAmount(config.SpinAmount).SetTick(_processedTick).Execute();
             
             _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId);
             _physicsSimulator.RemoveChickenEgg(egg.Id);
@@ -668,7 +668,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var forceMagnitude = environmentSpringsConfig.Force * _matchDataService.SimulationState.MapSizeMultiplier;
             var force = pushDirection * forceMagnitude;
             var randomSpin = RNG.NextFloat(environmentSpringsConfig.MinSpin, environmentSpringsConfig.MaxSpin);
-            _spinPlayerCommand
+            _trySpinPlayerCommand
                 .SetPlayer(playerId)
                 .SetSpinAmount(randomSpin)
                 .SetTick(_processedTick)
@@ -767,11 +767,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             if (eventType == PhysicsEventEventType.Begin)
             {
-                _playersInLavaTrackerService.OnPlayerEnterLava(playerId);
+                if (_playersInLavaTrackerService.OnPlayerEnterLava(playerId))
+                {
+                    _matchDataService.SimulationState.GetPlayerById(playerId).Spaceship.IsExposedToLava = true;
+                    _netEventsDataService.AddPlayerStartedExposedToLavaNetEvent(_processedTick, playerId);
+                }
             }
             else if (eventType == PhysicsEventEventType.End)
             {
-                _playersInLavaTrackerService.OnPlayerExitLava(playerId);
+                if (_playersInLavaTrackerService.OnPlayerExitLava(playerId))
+                {
+                    _matchDataService.SimulationState.GetPlayerById(playerId).Spaceship.IsExposedToLava = false;
+                    _netEventsDataService.AddPlayerEndedExposedToLavaNetEvent(_processedTick, playerId);
+                }
             }
         }
 

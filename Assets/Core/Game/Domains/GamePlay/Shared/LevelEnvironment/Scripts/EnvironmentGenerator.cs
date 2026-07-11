@@ -14,36 +14,13 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
         [SerializeField] private List<PolygonPath2D> _walls;
         [SerializeField] private List<LavaWall> _lavaWalls;
         [SerializeField] private List<PowerUpSpawnPoint> _powerUpSpawnPoints;
+        [SerializeField] private Transform _cameraTopLeftBoundary;
+        [SerializeField] private Transform _cameraBottomRightBoundary;
         [SerializeField] private SharedGamePlayConfig _sharedGamePlayConfig;
 
         [Button]
         public void RefreshConfig(int index)
         {
-            // _walls = GetWalls();
-            // var wallsConfigs = new WallConfig[_walls.Count];
-            //
-            // for (int i = 0; i < _walls.Count; i++)
-            // {
-            //     var wallGenerator = _walls[i];
-            //     var wallConfig = new WallConfig((ushort) (i + _sharedGamePlayConfig.MinEntityId), wallGenerator.GetPointsRelativeToObject().Select(x=>x.ToNumericsVector2()).ToArray());
-            //     wallsConfigs[i] = wallConfig;
-            // }
-            //
-            // _environmentConfig.SetWalls(wallsConfigs, index);
-
-            // _lavaWalls = GetLavaWalls();
-            // var lavaConfigs = new WallConfig[_lavaWalls.Count];
-            // var lavaStartId = _sharedGamePlayConfig.MinEntityId;
-            //
-            // for (int i = 0; i < _lavaWalls.Count; i++)
-            // {
-            //     var lavaWall = _lavaWalls[i];
-            //     var lavaConfig = new WallConfig((ushort)(i + lavaStartId), lavaWall.GetPoints().Select(x => x.ToNumericsVector2()).ToArray());
-            //     lavaConfigs[i] = lavaConfig;
-            // }
-            //
-            // _environmentConfig.SetLavaWalls(lavaConfigs, index);
-            
             var powerUpSpawnPointConfigs = new PowerUpSpawnPointConfig[_powerUpSpawnPoints.Count];
 
             for (int i = 0; i < _powerUpSpawnPoints.Count; i++)
@@ -52,6 +29,14 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
             }
 
             _environmentConfig.SetPowerUpSpawnPoints(powerUpSpawnPointConfigs, index);
+        }
+
+        [Button]
+        public void SaveCameraBoundaries(int index)
+        {
+            var topLeft = _cameraTopLeftBoundary.position.ToVector2XY().ToNumericsVector2();
+            var bottomRight = _cameraBottomRightBoundary.position.ToVector2XY().ToNumericsVector2();
+            _environmentConfig.SetCameraBoundaries(new CameraBoundariesConfig(topLeft, bottomRight), index);
         }
 
         private List<PolygonPath2D> GetWalls()
@@ -75,6 +60,23 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
             CreateWallPieces(layoutConfig.Configs[index].GetWalls(), false);
             CreateWallPieces(layoutConfig.Configs[index].GetLavaWalls(), true);
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (_cameraTopLeftBoundary == null || _cameraBottomRightBoundary == null)
+            {
+                return;
+            }
+
+            var topLeft = _cameraTopLeftBoundary.position;
+            var bottomRight = _cameraBottomRightBoundary.position;
+            var center = (topLeft + bottomRight) * 0.5f;
+            var size = new Vector3(Mathf.Abs(bottomRight.x - topLeft.x), Mathf.Abs(topLeft.y - bottomRight.y), 0f);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(center, size);
+        }
+#endif
 
         private void CreateWallPieces(WallConfig[] wallConfigs, bool isLava)
         {

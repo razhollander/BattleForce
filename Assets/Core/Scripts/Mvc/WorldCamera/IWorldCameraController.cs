@@ -13,6 +13,7 @@ namespace Core.Scripts.Mvc.WorldCamera
         void ShakeCamera(float intensity, float durationInSeconds);
         void MultiplyOthographicSize(float multiplier);
         public void SetisDampingEnabled(bool isEnabled);
+        void SetWorldBoundaries(Vector2 topLeft, Vector2 bottomRight);
         Awaitable LerpOrthographicSizeMultiplier(float targetMultiplier, float durationSeconds, CancellationToken cancellationToken);
         void InitEntryPoint();
 

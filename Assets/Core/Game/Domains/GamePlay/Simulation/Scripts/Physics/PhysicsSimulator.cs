@@ -11,6 +11,7 @@ using Box2D.NetStandard.Dynamics.World;
 using Box2D.NetStandard.Dynamics.World.Callbacks;
 #endif
 using Box2D.WorldTests;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
@@ -29,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
     {
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkConfig _networkConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IUnityMainThreadDispatcher _unityMainThreadDispatcher;
         private World _world;
         private readonly CollisionEventCacheListener _collisionEventCacheListener;
@@ -39,10 +41,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private readonly ConcurrentPool<CircleShape> _circleShapePool;
         private readonly ConcurrentPool<Filter> _filterPool;
 
-        public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig, IUnityMainThreadDispatcher unityMainThreadDispatcher)
+        public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig, ISimulationGamePlayConfigService gamePlayConfigService, IUnityMainThreadDispatcher unityMainThreadDispatcher)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _networkConfig = networkConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _unityMainThreadDispatcher = unityMainThreadDispatcher;
             _collisionEventCacheListener = new CollisionEventCacheListener(_networkConfig);
 
@@ -286,6 +289,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var gravity = new Vector2(0f, 0f);
             var world = new World(gravity, _collisionEventCacheListener, _networkConfig.MaxCap.ConcurrentTimeOfImpactContacts, _networkConfig.MaxCap.ConcurrentBodyCount, _networkConfig.MaxCap.ConcurrentContactCount, _networkConfig.MaxCap.ConcurrentJointCount);
+            world.SetContactFilter(new PlayerCollisionContactFilter(_gamePlayConfigService));
             var testDebugDrawer = CreateTestDebugDrawer();
             world.SetDebugDraw(testDebugDrawer);
             return world;

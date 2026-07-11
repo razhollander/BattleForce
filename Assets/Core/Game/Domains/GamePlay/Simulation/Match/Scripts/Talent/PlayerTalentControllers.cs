@@ -204,5 +204,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _fishingRodTalentController.ResetData();
             _soulTalentController.ResetData();
         }
+
+        public bool IsHeadbuttCharging()
+        {
+            return _headbuttTalentController.IsCharging;
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ICommandFactory _commandFactory;
         private readonly IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private AddForceToPlayerCommand _addForceToPlayerCommand;
-        private SpinPlayerCommand _spinPlayerCommand;
+        private TrySpinPlayerCommand _trySpinPlayerCommand;
 
         public TalentType TalentType => TalentType.Rock;
 
@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         public void InitEntryPoint()
         {
             _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
-            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -89,14 +89,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _startTick = tick;
 
             var config = _gamePlayConfigService.GamePlayConfig.Talents.RockTalentConfig;
-            casterPlayerState.Spaceship.IsEngineOn = false;
-            casterPlayerState.Spaceship.Transform.StopMotion();
+            var casterSpaceship = casterPlayerState.Spaceship;
+            casterSpaceship.IsEngineOn = false;
+            casterSpaceship.Transform.StopMotion();
 
             _physicsSimulator.EnableRockBody(_casterPlayerId, config.ColliderRadiusMultiplier, config.BodyDensity, config.Restitution);
             _physicsSimulator.DisablePlayerHeartCollider(_casterPlayerId);
 
             PushAndSpinNearbyEnemies(tick, casterPlayerState, config);
-
+            casterSpaceship.IsSpinned = false;
+            _netEventsDataService.AddPlayerSpinnedEndedNetEvent(tick, _casterPlayerId);
             _netEventsDataService.AddActivateRockTalentNetEvent(tick, _casterPlayerId);
         }
 
@@ -122,7 +124,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
                 var pushDirection = toEnemy.NormalizeSafe();
                 _addForceToPlayerCommand.SetPlayerId(enemyPlayerState.Id).SetForce(pushDirection * config.EnemyPushForce).ShouldTurnOffEngine(true).Execute();
-                _spinPlayerCommand.SetPlayer(enemyPlayerState.Id).SetSpinAmount(config.EnemySpinAmount).SetTick(tick).Execute();
+                _trySpinPlayerCommand.SetPlayer(enemyPlayerState.Id).SetSpinAmount(config.EnemySpinAmount).SetTick(tick).Execute();
             }
         }
 

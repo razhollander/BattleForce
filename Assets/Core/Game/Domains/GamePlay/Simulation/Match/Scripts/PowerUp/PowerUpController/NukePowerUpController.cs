@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
         private readonly IMatchDataService _matchDataService;
         private readonly INetEventsDataService _netEventsDataService;
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
-        private readonly SpinPlayerCommand _spinPlayerCommand;
+        private readonly TrySpinPlayerCommand _trySpinPlayerCommand;
         private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
         private ushort _casterPlayerId;
 
@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             _matchDataService = matchDataService;
             _netEventsDataService = netEventsDataService;
             _gamePlayConfigService = gamePlayConfigService;
-            _spinPlayerCommand = commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _trySpinPlayerCommand = commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
 
@@ -56,7 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
                 var spinMagnitude = RNG.NextFloat(minSpin, maxSpin);
                 var spinSign = RNG.NextBool() ? 1f : -1f;
                 var signedSpin = spinMagnitude * spinSign;
-                _spinPlayerCommand.SetPlayer(playerState.Id).SetSpinAmount(signedSpin).SetTick(tick).Execute();
+                _trySpinPlayerCommand.SetPlayer(playerState.Id).SetSpinAmount(signedSpin).SetTick(tick).Execute();
                 
                 var dir = playerState.Spaceship.Transform.Position - casterPosition;
                 var isAtSamePosition = dir.LengthSquared() == 0f;

@@ -34,6 +34,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleTalentCardHitNetEventsCommand _handleTalentCardHitNetEventsCommand;
         private readonly HandlePlayerSpinnedStartedNetEventsCommand _handlePlayerSpinnedStartedNetEventsCommand;
         private readonly HandlePlayerSpinnedEndedNetEventsCommand _handlePlayerSpinnedEndedNetEventsCommand;
+        private readonly HandlePlayerStartedExposedToLavaNetEventsCommand _handlePlayerStartedExposedToLavaNetEventsCommand;
+        private readonly HandlePlayerEndedExposedToLavaNetEventsCommand _handlePlayerEndedExposedToLavaNetEventsCommand;
         private readonly HandlePowerUpBallSpawnedNetEventsCommand _handlePowerUpBallSpawneddNetEventsCommand;
         private readonly HandlePowerUpBallObtainedNetEventsCommand _handlePowerUpBallObtainedNetEventsCommand;
         private readonly HandleStageEndNetEventsCommand _handleStageEndNetEventsCommand;
@@ -120,6 +122,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleTalentCardHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleTalentCardHitNetEventsCommand>();
             _handlePlayerSpinnedStartedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerSpinnedStartedNetEventsCommand>();
             _handlePlayerSpinnedEndedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerSpinnedEndedNetEventsCommand>();
+            _handlePlayerStartedExposedToLavaNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerStartedExposedToLavaNetEventsCommand>();
+            _handlePlayerEndedExposedToLavaNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerEndedExposedToLavaNetEventsCommand>();
             _handlePowerUpBallSpawneddNetEventsCommand = commandFactory.CreateCommandVoid<HandlePowerUpBallSpawnedNetEventsCommand>();
             _handlePowerUpBallObtainedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePowerUpBallObtainedNetEventsCommand>();
             _handleStageEndNetEventsCommand = commandFactory.CreateCommandVoid<HandleStageEndNetEventsCommand>();
@@ -211,6 +215,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleTalentCardHitNetEventsCommand.Execute();
             _handlePlayerSpinnedStartedNetEventsCommand.Execute();
             _handlePlayerSpinnedEndedNetEventsCommand.Execute();
+            _handlePlayerStartedExposedToLavaNetEventsCommand.Execute();
+            _handlePlayerEndedExposedToLavaNetEventsCommand.Execute();
             _handlePowerUpBallSpawneddNetEventsCommand.Execute();
             _handlePowerUpBallObtainedNetEventsCommand.Execute();
             _handleStageEndNetEventsCommand.Execute();

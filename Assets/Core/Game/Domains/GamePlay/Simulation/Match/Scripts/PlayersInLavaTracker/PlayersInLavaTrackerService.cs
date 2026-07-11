@@ -23,18 +23,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
             _playerInLavaDataPool = new ConcurrentPool<PlayerInLavaData>(() => new PlayerInLavaData(), networkConfig.MaxCap.ConcurrentPlayers);
         }
         
-        public void OnPlayerEnterLava(ushort playerId)
+        public bool OnPlayerEnterLava(ushort playerId)
         {
-            if (!_playersInLava.ContainsKey(playerId))
+            var didStartBeingExposedToLava = !_playersInLava.ContainsKey(playerId);
+            if (didStartBeingExposedToLava)
             {
                 var playerInLavaData = _playerInLavaDataPool.Get();
                 _playersInLava.Add(playerId, playerInLavaData);
             }
-            
+
             _playersInLava[playerId].LavaAmountPlayerIsIn++;
+            return didStartBeingExposedToLava;
         }
 
-        public void OnPlayerExitLava(ushort playerId)
+        public bool OnPlayerExitLava(ushort playerId)
         {
             if (_playersInLava.ContainsKey(playerId))
             {
@@ -45,12 +47,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
                     playerInLavaData.Reset();
                     _playerInLavaDataPool.Return(playerInLavaData);
                     _playersInLava.Remove(playerId);
+                    return true;
                 }
             }
             else
             {
                 LogService.LogError($"Player {playerId} exit lava but does not exist in lava");
             }
+
+            return false;
         }
 
         public void StepTimePassedSinceLastDamageTaken(FixedUnorderedList<ushort> playerIdsNotToIncrementTimerInLava, float deltaTime)

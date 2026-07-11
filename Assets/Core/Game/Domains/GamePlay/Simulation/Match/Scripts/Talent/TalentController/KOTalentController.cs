@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly ICommandFactory _commandFactory;
-        private SpinPlayerCommand _spinPlayerCommand;
+        private TrySpinPlayerCommand _trySpinPlayerCommand;
         private AddForceToPlayerCommand _addForceToPlayerCommand;
 
         public TalentType TalentType => TalentType.KO;
@@ -70,7 +70,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void InitEntryPoint()
         {
-            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
+            _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
         }
         
@@ -190,7 +190,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var pushForce = pushDirection * koConfig.PushForce;
             var randomSpin = RNG.NextFloat(koConfig.MinSpin, koConfig.MaxSpin);
             enemyPlayerState.Spaceship.Transform.Direction = pushDirection;
-            _spinPlayerCommand
+            _trySpinPlayerCommand
                 .SetPlayer(enemyPlayerId)
                 .SetSpinAmount(randomSpin)
                 .SetTick(tick)
