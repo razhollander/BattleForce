@@ -214,11 +214,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.ShowHeadbuttHelmet();
         }
 
-        public void StartHeadbuttDashHelmetHideTimer()
-        {
-            _playerView.StartHeadbuttDashHelmetHideTimer(_stageCancellationTokenProvider.CancellationTokenSource.Token);
-        }
-
         public void HideHeadbuttHelmet()
         {
             _playerView.HideHeadbuttHelmet();

@@ -136,11 +136,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).ShowHeadbuttHelmet();
         }
 
-        public void StartPlayerHeadbuttDashHelmetHideTimer(ushort playerId)
-        {
-            GetPlayer(playerId).StartHeadbuttDashHelmetHideTimer();
-        }
-
         public void HidePlayerHeadbuttHelmet(ushort playerId)
         {
             GetPlayer(playerId).HideHeadbuttHelmet();

@@ -36,7 +36,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         UnityEngine.Vector2 GetPlayerFishingRodTipPivotPosition(ushort playerId);
         void SetPlayerHeadbuttChargingState(ushort playerId, bool isCharging);
         void ShowPlayerHeadbuttHelmet(ushort playerId);
-        void StartPlayerHeadbuttDashHelmetHideTimer(ushort playerId);
         void HidePlayerHeadbuttHelmet(ushort playerId);
         void OnPlayerHeadbuttTalentDeactivated(ushort playerId);
         void SetPlayerChickenState(ushort playerId, bool isOn);

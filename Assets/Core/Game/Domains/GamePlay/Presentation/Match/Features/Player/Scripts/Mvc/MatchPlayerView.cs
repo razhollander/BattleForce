@@ -45,14 +45,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private DeadTombstoneView _deadTombstoneView;
         [SerializeField] private ActivatePowerUpEffectView _activatePowerUpEffectView;
         [SerializeField] private GameObject _headbuttHelmet;
-        [SerializeField] private float _headbuttHelmetDashHideSeconds = 1f;
         [SerializeField] private GameObject _rockGameObject;
         [SerializeField] private GameObject _onLavaEffect;
         [field: SerializeField] public Transform LeaderFlagPivot { get; private set; }
         [field: SerializeField] public Transform FishingRodPivot { get; private set; }
 
-        private CancellationTokenSource _headbuttHelmetHideCancellationTokenSource;
-        private bool _isHeadbuttDashing;
         public Action Despawn { get; set; }
         
         public PlayerView Base => _playerView;
@@ -173,59 +170,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void ShowHeadbuttHelmet()
         {
-            CancelHeadbuttHelmetHideTimer();
-            _isHeadbuttDashing = false;
             _headbuttHelmet.SetActive(true);
             _playerEyesView.SetHeadbuttActive(true);
         }
 
-        public void StartHeadbuttDashHelmetHideTimer(CancellationToken stageCancellationToken)
-        {
-            CancelHeadbuttHelmetHideTimer();
-            _isHeadbuttDashing = true;
-            _headbuttHelmetHideCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stageCancellationToken);
-            HideHeadbuttHelmetAfterDelay(_headbuttHelmetDashHideSeconds, _headbuttHelmetHideCancellationTokenSource.Token).Forget();
-        }
-
         public void HideHeadbuttHelmet()
         {
-            CancelHeadbuttHelmetHideTimer();
-            _isHeadbuttDashing = false;
             _headbuttHelmet.SetActive(false);
             _playerEyesView.SetHeadbuttActive(false);
         }
 
         public void OnHeadbuttTalentDeactivated()
         {
-            // A dash hides the helmet via its own timer so it stays for the full second;
-            // only hide here when the charge was interrupted before any dash started.
-            if (!_isHeadbuttDashing)
-            {
-                HideHeadbuttHelmet();
-            }
-        }
-
-        private async Awaitable HideHeadbuttHelmetAfterDelay(float delaySeconds, CancellationToken cancellationToken)
-        {
-            try
-            {
-                await Awaitable.WaitForSecondsAsync(delaySeconds, cancellationToken);
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-
-            _isHeadbuttDashing = false;
-            _headbuttHelmet.SetActive(false);
-            _playerEyesView.SetHeadbuttActive(false);
-        }
-
-        private void CancelHeadbuttHelmetHideTimer()
-        {
-            _headbuttHelmetHideCancellationTokenSource?.Cancel();
-            _headbuttHelmetHideCancellationTokenSource?.Dispose();
-            _headbuttHelmetHideCancellationTokenSource = null;
+            // The helmet stays on for the whole charge + dash and is hidden when the talent deactivates.
+            HideHeadbuttHelmet();
         }
 
         public void SetWaterGunState(bool isOn)

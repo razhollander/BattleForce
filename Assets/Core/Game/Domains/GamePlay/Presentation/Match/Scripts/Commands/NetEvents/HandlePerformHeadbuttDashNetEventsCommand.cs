@@ -30,7 +30,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var evt in events)
             {
                 _playerControllers.SetPlayerHeadbuttChargingState(evt.CasterPlayerId, false);
-                _playerControllers.StartPlayerHeadbuttDashHelmetHideTimer(evt.CasterPlayerId);
             }
 
             _audioService.PlayAudio(AudioClipType.HeadbuttDash);
