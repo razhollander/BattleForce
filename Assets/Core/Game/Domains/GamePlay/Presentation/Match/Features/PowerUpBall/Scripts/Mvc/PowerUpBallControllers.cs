@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Scripts.Mvc.WorldCamera;
 using UnityEngine;
 using Zenject;
 
@@ -11,14 +12,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
         private readonly PowerUpBallPool _pool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly IMatchDataService _matchDataService;
+        private readonly IWorldCameraController _worldCameraController;
         private readonly List<PowerUpBallController> _controllers = new List<PowerUpBallController>();
         private Transform _parent;
 
-        public PowerUpBallControllers(PowerUpBallView powerUpBallViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService)
+        public PowerUpBallControllers(PowerUpBallView powerUpBallViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService, IWorldCameraController worldCameraController)
         {
             _pool = new PowerUpBallPool(powerUpBallViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
             _matchDataService = matchDataService;
+            _worldCameraController = worldCameraController;
         }
         
         public void InitEntryPoint()
@@ -32,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
             var controller = new PowerUpBallController(powerUpBallId, _matchDataService, _pool, _parent);
             controller.CreateView(position);
             _controllers.Add(controller);
+            _worldCameraController.AddFollowTarget(controller.GetTransform());
         }
 
         public Vector2 GetPowerUpBallPosition(ushort powerUpBallId)
@@ -42,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
         public void DestroyPowerUpBall(ushort cardId)
         {
             var cardController = GetController(cardId);
+            _worldCameraController.RemoveFollowTarget(cardController.GetTransform());
             cardController.DestroyView();
             _controllers.Remove(cardController);
         }
@@ -50,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
         {
             foreach (var controller in _controllers)
             {
+                _worldCameraController.RemoveFollowTarget(controller.GetTransform());
                 controller.DestroyView();
             }
             _controllers.Clear();

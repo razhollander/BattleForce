@@ -36,6 +36,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
             return _powerUpBallView.transform.position;
         }
 
+        public Transform GetTransform()
+        {
+            return _powerUpBallView.transform;
+        }
+
         public void InterpolatePosition(float decay)
         {
             var powerUpBall = _matchDataService.GetPowerUpBall(PowerUpBallId);

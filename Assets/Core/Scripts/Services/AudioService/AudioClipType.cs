@@ -44,5 +44,7 @@ namespace Core.Scripts.Services.AudioService
         SoulTeleport = 41,
         RockStart = 42,
         RockEnd = 43,
+        FrozenActivated = 44,
+        FrozenDeactivated = 45,
     }
 }
