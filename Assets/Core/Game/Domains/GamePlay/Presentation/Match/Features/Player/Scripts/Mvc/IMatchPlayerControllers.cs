@@ -40,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void OnPlayerHeadbuttTalentDeactivated(ushort playerId);
         void SetPlayerChickenState(ushort playerId, bool isOn);
         void SetPlayerRockState(ushort playerId, bool isRock);
+        void SetPlayerFrozenState(ushort playerId, bool isFrozen);
         void SetPlayerOnLavaEffectState(ushort playerId, bool isExposedToLava);
         void PlayLayEggAnimation(ushort playerId);
         void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction);

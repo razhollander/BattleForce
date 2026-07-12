@@ -161,14 +161,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     }
 
                     var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+
+                    bool isTalentAInputPressed = playerInput.IsTalentAInputPressed;
+                    bool isTalentBInputPressed = playerInput.IsTalentBInputPressed;
+                    bool isTalentCInputPressed = playerInput.IsTalentCInputPressed;
+
+                    // While frozen every input is ignored except pressing the Frozen talent again (which cancels it).
+                    // We still feed the talent inputs into the input service so the talent controller can detect that
+                    // second press, but skip shooting, aiming, movement, talent switching and power-ups entirely.
+                    var isFrozen = playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent)
+                                   && selectedTalent is {IsCurrentlyActive: true, TalentType: TalentType.Frozen};
+                    if (isFrozen)
+                    {
+                        _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentAInput, isTalentAInputPressed);
+                        _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentBInput, isTalentBInputPressed);
+                        _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentCInput, isTalentCInputPressed);
+                        ProcessPlayerTalentInput(processedTick, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, playerState, deltaTime);
+                        continue;
+                    }
+
                     UpdatePlayerShoot(processedTick, playerInput.IsShootInputPressed, playerState);
 
                     playerState.Spaceship.TalentsState.AimDirection = playerInput.AimDirection;
                     _playersMouseDataService.SetPlayerMouseData(playerId, playerInput.IsUsingMouseAim, playerInput.MouseWorldPosition);
                     UpdatePlayerDirection(playerInput, playerState);
-                    bool isTalentAInputPressed = playerInput.IsTalentAInputPressed;
-                    bool isTalentBInputPressed = playerInput.IsTalentBInputPressed;
-                    bool isTalentCInputPressed = playerInput.IsTalentCInputPressed;
 
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentAInput, isTalentAInputPressed);
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentBInput, isTalentBInputPressed);

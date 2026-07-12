@@ -121,6 +121,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _tailView.SetIsTailWaving(isWaving);
         }
 
+        public void SetIsTailFrozen(bool isFrozen)
+        {
+            _tailView.SetIsTailFrozen(isFrozen);
+        }
+
         public Transform GetHeadTransform()
         {
             return _headTransform;

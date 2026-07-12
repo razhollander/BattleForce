@@ -66,6 +66,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<DeactivateSoulTalentNetEventS2C>> DeactivateSoulTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateRockTalentNetEventS2C>> ActivateRockTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateRockTalentNetEventS2C>> DeactivateRockTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ActivateFrozenTalentNetEventS2C>> ActivateFrozenTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>> DeactivateFrozenTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>> CreateMagneticPullFieldNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerClient { get; }
@@ -146,6 +148,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateSoulTalentNetEventS2C>> _deactivateSoulTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateRockTalentNetEventS2C>> _activateRockTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateRockTalentNetEventS2C>> _deactivateRockTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateFrozenTalentNetEventS2C>> _activateFrozenTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>> _deactivateFrozenTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>> _createMagneticPullFieldNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> _activateUmbrellaTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> _deactivateUmbrellaTalentNetEventsListPool;
@@ -225,6 +229,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             DeactivateSoulTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateSoulTalentNetEventS2C>>(maxConcurrentPlayers);
             ActivateRockTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateRockTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateRockTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateRockTalentNetEventS2C>>(maxConcurrentPlayers);
+            ActivateFrozenTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateFrozenTalentNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateFrozenTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>>(maxConcurrentPlayers);
             CreateMagneticPullFieldNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>>(maxConcurrentPlayers);
             ActivateUmbrellaTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateUmbrellaTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
@@ -328,6 +334,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _deactivateSoulTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateSoulTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateSoulTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSoulTalentNetEvents), maxConcurrentPlayers);
             _activateRockTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateRockTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateRockTalentNetEventS2C>(networkConfig.MaxCap.ActivateRockTalentNetEvents), maxConcurrentPlayers);
             _deactivateRockTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateRockTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateRockTalentNetEventS2C>(networkConfig.MaxCap.DeactivateRockTalentNetEvents), maxConcurrentPlayers);
+            _activateFrozenTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateFrozenTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateFrozenTalentNetEventS2C>(networkConfig.MaxCap.ActivateFrozenTalentNetEvents), maxConcurrentPlayers);
+            _deactivateFrozenTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>(networkConfig.MaxCap.DeactivateFrozenTalentNetEvents), maxConcurrentPlayers);
             _createMagneticPullFieldNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>>(() => new FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents), maxConcurrentPlayers);
             _activateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
             _deactivateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
@@ -710,6 +718,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 DeactivateRockTalentNetEventsPerClient.Add(clientId, _deactivateRockTalentNetEventsListPool.Get());
             }
+            if (!ActivateFrozenTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                ActivateFrozenTalentNetEventsPerClient.Add(clientId, _activateFrozenTalentNetEventsListPool.Get());
+            }
+            if (!DeactivateFrozenTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                DeactivateFrozenTalentNetEventsPerClient.Add(clientId, _deactivateFrozenTalentNetEventsListPool.Get());
+            }
             if (!CreateMagneticPullFieldNetEventsPerClient.ContainsKey(clientId))
             {
                 CreateMagneticPullFieldNetEventsPerClient.Add(clientId, _createMagneticPullFieldNetEventsListPool.Get());
@@ -983,6 +999,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             deactivateRockTalentNetEventsList.Clear();
             _deactivateRockTalentNetEventsListPool.Return(deactivateRockTalentNetEventsList);
 
+            var activateFrozenTalentNetEventsList = ActivateFrozenTalentNetEventsPerClient[clientId];
+            activateFrozenTalentNetEventsList.Clear();
+            _activateFrozenTalentNetEventsListPool.Return(activateFrozenTalentNetEventsList);
+
+            var deactivateFrozenTalentNetEventsList = DeactivateFrozenTalentNetEventsPerClient[clientId];
+            deactivateFrozenTalentNetEventsList.Clear();
+            _deactivateFrozenTalentNetEventsListPool.Return(deactivateFrozenTalentNetEventsList);
+
             var createMagneticPullFieldNetEventsList = CreateMagneticPullFieldNetEventsPerClient[clientId];
             createMagneticPullFieldNetEventsList.Clear();
             _createMagneticPullFieldNetEventsListPool.Return(createMagneticPullFieldNetEventsList);
@@ -1121,6 +1145,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             DeactivateSoulTalentNetEventsPerClient.Remove(clientId);
             ActivateRockTalentNetEventsPerClient.Remove(clientId);
             DeactivateRockTalentNetEventsPerClient.Remove(clientId);
+            ActivateFrozenTalentNetEventsPerClient.Remove(clientId);
+            DeactivateFrozenTalentNetEventsPerClient.Remove(clientId);
             ActivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
             DeactivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
             ActivateWaterGunTalentNetEventsPerClient.Remove(clientId);
@@ -2051,6 +2077,28 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 }
             }
 
+            if (ActivateFrozenTalentNetEventsPerClient.TryGetValue(clientId, out var activateFrozenTalentNetEvents))
+            {
+                for (int i = activateFrozenTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateFrozenTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateFrozenTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateFrozenTalentNetEventsPerClient.TryGetValue(clientId, out var deactivateFrozenTalentNetEvents))
+            {
+                for (int i = deactivateFrozenTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateFrozenTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateFrozenTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
             if (CreateMagneticPullFieldNetEventsPerClient.TryGetValue(clientId, out var createMagneticPullFieldNetEvents))
             {
                 for (int i = createMagneticPullFieldNetEvents.Count - 1; i >= 0; i--)
@@ -2710,6 +2758,27 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
         public void AddDeactivateRockTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick)
         {
             foreach (var kvp in DeactivateRockTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+            }
+        }
+
+        public void AddActivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in ActivateFrozenTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddDeactivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick)
+        {
+            foreach (var kvp in DeactivateFrozenTalentNetEventsPerClient)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;

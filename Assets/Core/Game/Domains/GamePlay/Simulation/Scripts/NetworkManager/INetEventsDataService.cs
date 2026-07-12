@@ -63,6 +63,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<DeactivateSoulTalentNetEventS2C>> DeactivateSoulTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateRockTalentNetEventS2C>> ActivateRockTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateRockTalentNetEventS2C>> DeactivateRockTalentNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<ActivateFrozenTalentNetEventS2C>> ActivateFrozenTalentNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>> DeactivateFrozenTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>> ActivateWaterGunTalentNetEventsPerClient { get; }
@@ -143,6 +145,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddDeactivateSoulTalentNetEvent(int onTick, ushort ghostId, ushort casterPlayerId, int talentCooldownEndTick, bool didTeleport, Vector2 teleportPosition, Vector2 teleportDirection);
         void AddActivateRockTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateRockTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
+        void AddActivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId);
+        void AddDeactivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddActivateWaterGunTalentNetEvent(int onTick, ushort casterPlayerId);

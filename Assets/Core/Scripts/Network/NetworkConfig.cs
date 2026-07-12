@@ -138,6 +138,8 @@ namespace Core.Scripts.Network
         public int DeactivateSoulTalentNetEvents = 128;
         public int ActivateRockTalentNetEvents = 128;
         public int DeactivateRockTalentNetEvents = 128;
+        public int ActivateFrozenTalentNetEvents = 128;
+        public int DeactivateFrozenTalentNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel

@@ -48,6 +48,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<DeactivateSoulTalentNetEventS2C> DeactivateSoulTalentNetEvents { get; }
         List<ActivateRockTalentNetEventS2C> ActivateRockTalentNetEvents { get; }
         List<DeactivateRockTalentNetEventS2C> DeactivateRockTalentNetEvents { get; }
+        List<ActivateFrozenTalentNetEventS2C> ActivateFrozenTalentNetEvents { get; }
+        List<DeactivateFrozenTalentNetEventS2C> DeactivateFrozenTalentNetEvents { get; }
         List<ShootFrigidBlockNetEventS2C> ShootFrigidBlockNetEvents { get; }
         List<DestroyFrigidBlockNetEventS2C> DestroyFrigidBlockNetEvents { get; }
         List<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents { get; }

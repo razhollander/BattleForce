@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
@@ -64,7 +65,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
-                _playersDecelerationLogic.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
+                // A frozen player keeps its linear velocity (it slides freely); its spin still decays and rotates
+                // its facing, which is the only thing allowed to change a frozen player's direction.
+                var isFrozen = playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent)
+                               && selectedTalent is {IsCurrentlyActive: true, TalentType: TalentType.Frozen};
+                if (!isFrozen)
+                {
+                    _playersDecelerationLogic.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
+                }
+
                 _playersDecelerationLogic.DeceleratePlayerSpin(playerState.Spaceship, stepDeltaTime);
                 _playersEngineLogic.TurnOnEngineForPlayerIfPossible(playerState);
                 _playersEngineLogic.TryAddEngineForceToPlayer(playerState.Spaceship, stepDeltaTime);

@@ -425,6 +425,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.type = BodyType.Dynamic;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PlayerSpaceship);
             bodyDef.allowSleep = false;
+            bodyDef.bullet = true;
             var body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
 

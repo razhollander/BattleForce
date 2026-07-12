@@ -31,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly FrigidBlockTalentController _frigidBlockTalentController;
         private readonly FishingRodTalentController _fishingRodTalentController;
         private readonly SoulTalentController _soulTalentController;
+        private readonly FrozenTalentController _frozenTalentController;
 
         private ushort _casterPlayerId;
         private bool _isInitialized = false;
@@ -53,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _frigidBlockTalentController = new FrigidBlockTalentController(matchDataService, gamePlayConfigService, networkConfig, sharedGamePlayConfig, commandFactory);
             _fishingRodTalentController = new FishingRodTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory, playersMouseDataService);
             _soulTalentController = new SoulTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig);
+            _frozenTalentController = new FrozenTalentController(netEventsDataService, matchDataService, gamePlayConfigService, networkConfig, commandFactory, playersInLavaTrackerService);
         }
 
         public void InitEntryPoint()
@@ -71,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _rockTalentController.InitEntryPoint();
             _frigidBlockTalentController.InitEntryPoint();
             _fishingRodTalentController.InitEntryPoint();
+            _frozenTalentController.InitEntryPoint();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -91,6 +94,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _frigidBlockTalentController.SetCasterId(casterPlayerId);
             _fishingRodTalentController.SetCasterId(casterPlayerId);
             _soulTalentController.SetCasterId(casterPlayerId);
+            _frozenTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)
@@ -112,6 +116,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.FrigidBlock: return _frigidBlockTalentController;
                 case TalentType.FishingRod: return _fishingRodTalentController;
                 case TalentType.Soul: return _soulTalentController;
+                case TalentType.Frozen: return _frozenTalentController;
                 default: return default;
             }
         }
@@ -138,6 +143,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _frigidBlockTalentController?.OnTick(tick, deltaTime);
             _fishingRodTalentController?.OnTick(tick, deltaTime);
             _soulTalentController?.OnTick(tick, deltaTime);
+            _frozenTalentController?.OnTick(tick, deltaTime);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)
@@ -203,6 +209,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _frigidBlockTalentController.ResetData();
             _fishingRodTalentController.ResetData();
             _soulTalentController.ResetData();
+            _frozenTalentController.ResetData();
         }
 
         public bool IsHeadbuttCharging()

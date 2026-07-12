@@ -46,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private ActivatePowerUpEffectView _activatePowerUpEffectView;
         [SerializeField] private GameObject _headbuttHelmet;
         [SerializeField] private GameObject _rockGameObject;
+        [SerializeField] private GameObject _frozenGameObject;
         [SerializeField] private GameObject _onLavaEffect;
         [field: SerializeField] public Transform LeaderFlagPivot { get; private set; }
         [field: SerializeField] public Transform FishingRodPivot { get; private set; }
@@ -67,6 +68,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetRockState(bool isOn)
         {
             _rockGameObject.TrySetActive(isOn);
+        }
+
+        public void SetFrozenState(bool isOn)
+        {
+            _frozenGameObject.TrySetActive(isOn);
         }
 
         public void SetOnLavaEffectState(bool isOn)
@@ -262,6 +268,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _headbuttChargeEffectView.StopCharging();
             HideHeadbuttHelmet();
             SetOnLavaEffectState(false);
+            SetFrozenState(false);
             Base.OnDespawned();
         }
 

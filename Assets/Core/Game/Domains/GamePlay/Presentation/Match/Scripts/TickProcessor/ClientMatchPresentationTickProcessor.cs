@@ -72,6 +72,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleDeactivateSentryGunTalentNetEventsCommand _handleDeactivateSentryGunTalentNetEventsCommand;
         private readonly HandleActivateRockTalentNetEventsCommand _handleActivateRockTalentNetEventsCommand;
         private readonly HandleDeactivateRockTalentNetEventsCommand _handleDeactivateRockTalentNetEventsCommand;
+        private readonly HandleActivateFrozenTalentNetEventsCommand _handleActivateFrozenTalentNetEventsCommand;
+        private readonly HandleDeactivateFrozenTalentNetEventsCommand _handleDeactivateFrozenTalentNetEventsCommand;
         private readonly HandleKOProjectHitPlayerNetEventsCommand _handleKOProjectHitPlayerNetEventsCommand;
         private readonly HandleActivateUmbrellaTalentNetEventsCommand _handleActivateUmbrellaTalentNetEventsCommand;
         private readonly HandleDeactivateUmbrellaTalentNetEventsCommand _handleDeactivateUmbrellaTalentNetEventsCommand;
@@ -160,6 +162,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSentryGunTalentNetEventsCommand>();
             _handleActivateRockTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateRockTalentNetEventsCommand>();
             _handleDeactivateRockTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateRockTalentNetEventsCommand>();
+            _handleActivateFrozenTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateFrozenTalentNetEventsCommand>();
+            _handleDeactivateFrozenTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateFrozenTalentNetEventsCommand>();
             _handleActivateUmbrellaTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateUmbrellaTalentNetEventsCommand>();
             _handleDeactivateUmbrellaTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateUmbrellaTalentNetEventsCommand>();
             _handleActivateWaterGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateWaterGunTalentNetEventsCommand>();
@@ -253,6 +257,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateSentryGunTalentNetEventsCommand.Execute();
             _handleActivateRockTalentNetEventsCommand.Execute();
             _handleDeactivateRockTalentNetEventsCommand.Execute();
+            _handleActivateFrozenTalentNetEventsCommand.Execute();
+            _handleDeactivateFrozenTalentNetEventsCommand.Execute();
             _handleActivateUmbrellaTalentNetEventsCommand.Execute();
             _handleDeactivateUmbrellaTalentNetEventsCommand.Execute();
             _handleActivateWaterGunTalentNetEventsCommand.Execute();

@@ -156,6 +156,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetRockState(isRock);
         }
 
+        public void SetPlayerFrozenState(ushort playerId, bool isFrozen)
+        {
+            GetPlayer(playerId).SetFrozenState(isFrozen);
+        }
+
         public void SetPlayerOnLavaEffectState(ushort playerId, bool isExposedToLava)
         {
             GetPlayer(playerId).SetOnLavaEffectState(isExposedToLava);

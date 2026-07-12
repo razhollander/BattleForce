@@ -54,6 +54,7 @@ MonoBehaviour:
         - rid: 1595758794195075078
         - rid: 1595758799730769926
         - rid: 1595758799730770084
+        - rid: 1595758876279177872
       TalentsArrowConfigs:
         TalentCooldownConfigs:
         - TalentType: 1
@@ -129,7 +130,7 @@ MonoBehaviour:
       WaterGunTalentConfig:
         DurationInSeconds: 3
         ConeAngleDegrees: 45
-        ConeRange: 15
+        ConeRange: 8.5
         EnemyPushForcePerTick: 100
         CasterRecoilForcePerTick: 60
       HeadbuttTalentConfig:
@@ -168,6 +169,8 @@ MonoBehaviour:
       SoulTalentConfig:
         GhostSpeed: 15
         SpawnForwardOffset: 2
+      FrozenTalentConfig:
+        DurationInSeconds: 4
       TalentCardWidth: 1.602175
       TalentCardHeight: 2.382844
     Lava:
@@ -231,6 +234,11 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 13
+        CooldownInSeconds: 1
+    - rid: 1595758876279177872
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 17
         CooldownInSeconds: 1
     - rid: 1717594783917015173
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}

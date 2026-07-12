@@ -30,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public FrigidBlockTalentConfig FrigidBlockTalentConfig;
         public FishingRodTalentConfig FishingRodTalentConfig;
         public SoulTalentConfig SoulTalentConfig;
+        public FrozenTalentConfig FrozenTalentConfig;
         public float TalentCardWidth = 1.602175f;
         public float TalentCardHeight = 2.382844f;
     }

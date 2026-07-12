@@ -51,7 +51,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
             {
                 return;
             }
-            
+
+            // A frozen player's engine stays off for the whole duration.
+            var isPlayerFrozen = selectedTalent is {TalentType: TalentType.Frozen, IsCurrentlyActive: true};
+            if (isPlayerFrozen)
+            {
+                return;
+            }
+
             var isPlayerIdle = playerSpaceshipState.Transform.Velocity.Length() < _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TurnEngineOnWhenReachVelocity;
             if (isPlayerIdle)
             {

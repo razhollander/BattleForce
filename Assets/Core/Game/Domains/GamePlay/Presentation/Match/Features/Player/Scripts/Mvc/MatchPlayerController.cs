@@ -104,6 +104,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             SetWaterGunState(currentSelectedTalentType == TalentType.WaterGun && isCurrentSelectedTalentActive);
             SetChickenState(currentSelectedTalentType == TalentType.Chicken);
             SetRockState(currentSelectedTalentType == TalentType.Rock && isCurrentSelectedTalentActive);
+            SetFrozenState(currentSelectedTalentType == TalentType.Frozen && isCurrentSelectedTalentActive);
             SetFishingRodStickState(currentSelectedTalentState.TalentType == TalentType.FishingRod && isCurrentSelectedTalentActive);
         }
 
@@ -141,6 +142,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetRockState(bool isRockActive)
         {
             _playerView.SetRockState(isRockActive);
+        }
+
+        public void SetFrozenState(bool isFrozenActive)
+        {
+            _playerView.SetFrozenState(isFrozenActive);
+
+            // Freeze the tail in its exact wave pose for the duration; it resumes animating when the talent ends.
+            _playerView.Base.SetIsTailFrozen(isFrozenActive);
         }
 
         public void SetOnLavaEffectState(bool isExposedToLava)

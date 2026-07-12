@@ -45,12 +45,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             var playerSpaceship = _matchDataService.SimulationState.GetPlayerById(_playerId).Spaceship;
             playerSpaceship.Transform.AngularVelocity += _spinAmount;
+
+            var hasSelectedTalent = playerSpaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent);
+
+            // A frozen player still receives the angular velocity, but is never marked as "spinned" and its Frozen
+            // talent is not interrupted by the spin.
+            if (hasSelectedTalent && selectedTalent is {IsCurrentlyActive: true, TalentType: TalentType.Frozen})
+            {
+                return;
+            }
+
             var isSpinningNow = playerSpaceship.Transform.AngularVelocity != 0;
 
             var isPlayerAlreadySpinned = playerSpaceship.IsSpinned;
             var didPlayerStartSpinning = !isPlayerAlreadySpinned && isSpinningNow;
 
-            if (playerSpaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) && selectedTalent.IsCurrentlyActive &&
+            if (hasSelectedTalent && selectedTalent.IsCurrentlyActive &&
                 selectedTalent.TalentType != TalentType.Chicken && selectedTalent.TalentType != TalentType.Rock)
             {
                 _playersTalentsManager.StopTalentIfActive(selectedTalent.TalentType, _playerId, _tick);

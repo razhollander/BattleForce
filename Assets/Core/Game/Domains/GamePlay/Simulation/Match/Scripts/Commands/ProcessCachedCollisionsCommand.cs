@@ -145,6 +145,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             playerModel.Spaceship.Transform.Velocity = relativeVelocity.ReflectFromWall(blockNormal);
+
+            if (IsFrozenActive(playerId))
+            {
+                return;
+            }
+
             var currentDirection = playerModel.Spaceship.Transform.Direction;
             var reflectedDirection = currentDirection.ReflectFromWall(blockNormal);
             playerModel.Spaceship.Transform.Direction = reflectedDirection.Length() > 0
@@ -199,6 +205,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             return _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.Rock);
         }
 
+        // A frozen player's facing may only change through the physical result of its angular velocity, so wall-like
+        // bounces reflect its velocity but must leave its direction untouched.
+        private bool IsFrozenActive(ushort playerId)
+        {
+            return _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.Frozen);
+        }
+
         // A player colliding with an active Rock is reflected like it hit a wall; the rock itself never moves.
         private void HandlePlayerRockCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
         {
@@ -231,6 +244,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             otherPlayerModel.Spaceship.Transform.Velocity = relativeVelocity.ReflectFromWall(rockNormal);
+
+            if (IsFrozenActive(otherPlayerId))
+            {
+                return;
+            }
+
             var currentDirection = otherPlayerModel.Spaceship.Transform.Direction;
             var reflectedDirection = currentDirection.ReflectFromWall(rockNormal);
             otherPlayerModel.Spaceship.Transform.Direction = reflectedDirection.Length() > 0
@@ -1051,6 +1070,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
             LogService.LogTopic($"new pos {_physicsSimulator.GetPlayer(playerModel.Id).Position}, prev pos: {playerModel.Spaceship.Transform.Position} ", LogTopicType.ServerNetwork);
+
+            // While frozen the ship bounces off the wall (velocity reflects) but keeps its spin-driven facing.
+            if (IsFrozenActive(playerModel.Id))
+            {
+                return;
+            }
+
             var currentDirection = playerModel.Spaceship.Transform.Direction;
             var reflectedDirection = currentDirection.ReflectFromWall(collisionNormal);
             playerModel.Spaceship.Transform.Direction = reflectedDirection.Length() > 0

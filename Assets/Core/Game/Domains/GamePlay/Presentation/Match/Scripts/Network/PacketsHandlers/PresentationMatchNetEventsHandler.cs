@@ -867,6 +867,34 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessActivateFrozenTalentEvents(CapacityList<ActivateFrozenTalentNetEventS2C> activateFrozenTalentNetEvents)
+        {
+            if (activateFrozenTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in activateFrozenTalentNetEvents)
+            {
+                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.Frozen);
+                _cachedPresentationEventsService.ActivateFrozenTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateFrozenTalentEvents(CapacityList<DeactivateFrozenTalentNetEventS2C> deactivateFrozenTalentNetEvents)
+        {
+            if (deactivateFrozenTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in deactivateFrozenTalentNetEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Frozen, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateFrozenTalentNetEvents.Add(netEvent);
+            }
+        }
+
         private void SetPlayerTalentActive(ushort playerId, TalentType talentType)
         {
             var casterPlayer = _matchDataService.GetPlayer(playerId);

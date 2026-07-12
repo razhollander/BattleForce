@@ -42,7 +42,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             var spaceship = _matchDataService.SimulationState.GetPlayerById(_playerId).Spaceship;
             var isPlayerRockActive = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerId, TalentType.Rock);
-            var shouldBeExposed = _playersInLavaTrackerService.IsPlayerInLava(_playerId) && !isPlayerRockActive;
+            var isPlayerFrozenActive = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerId, TalentType.Frozen);
+            var isPlayerLavaImmune = isPlayerRockActive || isPlayerFrozenActive;
+            var shouldBeExposed = _playersInLavaTrackerService.IsPlayerInLava(_playerId) && !isPlayerLavaImmune;
 
             var didPlayerExposedStateChange = shouldBeExposed != spaceship.IsExposedToLava;
 
