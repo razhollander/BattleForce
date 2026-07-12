@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: WaterGunStreamMaterial
-  m_Shader: {fileID: 4800000, guid: 0945e773a54664f4394e42c109807394, type: 3}
+  m_Name: FrigidBlockTrail
+  m_Shader: {fileID: 4800000, guid: 2b1eaa2da86d493aad9db735aa6f4bf4, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -16,7 +16,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 3000
   stringTagMap: {}
   disabledShaderPasses: []
   m_LockedProperties: 
@@ -24,29 +24,16 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: d8215be58e5c94fd983baae65505c208, type: 3}
+        m_Texture: {fileID: 2800000, guid: ad4148593b05d0f47980774815c325fe, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BendAmount: 0
-    - _CoreTightness: 1.6
-    - _EdgeSoftness: 0.15
-    - _Emission: 1.5
-    - _FoamAmount: 1
-    - _FoamSharpness: 8
-    - _FoamSpeed: 4
-    - _NoiseScale: 4
-    - _PulseAmount: 0.25
-    - _PulseFreq: 3
-    - _PulseSpeed: 3
-    - _RimBoost: 0.6
-    - _ScrollSpeed: 1.5
-    - _SprayScale: 10
-    - _SprayStart: 0.55
-    - _WarpStrength: 0.35
+    - _Alpha: 0.5
+    - _StencilRef: 42
+    - _WorldUvScale: 0.5
     m_Colors:
-    - _ColorDeep: {r: 0, g: 0.4, b: 0.9, a: 1}
-    - _ColorShallow: {r: 0.4, g: 0.9, b: 1, a: 0.8}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _WorldUvScroll: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

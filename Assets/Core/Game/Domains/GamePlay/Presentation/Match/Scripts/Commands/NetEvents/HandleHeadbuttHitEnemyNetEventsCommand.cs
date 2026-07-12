@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
             
             _audioService.PlayAudio(AudioClipType.HeadbuttHit);
-            _worldCameraController.ShakeCamera(10,0.25f);
+            _worldCameraController.ShakeCamera(2,0.25f);
             _cachedPresentationEventsService.HeadbuttHitEnemyNetEvents.Clear();
         }
     }

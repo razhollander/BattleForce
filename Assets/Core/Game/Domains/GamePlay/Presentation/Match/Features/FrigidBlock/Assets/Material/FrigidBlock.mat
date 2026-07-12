@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: WaterGunStreamMaterial
-  m_Shader: {fileID: 4800000, guid: 0945e773a54664f4394e42c109807394, type: 3}
+  m_Name: FrigidBlock
+  m_Shader: {fileID: 4800000, guid: e260cfa7296ee7642b167f1eb5be5023, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -23,30 +23,28 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: d8215be58e5c94fd983baae65505c208, type: 3}
+        m_Texture: {fileID: 2800000, guid: f655d54df911c4239b768aa572f60bd6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BendAmount: 0
-    - _CoreTightness: 1.6
-    - _EdgeSoftness: 0.15
-    - _Emission: 1.5
-    - _FoamAmount: 1
-    - _FoamSharpness: 8
-    - _FoamSpeed: 4
-    - _NoiseScale: 4
-    - _PulseAmount: 0.25
-    - _PulseFreq: 3
-    - _PulseSpeed: 3
-    - _RimBoost: 0.6
-    - _ScrollSpeed: 1.5
-    - _SprayScale: 10
-    - _SprayStart: 0.55
-    - _WarpStrength: 0.35
+    - _EnableExternalAlpha: 0
+    - _ZWrite: 0
     m_Colors:
-    - _ColorDeep: {r: 0, g: 0.4, b: 0.9, a: 1}
-    - _ColorShallow: {r: 0.4, g: 0.9, b: 1, a: 0.8}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

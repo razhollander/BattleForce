@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scr
         private readonly FrigidBlockPool _pool;
         private readonly Transform _parent;
         private FrigidBlockView _view;
+        private FrigidBlockTrailViewController _trailViewController;
 
         public ushort BlockId => _blockId;
 
@@ -28,6 +29,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scr
             _view.transform.SetParent(_parent);
             _view.SetMesh(mesh);
             _view.SetTransform(position, rotation);
+
+            _trailViewController = new FrigidBlockTrailViewController(_view);
+            _trailViewController.Reset(Time.time);
         }
 
         public void InterpolateTransform(Vector2 position, Quaternion rotation, float decay)
@@ -35,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scr
             var lerpedPosition = MathUtils.ExpDecay(_view.Transform.position, position, decay, Time.deltaTime);
             var lerpedRotation = MathUtils.ExpDecay(_view.Transform.rotation, rotation, decay, Time.deltaTime);
             _view.SetTransform(lerpedPosition, lerpedRotation);
+            _trailViewController.Advance(Time.time);
         }
 
         public void Destroy()

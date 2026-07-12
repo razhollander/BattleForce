@@ -130,8 +130,8 @@ MonoBehaviour:
         DurationInSeconds: 3
         ConeAngleDegrees: 45
         ConeRange: 15
-        EnemyPushForcePerTick: 400
-        CasterRecoilForcePerTick: 100
+        EnemyPushForcePerTick: 100
+        CasterRecoilForcePerTick: 60
       HeadbuttTalentConfig:
         MaxChargeForce: 70
         MaxDashWindowSeconds: 1.5
@@ -179,7 +179,7 @@ MonoBehaviour:
       MaxConcurrentPowerUpBalls: 5
       MoveSpeed: 5
       Radius: 1.269
-      ObtainablePowerUps: 02000000
+      ObtainablePowerUps: 03000000
       GalacticPullDurationSeconds: 4
       GalacticPullForce: 70
       NukeForce: 50
@@ -236,7 +236,7 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 11
-        CooldownInSeconds: 5
+        CooldownInSeconds: 1
     - rid: 1717594787500785824
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
@@ -251,7 +251,7 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 6
-        CooldownInSeconds: 7
+        CooldownInSeconds: 1
     - rid: 2200602851054190749
       type: {class: TalentStocksCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
@@ -286,7 +286,7 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 2
-        CooldownInSeconds: 6
+        CooldownInSeconds: 1
     - rid: 2200602851054190760
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:

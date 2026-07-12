@@ -59,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 }
 
                 _stageEndedUiController.Show(winningTeamId, stageEndEvent.JemsWonPerTeam);
-                _worldCameraController.ShakeCamera(10,0.5f);
+                _worldCameraController.ShakeCamera(10f,0.5f);
             }
             
             if (_matchDataService.TryGetKingedPlayers(out var kingedPlayers) && !kingedPlayers.IsNullOrEmpty())

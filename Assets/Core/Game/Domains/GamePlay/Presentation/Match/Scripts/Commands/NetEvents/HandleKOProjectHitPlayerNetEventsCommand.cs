@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
-            _worldCameraController.ShakeCamera(10,0.25f);
+            _worldCameraController.ShakeCamera(2f,0.25f);
             _audioService.PlayAudio(AudioClipType.KOHit);
             _cachedPresentationEventsService.KOProjectHitPlayerNetEvents.Clear();
         }

@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3540734165464911668}
-  - component: {fileID: 564293531212030211}
   m_Layer: 0
   m_Name: WaterGunStream
   m_TagString: Untagged
@@ -33,20 +32,6 @@ Transform:
   - {fileID: 6741380230871411345}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &564293531212030211
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3638549762676152913}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 751af5094701a4552b844aa0dbab81e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PresentationMatchAssembly::Core.Game.Domains.GamePlay.Presentation.Match.Features.WaterGunStream.Scripts.Mvc.WaterGunStreamView
-  _meshFilter: {fileID: 1548667867140198608}
-  _meshRenderer: {fileID: 7159309804208897613}
 --- !u!1 &4381353646061048047
 GameObject:
   m_ObjectHideFlags: 0

@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             if (didHitAnyPlayer)
             {
-                _worldCameraController.ShakeCamera(10,0.25f);
+                _worldCameraController.ShakeCamera(3f,0.25f);
                 _audioService.PlayAudio(AudioClipType.YearsOfPainHit);
             }
 
