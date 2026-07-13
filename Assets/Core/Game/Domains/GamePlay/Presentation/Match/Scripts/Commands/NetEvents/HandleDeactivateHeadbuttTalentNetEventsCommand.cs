@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -9,11 +10,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchPlayerControllers _playerControllers;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -29,6 +32,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _playerControllers.SetPlayerHeadbuttChargingState(evt.CasterPlayerId, false);
                 _playerControllers.OnPlayerHeadbuttTalentDeactivated(evt.CasterPlayerId);
             }
+
+            _audioService.StopLoopAudio(AudioClipType.HeadbuttCharge);
 
             _cachedPresentationEventsService.DeactivateHeadbuttTalentNetEvents.Clear();
         }

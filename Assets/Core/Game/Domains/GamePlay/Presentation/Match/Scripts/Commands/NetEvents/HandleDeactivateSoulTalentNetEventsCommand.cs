@@ -33,22 +33,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
-            var didAnyTeleport = false;
             foreach (var netEvent in events)
             {
                 if (netEvent.DidTeleport)
                 {
                     _playerControllers.SetPlayerTransform(netEvent.CasterPlayerId, netEvent.TeleportPosition, netEvent.TeleportDirection);
-                    didAnyTeleport = true;
+                    _audioService.PlayAudio(AudioClipType.SoulTeleport); // play only once no matter how many events received
                 }
 
                 _soulGhostControllers.DestroySoulGhost(netEvent.GhostId);
                 _matchDataService.RemoveSoulGhost(netEvent.GhostId);
-            }
-
-            if (didAnyTeleport)
-            {
-                _audioService.PlayAudio(AudioClipType.SoulTeleport);
             }
 
             _cachedPresentationEventsService.DeactivateSoulTalentNetEvents.Clear();

@@ -140,7 +140,7 @@ MonoBehaviour:
         EnemyPushForce: 30
         EnemySpinAmount: 50
       RockTalentConfig:
-        DurationInSeconds: 4
+        DurationInSeconds: 2.5
         ColliderRadiusMultiplier: 2.6
         BodyDensity: 1000
         Restitution: 1
@@ -170,7 +170,7 @@ MonoBehaviour:
         GhostSpeed: 15
         SpawnForwardOffset: 2
       FrozenTalentConfig:
-        DurationInSeconds: 4
+        DurationInSeconds: 2.5
       TalentCardWidth: 1.602175
       TalentCardHeight: 2.382844
     Lava:

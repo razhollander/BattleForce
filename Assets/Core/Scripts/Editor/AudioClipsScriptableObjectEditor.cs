@@ -191,7 +191,10 @@ namespace Core.Scripts.Editor
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.BeginHorizontal();
 
-                EditorGUILayout.LabelField(keyProp.enumDisplayNames[keyProp.enumValueIndex], EditorStyles.boldLabel, GUILayout.Width(180));
+                var keyLabel = keyProp.enumValueIndex >= 0 && keyProp.enumValueIndex < keyProp.enumDisplayNames.Length
+                    ? keyProp.enumDisplayNames[keyProp.enumValueIndex]
+                    : $"<missing enum value: {keyProp.intValue}>";
+                EditorGUILayout.LabelField(keyLabel, EditorStyles.boldLabel, GUILayout.Width(180));
 
                 var clip = (AudioClip)clipProp.objectReferenceValue;
                 var volume = volumeProp.floatValue;

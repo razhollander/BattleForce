@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _soulGhostControllers.CreateSoulGhost(ghost.Id, ghost.PlayerCasterId, teamId, ghost.Position.ToUnityVector2(), ghost.Direction.ToUnityVector2());
             }
 
-            _audioService.PlayAudio(AudioClipType.SoulCast); // play only once no matter how many events received
+            _audioService.PlayAudio(AudioClipType.SoulActivated); // play only once no matter how many events received
             _cachedPresentationEventsService.CreateSoulGhostNetEvents.Clear();
         }
     }

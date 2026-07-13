@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimArrowEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -15,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ISecondCastEffectController _secondCastEffectController;
         private IMatchDataService _matchDataService;
         private IMatchPlayerControllers _playerControllers;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
@@ -23,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _secondCastEffectController = _diContainer.Resolve<ISecondCastEffectController>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -41,6 +44,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _matchDataService.RemoveFishingRodTip(netEvent.ProjectileId);
                 _playerControllers.SetPlayerFishingRodStickState(netEvent.CasterPlayerId, false);
             }
+
+            _audioService.StopLoopAudio(AudioClipType.FishingRodActivate);
 
             _cachedPresentationEventsService.DeactivateFishingRodTalentNetEvents.Clear();
         }

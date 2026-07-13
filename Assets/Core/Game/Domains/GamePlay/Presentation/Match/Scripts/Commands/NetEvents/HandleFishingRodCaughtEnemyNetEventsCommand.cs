@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -10,11 +11,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchDataService _matchDataService;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -35,6 +38,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     tip.Phase = FishingRodTipPhase.CaughtEnemy;
                 }
             }
+
+            _audioService.StopLoopAudio(AudioClipType.FishingRodActivate);
+            _audioService.PlayAudio(AudioClipType.FishingRodCatch); // play only once no matter how many events received
 
             _cachedPresentationEventsService.FishingRodCaughtEnemyNetEvents.Clear();
         }
