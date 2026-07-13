@@ -131,8 +131,8 @@ MonoBehaviour:
         DurationInSeconds: 3
         ConeAngleDegrees: 45
         ConeRange: 8.5
-        EnemyPushForcePerTick: 100
-        CasterRecoilForcePerTick: 60
+        EnemyPushForcePerTick: 150
+        CasterRecoilForcePerTick: 0
       HeadbuttTalentConfig:
         MaxChargeForce: 70
         MaxDashWindowSeconds: 1.5
