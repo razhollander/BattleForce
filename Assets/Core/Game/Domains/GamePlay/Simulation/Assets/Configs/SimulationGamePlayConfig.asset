@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SimulationAssembly::Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig
   InnerConfig:
     PlayerSpaceship:
-      StartHealth: 100
+      StartHealth: 3
       TargetMovementSpeed: 5
       RotationSpeed: 150
       ShootCooldown: 0.35
@@ -213,7 +213,7 @@ MonoBehaviour:
     PreparationPhaseDuration: 4
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
-    StageSizeMultiplier: 1
+    StageSizeMultiplier: 1.3
     SpeedupSimulation: 1
     IsAutoShoot: 0
     CanPlayersCollideWithEachOther: 0
