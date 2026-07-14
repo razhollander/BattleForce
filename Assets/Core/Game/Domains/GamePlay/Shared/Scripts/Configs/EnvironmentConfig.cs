@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using Core.Scripts.Extensions;
-using Core.Scripts.Extensions.Linq;
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
