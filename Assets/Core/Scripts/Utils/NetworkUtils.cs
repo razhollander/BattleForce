@@ -25,23 +25,42 @@ namespace Core.Scripts.Utils
         
         public static string GetLocalIPAddress()
         {
+            // Determine the LAN IP without relying on DNS resolution of the machine hostname.
+            // "Connecting" a UDP socket doesn't send any packets, but makes the OS pick the
+            // outbound network interface, whose local endpoint is our real LAN IP.
             try
             {
-                var host = Dns.GetHostEntry(Dns.GetHostName());
-                foreach (var ip in host.AddressList)
+                using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
                 {
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    socket.Connect("8.8.8.8", 65530);
+                    if (socket.LocalEndPoint is IPEndPoint endPoint)
+                    {
+                        return endPoint.Address.ToString();
+                    }
+                }
+            }
+            catch (System.Exception e)
+            {
+                LogService.LogError("Error getting local IP via UDP socket: " + e.Message);
+            }
+
+            // Fallback: enumerate interface addresses directly (still no DNS).
+            try
+            {
+                foreach (var ip in Dns.GetHostAddresses(Dns.GetHostName()))
+                {
+                    if (ip.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip))
                     {
                         return ip.ToString();
                     }
                 }
-                return "No IPv4 detected";
             }
             catch (System.Exception e)
             {
-                LogService.LogError("Error getting local IP: " + e.Message);
-                throw e;
+                LogService.LogError("Error getting local IP via host addresses: " + e.Message);
             }
+
+            return "No IPv4 detected";
         }
         
         public static async Task<string> GetPublicIpAddress()
