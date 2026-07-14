@@ -81,7 +81,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             else
             {
                 // can get here for example when a powerup ball collides with a rotating wall and the wall rotates towards the ball at the same tick.
-                LogService.LogError($"Notice! (not really an error). Already have event {key}");
+//                LogService.LogError($"Notice! (not really an error). Already have event {key}");
             }
         }
         
