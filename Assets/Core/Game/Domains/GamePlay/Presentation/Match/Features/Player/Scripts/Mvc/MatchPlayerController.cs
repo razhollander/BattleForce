@@ -104,7 +104,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 _stageCancellationTokenProvider.CancellationTokenSource);
             SetUmbrellaState(currentSelectedTalentType == TalentType.Umbrella && isCurrentSelectedTalentActive);
             SetWaterGunState(currentSelectedTalentType == TalentType.WaterGun && isCurrentSelectedTalentActive);
-            SetChickenState(currentSelectedTalentType == TalentType.Chicken);
             SetRockState(currentSelectedTalentType == TalentType.Rock && isCurrentSelectedTalentActive);
             SetFrozenState(currentSelectedTalentType == TalentType.Frozen && isCurrentSelectedTalentActive);
             SetFishingRodStickState(currentSelectedTalentState.TalentType == TalentType.FishingRod && isCurrentSelectedTalentActive);
@@ -286,6 +285,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetSelectedTalent(int talentIndex)
         {
             _playerView.SetSelectedTalent(talentIndex, _stageCancellationTokenProvider.CancellationTokenSource.Token);
+            var talents = _matchDataService.GetPlayer(PlayerId).Spaceship.TalentsState.Talents;
+            if (talentIndex >= 0 && talentIndex < talents.Count)
+            {
+                SetChickenState(talents[talentIndex].TalentType == TalentType.Chicken);
+            }
+            else
+            {
+                LogService.LogError($"Index out of range! {talentIndex}/{talents.Count}");
+            }
         }
 
         public void UpdateTickDeltas()
