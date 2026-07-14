@@ -148,7 +148,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             fishingRodProjectile.StartPosition = position;
             fishingRodProjectile.Position = position;
             fishingRodProjectile.Velocity = velocity;
-            fishingRodProjectile.Phase = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.Flying;
+            fishingRodProjectile.Phase = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.FlyingForward;
             fishingRodProjectile.CaughtEnemyId = 0;
             fishingRodProjectile.EnemyCaughtArrowDirection = Vector2.Zero;
             return fishingRodProjectile;

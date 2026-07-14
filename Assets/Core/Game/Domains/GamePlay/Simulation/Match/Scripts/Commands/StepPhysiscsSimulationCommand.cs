@@ -161,7 +161,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 ref var fishingRodProjectile = ref _matchDataService.SimulationState.FishingRodProjectiles.GetByIndex(i);
                 // The tip only has a physics body while flying; caught/returning tips are moved by the controller.
-                if (fishingRodProjectile.Phase == Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.Flying)
+                if (fishingRodProjectile.Phase == Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.FlyingForward)
                 {
                     fishingRodProjectile.Position = _physicsSimulator.GetFishingRodTip(fishingRodProjectile.Id).Position;
                 }

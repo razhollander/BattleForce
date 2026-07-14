@@ -90,12 +90,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             ref var projectile = ref _matchDataService.SimulationState.GetFishingRodProjectileById(_projectileId);
-            if (projectile.Phase != FishingRodTipPhase.CaughtEnemy)
-            {
-                return;
-            }
 
-            ProcessThrowCastInput(wasTalentInputDownThisTick, tick, casterPlayerState, ref projectile);
+            switch (projectile.Phase)
+            {
+                case FishingRodTipPhase.FlyingForward:
+                    if (wasTalentInputDownThisTick)
+                    {
+                        StartReturnPhase(ref projectile);
+                    }
+                    break;
+                case FishingRodTipPhase.CaughtEnemy:
+                    ProcessThrowCastInput(wasTalentInputDownThisTick, tick, casterPlayerState, ref projectile);
+                    break;
+            }
         }
 
         private void ProcessInitialCastInput(bool wasTalentInputDownThisTick, bool wasTalentInputReleasedThisTick, bool isCurrentlyAiming, int tick, PlayerStateS2C casterPlayerState)
@@ -157,13 +164,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             switch (projectile.Phase)
             {
-                case FishingRodTipPhase.Flying:
+                case FishingRodTipPhase.FlyingForward:
                     UpdateFlyingPhase(tick, ref projectile);
                     break;
                 case FishingRodTipPhase.CaughtEnemy:
                     UpdateCaughtPhase(tick, casterPlayerState, ref projectile);
                     break;
-                case FishingRodTipPhase.Returning:
+                case FishingRodTipPhase.ReturningBackwards:
                     UpdateReturnPhase(tick, deltaTime, casterPlayerState, ref projectile);
                     break;
             }
@@ -229,7 +236,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             ref var projectile = ref _matchDataService.SimulationState.GetFishingRodProjectileById(_projectileId);
-            if (projectile.Phase != FishingRodTipPhase.Flying)
+            if (projectile.Phase != FishingRodTipPhase.FlyingForward)
             {
                 return;
             }
@@ -255,7 +262,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             ref var projectile = ref _matchDataService.SimulationState.GetFishingRodProjectileById(_projectileId);
-            if (projectile.Phase != FishingRodTipPhase.Flying)
+            if (projectile.Phase != FishingRodTipPhase.FlyingForward)
             {
                 return;
             }
@@ -296,7 +303,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private void StartReturnPhase(ref TalentFishingRodProjectileStateS2C projectile)
         {
-            projectile.Phase = FishingRodTipPhase.Returning;
+            projectile.Phase = FishingRodTipPhase.ReturningBackwards;
             projectile.Velocity = Vector2.Zero;
             _physicsSimulator.RemoveFishingRodTip(_projectileId);
         }
@@ -332,7 +339,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
             }
 
-            if (phase == FishingRodTipPhase.Flying)
+            if (phase == FishingRodTipPhase.FlyingForward)
             {
                 _physicsSimulator.RemoveFishingRodTip(_projectileId);
             }

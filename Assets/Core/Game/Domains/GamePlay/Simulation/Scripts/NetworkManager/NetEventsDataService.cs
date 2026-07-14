@@ -2663,7 +2663,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.FishingRodProjectile.Id = projectileId;
                 packet.FishingRodProjectile.PlayerCasterId = playerCasterId;
                 packet.FishingRodProjectile.Position = position;
-                packet.FishingRodProjectile.Phase = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.Flying;
+                packet.FishingRodProjectile.Phase = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.FlyingForward;
                 packet.FishingRodProjectile.CaughtEnemyId = 0;
             }
         }
