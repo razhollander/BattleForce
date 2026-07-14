@@ -191,7 +191,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateSprings(mapSizeMultiplier);
             CreateSpikes(mapSizeMultiplier);
             CreateLavaWalls(mapSizeMultiplier);
-            CreateTalentCards(mapSizeMultiplier);
+            CreateTalentCards();
             CreatePowerUpBalls();
             CreateTeamBoards();
             var teleportGatesPerWheelId = CreateTeleportGates(mapSizeMultiplier);
@@ -395,11 +395,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
         
-        private void CreateTalentCards(float mapSizeMultiplier)
+        private void CreateTalentCards()
         {
             foreach (var talentCard in _simulationState.TalentCards.AsSpan())
             {
-                _matchDataService.AddTalentCard(talentCard.Id, talentCard.Position.ToUnityVector2()*mapSizeMultiplier, talentCard.TalentType, talentCard.Health);
+                _matchDataService.AddTalentCard(talentCard.Id, talentCard.Position.ToUnityVector2(), talentCard.TalentType, talentCard.Health);// NOTE: talentCard.Position is already scaled by the server (InitStageCommand stores position * mapSizeMultiplier into state), so it must not be scaled again here.
                 _talentCardControllers.CreateTalentCard(talentCard.Id);
             }
         }
@@ -549,7 +549,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     {
                         var scaledPosition = spikeConfig.Position * mapSizeMultiplier;
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelConfig.CenterPosition, scaledPosition, spikeConfig.RotationAngle,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, spikeConfig.RotationAngle,
                             out var worldPosition, out var worldRotation
                         );
 
@@ -653,9 +653,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var position = fishingRodTip.Position;
                 var casterPosition = casterState.Spaceship.Transform.Position.ToUnityVector2();
                 var rotation = fishingRodTip.Position - casterPosition.ToNumericsVector2();
-                var tipModel = _matchDataService.AddFishingRodTip(fishingRodTip.Id, casterId, position);
-                tipModel.Phase = fishingRodTip.Phase;
-                _fishingRodTipControllers.CreateFishingRodTip(fishingRodTip.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition);
+                _matchDataService.AddFishingRodTip(fishingRodTip.Id, casterId, position, fishingRodTip.Phase);
+                _fishingRodTipControllers.CreateFishingRodTip(fishingRodTip.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, fishingRodTip.Phase);
             }
         }
     }

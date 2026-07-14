@@ -11,12 +11,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
     {
         public ushort Id;
         public ushort PlayerCasterId;
-        public Vector2 StartPosition;
         public Vector2 Position;
         public Vector2 Velocity;
         public FishingRodTipPhase Phase;
         public ushort CaughtEnemyId;
-        // Direction of the throw-aim arrow shown on the caught enemy. Vector2.Zero means no arrow is shown for this projectile.
         public Vector2 EnemyCaughtArrowDirection;
 
         public void Serialize(NetDataWriter writer)

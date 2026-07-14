@@ -74,7 +74,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchGrapplingHookProjectileModel AddGrapplingHookProjectile(ushort id, ushort casterPlayerId, Vector2 position);
         MatchGrapplingHookProjectileModel GetGrapplingHookProjectile(ushort id);
         void RemoveGrapplingHookProjectile(ushort id);
-        MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position);
+        MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position, FishingRodTipPhase phase);
         MatchFishingRodTipModel GetFishingRodTip(ushort id);
         void RemoveFishingRodTip(ushort id);
         bool IsPlayerAimingFishingRodThrow(ushort casterPlayerId);

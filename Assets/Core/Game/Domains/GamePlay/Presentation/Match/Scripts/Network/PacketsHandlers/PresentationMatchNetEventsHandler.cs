@@ -497,7 +497,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 var tipState = netEvent.FishingRodProjectile;
                 SetPlayerTalentActive(tipState.PlayerCasterId, TalentType.FishingRod);
-                _matchDataService.AddFishingRodTip(tipState.Id, tipState.PlayerCasterId, tipState.Position);
+                _matchDataService.AddFishingRodTip(tipState.Id, tipState.PlayerCasterId, tipState.Position, tipState.Phase);
                 _cachedPresentationEventsService.CreateFishingRodProjectileNetEvents.Add(netEvent);
             }
         }
@@ -1066,6 +1066,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in netEvents)
             {
+                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.Headbutt);
                 _cachedPresentationEventsService.ActivateHeadbuttChargingNetEvents.Add(netEvent);
             }
         }

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
+using Core.Scripts.Services.AudioService;
 using UnityEngine;
 using Zenject;
 using Core.Scripts.Extensions;
@@ -9,13 +11,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scri
     public class FishingRodTipControllers : IFishingRodTipControllers
     {
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IAudioService _audioService;
         private readonly FishingRodTipPool _pool;
         private readonly Dictionary<ushort, FishingRodTipController> _controllers = new();
         private Transform _parentTransform;
 
-        public FishingRodTipControllers(FishingRodTipView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
+        public FishingRodTipControllers(FishingRodTipView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IAudioService audioService)
         {
             _gamePlayConfig = gamePlayConfig;
+            _audioService = audioService;
             _pool = new FishingRodTipPool(prefab, diContainer);
         }
 
@@ -25,11 +29,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scri
             _pool.InitPool();
         }
 
-        public void CreateFishingRodTip(ushort tipId, ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 casterPosition)
+        public void CreateFishingRodTip(ushort tipId, ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 casterPosition, FishingRodTipPhase phase)
         {
-            var controller = new FishingRodTipController(tipId, casterPlayerId, _pool, _parentTransform);
-            controller.CreateView(position, rotation.ToQuaternion(), casterPosition);
+            var controller = new FishingRodTipController(tipId, casterPlayerId, _pool, _parentTransform, _audioService);
+            controller.CreateView(position, rotation.ToQuaternion(), casterPosition, phase);
             _controllers[tipId] = controller;
+        }
+
+        public void StopFishingRodTipReelLoopAudio(ushort tipId)
+        {
+            if (_controllers.TryGetValue(tipId, out var controller))
+            {
+                controller.StopReelLoopAudio();
+            }
         }
 
         public void InterpolateFishingRodTipTransform(ushort tipId, Vector2 position, Quaternion rotation, Vector2 casterPosition)

@@ -145,10 +145,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             var projectileId = (ushort)(++_lastFishingRodProjectileCreatedId % byte.MaxValue);
             fishingRodProjectile.Id = projectileId;
             fishingRodProjectile.PlayerCasterId = casterPlayerId;
-            fishingRodProjectile.StartPosition = position;
             fishingRodProjectile.Position = position;
             fishingRodProjectile.Velocity = velocity;
-            fishingRodProjectile.Phase = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.FlyingForward;
+            fishingRodProjectile.Phase = FishingRodTipPhase.FlyingForward;
             fishingRodProjectile.CaughtEnemyId = 0;
             fishingRodProjectile.EnemyCaughtArrowDirection = Vector2.Zero;
             return fishingRodProjectile;

@@ -42,11 +42,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var casterPosition = _playerControllers.GetPlayerPosition(casterPlayerId);
                 var lineStartPosition = _playerControllers.GetPlayerFishingRodTipPivotPosition(casterPlayerId);
                 var rotation = tipModel.Position - casterPosition.ToNumericsVector2();
-
-                _fishingRodTipControllers.CreateFishingRodTip(tipModel.Id, casterPlayerId, tipModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), lineStartPosition);
+                // The tip controller owns the reel loop SFX and plays it unless the rod is already in the caught phase.
+                _fishingRodTipControllers.CreateFishingRodTip(tipModel.Id, casterPlayerId, tipModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), lineStartPosition, tipModel.Phase);
             }
 
-            _audioService.PlayAudioLoop(AudioClipType.FishingRodReel); // looped, stopped on catch/deactivate
             _audioService.PlayAudio(AudioClipType.FishingRodActivate);
 
             _cachedPresentationEventsService.CreateFishingRodProjectileNetEvents.Clear();

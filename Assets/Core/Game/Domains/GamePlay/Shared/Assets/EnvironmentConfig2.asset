@@ -1072,4 +1072,4 @@ MonoBehaviour:
       _stageBoundriesWallsJson: 
       _powerUpSpawnPointsJson: '[{"Position":{"X":-31.1,"Y":0.0}},{"Position":{"X":7.7,"Y":-20.9}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":-28.0,"Y":12.4}},{"Position":{"X":-29.0,"Y":-15.9}},{"Position":{"X":19.2,"Y":-0.7}},{"Position":{"X":30.8,"Y":-13.2}},{"Position":{"X":29.5,"Y":17.8}}]'
       _cameraBoundariesJson: 
-  AvailableLayoutIndexes: 000000000300000004000000050000000a0000000b0000000800000009000000
+  AvailableLayoutIndexes: 000000000300000004000000050000000a0000000b000000

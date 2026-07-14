@@ -377,9 +377,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             }
         }
 
-        public MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position)
+        public MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position, FishingRodTipPhase phase)
         {
-            var model = new MatchFishingRodTipModel(id, casterPlayerId, position.ToUnityVector2());
+            var model = new MatchFishingRodTipModel(id, casterPlayerId, position.ToUnityVector2(), phase);
             FishingRodTips.Add(model);
             return model;
         }

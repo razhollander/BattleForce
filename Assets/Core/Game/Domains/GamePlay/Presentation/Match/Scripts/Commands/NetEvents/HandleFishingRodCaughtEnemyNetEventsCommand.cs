@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
@@ -11,12 +12,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMatchDataService _matchDataService;
+        private IFishingRodTipControllers _fishingRodTipControllers;
         private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
+            _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
             _audioService = _diContainer.Resolve<IAudioService>();
         }
 
@@ -37,9 +40,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 {
                     tip.Phase = FishingRodTipPhase.CaughtEnemy;
                 }
+
+                _fishingRodTipControllers.StopFishingRodTipReelLoopAudio(caughtEvent.ProjectileId);
             }
 
-            _audioService.StopLoopAudio(AudioClipType.FishingRodReel);
             _audioService.PlayAudio(AudioClipType.FishingRodCatch); // play only once no matter how many events received
 
             _cachedPresentationEventsService.FishingRodCaughtEnemyNetEvents.Clear();

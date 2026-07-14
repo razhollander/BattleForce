@@ -32,7 +32,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _playerControllers.SetPlayerHeadbuttChargingState(evt.CasterPlayerId, false);
             }
 
-            _audioService.StopLoopAudio(AudioClipType.HeadbuttCharge);
             _audioService.PlayAudio(AudioClipType.HeadbuttDash);
             _cachedPresentationEventsService.PerformHeadbuttDashNetEvents.Clear();
         }

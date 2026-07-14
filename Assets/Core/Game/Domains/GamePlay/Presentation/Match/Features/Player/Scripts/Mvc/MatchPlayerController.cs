@@ -34,6 +34,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly MatchPlayerViewPool _playerPool;
         private readonly Sprite[] _powerUpReelSpritesArray;
         private int? _currentPowerupGrantingAudioId;
+        private int? _headbuttChargeLoopAudioId;
+        private int? _waterGunLoopAudioId;
         private bool _isFlagActive;
         private bool _isFishingRodStickActive;
 
@@ -211,11 +213,59 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetWaterGunState(bool isActive)
         {
             _playerView.SetWaterGunState(isActive);
+
+            if (isActive)
+            {
+                PlayLoopAudio(ref _waterGunLoopAudioId, AudioClipType.WaterGunLoop);
+            }
+            else
+            {
+                TryStopLoopAudio(ref _waterGunLoopAudioId);
+            }
         }
 
         public void SetHeadbuttChargingState(bool isCharging)
         {
             _playerView.SetHeadbuttChargingState(isCharging, _sharedGamePlayConfig.HeadbuttMaxChargeDurationSeconds);
+
+            if (isCharging)
+            {
+                PlayLoopAudio(ref _headbuttChargeLoopAudioId, AudioClipType.HeadbuttCharge);
+            }
+            else
+            {
+                TryStopLoopAudio(ref _headbuttChargeLoopAudioId);
+            }
+        }
+
+        // Loops are played per-player with their own id so each player's loop can be stopped independently, and so
+        // they can be force-stopped when the player view is destroyed on stage exit (see StopAllLoopAudio / Destroy).
+        private void PlayLoopAudio(ref int? loopAudioId, AudioClipType audioClipType)
+        {
+            if (loopAudioId.HasValue)
+            {
+                LogService.LogError($"Tried to play {audioClipType} while already playing");
+                return;
+            }
+
+            loopAudioId = _audioService.PlayAudioLoopWithId(audioClipType);
+        }
+
+        private void TryStopLoopAudio(ref int? loopAudioId)
+        {
+            if (!loopAudioId.HasValue)
+            {
+                return;
+            }
+
+            _audioService.StopLoopAudioById(loopAudioId.Value);
+            loopAudioId = null;
+        }
+
+        private void StopAllLoopAudio()
+        {
+            TryStopLoopAudio(ref _headbuttChargeLoopAudioId);
+            TryStopLoopAudio(ref _waterGunLoopAudioId);
         }
 
         public void ShowHeadbuttHelmet()
@@ -425,6 +475,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void Destroy()
         {
+            // The talent-deactivated net events may never arrive when the stage exits, so force-stop any loop audio here.
+            StopAllLoopAudio();
             _playerView.Despawn();
         }
 

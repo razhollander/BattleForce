@@ -198,10 +198,10 @@ MonoBehaviour:
       Damage: 1
       Size: {x: 4.1362, y: 1.663131}
     DeafultEnvironmentId: 0
-    ShouldChooseRandomStage: 0
+    ShouldChooseRandomStage: 1
     ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3
-    StartMatchCountdownDuration: 1
+    StartMatchCountdownDuration: 3
     ShootCooldownMultiplierWhenDead: 1
     StageRestartDelaySeconds: 3
     GemsCollectedForTeamAlive: 1
@@ -213,7 +213,7 @@ MonoBehaviour:
     PreparationPhaseDuration: 4
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
-    StageSizeMultiplier: 1.3
+    StageSizeMultiplier: 1.15
     SpeedupSimulation: 1
     IsAutoShoot: 0
     CanPlayersCollideWithEachOther: 0

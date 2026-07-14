@@ -52,5 +52,6 @@ namespace Core.Scripts.Services.AudioService
         FishingRodCatch = 51,
         FishingRodActivate = 52,
         FishingRodThrowEnemy = 53,
+        WaterGunLoop = 54,
     }
 }
