@@ -315,7 +315,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 return;
             }
 
-            _waterGunStreamView.UpdateStream(aimDirection, 0f);
+            _waterGunStreamView.UpdateStream(aimDirection, decay);
         }
 
 

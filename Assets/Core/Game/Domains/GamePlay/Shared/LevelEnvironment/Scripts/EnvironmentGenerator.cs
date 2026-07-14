@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System.Collections.Generic;
 using System.Linq;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
@@ -61,7 +63,6 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
             CreateWallPieces(layoutConfig.Configs[index].GetLavaWalls(), true);
         }
 
-#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             if (_cameraTopLeftBoundary == null || _cameraBottomRightBoundary == null)
@@ -76,8 +77,7 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireCube(center, size);
         }
-#endif
-
+        
         private void CreateWallPieces(WallConfig[] wallConfigs, bool isLava)
         {
             if (wallConfigs.IsNullOrEmpty())
@@ -102,3 +102,4 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
         }
     }
 }
+#endif

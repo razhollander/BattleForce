@@ -1,16 +1,14 @@
 using Core.Scripts.Extensions;
+using Core.Scripts.Utils;
+using CoreDomain.Scripts.Utils;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.WaterGunStream.Scripts.Mvc
 {
     public class WaterGunStreamView : MonoBehaviour
     {
-        [SerializeField] private MeshFilter _meshFilter;
-        [SerializeField] private MeshRenderer _meshRenderer;
         [SerializeField] private Transform _pivotTransform;
-
-        private static readonly int BendAmountProperty = Shader.PropertyToID("_BendAmount");
-
+        
         public void Show()
         {
             gameObject.TrySetActive(true);
@@ -21,11 +19,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.WaterGunStream.
             gameObject.TrySetActive(false);
         }
 
-        public void UpdateStream(System.Numerics.Vector2 aimDirection, float angularVelocity)
+        public void UpdateStream(System.Numerics.Vector2 aimDirection, float decay)
         {
-            var angle = Mathf.Atan2(aimDirection.Y, aimDirection.X) * Mathf.Rad2Deg;
-            _pivotTransform.rotation = Quaternion.Euler(0f, 0f, angle);
-            _meshRenderer.material.SetFloat(BendAmountProperty, angularVelocity);
+            var targetRotation = aimDirection.ToQuaternion();
+            _pivotTransform.rotation = MathUtils.ExpDecay(_pivotTransform.rotation, targetRotation, decay, Time.deltaTime);
         }
     }
 }
