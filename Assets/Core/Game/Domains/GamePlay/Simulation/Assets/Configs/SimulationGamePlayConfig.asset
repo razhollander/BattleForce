@@ -129,8 +129,8 @@ MonoBehaviour:
         MinSpin: 180
       WaterGunTalentConfig:
         DurationInSeconds: 3
-        ConeAngleDegrees: 45
-        ConeRange: 8.5
+        ConeAngleDegrees: 30
+        ConeRange: 9.3
         EnemyPushForcePerTick: 150
         CasterRecoilForcePerTick: 0
       HeadbuttTalentConfig:

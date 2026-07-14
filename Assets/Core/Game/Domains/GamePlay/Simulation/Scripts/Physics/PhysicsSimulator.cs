@@ -829,6 +829,82 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return hasCollision;
         }
 
+        public bool EllipseCastOnPlayers(Vector2 center, float radius, Vector2 direction, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        {
+            var hasCollision = false;
+            hitBodyData = default;
+
+            // Match the arc's footprint: full length along the aim direction is 'radius',
+            // and the perpendicular width matches the arc's angular spread at its far edge.
+            var halfAngleRad = (arcAngleDegrees * 0.5f).ToRadians();
+            var semiMajor = radius * 0.5f;
+            var semiMinor = radius * MathF.Sin(halfAngleRad);
+
+            var rot = Matrix3x2.CreateRotation(direction.ToAngleRadians());
+
+            // Ellipse is centered halfway along the aim direction so it spans from the apex to the tip.
+            var ellipseCenter = center + direction * semiMajor;
+
+            // Box2D polygons are capped at 8 vertices, so approximate the ellipse with 8 points.
+            const int vertexCount = 8;
+            var vertices = new Vector2[vertexCount];
+            for (int i = 0; i < vertexCount; i++)
+            {
+                var t = i / (float) vertexCount * MathF.PI * 2f;
+                var local = new Vector2(MathF.Cos(t) * semiMajor, MathF.Sin(t) * semiMinor);
+                vertices[i] = Vector2.Transform(local, rot);
+            }
+
+            var min = ellipseCenter;
+            var max = ellipseCenter;
+
+            foreach (var v in vertices)
+            {
+                var worldV = v + ellipseCenter;
+                min = Vector2.Min(min, worldV);
+                max = Vector2.Max(max, worldV);
+            }
+
+            _unityMainThreadDispatcher.EnqueueDraw(() => DebugDrawUtils.DrawPolygon(ellipseCenter, vertices));
+
+            var aabb = new AABB(min, max);
+            PhysicsBodyData hitBody = default;
+
+            _world.QueryAABB(fixture =>
+            {
+                var currentBodyData = (PhysicsBodyData) fixture.Body.UserData;
+                var shouldContinueQuery = true;
+                var isPlayerFromNotIgnoredTeam = currentBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && fixture.FilterData.groupIndex != -ignoreTeamId;
+                if (isPlayerFromNotIgnoredTeam)
+                {
+                    var polygonShape = GetPolygonShape();
+                    polygonShape.Set(vertices);
+
+                    var input = new ShapeCastInput();
+                    input.proxyA.Set(polygonShape, 0);
+                    input.proxyB.Set(fixture.Shape, 0);
+                    input.transformA = new Transform(ellipseCenter, Matrix3x2.Identity);
+                    input.transformB = fixture.Body.GetTransform();
+                    input.translationB = Vector2.Zero;
+
+                    if (Contact.ShapeCast(out _, input))
+                    {
+                        hasCollision = true;
+                        hitBody = currentBodyData;
+                    }
+
+                    _polygonShapePool.Return(polygonShape);
+                    shouldContinueQuery = !hasCollision;
+                }
+
+                return shouldContinueQuery;
+            }, aabb);
+
+            hitBodyData = hitBody;
+
+            return hasCollision;
+        }
+
         public void ManagedOnGUI()
         {
             

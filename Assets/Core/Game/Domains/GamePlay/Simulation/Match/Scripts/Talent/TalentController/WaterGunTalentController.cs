@@ -114,7 +114,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var offset = casterPlayerState.Spaceship.Transform.Radius;
             var center = casterPlayerState.Spaceship.Transform.Position + aimDirection * offset;
 
-            var didHitEnemy = _physicsSimulator.ArcCastOnPlayers(
+            var didHitEnemy = _physicsSimulator.EllipseCastOnPlayers(
                 center, config.ConeRange, aimDirection, config.ConeAngleDegrees,
                 (short)casterPlayerState.TeamId, out var hitBodyData);
 

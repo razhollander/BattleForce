@@ -274,6 +274,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             HideHeadbuttHelmet();
             SetOnLavaEffectState(false);
             SetFrozenState(false);
+            SetRockState(false);
             Base.OnDespawned();
         }
 

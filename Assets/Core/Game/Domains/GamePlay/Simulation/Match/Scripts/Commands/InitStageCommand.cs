@@ -13,6 +13,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
@@ -191,6 +192,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.IsAlive = true;
                 player.Spaceship.IsSpinned = false;
                 player.Spaceship.IsExposedToLava = false;
+                player.Spaceship.AssistArrowType = PlayerAssistArrowType.Hidden;
                 player.Spaceship.LockOnTargetObjects.Clear();
                 
                 if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
@@ -211,6 +213,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 {
                     ref var talentState = ref player.Spaceship.TalentsState.Talents.Get(k);
                     talentState.ClearCooldown();
+                    talentState.IsCurrentlyActive = false;
+                    talentState.IsCurrentlyAiming = false;
                 }
                 
                 _physicsSimulator.AddPlayer(player.Id, player.TeamId, position, velocity, radius, heartRadius);

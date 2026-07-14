@@ -113,6 +113,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void ResetData()
         {
+            IsCurrentlyAiming = false;
         }
     }
 }
