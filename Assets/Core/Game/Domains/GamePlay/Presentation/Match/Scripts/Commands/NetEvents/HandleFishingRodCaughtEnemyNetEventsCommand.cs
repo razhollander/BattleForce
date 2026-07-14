@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 }
             }
 
-            _audioService.StopLoopAudio(AudioClipType.FishingRodActivate);
+            _audioService.StopLoopAudio(AudioClipType.FishingRodReel);
             _audioService.PlayAudio(AudioClipType.FishingRodCatch); // play only once no matter how many events received
 
             _cachedPresentationEventsService.FishingRodCaughtEnemyNetEvents.Clear();

@@ -26,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             // The thrown enemy's spin/push is reflected through the state snapshot and the spin net-event.
             // The caught enemy's aim arrow is hidden by the deactivate event that always follows a throw.
-            _audioService.PlayAudio(AudioClipType.FishingRodThrow); // play only once no matter how many events received
+            _audioService.PlayAudio(AudioClipType.FishingRodThrowEnemy); // play only once no matter how many events received
 
             _cachedPresentationEventsService.FishingRodThrowNetEvents.Clear();
         }

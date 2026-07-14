@@ -294,6 +294,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.HideAssistArrow();
         }
 
+        public void UpdateSelectedTalentActiveEffect()
+        {
+            var talentsState = _matchDataService.GetPlayer(PlayerId).Spaceship.TalentsState;
+            var isSelectedTalentActive = talentsState.TryGetCurrentSelectedTalent(out var selectedTalent) && selectedTalent.IsCurrentlyActive;
+            _playerView.SetSelectedTalentActiveEffect(talentsState.SelectedTalentIndex, isSelectedTalentActive);
+        }
+
         public void UpdateBulletCooldown()
         {
             var playerModel = _matchDataService.GetPlayer(PlayerId);

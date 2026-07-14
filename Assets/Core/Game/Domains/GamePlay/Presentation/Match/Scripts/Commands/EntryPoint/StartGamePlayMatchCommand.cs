@@ -2,6 +2,7 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.CoolBGMusic.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
@@ -86,6 +87,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ILocalPlayersDataService _localPlayersDataService;
         private IGameInputActionsController _gameInputActionsController;
         private IAudioService _audioService;
+        private ICoolBGMusicController _coolBGMusicController;
         private INukeShockwaveEffectController _nukeShockwaveEffectController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
@@ -135,12 +137,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
             _audioService = _diContainer.Resolve<IAudioService>();
+            _coolBGMusicController = _diContainer.Resolve<ICoolBGMusicController>();
             _nukeShockwaveEffectController = _diContainer.Resolve<INukeShockwaveEffectController>();
         }
 
         public void Execute()
         {
-            _audioService.PlayAudioLoop(AudioClipType.MatchGamePlayBGMusic);
+            _coolBGMusicController.InitEntryPoint();
+            if (!_coolBGMusicController.TryPlayStageBackgroundMusic())
+            {
+                _audioService.PlayAudioLoop(AudioClipType.MatchGamePlayBGMusic);
+            }
             _fullTickPacketsHandler.InitEntryPoint();
             _startStagePacketHandler.InitEntryPoint();
             _talentCardControllers.InitEntryPoint();

@@ -48,8 +48,9 @@ namespace Core.Scripts.Services.AudioService
         FrigidBlockActivated = 46,
         SoulActivated = 47,
         HeadbuttCharge = 49,
-        FishingRodActivate = 50,
+        FishingRodReel = 50,
         FishingRodCatch = 51,
-        FishingRodThrow = 52,
+        FishingRodActivate = 52,
+        FishingRodThrowEnemy = 53,
     }
 }

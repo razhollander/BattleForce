@@ -76,6 +76,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
         }
 
+        public void UpdatePlayersSelectedTalentActiveEffect()
+        {
+            foreach (var playerController in _playerControllers)
+            {
+                playerController.UpdateSelectedTalentActiveEffect();
+            }
+        }
+
         public void ShootBulletEffectForPlayer(ushort playerId)
         {
             GetPlayer(playerId).DoShootEffect();

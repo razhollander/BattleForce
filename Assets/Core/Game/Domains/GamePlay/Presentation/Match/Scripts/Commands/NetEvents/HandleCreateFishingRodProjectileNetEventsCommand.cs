@@ -46,7 +46,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _fishingRodTipControllers.CreateFishingRodTip(tipModel.Id, casterPlayerId, tipModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), lineStartPosition);
             }
 
-            _audioService.PlayAudioLoop(AudioClipType.FishingRodActivate); // looped, stopped on catch/deactivate
+            _audioService.PlayAudioLoop(AudioClipType.FishingRodReel); // looped, stopped on catch/deactivate
+            _audioService.PlayAudio(AudioClipType.FishingRodActivate);
 
             _cachedPresentationEventsService.CreateFishingRodProjectileNetEvents.Clear();
         }

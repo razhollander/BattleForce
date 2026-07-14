@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f420d16bda6c14ad38e22d2960e471bf, type: 3}
+  m_Name: CoolBGMusicConfig
+  m_EditorClassIdentifier: PresentationAssembly::Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects.CoolBGMusicConfig
+  BackgroundMusics:
+  - Clip: {fileID: 8300000, guid: 1a70106779d0b437c9cef3f1a7c98362, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: 1951567b7d4d6461d9ea8644185e3b09, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: 7f42debcd508a4b6e81c0cc096b7129e, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: 42da18fcaac354235aee00b121b551fb, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: d168bc59fb6c7441d9a84fc8bcddf3c3, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: b8fcf2d50517a471faa1e547bfce4706, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: 43409a0fed9e34fc1950c9bd547b3a36, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: c2fe64d0c3b6d4fa3bfab4befc002410, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: 197f8bb37ba0047b5b728c2ab23e9cb3, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: 89fed250742874b8d86c65c7e2816c77, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: 03df55ce36eb9437c87f98dfb57b0d8a, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: 1da47b9fdd1cc4a19adfb54cf04f9619, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: 5bde16ce0ac644235a4889795520dd4b, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: 42b39fa9c116442929cddc145c14fcac, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: be1ed26839a4142539121dc9bdfbdbda, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: e8b6be8c703aa4c9ab816e46847254bc, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: 4d5df3dae93dc4d45bd3af9f6a097d6d, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: e045e90188cf5470ea4f0c82ba9bbd23, type: 3}
+    Volume: 0
+  - Clip: {fileID: 8300000, guid: c35a9c66417cd426c96f34182fb97e80, type: 3}
+    Volume: 0

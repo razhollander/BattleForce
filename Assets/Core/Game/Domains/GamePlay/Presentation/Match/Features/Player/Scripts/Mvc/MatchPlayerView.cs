@@ -89,6 +89,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _talentsHudView.SelectTalent(selectedTalentIndex, cancellationToken);
         }
+
+        public void SetSelectedTalentActiveEffect(int selectedTalentIndex, bool isSelectedTalentActive)
+        {
+            _talentsHudView.SetSelectedTalentActiveEffect(selectedTalentIndex, isSelectedTalentActive);
+        }
         
         public void MakeAngryForShortDuration(CancellationToken cancellationToken)
         {

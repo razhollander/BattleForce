@@ -45,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _playerControllers.SetPlayerFishingRodStickState(netEvent.CasterPlayerId, false);
             }
 
-            _audioService.StopLoopAudio(AudioClipType.FishingRodActivate);
+            _audioService.StopLoopAudio(AudioClipType.FishingRodReel);
 
             _cachedPresentationEventsService.DeactivateFishingRodTalentNetEvents.Clear();
         }

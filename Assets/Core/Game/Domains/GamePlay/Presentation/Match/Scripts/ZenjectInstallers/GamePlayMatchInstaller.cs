@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.CoolBGMusic.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
@@ -105,6 +106,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.Bind<IFullTickPacketsHandler>().To<MatchFullTickPacketsHandler>().AsSingle().NonLazy();
             Container.Bind<IClientMatchPresentationTickProcessor>().To<ClientMatchPresentationTickProcessor>().AsSingle().NonLazy();
             Container.Bind<IStartStagePacketHandler>().To<StartStagePacketHandler>().AsSingle().NonLazy();
+            Container.Bind<ICoolBGMusicController>().To<CoolBGMusicController>().AsSingle().NonLazy();
         }
         
         private void BindControllers()

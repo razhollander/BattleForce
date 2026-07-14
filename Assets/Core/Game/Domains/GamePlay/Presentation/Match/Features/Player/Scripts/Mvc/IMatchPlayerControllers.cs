@@ -1,7 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
-using CoreDomain.Scripts.Services.UpdateService;
 
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
@@ -13,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void UpdatePlayersTickDeltas();
         void UpdatePlayersBulletCooldowns();
         void UpdatePlayersTalentCooldowns(int currentServerTick);
+        void UpdatePlayersSelectedTalentActiveEffect();
         void ShootBulletEffectForPlayer(ushort playerId);
         void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth);
         void SetPlayerTransform(ushort playerId, Vector2 position, Vector2 direction);

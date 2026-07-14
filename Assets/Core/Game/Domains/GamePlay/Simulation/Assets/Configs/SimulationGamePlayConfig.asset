@@ -162,7 +162,7 @@ MonoBehaviour:
         ReturnSpeedMultiplier: 3
         ArriveDistance: 2
         TipMaxLifetimeSeconds: 1.5
-        ThrowWindowSeconds: 3
+        ThrowWindowSeconds: 300
         ThrowPushForce: 40
         ThrowMinSpin: 60
         ThrowMaxSpin: 80
