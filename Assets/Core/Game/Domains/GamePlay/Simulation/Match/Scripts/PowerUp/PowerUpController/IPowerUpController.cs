@@ -8,5 +8,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
         void SetCasterId(ushort casterPlayerId);
         void Perform(int tick);
         void OnTick(int tick);
+        void Reset();
     }
 }

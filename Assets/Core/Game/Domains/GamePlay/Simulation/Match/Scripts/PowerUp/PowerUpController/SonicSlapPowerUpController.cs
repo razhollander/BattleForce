@@ -29,6 +29,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
 
         public void OnTick(int tick) { }
 
+        public void Reset() { }
+
         public void Perform(int tick)
         {
             var casterTeamId = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId).TeamId;

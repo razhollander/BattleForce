@@ -41,6 +41,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
             _shufflePowerUpController.OnTick(tick);
         }
 
+        public void Reset()
+        {
+            _sonicSlapPowerUpController.Reset();
+            _galacticPullPowerUpController.Reset();
+            _nukePowerUpController.Reset();
+            _shufflePowerUpController.Reset();
+        }
+
         private IPowerUpController GetPowerUpByType(PowerUpType powerUpType)
         {
             switch (powerUpType)

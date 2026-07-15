@@ -192,7 +192,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public async Awaitable StartPowerUpGrantingPhase(CancellationToken cancellationToken)
         {
-            _currentPowerupGrantingAudioId = _audioService.PlayAudioLoopWithId(AudioClipType.PowerUpRandomReels);
+            PlayLoopAudio(ref _currentPowerupGrantingAudioId, AudioClipType.PowerUpRandomReels);
             await _playerView.StartPowerUpGrantingPhaseReel(_powerUpReelSpritesArray, cancellationToken);
         }
 
@@ -265,6 +265,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             TryStopLoopAudio(ref _headbuttChargeLoopAudioId);
             TryStopLoopAudio(ref _waterGunLoopAudioId);
+            TryStopLoopAudio(ref _currentPowerupGrantingAudioId);
         }
 
         public void ShowHeadbuttHelmet()

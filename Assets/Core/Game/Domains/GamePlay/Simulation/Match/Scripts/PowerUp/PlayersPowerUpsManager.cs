@@ -3,7 +3,6 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
@@ -144,6 +143,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp
             {
                 playerState.Spaceship.CurrentPowerUp = PowerUpType.None;
                 playerState.Spaceship.IsCurrentlyInGrantingPowerUpPhase = false;
+                playerState.Spaceship.IsPowerUpCurrentlyActive = false;
+            }
+            
+            foreach (var controllers in _powerUpControllersPerPlayer.Values)
+            {
+                controllers.Reset();
             }
 
             _powerUpInGrantingPhasePerPlayer.Clear();
