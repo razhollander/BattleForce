@@ -26,6 +26,19 @@ namespace Core.Scripts.Services.HapticsService
 
         public void PlayHaptics(HapticType hapticType, Gamepad gamepad)
         {
+            // TEMP DIAGNOSTIC — remove once controller identity is confirmed.
+            // Dumps the target pad and every connected pad (name / deviceId / Gamepad.all index / serial)
+            // so we can verify whether identical pads expose a distinct serial we can match on.
+            // var sb = new System.Text.StringBuilder();
+            // var targetIndex = Gamepad.all.IndexOf(g => g == gamepad);
+            // sb.Append($"[HapticsDiag] TARGET name='{gamepad?.name}' deviceId={gamepad?.deviceId} allIndex={targetIndex} serial='{gamepad?.description.serial}' product='{gamepad?.description.product}' manufacturer='{gamepad?.description.manufacturer}'\n");
+            // for (var i = 0; i < Gamepad.all.Count; i++)
+            // {
+            //     var g = Gamepad.all[i];
+            //     sb.Append($"[HapticsDiag]   all[{i}] name='{g.name}' deviceId={g.deviceId} serial='{g.description.serial}' product='{g.description.product}'\n");
+            // }
+            // UnityEngine.Debug.LogWarning(sb.ToString());
+
             PlayOneShotRoutineAsync(gamepad, _hapticsConfig.Profiles[hapticType], new CancellationToken()).Forget();
         }
 
