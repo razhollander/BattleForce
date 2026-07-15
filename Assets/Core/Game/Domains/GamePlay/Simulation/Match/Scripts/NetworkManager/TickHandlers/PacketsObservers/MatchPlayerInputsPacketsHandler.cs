@@ -40,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ICommandFactory _commandFactory;
         private readonly ISimulationInputService _simulationInputService;
+        private readonly IRandomPlayersInputService _randomPlayersInputService;
         private readonly IPlayersMouseDataService _playersMouseDataService;
         private readonly IClientsNetworkDataService _clientsNetworkDataService;
 
@@ -63,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, INetEventsDataService netEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
             IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, ISimulationInputService simulationInputService, IClientsNetworkDataService clientsNetworkDataService,
-            IPlayersPowerUpsManager playersPowerUpsManager, IPlayersMouseDataService playersMouseDataService)
+            IPlayersPowerUpsManager playersPowerUpsManager, IPlayersMouseDataService playersMouseDataService, IRandomPlayersInputService randomPlayersInputService)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
@@ -77,6 +78,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _playersPowerUpsManager = playersPowerUpsManager;
             _playerbackRecorderService = playerbackRecorderService;
             _simulationInputService = simulationInputService;
+            _randomPlayersInputService = randomPlayersInputService;
             _playersMouseDataService = playersMouseDataService;
             _clientsNetworkDataService = clientsNetworkDataService;
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
@@ -150,14 +152,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 
                 lastProcessedClientInsputs.CopyFrom(currentPacket);
                 
-                foreach (var playerInput in currentPacket.PlayerInputs.AsSpan())
+                var playerInputs = currentPacket.PlayerInputs.AsSpan();
+                for (var inputIndex = 0; inputIndex < playerInputs.Length; inputIndex++)
                 {
+                    var playerInput = playerInputs[inputIndex];
                     var playerId = playerInput.PlayerId;
 
                     if (!clientNetworkData.PlayerIds.Contains(playerId))
                     {
                         LogService.LogError("Player try to cheat and send inputs of different player! ClientId: " + clientId + " PlayerId: " + playerId + "");
                         continue;
+                    }
+
+                    // Testing only: overwrite the real client input with fabricated "dumb player" input.
+                    if (_gamePlayConfigService.GamePlayConfig.RandomPlayersInput)
+                    {
+                        _randomPlayersInputService.ApplyRandomInput(ref playerInput);
                     }
 
                     var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);

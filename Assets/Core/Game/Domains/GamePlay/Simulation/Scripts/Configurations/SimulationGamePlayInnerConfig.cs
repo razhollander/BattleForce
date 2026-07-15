@@ -35,5 +35,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float SpeedupSimulation = 2f;
         public bool IsAutoShoot = false;
         public bool CanPlayersCollideWithEachOther = false;
+        // Testing only: when true the server ignores real client input and drives every player with
+        // fabricated "dumb player" input (see RandomPlayersInputService).
+        public bool RandomPlayersInput = false;
     }
 }
