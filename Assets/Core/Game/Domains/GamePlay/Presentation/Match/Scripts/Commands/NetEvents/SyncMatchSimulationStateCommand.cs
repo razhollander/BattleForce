@@ -654,7 +654,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var casterPosition = casterState.Spaceship.Transform.Position.ToUnityVector2();
                 var rotation = fishingRodTip.Position - casterPosition.ToNumericsVector2();
                 _matchDataService.AddFishingRodTip(fishingRodTip.Id, casterId, position, fishingRodTip.Phase);
-                _fishingRodTipControllers.CreateFishingRodTip(fishingRodTip.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, fishingRodTip.Phase);
+                _fishingRodTipControllers.CreateFishingRodTip(fishingRodTip.Id, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, fishingRodTip.Phase);
             }
         }
     }

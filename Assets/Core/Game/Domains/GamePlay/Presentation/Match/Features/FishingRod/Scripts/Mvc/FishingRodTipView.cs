@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scri
         public void SetTransform(Vector2 tipPosition, Quaternion rotation, Vector2 lineStartPosition)
         {
             Transform.SetPositionAndRotation(tipPosition, rotation);
-            UpdateLineRenderer(lineStartPosition, _tipPivot != null ? (Vector2)_tipPivot.position : tipPosition);
+            UpdateLineRenderer(lineStartPosition,  _tipPivot.position);
         }
 
         private void UpdateLineRenderer(Vector2 startPosition, Vector2 endPosition)

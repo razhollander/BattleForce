@@ -30,7 +30,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         private float _maxWaveAmplitude;
         private float _currentWaveAmplitude;
         private float _wavePhase;
-        private bool _isTailFrozen;
 
         public void OnCreated()
         {
@@ -38,20 +37,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _previousRotationZ = transform.eulerAngles.z;
             _maxWaveAmplitude = _tailMaterial.GetFloat(WAVE_AMPLITUDE_SHADER_PROPERTY);
             _currentWaveAmplitude = _maxWaveAmplitude;
-            _isTailFrozen = false;
             _wavePhase = Time.time;
             _tailMaterial.SetFloat(WAVE_PHASE_SHADER_PROPERTY, _wavePhase);
         }
 
         public void UpdateTail()
         {
-            // While frozen we stop driving every tail property so it holds the exact wave pose captured
-            // at the moment the freeze started (phase, amplitude and bend all stay put).
-            if (_isTailFrozen)
-            {
-                return;
-            }
-
             AdvanceWavePhase();
             UpdateTailBend();
             UpdateTailWaveAmplitude();
@@ -95,11 +86,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         public void SetIsTailWaving(bool isWaving)
         {
             _isTailWaving = isWaving;
-        }
-
-        public void SetIsTailFrozen(bool isFrozen)
-        {
-            _isTailFrozen = isFrozen;
         }
     }
 }

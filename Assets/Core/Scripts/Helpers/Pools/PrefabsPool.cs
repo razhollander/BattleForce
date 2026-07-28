@@ -26,7 +26,7 @@ namespace CoreDomain.Scripts.Helpers.Pools
 
         public override void DisposePool()
         {
-            Object.Destroy(_parentTransform);
+            Object.Destroy(_parentTransform.gameObject);
             base.DisposePool();
         }
         

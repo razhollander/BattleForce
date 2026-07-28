@@ -1,188 +1,103 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc
 {
-    // Builds a world-space ribbon mesh from two emitter transforms. A new column (one point per
-    // emitter) is committed to a ring buffer every time the emitters travel _spawnDistance world
-    // units; columns older than _pointLifetime seconds are discarded from the tail, and the buffer
-    // is hard-capped at _capacity columns. The current live emitter positions are always appended as
-    // the leading edge so the head tracks the block smoothly between commits.
-    //
-    // Points are stored in world space and converted to the trail object's local space when the mesh
-    // is written, so the ribbon stays anchored in the world while the block GameObject moves.
-    // All buffers are allocated once and reused every frame (no per-frame garbage).
     public class FrigidBlockTrailViewController
     {
-        private const int VertsPerColumn = 2;
-        private const int IndicesPerQuad = 6;
+        private const float MIN_COLUMN_SPAWN_DISTANCE = 0.0001f;
+        private const float MIN_COLUMN_LIFETIME_IN_SECONDS = 0.0001f;
+        private const int MIN_COLUMNS_CAPACITY = 2;
+        private const int LIVE_LEADING_COLUMNS_COUNT = 1;
+        private const float FULLY_OPAQUE_ALPHA = 1f;
+        private const float EMITTERS_MIDPOINT_WEIGHT = 0.5f;
 
-        private readonly Transform _trailTransform;
-        private readonly Transform _emitterA;
-        private readonly Transform _emitterB;
-        private readonly Mesh _mesh;
-        private readonly float _spawnDistanceSqr;
-        private readonly float _pointLifetime;
+        private readonly Transform _leftEdgeEmitterTransform;
+        private readonly Transform _rightEdgeEmitterTransform;
+        private readonly FrigidBlockTrailColumnsBuffer _columnsBuffer;
+        private readonly FrigidBlockTrailMeshBuilder _meshBuilder;
+        private readonly float _columnSpawnDistanceSquared;
+        private readonly float _columnLifetimeInSeconds;
 
-        // Ring buffer of committed columns.
-        private readonly Vector3[] _worldA;
-        private readonly Vector3[] _worldB;
-        private readonly float[] _spawnTime;
-        private readonly int _capacity;
-        private int _head;
-        private int _count;
-        private Vector3 _lastCommitReference;
-
-        // Reused mesh build buffers (capacity includes the live leading column).
-        private readonly List<Vector3> _vertices;
-        private readonly List<Color32> _colors;
-        private readonly List<Vector2> _uvs;
-        private readonly List<int> _triangles;
+        private Vector3 _lastCommittedColumnCenterWorldPosition;
 
         public FrigidBlockTrailViewController(FrigidBlockView view)
         {
-            _trailTransform = view.TrailTransform;
-            _emitterA = view.TrailEmitterA;
-            _emitterB = view.TrailEmitterB;
-            _mesh = view.TrailMesh;
-            var spawnDistance = Mathf.Max(0.0001f, view.PointSpawnDistance);
-            _spawnDistanceSqr = spawnDistance * spawnDistance;
-            _pointLifetime = Mathf.Max(0f, view.PointLifetime);
+            _leftEdgeEmitterTransform = view.TrailLeftEdgeEmitter;
+            _rightEdgeEmitterTransform = view.TrailRightEdgeEmitter;
 
-            _capacity = Mathf.Max(2, view.MaxTrailPoints);
-            _worldA = new Vector3[_capacity];
-            _worldB = new Vector3[_capacity];
-            _spawnTime = new float[_capacity];
+            var columnSpawnDistance = Mathf.Max(MIN_COLUMN_SPAWN_DISTANCE, view.TrailColumnSpawnDistance);
+            _columnSpawnDistanceSquared = columnSpawnDistance * columnSpawnDistance;
+            _columnLifetimeInSeconds = Mathf.Max(MIN_COLUMN_LIFETIME_IN_SECONDS, view.TrailColumnLifetimeInSeconds);
 
-            var maxColumns = _capacity + 1;
-            _vertices = new List<Vector3>(maxColumns * VertsPerColumn);
-            _colors = new List<Color32>(maxColumns * VertsPerColumn);
-            _uvs = new List<Vector2>(maxColumns * VertsPerColumn);
-            _triangles = new List<int>((maxColumns - 1) * IndicesPerQuad);
+            var columnsCapacity = Mathf.Max(MIN_COLUMNS_CAPACITY, view.MaxTrailColumns);
+            _columnsBuffer = new FrigidBlockTrailColumnsBuffer(columnsCapacity);
+            _meshBuilder = new FrigidBlockTrailMeshBuilder(view.TrailMesh, view.TrailTransform, columnsCapacity + LIVE_LEADING_COLUMNS_COUNT);
         }
 
-        // Collapses the whole trail onto the current emitter positions so a freshly pooled block does
-        // not draw a streak from wherever it was last used.
-        public void Reset(float time)
+        public void CollapseTrailOntoEmitters(float currentTimeInSeconds)
         {
-            _head = 0;
-            _count = 0;
-            var liveA = _emitterA.position;
-            var liveB = _emitterB.position;
-            _lastCommitReference = (liveA + liveB) * 0.5f;
-            Commit(liveA, liveB, time);
-            RebuildMesh(liveA, liveB, time);
+            var leftEdgeWorldPosition = _leftEdgeEmitterTransform.position;
+            var rightEdgeWorldPosition = _rightEdgeEmitterTransform.position;
+
+            _columnsBuffer.Clear();
+            _lastCommittedColumnCenterWorldPosition = GetCenterWorldPosition(leftEdgeWorldPosition, rightEdgeWorldPosition);
+            CommitColumn(leftEdgeWorldPosition, rightEdgeWorldPosition, currentTimeInSeconds);
+            RebuildMesh(leftEdgeWorldPosition, rightEdgeWorldPosition, currentTimeInSeconds);
         }
 
-        public void Advance(float time)
+        public void UpdateTrail(float currentTimeInSeconds)
         {
-            var liveA = _emitterA.position;
-            var liveB = _emitterB.position;
+            var leftEdgeWorldPosition = _leftEdgeEmitterTransform.position;
+            var rightEdgeWorldPosition = _rightEdgeEmitterTransform.position;
 
-            // Drop columns that have outlived _pointLifetime (from the tail / oldest end).
-            while (_count > 0 && time - _spawnTime[_head] > _pointLifetime)
-            {
-                _head = (_head + 1) % _capacity;
-                _count--;
-            }
-
-            // Commit a new column once the emitters have travelled far enough since the last one.
-            var reference = (liveA + liveB) * 0.5f;
-            if ((reference - _lastCommitReference).sqrMagnitude >= _spawnDistanceSqr)
-            {
-                Commit(liveA, liveB, time);
-                _lastCommitReference = reference;
-            }
-
-            RebuildMesh(liveA, liveB, time);
+            _columnsBuffer.RemoveColumnsSpawnedBefore(currentTimeInSeconds - _columnLifetimeInSeconds);
+            TryCommitColumn(leftEdgeWorldPosition, rightEdgeWorldPosition, currentTimeInSeconds);
+            RebuildMesh(leftEdgeWorldPosition, rightEdgeWorldPosition, currentTimeInSeconds);
         }
 
-        private void Commit(Vector3 worldA, Vector3 worldB, float time)
+        private void TryCommitColumn(Vector3 leftEdgeWorldPosition, Vector3 rightEdgeWorldPosition, float currentTimeInSeconds)
         {
-            if (_count == _capacity)
+            var centerWorldPosition = GetCenterWorldPosition(leftEdgeWorldPosition, rightEdgeWorldPosition);
+            var distanceSinceLastColumnSquared = (centerWorldPosition - _lastCommittedColumnCenterWorldPosition).sqrMagnitude;
+
+            if (distanceSinceLastColumnSquared < _columnSpawnDistanceSquared)
             {
-                // Full: overwrite the oldest column.
-                _head = (_head + 1) % _capacity;
-                _count--;
-            }
-
-            var tail = (_head + _count) % _capacity;
-            _worldA[tail] = worldA;
-            _worldB[tail] = worldB;
-            _spawnTime[tail] = time;
-            _count++;
-        }
-
-        private void RebuildMesh(Vector3 liveA, Vector3 liveB, float time)
-        {
-            _vertices.Clear();
-            _colors.Clear();
-            _uvs.Clear();
-            _triangles.Clear();
-
-            var totalColumns = _count + 1;
-            if (totalColumns < 2)
-            {
-                _mesh.Clear();
                 return;
             }
 
-            var lastColumnIndex = totalColumns - 1;
-            for (var column = 0; column < totalColumns; column++)
+            CommitColumn(leftEdgeWorldPosition, rightEdgeWorldPosition, currentTimeInSeconds);
+            _lastCommittedColumnCenterWorldPosition = centerWorldPosition;
+        }
+
+        private void CommitColumn(Vector3 leftEdgeWorldPosition, Vector3 rightEdgeWorldPosition, float spawnTimeInSeconds)
+        {
+            _columnsBuffer.AddNewestColumn(new FrigidBlockTrailColumn(leftEdgeWorldPosition, rightEdgeWorldPosition, spawnTimeInSeconds));
+        }
+
+        private void RebuildMesh(Vector3 liveLeftEdgeWorldPosition, Vector3 liveRightEdgeWorldPosition, float currentTimeInSeconds)
+        {
+            _meshBuilder.StartBuilding(_columnsBuffer.ColumnsCount + LIVE_LEADING_COLUMNS_COUNT);
+
+            for (var orderFromOldest = 0; orderFromOldest < _columnsBuffer.ColumnsCount; orderFromOldest++)
             {
-                Vector3 worldA;
-                Vector3 worldB;
-                float alpha01;
-
-                if (column < _count)
-                {
-                    var index = (_head + column) % _capacity;
-                    worldA = _worldA[index];
-                    worldB = _worldB[index];
-                    // Oldest column fades to zero, newest committed column stays opaque.
-                    alpha01 = Mathf.Clamp01(1f - (time - _spawnTime[index]) / _pointLifetime);
-                }
-                else
-                {
-                    // Leading live edge tracks the emitters every frame.
-                    worldA = liveA;
-                    worldB = liveB;
-                    alpha01 = 1f;
-                }
-
-                var color = new Color32(255, 255, 255, (byte)(alpha01 * 255f));
-                var v = column / (float)lastColumnIndex;
-
-                _vertices.Add(_trailTransform.InverseTransformPoint(worldA));
-                _colors.Add(color);
-                _uvs.Add(new Vector2(0f, v));
-
-                _vertices.Add(_trailTransform.InverseTransformPoint(worldB));
-                _colors.Add(color);
-                _uvs.Add(new Vector2(1f, v));
+                var column = _columnsBuffer.GetColumn(orderFromOldest);
+                _meshBuilder.AddColumn(column.LeftEdgeWorldPosition, column.RightEdgeWorldPosition, GetFadeOutAlpha01(column, currentTimeInSeconds));
             }
 
-            for (var column = 0; column < lastColumnIndex; column++)
-            {
-                var a0 = column * VertsPerColumn;
-                var b0 = a0 + 1;
-                var a1 = a0 + VertsPerColumn;
-                var b1 = a1 + 1;
+            _meshBuilder.AddColumn(liveLeftEdgeWorldPosition, liveRightEdgeWorldPosition, FULLY_OPAQUE_ALPHA);
+            _meshBuilder.FinishBuilding();
+        }
 
-                _triangles.Add(a0);
-                _triangles.Add(a1);
-                _triangles.Add(b1);
+        private float GetFadeOutAlpha01(FrigidBlockTrailColumn column, float currentTimeInSeconds)
+        {
+            var columnAgeInSeconds = currentTimeInSeconds - column.SpawnTimeInSeconds;
 
-                _triangles.Add(a0);
-                _triangles.Add(b1);
-                _triangles.Add(b0);
-            }
+            return Mathf.Clamp01(1f - columnAgeInSeconds / _columnLifetimeInSeconds);
+        }
 
-            _mesh.Clear();
-            _mesh.SetVertices(_vertices);
-            _mesh.SetColors(_colors);
-            _mesh.SetUVs(0, _uvs);
-            _mesh.SetTriangles(_triangles, 0);
+        private Vector3 GetCenterWorldPosition(Vector3 leftEdgeWorldPosition, Vector3 rightEdgeWorldPosition)
+        {
+            return (leftEdgeWorldPosition + rightEdgeWorldPosition) * EMITTERS_MIDPOINT_WEIGHT;
         }
     }
 }

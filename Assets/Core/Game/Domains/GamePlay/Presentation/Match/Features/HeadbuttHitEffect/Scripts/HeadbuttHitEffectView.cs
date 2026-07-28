@@ -19,7 +19,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffe
 
         public async Awaitable PlayAndDespawn(CancellationTokenSource cancellationTokenSource)
         {
-            _animationCancellationTokenSource?.Cancel();
             _animationCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
             transform.localScale = _startScale;
 
@@ -32,9 +31,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffe
                 _spriteRenderer.color = color;
                 sequence.Join(_spriteRenderer.DOFade(0f, _showDuration).SetEase(Ease.InQuad));
             }
-
-            await sequence.WithCancellationSafe(_animationCancellationTokenSource.Token);
-            Despawn.Invoke();
+            
+            try
+            {
+                await sequence.WithCancellationSafe(_animationCancellationTokenSource.Token);
+            }
+            finally
+            {
+                _animationCancellationTokenSource.Dispose();
+                Despawn.Invoke();
+            }
         }
 
         public void OnCreated()

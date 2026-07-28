@@ -8,10 +8,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scr
 {
     public class FrigidBlocksControllers : IFrigidBlocksControllers
     {
+        private const string PARENT_GAME_OBJECT_NAME = "FrigidBlocksParent";
+
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly FrigidBlockPool _pool;
         private readonly Dictionary<ushort, FrigidBlockController> _controllers = new();
+        private readonly FrigidBlockTrailViewControllersCache _trailViewControllersCache = new();
         private Transform _parentTransform;
         private Mesh _blockMesh;
 
@@ -24,11 +27,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scr
 
         public void InitEntryPoint()
         {
-            _parentTransform = (new GameObject("FrigidBlocksParent")).transform;
+            _parentTransform = (new GameObject(PARENT_GAME_OBJECT_NAME)).transform;
             _pool.InitPool();
-            // Build the block quad from its collider box (matching the physics SetAsBox) so it is rendered
-            // from its collider like environment walls are. All blocks share this single mesh.
-            _blockMesh = MeshUtils.CreateRectangleMesh(_sharedGamePlayConfig.FrigidBlockSize.ToNumericsVector2());
+            _blockMesh = CreateSharedBlockMeshFromColliderSize();
+        }
+
+        public void InitExitPoint()
+        {
+            if (_parentTransform == null)
+            {
+                return;
+            }
+
+            DestroyAll();
+            _trailViewControllersCache.DestroyCachedTrailMeshes();
+            _pool.DisposePool();
+            Object.Destroy(_blockMesh);
+            _blockMesh = null;
+            Object.Destroy(_parentTransform.gameObject);
+            _parentTransform = null;
         }
 
         public void CreateFrigidBlock(ushort blockId, Vector2 position, Vector2 rotation)
@@ -38,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scr
                 return;
             }
 
-            var controller = new FrigidBlockController(blockId, _pool, _parentTransform);
+            var controller = new FrigidBlockController(blockId, _pool, _parentTransform, _trailViewControllersCache);
             controller.CreateView(position, rotation.ToQuaternion(), _blockMesh);
             _controllers.Add(blockId, controller);
         }
@@ -68,6 +85,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scr
             }
 
             _controllers.Clear();
+        }
+
+        private Mesh CreateSharedBlockMeshFromColliderSize()
+        {
+            return MeshUtils.CreateRectangleMesh(_sharedGamePlayConfig.FrigidBlockSize.ToNumericsVector2());
         }
     }
 }

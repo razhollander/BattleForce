@@ -29,10 +29,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             transform.position = new Vector3(position.x, position.y, transform.position.z);
         }
 
-        public void SetDirection(bool isDirectionRight)
+        public void SetDirectionIfDifferent(bool isDirectionRight)
         {
-            // Guard against replaying the clip every frame, which would freeze it on its first frame.
-            if (_isLookingRight == isDirectionRight)
+            var isDifferentDirection = _isLookingRight != isDirectionRight;
+            if (!isDifferentDirection)
             {
                 return;
             }

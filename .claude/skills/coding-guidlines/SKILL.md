@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Supersonic Genesis code-review conventions and architecture rules.
+description: code-review conventions and architecture rules.
 ---
 ## **ENTRY POINTS**
 

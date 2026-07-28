@@ -228,7 +228,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetFishingRodStickDirection(bool isDirectionRight)
         {
-            _fishingRodStickView.SetDirection(isDirectionRight);
+            _fishingRodStickView.SetDirectionIfDifferent(isDirectionRight);
         }
 
         public Vector2 GetFishingRodTipPivotPosition()
@@ -286,6 +286,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void OnCreated()
         {
             _playerEyesView.OnCreated();
+            _headbuttChargeEffectView.OnCreated();
             Base.OnCreated();
         }
 

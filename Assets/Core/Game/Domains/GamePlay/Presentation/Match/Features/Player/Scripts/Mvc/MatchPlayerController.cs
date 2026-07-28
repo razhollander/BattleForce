@@ -148,9 +148,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetFrozenState(bool isFrozenActive)
         {
             _playerView.SetFrozenState(isFrozenActive);
-
-            // Freeze the tail in its exact wave pose for the duration; it resumes animating when the talent ends.
-            _playerView.Base.SetIsTailFrozen(isFrozenActive);
         }
 
         public void SetOnLavaEffectState(bool isExposedToLava)
@@ -306,9 +303,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var decay = _gamePlayConfig.ExponentialDecay;
             var aimDirection = playerModel.Spaceship.TalentsState.AimDirection;
             _playerView.Base.InterpolateTransform(playerPosition, playerRotation, decay);
-            _playerView.Base.UpdateTailBend();
             UpdateAim(playerModel.Spaceship.AssistArrowType, aimDirection, decay);
-
+            var isPlayerFrozen = false;
             if (playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent))
             {
                 if(selectedTalent is {TalentType: TalentType.Umbrella, IsCurrentlyActive: true})
@@ -319,6 +315,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 {
                     _playerView.InterpolateWaterGunRotation(aimDirection, decay);
                 }
+
+                isPlayerFrozen = selectedTalent is {TalentType: TalentType.Frozen, IsCurrentlyActive: true};
+            }
+            
+            if (!isPlayerFrozen)
+            {
+                _playerView.Base.UpdateTailBend();
             }
 
             UpdateLeaderFlagAccordingToDirection(playerTransformState.Direction);

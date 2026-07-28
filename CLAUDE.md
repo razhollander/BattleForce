@@ -25,7 +25,7 @@ Core/Game/Domains/GamePlay/
 
 ## Simulation domain
 
-**Entry point:** `Simulation/Match/Scripts/Initiator/ServerMatchEntryPointCommand.cs`  
+**Entry point:** `Simulation/Match/Scripts/Initiator/ServerMatchEntryPointCommand.cs`
 **Tick driver:** `Simulation/Match/Scripts/NetworkManager/TickHandlers/ServerMatchNetworkTickProcessor.cs`
 
 Zero grabage allocation. Allocate all the data needed in advance inside entry points and not during the gameplay.
@@ -52,7 +52,7 @@ Each tick the server:
 
 ## Presentation domain
 
-**Entry point:** `Presentation/Match/Scripts/TickProcessor/ClientMatchPresentationTickProcessor.cs`  
+**Entry point:** `Presentation/Match/Scripts/TickProcessor/ClientMatchPresentationTickProcessor.cs`. Or use the InitEntry/ExitPoints of the framework. No Update/OnDestroy/Awake/Etc.
 **Tick driver:** `ManagedUpdate()` on that class, called by Unity's update loop each frame
 
 Each frame the client:
@@ -109,6 +109,17 @@ To add a new talent (which defines its own events): use the `/add-talent` skill.
 | `ConcurrentPool<T>` | Thread-safe object pool — used by `NetEventsDataService` for per-client event lists |
 
 All network types implement `INetSerializable` with `Serialize(NetDataWriter)` / `Deserialize(NetDataReader)`.
+
+---
+
+### NAMING CONVENTIONS
+
+* **Prefixes:** `I`Interface, Enum`Type`, `_`privateField, `On`EventHandler, `Try`Method (if early exit).  
+* **Suffixes:** `Event` (for Events). Append the data structure type (e.g., `OffersDictionary`, `EnemyArray`, `WindowPrefab AnimationCancellationToken`). `Coroutine` (for Unity Coroutines). `Async` (For Task/UniTask).   
+* **Casing:** `ALL_CAPS` (Constants), `PascalCase` (Properties/Enums), `camelCase` (Locals).  
+* **Booleans:** Prefix with question words (`is`, `can`, `has`).  
+* **Specificity:** No abbreviations (`Pref`, `GO`, `Pos`). Include time units in names (e.g., `cooldownInSeconds`).  
+* **Comments:** Code must self-document via long/clear names. Avoid comments, if you have no choice then use Comments to explain *why*, not *what*.
 
 ---
 
