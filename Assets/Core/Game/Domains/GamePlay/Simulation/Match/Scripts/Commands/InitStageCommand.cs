@@ -187,6 +187,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 player.Spaceship.Transform.Position = position;
                 player.Spaceship.Transform.Direction = direction;
                 player.Spaceship.Transform.Velocity = velocity;
+                player.Spaceship.Transform.AngularVelocity = 0;
                 player.Spaceship.Transform.Radius = radius;
                 player.Spaceship.IsEngineOn = true;
                 player.Spaceship.IsAlive = true;
