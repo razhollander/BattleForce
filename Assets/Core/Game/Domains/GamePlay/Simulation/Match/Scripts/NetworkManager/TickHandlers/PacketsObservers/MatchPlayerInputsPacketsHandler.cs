@@ -163,9 +163,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                         LogService.LogError("Player try to cheat and send inputs of different player! ClientId: " + clientId + " PlayerId: " + playerId + "");
                         continue;
                     }
-
-                    // Testing only: overwrite the real client input with fabricated "dumb player" input.
-                    if (_gamePlayConfigService.GamePlayConfig.RandomPlayersInput)
+                    
+                    if (_gamePlayConfigService.GamePlayConfig.TestWithRandomPlayersInput)
                     {
                         _randomPlayersInputService.ApplyRandomInput(ref playerInput);
                     }
@@ -175,20 +174,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     bool isTalentAInputPressed = playerInput.IsTalentAInputPressed;
                     bool isTalentBInputPressed = playerInput.IsTalentBInputPressed;
                     bool isTalentCInputPressed = playerInput.IsTalentCInputPressed;
-
-                    // While frozen every input is ignored except pressing the Frozen talent again (which cancels it).
-                    // We still feed the talent inputs into the input service so the talent controller can detect that
-                    // second press, but skip shooting, aiming, movement, talent switching and power-ups entirely.
-                    var isFrozen = playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent)
-                                   && selectedTalent is {IsCurrentlyActive: true, TalentType: TalentType.Frozen};
-                    if (isFrozen)
-                    {
-                        _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentAInput, isTalentAInputPressed);
-                        _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentBInput, isTalentBInputPressed);
-                        _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentCInput, isTalentCInputPressed);
-                        ProcessPlayerTalentInput(processedTick, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, playerState, deltaTime);
-                        continue;
-                    }
 
                     UpdatePlayerShoot(processedTick, playerInput.IsShootInputPressed, playerState);
 
@@ -213,13 +198,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private void ProcessPlayerPowerUpInput(int processedTick, PlayerStateS2C playerState)
         {
             var playerId = playerState.Id;
-
-            // While in Rock state the player can't perform any power-up.
-            // if (_matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.Rock))
-            // {
-            //     return;
-            // }
-
             var wasPowerUpInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.PowerUpInput);
             _playersPowerUpsManager.ProcessPowerUpInput(playerId, processedTick, wasPowerUpInputDownThisTick);
         }
@@ -364,7 +342,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private void UpdatePlayerDirection(MatchLocalPlayerInputDataC2S playerInputData, PlayerStateS2C playerState)
         {
             if (playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) && selectedTalent.IsCurrentlyAiming
-                || selectedTalent is {TalentType: TalentType.Umbrella, IsCurrentlyActive: true} || selectedTalent is {TalentType: TalentType.Rock, IsCurrentlyActive: true})
+                || selectedTalent is {TalentType: TalentType.Umbrella, IsCurrentlyActive: true} || selectedTalent is {TalentType: TalentType.Rock, IsCurrentlyActive: true}
+                || selectedTalent is {TalentType: TalentType.Frozen, IsCurrentlyActive: true})
             {
                 return;
             }

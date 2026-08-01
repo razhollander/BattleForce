@@ -29,10 +29,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scri
             _pool.InitPool();
         }
 
-        public void CreateFishingRodTip(ushort tipId, Vector2 position, Vector2 rotation, Vector2 casterPosition, FishingRodTipPhase phase)
+        public void CreateFishingRodTip(ushort tipId, Vector2 position, Vector2 rotation, Vector2 lineStartPosition, FishingRodTipPhase phase)
         {
             var controller = new FishingRodTipController(tipId, _pool, _parentTransform, _audioService);
-            controller.CreateView(position, rotation.ToQuaternion(), casterPosition, phase);
+            controller.CreateView(position, rotation.ToQuaternion(), lineStartPosition, phase);
             _controllers[tipId] = controller;
         }
 

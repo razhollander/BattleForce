@@ -15,6 +15,7 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
@@ -40,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         private IPlayersTalentsManager _playersTalentsManager;
         private IPlayersPowerUpsManager _playersPowerUpsManager;
-        private FrigidBlock.IFrigidBlocksController _frigidBlocksController;
+        private IFrigidBlocksController _frigidBlocksController;
         private ICommandFactory _commandFactory;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
         private TryAddARandomTalentForPlayerCommand _tryAddARandomTalentForPlayerCommand;
@@ -64,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _playersPowerUpsManager = _diContainer.Resolve<IPlayersPowerUpsManager>();
-            _frigidBlocksController = _diContainer.Resolve<FrigidBlock.IFrigidBlocksController>();
+            _frigidBlocksController = _diContainer.Resolve<IFrigidBlocksController>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
             _tryAddARandomTalentForPlayerCommand = _commandFactory.CreateCommandVoid<TryAddARandomTalentForPlayerCommand>();

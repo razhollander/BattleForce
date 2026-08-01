@@ -104,7 +104,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return TryFindAvailableSpawnPointPosition(spawnPoints, mapSizeMultiplier, powerUpsRadius, out position);
             }
 
-            return TryFindAvailableRandomPosition(mapSizeMultiplier, powerUpsRadius, out position);
+            LogService.LogError("No spawn points found in match environment config data service, trying to find random position");
+            return TryFindAvailableRandomPositionInEnvironmentBoundries(mapSizeMultiplier, powerUpsRadius, out position);
         }
 
         private bool TryFindAvailableSpawnPointPosition(PowerUpSpawnPointConfig[] spawnPoints, float mapSizeMultiplier, float powerUpsRadius, out Vector2 position)
@@ -127,7 +128,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             return false;
         }
 
-        private bool TryFindAvailableRandomPosition(float mapSizeMultiplier, float powerUpsRadius, out Vector2 position)
+        private bool TryFindAvailableRandomPositionInEnvironmentBoundries(float mapSizeMultiplier, float powerUpsRadius, out Vector2 position)
         {
             position = Vector2.Zero;
             var maxAttempts = MAX_ATTEMPTS_TO_FIND_FREE_SPAWN_POSITION;

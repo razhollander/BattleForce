@@ -16,7 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
         private readonly INetEventsDataService _netEventsDataService;
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly TrySpinPlayerCommand _trySpinPlayerCommand;
-        private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
+        private readonly TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private ushort _casterPlayerId;
 
         public PowerUpType PowerUpType => PowerUpType.Nuke;
@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             _netEventsDataService = netEventsDataService;
             _gamePlayConfigService = gamePlayConfigService;
             _trySpinPlayerCommand = commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
-            _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -63,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
                 var dir = playerState.Spaceship.Transform.Position - casterPosition;
                 var isAtSamePosition = dir.LengthSquared() == 0f;
                 var pushDirection = isAtSamePosition ? RNG.NextFloat(0f, 360f).AngleToVector() : dir.NormalizeSafe();
-                _addForceToPlayerCommand.SetPlayerId(playerState.Id).SetForce(pushDirection * nukeForce).ShouldTurnOffEngine(false).Execute();
+                _tryAddForceToPlayerCommand.SetPlayerId(playerState.Id).SetForce(pushDirection * nukeForce).ShouldTurnOffEngine(false).Execute();
             }
 
             _netEventsDataService.AddActivateNukePowerUpNetEvent(tick, _casterPlayerId, casterPosition);

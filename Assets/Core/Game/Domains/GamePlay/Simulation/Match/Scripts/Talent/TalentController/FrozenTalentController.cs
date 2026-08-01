@@ -11,12 +11,6 @@ using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
-    // Frozen turns the caster into an inert, invulnerable block that keeps whatever velocity/spin it had:
-    // it takes no damage, ignores lava, doesn't decelerate, has its engine off, ignores all inputs (except a
-    // second talent press) and can only change its facing through the physical result of its angular velocity.
-    // Most of those rules live in the systems that own them (see PlayerHitCommand, PlayersDecelerationLogic,
-    // PlayersEngineLogic, TrySpinPlayerCommand, ProcessCachedCollisionsCommand, MatchPlayerInputsPacketsHandler,
-    // StepTimersCommand); they all key off GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.Frozen).
     public class FrozenTalentController : ITalentController
     {
         private ushort _casterPlayerId;
@@ -66,8 +60,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             {
                 return;
             }
-
-            // A second press cancels the talent early (this is the only input honored while frozen).
+            
             if (IsCurrentlyActive)
             {
                 DeactivateTalent(tick);
@@ -87,13 +80,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             IsCurrentlyActive = true;
             _startTick = tick;
-
-            // The engine is turned off but motion is intentionally NOT stopped: a frozen ship keeps sliding/spinning.
             casterPlayerState.Spaceship.IsEngineOn = false;
 
             _netEventsDataService.AddActivateFrozenTalentNetEvent(tick, _casterPlayerId);
-
-            // Frozen grants lava immunity: if the player activated it while standing in lava, stop the exposed state.
             _updatePlayerLavaExposureCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
         }
 
@@ -103,10 +92,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             {
                 return;
             }
-
-            // Keep the engine off for the whole duration; the deceleration/engine systems leave a frozen player alone.
-            _matchDataService.SimulationState.GetPlayerById(_casterPlayerId).Spaceship.IsEngineOn = false;
-
+            
             var elapsedSeconds = (tick - _startTick) * deltaTime;
             if (elapsedSeconds >= _gamePlayConfigService.GamePlayConfig.Talents.FrozenTalentConfig.DurationInSeconds)
             {
@@ -148,8 +134,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             _netEventsDataService.AddDeactivateFrozenTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);
             _playersInLavaTrackerService.TryResetPlayerTimePassedSinceLastDamageTaken(_casterPlayerId);
-
-            // Immunity ends with Frozen: if the player is still in lava, resume the exposed state.
+            
             _updatePlayerLavaExposureCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
         }
 

@@ -19,21 +19,21 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)Id);
-            writer.Put(PlayerCasterId);
+            writer.Put(Id);
+            writer.Put((byte)PlayerCasterId);
             writer.PutVector2Quantized(Position);
             writer.Put((byte)Phase);
-            writer.Put(CaughtEnemyId);
+            writer.Put((byte)CaughtEnemyId);
             writer.PutVector2Quantized(EnemyCaughtArrowDirection);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            Id = reader.GetByte();
-            PlayerCasterId = reader.GetUShort();
+            Id = reader.GetUShort();
+            PlayerCasterId = reader.GetByte();
             Position = reader.GetVector2Quantized();
             Phase = (FishingRodTipPhase)reader.GetByte();
-            CaughtEnemyId = reader.GetUShort();
+            CaughtEnemyId = reader.GetByte();
             EnemyCaughtArrowDirection = reader.GetVector2Quantized();
         }
 

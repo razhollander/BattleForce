@@ -15,14 +15,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchPlayerControllers _playerControllers;
         private IAudioService _audioService;
 
-        private IMatchDataService _matchDataService;
-
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _hookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
-            _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _audioService = _diContainer.Resolve<IAudioService>();
         }
 

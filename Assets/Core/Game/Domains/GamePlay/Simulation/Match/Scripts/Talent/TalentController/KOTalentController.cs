@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
         private readonly ICommandFactory _commandFactory;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
-        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
         public TalentType TalentType => TalentType.KO;
         private bool IsCurrentlyActive
@@ -71,7 +71,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         public void InitEntryPoint()
         {
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
-            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -195,7 +195,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 .SetSpinAmount(randomSpin)
                 .SetTick(tick)
                 .Execute();
-            _addForceToPlayerCommand.SetForce(pushForce).SetPlayerId(enemyPlayerId).ShouldTurnOffEngine(true).Execute();
+            _tryAddForceToPlayerCommand.SetForce(pushForce).SetPlayerId(enemyPlayerId).ShouldTurnOffEngine(true).Execute();
             _netEventsDataService.AddKOProjectHitPlayerNetEvent(tick, _projectileId, enemyPlayerState.Id, projectile.Position);
             StartReturnPhase();
         }

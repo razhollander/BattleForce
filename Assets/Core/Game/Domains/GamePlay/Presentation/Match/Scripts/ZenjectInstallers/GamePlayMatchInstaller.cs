@@ -137,7 +137,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<KOProjectilesControllers>().AsSingle().WithArguments(_koProjectileViewPrefab).NonLazy();
             Container.BindInterfacesTo<GrapplingHookProjectilesControllers>().AsSingle().WithArguments(_grapplingHookProjectileViewPrefab).NonLazy();
             Container.BindInterfacesTo<FishingRodTipControllers>().AsSingle().WithArguments(_fishingRodTipViewPrefab).NonLazy();
-            Container.BindInterfacesTo<SecondCastEffectController>().AsSingle().WithArguments(_secondCastAimArrowViewPrefab).NonLazy();
+            Container.BindInterfacesTo<SecondCastAimArrowControllers>().AsSingle().WithArguments(_secondCastAimArrowViewPrefab).NonLazy();
             Container.BindInterfacesTo<SoulGhostControllers>().AsSingle().WithArguments(_soulGhostViewPrefab).NonLazy();
             Container.BindInterfacesTo<FrigidBlocksControllers>().AsSingle().WithArguments(_frigidBlockViewPrefab).NonLazy();
             Container.BindInterfacesTo<DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();

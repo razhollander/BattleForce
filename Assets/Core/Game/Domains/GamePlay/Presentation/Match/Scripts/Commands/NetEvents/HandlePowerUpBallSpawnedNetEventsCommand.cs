@@ -1,4 +1,3 @@
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Services.AudioService;
@@ -8,15 +7,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 {
     public class HandlePowerUpBallSpawnedNetEventsCommand  : BaseCommand, ICommandVoid
     {
-        private IPowerUpBallControllers _powerUpBallControllers;
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IAudioService _audioService;
+        private ICommandFactory _commandFactory;
+        private CreatePowerUpBallCommand _createPowerUpBallCommand;
 
         public override void ResolveDependencies()
         {
-            _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _audioService = _diContainer.Resolve<IAudioService>();
+            _commandFactory = _diContainer.Resolve<ICommandFactory>();
+            _createPowerUpBallCommand = _commandFactory.CreateCommandVoid<CreatePowerUpBallCommand>();
         }
 
         public void Execute()
@@ -30,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var powerUpBallsSpawnEvent in powerUpBallsSpawnEvents)
             {
                 var powerUpBallId = powerUpBallsSpawnEvent.PowerUpBallId;
-                _powerUpBallControllers.CreatePowerUpBall(powerUpBallId, powerUpBallsSpawnEvent.Position.ToUnityVector2());
+                _createPowerUpBallCommand.SetPowerUpBallId(powerUpBallId).SetPosition(powerUpBallsSpawnEvent.Position.ToUnityVector2()).Execute();
             }
             _audioService.PlayAudio(AudioClipType.PowerUpBallSpawned);
             powerUpBallsSpawnEvents.Clear();

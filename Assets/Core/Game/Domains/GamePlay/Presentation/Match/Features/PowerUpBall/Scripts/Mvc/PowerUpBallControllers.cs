@@ -35,16 +35,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
             var controller = new PowerUpBallController(powerUpBallId, _matchDataService, _pool, _parent);
             controller.CreateView(position);
             _controllers.Add(controller);
-
-            if (!_matchDataService.IsInShowoffWinners)
-            {
-                _worldCameraController.AddFollowTarget(controller.GetTransform());
-            }
         }
 
         public Vector2 GetPowerUpBallPosition(ushort powerUpBallId)
         {
             return GetController(powerUpBallId).GetPosition();
+        }
+
+        public Transform GetPowerUpBallTransform(ushort powerUpBallId)
+        {
+            return GetController(powerUpBallId).GetTransform();
         }
 
         public void DestroyPowerUpBall(ushort cardId)

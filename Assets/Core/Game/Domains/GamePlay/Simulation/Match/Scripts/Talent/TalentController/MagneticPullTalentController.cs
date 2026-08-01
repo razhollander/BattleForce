@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
-        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private readonly ICommandFactory _commandFactory;
 
         public TalentType TalentType => TalentType.MagneticPull;
@@ -56,7 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         public void InitEntryPoint()
         {
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
-            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -127,7 +127,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var forceToEnemy = -directionToEnemy * pullForce;
             var randomSpin = RNG.NextFloat(config.MinSpin, config.MaxSpin);
             _trySpinPlayerCommand.SetPlayer(hitEnemyPlayer.Id).SetSpinAmount(randomSpin).SetTick(tick).Execute();
-            _addForceToPlayerCommand.SetForce(forceToEnemy).SetPlayerId(enemyId).ShouldTurnOffEngine(true).Execute();
+            _tryAddForceToPlayerCommand.SetForce(forceToEnemy).SetPlayerId(enemyId).ShouldTurnOffEngine(true).Execute();
         }
 
         public void StopIfActive(int tick)

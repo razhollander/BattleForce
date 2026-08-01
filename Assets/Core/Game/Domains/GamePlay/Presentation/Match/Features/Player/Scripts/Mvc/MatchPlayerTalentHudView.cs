@@ -23,9 +23,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private Color _cooldownOverlayColorWhenOnCooldown = Color.black;
         [SerializeField] private GameObject _activeEffect;
 
-        public void SetActiveEffect(bool isActive)
+        public void SetIsActiveEffectShown(bool isShown)
         {
-            _activeEffect.TrySetActive(isActive);
+            _activeEffect.TrySetActive(isShown);
         }
 
         public void SetNoneTalent()
@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _talentImage.sprite = _noneTalentSprite;
             _canvasGroup.alpha = 0.5f;
             _cooldownText.gameObject.SetActive(false);
-            SetActiveEffect(false);
+            SetIsActiveEffectShown(false);
         }
 
         public void SetStocksAmount(int amount)

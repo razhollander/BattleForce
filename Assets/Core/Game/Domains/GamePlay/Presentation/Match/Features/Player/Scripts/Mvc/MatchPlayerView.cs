@@ -191,12 +191,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerEyesView.SetHeadbuttActive(false);
         }
 
-        public void OnHeadbuttTalentDeactivated()
-        {
-            // The helmet stays on for the whole charge + dash and is hidden when the talent deactivates.
-            HideHeadbuttHelmet();
-        }
-
         public void SetWaterGunState(bool isOn)
         {
             if (isOn)
@@ -221,9 +215,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
         }
 
-        public void SetFishingRodStickPosition(Vector2 position)
+        public void RefreshFishingRodStickPosition()
         {
-            _fishingRodStickView.SetPosition(position);
+            _fishingRodStickView.SetPosition(FishingRodPivot.position);
         }
 
         public void SetFishingRodStickDirection(bool isDirectionRight)
@@ -316,7 +310,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 return;
             }
 
-            _waterGunStreamView.UpdateStream(aimDirection, decay);
+            _waterGunStreamView.UpdateStreamRotation(aimDirection, decay);
         }
 
 

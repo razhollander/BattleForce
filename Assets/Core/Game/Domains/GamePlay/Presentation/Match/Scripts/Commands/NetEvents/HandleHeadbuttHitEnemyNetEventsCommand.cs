@@ -37,8 +37,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var casterPosition = _playerControllers.GetPlayerPosition(hitEvent.CasterPlayerId);
                 var enemyPosition = _playerControllers.GetPlayerPosition(hitEvent.EnemyPlayerId);
-                var hitPosition = (casterPosition + enemyPosition) * 0.5f;
-                _headbuttHitEffectController.PlayEffect(hitPosition);
+                var middlePointBetweenCasterAndEnemy = (casterPosition + enemyPosition) * 0.5f;
+                _headbuttHitEffectController.PlayEffect(middlePointBetweenCasterAndEnemy);
                 _playerControllers.HidePlayerHeadbuttHelmet(hitEvent.CasterPlayerId);
             }
             

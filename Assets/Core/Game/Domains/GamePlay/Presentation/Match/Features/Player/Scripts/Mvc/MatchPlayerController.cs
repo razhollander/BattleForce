@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private int? _currentPowerupGrantingAudioId;
         private int? _headbuttChargeLoopAudioId;
         private int? _waterGunLoopAudioId;
-        private bool _isFlagActive;
+        private bool _isLeaderFlagActive;
         private bool _isFishingRodStickActive;
 
         public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
@@ -116,7 +116,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
             if (isActive)
             {
-                UpdateFishingRodStickPosition();
+                RefreshFishingRodStickPosition();
             }
         }
 
@@ -132,11 +132,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerView.SetFishingRodStickDirection(isDirectionRight);
         }
 
-        private void UpdateFishingRodStickPosition()
+        private void RefreshFishingRodStickPosition()
         {
             if (_isFishingRodStickActive)
             {
-                _playerView.SetFishingRodStickPosition(_playerView.FishingRodPivot.position);
+                _playerView.RefreshFishingRodStickPosition();
             }
         }
 
@@ -277,7 +277,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void OnHeadbuttTalentDeactivated()
         {
-            _playerView.OnHeadbuttTalentDeactivated();
+            _playerView.HideHeadbuttHelmet();
         }
         
         public void SetSelectedTalent(int talentIndex)
@@ -324,8 +324,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 _playerView.Base.UpdateTailBend();
             }
 
-            UpdateLeaderFlagAccordingToDirection(playerTransformState.Direction);
-            UpdateFishingRodStickPosition();
+            TryUpdateLeaderFlagAccordingToDirection(playerTransformState.Direction);
+            RefreshFishingRodStickPosition();
         }
 
         private void UpdateAim(PlayerAssistArrowType arrowType, Vector2 aimDirection, float decay)
@@ -457,17 +457,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetTransform(Vector2 position, Vector2 direction)
         {
             _playerView.Base.SetPositionAndRotation(position.ToUnityVector2(), direction.ToUnityVector2().ToQuaternion());
-            UpdateLeaderFlagAccordingToDirection(direction);
-            UpdateFishingRodStickPosition();
+            TryUpdateLeaderFlagAccordingToDirection(direction);
+            RefreshFishingRodStickPosition();
         }
 
-        private void UpdateLeaderFlagAccordingToDirection(Vector2 direction)
+        private void TryUpdateLeaderFlagAccordingToDirection(Vector2 direction)
         {
-            if (_isFlagActive)
+            if (!_isLeaderFlagActive)
             {
-                var isDirectionRight = direction.ToUnityVector2().x > 0;
-                _playerView.UpdateLeaderFlag(isDirectionRight, _playerView.LeaderFlagPivot.position);
+                return;
             }
+
+            var isDirectionRight = direction.ToUnityVector2().x > 0;
+            _playerView.UpdateLeaderFlag(isDirectionRight, _playerView.LeaderFlagPivot.position);
         }
 
         public UnityEngine.Vector2 GetPosition()
@@ -597,7 +599,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void SetIsLeader(bool isLeader)
         {
-            _isFlagActive = isLeader;
+            _isLeaderFlagActive = isLeader;
             _playerView.SetIsLeader(isLeader);
         }
     }

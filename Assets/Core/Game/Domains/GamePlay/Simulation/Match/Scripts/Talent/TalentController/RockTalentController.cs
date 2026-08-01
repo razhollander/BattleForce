@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
         private readonly ICommandFactory _commandFactory;
         private readonly IPlayersInLavaTrackerService _playersInLavaTrackerService;
-        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private UpdatePlayerLavaExposureCommand _updatePlayerLavaExposureCommand;
 
@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void InitEntryPoint()
         {
-            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _updatePlayerLavaExposureCommand = _commandFactory.CreateCommandVoid<UpdatePlayerLavaExposureCommand>();
         }
@@ -102,8 +102,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             casterSpaceship.IsSpinned = false;
             _netEventsDataService.AddPlayerSpinnedEndedNetEvent(tick, _casterPlayerId);
             _netEventsDataService.AddActivateRockTalentNetEvent(tick, _casterPlayerId);
-
-            // Rock grants lava immunity: if the player activated it while standing in lava, stop the exposed state.
             _updatePlayerLavaExposureCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
         }
 
@@ -128,7 +126,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 }
 
                 var pushDirection = toEnemy.NormalizeSafe();
-                _addForceToPlayerCommand.SetPlayerId(enemyPlayerState.Id).SetForce(pushDirection * config.EnemyPushForce).ShouldTurnOffEngine(true).Execute();
+                _tryAddForceToPlayerCommand.SetPlayerId(enemyPlayerState.Id).SetForce(pushDirection * config.EnemyPushForce).ShouldTurnOffEngine(true).Execute();
                 _trySpinPlayerCommand.SetPlayer(enemyPlayerState.Id).SetSpinAmount(config.EnemySpinAmount).SetTick(tick).Execute();
             }
         }
@@ -140,14 +138,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            // The rock can't move or be pushed/spun for any reason. We zero its motion every tick; a rotating wall
-            // still displaces it via the physics position solver (which writes back Position), but nothing else can.
-            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            casterPlayerState.Spaceship.IsEngineOn = false;
-            casterPlayerState.Spaceship.Transform.StopMotion();
-
-            var elapsedSeconds = (tick - _startTick) * deltaTime;
-            if (elapsedSeconds >= _gamePlayConfigService.GamePlayConfig.Talents.RockTalentConfig.DurationInSeconds)
+            var elapsedSecondsBeingRock = (tick - _startTick) * deltaTime;
+            var didRockDurationFinish = elapsedSecondsBeingRock >= _gamePlayConfigService.GamePlayConfig.Talents.RockTalentConfig.DurationInSeconds;
+            if (didRockDurationFinish)
             {
                 DeactivateTalent(tick);
             }

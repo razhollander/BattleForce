@@ -6,10 +6,6 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    // Single source of truth for a player's lava-exposure state (the burning visual + damage flag).
-    // A player is exposed while physically in lava AND not in Rock state. Rock makes the player immune,
-    // so it must not show as exposed. This reconciles that rule regardless of what changed (entering/leaving
-    // lava, or Rock toggling on/off) and only emits a net event when the state actually flips.
     public class UpdatePlayerLavaExposureCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;

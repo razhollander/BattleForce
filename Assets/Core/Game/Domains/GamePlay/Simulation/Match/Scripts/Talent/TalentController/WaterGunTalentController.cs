@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly ICommandFactory _commandFactory;
-        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
         private ushort _casterPlayerId;
         private int _startTick;
@@ -48,7 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void InitEntryPoint()
         {
-            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -120,10 +120,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             if (didHitEnemy)
             {
-                _addForceToPlayerCommand.SetPlayerId(hitBodyData.Id).SetForce(aimDirection * config.EnemyPushForcePerTick * deltaTime).ShouldTurnOffEngine(false).Execute();
+                _tryAddForceToPlayerCommand.SetPlayerId(hitBodyData.Id).SetForce(aimDirection * config.EnemyPushForcePerTick * deltaTime).ShouldTurnOffEngine(false).Execute();
             }
 
-            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(-aimDirection * config.CasterRecoilForcePerTick * deltaTime).ShouldTurnOffEngine(false).Execute();
+            _tryAddForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(-aimDirection * config.CasterRecoilForcePerTick * deltaTime).ShouldTurnOffEngine(false).Execute();
         }
 
         private void DeactivateTalent(int tick)

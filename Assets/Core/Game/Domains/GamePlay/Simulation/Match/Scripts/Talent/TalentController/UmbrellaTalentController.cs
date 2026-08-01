@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IMatchDataService _matchDataService;
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly NetworkConfig _networkConfig;
-        private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
+        private readonly TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         
         private ushort _casterPlayerId;
         private int _startTick;
@@ -54,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _matchDataService = matchDataService;
             _gamePlayConfigService = gamePlayConfigService;
             _networkConfig = networkConfig;
-            _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -135,7 +135,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
             var force = aimDirection * _gamePlayConfigService.GamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick * deltaTime;
-            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
+            _tryAddForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
         }
 
         private void DeactivateTalent(int tick)

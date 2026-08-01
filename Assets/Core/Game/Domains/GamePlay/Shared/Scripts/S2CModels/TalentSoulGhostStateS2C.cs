@@ -16,16 +16,16 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)Id);
-            writer.Put(PlayerCasterId);
+            writer.Put(Id);
+            writer.Put((byte)PlayerCasterId);
             writer.PutVector2Quantized(Position);
             writer.PutVector2AsAngle16(Direction);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            Id = reader.GetByte();
-            PlayerCasterId = reader.GetUShort();
+            Id = reader.GetUShort();
+            PlayerCasterId = reader.GetByte();
             Position = reader.GetVector2Quantized();
             Direction = reader.GetVector2FromAngle16();
         }

@@ -51,8 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
             {
                 return;
             }
-
-            // A frozen player's engine stays off for the whole duration.
+            
             var isPlayerFrozen = selectedTalent is {TalentType: TalentType.Frozen, IsCurrentlyActive: true};
             if (isPlayerFrozen)
             {
@@ -89,20 +88,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
             var newSpeed = Mathf.Clamp(velocityLength, 0, targetMovementSpeed);
             transformState.Velocity = transformState.Velocity / velocityLength * newSpeed;
             playerSpaceshipState.Transform = transformState;
-            
-            // var transformState = playerSpaceshipState.Transform;
-            // var targetMovementSpeed = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
-            // var lookDirection = transformState.Direction;
-            // var currentForwardSpeed = System.Numerics.Vector2.Dot(transformState.Velocity, lookDirection);
-            // var isBelowTargetMovementSpeed = currentForwardSpeed < targetMovementSpeed;
-            // if (!isBelowTargetMovementSpeed)
-            // {
-            //     return;
-            // }
-            //
-            // var engineForce = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.EngineAcceleration * deltaTIme * lookDirection;
-            // transformState.Velocity += engineForce;
-            // playerSpaceshipState.Transform = transformState;
         }
     }
 }

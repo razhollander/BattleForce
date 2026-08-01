@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IFishingRodTipControllers _fishingRodTipControllers;
-        private ISecondCastEffectController _secondCastEffectController;
+        private ISecondCastAimArrowControllers _secondCastAimArrowControllers;
         private IMatchDataService _matchDataService;
         private IMatchPlayerControllers _playerControllers;
 
@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
-            _secondCastEffectController = _diContainer.Resolve<ISecondCastEffectController>();
+            _secondCastAimArrowControllers = _diContainer.Resolve<ISecondCastAimArrowControllers>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
         }
@@ -35,9 +35,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in events)
             {
-                // The projectile is gone, so remove its throw-aim arrow (if any) along with the tip.
-                // Destroying the tip also stops its reel loop SFX.
-                _secondCastEffectController.RemoveArrow(netEvent.ProjectileId);
+                // Deactivating is the only way a tip stops holding a caught enemy, so it is also the only place the
+                // throw-aim arrow needs removing. Tips that never caught an enemy have no arrow.
+                _secondCastAimArrowControllers.TryRemoveArrow(netEvent.ProjectileId);
                 _fishingRodTipControllers.DestroyFishingRodTip(netEvent.ProjectileId);
                 _matchDataService.RemoveFishingRodTip(netEvent.ProjectileId);
                 _playerControllers.SetPlayerFishingRodStickState(netEvent.CasterPlayerId, false);

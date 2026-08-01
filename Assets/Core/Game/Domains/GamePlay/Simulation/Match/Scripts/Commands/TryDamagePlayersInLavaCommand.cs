@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         
         private int _processedTick;
-        private PlayerHitCommand _playerHitCommand;
+        private TryHitPlayerCommand _tryHitPlayerCommand;
 
         public TryDamagePlayersInLavaCommand SetProcessedTick(int processedTick)
         {
@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
-            _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
+            _tryHitPlayerCommand = _commandFactory.CreateCommandVoid<TryHitPlayerCommand>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
         }
 
@@ -35,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             foreach (var playerId in playerIdsToDamage)
             {
                 _playersInLavaTrackerService.TryResetPlayerTimePassedSinceLastDamageTaken(playerId);
-                _playerHitCommand
+                _tryHitPlayerCommand
                     .SetPlayerIdGotHit(playerId)
                     .SetWasHitByAnotherPlayer(false)
                     .SetProcessedTick(_processedTick)

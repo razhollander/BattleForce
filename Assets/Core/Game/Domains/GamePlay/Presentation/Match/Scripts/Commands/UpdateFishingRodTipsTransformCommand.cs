@@ -11,14 +11,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
     public class UpdateFishingRodTipsTransformCommand : BaseCommand, ICommandVoid
     {
         private IFishingRodTipControllers _tipControllers;
-        private ISecondCastEffectController _secondCastEffectController;
+        private ISecondCastAimArrowControllers _secondCastAimArrowControllers;
         private IMatchPlayerControllers _playerControllers;
         private IMatchDataService _matchDataService;
 
         public override void ResolveDependencies()
         {
             _tipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
-            _secondCastEffectController = _diContainer.Resolve<ISecondCastEffectController>();
+            _secondCastAimArrowControllers = _diContainer.Resolve<ISecondCastAimArrowControllers>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
         }
@@ -30,21 +30,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 var casterPosition = _playerControllers.GetPlayerPosition(tipModel.CasterPlayerId);
                 var directionFromCaster = tipModel.Position - casterPosition;
                 var rotation = directionFromCaster.ToQuaternion();
-                // The rod looks toward whichever side the projectile currently sits relative to the caster.
-                _playerControllers.SetPlayerFishingRodStickDirection(tipModel.CasterPlayerId, directionFromCaster.x > 0);
-                // The fishing line starts from the stick's tip pivot rather than the caster's centre.
+                var shouldRodLookRight = directionFromCaster.x > 0;
+                _playerControllers.SetPlayerFishingRodStickDirection(tipModel.CasterPlayerId, shouldRodLookRight);
+                
                 var lineStartPosition = _playerControllers.GetPlayerFishingRodTipPivotPosition(tipModel.CasterPlayerId);
                 _tipControllers.InterpolateFishingRodTipTransform(tipModel.Id, tipModel.Position, rotation, lineStartPosition);
 
-                // The throw-aim arrow is only shown while the tip holds a caught enemy; it sits on that enemy (the tip
-                // position) and points along the throw direction.
                 if (tipModel.Phase == FishingRodTipPhase.CaughtEnemy)
                 {
-                    _secondCastEffectController.SetArrow(tipModel.Id, tipModel.Position, tipModel.EnemyCaughtArrowDirection);
-                }
-                else
-                {
-                    _secondCastEffectController.RemoveArrow(tipModel.Id);
+                    _secondCastAimArrowControllers.SetArrow(tipModel.Id, tipModel.Position, tipModel.EnemyCaughtArrowDirection);
                 }
             }
         }

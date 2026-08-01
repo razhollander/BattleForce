@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedConfig;
         private readonly ICommandFactory _commandFactory;
-        private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
+        private readonly TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
         public TalentType TalentType => TalentType.GrapplingHook;
         private bool IsCurrentlyActive
@@ -67,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _sharedConfig = sharedConfig;
-            _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -198,7 +198,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                         {
                             var directionToHook = (projectile.Position - casterPlayerState.Spaceship.Transform.Position).NormalizeSafe();
                             var force = directionToHook * config.PlayerPullForceWhileHooked * deltaTime;
-                            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
+                            _tryAddForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
                         }
                     }
                 }
@@ -259,9 +259,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator.EnablePlayerToCollideWithPlayers(_casterPlayerId);
             _netEventsDataService.AddGrapplingHookHitWallNetEvent(tick, _projectileId, attachedEntityId, projectile.Position);
         }
-
-        // Resolves the world-space transform (position + rotation) of whatever the hook attached to, so the hook can
-        // follow it while it moves/rotates. Returns false if the entity no longer exists or is no longer valid to follow.
+        
         private bool TryGetAttachedEntityTransform(GrapplingHookHitType hitType, ushort attachedEntityId, out Vector2 position, out float rotationRadians)
         {
             switch (hitType)

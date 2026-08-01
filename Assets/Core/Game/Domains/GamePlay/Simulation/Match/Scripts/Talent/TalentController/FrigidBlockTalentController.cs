@@ -6,7 +6,6 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
-using Core.Scripts.Extensions;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController
 {
@@ -103,8 +102,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void StopIfActive(int tick)
         {
-            // The block is a world object with its own lifecycle; it outlives the aim/cast and is
-            // not cancelled when the caster is spun. Nothing to stop here.
         }
 
         public void OnTick(int tick, float deltaTime)

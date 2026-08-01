@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
@@ -7,10 +8,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     public class HandleFishingRodTipHitWallNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
+        private IAudioService _audioService;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
+            _audioService = _diContainer.Resolve<IAudioService>();
         }
 
         public void Execute()
@@ -21,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
-            // The tip starts returning (position keeps syncing from the server). Hook point for future wall-hit VFX/SFX.
+            _audioService.PlayAudio(AudioClipType.FishingRodHitWall);
             _cachedPresentationEventsService.FishingRodTipHitWallNetEvents.Clear();
         }
     }

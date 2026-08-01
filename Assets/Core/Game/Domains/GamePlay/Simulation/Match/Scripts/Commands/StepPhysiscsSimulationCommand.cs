@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
@@ -65,10 +66,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
-                // A frozen player keeps its linear velocity (it slides freely); its spin still decays and rotates
-                // its facing, which is the only thing allowed to change a frozen player's direction.
                 var isFrozen = playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent)
-                               && selectedTalent is {IsCurrentlyActive: true, TalentType: TalentType.Frozen};
+                               && (selectedTalent is {IsCurrentlyActive: true, TalentType: TalentType.Frozen});
                 if (!isFrozen)
                 {
                     _playersDecelerationLogic.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
@@ -160,8 +159,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             for (int i = 0; i < _matchDataService.SimulationState.FishingRodProjectiles.Count; i++)
             {
                 ref var fishingRodProjectile = ref _matchDataService.SimulationState.FishingRodProjectiles.GetByIndex(i);
-                // The tip only has a physics body while flying; caught/returning tips are moved by the controller.
-                if (fishingRodProjectile.Phase == Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.FlyingForward)
+                bool doesTipHaveACollider = fishingRodProjectile.Phase == FishingRodTipPhase.FlyingForward;
+                if (doesTipHaveACollider)
                 {
                     fishingRodProjectile.Position = _physicsSimulator.GetFishingRodTip(fishingRodProjectile.Id).Position;
                 }

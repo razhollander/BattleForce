@@ -10,13 +10,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IFrigidBlocksControllers _frigidBlocksControllers;
-        private IMatchDataService _matchDataService;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
-            _matchDataService = _diContainer.Resolve<IMatchDataService>();
         }
 
         public void Execute()
@@ -30,7 +28,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var netEvent in netEvents)
             {
                 _frigidBlocksControllers.DestroyFrigidBlock(netEvent.BlockId);
-                _matchDataService.RemoveFrigidBlock(netEvent.BlockId);
             }
 
             _cachedPresentationEventsService.DestroyFrigidBlockNetEvents.Clear();

@@ -4,7 +4,6 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Scripts.Extensions;
 using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
-using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -26,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         public void Execute()
         {
             var netEvents = _cachedPresentationEventsService.CreateFishingRodProjectileNetEvents;
-            if (netEvents.Count == 0)
+            if (netEvents.IsNullOrEmpty())
             {
                 return;
             }
@@ -35,14 +34,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var tipModel = netEvent.FishingRodProjectile;
                 var casterPlayerId = tipModel.PlayerCasterId;
-
-                // The stick must be shown before we read its tip pivot, since the fishing line starts from that pivot.
+                
                 _playerControllers.SetPlayerFishingRodStickState(casterPlayerId, true);
-
                 var casterPosition = _playerControllers.GetPlayerPosition(casterPlayerId);
                 var lineStartPosition = _playerControllers.GetPlayerFishingRodTipPivotPosition(casterPlayerId);
                 var rotation = tipModel.Position - casterPosition.ToNumericsVector2();
-                // The tip controller owns the reel loop SFX and plays it unless the rod is already in the caught phase.
                 _fishingRodTipControllers.CreateFishingRodTip(tipModel.Id, tipModel.Position.ToUnityVector2(), rotation.ToUnityVector2(), lineStartPosition, tipModel.Phase);
             }
 

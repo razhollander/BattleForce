@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _frigidBlocksControllers.CreateFrigidBlock(block.Id, block.Position.ToUnityVector2(), block.Rotation.ToUnityVector2());
             }
 
-            _audioService.PlayAudio(AudioClipType.FrigidBlockActivated); // play only once no matter how many events received
+            _audioService.PlayAudio(AudioClipType.FrigidBlockActivated);
 
             _cachedPresentationEventsService.ShootFrigidBlockNetEvents.Clear();
         }

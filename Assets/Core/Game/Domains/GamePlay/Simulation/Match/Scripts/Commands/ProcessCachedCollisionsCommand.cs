@@ -35,10 +35,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersTouchingWallDataService _playersTouchingWallDataService;
 
         private int _processedTick;
-        private PlayerHitCommand _playerHitCommand;
+        private TryHitPlayerCommand _tryHitPlayerCommand;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private ObtainPowerUpBallCommand _obtainPowerUpBallCommand;
-        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private UpdatePlayerLavaExposureCommand _updatePlayerLavaExposureCommand;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
@@ -53,9 +53,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
-            _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
+            _tryHitPlayerCommand = _commandFactory.CreateCommandVoid<TryHitPlayerCommand>();
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
-            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
             _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
             _updatePlayerLavaExposureCommand = _commandFactory.CreateCommandVoid<UpdatePlayerLavaExposureCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
@@ -105,7 +105,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandleKOProjectilePlayerCollision(objectA, objectB);
                 HandleKOProjectileWallCollision(objectA, objectB);
                 HandleGrapplingHookCollision(objectA, objectB);
-                HandleGrapplingHookCasterEnemyCollision(objectA, objectB);
+                HandlePlayerUsingGrapplingHookHitEnemyCollision(objectA, objectB);
                 HandleFishingRodTipWallCollision(objectA, objectB);
                 HandleFishingRodTipEnemyCollision(objectA, objectB);
                 HandleSoulGhostWallCollision(objectA, objectB);
@@ -135,8 +135,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var playerModel = _matchDataService.SimulationState.GetPlayerById(playerId);
 
             contact.GetWorldManifold(out var worldManifold);
-            // The manifold normal points from fixture A to fixture B. Orient it to point from the block toward the player.
-            var blockNormal = isPlayerToBlock ? -worldManifold.normal : worldManifold.normal;
+            var blockNormal = isPlayerToBlock ? -worldManifold.normal : worldManifold.normal; // The manifold normal points from fixture A to fixture B. Orient it to point from the block toward the player.
 
             var relativeVelocity = playerModel.Spaceship.Transform.Velocity;
             if (!relativeVelocity.IsFacingWall(blockNormal))
@@ -146,7 +145,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             playerModel.Spaceship.Transform.Velocity = relativeVelocity.ReflectFromWall(blockNormal);
 
-            if (IsFrozenActive(playerId))
+            if (IsFrozenActiveForPlayer(playerId))
             {
                 return;
             }
@@ -191,7 +190,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ref var powerUpBallModel = ref _matchDataService.SimulationState.GetPowerUpBallById(isPowerUpToBlock ? objectA.Id : objectB.Id);
             var relativeVelocity = powerUpBallModel.Velocity;
             contact.GetWorldManifold(out var worldManifold);
-            var collisionNormal = worldManifold.normal;
+            var collisionNormal = isPowerUpToBlock ? -worldManifold.normal : worldManifold.normal; // The manifold normal points from fixture A to fixture B. Orient it to point from the block toward the ball.
             if (!relativeVelocity.IsFacingWall(collisionNormal))
             {
                 return;
@@ -200,19 +199,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             powerUpBallModel.Velocity = relativeVelocity.ReflectFromWall(collisionNormal);
         }
 
-        private bool IsRockActive(ushort playerId)
+        private bool IsRockActiveForPlayer(ushort playerId)
         {
             return _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.Rock);
         }
-
-        // A frozen player's facing may only change through the physical result of its angular velocity, so wall-like
-        // bounces reflect its velocity but must leave its direction untouched.
-        private bool IsFrozenActive(ushort playerId)
+        
+        private bool IsFrozenActiveForPlayer(ushort playerId)
         {
             return _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.Frozen);
         }
-
-        // A player colliding with an active Rock is reflected like it hit a wall; the rock itself never moves.
+        
         private void HandlePlayerRockCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
         {
             var isPlayerToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
@@ -221,10 +217,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
-            var isARock = IsRockActive(objectA.Id);
-            var isBRock = IsRockActive(objectB.Id);
-            // Reflect only when exactly one of the two is a rock (two rocks: neither moves anyway).
-            if (isARock == isBRock)
+            var isARock = IsRockActiveForPlayer(objectA.Id);
+            var isBRock = IsRockActiveForPlayer(objectB.Id);
+            var isExactlyOneIsRock = isARock != isBRock;
+            if (!isExactlyOneIsRock)
             {
                 return;
             }
@@ -245,7 +241,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             otherPlayerModel.Spaceship.Transform.Velocity = relativeVelocity.ReflectFromWall(rockNormal);
 
-            if (IsFrozenActive(otherPlayerId))
+            if (IsFrozenActiveForPlayer(otherPlayerId))
             {
                 return;
             }
@@ -268,7 +264,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var playerId = isBallToPlayer ? objectB.Id : objectA.Id;
-            if (!IsRockActive(playerId))
+            if (!IsRockActiveForPlayer(playerId))
             {
                 return;
             }
@@ -277,7 +273,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ref var powerUpBallModel = ref _matchDataService.SimulationState.GetPowerUpBallById(ballId);
             var relativeVelocity = powerUpBallModel.Velocity;
             contact.GetWorldManifold(out var worldManifold);
-            var collisionNormal = worldManifold.normal;
+            var collisionNormal = isBallToPlayer ? -worldManifold.normal : worldManifold.normal; // The manifold normal points from fixture A to fixture B. Orient it to point from the rock toward the ball.
             if (!relativeVelocity.IsFacingWall(collisionNormal))
             {
                 return;
@@ -291,8 +287,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             bool isPlayerToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
             if (!isPlayerToPlayer) return;
 
-            _playersTalentsManager.TryHeadbuttHitEnemy(objectA.Id, objectB.Id, _processedTick);
-            _playersTalentsManager.TryHeadbuttHitEnemy(objectB.Id, objectA.Id, _processedTick);
+            if (_matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(objectA.Id, TalentType.Headbutt))
+            {
+                _playersTalentsManager.TryHeadbuttHitEnemy(objectA.Id, objectB.Id, _processedTick);
+            }
+
+            if (_matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(objectB.Id, TalentType.Headbutt))
+            {
+                _playersTalentsManager.TryHeadbuttHitEnemy(objectB.Id, objectA.Id, _processedTick);
+            }
         }
 
         private void HandleChickenEggKOProjectileCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -338,8 +341,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var isProjectileA = objectA.PhysicsBodyType == PhysicsBodyType.GrapplingHookProjectile;
             var isProjectileB = objectB.PhysicsBodyType == PhysicsBodyType.GrapplingHookProjectile;
 
-            // Exactly one of the two bodies must be the projectile.
-            if (isProjectileA == isProjectileB)
+            var isExactlyOneOfTheTwoAGrappglingHook = isProjectileA != isProjectileB;
+            if (!isExactlyOneOfTheTwoAGrappglingHook)
             {
                 return;
             }
@@ -371,7 +374,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 case PhysicsBodyType.FrigidBlock:
                     hitType = GrapplingHookHitType.FrigidBlock;
                     return true;
-                case PhysicsBodyType.PlayerSpaceship when IsRockActive(attachedObject.Id):
+                case PhysicsBodyType.PlayerSpaceship when IsRockActiveForPlayer(attachedObject.Id):
                     hitType = GrapplingHookHitType.RockPlayer;
                     return true;
                 default:
@@ -404,10 +407,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void HandleSoulGhostWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
-            var isGhostToWall = objectA.PhysicsBodyType == PhysicsBodyType.SoulGhost &&
-                                (objectB.PhysicsBodyType == PhysicsBodyType.Wall || objectB.PhysicsBodyType == PhysicsBodyType.FrigidBlock);
-            var isWallToGhost = objectB.PhysicsBodyType == PhysicsBodyType.SoulGhost &&
-                                (objectA.PhysicsBodyType == PhysicsBodyType.Wall || objectA.PhysicsBodyType == PhysicsBodyType.FrigidBlock);
+            var isGhostToWall = objectA.PhysicsBodyType == PhysicsBodyType.SoulGhost && IsSoulGhostBlockerBody(objectB);
+            var isWallToGhost = objectB.PhysicsBodyType == PhysicsBodyType.SoulGhost && IsSoulGhostBlockerBody(objectA);
 
             if (!isGhostToWall && !isWallToGhost)
             {
@@ -422,6 +423,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _playersTalentsManager.HitSoulGhostWithWall(ghost.PlayerCasterId, ghostId, _processedTick);
+        }
+        
+        private bool IsSoulGhostBlockerBody(PhysicsBodyData bodyData)
+        {
+            return IsWallLikeBodyType(bodyData.PhysicsBodyType)
+                   || (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && IsRockActiveForPlayer(bodyData.Id));
         }
 
         private void HandleFishingRodTipEnemyCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -444,8 +451,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             var caster = _matchDataService.SimulationState.GetPlayerById(projectile.PlayerCasterId);
             var hitPlayer = _matchDataService.SimulationState.GetPlayerById(playerId);
+            var arePlayersAllies = caster.TeamId == hitPlayer.TeamId;
 
-            if (caster.TeamId == hitPlayer.TeamId)
+            if (arePlayersAllies)
             {
                 return;
             }
@@ -453,7 +461,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersTalentsManager.CatchFishingRodWithEnemy(projectile.PlayerCasterId, hitPlayer.Id, _processedTick);
         }
 
-        private void HandleGrapplingHookCasterEnemyCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        private void HandlePlayerUsingGrapplingHookHitEnemyCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
             bool isPlayerToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
             if (!isPlayerToPlayer)
@@ -474,8 +482,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             var caster = _matchDataService.SimulationState.GetPlayerById(casterId);
             var enemy = _matchDataService.SimulationState.GetPlayerById(enemyId);
+            var arePlayersAllies = caster.TeamId == enemy.TeamId;
 
-            if (caster.TeamId == enemy.TeamId)
+            if (arePlayersAllies)
             {
                 return;
             }
@@ -520,8 +529,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void HandleKOProjectileWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
-            var isWallToProjectile = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.KOProjectile;
-            var isProjectileToWall = objectA.PhysicsBodyType == PhysicsBodyType.KOProjectile && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
+            var isWallToProjectile = IsWallLikeBodyType(objectA.PhysicsBodyType) && objectB.PhysicsBodyType == PhysicsBodyType.KOProjectile;
+            var isProjectileToWall = objectA.PhysicsBodyType == PhysicsBodyType.KOProjectile && IsWallLikeBodyType(objectB.PhysicsBodyType);
 
             if (!isWallToProjectile && !isProjectileToWall)
             {
@@ -696,7 +705,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 .Execute();
             
             playerState.Spaceship.Transform.Direction = force.NormalizeSafe();
-            _addForceToPlayerCommand.SetPlayerId(playerId).SetForce(force).ShouldTurnOffEngine(true).Execute();
+            _tryAddForceToPlayerCommand.SetPlayerId(playerId).SetForce(force).ShouldTurnOffEngine(true).Execute();
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
         }
 
@@ -730,7 +739,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var damage = _gamePlayConfigService.GamePlayConfig.EnvironmentSpikes.Damage;
-            _playerHitCommand
+            _tryHitPlayerCommand
                 .SetPlayerIdGotHit(playerId)
                 .SetHitDamage(damage)
                 .SetProcessedTick(_processedTick)
@@ -794,8 +803,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 _playersInLavaTrackerService.OnPlayerExitLava(playerId);
             }
-
-            // A Rock player is immune to lava and must not show as exposed; the command reconciles that rule.
+            
             _updatePlayerLavaExposureCommand.SetPlayerId(playerId).SetProcessedTick(_processedTick).Execute();
         }
 
@@ -823,8 +831,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void HandlePlayerWallStickTracking(PhysicsBodyData objectA, PhysicsBodyData objectB, PhysicsEventEventType eventType, Contact contact)
         {
-            var isPlayerToWall = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Wall;
-            var isWallToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.Wall && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            var isPlayerToWall = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && IsWallLikeBodyType(objectB.PhysicsBodyType);
+            var isWallToPlayer = IsWallLikeBodyType(objectA.PhysicsBodyType) && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
 
             if (!isPlayerToWall && !isWallToPlayer)
             {
@@ -832,21 +840,48 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var playerId = isPlayerToWall ? objectA.Id : objectB.Id;
-            var wallId = isPlayerToWall ? objectB.Id : objectA.Id;
+            var wallObject = isPlayerToWall ? objectB : objectA;
 
             if (eventType == PhysicsEventEventType.Begin)
             {
+                if (!TryGetWallLikeRotationDegrees(wallObject, out var wallRotationDegrees))
+                {
+                    return;
+                }
+
                 contact.GetWorldManifold(out var worldManifold);
                 // Box2D's manifold normal always points from fixture A to fixture B. Downstream code expects the wall's
                 // outward normal (pointing from the wall toward the player), so flip it when the player is fixture A.
                 var wallNormal = isPlayerToWall ? -worldManifold.normal : worldManifold.normal;
-                var wallRotationDegrees = _matchDataService.EnvironmentData.GetWall(wallId).Transform.WorldRotationDegrees;
-                _playersTouchingWallDataService.OnPlayerBeginTouchWall(playerId, wallId, wallNormal, wallRotationDegrees, _processedTick);
+                _playersTouchingWallDataService.OnPlayerBeginTouchWall(playerId, wallObject.PhysicsBodyType, wallObject.Id, wallNormal, wallRotationDegrees, _processedTick);
             }
             else if (eventType == PhysicsEventEventType.End)
             {
-                _playersTouchingWallDataService.OnPlayerEndTouchWall(playerId, wallId);
+                _playersTouchingWallDataService.OnPlayerEndTouchWall(playerId, wallObject.PhysicsBodyType, wallObject.Id);
             }
+        }
+        
+        private static bool IsWallLikeBodyType(PhysicsBodyType bodyType)
+        {
+            return bodyType == PhysicsBodyType.Wall || bodyType == PhysicsBodyType.FrigidBlock;
+        }
+
+        private bool TryGetWallLikeRotationDegrees(PhysicsBodyData wallObject, out float wallRotationDegrees)
+        {
+            if (wallObject.PhysicsBodyType == PhysicsBodyType.Wall)
+            {
+                wallRotationDegrees = _matchDataService.EnvironmentData.GetWall(wallObject.Id).Transform.WorldRotationDegrees;
+                return true;
+            }
+
+            if (_matchDataService.SimulationState.TryGetFrigidBlockById(wallObject.Id, out var frigidBlock))
+            {
+                wallRotationDegrees = frigidBlock.Rotation.ToAngleDegrees();
+                return true;
+            }
+
+            wallRotationDegrees = 0f;
+            return false;
         }
 
         private void HandlePlayerBulletCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
@@ -927,7 +962,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
             
-            _playerHitCommand
+            _tryHitPlayerCommand
                 .SetPlayerIdGotHit(playerId)
                 .SetWasHitByAnotherPlayer(true, bulletModel.BelongToPlayerId)
                 .SetHitDamage(_gamePlayConfigService.GamePlayConfig.PlayerBullet.HitDamage)
@@ -1039,7 +1074,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ref var powerUpBallModel = ref _matchDataService.SimulationState.GetPowerUpBallById(isPowerUpBallToWallCollision ? objectA.Id : objectB.Id);
             var relativeVelocity = powerUpBallModel.Velocity;
             contact.GetWorldManifold(out var worldManifold);
-            var collisionNormal = worldManifold.normal;
+            var collisionNormal = isPowerUpBallToWallCollision ? -worldManifold.normal : worldManifold.normal; // The manifold normal points from fixture A to fixture B. Orient it to point from the wall toward the ball.
             if (!relativeVelocity.IsFacingWall(collisionNormal))
             {
                 return;
@@ -1061,7 +1096,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var playerModel = GetPlayerFromCollision(objectA, objectB, isPlayerToWallCollision, isWallToPlayerCollision);
             var relativeVelocity = playerModel.Spaceship.Transform.Velocity;
             contact.GetWorldManifold(out var worldManifold);
-            var collisionNormal = worldManifold.normal;
+            var collisionNormal = isPlayerToWallCollision ? -worldManifold.normal : worldManifold.normal; // The manifold normal points from fixture A to fixture B. Orient it to point from the wall toward the player.
             var reflectedVelocity = relativeVelocity.ReflectFromWall(collisionNormal);
             if (!relativeVelocity.IsFacingWall(collisionNormal))
             {
@@ -1070,9 +1105,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             
             playerModel.Spaceship.Transform.Velocity = reflectedVelocity;
             LogService.LogTopic($"new pos {_physicsSimulator.GetPlayer(playerModel.Id).Position}, prev pos: {playerModel.Spaceship.Transform.Position} ", LogTopicType.ServerNetwork);
-
-            // While frozen the ship bounces off the wall (velocity reflects) but keeps its spin-driven facing.
-            if (IsFrozenActive(playerModel.Id))
+            
+            if (IsFrozenActiveForPlayer(playerModel.Id) || IsRockActiveForPlayer(playerModel.Id))
             {
                 return;
             }

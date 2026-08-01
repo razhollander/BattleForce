@@ -31,6 +31,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Scripts.Extensions;
@@ -56,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
         private AddMatchPlayerCommand _addMatchPlayerCommand;
+        private CreatePowerUpBallCommand _createPowerUpBallCommand;
         private ICommandFactory _commandFactory;
         private PresentationGamePlayConfig _gameplayConfig;
         private IMatchPlayerControllers _playerControllers;
@@ -71,7 +73,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
         private IFishingRodTipControllers _fishingRodTipControllers;
-        private ISecondCastEffectController _secondCastEffectController;
+        private ISecondCastAimArrowControllers _secondCastAimArrowControllers;
         private ISoulGhostControllers _soulGhostControllers;
         private IFrigidBlocksControllers _frigidBlocksControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
@@ -106,6 +108,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
+            _createPowerUpBallCommand = _commandFactory.CreateCommandVoid<CreatePowerUpBallCommand>();
             _gameplayConfig =_diContainer.Resolve<PresentationGamePlayConfig>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
@@ -120,7 +123,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
             _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
-            _secondCastEffectController = _diContainer.Resolve<ISecondCastEffectController>();
+            _secondCastAimArrowControllers = _diContainer.Resolve<ISecondCastAimArrowControllers>();
             _soulGhostControllers = _diContainer.Resolve<ISoulGhostControllers>();
             _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
@@ -162,7 +165,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers.DestroyAll();
             _grapplingHookProjectilesControllers.DestroyAll();
             _fishingRodTipControllers.DestroyAll();
-            _secondCastEffectController.DestroyAll();
+            _secondCastAimArrowControllers.DestroyAll();
             _soulGhostControllers.DestroyAll();
             _frigidBlocksControllers.DestroyAll();
             _chickenEggsControllers.DestroyAll();
@@ -212,7 +215,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var player in _simulationState.Players.AsSpan())
             {
                 var playerTeamId = player.TeamId;
-                _matchDataService.AddTeamIdIdDoesntExist(playerTeamId);
+                _matchDataService.AddTeamIdIfDoesntExist(playerTeamId);
                 var teamGems = _simulationState.GemsPerTeamId[playerTeamId];
                 var teamBolts = _simulationState.BoltsPerTeam[playerTeamId];
                 _matchDataService.SetTeamBolts(playerTeamId, teamBolts);
@@ -391,7 +394,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var position = powerUpBall.Position.ToUnityVector2();
                 _matchDataService.AddPowerUpBall(powerUpBall.Id, position);
-                _powerUpBallControllers.CreatePowerUpBall(powerUpBall.Id, position);
+                _createPowerUpBallCommand.SetPowerUpBallId(powerUpBall.Id).SetPosition(position).Execute();
             }
         }
         
@@ -655,6 +658,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var rotation = fishingRodTip.Position - casterPosition.ToNumericsVector2();
                 _matchDataService.AddFishingRodTip(fishingRodTip.Id, casterId, position, fishingRodTip.Phase);
                 _fishingRodTipControllers.CreateFishingRodTip(fishingRodTip.Id, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, fishingRodTip.Phase);
+
+                if (fishingRodTip.Phase == FishingRodTipPhase.CaughtEnemy)
+                {
+                    _secondCastAimArrowControllers.AddArrow(fishingRodTip.Id, position.ToUnityVector2(), fishingRodTip.EnemyCaughtArrowDirection.ToUnityVector2());
+                }
             }
         }
     }

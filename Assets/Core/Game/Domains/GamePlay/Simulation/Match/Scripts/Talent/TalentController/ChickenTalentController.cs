@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly NetworkConfig _networkConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
-        private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
+        private readonly TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
         private ushort _casterPlayerId;
         private int _countdownEndTick;
@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
-            _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort id) { _casterPlayerId = id; }
@@ -75,7 +75,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var movementDirection = casterPlayerState.Spaceship.Transform.Direction;
             var force = movementDirection * config.PushForce;
-            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
+            _tryAddForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
             var egg = _matchDataService.AddChickenEgg(_casterPlayerId, casterPlayerState.Spaceship.Transform.Position);
             _physicsSimulator.AddChickenEgg(egg.Id, casterPlayerState.TeamId, egg.Position, casterPlayerState.Spaceship.Transform.Radius);
             _netEventsDataService.AddLayChickenEggNetEventS2C(tick, _casterPlayerId, egg.Id, egg.Position);

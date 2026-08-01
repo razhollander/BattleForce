@@ -163,9 +163,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                     _playersPowerUpsManager.AddPlayer(playerId);
                     _simulationInputService.AddPlayer(playerId);
                     _lockOnTargetTimerService.AddPlayer(playerId);
-                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.FishingRod, playerId, 0, out _, out _);
-                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.FrigidBlock, playerId, 0, out _, out _);
-                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.GrapplingHook, playerId, 0, out _, out _);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Headbutt, playerId, 0, out _, out _);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Frozen, playerId, 0, out _, out _);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Rock, playerId, 0, out _, out _);
                 
                     if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                     {

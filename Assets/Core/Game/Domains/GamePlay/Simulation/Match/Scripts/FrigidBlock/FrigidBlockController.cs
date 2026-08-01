@@ -1,21 +1,13 @@
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
-using Core.Scripts.Network;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock
 {
-    /// <summary>
-    /// Owns the per-tick logic of a single FrigidBlock: detecting when it has come to rest
-    /// (both linear and angular velocity below their idle thresholds) and signalling when it
-    /// has stayed idle long enough to be destroyed. Physics (movement + deceleration) is owned
-    /// by the Box2D body; this controller only reads the block's state.
-    /// </summary>
     public class FrigidBlockController
     {
         private readonly IMatchDataService _matchDataService;
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
-        private readonly NetworkConfig _networkConfig;
 
         private ushort _blockId;
         private bool _hasBecomeIdle;
@@ -23,11 +15,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock
 
         public ushort BlockId => _blockId;
 
-        public FrigidBlockController(IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig)
+        public FrigidBlockController(IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService)
         {
             _matchDataService = matchDataService;
             _gamePlayConfigService = gamePlayConfigService;
-            _networkConfig = networkConfig;
         }
 
         public void Init(ushort blockId)
@@ -36,9 +27,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock
             _hasBecomeIdle = false;
             _idleStartTick = 0;
         }
-
-        /// <returns>True when the block has stayed idle long enough and should be destroyed.</returns>
-        public bool OnTick(int tick, float deltaTime)
+        
+        public bool IsIdleLongEnoughToBeDestroyed(int tick, float deltaTime)
         {
             if (!_matchDataService.SimulationState.TryGetFrigidBlockById(_blockId, out var block))
             {
@@ -64,7 +54,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock
             }
 
             var destroyTick = TickUtils.GetTickPassedAfterDuration(_idleStartTick, config.SecondsIdleUntilDestroy, deltaTime);
-            return tick >= destroyTick;
+            var isIdleLongEnoughToBeDestroyed = tick >= destroyTick;
+            return isIdleLongEnoughToBeDestroyed;
         }
     }
 }

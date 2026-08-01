@@ -2,11 +2,11 @@ using System;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.LocalEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
 using Core.Scripts.Extensions;
@@ -511,6 +511,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in events)
             {
+                _matchDataService.GetFishingRodTip(netEvent.ProjectileId).Phase = FishingRodTipPhase.CaughtEnemy;
                 _cachedPresentationEventsService.FishingRodCaughtEnemyNetEvents.Add(netEvent);
             }
         }
@@ -524,6 +525,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in events)
             {
+                //_matchDataService.GetFishingRodTip(netEvent.ProjectileId).Phase = FishingRodTipPhase.ReturningBackwards; no need since the client doesn't care, FishingRodTipPhase.ReturningBackwards is only used for server side
                 _cachedPresentationEventsService.FishingRodTipHitWallNetEvents.Add(netEvent);
             }
         }
@@ -581,6 +583,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var netEvent in events)
             {
                 SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Soul, netEvent.TalentCooldownEndTick);
+                _matchDataService.RemoveSoulGhost(netEvent.GhostId);
                 _cachedPresentationEventsService.DeactivateSoulTalentNetEvents.Add(netEvent);
             }
         }
@@ -610,6 +613,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in events)
             {
+                _matchDataService.RemoveFrigidBlock(netEvent.BlockId);
                 _cachedPresentationEventsService.DestroyFrigidBlockNetEvents.Add(netEvent);
             }
         }

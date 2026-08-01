@@ -42,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             for (int i = 0; i < _talentViews.Length; i++)
             {
                 var isSelected = i == selectedTalentIndex;
-                _talentViews[i].SetActiveEffect(isSelected && isSelectedTalentActive);
+                _talentViews[i].SetIsActiveEffectShown(isSelected && isSelectedTalentActive);
             }
         }
         

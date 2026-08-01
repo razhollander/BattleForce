@@ -14,7 +14,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    public class PlayerHitCommand : BaseCommand, ICommandVoid
+    public class TryHitPlayerCommand : BaseCommand, ICommandVoid
     {
         private const ushort DEAD_HEALTH_AMOUNT = 0;
         
@@ -30,32 +30,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private Dictionary<ushort,Dictionary<ushort, int>> _gemsGainedPerTeamIdPerTeam;
         private Dictionary<ushort,Dictionary<ushort, int>> _totalGemsPerTeamIdPerTeam;
-        private NetworkConfig _networkConfig;
         private PlayerGainedBoltsCommand _playerGainedBoltsCommand;
         private ushort _byPlayerId;
         private bool _wasHitByAnotherPlayer;
         private IOverrideableNetEventsService _overrideableNetEventsService;
 
-        public PlayerHitCommand SetHitDamage(ushort hitDamage)
+        public TryHitPlayerCommand SetHitDamage(ushort hitDamage)
         {
             _hitDamage = hitDamage;
             return this;
         }
 
-        public PlayerHitCommand SetPlayerIdGotHit(ushort playerIdGotHit)
+        public TryHitPlayerCommand SetPlayerIdGotHit(ushort playerIdGotHit)
         {
             _playerIdGotHit = playerIdGotHit;
             return this;
         }
         
-        public PlayerHitCommand SetWasHitByAnotherPlayer(bool wasHitByAnotherPlayer, ushort byPlayerId = default)
+        public TryHitPlayerCommand SetWasHitByAnotherPlayer(bool wasHitByAnotherPlayer, ushort byPlayerId = default)
         {
             _byPlayerId = byPlayerId;
             _wasHitByAnotherPlayer = wasHitByAnotherPlayer;
             return this;
         }
         
-        public PlayerHitCommand SetProcessedTick(int processedTick)
+        public TryHitPlayerCommand SetProcessedTick(int processedTick)
         {
             _processedTick = processedTick;
             return this;
@@ -70,7 +69,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
-            _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _playerGainedBoltsCommand = _commandFactory.CreateCommandVoid<PlayerGainedBoltsCommand>();
             _chachedTeamsCurrentlyAlive = new HashSet<ushort>(_sharedGamePlayConfig.MaxTeamsAmount);
             _gemsGainedPerTeamIdPerTeam = new Dictionary<ushort, Dictionary<ushort, int>>(_sharedGamePlayConfig.MaxTeamsAmount);
@@ -97,15 +95,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 return;
             }
-
-            // A player in Rock state is invulnerable to all damage sources.
-            if (_matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerIdGotHit, TalentType.Rock))
-            {
-                return;
-            }
-
-            // A player in Frozen state is invulnerable to all damage sources.
-            if (_matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerIdGotHit, TalentType.Frozen))
+            
+            var isPlayerInvulnerableToDamage = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerIdGotHit, TalentType.Rock)
+                || _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerIdGotHit, TalentType.Frozen);
+            if (isPlayerInvulnerableToDamage)
             {
                 return;
             }

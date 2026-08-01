@@ -63,8 +63,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _cachedPlayerIdsNotToIncrementTimerInLavaList.Clear();
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
-                if (playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) &&
-                    selectedTalent is {IsCurrentlyActive: true, TalentType: TalentType.Rock or TalentType.Frozen})
+                var IsPlayerRockOrFrozen = playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) &&
+                                                   selectedTalent is {IsCurrentlyActive: true, TalentType: TalentType.Rock or TalentType.Frozen};
+                if (IsPlayerRockOrFrozen)
                 {
                     ref var playerId = ref _cachedPlayerIdsNotToIncrementTimerInLavaList.AddAndGet();
                     playerId = playerState.Id;

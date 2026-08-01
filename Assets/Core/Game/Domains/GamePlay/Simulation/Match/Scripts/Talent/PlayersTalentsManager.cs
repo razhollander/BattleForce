@@ -132,12 +132,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 
             if (selectedTalent.TalentType == TalentType.Headbutt)
             {
-                // A charging or dashing Headbutt is interrupted (and put on cooldown) so the player can switch to and perform another talent.
                 _talentControllersPerPlayer[playerId].StopTalentIfActive(TalentType.Headbutt, tick);
+            }
+            else if (selectedTalent.TalentType == TalentType.Frozen)
+            {
+                _talentControllersPerPlayer[playerId].StopTalentIfActive(TalentType.Frozen, tick);
+            }
+            else if (selectedTalent.TalentType == TalentType.Rock)
+            {
+                _talentControllersPerPlayer[playerId].StopTalentIfActive(TalentType.Rock, tick);
             }
             else if (selectedTalent.IsCurrentlyActive)
             {
-                // Any other active talent blocks switching.
                 return false;
             }
 

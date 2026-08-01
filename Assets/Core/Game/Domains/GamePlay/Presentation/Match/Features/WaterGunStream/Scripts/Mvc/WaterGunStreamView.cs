@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.WaterGunStream.
             gameObject.TrySetActive(false);
         }
 
-        public void UpdateStream(System.Numerics.Vector2 aimDirection, float decay)
+        public void UpdateStreamRotation(System.Numerics.Vector2 aimDirection, float decay)
         {
             var targetRotation = aimDirection.ToQuaternion();
             _pivotTransform.rotation = MathUtils.ExpDecay(_pivotTransform.rotation, targetRotation, decay, Time.deltaTime);

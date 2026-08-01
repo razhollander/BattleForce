@@ -175,7 +175,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newPlayer;
         }
 
-        public void AddTeamIdIdDoesntExist(ushort teamId)
+        public void AddTeamIdIfDoesntExist(ushort teamId)
         {
             TeamIds.Add(teamId);
             BoltsPerTeam.TryAdd(teamId, 0);

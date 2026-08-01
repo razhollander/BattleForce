@@ -66,8 +66,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             _matchDataService.SimulationState.SetIsPowerUpCurrentlyActiveForPlayer(_casterPlayerId, true);
             _netEventsDataService.AddActivateShuffleNetEvent(tick, _casterPlayerId);
         }
-
-        // Called on stage change: abandon any in-progress swap sequence so leftover swaps don't resume on the next stage.
+        
         public void Reset()
         {
             _pendingSwapsCount = 0;

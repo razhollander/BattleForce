@@ -1,4 +1,3 @@
-using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
@@ -76,7 +75,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IKOProjectilesControllers _koProjectilesControllers;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
         private IFishingRodTipControllers _fishingRodTipControllers;
-        private ISecondCastEffectController _secondCastEffectController;
+        private ISecondCastAimArrowControllers _secondCastAimArrowControllers;
         private ISoulGhostControllers _soulGhostControllers;
         private IFrigidBlocksControllers _frigidBlocksControllers;
         private IDashPulseGustEffectController _dashPulseGustEffectController;
@@ -126,7 +125,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _koProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
             _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
-            _secondCastEffectController = _diContainer.Resolve<ISecondCastEffectController>();
+            _secondCastAimArrowControllers = _diContainer.Resolve<ISecondCastAimArrowControllers>();
             _soulGhostControllers = _diContainer.Resolve<ISoulGhostControllers>();
             _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
@@ -143,11 +142,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
 
         public void Execute()
         {
-            _coolBGMusicController.InitEntryPoint();
-            if (!_coolBGMusicController.TryPlayStageBackgroundMusic())
-            {
-                _audioService.PlayAudioLoop(AudioClipType.MatchGamePlayBGMusic);
-            }
+            InitCoolBackgroundMusic();
             _fullTickPacketsHandler.InitEntryPoint();
             _startStagePacketHandler.InitEntryPoint();
             _talentCardControllers.InitEntryPoint();
@@ -159,7 +154,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _koProjectilesControllers.InitEntryPoint();
             _grapplingHookProjectilesControllers.InitEntryPoint();
             _fishingRodTipControllers.InitEntryPoint();
-            _secondCastEffectController.InitEntryPoint();
+            _secondCastAimArrowControllers.InitEntryPoint();
             _soulGhostControllers.InitEntryPoint();
             _frigidBlocksControllers.InitEntryPoint();
             _powerUpBallObtainedEffectController.InitEntryPoint();
@@ -189,7 +184,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }
-        
+
+        private void InitCoolBackgroundMusic()
+        {
+            _coolBGMusicController.InitEntryPoint();
+
+            if (!_coolBGMusicController.TryPlayStageBackgroundMusic())
+            {
+                _audioService.PlayAudioLoop(AudioClipType.MatchGamePlayBGMusic);
+            }
+        }
+
         private void AddPlayersDevicesNotAddedDuringMatchMaking()
         {
             _localPlayersDataService.SetLocalPlayers(_enterData.PlayerIdToDeviceIdDictionary);

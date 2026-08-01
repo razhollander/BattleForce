@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ICommandFactory _commandFactory;
         private readonly IPlayersMouseDataService _playersMouseDataService;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
-        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
         public TalentType TalentType => TalentType.FishingRod;
 
@@ -65,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         public void InitEntryPoint()
         {
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
-            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -126,13 +126,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private void ProcessThrowCastInput(bool wasTalentInputDownThisTick, int tick, PlayerStateS2C casterPlayerState,
             ref TalentFishingRodProjectileStateS2C projectile)
         {
-            // Aiming already started on catch, so a single talent press throws the caught enemy.
             if (!wasTalentInputDownThisTick)
             {
                 return;
             }
 
-            PerformThrow(tick, casterPlayerState, ref projectile);
+            PerformThrowEnemy(tick, casterPlayerState, ref projectile);
         }
 
         private void ActivateTalent(int tick, PlayerStateS2C casterPlayerState)
@@ -271,7 +270,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             StartReturnPhase(ref projectile);
         }
 
-        private void PerformThrow(int tick, PlayerStateS2C casterPlayerState, ref TalentFishingRodProjectileStateS2C projectile)
+        private void PerformThrowEnemy(int tick, PlayerStateS2C casterPlayerState, ref TalentFishingRodProjectileStateS2C projectile)
         {
             var config = _gamePlayConfigService.GamePlayConfig.Talents.FishingRodTalentConfig;
             var caughtEnemy = _matchDataService.SimulationState.GetPlayerById(projectile.CaughtEnemyId);
@@ -280,9 +279,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var spinAmount = RNG.NextFloat(config.ThrowMinSpin, config.ThrowMaxSpin);
 
             _trySpinPlayerCommand.SetPlayer(caughtEnemy.Id).SetSpinAmount(spinAmount).SetTick(tick).Execute();
-            _addForceToPlayerCommand.SetPlayerId(caughtEnemy.Id).SetForce(force).ShouldTurnOffEngine(true).Execute();
-
-            // The projectile (and its arrow) is removed by DeactivateTalent below, so no explicit arrow clear is needed.
+            _tryAddForceToPlayerCommand.SetPlayerId(caughtEnemy.Id).SetForce(force).ShouldTurnOffEngine(true).Execute();
+            
             _netEventsDataService.AddFishingRodThrowNetEvent(tick, _casterPlayerId, caughtEnemy.Id, throwDirection);
             DeactivateTalent(tick);
         }
@@ -290,8 +288,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private Vector2 GetThrowDirection(PlayerStateS2C casterPlayerState, PlayerStateS2C caughtEnemy)
         {
             var mouseData = _playersMouseDataService.GetPlayerMouseData(_casterPlayerId);
-
-            // Keyboard/mouse players throw from the enemy towards the mouse world position; gamepad players fall back to the caster's aim direction.
+            
             if (mouseData.IsUsingMouseAim)
             {
                 var enemyPosition = caughtEnemy.Spaceship.Transform.Position;

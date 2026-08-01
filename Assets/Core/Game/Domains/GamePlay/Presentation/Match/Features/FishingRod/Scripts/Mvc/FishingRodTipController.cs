@@ -25,12 +25,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scri
             _audioService = audioService;
         }
 
-        public void CreateView(Vector2 position, Quaternion rotation, Vector2 casterPosition, FishingRodTipPhase phase)
+        public void CreateView(Vector2 position, Quaternion rotation, Vector2 lineStartPosition, FishingRodTipPhase phase)
         {
             _view = _pool.Spawn();
             _view.name = TIP_NAME + _tipId;
             _view.transform.SetParent(_parent);
-            _view.Setup(position, rotation, casterPosition);
+            _view.Setup(position, rotation, lineStartPosition);
             
             if (phase != FishingRodTipPhase.CaughtEnemy)
             {

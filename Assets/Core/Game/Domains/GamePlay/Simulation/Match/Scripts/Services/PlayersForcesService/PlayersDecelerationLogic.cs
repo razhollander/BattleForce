@@ -17,22 +17,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
 
         public void DeceleratePlayerSpin(PlayerSpaceshipStateS2C playerSpaceshipState, float deltaTime)
         {
-            // 1. Calculate the Damping Factor
-            // SpinDampingPerSecond should be a value between 0 and 1 (e.g., 0.5 to lose 50% speed per second).
-            float dampingFactor = MathF.Pow(_gamePlayConfigService.GamePlayConfig.PlayerSpaceship.SpinDecelerationPerSecond, deltaTime);
-    
-            // 2. Apply Damping (Works for both clockwise and counter-clockwise)
+            var dampingFactor = MathF.Pow(_gamePlayConfigService.GamePlayConfig.PlayerSpaceship.SpinDecelerationPerSecond, deltaTime);
             playerSpaceshipState.Transform.AngularVelocity *= dampingFactor;
+            
+            var isAngularVelocityAlmostZero = MathF.Abs(playerSpaceshipState.Transform.AngularVelocity) < _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.MinSpin;
 
-            // 3. Stop if the spin is negligible
-            if (MathF.Abs(playerSpaceshipState.Transform.AngularVelocity) < _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.MinSpin)
+            if (isAngularVelocityAlmostZero)
             {
                 playerSpaceshipState.Transform.AngularVelocity = 0;
             }
 
             if (playerSpaceshipState.Transform.AngularVelocity != 0)
             {
-                // Velocity (deg/s) * Time (s) = Rotation for this frame (deg)
                 var rotationDegrees = playerSpaceshipState.Transform.AngularVelocity;
                 playerSpaceshipState.Transform.Direction = playerSpaceshipState.Transform.Direction.Rotate(rotationDegrees);
             }

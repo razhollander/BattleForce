@@ -28,6 +28,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 {
     public class PhysicsSimulator : IPhysicsSimulator, IGUIUpdatable
     {
+        private const float DEFAULT_PLAYER_DENSITY = 1.0f;
+        private const float DEFAULT_PLAYER_RESTITUTION = 0f;
+        
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkConfig _networkConfig;
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
@@ -1109,7 +1112,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.linearVelocity = velocity;
             bodyDef.linearDamping = linearDamping;
             bodyDef.angularDamping = angularDamping;
-            bodyDef.bullet = true; // continuous collision detection so the fast-moving block can't tunnel through walls
+            bodyDef.bullet = true;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.FrigidBlock);
 
             var body = _world.CreateBody(bodyDef);
@@ -1352,13 +1355,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixture.FilterData = filter;
             body.SetAwake(true);
         }
-
-        private const float DEFAULT_PLAYER_DENSITY = 1.0f;
-        private const float DEFAULT_PLAYER_RESTITUTION = 0f;
-
-        // Turns the player's spaceship body into a "rock": a bigger, wall-like, immovable obstacle.
-        // The huge density makes static (rotating) walls still shove it out fully while dynamic bodies bounce off it,
-        // and the filter changes make it physically collide with all players (incl. teammates), bullets and power-up balls.
+        
         public void EnableRockBody(ushort playerId, float radiusMultiplier, float density, float restitution)
         {
             var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
@@ -1374,6 +1371,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             filter.categoryBits |= PhysicsCollisionType.PowerUpBall.GetCollisionMask();
             // Expose the GrapplingHookProjectile category so a hook (mask = GrapplingHookProjectile) can attach to a rock.
             filter.categoryBits |= PhysicsCollisionType.GrapplingHookProjectile.GetCollisionMask();
+            // Expose the SoulGhost category so a ghost (mask = SoulGhost) is stopped by a rock instead of flying through it.
+            filter.categoryBits |= PhysicsCollisionType.SoulGhost.GetCollisionMask();
             filter.maskBits |= PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
             filter.maskBits |= PhysicsCollisionType.Wall.GetCollisionMask();
             filter.maskBits |= PhysicsCollisionType.GrapplingHookProjectile.GetCollisionMask();

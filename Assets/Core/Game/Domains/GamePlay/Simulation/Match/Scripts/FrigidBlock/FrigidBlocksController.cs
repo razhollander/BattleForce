@@ -10,12 +10,6 @@ using Core.Scripts.Utils;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock
 {
-    /// <summary>
-    /// Owns all active FrigidBlocks. Spawning a block adds it to the simulation state and physics
-    /// and registers a pooled <see cref="FrigidBlockController"/> to run its lifecycle. Each tick the
-    /// active controllers are stepped; when a controller reports it has become idle long enough, the
-    /// block is removed from physics + state and a destroy net event is queued.
-    /// </summary>
     public class FrigidBlocksController : IFrigidBlocksController
     {
         private readonly IMatchDataService _matchDataService;
@@ -37,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock
 
             var maxFrigidBlocks = networkConfig.MaxCap.ConcurrentFrigidBlocks;
             _controllersPool = new ConcurrentPool<FrigidBlockController>(
-                () => new FrigidBlockController(matchDataService, gamePlayConfigService, networkConfig), maxFrigidBlocks);
+                () => new FrigidBlockController(matchDataService, gamePlayConfigService), maxFrigidBlocks);
             _activeControllers = new List<FrigidBlockController>(maxFrigidBlocks);
         }
 
@@ -46,8 +40,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock
             var config = _gamePlayConfigService.GamePlayConfig.Talents.FrigidBlockTalentConfig;
             var size = _sharedGamePlayConfig.FrigidBlockSize.ToNumericsVector2();
             var velocity = direction * config.ProjectileSpeed;
-            // Orient the block so its wide side (local X / size.X) faces perpendicular to the travel
-            // direction — it leads with its broad face like a plow.
             var rotation = new Vector2(-direction.Y, direction.X);
 
             var block = _matchDataService.AddFrigidBlock(casterPlayerId, position, rotation, velocity);
@@ -65,7 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock
             for (int i = _activeControllers.Count - 1; i >= 0; i--)
             {
                 var controller = _activeControllers[i];
-                if (controller.OnTick(tick, deltaTime))
+                if (controller.IsIdleLongEnoughToBeDestroyed(tick, deltaTime))
                 {
                     DestroyBlock(controller.BlockId, tick);
                     _activeControllers.RemoveAt(i);

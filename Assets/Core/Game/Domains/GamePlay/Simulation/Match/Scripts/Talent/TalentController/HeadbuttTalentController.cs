@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly ICommandFactory _commandFactory;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
-        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
         private ushort _casterPlayerId;
         private HeadButtPhaseType _phase;
@@ -61,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         public void InitEntryPoint()
         {
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
-            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -96,7 +96,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 _chargeFraction = Mathf.Clamp01(chargedSeconds / _sharedGamePlayConfig.HeadbuttMaxChargeDurationSeconds);
                 _dashDirection = casterPlayerState.Spaceship.Transform.Direction;
 
-                _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(_dashDirection * config.MaxChargeForce * _chargeFraction).ShouldTurnOffEngine(false).Execute();
+                _tryAddForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(_dashDirection * config.MaxChargeForce * _chargeFraction).ShouldTurnOffEngine(false).Execute();
                 casterPlayerState.Spaceship.IsEngineOn = true;
 
                 _phase = HeadButtPhaseType.Dashing;
@@ -118,7 +118,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             if (_phase != HeadButtPhaseType.Dashing) return;
 
             var config = _gamePlayConfigService.GamePlayConfig.Talents.HeadbuttTalentConfig;
-            var dashWindow = Mathf.Lerp(config.MinDashWindowSeconds, config.MaxDashWindowSeconds, _chargeFraction);
+            var dashWindow = Mathf.Lerp(config.MinSecondsInDash, config.MaxSecondsInDash, _chargeFraction);
             var elapsed = (tick - _dashStartTick) * deltaTime;
 
             if (elapsed >= dashWindow)
@@ -136,10 +136,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
 
             _trySpinPlayerCommand.SetPlayer(enemyId).SetSpinAmount(config.EnemySpinAmount).SetTick(tick).Execute();
-            _addForceToPlayerCommand.SetPlayerId(enemyId).SetForce(_dashDirection * config.EnemyPushForce).ShouldTurnOffEngine(true).Execute();
-
-            // Keep the caster's momentum but stop powering forward through the enemy.
-            //casterPlayerState.Spaceship.IsEngineOn = false;
+            _tryAddForceToPlayerCommand.SetPlayerId(enemyId).SetForce(_dashDirection * config.EnemyPushForce).ShouldTurnOffEngine(true).Execute();
             casterPlayerState.Spaceship.Transform.Velocity = Vector2.Zero;
 
             _netEventsDataService.AddHeadbuttHitEnemyNetEvent(tick, _casterPlayerId, enemyId);

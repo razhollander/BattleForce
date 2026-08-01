@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchFrigidBlockModel> FrigidBlocks { get; }
         Dictionary<ushort, int> BoltsPerTeam  {get; }
         Dictionary<ushort, int> GemsPerTeam  {get; }
-        void AddTeamIdIdDoesntExist(ushort teamId);
+        void AddTeamIdIfDoesntExist(ushort teamId);
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
