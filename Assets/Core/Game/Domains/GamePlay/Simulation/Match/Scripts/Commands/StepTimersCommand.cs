@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -16,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     {
         private IMatchDataService _matchDataService;
         private IPowerUpsSpawnerService _powerUpsSpawnerService;
+        private IMolesSpawnerService _molesSpawnerService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IHeadLessQuitterController _headLessQuitterController;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
@@ -34,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _powerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerService>();
+            _molesSpawnerService = _diContainer.Resolve<IMolesSpawnerService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
@@ -46,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             StepPlayersShootCooldown(_deltaTime);
             _powerUpsSpawnerService.StepTimer(_deltaTime);
+            _molesSpawnerService.StepTimer(_deltaTime);
             StepPlayersInLavaTimer(_deltaTime);
             _headLessQuitterController.StepTimer(_deltaTime);
             StepPreperationPhaseTimer(_deltaTime);

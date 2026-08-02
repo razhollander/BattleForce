@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
 using Newtonsoft.Json;
@@ -18,11 +19,18 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         
 #endif
 
+        // The DeathMatch layout pool. Kept under its original name so existing assets keep working.
         public List<int> AvailableLayoutIndexes;
-        
+        public List<int> WhacAMoleLayoutIndexes;
+
         public EnvironmentLayoutConfig GetEnvironmentLayout(int index)
         {
             return _environmentLayoutConfigs[index];
+        }
+
+        public List<int> GetLayoutIndexesForStageType(StageType stageType)
+        {
+            return stageType == StageType.WhacAMole ? WhacAMoleLayoutIndexes : AvailableLayoutIndexes;
         }
         
         public void SetWalls(WallConfig[] wallConfigs, int index)
@@ -154,6 +162,25 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                 var newLayout = new EnvironmentLayoutConfig("", "");
                 var json = JsonConvert.SerializeObject(powerUpSpawnPoints);
                 newLayout.SetPowerUpSpawnPointsJson(json);
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
+
+        public void SetMoleSpawnPoints(S2CModels.MoleSpawnPointConfig[] moleSpawnPoints, int index)
+        {
+            var json = JsonConvert.SerializeObject(moleSpawnPoints);
+
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetMoleSpawnPointsJson(json);
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetMoleSpawnPointsJson(json);
                 _environmentLayoutConfigs[index] = newLayout;
             }
 #if UNITY_EDITOR

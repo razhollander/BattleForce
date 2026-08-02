@@ -80,15 +80,45 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             LogService.LogTopic("init stage on server side", LogTopicType.ClientNetwork);
             RestartStageData();
+            var stageType = ResolveStageTypeForCurrentStage();
+            _matchDataService.SimulationState.StageType = stageType;
+            SetupWhacAMoleStageData(stageType);
             var mapSizeMultiplier = _matchDataService.SimulationState.MapSizeMultiplier = _gamePlayConfigService.GamePlayConfig.StageSizeMultiplier;
-            CreateEnvironmentLayout(mapSizeMultiplier);
+            CreateEnvironmentLayout(stageType, mapSizeMultiplier);
             SetupPlayers(mapSizeMultiplier);
             _stageNumber++;
         }
 
-        private void CreateEnvironmentLayout(float mapSizeMultiplier)
+        private StageType ResolveStageTypeForCurrentStage()
         {
-            var environmentLayoutId = GenerateNextStageEnvironmentLayoutId();
+            var gamePlayConfig = _gamePlayConfigService.GamePlayConfig;
+            var isRotationConfigured = gamePlayConfig.IsWhacAMoleModeEnabled && gamePlayConfig.WhacAMoleEveryXStages > 0;
+            var didReachWhacAMoleStage = isRotationConfigured && _stageNumber % gamePlayConfig.WhacAMoleEveryXStages == 0;
+
+            return didReachWhacAMoleStage ? StageType.WhacAMole : StageType.DeathMatch;
+        }
+
+        // The end tick already covers the preparation phase, so a rejoining client can always derive the countdown from it.
+        private void SetupWhacAMoleStageData(StageType stageType)
+        {
+            var simulationState = _matchDataService.SimulationState;
+            simulationState.ResetMolesHitPerTeam(_matchDataService.TeamIds);
+
+            if (stageType != StageType.WhacAMole)
+            {
+                simulationState.WhacAMoleEndTick = 0;
+                return;
+            }
+
+            var gamePlayConfig = _gamePlayConfigService.GamePlayConfig;
+            var stageDurationSeconds = gamePlayConfig.PreparationPhaseDuration + gamePlayConfig.WhacAMole.StageDurationSeconds;
+            var stageDurationTicks = (int)System.MathF.Ceiling(stageDurationSeconds * _networkConfig.TicksPerSeconds);
+            simulationState.WhacAMoleEndTick = _tickService.CurrentTick + stageDurationTicks;
+        }
+
+        private void CreateEnvironmentLayout(StageType stageType, float mapSizeMultiplier)
+        {
+            var environmentLayoutId = GenerateNextStageEnvironmentLayoutId(stageType);
             _matchDataService.SimulationState.EnvironmentLayoutId = environmentLayoutId;
             _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutId);
             
@@ -103,29 +133,38 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateFieldBarriers(mapSizeMultiplier);
         }
         
-        private int GenerateNextStageEnvironmentLayoutId()
+        private int GenerateNextStageEnvironmentLayoutId(StageType stageType)
         {
             var environmentLayoutId = _gamePlayConfigService.GamePlayConfig.DeafultEnvironmentId;
             if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomStage)
             {
-                environmentLayoutId = GenerateRandomStageId();
+                environmentLayoutId = GenerateRandomStageId(stageType);
             }
 
             return environmentLayoutId;
         }
 
-        private int GenerateRandomStageId()
+        // Each stage type draws from its own pool and never repeats a layout until that pool is exhausted.
+        private int GenerateRandomStageId(StageType stageType)
         {
-            var didntPlayYetStageIndexes = _matchDataService.DidntPlayYetStageIndexes;
+            var availableLayoutIndexes = _sharedGamePlayConfig.Environment.GetLayoutIndexesForStageType(stageType);
+
+            if (availableLayoutIndexes.IsNullOrEmpty())
+            {
+                LogService.LogError($"No environment layout indexes configured for stage type {stageType}!");
+                return _gamePlayConfigService.GamePlayConfig.DeafultEnvironmentId;
+            }
+
+            var didntPlayYetStageIndexes = _matchDataService.GetDidntPlayYetStageIndexes(stageType);
 
             if (didntPlayYetStageIndexes.IsNullOrEmpty())
             {
-                foreach (int index in _sharedGamePlayConfig.Environment.AvailableLayoutIndexes)
+                foreach (int index in availableLayoutIndexes)
                 {
                     didntPlayYetStageIndexes.Add(index);
                 }
             }
-                
+
             var randomIndex = RNG.NextInt(0, didntPlayYetStageIndexes.Count);
             var environmentLayoutId = didntPlayYetStageIndexes[randomIndex];
             didntPlayYetStageIndexes.RemoveAt(randomIndex);

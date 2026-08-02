@@ -31,6 +31,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _view.UpdateTeamBolts(teamId, teamBolts, _stageCancellationTokenProvider.CancellationTokenSource);
         }
 
+        public void UpdateTeamMolesHit(ushort teamId, int molesHit)
+        {
+            _view.UpdateTeamMolesHit(teamId, molesHit);
+        }
+
+        public void SetIsMolesHitShown(bool isShown)
+        {
+            _view.SetIsMolesHitShown(isShown);
+        }
+
         public void CreateTeamBoard(ushort teamId, int teamGems, int teamBolts)
         {
             if (_presentationGamePlayConfig.ColorPerTeamId.TryGetValue(teamId, out var color))

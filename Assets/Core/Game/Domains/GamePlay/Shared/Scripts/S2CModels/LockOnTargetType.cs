@@ -4,6 +4,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
     {
         Heart = 0,
         PowerUpBall = 1,
-        StartMatchWall = 2
+        StartMatchWall = 2,
+        Mole = 3
     }
 }

@@ -43,6 +43,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
+        private TrySpawnMolesCommand _trySpawnMolesCommand;
+        private TryEndWhacAMoleStageCommand _tryEndWhacAMoleStageCommand;
         private ApplyGalacticPullForcesCommand _applyGalacticPullForcesCommand;
         private TryDeactivateEndedGalacticFieldsCommand _tryDeactivateEndedGalacticFieldsCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
@@ -87,6 +89,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _tryEndPlayersSpinIfReachedZeroAngularVecityCommand = _commandFactory.CreateCommandVoid<TryEndPlayersSpinIfReachedZeroAngularVecityCommand>();
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
+            _trySpawnMolesCommand = _commandFactory.CreateCommandVoid<TrySpawnMolesCommand>();
+            _tryEndWhacAMoleStageCommand = _commandFactory.CreateCommandVoid<TryEndWhacAMoleStageCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
             _stepFrigidBlocksCommand = _commandFactory.CreateCommandVoid<StepFrigidBlocksCommand>();
@@ -122,6 +126,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _playersPowerUpsManager.OnTick(currentTick);
                 _stepAllPlayersTalentsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
+                _trySpawnMolesCommand.SetProcessedTick(currentTick).Execute();
+                _tryEndWhacAMoleStageCommand.SetProcessedTick(currentTick).Execute();
                 _tryDeactivateEndedGalacticFieldsCommand.SetTick(currentTick).Execute();
                 _applyGalacticPullForcesCommand.Execute();
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();
@@ -315,6 +321,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.DeactivateRockTalentNetEvents = _netEventsDataService.DeactivateRockTalentNetEventsPerClient[clientId];
                 _fullTickPacket.ActivateFrozenTalentNetEvents = _netEventsDataService.ActivateFrozenTalentNetEventsPerClient[clientId];
                 _fullTickPacket.DeactivateFrozenTalentNetEvents = _netEventsDataService.DeactivateFrozenTalentNetEventsPerClient[clientId];
+                _fullTickPacket.MoleSpawnedNetEvents = _netEventsDataService.MoleSpawnedNetEventsPerClient[clientId];
+                _fullTickPacket.MoleHitNetEvents = _netEventsDataService.MoleHitNetEventsPerClient[clientId];
+                _fullTickPacket.MoleExpiredNetEvents = _netEventsDataService.MoleExpiredNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

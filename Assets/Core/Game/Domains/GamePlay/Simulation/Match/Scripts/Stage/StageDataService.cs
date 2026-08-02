@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
@@ -10,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         public Dictionary<ushort, int> GemsCollectedPerTeam { get; private set; }
         public bool IsStageEnded { get; set; }
         public float StageRestartTimer { get; set; }
+        public bool IsWhacAMoleStage => _matchDataService.SimulationState.StageType == StageType.WhacAMole;
 
         public StageDataService(IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig)
         {

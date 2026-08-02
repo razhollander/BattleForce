@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.ChickenEgg)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
                                     | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
+                                    | GetCollisionMask(PhysicsCollisionType.Mole)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerBullet);
                     break;
                 case PhysicsBodyType.PlayerHeart:
@@ -34,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.TalentCard)
                                     | GetCollisionMask(PhysicsCollisionType.PowerUpBall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
+                                    | GetCollisionMask(PhysicsCollisionType.Mole)
                                     | GetCollisionMask(PhysicsCollisionType.StartMatchWall);
                     break;
                 case PhysicsBodyType.Wall:
@@ -110,6 +112,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 case PhysicsBodyType.ChickenEgg:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsCollisionType.KOProjectile);
+                    break;
+                // A mole is a sensor that only needs to notice bullets and spaceships - those are the two ways it can be whacked.
+                case PhysicsBodyType.Mole:
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerBullet)
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 default:
                     collisionMask = 0xFFFF;

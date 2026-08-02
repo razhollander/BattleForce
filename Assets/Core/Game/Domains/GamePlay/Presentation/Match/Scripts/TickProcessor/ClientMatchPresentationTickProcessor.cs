@@ -105,6 +105,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleEndPowerUpGrantingPhaseNetEventsCommand _handleEndPowerUpGrantingPhaseNetEventsCommand;
         private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
         private readonly UpdatePreperationPhaseCountdownCommand _updatePreperationPhaseCountdownCommand;
+        private readonly UpdateWhacAMoleCountdownCommand _updateWhacAMoleCountdownCommand;
+        private readonly HandleMoleSpawnedNetEventsCommand _handleMoleSpawnedNetEventsCommand;
+        private readonly HandleMoleHitNetEventsCommand _handleMoleHitNetEventsCommand;
+        private readonly HandleMoleExpiredNetEventsCommand _handleMoleExpiredNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -195,6 +199,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleEndPowerUpGrantingPhaseNetEventsCommand = commandFactory.CreateCommandVoid<HandleEndPowerUpGrantingPhaseNetEventsCommand>();
             _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
             _updatePreperationPhaseCountdownCommand = commandFactory.CreateCommandVoid<UpdatePreperationPhaseCountdownCommand>();
+            _updateWhacAMoleCountdownCommand = commandFactory.CreateCommandVoid<UpdateWhacAMoleCountdownCommand>();
+            _handleMoleSpawnedNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleSpawnedNetEventsCommand>();
+            _handleMoleHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleHitNetEventsCommand>();
+            _handleMoleExpiredNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleExpiredNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -240,6 +248,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateSwapFieldsTransformCommand.SetTick(lastProcessedTickFromServer).Execute();// must be after _playerControllers.UpdatePlayersTickDeltas();
             _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTickDeltas();
             _updatePreperationPhaseCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
+            _updateWhacAMoleCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
+            _handleMoleSpawnedNetEventsCommand.Execute();
+            _handleMoleHitNetEventsCommand.Execute();
+            _handleMoleExpiredNetEventsCommand.Execute();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();
             _handleDeactivateKOTalentNetEventsCommand.Execute();
             _handleCreateGrapplingHookProjecitleNetEventsCommand.Execute();

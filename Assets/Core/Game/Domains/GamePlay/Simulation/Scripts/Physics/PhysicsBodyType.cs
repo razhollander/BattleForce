@@ -24,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         FrigidBlock = 18,
         FishingRodTip = 19,
         SoulGhost = 20,
+        Mole = 21,
     }
     
     public enum PhysicsCollisionType
@@ -43,5 +44,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         FrigidBlock = 12,
         FishingRodTip = 13,
         SoulGhost = 14,
+        Mole = 15,
     }
 }

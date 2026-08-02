@@ -269,6 +269,49 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessMoleSpawnedEvents(CapacityList<MoleSpawnedNetEventS2C> moleSpawnedNetEvents)
+        {
+            if (moleSpawnedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var moleSpawnedNetEvent in moleSpawnedNetEvents)
+            {
+                _matchDataService.AddMole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.Position.ToUnityVector2());
+                _cachedPresentationEventsService.MoleSpawnedNetEvents.Add(moleSpawnedNetEvent);
+            }
+        }
+
+        public void ProcessMoleHitEvents(CapacityList<MoleHitNetEventS2C> moleHitNetEvents)
+        {
+            if (moleHitNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var moleHitNetEvent in moleHitNetEvents)
+            {
+                _matchDataService.RemoveMole(moleHitNetEvent.MoleId);
+                _matchDataService.SetTeamMolesHit(moleHitNetEvent.ByTeamId, moleHitNetEvent.TeamMolesHitTotal);
+                _cachedPresentationEventsService.MoleHitNetEvents.Add(moleHitNetEvent);
+            }
+        }
+
+        public void ProcessMoleExpiredEvents(CapacityList<MoleExpiredNetEventS2C> moleExpiredNetEvents)
+        {
+            if (moleExpiredNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var moleExpiredNetEvent in moleExpiredNetEvents)
+            {
+                _matchDataService.RemoveMole(moleExpiredNetEvent.MoleId);
+                _cachedPresentationEventsService.MoleExpiredNetEvents.Add(moleExpiredNetEvent);
+            }
+        }
+
         public void ProcessStageEndEvents(CapacityList<StageEndNetEventS2C> stageEndNetEvents)
         {
             if (stageEndNetEvents.IsNullOrEmpty())

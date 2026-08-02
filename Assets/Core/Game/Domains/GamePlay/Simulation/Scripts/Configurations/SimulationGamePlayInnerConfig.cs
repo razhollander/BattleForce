@@ -31,6 +31,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public bool ShouldAddTalentEveryXStages = false;
         [ConditionalField(nameof(ShouldAddTalentEveryXStages), true)]
         public int EveryXStages = 2;
+        public bool IsWhacAMoleModeEnabled = true;
+        [ConditionalField(nameof(IsWhacAMoleModeEnabled), true)]
+        public int WhacAMoleEveryXStages = 3;
+        public WhacAMoleConfig WhacAMole;
         public float StageSizeMultiplier = 1.0f;
         public float SpeedupSimulation = 2f;
         public bool IsAutoShoot = false;

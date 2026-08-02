@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.CoolBGMusic.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc;
@@ -50,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
+        private IMoleControllers _moleControllers;
         private IPowerUpBallObtainedEffectController _powerUpBallObtainedEffectController;
         private ITalentCardControllers _talentCardControllers;
         private IMatchPlayerControllers _playerControllers;
@@ -100,6 +102,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardObtainedEffectController = _diContainer.Resolve<ITalentCardObtainedEffectController>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
+            _moleControllers = _diContainer.Resolve<IMoleControllers>();
             _powerUpBallObtainedEffectController = _diContainer.Resolve<IPowerUpBallObtainedEffectController>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
@@ -150,6 +153,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentFieldBarrierControllers.InitEntryPoint();
             _talentCardObtainedEffectController.InitEntryPoint();
             _powerUpBallControllers.InitEntryPoint();
+            _moleControllers.InitEntryPoint();
             _swapFieldControllers.InitEntryPoint();
             _koProjectilesControllers.InitEntryPoint();
             _grapplingHookProjectilesControllers.InitEntryPoint();

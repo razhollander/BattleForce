@@ -12,11 +12,11 @@ Introduce a second game mode alongside the existing one. Concretely:
 
 1. Rename the current health-based elimination mode from the generic "the normal stage" to **DeathMatch**. `StageType.DeathMatch` already exists (`Shared/Scripts/Enums/StageType.cs`) — this is mostly making the *behavior* explicitly branch on stage type, and naming things consistently.
 2. Add a new **`StageType.WhacAMole`** mode with these rules:
-   - **Moles** spawn at random positions during the stage.
-   - Players destroy a Mole by **shooting it (bullet)** or **spinning into it** (the player's spinning body hitting the Mole). When hit, the Mole **disappears** and the hitting player's **team score ("moles hit") increments**.
-   - **No player health / no deaths.** Players cannot damage each other by shooting — bullets pass through / do not damage enemy players. **Talents still affect enemies** (spin, KO, fishing rod, etc. keep working).
+   - **Moles** spawn at random positions during the stage. The available spawn positions for each environment should be pre-determinded in the EnvironmentLayoutConfig. After X seconds a Mole which wasn't hit - **dissapears**.
+   - Players destroy a Mole by **shooting it (bullet)** or **shooting it (with a lock on target on the Mole)** or **Hitting it with a spin talent (for example hitting with a KO talent spins the target which got hit). When hit, the Mole **disappears** and the hitting player's **team score ("moles hit") increments**.
+   - **No player health / no deaths.** Players cannot damage each other by shooting and can't lock on target on eachother— Note:bullets dont pass through enemies but they do not damage enemy players. Players dont have health. **Talents still affect enemies** (spin, KO, fishing rod, etc. keep working).
    - **PowerUp balls still spawn** (same system as today).
-   - A **countdown timer is shown in the middle of the screen.** When it reaches zero the stage ends and the **team with the most Moles hit wins** (define tie-breaking, see §7).
+   - A **countdown timer is shown in the middle of the screen.** When it reaches zero the stage ends and the **team with the most Moles hit wins and gets the most gems**. If tie - then they receive the same amount of gems
 3. **Stage rotation:** every **X (default 3)** stages the players enter is a Whac-A-Mole stage; the rest are DeathMatch.
 4. Whac-A-Mole is **configurable** and has its **own pool of environment layouts** (chosen randomly from that pool, independent of the DeathMatch pool).
 
@@ -201,7 +201,7 @@ Add `MoleStateS2C` — `Shared/Scripts/S2CModels/MoleStateS2C.cs`. Model after `
 ```csharp
 public ushort Id;
 public System.Numerics.Vector2 Position;
-// optional: float RemainingLifetimeSeconds; (server-only need not serialize if not shown)
+// optional: int DissapearInTick; (server-only need not serialize if not shown)
 ```
 Serialize position quantized like other entities.
 
@@ -231,7 +231,7 @@ Also add an `AddMole(...)` convenience on `IMatchDataService`/`MatchDataService`
                       | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
       break;
   ```
-- Add `GetCollisionMask(PhysicsCollisionType.Mole)` to the **PlayerBullet** case and the **PlayerSpaceship** case so those bodies see moles.
+- Add `GetCollisionMask(PhysicsCollisionType.Mole)` to the **PlayerBullet** case and the talents that can hit it. also sometimes the player can hit a Mole by performing a Rock on it or hit it while being dragged by a grapling hook (because both spin the target which got hit).
   - ⚠️ Adding Mole to the PlayerBullet mask means bullets will now generate contacts with moles in *all* modes. That's fine because moles only exist in Whac-A-Mole stages (none are spawned otherwise), so there are no mole bodies to contact in DeathMatch.
 
 `Simulation/Scripts/Physics/IPhysicsSimulator.cs` + `PhysicsSimulator.cs`:

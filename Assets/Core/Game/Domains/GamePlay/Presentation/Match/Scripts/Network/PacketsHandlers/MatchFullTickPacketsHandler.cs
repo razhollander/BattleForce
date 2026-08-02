@@ -51,6 +51,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PlayerEndedExposedToLavaNetEventS2C> _cachedUnprocessedPlayerEndedExposedToLavaEvents;
         private readonly CapacityList<PowerUpBallSpawnedNetEventS2C> _cachedUnprocessedPowerUpBallSpawnedEvents;
         private readonly CapacityList<PowerUpBallObtainedNetEventS2C> _cachedUnprocessedPowerUpBallObtainedEvents;
+        private readonly CapacityList<MoleSpawnedNetEventS2C> _cachedUnprocessedMoleSpawnedEvents;
+        private readonly CapacityList<MoleHitNetEventS2C> _cachedUnprocessedMoleHitEvents;
+        private readonly CapacityList<MoleExpiredNetEventS2C> _cachedUnprocessedMoleExpiredEvents;
         private readonly CapacityList<StageEndNetEventS2C> _cachedUnprocessedStageEndEvents;
         private readonly CapacityList<TeamLostNetEventS2C> _cachedUnprocessedTeamLostEvents;
         private readonly CapacityList<TalentSwitchNetEventS2C> _cachedUnprocessedTalentSwitchEvents;
@@ -149,6 +152,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPlayerEndedExposedToLavaEvents = new CapacityList<PlayerEndedExposedToLavaNetEventS2C>(networkConfig.MaxCap.PlayerEndedExposedToLavaNetEvents);
             _cachedUnprocessedPowerUpBallSpawnedEvents = new CapacityList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents);
             _cachedUnprocessedPowerUpBallObtainedEvents = new CapacityList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents);
+            _cachedUnprocessedMoleSpawnedEvents = new CapacityList<MoleSpawnedNetEventS2C>(networkConfig.MaxCap.MoleSpawnedNetEvents);
+            _cachedUnprocessedMoleHitEvents = new CapacityList<MoleHitNetEventS2C>(networkConfig.MaxCap.MoleHitNetEvents);
+            _cachedUnprocessedMoleExpiredEvents = new CapacityList<MoleExpiredNetEventS2C>(networkConfig.MaxCap.MoleExpiredNetEvents);
             _cachedUnprocessedStageEndEvents = new CapacityList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents);
             _cachedUnprocessedTeamLostEvents = new CapacityList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
             _cachedUnprocessedTalentSwitchEvents = new CapacityList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents);
@@ -272,6 +278,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessTalentCardObtainedEvents(latestFullTickPacket.TalentCardObtainedNetEvents, ignoreEventsNotAboveTick);
             ProcessPowerUpBallSpawnedEvents(latestFullTickPacket.PowerUpSpawnedNetEvents, ignoreEventsNotAboveTick);
             ProcessPowerUpBallObtainedEvents(latestFullTickPacket.PowerUpObtainedNetEvents, ignoreEventsNotAboveTick);
+            ProcessMoleSpawnedEvents(latestFullTickPacket.MoleSpawnedNetEvents, ignoreEventsNotAboveTick);
+            ProcessMoleHitEvents(latestFullTickPacket.MoleHitNetEvents, ignoreEventsNotAboveTick);
+            ProcessMoleExpiredEvents(latestFullTickPacket.MoleExpiredNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerDiedEvents(latestFullTickPacket.PlayerDiedNetEvents, ignoreEventsNotAboveTick);
             ProcessStageEndEvents(latestFullTickPacket.StageEndNetEvents, ignoreEventsNotAboveTick);
             ProcessTeamLostEvents(latestFullTickPacket.TeamLostNetEvents, ignoreEventsNotAboveTick);
@@ -1334,6 +1343,63 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedPowerUpBallObtainedEvents.Sort();
                 _presentationNetEventsHandler.ProcessPowerUpObtainedEvents(_cachedUnprocessedPowerUpBallObtainedEvents);
+            }
+        }
+
+        private void ProcessMoleSpawnedEvents(FixedUnorderedList<MoleSpawnedNetEventS2C> moleSpawnedNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedMoleSpawnedEvents.Clear();
+
+            foreach (var netEvent in moleSpawnedNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedMoleSpawnedEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedMoleSpawnedEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedMoleSpawnedEvents.Sort();
+                _presentationNetEventsHandler.ProcessMoleSpawnedEvents(_cachedUnprocessedMoleSpawnedEvents);
+            }
+        }
+
+        private void ProcessMoleHitEvents(FixedUnorderedList<MoleHitNetEventS2C> moleHitNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedMoleHitEvents.Clear();
+
+            foreach (var netEvent in moleHitNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedMoleHitEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedMoleHitEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedMoleHitEvents.Sort();
+                _presentationNetEventsHandler.ProcessMoleHitEvents(_cachedUnprocessedMoleHitEvents);
+            }
+        }
+
+        private void ProcessMoleExpiredEvents(FixedUnorderedList<MoleExpiredNetEventS2C> moleExpiredNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedMoleExpiredEvents.Clear();
+
+            foreach (var netEvent in moleExpiredNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedMoleExpiredEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedMoleExpiredEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedMoleExpiredEvents.Sort();
+                _presentationNetEventsHandler.ProcessMoleExpiredEvents(_cachedUnprocessedMoleExpiredEvents);
             }
         }
 

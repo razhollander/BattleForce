@@ -89,13 +89,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
+            if (_stageDataService.IsWhacAMoleStage) // Whac-A-Mole players have no health, so nothing can damage them
+            {
+                return;
+            }
+
             var playerState = _matchDataService.SimulationState.GetPlayerById(_playerIdGotHit);
 
             if (!playerState.Spaceship.IsAlive)
             {
                 return;
             }
-            
+
             var isPlayerInvulnerableToDamage = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerIdGotHit, TalentType.Rock)
                 || _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerIdGotHit, TalentType.Frozen);
             if (isPlayerInvulnerableToDamage)

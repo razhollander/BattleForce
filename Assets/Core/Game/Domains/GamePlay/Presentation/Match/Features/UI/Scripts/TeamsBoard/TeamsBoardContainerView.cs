@@ -28,6 +28,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _boardViewsPerTeam[teamId].UpdateBolts(teamBolts, cancellationTokenSource);
         }
 
+        public void UpdateTeamMolesHit(ushort teamId, int molesHit)
+        {
+            _boardViewsPerTeam[teamId].UpdateMolesHit(molesHit);
+        }
+
+        public void SetIsMolesHitShown(bool isShown)
+        {
+            foreach (var boardUIView in _boardViewsPerTeam)
+            {
+                boardUIView.Value.SetIsMolesHitShown(isShown);
+            }
+        }
+
         public void DestroyAll()
         {
             foreach (var boardUIView in _boardViewsPerTeam)

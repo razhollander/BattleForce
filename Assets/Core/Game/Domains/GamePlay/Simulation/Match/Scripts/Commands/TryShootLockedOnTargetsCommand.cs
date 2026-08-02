@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private TryHitPlayerCommand _tryHitPlayerCommand;
         private ObtainPowerUpBallCommand _obtainPowerUpBallCommand;
+        private TryHitMoleCommand _tryHitMoleCommand;
 
         private int _processedTick;
         private ushort _casterPlayerId;
@@ -41,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _tryHitPlayerCommand = _commandFactory.CreateCommandVoid<TryHitPlayerCommand>();
             _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
+            _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
         }
 
         public void Execute()
@@ -67,6 +69,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     case LockOnTargetType.PowerUpBall:
                         ShootPowerUpBallTarget(targetId);
                         break;
+                    case LockOnTargetType.Mole:
+                        ShootMoleTarget(targetId);
+                        break;
                 }
             }
         }
@@ -81,6 +86,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 .Execute();
 
             _netEventsDataService.AddPlayerLockedOnTargetHitNetEvent(_processedTick, _casterPlayerId, targetId);
+        }
+
+        private void ShootMoleTarget(ushort moleId)
+        {
+            var casterTeamId = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId).TeamId;
+            _tryHitMoleCommand
+                .SetMoleId(moleId)
+                .SetByPlayerId(_casterPlayerId)
+                .SetByTeamId(casterTeamId)
+                .SetProcessedTick(_processedTick)
+                .Execute();
         }
 
         private void ShootPowerUpBallTarget(ushort powerUpBallId)

@@ -19,7 +19,9 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scri
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.WhacAMoleCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
@@ -70,6 +72,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private GainBoltEffectView gainBoltEffectViewPrefab;
         [SerializeField] private HitDamageIndicatorEffectView _hitDamageIndicatorEffectViewPrefab;
         [SerializeField] private PreparationPhaseCountdownView _preparationPhaseCountdownView;
+        [SerializeField] private WhacAMoleCountdownView _whacAMoleCountdownView;
+        [SerializeField] private MoleView _moleViewPrefab;
         [SerializeField] private PlayerTeleportEffectView playerTeleportEffectViewPrefab;
         [SerializeField] private HeadbuttHitEffectView _headbuttHitEffectViewPrefab;
         [SerializeField] private EnvironmentFieldBarrierView _environmentFieldBarrierViewPrefab;
@@ -130,6 +134,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<GainBoltEffectController>().AsSingle().WithArguments(gainBoltEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<HitDamageIndicatorEffectController>().AsSingle().WithArguments(_hitDamageIndicatorEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<PreparationPhaseCountdownController>().AsSingle().WithArguments(_preparationPhaseCountdownView).NonLazy();
+            Container.BindInterfacesTo<WhacAMoleCountdownController>().AsSingle().WithArguments(_whacAMoleCountdownView).NonLazy();
+            Container.BindInterfacesTo<MoleControllers>().AsSingle().WithArguments(_moleViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentTeleportGateControllers>().AsSingle().WithArguments(_environmentTeleportGateViewPrefab).NonLazy();
             Container.BindInterfacesTo<PlayerTeleportEffectController>().AsSingle().WithArguments(playerTeleportEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<HeadbuttHitEffectController>().AsSingle().WithArguments(_headbuttHitEffectViewPrefab).NonLazy();

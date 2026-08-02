@@ -24,11 +24,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentFrigidBlockStateS2C> FrigidBlocks;
         public FixedUnorderedList<TalentChickenEggStateS2C> ChickenEggs;
         public FixedUnorderedList<GalacticForceFieldS2C> GalacticForceFields;
+        public FixedUnorderedList<MoleStateS2C> Moles;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
+        public Dictionary<ushort, int> MolesHitPerTeamId;
         public FixedOrderedList<ushort> FieldBarriersOrderedByTeamId;
         public int EnvironmentLayoutId;
         public StageType StageType;
+        public int WhacAMoleEndTick;
         public int PreperationPhaseStartedOnTick;
         public int PreperationPhaseEndedOnTick;
         public bool IsInPreparationPhase;
@@ -36,7 +39,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public ushort CurrentStageWinnerTeamId;
         public float MapSizeMultiplier;
         
-        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs, int maxGalacticForceFields, int maxFrigidBlocks)
+        public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs, int maxGalacticForceFields, int maxFrigidBlocks,
+            int maxMoles)
         {
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer, maxPlayers - 1 + maxPowerUpBalls));
             Bullets = new FixedOrderedList<PlayerBulletS2C>(maxBullets);
@@ -50,8 +54,10 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             FrigidBlocks = new FixedUnorderedList<TalentFrigidBlockStateS2C>(maxFrigidBlocks);
             ChickenEggs = new FixedUnorderedList<TalentChickenEggStateS2C>(maxChickenEggs);
             GalacticForceFields = new FixedUnorderedList<GalacticForceFieldS2C>(maxGalacticForceFields);
+            Moles = new FixedUnorderedList<MoleStateS2C>(maxMoles);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
+            MolesHitPerTeamId = new Dictionary<ushort, int>(maxTeams);
             FieldBarriersOrderedByTeamId = new FixedOrderedList<ushort>(maxTeams);
         }
 
@@ -88,18 +94,31 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 powerUp.Serialize(writer);
             }
 
+            var molesCount = Moles.Count;
+            writer.Put((byte)molesCount);
+            foreach (var mole in Moles.AsSpan())
+            {
+                mole.Serialize(writer);
+            }
+
             foreach (var kvp in GemsPerTeamId)
             {
                 writer.Put(kvp.Key);
                 writer.Put(kvp.Value);
             }
-            
+
             foreach (var kvp in BoltsPerTeam)
             {
                 writer.Put(kvp.Key);
                 writer.Put(kvp.Value);
             }
-            
+
+            foreach (var kvp in MolesHitPerTeamId)
+            {
+                writer.Put(kvp.Key);
+                writer.Put(kvp.Value);
+            }
+
             var swapFieldsCount = SwapFields.Count;
             writer.Put((byte)swapFieldsCount);
             foreach (var swapField in SwapFields.AsSpan())
@@ -163,6 +182,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             writer.Put((byte)EnvironmentLayoutId);
             writer.Put((byte)StageType);
+            writer.Put(WhacAMoleEndTick);
             writer.Put(PreperationPhaseStartedOnTick);
             writer.Put(PreperationPhaseEndedOnTick);
             writer.Put(IsInPreparationPhase);
@@ -207,6 +227,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 powerUp.Deserialize(reader);
             }
             
+            var molesCount = reader.GetByte();
+            Moles.Clear();
+            for (var i = 0; i < molesCount; i++)
+            {
+                ref var mole = ref Moles.AddAndGet();
+                mole.Deserialize(reader);
+            }
+
             GemsPerTeamId.Clear();
             for (int i = 0; i < amountOfTeams; i++)
             {
@@ -221,6 +249,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 var teamId = reader.GetUShort();
                 var bolts = reader.GetInt();
                 BoltsPerTeam.Add(teamId, bolts);
+            }
+
+            MolesHitPerTeamId.Clear();
+            for (int i = 0; i < amountOfTeams; i++)
+            {
+                var teamId = reader.GetUShort();
+                var molesHit = reader.GetInt();
+                MolesHitPerTeamId.Add(teamId, molesHit);
             }
 
             var swapFieldsCount = reader.GetByte();
@@ -296,6 +332,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             EnvironmentLayoutId = reader.GetByte();
             StageType = (StageType)reader.GetByte();
+            WhacAMoleEndTick = reader.GetInt();
             PreperationPhaseStartedOnTick = reader.GetInt();
             PreperationPhaseEndedOnTick = reader.GetInt();
             IsInPreparationPhase = reader.GetBool();
@@ -1030,6 +1067,76 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             throw new System.Exception($"No galactic force field for id {fieldId}!");
         }
 
+        public bool TryGetMoleIndexById(ushort moleId, out int moleIndex)
+        {
+            for (int i = 0; i < Moles.Count; i++)
+            {
+                if (Moles[i].Id == moleId)
+                {
+                    moleIndex = i;
+                    return true;
+                }
+            }
+
+            moleIndex = -1;
+            return false;
+        }
+
+        public bool TryGetMoleById(ushort moleId, out MoleStateS2C mole)
+        {
+            for (int i = 0; i < Moles.Count; i++)
+            {
+                if (Moles[i].Id == moleId)
+                {
+                    mole = Moles.GetByIndex(i);
+                    return true;
+                }
+            }
+
+            mole = default;
+            return false;
+        }
+
+        public ref MoleStateS2C GetMoleById(ushort moleId)
+        {
+            for (int i = 0; i < Moles.Count; i++)
+            {
+                if (Moles[i].Id == moleId)
+                {
+                    return ref Moles.GetByIndex(i);
+                }
+            }
+
+            throw new System.Exception($"No mole for id {moleId}!");
+        }
+
+        public void RemoveMoleById(ushort moleId)
+        {
+            for (int i = 0; i < Moles.Count; i++)
+            {
+                if (Moles[i].Id == moleId)
+                {
+                    Moles.RemoveAt(i);
+                    return;
+                }
+            }
+
+            throw new System.Exception($"No mole for id {moleId}!");
+        }
+
+        public void AddMolesHitForTeam(ushort teamId, int molesHitDelta)
+        {
+            MolesHitPerTeamId[teamId] += molesHitDelta;
+        }
+
+        public void ResetMolesHitPerTeam(HashSet<ushort> teamIds)
+        {
+            foreach (var teamId in teamIds)
+            {
+                MolesHitPerTeamId[teamId] = 0;
+            }
+        }
+
         public void ClearObjectStates()
         {
             Bullets.Clear();
@@ -1043,6 +1150,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             FrigidBlocks.Clear();
             ChickenEggs.Clear();
             GalacticForceFields.Clear();
+            Moles.Clear();
             FieldBarriersOrderedByTeamId.Clear();
         }
     }

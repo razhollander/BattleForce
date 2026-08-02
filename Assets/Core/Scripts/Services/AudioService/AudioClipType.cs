@@ -53,6 +53,8 @@ namespace Core.Scripts.Services.AudioService
         FishingRodActivate = 52,
         FishingRodThrowEnemy = 53,
         WaterGunLoop = 54,
-        FishingRodHitWall = 55
+        FishingRodHitWall = 55,
+        MoleSpawned = 56,
+        MoleHit = 57
     }
 }

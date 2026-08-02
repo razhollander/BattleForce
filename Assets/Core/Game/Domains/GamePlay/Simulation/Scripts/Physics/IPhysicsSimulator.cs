@@ -31,6 +31,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
         void AddTalentCard(ushort id, Vector2 position, float length, float height);
         void AddPowerUpBall(ushort id, Vector2 position, Vector2 velocity, float radius);
+        void AddMole(ushort id, Vector2 position, float radius);
+        void RemoveMole(ushort id);
         Body GetBullet(ushort bulletId);
         Body GetPowerUpBall(ushort powerUpBallId);
         void RemoveBody(Body body);

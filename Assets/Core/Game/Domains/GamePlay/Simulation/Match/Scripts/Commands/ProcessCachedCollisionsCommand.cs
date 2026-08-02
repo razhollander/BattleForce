@@ -40,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ObtainPowerUpBallCommand _obtainPowerUpBallCommand;
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private UpdatePlayerLavaExposureCommand _updatePlayerLavaExposureCommand;
+        private TryHitMoleCommand _tryHitMoleCommand;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
         {
@@ -58,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
             _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
             _updatePlayerLavaExposureCommand = _commandFactory.CreateCommandVoid<UpdatePlayerLavaExposureCommand>();
+            _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
@@ -117,6 +119,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePowerUpBallFrigidBlockCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerRockCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePowerUpBallRockCollision(objectA, objectB, collisionEvent.Contact);
+                HandleBulletMoleCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerMoleCollision(objectA, objectB);
             }
 
             _physicsSimulator.ClearCachedCollisions();
@@ -197,6 +201,84 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             powerUpBallModel.Velocity = relativeVelocity.ReflectFromWall(collisionNormal);
+        }
+
+        private void HandleBulletMoleCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBulletToMole = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.Mole;
+            var isMoleToBullet = objectA.PhysicsBodyType == PhysicsBodyType.Mole && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+
+            if (!isBulletToMole && !isMoleToBullet)
+            {
+                return;
+            }
+
+            var bulletId = isBulletToMole ? objectA.Id : objectB.Id;
+            var bulletBody = isBulletToMole ? contact.FixtureA.Body : contact.FixtureB.Body;
+            var moleId = isBulletToMole ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetBulletById(bulletId, out var bulletModel))
+            {
+                LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            if (!_matchDataService.SimulationState.TryGetMoleIndexById(moleId, out _))
+            {
+                LogService.LogTopic("Mole was already removed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            DestroyBullet(bulletModel, bulletBody);
+            HitMole(moleId, bulletModel.BelongToPlayerId);
+        }
+
+        // A mole is smashed by a ship only while that ship is in a state that would spin whatever it touches.
+        private void HandlePlayerMoleCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isPlayerToMole = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Mole;
+            var isMoleToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.Mole && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerToMole && !isMoleToPlayer)
+            {
+                return;
+            }
+
+            var playerId = isPlayerToMole ? objectA.Id : objectB.Id;
+            var moleId = isPlayerToMole ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetMoleIndexById(moleId, out _))
+            {
+                LogService.LogTopic("Mole was already removed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            if (!CanPlayerSmashMoles(playerId))
+            {
+                return;
+            }
+
+            HitMole(moleId, playerId);
+        }
+
+        private bool CanPlayerSmashMoles(ushort playerId)
+        {
+            var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+
+            return playerState.Spaceship.IsSpinned
+                   || IsRockActiveForPlayer(playerId)
+                   || _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.GrapplingHook);
+        }
+
+        private void HitMole(ushort moleId, ushort byPlayerId)
+        {
+            var byTeamId = _matchDataService.SimulationState.GetPlayerById(byPlayerId).TeamId;
+            _tryHitMoleCommand
+                .SetMoleId(moleId)
+                .SetByPlayerId(byPlayerId)
+                .SetByTeamId(byTeamId)
+                .SetProcessedTick(_processedTick)
+                .Execute();
         }
 
         private bool IsRockActiveForPlayer(ushort playerId)
@@ -961,7 +1043,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 return;
             }
-            
+
             _tryHitPlayerCommand
                 .SetPlayerIdGotHit(playerId)
                 .SetWasHitByAnotherPlayer(true, bulletModel.BelongToPlayerId)

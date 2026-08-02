@@ -21,6 +21,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<PlayerEndedExposedToLavaNetEventS2C> PlayerEndedExposedToLavaNetEvents { get; } = new();
         public List<PowerUpBallSpawnedNetEventS2C> PowerUpBallSpawnedNetEvents { get; } = new();
         public List<PowerUpBallObtainedNetEventS2C> PowerUpBallObtainedNetEvents { get; } = new();
+        public List<MoleSpawnedNetEventS2C> MoleSpawnedNetEvents { get; } = new();
+        public List<MoleHitNetEventS2C> MoleHitNetEvents { get; } = new();
+        public List<MoleExpiredNetEventS2C> MoleExpiredNetEvents { get; } = new();
         public List<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents { get; } = new();
         public List<StageEndNetEventS2C> StageEndNetEvents { get; } = new();
         public List<TeamLostNetEventS2C> TeamLostNetEvents { get; } = new();

@@ -17,6 +17,8 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.WhacAMoleCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
@@ -79,6 +81,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private IPreparationPhaseCountdownController _preparationPhaseCountdownController;
         private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
+        private IMoleControllers _moleControllers;
+        private IWhacAMoleCountdownController _whacAMoleCountdownController;
 
         private MatchSimulationStateS2C _simulationState;
         private int _stateOccouredOnTick;
@@ -130,6 +134,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
             _preparationPhaseCountdownController = _diContainer.Resolve<IPreparationPhaseCountdownController>();
             _galacticPullStarEffectControllers = _diContainer.Resolve<IGalacticPullStarEffectControllers>();
+            _moleControllers = _diContainer.Resolve<IMoleControllers>();
+            _whacAMoleCountdownController = _diContainer.Resolve<IWhacAMoleCountdownController>();
         }
 
         public void Execute()
@@ -140,6 +146,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService.IsInShowoffWinners = _simulationState.IsInShowoffWinners;
             _matchDataService.CurrentStageWinnerTeamId = _simulationState.CurrentStageWinnerTeamId;
             _matchDataService.StageType = _simulationState.StageType;
+            _matchDataService.WhacAMoleEndTick = _simulationState.WhacAMoleEndTick;
             _stageCancellationTokenProvider.CancelAndRegenarateStageToken();
             DestroyAll();
             CreateAll();
@@ -171,7 +178,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _chickenEggsControllers.DestroyAll();
             _galacticPullStarEffectControllers.DestroyAll();
             _lockOnTargetEffectController.DestroyAll();
+            _moleControllers.DestroyAll();
             _preparationPhaseCountdownController.StopCountdown();
+            _whacAMoleCountdownController.HideCountdown();
         }
 
         private void CreateAll()
@@ -196,6 +205,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateLavaWalls(mapSizeMultiplier);
             CreateTalentCards();
             CreatePowerUpBalls();
+            CreateMoles();
             CreateTeamBoards();
             var teleportGatesPerWheelId = CreateTeleportGates(mapSizeMultiplier);
             CreateRotatingWheels(mapSizeMultiplier, teleportGatesPerWheelId);
@@ -208,6 +218,35 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateFrigidBlocks();
             CreateChickenEggs();
             CreateGalacticPullStars();
+            SetupWhacAMoleHud();
+        }
+
+        // Whac-A-Mole players cannot be damaged, so their health bars are meaningless and the moles-hit score takes over.
+        private void SetupWhacAMoleHud()
+        {
+            var isWhacAMoleStage = _simulationState.StageType == StageType.WhacAMole;
+            _teamsBoardUIController.SetIsMolesHitShown(isWhacAMoleStage);
+
+            if (!isWhacAMoleStage)
+            {
+                return;
+            }
+
+            foreach (var player in _simulationState.Players.AsSpan())
+            {
+                _playerControllers.HidePlayerHealthBar(player.Id);
+                _playerUIControllers.HidePlayerHealthBar(player.Id);
+            }
+        }
+
+        private void CreateMoles()
+        {
+            foreach (var mole in _simulationState.Moles.AsSpan())
+            {
+                var position = mole.Position.ToUnityVector2();
+                _matchDataService.AddMole(mole.Id, position);
+                _moleControllers.CreateMole(mole.Id, position);
+            }
         }
 
         private void SetTeamsData()
@@ -218,8 +257,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _matchDataService.AddTeamIdIfDoesntExist(playerTeamId);
                 var teamGems = _simulationState.GemsPerTeamId[playerTeamId];
                 var teamBolts = _simulationState.BoltsPerTeam[playerTeamId];
+                var teamMolesHit = _simulationState.MolesHitPerTeamId[playerTeamId];
                 _matchDataService.SetTeamBolts(playerTeamId, teamBolts);
                 _matchDataService.SetTeamGems(playerTeamId, teamGems);
+                _matchDataService.SetTeamMolesHit(playerTeamId, teamMolesHit);
             }
         }
 
@@ -253,6 +294,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var teamGems = _matchDataService.GemsPerTeam[teamId];
                 var teamBolts = _matchDataService.BoltsPerTeam[teamId];
                 _teamsBoardUIController.CreateTeamBoard(teamId, teamGems, teamBolts);
+                _teamsBoardUIController.UpdateTeamMolesHit(teamId, _matchDataService.MolesHitPerTeam[teamId]);
             }
         }
 

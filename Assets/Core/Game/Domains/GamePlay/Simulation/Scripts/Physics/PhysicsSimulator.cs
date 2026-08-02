@@ -558,6 +558,39 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _circleShapePool.Return(circleShape);
         }
 
+        // Moles are stationary sensors: they must notice bullets and spaceships without pushing them around.
+        public void AddMole(ushort id, Vector2 position, float radius)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.Mole);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var circleShape = GetCircleShape();
+            circleShape.Radius = radius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = circleShape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.Mole.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.Mole.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(circleShape);
+        }
+
+        public void RemoveMole(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.Mole, id);
+            RemoveBody(body);
+        }
+
         public Body GetBullet(ushort bulletId)
         {
             return GetBody(PhysicsBodyType.PlayerBullet, bulletId);

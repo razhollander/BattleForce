@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchFrigidBlockModel> FrigidBlocks { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
+        public List<MatchMoleModel> Moles { get; private set; }
         public List<MatchChickenEggModel> ChickenEggs { get; private set; }
 
         public HashSet<ushort> TeamIds  {get; private set; }
@@ -43,6 +44,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public StageType StageType { get; set; }
         public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }
         public Dictionary<ushort, int> GemsPerTeam  {get; private set; }
+        public Dictionary<ushort, int> MolesHitPerTeam  {get; private set; }
+        public int WhacAMoleEndTick { get; set; }
 
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -55,9 +58,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             RotatingWheels = new List<MatchEnvironmentRotatingWheelModel>(networkConfig.MaxCap.ConcurrentEnvironmentRotatingWheels);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
             PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
+            Moles = new List<MatchMoleModel>(networkConfig.MaxCap.ConcurrentMoles);
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             BoltsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             GemsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
+            MolesHitPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             EnvironmentTeleportPairs = new List<MatchEnvironmentTeleportPairModel>(networkConfig.MaxCap.ConcurrentEvironmentTeleportPairs);
             FieldBarriers = new List<MatchEnvironmentFieldBarrierModel>(networkConfig.MaxCap.ConcurrentFieldBarriers);
             SwapFields = new List<MatchSwapFieldModel>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -131,6 +136,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newPowerUpBall;
         }
 
+        public MatchMoleModel GetMole(ushort moleId)
+        {
+            return Moles.Find(x => x.Id == moleId);
+        }
+
+        public MatchMoleModel AddMole(ushort moleId, UnityEngine.Vector2 position)
+        {
+            var newMole = new MatchMoleModel(moleId, position);
+            Moles.Add(newMole);
+            return newMole;
+        }
+
+        public void RemoveMole(ushort moleId)
+        {
+            var moleModel = GetMole(moleId);
+
+            if (moleModel == null)
+            {
+                LogService.LogError($"No mole to remove with id {moleId}!");
+                return;
+            }
+
+            Moles.Remove(moleModel);
+        }
+
         public void RemoveTalentCard(ushort cardId)
         {
             var talentCardModel = TalentCards.Find(x => x.Id == cardId);
@@ -180,6 +210,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             TeamIds.Add(teamId);
             BoltsPerTeam.TryAdd(teamId, 0);
             GemsPerTeam.TryAdd(teamId, 0);
+            MolesHitPerTeam.TryAdd(teamId, 0);
         }
 
         public MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle)
@@ -247,8 +278,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             RotatingWheels.Clear();
             TalentCards.Clear();
             PowerUpBalls.Clear();
+            Moles.Clear();
             BoltsPerTeam.Clear();
             GemsPerTeam.Clear();
+            MolesHitPerTeam.Clear();
             EnvironmentTeleportPairs.Clear();
             FieldBarriers.Clear();
             SwapFields.Clear();
@@ -268,6 +301,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public void SetTeamGems(ushort teamId, int totalTeamGems)
         {
             GemsPerTeam[teamId] = totalTeamGems;
+        }
+
+        public void SetTeamMolesHit(ushort teamId, int totalTeamMolesHit)
+        {
+            MolesHitPerTeam[teamId] = totalTeamMolesHit;
         }
 
         public bool IsTeamLeadingInGems(ushort teamId)

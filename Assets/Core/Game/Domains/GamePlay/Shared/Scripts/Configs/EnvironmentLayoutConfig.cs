@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [TextArea(1, 5)] [SerializeField] private string _fieldBarriersJson;
         [TextArea(1, 5)] [SerializeField] private string _stageBoundriesWallsJson;
         [TextArea(1, 5)] [SerializeField] private string _powerUpSpawnPointsJson;
+        [TextArea(1, 5)] [SerializeField] private string _moleSpawnPointsJson;
         [TextArea(1, 5)] [SerializeField] private string _cameraBoundariesJson;
 
         public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
@@ -93,6 +94,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             _powerUpSpawnPointsJson = powerUpSpawnPointsJson;
         }
 
+        public void SetMoleSpawnPointsJson(string moleSpawnPointsJson)
+        {
+            _moleSpawnPointsJson = moleSpawnPointsJson;
+        }
+
         public void SetCameraBoundariesJson(string cameraBoundariesJson)
         {
             _cameraBoundariesJson = cameraBoundariesJson;
@@ -148,6 +154,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                 return default;
             }
             return _powerUpSpawnPointsJson.FromJson<PowerUpSpawnPointConfig[]>();
+        }
+
+        public MoleSpawnPointConfig[] GetMoleSpawnPoints()
+        {
+            if (string.IsNullOrEmpty(_moleSpawnPointsJson))
+            {
+                return default;
+            }
+            return _moleSpawnPointsJson.FromJson<MoleSpawnPointConfig[]>();
         }
     }
 }

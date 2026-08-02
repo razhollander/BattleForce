@@ -11,12 +11,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         [SerializeField] private TextMeshProUGUI _gemCountText;
         [SerializeField] private CountableTextView _boltsCountText;
         [SerializeField] private Image _backgroundImage;
-        
+        [SerializeField] private GameObject _molesHitContainer;
+        [SerializeField] private TextMeshProUGUI _molesHitCountText;
+
         public void Setup(Color teamColor, int teamGems, int teamBolts)
         {
             _backgroundImage.color = teamColor;
             UpdateGems(teamGems);
             _boltsCountText.SetNumber(teamBolts);
+        }
+
+        public void SetIsMolesHitShown(bool isShown)
+        {
+            _molesHitContainer.SetActive(isShown);
+        }
+
+        public void UpdateMolesHit(int molesHit)
+        {
+            _molesHitCountText.text = molesHit.ToString();
         }
 
         public void UpdateGems(int gems)

@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchPlayerModel> Players { get; }
         List<MatchPlayerBulletModel> Bullets { get; }
         List<MatchPowerUpBallModel> PowerUpBalls { get; }
+        List<MatchMoleModel> Moles { get; }
         List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; }
         List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; }
         List<MatchEnvironmentSpikeModel> EnvironmentSpikes { get; }
@@ -29,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public bool IsInShowoffWinners { get; set; }
         public ushort CurrentStageWinnerTeamId { get; set; }
         public StageType StageType { get; set; }
+        public int WhacAMoleEndTick { get; set; }
         List<MatchKOProjectileModel> KOProjectiles { get; }
         List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
         List<MatchFishingRodTipModel> FishingRodTips { get; }
@@ -36,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchFrigidBlockModel> FrigidBlocks { get; }
         Dictionary<ushort, int> BoltsPerTeam  {get; }
         Dictionary<ushort, int> GemsPerTeam  {get; }
+        Dictionary<ushort, int> MolesHitPerTeam  {get; }
         void AddTeamIdIfDoesntExist(ushort teamId);
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
@@ -53,6 +56,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchPowerUpBallModel GetPowerUpBall(ushort powerUpBallId);
         MatchPowerUpBallModel AddPowerUpBall(ushort powerUpBallId, UnityEngine.Vector2 position);
         void RemovePowerUpBall(ushort powerUpBallId);
+        MatchMoleModel GetMole(ushort moleId);
+        MatchMoleModel AddMole(ushort moleId, UnityEngine.Vector2 position);
+        void RemoveMole(ushort moleId);
         MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort lavaWallId);
         MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle);
         MatchEnvironmentSpringModel GetEnvironmentSpring(ushort springId);
@@ -63,6 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);
         void SetTeamGems(ushort teamId, int totalTeamGems);
+        void SetTeamMolesHit(ushort teamId, int totalTeamMolesHit);
         bool IsTeamLeadingInGems(ushort teamId);
         void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition,
             float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation, Vector2 size);
