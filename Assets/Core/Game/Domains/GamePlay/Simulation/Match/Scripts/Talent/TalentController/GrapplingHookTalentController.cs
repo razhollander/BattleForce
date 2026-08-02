@@ -122,7 +122,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _isInReturnPhase = false;
 
             var config = _gamePlayConfigService.GamePlayConfig.Talents.GrapplingHookTalentConfig;
-            var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var aimDirection = casterPlayerState.Spaceship.AimDirection;
             var velocity = aimDirection * config.ProjectileSpeed;
             var size = _sharedConfig.GrapplingHookProjectileSize;
             var projectilePosition = casterPlayerState.Spaceship.Transform.Position + aimDirection * casterPlayerState.Spaceship.Transform.Radius;

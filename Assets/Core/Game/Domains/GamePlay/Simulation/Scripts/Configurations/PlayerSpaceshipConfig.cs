@@ -20,5 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float LockOnTargetMaxRange = 13f;
         public float LockOnTargetHalfArcAngleDegrees = 45;
         public ushort LockOnTargetHitDamage = 1;
+        public float BarrelDashForce = 40f;
+        public float BarrelDashSpinAmount = 50f;
     }
 }

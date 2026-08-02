@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public PlayerShootStateS2C Shoot;
         public PlayerHealthS2C Health;
         public PlayerTalentsStateS2C TalentsState;
+        public Vector2 AimDirection;
         public bool IsEngineOn = true;
         public bool IsAlive = true;
         public bool IsSpinned;
@@ -39,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 Transform = this.Transform,
                 Shoot = this.Shoot,
                 Health = this.Health,
+                AimDirection = this.AimDirection,
                 IsEngineOn = this.IsEngineOn,
                 IsAlive = this.IsAlive,
                 IsSpinned = this.IsSpinned,
@@ -66,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Shoot.Serialize(writer);
             Health.Serialize(writer);
             TalentsState.Serialize(writer);
+            writer.PutVector2AsAngle16(AimDirection);
             writer.Put(IsEngineOn);
             writer.Put(IsAlive);
             writer.Put((byte)AssistArrowType);
@@ -92,6 +95,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Shoot.Deserialize(reader);
             Health.Deserialize(reader);
             TalentsState.Deserialize(reader);
+            AimDirection = reader.GetVector2FromAngle16();
             IsEngineOn = reader.GetBool();
             IsAlive = reader.GetBool();
             AssistArrowType = (PlayerAssistArrowType) reader.GetByte();
@@ -116,7 +120,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             Transform.SerializeDeltas(writer);
             Shoot.SerializeDeltas(writer);
-            TalentsState.SerializeDeltas(writer);
+            writer.PutVector2AsAngle16(AimDirection);
             writer.Put((ushort)AssistArrowType);
         }
 
@@ -124,7 +128,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             Transform.DeserializeDeltas(reader);
             Shoot.DeserializeDeltas(reader);
-            TalentsState.DeserializeDeltas(reader);
+            AimDirection = reader.GetVector2FromAngle16();
             AssistArrowType = (PlayerAssistArrowType)reader.GetUShort();
         }
     }

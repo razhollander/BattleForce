@@ -97,7 +97,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var direction = casterPlayerState.Spaceship.AimDirection;
             var offset = casterPlayerState.Spaceship.Transform.Radius;
             var config = _gamePlayConfigService.GamePlayConfig.Talents.YearsOfPainTalentConfig;
             var colliderSize = config.RectangleColliderSize.ToNumericsVector2();
@@ -124,7 +124,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var config = _gamePlayConfigService.GamePlayConfig.Talents.YearsOfPainTalentConfig;
             var hitEnemyPlayer = _matchDataService.SimulationState.GetPlayerById(enemyId);
             var pushForce = config.PushForce;
-            var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var direction = casterPlayerState.Spaceship.AimDirection;
 
             var forceToEnemy = direction * pushForce;
             var randomSpin = RNG.NextFloat(config.MinSpin, config.MaxSpin);

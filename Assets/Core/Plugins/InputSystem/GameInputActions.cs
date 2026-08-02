@@ -199,6 +199,15 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""BarrelDash"",
+                    ""type"": ""Button"",
+                    ""id"": ""a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -397,6 +406,28 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""PowerUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""BarrelDash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c3d4e5f6-a7b8-4c9d-8e1f-2a3b4c5d6e7f"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""BarrelDash"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1007,6 +1038,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         m_GamePlay_TalentB = m_GamePlay.FindAction("TalentB", throwIfNotFound: true);
         m_GamePlay_TalentC = m_GamePlay.FindAction("TalentC", throwIfNotFound: true);
         m_GamePlay_PowerUp = m_GamePlay.FindAction("PowerUp", throwIfNotFound: true);
+        m_GamePlay_BarrelDash = m_GamePlay.FindAction("BarrelDash", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1112,6 +1144,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_GamePlay_TalentB;
     private readonly InputAction m_GamePlay_TalentC;
     private readonly InputAction m_GamePlay_PowerUp;
+    private readonly InputAction m_GamePlay_BarrelDash;
     /// <summary>
     /// Provides access to input actions defined in input action map "GamePlay".
     /// </summary>
@@ -1171,6 +1204,10 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "GamePlay/PowerUp".
         /// </summary>
         public InputAction @PowerUp => m_Wrapper.m_GamePlay_PowerUp;
+        /// <summary>
+        /// Provides access to the underlying input action "GamePlay/BarrelDash".
+        /// </summary>
+        public InputAction @BarrelDash => m_Wrapper.m_GamePlay_BarrelDash;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1233,6 +1270,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @PowerUp.started += instance.OnPowerUp;
             @PowerUp.performed += instance.OnPowerUp;
             @PowerUp.canceled += instance.OnPowerUp;
+            @BarrelDash.started += instance.OnBarrelDash;
+            @BarrelDash.performed += instance.OnBarrelDash;
+            @BarrelDash.canceled += instance.OnBarrelDash;
         }
 
         /// <summary>
@@ -1280,6 +1320,9 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @PowerUp.started -= instance.OnPowerUp;
             @PowerUp.performed -= instance.OnPowerUp;
             @PowerUp.canceled -= instance.OnPowerUp;
+            @BarrelDash.started -= instance.OnBarrelDash;
+            @BarrelDash.performed -= instance.OnBarrelDash;
+            @BarrelDash.canceled -= instance.OnBarrelDash;
         }
 
         /// <summary>
@@ -1664,6 +1707,13 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPowerUp(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "BarrelDash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnBarrelDash(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

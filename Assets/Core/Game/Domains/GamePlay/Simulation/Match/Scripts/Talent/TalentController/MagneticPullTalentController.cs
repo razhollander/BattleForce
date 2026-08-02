@@ -97,7 +97,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
             
-            var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var direction = casterPlayerState.Spaceship.AimDirection;
             var offset = casterPlayerState.Spaceship.Transform.Radius;
             var center = casterPlayerState.Spaceship.Transform.Position + (direction * offset);
             ushort hitEnemyId = 0;

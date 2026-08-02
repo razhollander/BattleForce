@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
         private const float ShootChance = 0.85f;
         private const float TalentPressChancePerTick = 0.01f;
         private const float PowerUpPressChancePerTick = 0.005f;
+        private const float BarrelDashPressChancePerTick = 0.01f;
 
         private readonly CapacityDict<ushort, RandomInputState> _statePerPlayer;
 
@@ -52,6 +53,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
             input.IsTalentBInputPressed = RNG.RNG.NextFloat() < TalentPressChancePerTick;
             input.IsTalentCInputPressed = RNG.RNG.NextFloat() < TalentPressChancePerTick;
             input.IsPowerUpInputPressed = RNG.RNG.NextFloat() < PowerUpPressChancePerTick;
+            input.IsBarrelDashInputPressed = RNG.RNG.NextFloat() < BarrelDashPressChancePerTick;
         }
 
         private void RerollDecision(RandomInputState state)

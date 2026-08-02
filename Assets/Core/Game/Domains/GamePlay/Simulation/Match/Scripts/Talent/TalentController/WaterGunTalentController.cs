@@ -110,7 +110,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var aimDirection = casterPlayerState.Spaceship.AimDirection;
             var offset = casterPlayerState.Spaceship.Transform.Radius;
             var center = casterPlayerState.Spaceship.Transform.Position + aimDirection * offset;
 

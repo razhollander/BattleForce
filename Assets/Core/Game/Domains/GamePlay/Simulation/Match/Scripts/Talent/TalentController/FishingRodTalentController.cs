@@ -139,7 +139,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             IsCurrentlyActive = true;
 
             var config = _gamePlayConfigService.GamePlayConfig.Talents.FishingRodTalentConfig;
-            var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var aimDirection = casterPlayerState.Spaceship.AimDirection;
             var velocity = aimDirection * config.TipSpeed;
             var size = _sharedConfig.FishingRodTipSize;
             var tipPosition = casterPlayerState.Spaceship.Transform.Position + aimDirection * casterPlayerState.Spaceship.Transform.Radius;
@@ -295,7 +295,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return (mouseData.MouseWorldPosition - enemyPosition).NormalizeSafe();
             }
 
-            return casterPlayerState.Spaceship.TalentsState.AimDirection;
+            return casterPlayerState.Spaceship.AimDirection;
         }
 
         private void StartReturnPhase(ref TalentFishingRodProjectileStateS2C projectile)

@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
         public bool IsTalentBInputPressed;
         public bool IsTalentCInputPressed;
         public bool IsPowerUpInputPressed;
+        public bool IsBarrelDashInputPressed;
         public Vector2 AimDirection;
         public bool IsUsingMouseAim;
         public Vector2 MouseWorldPosition;
@@ -22,18 +23,19 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
         {
             writer.Put((byte)PlayerId);
 
-            byte inputByte = (byte)(
-                (IsMoveRightInputPressed ? 1 << 0 : 0) |
-                (IsMoveLeftInputPressed  ? 1 << 1 : 0) |
-                (IsShootInputPressed     ? 1 << 2 : 0) |
-                (IsTalentAInputPressed   ? 1 << 3 : 0) |
-                (IsTalentBInputPressed   ? 1 << 4 : 0) |
-                (IsTalentCInputPressed   ? 1 << 5 : 0) |
-                (IsPowerUpInputPressed   ? 1 << 6 : 0) |
-                (IsUsingMouseAim         ? 1 << 7 : 0)
+            ushort inputBits = (ushort)(
+                (IsMoveRightInputPressed  ? 1 << 0 : 0) |
+                (IsMoveLeftInputPressed   ? 1 << 1 : 0) |
+                (IsShootInputPressed      ? 1 << 2 : 0) |
+                (IsTalentAInputPressed    ? 1 << 3 : 0) |
+                (IsTalentBInputPressed    ? 1 << 4 : 0) |
+                (IsTalentCInputPressed    ? 1 << 5 : 0) |
+                (IsPowerUpInputPressed    ? 1 << 6 : 0) |
+                (IsUsingMouseAim          ? 1 << 7 : 0) |
+                (IsBarrelDashInputPressed ? 1 << 8 : 0)
             );
 
-            writer.Put(inputByte);
+            writer.Put(inputBits);
             writer.PutVector2AsAngle16(AimDirection);
 
             if (IsUsingMouseAim)
@@ -46,15 +48,16 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
         {
             PlayerId = reader.GetByte();
 
-            byte data = reader.GetByte();
-            IsMoveRightInputPressed = (data & (1 << 0)) != 0;
-            IsMoveLeftInputPressed  = (data & (1 << 1)) != 0;
-            IsShootInputPressed     = (data & (1 << 2)) != 0;
-            IsTalentAInputPressed   = (data & (1 << 3)) != 0;
-            IsTalentBInputPressed   = (data & (1 << 4)) != 0;
-            IsTalentCInputPressed   = (data & (1 << 5)) != 0;
-            IsPowerUpInputPressed   = (data & (1 << 6)) != 0;
-            IsUsingMouseAim         = (data & (1 << 7)) != 0;
+            ushort inputBits = reader.GetUShort();
+            IsMoveRightInputPressed  = (inputBits & (1 << 0)) != 0;
+            IsMoveLeftInputPressed   = (inputBits & (1 << 1)) != 0;
+            IsShootInputPressed      = (inputBits & (1 << 2)) != 0;
+            IsTalentAInputPressed    = (inputBits & (1 << 3)) != 0;
+            IsTalentBInputPressed    = (inputBits & (1 << 4)) != 0;
+            IsTalentCInputPressed    = (inputBits & (1 << 5)) != 0;
+            IsPowerUpInputPressed    = (inputBits & (1 << 6)) != 0;
+            IsUsingMouseAim          = (inputBits & (1 << 7)) != 0;
+            IsBarrelDashInputPressed = (inputBits & (1 << 8)) != 0;
 
             AimDirection = reader.GetVector2FromAngle16();
             MouseWorldPosition = IsUsingMouseAim ? reader.GetVector2Quantized() : Vector2.Zero;

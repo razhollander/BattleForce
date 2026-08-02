@@ -1573,7 +1573,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 playerModel.Spaceship.Transform.Position = playerState.Spaceship.Transform.Position;
                 playerModel.Spaceship.Transform.Direction = playerState.Spaceship.Transform.Direction;
                 playerModel.Spaceship.Shoot.CooldownSecondsLeft = playerState.Spaceship.Shoot.CooldownSecondsLeft;
-                playerModel.Spaceship.TalentsState.AimDirection = playerState.Spaceship.TalentsState.AimDirection;
+                playerModel.Spaceship.AimDirection = playerState.Spaceship.AimDirection;
                 playerModel.Spaceship.AssistArrowType = playerState.Spaceship.AssistArrowType;
             }
         }

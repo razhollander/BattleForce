@@ -31,6 +31,8 @@ MonoBehaviour:
       LockOnTargetMaxRange: 13
       LockOnTargetHalfArcAngleDegrees: 45
       LockOnTargetHitDamage: 1
+      BarrelDashForce: 30
+      BarrelDashSpinAmount: 57
     PlayerBullet:
       MoveSpeed: 10
       Radius: 0.14154
@@ -135,8 +137,8 @@ MonoBehaviour:
         CasterRecoilForcePerTick: 0
       HeadbuttTalentConfig:
         MaxChargeForce: 70
-        MaxDashWindowSeconds: 1.5
-        MinDashWindowSeconds: 0.3
+        MaxSecondsInDash: 1.5
+        MinSecondsInDash: 0.3
         EnemyPushForce: 30
         EnemySpinAmount: 50
       RockTalentConfig:
@@ -217,7 +219,7 @@ MonoBehaviour:
     SpeedupSimulation: 1
     IsAutoShoot: 0
     CanPlayersCollideWithEachOther: 1
-    RandomPlayersInput: 0
+    TestWithRandomPlayersInput: 0
   references:
     version: 2
     RefIds:

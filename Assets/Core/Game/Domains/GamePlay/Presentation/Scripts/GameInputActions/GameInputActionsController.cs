@@ -217,6 +217,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             return actions.GamePlay.PowerUp.IsPressed();
         }
 
+        public bool IsPlayerBarrelDashInputPressed(ushort playerId)
+        {
+            if (!TryGetPlayerInputActions(playerId, out var actions))
+            {
+                return false;
+            }
+
+            return actions.GamePlay.BarrelDash.IsPressed();
+        }
+
         public async Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui = false)
         {
             await AwaitableUtils.WaitUntil(() => (canPressOverGui || !IsOverUiOnMobile()) && IsAnyInputPressed(),

@@ -55,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IPlayersPowerUpsManager _playersPowerUpsManager;
         private readonly IPlaybackRecorderService _playerbackRecorderService;
         private TryShootLockedOnTargetsCommand _tryShootLockedOnTargetsCommand;
+        private TryPerformBarrelDashCommand _tryPerformBarrelDashCommand;
 
         public bool DidReceiveAnyInputFromClient(long clientId)
         {
@@ -97,6 +98,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _networkManager.RegisterPacketsObserver(this);
             _updateSubscriptionService.RegisterGuiUpdatable(this);
             _tryShootLockedOnTargetsCommand = _commandFactory.CreateCommandVoid<TryShootLockedOnTargetsCommand>();
+            _tryPerformBarrelDashCommand = _commandFactory.CreateCommandVoid<TryPerformBarrelDashCommand>();
         }
 
         public void InitExitPoint()
@@ -177,7 +179,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
                     UpdatePlayerShoot(processedTick, playerInput.IsShootInputPressed, playerState);
 
-                    playerState.Spaceship.TalentsState.AimDirection = playerInput.AimDirection;
+                    playerState.Spaceship.AimDirection = playerInput.AimDirection;
                     _playersMouseDataService.SetPlayerMouseData(playerId, playerInput.IsUsingMouseAim, playerInput.MouseWorldPosition);
                     UpdatePlayerDirection(playerInput, playerState);
 
@@ -185,10 +187,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentBInput, isTalentBInputPressed);
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentCInput, isTalentCInputPressed);
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.PowerUpInput, playerInput.IsPowerUpInputPressed);
+                    _simulationInputService.SetPlayerInput(playerId, PlayerInputType.BarrelDashInput, playerInput.IsBarrelDashInputPressed);
 
                     TrySwitchTalent(processedTick, playerState);
                     ProcessPlayerTalentInput(processedTick, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, playerState, deltaTime);
                     ProcessPlayerPowerUpInput(processedTick, playerState);
+                    ProcessPlayerBarrelDashInput(processedTick, playerId);
                 }
             }
 
@@ -200,6 +204,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var playerId = playerState.Id;
             var wasPowerUpInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.PowerUpInput);
             _playersPowerUpsManager.ProcessPowerUpInput(playerId, processedTick, wasPowerUpInputDownThisTick);
+        }
+
+        private void ProcessPlayerBarrelDashInput(int processedTick, ushort playerId)
+        {
+            var wasBarrelDashInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.BarrelDashInput);
+            if (!wasBarrelDashInputDownThisTick)
+            {
+                return;
+            }
+
+            _tryPerformBarrelDashCommand.SetPlayerId(playerId).SetProcessedTick(processedTick).Execute();
         }
 
         private void ProcessPlayerTalentInput(int processedTick, bool isTalentAInputPressed, bool isTalentBInputPressed, bool isTalentCInputPressed, PlayerStateS2C playerState, float deltaTime)
