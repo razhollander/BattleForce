@@ -1,5 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimArrowEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor;
@@ -19,6 +21,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IBackgroundParallaxController _backgroundParallaxController;
         private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
         private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
+        private IFrigidBlocksControllers _frigidBlocksControllers;
+        private ISecondCastAimArrowControllers _secondCastAimArrowControllers;
 
         public override void ResolveDependencies()
         {
@@ -29,6 +33,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
             _talentCardObtainedEffectController = _diContainer.Resolve<ITalentCardObtainedEffectController>();
             _galacticPullStarEffectControllers = _diContainer.Resolve<IGalacticPullStarEffectControllers>();
+            _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
+            _secondCastAimArrowControllers = _diContainer.Resolve<ISecondCastAimArrowControllers>();
         }
 
         public void Execute()
@@ -40,6 +46,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _startStagePacketHandler.InitExitPoint();
             _talentCardObtainedEffectController.InitExitPoint();
             _galacticPullStarEffectControllers.InitExitPoint();
+            _frigidBlocksControllers.InitExitPoint();
+            _secondCastAimArrowControllers.InitExitPoint();
         }
     }
 }

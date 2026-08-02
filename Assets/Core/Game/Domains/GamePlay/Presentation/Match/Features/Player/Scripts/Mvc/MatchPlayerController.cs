@@ -1,3 +1,4 @@
+using System;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using System.Linq;
 using System.Threading;
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
     {
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly Transform _parent;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
@@ -32,13 +34,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly MatchPlayerViewPool _playerPool;
         private readonly Sprite[] _powerUpReelSpritesArray;
         private int? _currentPowerupGrantingAudioId;
+        private int? _headbuttChargeLoopAudioId;
+        private int? _waterGunLoopAudioId;
+        private bool _isLeaderFlagActive;
+        private bool _isFishingRodStickActive;
 
         public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
+            SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkConfig = networkConfig;
             _parent = parent;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
@@ -66,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             UpdateTalents(playerModel.Spaceship.TalentsState.Talents, playerModel.Spaceship.TalentsState.SelectedTalentIndex, 0);
             SetupPlayerAccordingToHisSelectedTalent(playerModel);
             SetPlayersSpinnedState(playerModel.Spaceship.IsSpinned);
+            SetOnLavaEffectState(playerModel.Spaceship.IsExposedToLava);
             SetIsLockOnTargetSightShown(playerModel.Spaceship.IsPlayerLockOnTargetSightShown);
 
             if (playerModel.Spaceship.IsCurrentlyInGrantingPowerUpPhase)
@@ -78,29 +86,73 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
             var isKinged = _matchDataService.TryGetKingedPlayers(out var kingedPlayers) && kingedPlayers.Exists(x => x.PlayerId == PlayerId);
             SetIsKinged(isKinged);
+            SetIsLeader(_matchDataService.IsTeamLeadingInGems(playerModel.TeamId));
         }
 
         private void SetupPlayerAccordingToHisSelectedTalent(MatchPlayerModel playerModel)
         {
-            if (!playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
+            var currentSelectedTalentType = TalentType.None;
+            var isCurrentSelectedTalentActive = false;
+            if (playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var currentSelectedTalentState))
             {
-                return;
+                currentSelectedTalentType = currentSelectedTalentState.TalentType;
+                isCurrentSelectedTalentActive = currentSelectedTalentState.IsCurrentlyActive;
             }
 
             SetSelectedTalent(playerModel.Spaceship.TalentsState.SelectedTalentIndex);
+            SetSentryGunState(currentSelectedTalentType == TalentType.SentryGun && isCurrentSelectedTalentActive,
+                _stageCancellationTokenProvider.CancellationTokenSource);
+            SetUmbrellaState(currentSelectedTalentType == TalentType.Umbrella && isCurrentSelectedTalentActive);
+            SetWaterGunState(currentSelectedTalentType == TalentType.WaterGun && isCurrentSelectedTalentActive);
+            SetRockState(currentSelectedTalentType == TalentType.Rock && isCurrentSelectedTalentActive);
+            SetFrozenState(currentSelectedTalentType == TalentType.Frozen && isCurrentSelectedTalentActive);
+            SetFishingRodStickState(currentSelectedTalentState.TalentType == TalentType.FishingRod && isCurrentSelectedTalentActive);
+        }
 
-            if (currentSelectedTalentState.TalentType == TalentType.SentryGun)
+        public void SetFishingRodStickState(bool isActive)
+        {
+            _isFishingRodStickActive = isActive;
+            _playerView.SetFishingRodStickState(isActive);
+
+            if (isActive)
             {
-                SetSentryGunState(currentSelectedTalentState.IsCurrentlyActive, _stageCancellationTokenProvider.CancellationTokenSource);
+                RefreshFishingRodStickPosition();
             }
-            else if (currentSelectedTalentState.TalentType == TalentType.Umbrella)
+        }
+
+        public UnityEngine.Vector2 GetFishingRodTipPivotPosition()
+        {
+            return _playerView.GetFishingRodTipPivotPosition();
+        }
+
+        // The look direction is driven by the projectile position (see UpdateFishingRodTipsTransformCommand),
+        // not the caster's facing direction.
+        public void SetFishingRodStickDirection(bool isDirectionRight)
+        {
+            _playerView.SetFishingRodStickDirection(isDirectionRight);
+        }
+
+        private void RefreshFishingRodStickPosition()
+        {
+            if (_isFishingRodStickActive)
             {
-                SetUmbrellaState(currentSelectedTalentState.IsCurrentlyActive);
+                _playerView.RefreshFishingRodStickPosition();
             }
-            else if (currentSelectedTalentState.TalentType == TalentType.Chicken)
-            {
-                SetChickenState(true);
-            }
+        }
+
+        public void SetRockState(bool isRockActive)
+        {
+            _playerView.SetRockState(isRockActive);
+        }
+
+        public void SetFrozenState(bool isFrozenActive)
+        {
+            _playerView.SetFrozenState(isFrozenActive);
+        }
+
+        public void SetOnLavaEffectState(bool isExposedToLava)
+        {
+            _playerView.SetOnLavaEffectState(isExposedToLava);
         }
 
         public void SetSentryGunState(bool isSentryGun, CancellationTokenSource cancellationTokenSource)
@@ -137,7 +189,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public async Awaitable StartPowerUpGrantingPhase(CancellationToken cancellationToken)
         {
-            _currentPowerupGrantingAudioId = _audioService.PlayAudioLoopWithId(AudioClipType.PowerUpRandomReels);
+            PlayLoopAudio(ref _currentPowerupGrantingAudioId, AudioClipType.PowerUpRandomReels);
             await _playerView.StartPowerUpGrantingPhaseReel(_powerUpReelSpritesArray, cancellationToken);
         }
 
@@ -153,14 +205,93 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             await _playerView.EndPowerUpGrantingPhaseReel(grantedSprite, cancellationToken);
         }
 
+
+        public void SetWaterGunState(bool isActive)
+        {
+            _playerView.SetWaterGunState(isActive);
+
+            if (isActive)
+            {
+                PlayLoopAudio(ref _waterGunLoopAudioId, AudioClipType.WaterGunLoop);
+            }
+            else
+            {
+                TryStopLoopAudio(ref _waterGunLoopAudioId);
+            }
+        }
+
+        public void SetHeadbuttChargingState(bool isCharging)
+        {
+            _playerView.SetHeadbuttChargingState(isCharging, _sharedGamePlayConfig.HeadbuttMaxChargeDurationSeconds);
+
+            if (isCharging)
+            {
+                PlayLoopAudio(ref _headbuttChargeLoopAudioId, AudioClipType.HeadbuttCharge);
+            }
+            else
+            {
+                TryStopLoopAudio(ref _headbuttChargeLoopAudioId);
+            }
+        }
+
+        // Loops are played per-player with their own id so each player's loop can be stopped independently, and so
+        // they can be force-stopped when the player view is destroyed on stage exit (see StopAllLoopAudio / Destroy).
+        private void PlayLoopAudio(ref int? loopAudioId, AudioClipType audioClipType)
+        {
+            if (loopAudioId.HasValue)
+            {
+                LogService.LogError($"Tried to play {audioClipType} while already playing");
+                return;
+            }
+
+            loopAudioId = _audioService.PlayAudioLoopWithId(audioClipType);
+        }
+
+        private void TryStopLoopAudio(ref int? loopAudioId)
+        {
+            if (!loopAudioId.HasValue)
+            {
+                return;
+            }
+
+            _audioService.StopLoopAudioById(loopAudioId.Value);
+            loopAudioId = null;
+        }
+
+        private void StopAllLoopAudio()
+        {
+            TryStopLoopAudio(ref _headbuttChargeLoopAudioId);
+            TryStopLoopAudio(ref _waterGunLoopAudioId);
+            TryStopLoopAudio(ref _currentPowerupGrantingAudioId);
+        }
+
+        public void ShowHeadbuttHelmet()
+        {
+            _playerView.ShowHeadbuttHelmet();
+        }
+
+        public void HideHeadbuttHelmet()
+        {
+            _playerView.HideHeadbuttHelmet();
+        }
+
+        public void OnHeadbuttTalentDeactivated()
+        {
+            _playerView.HideHeadbuttHelmet();
+        }
+        
         public void SetSelectedTalent(int talentIndex)
         {
-            var playerModel = _matchDataService.GetPlayer(PlayerId);
-            var talentState = playerModel.Spaceship.TalentsState.Talents[talentIndex];
-            var talentType = talentState.TalentType;
             _playerView.SetSelectedTalent(talentIndex, _stageCancellationTokenProvider.CancellationTokenSource.Token);
-            var isInChickenState = talentType == TalentType.Chicken;
-            SetChickenState(isInChickenState);
+            var talents = _matchDataService.GetPlayer(PlayerId).Spaceship.TalentsState.Talents;
+            if (talentIndex >= 0 && talentIndex < talents.Count)
+            {
+                SetChickenState(talents[talentIndex].TalentType == TalentType.Chicken);
+            }
+            else
+            {
+                LogService.LogError($"Index out of range! {talentIndex}/{talents.Count}");
+            }
         }
 
         public void UpdateTickDeltas()
@@ -172,19 +303,40 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var decay = _gamePlayConfig.ExponentialDecay;
             var aimDirection = playerModel.Spaceship.TalentsState.AimDirection;
             _playerView.Base.InterpolateTransform(playerPosition, playerRotation, decay);
-            _playerView.Base.UpdateTailBend();
             UpdateAim(playerModel.Spaceship.AssistArrowType, aimDirection, decay);
-
-            if (playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) &&
-                selectedTalent.TalentType == TalentType.Umbrella)
+            var isPlayerFrozen = false;
+            if (playerModel.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent))
             {
-                _playerView.InterpolateUmbrellaRotation(aimDirection, decay);
+                if(selectedTalent is {TalentType: TalentType.Umbrella, IsCurrentlyActive: true})
+                {
+                    _playerView.InterpolateUmbrellaRotation(aimDirection, decay);
+                }
+                else if (selectedTalent is {TalentType: TalentType.WaterGun, IsCurrentlyActive: true})
+                {
+                    _playerView.InterpolateWaterGunRotation(aimDirection, decay);
+                }
+
+                isPlayerFrozen = selectedTalent is {TalentType: TalentType.Frozen, IsCurrentlyActive: true};
             }
+            
+            if (!isPlayerFrozen)
+            {
+                _playerView.Base.UpdateTailBend();
+            }
+
+            TryUpdateLeaderFlagAccordingToDirection(playerTransformState.Direction);
+            RefreshFishingRodStickPosition();
         }
 
         private void UpdateAim(PlayerAssistArrowType arrowType, Vector2 aimDirection, float decay)
         {
-            _playerView.InterpolateAimRotation(aimDirection, decay);
+            // While aiming a fishing rod throw, the throw direction is shown by the arrow on the caught enemy,
+            // so keep the caster's own assist arrow still instead of rotating it toward the aim direction.
+            var isAimingFishingRodThrow = _matchDataService.IsPlayerAimingFishingRodThrow(PlayerId);
+            if (!isAimingFishingRodThrow)
+            {
+                _playerView.InterpolateAimRotation(aimDirection, decay);
+            }
 
             var shouldShowMoveAssistArrow = arrowType == PlayerAssistArrowType.Hidden /*&& _inputBeingUsedService.InputTypeBeingUsed == SupportedInputType.GamePad*/;
 
@@ -202,6 +354,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             }
 
             _playerView.HideAssistArrow();
+        }
+
+        public void UpdateSelectedTalentActiveEffect()
+        {
+            var talentsState = _matchDataService.GetPlayer(PlayerId).Spaceship.TalentsState;
+            var isSelectedTalentActive = talentsState.TryGetCurrentSelectedTalent(out var selectedTalent) && selectedTalent.IsCurrentlyActive;
+            _playerView.SetSelectedTalentActiveEffect(talentsState.SelectedTalentIndex, isSelectedTalentActive);
         }
 
         public void UpdateBulletCooldown()
@@ -298,6 +457,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetTransform(Vector2 position, Vector2 direction)
         {
             _playerView.Base.SetPositionAndRotation(position.ToUnityVector2(), direction.ToUnityVector2().ToQuaternion());
+            TryUpdateLeaderFlagAccordingToDirection(direction);
+            RefreshFishingRodStickPosition();
+        }
+
+        private void TryUpdateLeaderFlagAccordingToDirection(Vector2 direction)
+        {
+            if (!_isLeaderFlagActive)
+            {
+                return;
+            }
+
+            var isDirectionRight = direction.ToUnityVector2().x > 0;
+            _playerView.UpdateLeaderFlag(isDirectionRight, _playerView.LeaderFlagPivot.position);
         }
 
         public UnityEngine.Vector2 GetPosition()
@@ -317,6 +489,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void Destroy()
         {
+            // The talent-deactivated net events may never arrive when the stage exits, so force-stop any loop audio here.
+            StopAllLoopAudio();
             _playerView.Despawn();
         }
 
@@ -421,6 +595,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsKinged(bool isKinged)
         {
             _playerView.SetIsKinged(isKinged);
+        }
+
+        public void SetIsLeader(bool isLeader)
+        {
+            _isLeaderFlagActive = isLeader;
+            _playerView.SetIsLeader(isLeader);
         }
     }
 }

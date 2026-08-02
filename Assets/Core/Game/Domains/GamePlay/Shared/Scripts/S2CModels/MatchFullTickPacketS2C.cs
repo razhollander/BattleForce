@@ -28,6 +28,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<TalentCardHitNetEventS2C> TalentCardHitNetEvents;
         public FixedUnorderedList<PlayerSpinnedStartedNetEventS2C> PlayerSpinnedStartedNetEvents;
         public FixedUnorderedList<PlayerSpinnedEndedNetEventS2C> PlayerSpinnedEndedNetEvents;
+        public FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C> PlayerStartedExposedToLavaNetEvents;
+        public FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C> PlayerEndedExposedToLavaNetEvents;
         public FixedUnorderedList<PowerUpBallSpawnedNetEventS2C> PowerUpSpawnedNetEvents; // todo: remove events related to power up when bullet id destroyed
         public FixedUnorderedList<PowerUpBallObtainedNetEventS2C> PowerUpObtainedNetEvents;
         public FixedClassUnorderedList<StageEndNetEventS2C> StageEndNetEvents;
@@ -53,6 +55,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents;
         public FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents;
         public FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents;
+        public FixedUnorderedList<ActivateWaterGunTalentNetEventS2C> ActivateWaterGunTalentNetEvents;
+        public FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C> DeactivateWaterGunTalentNetEvents;
+        public FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C> ActivateHeadbuttChargingNetEvents;
+        public FixedUnorderedList<PerformHeadbuttDashNetEventS2C> PerformHeadbuttDashNetEvents;
+        public FixedUnorderedList<HeadbuttHitEnemyNetEventS2C> HeadbuttHitEnemyNetEvents;
+        public FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C> DeactivateHeadbuttTalentNetEvents;
         public FixedUnorderedList<CreateMagneticPullFieldNetEventS2C> CreateMagneticPullFieldNetEvents;
         public FixedUnorderedList<LayChickenEggNetEventS2C> LayChickenEggNetEvents;
         public FixedUnorderedList<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents;
@@ -69,6 +77,19 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<ActivateShuffleNetEventS2C> ActivateShuffleNetEvents;
         public FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C> StartPowerUpGrantingPhaseNetEvents;
         public FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C> EndPowerUpGrantingPhaseNetEvents;
+        public FixedUnorderedList<ShootFrigidBlockNetEventS2C> ShootFrigidBlockNetEvents;
+        public FixedUnorderedList<DestroyFrigidBlockNetEventS2C> DestroyFrigidBlockNetEvents;
+        public FixedUnorderedList<CreateFishingRodProjectileNetEventS2C> CreateFishingRodProjectileNetEvents;
+        public FixedUnorderedList<FishingRodCaughtEnemyNetEventS2C> FishingRodCaughtEnemyNetEvents;
+        public FixedUnorderedList<FishingRodTipHitWallNetEventS2C> FishingRodTipHitWallNetEvents;
+        public FixedUnorderedList<FishingRodThrowNetEventS2C> FishingRodThrowNetEvents;
+        public FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C> DeactivateFishingRodTalentNetEvents;
+        public FixedUnorderedList<CreateSoulGhostNetEventS2C> CreateSoulGhostNetEvents;
+        public FixedUnorderedList<DeactivateSoulTalentNetEventS2C> DeactivateSoulTalentNetEvents;
+        public FixedUnorderedList<ActivateRockTalentNetEventS2C> ActivateRockTalentNetEvents;
+        public FixedUnorderedList<DeactivateRockTalentNetEventS2C> DeactivateRockTalentNetEvents;
+        public FixedUnorderedList<ActivateFrozenTalentNetEventS2C> ActivateFrozenTalentNetEvents;
+        public FixedUnorderedList<DeactivateFrozenTalentNetEventS2C> DeactivateFrozenTalentNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -78,7 +99,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public MatchFullTickPacketS2C(MaxCap maxCap, SharedGamePlayConfig sharedGamePlayConfig)
         {
             CurrentSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
-                maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount, maxCap.ConcurrentChickenEggs, maxCap.ConcurrentGalacticForceFields);
+                maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount, maxCap.ConcurrentChickenEggs, maxCap.ConcurrentGalacticForceFields, maxCap.ConcurrentFrigidBlocks);
 
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
 
@@ -96,6 +117,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             TalentCardHitNetEvents = new FixedUnorderedList<TalentCardHitNetEventS2C>(maxCap.TalentCardHitNetEvents);
             PlayerSpinnedStartedNetEvents = new FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>(maxCap.PlayerSpinnedStartedNetEvents);
             PlayerSpinnedEndedNetEvents = new FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>(maxCap.PlayerSpinnedEndedNetEvents);
+            PlayerStartedExposedToLavaNetEvents = new FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>(maxCap.PlayerStartedExposedToLavaNetEvents);
+            PlayerEndedExposedToLavaNetEvents = new FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>(maxCap.PlayerEndedExposedToLavaNetEvents);
             PowerUpSpawnedNetEvents = new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(maxCap.PowerUpSpawnedNetEvents);
             PowerUpObtainedNetEvents = new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(maxCap.PowerUpObtainedNetEvents);
             StageEndNetEvents = new FixedClassUnorderedList<StageEndNetEventS2C>(maxCap.StageEndNetEvents, () => new StageEndNetEventS2C(sharedGamePlayConfig.MaxTeamsAmount));
@@ -128,6 +151,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             ActivateYearsOfPainTalentNetEvents = new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(maxCap.ActivateYearsOfPainTalentNetEvents);
             ActivateUmbrellaTalentNetEvents = new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(maxCap.ActivateUmbrellaTalentNetEvents);
             DeactivateUmbrellaTalentNetEvents = new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(maxCap.DeactivateUmbrellaTalentNetEvents);
+            ActivateWaterGunTalentNetEvents = new FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>(maxCap.ActivateWaterGunTalentNetEvents);
+            DeactivateWaterGunTalentNetEvents = new FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>(maxCap.DeactivateWaterGunTalentNetEvents);
+            ActivateHeadbuttChargingNetEvents = new FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>(maxCap.ActivateHeadbuttChargingNetEvents);
+            PerformHeadbuttDashNetEvents = new FixedUnorderedList<PerformHeadbuttDashNetEventS2C>(maxCap.PerformHeadbuttDashNetEvents);
+            HeadbuttHitEnemyNetEvents = new FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>(maxCap.HeadbuttHitEnemyNetEvents);
+            DeactivateHeadbuttTalentNetEvents = new FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>(maxCap.DeactivateHeadbuttTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
             ChickenEggHitNetEvents = new FixedUnorderedList<ChickenEggHitNetEventS2C>(maxCap.ChickenEggHitNetEvents);
             PlayerLockOnTargetsChangedNetEvents = new FixedClassUnorderedList<PlayerLockOnTargetsChangedNetEventS2C>(maxCap.PlayerLockOnTargetsChangedNetEvents, () => new PlayerLockOnTargetsChangedNetEventS2C(maxCap.ConcurrentLockOnTargets));
@@ -142,6 +171,19 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             ActivateShuffleNetEvents = new FixedUnorderedList<ActivateShuffleNetEventS2C>(maxCap.ActivateShufflePowerUpNetEvents);
             StartPowerUpGrantingPhaseNetEvents = new FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>(maxCap.StartPowerUpGrantingPhaseNetEvents);
             EndPowerUpGrantingPhaseNetEvents = new FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>(maxCap.EndPowerUpGrantingPhaseNetEvents);
+            ShootFrigidBlockNetEvents = new FixedUnorderedList<ShootFrigidBlockNetEventS2C>(maxCap.ShootFrigidBlockNetEvents);
+            DestroyFrigidBlockNetEvents = new FixedUnorderedList<DestroyFrigidBlockNetEventS2C>(maxCap.DestroyFrigidBlockNetEvents);
+            CreateFishingRodProjectileNetEvents = new FixedUnorderedList<CreateFishingRodProjectileNetEventS2C>(maxCap.CreateFishingRodProjectileNetEvents);
+            FishingRodCaughtEnemyNetEvents = new FixedUnorderedList<FishingRodCaughtEnemyNetEventS2C>(maxCap.FishingRodCaughtEnemyNetEvents);
+            FishingRodTipHitWallNetEvents = new FixedUnorderedList<FishingRodTipHitWallNetEventS2C>(maxCap.FishingRodTipHitWallNetEvents);
+            FishingRodThrowNetEvents = new FixedUnorderedList<FishingRodThrowNetEventS2C>(maxCap.FishingRodThrowNetEvents);
+            DeactivateFishingRodTalentNetEvents = new FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>(maxCap.DeactivateFishingRodTalentNetEvents);
+            CreateSoulGhostNetEvents = new FixedUnorderedList<CreateSoulGhostNetEventS2C>(maxCap.CreateSoulGhostNetEvents);
+            DeactivateSoulTalentNetEvents = new FixedUnorderedList<DeactivateSoulTalentNetEventS2C>(maxCap.DeactivateSoulTalentNetEvents);
+            ActivateRockTalentNetEvents = new FixedUnorderedList<ActivateRockTalentNetEventS2C>(maxCap.ActivateRockTalentNetEvents);
+            DeactivateRockTalentNetEvents = new FixedUnorderedList<DeactivateRockTalentNetEventS2C>(maxCap.DeactivateRockTalentNetEvents);
+            ActivateFrozenTalentNetEvents = new FixedUnorderedList<ActivateFrozenTalentNetEventS2C>(maxCap.ActivateFrozenTalentNetEvents);
+            DeactivateFrozenTalentNetEvents = new FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>(maxCap.DeactivateFrozenTalentNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -151,7 +193,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             
             var eventMask = CalculateEventMask();
             writer.Put(eventMask);
-            
+
+            // The primary 64-bit mask is fully used (bits 0-63). eventMask2 carries overflow events (bit 64+).
+            var eventMask2 = CalculateEventMask2();
+            writer.Put(eventMask2);
+
             if ((eventMask & (1UL << 0)) != 0) SerializedPlayerJoinedEvents(writer);
             if ((eventMask & (1UL << 1)) != 0) SerializedBulletSpawnedEvents(writer);
             if ((eventMask & (1UL << 2)) != 0) SerializedPlayerTakeDamageEvents(writer);
@@ -203,6 +249,42 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask & (1UL << 48)) != 0) SerializedActivateShuffleNetEvents(writer);
             if ((eventMask & (1UL << 49)) != 0) SerializedStartPowerUpGrantingPhaseNetEvents(writer);
             if ((eventMask & (1UL << 50)) != 0) SerializedEndPowerUpGrantingPhaseNetEvents(writer);
+            if ((eventMask & (1UL << 51)) != 0) SerializedActivateWaterGunTalentNetEvents(writer);
+            if ((eventMask & (1UL << 52)) != 0) SerializedDeactivateWaterGunTalentNetEvents(writer);
+            if ((eventMask & (1UL << 53)) != 0) SerializedActivateHeadbuttChargingNetEvents(writer);
+            if ((eventMask & (1UL << 54)) != 0) SerializedPerformHeadbuttDashNetEvents(writer);
+            if ((eventMask & (1UL << 55)) != 0) SerializedHeadbuttHitEnemyNetEvents(writer);
+            if ((eventMask & (1UL << 56)) != 0) SerializedDeactivateHeadbuttTalentNetEvents(writer);
+            if ((eventMask & (1UL << 57)) != 0) SerializedShootFrigidBlockNetEvents(writer);
+            if ((eventMask & (1UL << 58)) != 0) SerializedDestroyFrigidBlockNetEvents(writer);
+            if ((eventMask & (1UL << 59)) != 0) SerializedCreateFishingRodProjectileNetEvents(writer);
+            if ((eventMask & (1UL << 60)) != 0) SerializedFishingRodCaughtEnemyNetEvents(writer);
+            if ((eventMask & (1UL << 61)) != 0) SerializedFishingRodTipHitWallNetEvents(writer);
+            if ((eventMask & (1UL << 62)) != 0) SerializedFishingRodThrowNetEvents(writer);
+            if ((eventMask & (1UL << 63)) != 0) SerializedDeactivateFishingRodTalentNetEvents(writer);
+
+            if ((eventMask2 & (1UL << 0)) != 0) SerializedCreateSoulGhostNetEvents(writer);
+            if ((eventMask2 & (1UL << 1)) != 0) SerializedDeactivateSoulTalentNetEvents(writer);
+            if ((eventMask2 & (1UL << 2)) != 0) SerializedActivateRockTalentNetEvents(writer);
+            if ((eventMask2 & (1UL << 3)) != 0) SerializedDeactivateRockTalentNetEvents(writer);
+            if ((eventMask2 & (1UL << 4)) != 0) SerializedPlayerStartedExposedToLavaNetEvents(writer);
+            if ((eventMask2 & (1UL << 5)) != 0) SerializedPlayerEndedExposedToLavaNetEvents(writer);
+            if ((eventMask2 & (1UL << 6)) != 0) SerializedActivateFrozenTalentNetEvents(writer);
+            if ((eventMask2 & (1UL << 7)) != 0) SerializedDeactivateFrozenTalentNetEvents(writer);
+        }
+
+        private ulong CalculateEventMask2()
+        {
+            ulong eventMask2 = 0;
+            if (CreateSoulGhostNetEvents.Count > 0) eventMask2 |= 1UL << 0;
+            if (DeactivateSoulTalentNetEvents.Count > 0) eventMask2 |= 1UL << 1;
+            if (ActivateRockTalentNetEvents.Count > 0) eventMask2 |= 1UL << 2;
+            if (DeactivateRockTalentNetEvents.Count > 0) eventMask2 |= 1UL << 3;
+            if (PlayerStartedExposedToLavaNetEvents.Count > 0) eventMask2 |= 1UL << 4;
+            if (PlayerEndedExposedToLavaNetEvents.Count > 0) eventMask2 |= 1UL << 5;
+            if (ActivateFrozenTalentNetEvents.Count > 0) eventMask2 |= 1UL << 6;
+            if (DeactivateFrozenTalentNetEvents.Count > 0) eventMask2 |= 1UL << 7;
+            return eventMask2;
         }
 
         private ulong CalculateEventMask()
@@ -259,7 +341,19 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (ActivateShuffleNetEvents.Count > 0) eventMask |= 1UL << 48;
             if (StartPowerUpGrantingPhaseNetEvents.Count > 0) eventMask |= 1UL << 49;
             if (EndPowerUpGrantingPhaseNetEvents.Count > 0) eventMask |= 1UL << 50;
-
+            if (ActivateWaterGunTalentNetEvents.Count > 0) eventMask |= 1UL << 51;
+            if (DeactivateWaterGunTalentNetEvents.Count > 0) eventMask |= 1UL << 52;
+            if (ActivateHeadbuttChargingNetEvents.Count > 0) eventMask |= 1UL << 53;
+            if (PerformHeadbuttDashNetEvents.Count > 0) eventMask |= 1UL << 54;
+            if (HeadbuttHitEnemyNetEvents.Count > 0) eventMask |= 1UL << 55;
+            if (DeactivateHeadbuttTalentNetEvents.Count > 0) eventMask |= 1UL << 56;
+            if (ShootFrigidBlockNetEvents.Count > 0) eventMask |= 1UL << 57;
+            if (DestroyFrigidBlockNetEvents.Count > 0) eventMask |= 1UL << 58;
+            if (CreateFishingRodProjectileNetEvents.Count > 0) eventMask |= 1UL << 59;
+            if (FishingRodCaughtEnemyNetEvents.Count > 0) eventMask |= 1UL << 60;
+            if (FishingRodTipHitWallNetEvents.Count > 0) eventMask |= 1UL << 61;
+            if (FishingRodThrowNetEvents.Count > 0) eventMask |= 1UL << 62;
+            if (DeactivateFishingRodTalentNetEvents.Count > 0) eventMask |= 1UL << 63;
             return eventMask;
         }
 
@@ -269,7 +363,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             CurrentSimulationState.DeserializeTransforms(reader);
             
             ulong eventMask = reader.GetULong();
-            
+            ulong eventMask2 = reader.GetULong();
+
             if ((eventMask & (1UL << 0)) != 0) DeserializedPlayerJoinedEvents(reader);
             else PlayerJoinAcceptNetEvents.Clear();
 
@@ -435,6 +530,69 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask & (1UL << 50)) != 0) DeserializedEndPowerUpGrantingPhaseNetEvents(reader);
             else EndPowerUpGrantingPhaseNetEvents.Clear();
+
+            if ((eventMask & (1UL << 51)) != 0) DeserializedActivateWaterGunTalentNetEvents(reader);
+            else ActivateWaterGunTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 52)) != 0) DeserializedDeactivateWaterGunTalentNetEvents(reader);
+            else DeactivateWaterGunTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 53)) != 0) DeserializedActivateHeadbuttChargingNetEvents(reader);
+            else ActivateHeadbuttChargingNetEvents.Clear();
+
+            if ((eventMask & (1UL << 54)) != 0) DeserializedPerformHeadbuttDashNetEvents(reader);
+            else PerformHeadbuttDashNetEvents.Clear();
+
+            if ((eventMask & (1UL << 55)) != 0) DeserializedHeadbuttHitEnemyNetEvents(reader);
+            else HeadbuttHitEnemyNetEvents.Clear();
+
+            if ((eventMask & (1UL << 56)) != 0) DeserializedDeactivateHeadbuttTalentNetEvents(reader);
+            else DeactivateHeadbuttTalentNetEvents.Clear();
+
+            if ((eventMask & (1UL << 57)) != 0) DeserializedShootFrigidBlockNetEvents(reader);
+            else ShootFrigidBlockNetEvents.Clear();
+
+            if ((eventMask & (1UL << 58)) != 0) DeserializedDestroyFrigidBlockNetEvents(reader);
+            else DestroyFrigidBlockNetEvents.Clear();
+
+            if ((eventMask & (1UL << 59)) != 0) DeserializedCreateFishingRodProjectileNetEvents(reader);
+            else CreateFishingRodProjectileNetEvents.Clear();
+
+            if ((eventMask & (1UL << 60)) != 0) DeserializedFishingRodCaughtEnemyNetEvents(reader);
+            else FishingRodCaughtEnemyNetEvents.Clear();
+
+            if ((eventMask & (1UL << 61)) != 0) DeserializedFishingRodTipHitWallNetEvents(reader);
+            else FishingRodTipHitWallNetEvents.Clear();
+
+            if ((eventMask & (1UL << 62)) != 0) DeserializedFishingRodThrowNetEvents(reader);
+            else FishingRodThrowNetEvents.Clear();
+
+            if ((eventMask & (1UL << 63)) != 0) DeserializedDeactivateFishingRodTalentNetEvents(reader);
+            else DeactivateFishingRodTalentNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 0)) != 0) DeserializedCreateSoulGhostNetEvents(reader);
+            else CreateSoulGhostNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 1)) != 0) DeserializedDeactivateSoulTalentNetEvents(reader);
+            else DeactivateSoulTalentNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 2)) != 0) DeserializedActivateRockTalentNetEvents(reader);
+            else ActivateRockTalentNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 3)) != 0) DeserializedDeactivateRockTalentNetEvents(reader);
+            else DeactivateRockTalentNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 4)) != 0) DeserializedPlayerStartedExposedToLavaNetEvents(reader);
+            else PlayerStartedExposedToLavaNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 5)) != 0) DeserializedPlayerEndedExposedToLavaNetEvents(reader);
+            else PlayerEndedExposedToLavaNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 6)) != 0) DeserializedActivateFrozenTalentNetEvents(reader);
+            else ActivateFrozenTalentNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 7)) != 0) DeserializedDeactivateFrozenTalentNetEvents(reader);
+            else DeactivateFrozenTalentNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1449,6 +1607,388 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (var i = 0; i < count; i++)
             {
                 ref var netEvent = ref EndPowerUpGrantingPhaseNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateWaterGunTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateWaterGunTalentNetEvents.Count);
+            foreach (var netEvent in ActivateWaterGunTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedActivateWaterGunTalentNetEvents(NetDataReader reader)
+        {
+            ActivateWaterGunTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateWaterGunTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateWaterGunTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateWaterGunTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateWaterGunTalentNetEvents.AsSpan())
+            {
+                netEvent.Serialize(writer);
+            }
+        }
+
+        private void DeserializedDeactivateWaterGunTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateWaterGunTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateWaterGunTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateHeadbuttChargingNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateHeadbuttChargingNetEvents.Count);
+            foreach (var netEvent in ActivateHeadbuttChargingNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedActivateHeadbuttChargingNetEvents(NetDataReader reader)
+        {
+            ActivateHeadbuttChargingNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateHeadbuttChargingNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPerformHeadbuttDashNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PerformHeadbuttDashNetEvents.Count);
+            foreach (var netEvent in PerformHeadbuttDashNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedPerformHeadbuttDashNetEvents(NetDataReader reader)
+        {
+            PerformHeadbuttDashNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PerformHeadbuttDashNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedHeadbuttHitEnemyNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)HeadbuttHitEnemyNetEvents.Count);
+            foreach (var netEvent in HeadbuttHitEnemyNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedHeadbuttHitEnemyNetEvents(NetDataReader reader)
+        {
+            HeadbuttHitEnemyNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref HeadbuttHitEnemyNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateHeadbuttTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateHeadbuttTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateHeadbuttTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateHeadbuttTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateHeadbuttTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateHeadbuttTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedShootFrigidBlockNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ShootFrigidBlockNetEvents.Count);
+            foreach (var netEvent in ShootFrigidBlockNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedShootFrigidBlockNetEvents(NetDataReader reader)
+        {
+            ShootFrigidBlockNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ShootFrigidBlockNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDestroyFrigidBlockNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DestroyFrigidBlockNetEvents.Count);
+            foreach (var netEvent in DestroyFrigidBlockNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDestroyFrigidBlockNetEvents(NetDataReader reader)
+        {
+            DestroyFrigidBlockNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DestroyFrigidBlockNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedCreateFishingRodProjectileNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)CreateFishingRodProjectileNetEvents.Count);
+            foreach (var netEvent in CreateFishingRodProjectileNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedCreateFishingRodProjectileNetEvents(NetDataReader reader)
+        {
+            CreateFishingRodProjectileNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref CreateFishingRodProjectileNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedFishingRodCaughtEnemyNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)FishingRodCaughtEnemyNetEvents.Count);
+            foreach (var netEvent in FishingRodCaughtEnemyNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedFishingRodCaughtEnemyNetEvents(NetDataReader reader)
+        {
+            FishingRodCaughtEnemyNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref FishingRodCaughtEnemyNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedFishingRodTipHitWallNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)FishingRodTipHitWallNetEvents.Count);
+            foreach (var netEvent in FishingRodTipHitWallNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedFishingRodTipHitWallNetEvents(NetDataReader reader)
+        {
+            FishingRodTipHitWallNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref FishingRodTipHitWallNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedFishingRodThrowNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)FishingRodThrowNetEvents.Count);
+            foreach (var netEvent in FishingRodThrowNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedFishingRodThrowNetEvents(NetDataReader reader)
+        {
+            FishingRodThrowNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref FishingRodThrowNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateFishingRodTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateFishingRodTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateFishingRodTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateFishingRodTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateFishingRodTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateFishingRodTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedCreateSoulGhostNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)CreateSoulGhostNetEvents.Count);
+            foreach (var netEvent in CreateSoulGhostNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedCreateSoulGhostNetEvents(NetDataReader reader)
+        {
+            CreateSoulGhostNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref CreateSoulGhostNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateSoulTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateSoulTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateSoulTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateSoulTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateSoulTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateSoulTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateRockTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateRockTalentNetEvents.Count);
+            foreach (var netEvent in ActivateRockTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedActivateRockTalentNetEvents(NetDataReader reader)
+        {
+            ActivateRockTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateRockTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateRockTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateRockTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateRockTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateRockTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateRockTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateRockTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedActivateFrozenTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ActivateFrozenTalentNetEvents.Count);
+            foreach (var netEvent in ActivateFrozenTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedActivateFrozenTalentNetEvents(NetDataReader reader)
+        {
+            ActivateFrozenTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ActivateFrozenTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedDeactivateFrozenTalentNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)DeactivateFrozenTalentNetEvents.Count);
+            foreach (var netEvent in DeactivateFrozenTalentNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedDeactivateFrozenTalentNetEvents(NetDataReader reader)
+        {
+            DeactivateFrozenTalentNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref DeactivateFrozenTalentNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerStartedExposedToLavaNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerStartedExposedToLavaNetEvents.Count);
+            foreach (var netEvent in PlayerStartedExposedToLavaNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedPlayerStartedExposedToLavaNetEvents(NetDataReader reader)
+        {
+            PlayerStartedExposedToLavaNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PlayerStartedExposedToLavaNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerEndedExposedToLavaNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerEndedExposedToLavaNetEvents.Count);
+            foreach (var netEvent in PlayerEndedExposedToLavaNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedPlayerEndedExposedToLavaNetEvents(NetDataReader reader)
+        {
+            PlayerEndedExposedToLavaNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PlayerEndedExposedToLavaNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

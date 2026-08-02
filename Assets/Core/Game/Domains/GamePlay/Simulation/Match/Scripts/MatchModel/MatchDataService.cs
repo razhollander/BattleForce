@@ -16,6 +16,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastSwapFieldCreatedId = 0;
         private ushort _lastKOProjectileCreatedId = 0;
         private ushort _lastGrapplingHookProjectileCreatedId = 0;
+        private ushort _lastFishingRodProjectileCreatedId = 0;
+        private ushort _lastSoulGhostCreatedId = 0;
+        private ushort _lastFrigidBlockCreatedId = 0;
         private ushort _lastChickenEggCreatedId = 0;
         private ushort _lastGalacticForceFieldCreatedId = 0;
         public List<int> DidntPlayYetStageIndexes { get; } = new List<int>();
@@ -35,7 +38,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
                 maxCap.ConcurrentPowerUpBalls,
                 sharedGamePlayConfig.MaxTeamsAmount,
                 maxCap.ConcurrentChickenEggs,
-                maxCap.ConcurrentGalacticForceFields);
+                maxCap.ConcurrentGalacticForceFields,
+                maxCap.ConcurrentFrigidBlocks);
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
@@ -131,8 +135,47 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             grapplingHookProjectile.StartPosition = position;
             grapplingHookProjectile.Position = position;
             grapplingHookProjectile.Velocity = velocity;
-            grapplingHookProjectile.IsHookAttached = false;
+            grapplingHookProjectile.HitData = default;
             return grapplingHookProjectile;
+        }
+
+        public TalentFishingRodProjectileStateS2C AddFishingRodProjectile(ushort casterPlayerId, Vector2 position, Vector2 velocity)
+        {
+            ref var fishingRodProjectile = ref _simulationState.FishingRodProjectiles.AddAndGet();
+            var projectileId = (ushort)(++_lastFishingRodProjectileCreatedId % byte.MaxValue);
+            fishingRodProjectile.Id = projectileId;
+            fishingRodProjectile.PlayerCasterId = casterPlayerId;
+            fishingRodProjectile.Position = position;
+            fishingRodProjectile.Velocity = velocity;
+            fishingRodProjectile.Phase = FishingRodTipPhase.FlyingForward;
+            fishingRodProjectile.CaughtEnemyId = 0;
+            fishingRodProjectile.EnemyCaughtArrowDirection = Vector2.Zero;
+            return fishingRodProjectile;
+        }
+
+        public TalentSoulGhostStateS2C AddSoulGhost(ushort casterPlayerId, Vector2 position, Vector2 direction, Vector2 velocity)
+        {
+            ref var soulGhost = ref _simulationState.SoulGhosts.AddAndGet();
+            var ghostId = (ushort)(++_lastSoulGhostCreatedId % byte.MaxValue);
+            soulGhost.Id = ghostId;
+            soulGhost.PlayerCasterId = casterPlayerId;
+            soulGhost.Position = position;
+            soulGhost.Direction = direction;
+            soulGhost.Velocity = velocity;
+            return soulGhost;
+        }
+
+        public TalentFrigidBlockStateS2C AddFrigidBlock(ushort casterPlayerId, Vector2 position, Vector2 rotation, Vector2 velocity)
+        {
+            ref var frigidBlock = ref _simulationState.FrigidBlocks.AddAndGet();
+            var blockId = (ushort)(++_lastFrigidBlockCreatedId % byte.MaxValue);
+            frigidBlock.Id = blockId;
+            frigidBlock.PlayerCasterId = casterPlayerId;
+            frigidBlock.Position = position;
+            frigidBlock.Rotation = rotation;
+            frigidBlock.Velocity = velocity;
+            frigidBlock.AngularVelocity = 0f;
+            return frigidBlock;
         }
 
         public TalentChickenEggStateS2C AddChickenEgg(ushort casterPlayerId, Vector2 position)

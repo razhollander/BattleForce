@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
@@ -9,11 +10,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private ITeamsBoardUIController _teamsBoardUIController;
+        private IMatchPlayerControllers _matchPlayerControllers;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
+            _matchPlayerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
         }
 
         public void Execute()
@@ -31,6 +34,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     _teamsBoardUIController.UpdateTeamGems(kvp.Key, kvp.Value);
                 }
             }
+
+            _matchPlayerControllers.RefreshLeaderFlags();
 
             events.Clear();
         }

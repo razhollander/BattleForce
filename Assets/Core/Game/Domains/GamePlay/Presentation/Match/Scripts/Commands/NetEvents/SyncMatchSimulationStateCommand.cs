@@ -10,13 +10,17 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimArrowEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
@@ -27,6 +31,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Scripts.Extensions;
@@ -52,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
         private AddMatchPlayerCommand _addMatchPlayerCommand;
+        private CreatePowerUpBallCommand _createPowerUpBallCommand;
         private ICommandFactory _commandFactory;
         private PresentationGamePlayConfig _gameplayConfig;
         private IMatchPlayerControllers _playerControllers;
@@ -66,6 +72,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IKOProjectilesControllers _kOProjectilesControllers;
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
+        private IFishingRodTipControllers _fishingRodTipControllers;
+        private ISecondCastAimArrowControllers _secondCastAimArrowControllers;
+        private ISoulGhostControllers _soulGhostControllers;
+        private IFrigidBlocksControllers _frigidBlocksControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private IPreparationPhaseCountdownController _preparationPhaseCountdownController;
         private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
@@ -98,6 +108,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _addMatchPlayerCommand = _commandFactory.CreateCommandVoid<AddMatchPlayerCommand>();
+            _createPowerUpBallCommand = _commandFactory.CreateCommandVoid<CreatePowerUpBallCommand>();
             _gameplayConfig =_diContainer.Resolve<PresentationGamePlayConfig>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
@@ -111,6 +122,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _kOProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
+            _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
+            _secondCastAimArrowControllers = _diContainer.Resolve<ISecondCastAimArrowControllers>();
+            _soulGhostControllers = _diContainer.Resolve<ISoulGhostControllers>();
+            _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
             _preparationPhaseCountdownController = _diContainer.Resolve<IPreparationPhaseCountdownController>();
@@ -149,6 +164,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _swapFieldControllers.DestroyAll();
             _kOProjectilesControllers.DestroyAll();
             _grapplingHookProjectilesControllers.DestroyAll();
+            _fishingRodTipControllers.DestroyAll();
+            _secondCastAimArrowControllers.DestroyAll();
+            _soulGhostControllers.DestroyAll();
+            _frigidBlocksControllers.DestroyAll();
             _chickenEggsControllers.DestroyAll();
             _galacticPullStarEffectControllers.DestroyAll();
             _lockOnTargetEffectController.DestroyAll();
@@ -168,13 +187,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _worldCameraController.SetisDampingEnabled(true);
             }
 
+            SetTeamsData();
             CreatePlayers();
             CreateBullets();
             CreateWalls(mapSizeMultiplier);
             CreateSprings(mapSizeMultiplier);
             CreateSpikes(mapSizeMultiplier);
             CreateLavaWalls(mapSizeMultiplier);
-            CreateTalentCards(mapSizeMultiplier);
+            CreateTalentCards();
             CreatePowerUpBalls();
             CreateTeamBoards();
             var teleportGatesPerWheelId = CreateTeleportGates(mapSizeMultiplier);
@@ -183,8 +203,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateSwapField();
             CreateKOPRojectiles();
             CreateGrapplingHookPRojectiles();
+            CreateFishingRodTips();
+            CreateSoulGhosts();
+            CreateFrigidBlocks();
             CreateChickenEggs();
             CreateGalacticPullStars();
+        }
+
+        private void SetTeamsData()
+        {
+            foreach (var player in _simulationState.Players.AsSpan())
+            {
+                var playerTeamId = player.TeamId;
+                _matchDataService.AddTeamIdIfDoesntExist(playerTeamId);
+                var teamGems = _simulationState.GemsPerTeamId[playerTeamId];
+                var teamBolts = _simulationState.BoltsPerTeam[playerTeamId];
+                _matchDataService.SetTeamBolts(playerTeamId, teamBolts);
+                _matchDataService.SetTeamGems(playerTeamId, teamGems);
+            }
         }
 
         private void CreateFieldBarriers(float mapSizeMultiplier)
@@ -214,10 +250,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             foreach (ushort teamId in _matchDataService.TeamIds)
             {
-                var teamGems = _simulationState.GemsPerTeamId[teamId];
-                var teamBolts = _simulationState.BoltsPerTeam[teamId];
-                _matchDataService.SetTeamBolts(teamId, teamBolts);
-                _matchDataService.SetTeamGems(teamId, teamGems);
+                var teamGems = _matchDataService.GemsPerTeam[teamId];
+                var teamBolts = _matchDataService.BoltsPerTeam[teamId];
                 _teamsBoardUIController.CreateTeamBoard(teamId, teamGems, teamBolts);
             }
         }
@@ -360,15 +394,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 var position = powerUpBall.Position.ToUnityVector2();
                 _matchDataService.AddPowerUpBall(powerUpBall.Id, position);
-                _powerUpBallControllers.CreatePowerUpBall(powerUpBall.Id, position);
+                _createPowerUpBallCommand.SetPowerUpBallId(powerUpBall.Id).SetPosition(position).Execute();
             }
         }
         
-        private void CreateTalentCards(float mapSizeMultiplier)
+        private void CreateTalentCards()
         {
             foreach (var talentCard in _simulationState.TalentCards.AsSpan())
             {
-                _matchDataService.AddTalentCard(talentCard.Id, talentCard.Position.ToUnityVector2()*mapSizeMultiplier, talentCard.TalentType, talentCard.Health);
+                _matchDataService.AddTalentCard(talentCard.Id, talentCard.Position.ToUnityVector2(), talentCard.TalentType, talentCard.Health);// NOTE: talentCard.Position is already scaled by the server (InitStageCommand stores position * mapSizeMultiplier into state), so it must not be scaled again here.
                 _talentCardControllers.CreateTalentCard(talentCard.Id);
             }
         }
@@ -518,7 +552,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     {
                         var scaledPosition = spikeConfig.Position * mapSizeMultiplier;
                         EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                            calculationTick, rotationSpeed, deltaTime, wheelConfig.CenterPosition, scaledPosition, spikeConfig.RotationAngle,
+                            calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, spikeConfig.RotationAngle,
                             out var worldPosition, out var worldRotation
                         );
 
@@ -559,6 +593,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
 
+        private void CreateFrigidBlocks()
+        {
+            foreach (var frigidBlock in _simulationState.FrigidBlocks.AsSpan())
+            {
+                _matchDataService.AddFrigidBlock(frigidBlock.Id, frigidBlock.PlayerCasterId, frigidBlock.Position, frigidBlock.Rotation);
+                _frigidBlocksControllers.CreateFrigidBlock(frigidBlock.Id, frigidBlock.Position.ToUnityVector2(), frigidBlock.Rotation.ToUnityVector2());
+            }
+        }
+
         private void CreateChickenEggs()
         {
             foreach (var egg in _simulationState.ChickenEggs.AsSpan())
@@ -589,7 +632,37 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var rotation = grapplingHookProjectile.Position - casterPosition.ToNumericsVector2();
 
                 _matchDataService.AddGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position);
-                _grapplingHookProjectilesControllers.CreateGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, grapplingHookProjectile.IsHookAttached);
+                _grapplingHookProjectilesControllers.CreateGrapplingHookProjectile(grapplingHookProjectile.Id, casterId, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, grapplingHookProjectile.HitData.IsHookAttached);
+            }
+        }
+
+        private void CreateSoulGhosts()
+        {
+            foreach (var soulGhost in _simulationState.SoulGhosts.AsSpan())
+            {
+                var casterId = soulGhost.PlayerCasterId;
+                var casterState = _simulationState.GetPlayerById(casterId);
+                _matchDataService.AddSoulGhost(soulGhost.Id, casterId, soulGhost.Position, soulGhost.Direction);
+                _soulGhostControllers.CreateSoulGhost(soulGhost.Id, casterId, casterState.TeamId, soulGhost.Position.ToUnityVector2(), soulGhost.Direction.ToUnityVector2());
+            }
+        }
+
+        private void CreateFishingRodTips()
+        {
+            foreach (var fishingRodTip in _simulationState.FishingRodProjectiles.AsSpan())
+            {
+                var casterId = fishingRodTip.PlayerCasterId;
+                var casterState = _simulationState.GetPlayerById(casterId);
+                var position = fishingRodTip.Position;
+                var casterPosition = casterState.Spaceship.Transform.Position.ToUnityVector2();
+                var rotation = fishingRodTip.Position - casterPosition.ToNumericsVector2();
+                _matchDataService.AddFishingRodTip(fishingRodTip.Id, casterId, position, fishingRodTip.Phase);
+                _fishingRodTipControllers.CreateFishingRodTip(fishingRodTip.Id, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, fishingRodTip.Phase);
+
+                if (fishingRodTip.Phase == FishingRodTipPhase.CaughtEnemy)
+                {
+                    _secondCastAimArrowControllers.AddArrow(fishingRodTip.Id, position.ToUnityVector2(), fishingRodTip.EnemyCaughtArrowDirection.ToUnityVector2());
+                }
             }
         }
     }

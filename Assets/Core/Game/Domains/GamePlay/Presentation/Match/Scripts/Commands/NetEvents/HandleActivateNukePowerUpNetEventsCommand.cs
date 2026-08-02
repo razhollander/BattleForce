@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     public class HandleActivateNukePowerUpNetEventsCommand : BaseCommand, ICommandVoid
     {
         private const float CAMERA_SHAKE_DURATION = 0.6f;
-        private const float CAMERA_SHAKE_INTENSITY = 1.5f;
+        private const float CAMERA_SHAKE_INTENSITY = 10f;
         
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private INukeShockwaveEffectController _nukeShockwaveEffectController;

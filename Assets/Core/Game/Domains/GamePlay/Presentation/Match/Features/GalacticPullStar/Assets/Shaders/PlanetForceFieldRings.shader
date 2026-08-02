@@ -12,9 +12,32 @@ Shader "Custom/PlanetForceFieldRings"
         _RadiusInner ("Inner Radius Y (planet surface)", Range(0, 1)) = 0.45
         _RingWidth ("Ring Width", Range(0.001, 0.5)) = 0.06
 
-        _SpawnInterval ("Spawn Interval (seconds)", Range(0.01, 5)) = 0.6
+        _SpawnInterval ("Spawn Interval (seconds)", Range(0.01, 30)) = 0.6
         _ShrinkSpeed ("Shrink Speed (radius/sec)", Range(0.01, 2)) = 0.25
         _ShrinkEase ("Shrink Ease (1=linear, >1 slow-in, <1 slow-out)", Range(0.1, 5)) = 1.0
+
+        // --- Time source ---------------------------------------------------------------------
+        // This shader is stateless: it does not store when each ring was born. Every frame it
+        // re-derives a ring's spawn time as (ringIndex * _SpawnInterval), where the newest index
+        // is floor(time / _SpawnInterval). That reconstruction is only stable while the timing
+        // params (_SpawnInterval / _ShrinkSpeed) stay constant.
+        //
+        // _RadiusOuter / _StartColor / _EndColor are applied per-ring from each ring's own life
+        // progress, so changing them from outside at any moment is smooth and safe.
+        //
+        // _SpawnInterval / _ShrinkSpeed are different: the instant they change, every visible ring
+        // is re-derived and teleports. How far it teleports scales with `time` (ringIndex grows as
+        // time / interval). With the global _Time.y — a large, ever-growing number that differs
+        // every time the effect is triggered — ramping those params produces a different chaotic
+        // result each run. Driving _AnimTime from script and restarting it at 0 per effect keeps
+        // that number small and identical every run, so a live ramp stays reproducible.
+        //
+        // Use _Time (constant timing, endless loop): keep _UseManualTime = 0. Only tweak
+        //   radius/color from outside. This is what the GalacticPull materials use.
+        // Ramp the timing live (e.g. charge speed-up): set _UseManualTime = 1 and push _AnimTime
+        //   (elapsed seconds, from 0) every frame from script.
+        _UseManualTime ("Use Manual Time (0 = global _Time, 1 = _AnimTime)", Float) = 0
+        _AnimTime ("Animation Time (manual, seconds)", Float) = 0
     }
 
     SubShader
@@ -67,6 +90,8 @@ Shader "Custom/PlanetForceFieldRings"
             float _SpawnInterval;
             float _ShrinkSpeed;
             float _ShrinkEase;
+            float _UseManualTime;
+            float _AnimTime;
 
             Varyings vert(Attributes IN)
             {
@@ -89,7 +114,8 @@ Shader "Custom/PlanetForceFieldRings"
                 // Time it takes a single ring to shrink from the outer to the inner radius.
                 float lifetime = travel / max(_ShrinkSpeed, 1e-4);
                 float halfWidth = _RingWidth * 0.5;
-                float time = _Time.y;
+                // _UseManualTime is 0 or 1, so this selects cleanly between global and script-driven time.
+                float time = lerp(_Time.y, _AnimTime, _UseManualTime);
 
                 // Newest ring index for the current time; older rings are previous indices.
                 float currentIndex = floor(time / _SpawnInterval);

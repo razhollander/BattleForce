@@ -99,6 +99,226 @@ public class MeshUtils
         return finalMesh;
     }
     
+    /// <summary>
+    /// Creates a 2D cone (sector / pie-slice) mesh. The apex sits at the origin and the arc
+    /// is swept symmetrically around the +X axis, spanning <paramref name="openingAngle"/> total degrees.
+    /// The surface is subdivided both along the arc (<paramref name="arcSegments"/>) and radially
+    /// (<paramref name="radialSegments"/>) into concentric rings, producing evenly spread triangles
+    /// instead of thin slivers meeting at the apex.
+    /// </summary>
+    /// <param name="radius">Distance from the apex to the arc.</param>
+    /// <param name="openingAngle">Total opening angle of the cone in degrees.</param>
+    /// <param name="arcSegments">Number of segments used to approximate the arc.</param>
+    /// <param name="radialSegments">Number of concentric rings from the apex to the arc.</param>
+    /// <param name="z">Z offset for the generated vertices.</param>
+    public static Mesh CreateConeMesh(float radius, float openingAngle, int arcSegments = 16, int radialSegments = 8, float z = 0f)
+    {
+        if (arcSegments < 1) arcSegments = 1;
+        if (radialSegments < 1) radialSegments = 1;
+
+        var halfAngle = openingAngle * 0.5f;
+        var startAngle = -halfAngle;
+        var endAngle = halfAngle;
+
+        int arcPoints = arcSegments + 1;
+
+        // Apex (shared single vertex) + a full arc of points per radial ring (rings 1..radialSegments).
+        var verts = new Vector3[1 + radialSegments * arcPoints];
+        var uvs = new Vector2[verts.Length];
+        verts[0] = new Vector3(0f, 0f, z);
+
+        for (int r = 1; r <= radialSegments; r++)
+        {
+            float ringRadius = radius * ((float) r / radialSegments);
+            int ringStart = 1 + (r - 1) * arcPoints;
+
+            for (int a = 0; a < arcPoints; a++)
+            {
+                float t = (float) a / arcSegments;
+                float angle = Mathf.Lerp(startAngle, endAngle, t) * Mathf.Deg2Rad;
+                verts[ringStart + a] = new Vector3(Mathf.Cos(angle) * ringRadius, Mathf.Sin(angle) * ringRadius, z);
+            }
+        }
+
+        // UVs: normalize the (x, y) footprint into 0..1 so any texture maps sensibly.
+        float minX = -radius, minY = -radius * Mathf.Sin(halfAngle * Mathf.Deg2Rad);
+        float sizeX = radius - minX;
+        float sizeY = (radius * Mathf.Sin(halfAngle * Mathf.Deg2Rad)) - minY;
+        if (Mathf.Abs(sizeX) < 1e-6f) sizeX = 1f;
+        if (Mathf.Abs(sizeY) < 1e-6f) sizeY = 1f;
+        for (int i = 0; i < verts.Length; i++)
+            uvs[i] = new Vector2((verts[i].x - minX) / sizeX, (verts[i].y - minY) / sizeY);
+
+        // Triangles. Inner ring (apex fan) + a quad grid between successive rings.
+        var triangles = new int[(arcSegments + (radialSegments - 1) * arcSegments * 2) * 3];
+        int ti = 0;
+
+        // Apex fan to first ring (CCW when viewed from +Z).
+        int firstRingStart = 1;
+        for (int a = 0; a < arcSegments; a++)
+        {
+            triangles[ti++] = 0;
+            triangles[ti++] = firstRingStart + a;
+            triangles[ti++] = firstRingStart + a + 1;
+        }
+
+        // Quad grid between ring r and ring r+1.
+        for (int r = 1; r < radialSegments; r++)
+        {
+            int innerStart = 1 + (r - 1) * arcPoints;
+            int outerStart = 1 + r * arcPoints;
+
+            for (int a = 0; a < arcSegments; a++)
+            {
+                int aInner = innerStart + a;
+                int bInner = innerStart + a + 1;
+                int aOuter = outerStart + a;
+                int bOuter = outerStart + a + 1;
+
+                triangles[ti++] = aInner;
+                triangles[ti++] = aOuter;
+                triangles[ti++] = bOuter;
+
+                triangles[ti++] = aInner;
+                triangles[ti++] = bOuter;
+                triangles[ti++] = bInner;
+            }
+        }
+
+        var mesh = new Mesh();
+        mesh.SetVertices(verts);
+        mesh.SetUVs(0, uvs);
+        mesh.SetTriangles(triangles, 0);
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        return mesh;
+    }
+
+    /// <summary>
+    /// Creates a solid 3D cone: the surface of revolution of the 2D cone around its central (+X) axis.
+    /// The apex sits at the origin and the cone opens toward +X. <paramref name="radius"/> is the slant
+    /// distance from the apex to the rim and <paramref name="openingAngle"/> is the full apex angle, so
+    /// they keep the exact same meaning as <see cref="CreateConeMesh"/>. The lateral surface is subdivided
+    /// evenly both around the circumference (<paramref name="radialSegments"/>) and along the slant
+    /// (<paramref name="slantSegments"/>).
+    /// </summary>
+    /// <param name="radius">Slant distance from the apex to the base rim.</param>
+    /// <param name="openingAngle">Total apex angle in degrees.</param>
+    /// <param name="radialSegments">Number of segments around the circumference.</param>
+    /// <param name="slantSegments">Number of rings from the apex to the base rim.</param>
+    /// <param name="addBaseCap">Whether to close the base with a disk.</param>
+    public static Mesh CreateConeMesh3D(float radius, float openingAngle, int radialSegments = 24, int slantSegments = 4, bool addBaseCap = true)
+    {
+        if (radialSegments < 3) radialSegments = 3;
+        if (slantSegments < 1) slantSegments = 1;
+
+        float halfAngle = openingAngle * 0.5f * Mathf.Deg2Rad;
+        float axisCos = Mathf.Cos(halfAngle); // spread along +X per unit slant
+        float radialSin = Mathf.Sin(halfAngle); // spread away from the axis per unit slant
+
+        // --- Lateral surface vertices: apex + one circle per slant ring ---
+        int lateralCount = 1 + slantSegments * radialSegments;
+        int capCount = addBaseCap ? 1 + radialSegments : 0;
+
+        var verts = new Vector3[lateralCount + capCount];
+        var uvs = new Vector2[verts.Length];
+
+        verts[0] = Vector3.zero; // apex
+        uvs[0] = new Vector2(0.5f, 0f);
+
+        for (int r = 1; r <= slantSegments; r++)
+        {
+            float slant = radius * ((float) r / slantSegments);
+            float x = slant * axisCos;
+            float ringRadius = slant * radialSin;
+            int ringStart = 1 + (r - 1) * radialSegments;
+
+            for (int s = 0; s < radialSegments; s++)
+            {
+                float phi = (float) s / radialSegments * Mathf.PI * 2f;
+                verts[ringStart + s] = new Vector3(x, Mathf.Cos(phi) * ringRadius, Mathf.Sin(phi) * ringRadius);
+                uvs[ringStart + s] = new Vector2((float) s / radialSegments, (float) r / slantSegments);
+            }
+        }
+
+        // --- Base cap vertices (duplicated rim for a sharp edge + correct +X normals) ---
+        int capCenter = lateralCount;
+        if (addBaseCap)
+        {
+            float xBase = radius * axisCos;
+            float baseRadius = radius * radialSin;
+            verts[capCenter] = new Vector3(xBase, 0f, 0f);
+            uvs[capCenter] = new Vector2(0.5f, 0.5f);
+
+            for (int s = 0; s < radialSegments; s++)
+            {
+                float phi = (float) s / radialSegments * Mathf.PI * 2f;
+                verts[capCenter + 1 + s] = new Vector3(xBase, Mathf.Cos(phi) * baseRadius, Mathf.Sin(phi) * baseRadius);
+                uvs[capCenter + 1 + s] = new Vector2(0.5f + 0.5f * Mathf.Cos(phi), 0.5f + 0.5f * Mathf.Sin(phi));
+            }
+        }
+
+        // --- Triangles (wound so the outside faces outward) ---
+        int lateralTris = radialSegments + (slantSegments - 1) * radialSegments * 2;
+        int capTris = addBaseCap ? radialSegments : 0;
+        var triangles = new int[(lateralTris + capTris) * 3];
+        int ti = 0;
+
+        // Apex fan to the first ring.
+        int first = 1;
+        for (int s = 0; s < radialSegments; s++)
+        {
+            int next = (s + 1) % radialSegments;
+            triangles[ti++] = 0;
+            triangles[ti++] = first + next;
+            triangles[ti++] = first + s;
+        }
+
+        // Quad grid between successive rings.
+        for (int r = 1; r < slantSegments; r++)
+        {
+            int innerStart = 1 + (r - 1) * radialSegments;
+            int outerStart = 1 + r * radialSegments;
+
+            for (int s = 0; s < radialSegments; s++)
+            {
+                int next = (s + 1) % radialSegments;
+                int innerCurr = innerStart + s;
+                int innerNext = innerStart + next;
+                int outerCurr = outerStart + s;
+                int outerNext = outerStart + next;
+
+                triangles[ti++] = innerCurr;
+                triangles[ti++] = outerNext;
+                triangles[ti++] = outerCurr;
+
+                triangles[ti++] = innerCurr;
+                triangles[ti++] = innerNext;
+                triangles[ti++] = outerNext;
+            }
+        }
+
+        // Base cap fan (outward normal points +X).
+        if (addBaseCap)
+        {
+            for (int s = 0; s < radialSegments; s++)
+            {
+                int next = (s + 1) % radialSegments;
+                triangles[ti++] = capCenter;
+                triangles[ti++] = capCenter + 1 + s;
+                triangles[ti++] = capCenter + 1 + next;
+            }
+        }
+
+        var mesh = new Mesh();
+        mesh.SetVertices(verts);
+        mesh.SetUVs(0, uvs);
+        mesh.SetTriangles(triangles, 0);
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        return mesh;
+    }
+
     private static Vector2[] GenerateHalfRingPoints(float startAngle, float endAngle, int segments, float innerRadius, float outerRadius)
     {
         // A half ring needs (segments + 1) for the outer edge, and (segments + 1) for the inner edge

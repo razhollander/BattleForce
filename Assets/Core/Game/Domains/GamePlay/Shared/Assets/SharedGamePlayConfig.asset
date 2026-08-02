@@ -28,7 +28,11 @@ MonoBehaviour:
   NoTeamId: 5
   TeamIds: 0100020003000400
   MinEntityId: 1
+  FrigidBlockSize: {x: 6, y: 1.5}
   GrapplingHookProjectileSize: 1
   GrapplingHookProjectileMaxDistance: 30
+  FishingRodTipSize: 0.5
+  SoulGhostSize: 1
   MagneticPullFieldRadius: 10
-  LockOnTargetDurationInSeconds: 0.8
+  LockOnTargetDurationInSeconds: 0.65
+  HeadbuttMaxChargeDurationSeconds: 2

@@ -66,6 +66,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             _matchDataService.SimulationState.SetIsPowerUpCurrentlyActiveForPlayer(_casterPlayerId, true);
             _netEventsDataService.AddActivateShuffleNetEvent(tick, _casterPlayerId);
         }
+        
+        public void Reset()
+        {
+            _pendingSwapsCount = 0;
+            _nextSwapIndex = 0;
+            _nextSwapTick = 0;
+        }
 
         public void OnTick(int tick)
         {

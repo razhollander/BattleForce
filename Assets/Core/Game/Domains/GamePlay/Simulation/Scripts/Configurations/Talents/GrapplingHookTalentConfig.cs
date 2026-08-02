@@ -11,6 +11,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.Talents
         public float PlayerPullForceWhileHooked = 200f;
         public float PlayerVelocitySquaredThresholdToDeactivateHook = 0.1f;
         public float GraceTicksUntilCheckIfVelocityIsBelowThreshold = 5f;
-        public float PlayerRotateSpeedWhileHooked = 500f;
+        public float EnemyHitSpinAmount = 30f;
     }
 }

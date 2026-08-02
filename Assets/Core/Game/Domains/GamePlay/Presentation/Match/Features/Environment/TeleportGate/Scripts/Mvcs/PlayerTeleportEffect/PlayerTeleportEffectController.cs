@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Scripts.LayerOrders;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         public void PlayEffect(Vector2 position)
         {
             var view = _pool.Spawn();
-            view.transform.position = position;
+            view.transform.position = new Vector3(position.x, position.y, LayerOrder.Effects);
             view.PlayAndDespawn(_stateMachineService.CurrentState().CancellationTokenSource).Forget();
         }
     }

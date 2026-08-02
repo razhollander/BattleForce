@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private NetworkConfig _networkConfig;
         private ICommandFactory _commandFactory;
-        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
         public override void ResolveDependencies()
         {
@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
-            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
 
         public void Execute()
@@ -47,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                         continue;
                     }
 
-                    _addForceToPlayerCommand.SetPlayerId(playerState.Id).SetForce(pullDelta).Execute();
+                    _tryAddForceToPlayerCommand.SetPlayerId(playerState.Id).SetForce(pullDelta).Execute();
                 }
             }
         }

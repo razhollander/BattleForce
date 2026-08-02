@@ -85,6 +85,8 @@ MonoBehaviour:
     PlayerMaxShootCooldownChangedNetEvents: 128
     PlayerSpinnedStartedNetEvents: 128
     PlayerSpinnedEndedNetEvents: 128
+    PlayerStartedExposedToLavaNetEvents: 128
+    PlayerEndedExposedToLavaNetEvents: 128
     CreateGrapplingHookProjectileNetEvents: 128
     GrapplingHookHitWallNetEvents: 128
     DeactivateGrapplingHookTalentNetEvents: 128

@@ -1,6 +1,7 @@
 using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -13,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IMatchDataService _matchDataService;
         private IPlayersTouchingWallDataService _playersTouchingWallDataService;
         private ICommandFactory _commandFactory;
-        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
         private int _tick;
 
@@ -28,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _playersTouchingWallDataService = _diContainer.Resolve<IPlayersTouchingWallDataService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
-            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
 
         public void Execute()
@@ -41,8 +42,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var playerState = _matchDataService.SimulationState.GetPlayerById(stickData.PlayerId);
                 var velocity = playerState.Spaceship.Transform.Velocity;
 
-                var wallRotationDegrees = _matchDataService.EnvironmentData.GetWall(stickData.WallId).Transform.WorldRotationDegrees;
-                var wallNormal = stickData.WallLocalNormal.Rotate(wallRotationDegrees);
+                if (!TryGetCurrentWallNormal(stickData, out var wallNormal))
+                {
+                    continue;
+                }
 
                 if (!velocity.IsFacingWall(wallNormal))
                 {
@@ -51,12 +54,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
                 var velocityTowardsWall = Vector2.Dot(velocity, wallNormal) * wallNormal;
 
-                _addForceToPlayerCommand
+                _tryAddForceToPlayerCommand
                     .SetPlayerId(stickData.PlayerId)
                     .SetForce(-velocityTowardsWall)
                     .ShouldTurnOffEngine(false)
                     .Execute();
             }
+        }
+
+        // The touched body keeps rotating while the player is stuck to it, so the stored local normal is turned back
+        // into a world normal with the body's current rotation. A FrigidBlock can be destroyed mid-contact.
+        private bool TryGetCurrentWallNormal(in PlayerStickToWallData stickData, out Vector2 wallNormal)
+        {
+            if (stickData.WallBodyType == PhysicsBodyType.Wall)
+            {
+                var wallRotationDegrees = _matchDataService.EnvironmentData.GetWall(stickData.WallId).Transform.WorldRotationDegrees;
+                wallNormal = stickData.WallLocalNormal.Rotate(wallRotationDegrees);
+                return true;
+            }
+
+            if (_matchDataService.SimulationState.TryGetFrigidBlockById(stickData.WallId, out var frigidBlock))
+            {
+                wallNormal = stickData.WallLocalNormal.Rotate(frigidBlock.Rotation.ToAngleDegrees());
+                return true;
+            }
+
+            wallNormal = Vector2.Zero;
+            return false;
         }
     }
 }

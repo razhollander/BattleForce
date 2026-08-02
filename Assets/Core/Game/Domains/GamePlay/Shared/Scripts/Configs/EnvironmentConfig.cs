@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Core.Scripts.Extensions;
-using Core.Scripts.Extensions.Linq;
 using CoreDomain.Scripts.Helpers.SerializableDictionary;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
@@ -13,6 +13,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         
         [SerializeField]
         SerializableDictionary<int, EnvironmentLayoutConfig> _environmentLayoutConfigs = new SerializableDictionary<int, EnvironmentLayoutConfig>();
+#if UNITY_EDITOR
+        public SerializableDictionary<int, EnvironmentLayoutConfig> Configs => _environmentLayoutConfigs;
+        
+#endif
 
         public List<int> AvailableLayoutIndexes;
         
@@ -131,6 +135,44 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             {
                 var newLayout = new EnvironmentLayoutConfig("", "");
                 newLayout.SetFieldBarriersJson(fieldBarriers.ToJson());
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
+
+        public void SetPowerUpSpawnPoints(S2CModels.PowerUpSpawnPointConfig[] powerUpSpawnPoints, int index)
+        {
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                var json = JsonConvert.SerializeObject(powerUpSpawnPoints);
+                environmentLayout.SetPowerUpSpawnPointsJson(json);
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                var json = JsonConvert.SerializeObject(powerUpSpawnPoints);
+                newLayout.SetPowerUpSpawnPointsJson(json);
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
+
+        public void SetCameraBoundaries(S2CModels.CameraBoundariesConfig cameraBoundaries, int index)
+        {
+            var json = JsonConvert.SerializeObject(cameraBoundaries);
+
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetCameraBoundariesJson(json);
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetCameraBoundariesJson(json);
                 _environmentLayoutConfigs[index] = newLayout;
             }
 #if UNITY_EDITOR

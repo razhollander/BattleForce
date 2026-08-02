@@ -21,6 +21,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         StageBoundary = 14,
         PlayerHeart = 15,
         ChickenEgg = 16,
+        FrigidBlock = 18,
+        FishingRodTip = 19,
+        SoulGhost = 20,
     }
     
     public enum PhysicsCollisionType
@@ -32,10 +35,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         TalentCard = 4,
         PowerUpBall = 5,
         StartMatchWall = 6,
-        CollideOnlyWithPlayer = 7,
+        AnyObjectThatCollidesOnlyWithPlayer = 7,
         KOProjectile = 8,
         GrapplingHookProjectile = 9,
         PlayerHeart = 10,
         ChickenEgg = 11,
+        FrigidBlock = 12,
+        FishingRodTip = 13,
+        SoulGhost = 14,
     }
 }

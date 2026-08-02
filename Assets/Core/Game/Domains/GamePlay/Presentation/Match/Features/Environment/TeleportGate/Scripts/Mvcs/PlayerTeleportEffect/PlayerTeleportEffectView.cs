@@ -19,14 +19,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         
         public async Awaitable PlayAndDespawn(CancellationTokenSource cancellationTokenSource)
         {
-            _animationCancellationTokenSource?.Cancel();
             _animationCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationTokenSource.Token);
             transform.localScale = Vector3.one * _startScale;
-            await transform.DOScale(_endScale, _showDuration)
-                .SetLoops(2, LoopType.Yoyo)
-                .SetEase(Ease.InOutSine)
-                .WithCancellationSafe(cancellationTokenSource.Token);
-            Despawn.Invoke();
+
+            try
+            {
+                await transform.DOScale(_endScale, _showDuration)
+                    .SetLoops(2, LoopType.Yoyo)
+                    .SetEase(Ease.InOutSine)
+                    .WithCancellationSafe(_animationCancellationTokenSource.Token);
+            }
+            finally
+            {
+                _animationCancellationTokenSource.Dispose();
+                Despawn.Invoke();
+            }
         }
 
         public void OnCreated()

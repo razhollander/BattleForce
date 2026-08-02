@@ -11,6 +11,7 @@ using Box2D.NetStandard.Dynamics.World;
 using Box2D.NetStandard.Dynamics.World.Callbacks;
 #endif
 using Box2D.WorldTests;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
@@ -27,8 +28,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 {
     public class PhysicsSimulator : IPhysicsSimulator, IGUIUpdatable
     {
+        private const float DEFAULT_PLAYER_DENSITY = 1.0f;
+        private const float DEFAULT_PLAYER_RESTITUTION = 0f;
+        
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly NetworkConfig _networkConfig;
+        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IUnityMainThreadDispatcher _unityMainThreadDispatcher;
         private World _world;
         private readonly CollisionEventCacheListener _collisionEventCacheListener;
@@ -39,10 +44,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         private readonly ConcurrentPool<CircleShape> _circleShapePool;
         private readonly ConcurrentPool<Filter> _filterPool;
 
-        public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig, IUnityMainThreadDispatcher unityMainThreadDispatcher)
+        public PhysicsSimulator(IUpdateSubscriptionService updateSubscriptionService, NetworkConfig networkConfig, ISimulationGamePlayConfigService gamePlayConfigService, IUnityMainThreadDispatcher unityMainThreadDispatcher)
         {
             _updateSubscriptionService = updateSubscriptionService;
             _networkConfig = networkConfig;
+            _gamePlayConfigService = gamePlayConfigService;
             _unityMainThreadDispatcher = unityMainThreadDispatcher;
             _collisionEventCacheListener = new CollisionEventCacheListener(_networkConfig);
 
@@ -90,6 +96,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     case PhysicsBodyType.SwapField: CopySwapFieldToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.KOProjectile: CopyKOProjectileToBody(currentBody, bodyData.Id, simulationState); break;
                     case PhysicsBodyType.GrapplingHookProjectile: CopyGrapplingHookProjectileToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.FishingRodTip: CopyFishingRodTipToBody(currentBody, bodyData.Id, simulationState); break;
+                    case PhysicsBodyType.SoulGhost: CopySoulGhostToBody(currentBody, bodyData.Id, simulationState); break;
                 }
 
                 currentBody = currentBody.GetNext();
@@ -108,6 +116,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var grapplingHookProjectileState = simulationState.GrapplingHookProjectiles.FindWithId(grapplingHookProjectileId);
             grapplingHookProjectileBody.SetTransform(grapplingHookProjectileState.Position, 0);
             grapplingHookProjectileBody.SetLinearVelocity(grapplingHookProjectileState.Velocity);
+        }
+
+        private void CopyFishingRodTipToBody(Body fishingRodTipBody, ushort fishingRodTipId, MatchSimulationStateS2C simulationState)
+        {
+            var fishingRodTipState = simulationState.FishingRodProjectiles.FindWithId(fishingRodTipId);
+            fishingRodTipBody.SetTransform(fishingRodTipState.Position, 0);
+            fishingRodTipBody.SetLinearVelocity(fishingRodTipState.Velocity);
+        }
+
+        private void CopySoulGhostToBody(Body soulGhostBody, ushort soulGhostId, MatchSimulationStateS2C simulationState)
+        {
+            var soulGhostState = simulationState.SoulGhosts.FindWithId(soulGhostId);
+            soulGhostBody.SetTransform(soulGhostState.Position, 0);
+            soulGhostBody.SetLinearVelocity(soulGhostState.Velocity);
         }
 
         private void CopySwapFieldToBody(Body swapFieldBody, ushort swapFieldId, MatchSimulationStateS2C simulationState)
@@ -270,6 +292,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         {
             var gravity = new Vector2(0f, 0f);
             var world = new World(gravity, _collisionEventCacheListener, _networkConfig.MaxCap.ConcurrentTimeOfImpactContacts, _networkConfig.MaxCap.ConcurrentBodyCount, _networkConfig.MaxCap.ConcurrentContactCount, _networkConfig.MaxCap.ConcurrentJointCount);
+            world.SetContactFilter(new PlayerCollisionContactFilter(_gamePlayConfigService));
             var testDebugDrawer = CreateTestDebugDrawer();
             world.SetDebugDraw(testDebugDrawer);
             return world;
@@ -338,7 +361,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = PhysicsBodyType.Lava.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -364,7 +387,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = PhysicsBodyType.StageBoundary.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -390,7 +413,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.friction = 0;
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = PhysicsBodyType.TeamFloor.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -405,6 +428,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             bodyDef.type = BodyType.Dynamic;
             bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.PlayerSpaceship);
             bodyDef.allowSleep = false;
+            bodyDef.bullet = true;
             var body = _world.CreateBody(bodyDef);
             _bodyDefPool.Return(bodyDef);
 
@@ -808,6 +832,82 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return hasCollision;
         }
 
+        public bool EllipseCastOnPlayers(Vector2 center, float radius, Vector2 direction, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        {
+            var hasCollision = false;
+            hitBodyData = default;
+
+            // Match the arc's footprint: full length along the aim direction is 'radius',
+            // and the perpendicular width matches the arc's angular spread at its far edge.
+            var halfAngleRad = (arcAngleDegrees * 0.5f).ToRadians();
+            var semiMajor = radius * 0.5f;
+            var semiMinor = radius * MathF.Sin(halfAngleRad);
+
+            var rot = Matrix3x2.CreateRotation(direction.ToAngleRadians());
+
+            // Ellipse is centered halfway along the aim direction so it spans from the apex to the tip.
+            var ellipseCenter = center + direction * semiMajor;
+
+            // Box2D polygons are capped at 8 vertices, so approximate the ellipse with 8 points.
+            const int vertexCount = 8;
+            var vertices = new Vector2[vertexCount];
+            for (int i = 0; i < vertexCount; i++)
+            {
+                var t = i / (float) vertexCount * MathF.PI * 2f;
+                var local = new Vector2(MathF.Cos(t) * semiMajor, MathF.Sin(t) * semiMinor);
+                vertices[i] = Vector2.Transform(local, rot);
+            }
+
+            var min = ellipseCenter;
+            var max = ellipseCenter;
+
+            foreach (var v in vertices)
+            {
+                var worldV = v + ellipseCenter;
+                min = Vector2.Min(min, worldV);
+                max = Vector2.Max(max, worldV);
+            }
+
+            _unityMainThreadDispatcher.EnqueueDraw(() => DebugDrawUtils.DrawPolygon(ellipseCenter, vertices));
+
+            var aabb = new AABB(min, max);
+            PhysicsBodyData hitBody = default;
+
+            _world.QueryAABB(fixture =>
+            {
+                var currentBodyData = (PhysicsBodyData) fixture.Body.UserData;
+                var shouldContinueQuery = true;
+                var isPlayerFromNotIgnoredTeam = currentBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && fixture.FilterData.groupIndex != -ignoreTeamId;
+                if (isPlayerFromNotIgnoredTeam)
+                {
+                    var polygonShape = GetPolygonShape();
+                    polygonShape.Set(vertices);
+
+                    var input = new ShapeCastInput();
+                    input.proxyA.Set(polygonShape, 0);
+                    input.proxyB.Set(fixture.Shape, 0);
+                    input.transformA = new Transform(ellipseCenter, Matrix3x2.Identity);
+                    input.transformB = fixture.Body.GetTransform();
+                    input.translationB = Vector2.Zero;
+
+                    if (Contact.ShapeCast(out _, input))
+                    {
+                        hasCollision = true;
+                        hitBody = currentBodyData;
+                    }
+
+                    _polygonShapePool.Return(polygonShape);
+                    shouldContinueQuery = !hasCollision;
+                }
+
+                return shouldContinueQuery;
+            }, aabb);
+
+            hitBodyData = hitBody;
+
+            return hasCollision;
+        }
+
         public void ManagedOnGUI()
         {
             
@@ -899,7 +999,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.isSensor = true;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentSpring.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -927,7 +1027,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.isSensor = true;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentSpike.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -955,7 +1055,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.isSensor = true;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.EnvironmentTeleportGate.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
             _fixtureDefPool.Return(fixtureDef);
@@ -1003,6 +1103,48 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             RemoveBody(body);
         }
 
+        public void AddFrigidBlock(ushort id, Vector2 position, Vector2 rotation, Vector2 size, Vector2 velocity, float density, float restitution, float linearDamping, float angularDamping)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.angle = rotation.ToAngleRadians();
+            bodyDef.linearVelocity = velocity;
+            bodyDef.linearDamping = linearDamping;
+            bodyDef.angularDamping = angularDamping;
+            bodyDef.bullet = true;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.FrigidBlock);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var boxShape = GetPolygonShape();
+            boxShape.SetAsBox(size.X * 0.5f, size.Y * 0.5f);
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = boxShape;
+            fixtureDef.density = density;
+            fixtureDef.friction = 0;
+            fixtureDef.restitution = restitution;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.FrigidBlock.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.FrigidBlock.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(boxShape);
+        }
+
+        public Body GetFrigidBlock(ushort id)
+        {
+            return GetBody(PhysicsBodyType.FrigidBlock, id);
+        }
+
+        public void RemoveFrigidBlock(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.FrigidBlock, id);
+            RemoveBody(body);
+        }
+
         public void AddGrapplingHookProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity)
         {
             var bodyDef = GetBodyDef();
@@ -1044,6 +1186,81 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             RemoveBody(body);
         }
 
+        public void AddFishingRodTip(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.FishingRodTip);
+            bodyDef.bullet = true;
+            bodyDef.linearVelocity = velocity;
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var shape = GetCircleShape();
+            shape.Radius = radius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0.3f;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.FishingRodTip.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.FishingRodTip.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(shape);
+        }
+
+        public void UpdateFishingRodTip(ushort id, Vector2 position, Vector2 velocity)
+        {
+            var body = GetBody(PhysicsBodyType.FishingRodTip, id);
+            body.SetTransform(position, 0);
+            body.SetLinearVelocity(velocity);
+        }
+
+        public void RemoveFishingRodTip(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.FishingRodTip, id);
+            RemoveBody(body);
+        }
+
+        public void AddSoulGhost(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.SoulGhost);
+            bodyDef.bullet = true;
+            bodyDef.linearVelocity = velocity;
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var shape = GetCircleShape();
+            shape.Radius = radius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0.3f;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.SoulGhost.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.SoulGhost.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(shape);
+        }
+
+        public void RemoveSoulGhost(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.SoulGhost, id);
+            RemoveBody(body);
+        }
+
         public void AddSwapField(ushort id, ushort teamId, Vector2 position)
         {
             var bodyDef = GetBodyDef();
@@ -1065,7 +1282,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             fixtureDef.filter.groupIndex = (short)-teamId;
 
             fixtureDef.filter.categoryBits = PhysicsBodyType.SwapField.GetCollisionsCategory();
-            fixtureDef.filter.maskBits = PhysicsCollisionType.CollideOnlyWithPlayer.GetCollisionMask();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
 
             body.CreateFixture(fixtureDef);
 
@@ -1110,9 +1327,101 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var body = GetBody(koProjectile, projectileId);
             var fixture = body.GetFixtureList();
             var filter = fixture.FilterData;
-            filter.maskBits = 0x0000; 
+            filter.maskBits = 0x0000;
             fixture.FilterData = filter; // not sure needed
             body.SetAwake(true); // not sure needed
+        }
+
+        public void EnablePlayerToCollideWithPlayers(ushort playerId)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
+            var fixture = body.GetFixtureList();
+            var filter = fixture.FilterData;
+            // Add CollideOnlyWithPlayer to maskBits so caster.mask & enemy.category != 0
+            filter.maskBits |= PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
+            // Add PlayerSpaceship collision bit to categoryBits so enemy.mask & caster.category != 0
+            filter.categoryBits |= PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
+            fixture.FilterData = filter;
+            body.SetAwake(true);
+        }
+
+        public void DisablePlayerToCollideWithPlayers(ushort playerId)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
+            var fixture = body.GetFixtureList();
+            var filter = fixture.FilterData;
+            filter.maskBits = PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
+            filter.categoryBits = PhysicsBodyType.PlayerSpaceship.GetCollisionsCategory();
+            fixture.FilterData = filter;
+            body.SetAwake(true);
+        }
+        
+        public void EnableRockBody(ushort playerId, float radiusMultiplier, float density, float restitution)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
+            var fixture = body.GetFixtureList();
+
+            var circleShape = (CircleShape) fixture.Shape;
+            circleShape.Radius *= radiusMultiplier;
+
+            var filter = fixture.FilterData;
+            filter.groupIndex = 0; // clear team grouping so it collides with teammates too; category/mask below decide the rest
+            filter.categoryBits |= PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
+            filter.categoryBits |= PhysicsCollisionType.Wall.GetCollisionMask();
+            filter.categoryBits |= PhysicsCollisionType.PowerUpBall.GetCollisionMask();
+            // Expose the GrapplingHookProjectile category so a hook (mask = GrapplingHookProjectile) can attach to a rock.
+            filter.categoryBits |= PhysicsCollisionType.GrapplingHookProjectile.GetCollisionMask();
+            // Expose the SoulGhost category so a ghost (mask = SoulGhost) is stopped by a rock instead of flying through it.
+            filter.categoryBits |= PhysicsCollisionType.SoulGhost.GetCollisionMask();
+            filter.maskBits |= PhysicsCollisionType.AnyObjectThatCollidesOnlyWithPlayer.GetCollisionMask();
+            filter.maskBits |= PhysicsCollisionType.Wall.GetCollisionMask();
+            filter.maskBits |= PhysicsCollisionType.GrapplingHookProjectile.GetCollisionMask();
+            fixture.FilterData = filter;
+
+            fixture.Density = density;
+            fixture.Restitution = restitution;
+            body.ResetMassData();
+            body.SetAwake(true);
+        }
+
+        public void DisableRockBody(ushort playerId, float baseRadius, ushort teamId)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerSpaceship, playerId);
+            var fixture = body.GetFixtureList();
+
+            var circleShape = (CircleShape) fixture.Shape;
+            circleShape.Radius = baseRadius;
+
+            var filter = fixture.FilterData;
+            filter.categoryBits = PhysicsBodyType.PlayerSpaceship.GetCollisionsCategory();
+            filter.maskBits = PhysicsCollisionType.PlayerSpaceship.GetCollisionMask();
+            filter.groupIndex = (short)-teamId;
+            fixture.FilterData = filter;
+
+            fixture.Density = DEFAULT_PLAYER_DENSITY;
+            fixture.Restitution = DEFAULT_PLAYER_RESTITUTION;
+            body.ResetMassData();
+            body.SetAwake(true);
+        }
+
+        public void EnablePlayerHeartCollider(ushort playerId)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerHeart, playerId);
+            var fixture = body.GetFixtureList();
+            var filter = fixture.FilterData;
+            filter.maskBits = PhysicsCollisionType.PlayerHeart.GetCollisionMask();
+            fixture.FilterData = filter;
+            body.SetAwake(true);
+        }
+
+        public void DisablePlayerHeartCollider(ushort playerId)
+        {
+            var body = GetBody(PhysicsBodyType.PlayerHeart, playerId);
+            var fixture = body.GetFixtureList();
+            var filter = fixture.FilterData;
+            filter.maskBits = 0x0000;
+            fixture.FilterData = filter;
+            body.SetAwake(true);
         }
 
         public void AddChickenEgg(ushort eggId, ushort teamId, Vector2 position, float eggRadius)
@@ -1152,6 +1461,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public Body GetGrapplingHookProjectile(ushort grapplingHookProjectileId)
         {
             return GetBody(PhysicsBodyType.GrapplingHookProjectile, grapplingHookProjectileId);
+        }
+
+        public Body GetSoulGhost(ushort soulGhostId)
+        {
+            return GetBody(PhysicsBodyType.SoulGhost, soulGhostId);
+        }
+
+        public Body GetFishingRodTip(ushort fishingRodTipId)
+        {
+            return GetBody(PhysicsBodyType.FishingRodTip, fishingRodTipId);
         }
         
         public Body GetChickenEgg(ushort chieckEggId)

@@ -31,6 +31,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public StageType StageType { get; set; }
         List<MatchKOProjectileModel> KOProjectiles { get; }
         List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
+        List<MatchFishingRodTipModel> FishingRodTips { get; }
+        List<MatchSoulGhostModel> SoulGhosts { get; }
+        List<MatchFrigidBlockModel> FrigidBlocks { get; }
+        Dictionary<ushort, int> BoltsPerTeam  {get; }
+        Dictionary<ushort, int> GemsPerTeam  {get; }
+        void AddTeamIdIfDoesntExist(ushort teamId);
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
         MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
@@ -57,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);
         void SetTeamGems(ushort teamId, int totalTeamGems);
+        bool IsTeamLeadingInGems(ushort teamId);
         void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition,
             float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation, Vector2 size);
         MatchEnvironmentTeleportPairModel GetTeleportPair(ushort teleportPairId);
@@ -67,6 +74,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchGrapplingHookProjectileModel AddGrapplingHookProjectile(ushort id, ushort casterPlayerId, Vector2 position);
         MatchGrapplingHookProjectileModel GetGrapplingHookProjectile(ushort id);
         void RemoveGrapplingHookProjectile(ushort id);
+        MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position, FishingRodTipPhase phase);
+        MatchFishingRodTipModel GetFishingRodTip(ushort id);
+        void RemoveFishingRodTip(ushort id);
+        bool IsPlayerAimingFishingRodThrow(ushort casterPlayerId);
+        MatchSoulGhostModel AddSoulGhost(ushort id, ushort casterPlayerId, Vector2 position, Vector2 direction);
+        MatchSoulGhostModel GetSoulGhost(ushort id);
+        void RemoveSoulGhost(ushort id);
+        MatchFrigidBlockModel AddFrigidBlock(ushort id, ushort casterPlayerId, Vector2 position, Vector2 rotation);
+        void RemoveFrigidBlock(ushort id);
         MatchKOProjectileModel GetKOProjectile(ushort id);
         void RemoveKOProjectile(ushort id);
         MatchChickenEggModel GetChickenEgg(ushort id);

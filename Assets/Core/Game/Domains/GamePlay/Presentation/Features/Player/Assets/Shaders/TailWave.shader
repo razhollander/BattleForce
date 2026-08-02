@@ -8,7 +8,9 @@ Shader "Custom/SineWaveSpiralURP"
         [Header(Wave Settings)]
         _WaveSpeed ("Wave Speed", Float) = 3.0
         _WaveFrequency ("Wave Frequency", Float) = 10.0
-        _WaveAmplitude ("Wave Amplitude", Float) = 0.1 
+        _WaveAmplitude ("Wave Amplitude", Float) = 0.1
+        // Driven from C# (PlayerTailView) instead of _Time so the wave can be frozen in place.
+        _WavePhase ("Wave Phase", Float) = 0.0
         
         [Header(Spiral Settings)]
         _SpiralAmount ("Spiral Amount", Float) = 0.0 
@@ -43,7 +45,7 @@ Shader "Custom/SineWaveSpiralURP"
             TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);
 
             CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_ST; float4 _BaseColor; float _WaveSpeed; float _WaveFrequency; float _WaveAmplitude; float _SpiralAmount;
+                float4 _MainTex_ST; float4 _BaseColor; float _WaveSpeed; float _WaveFrequency; float _WaveAmplitude; float _SpiralAmount; float _WavePhase;
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -67,7 +69,7 @@ Shader "Custom/SineWaveSpiralURP"
                 spiraledUV.y = centeredUV.x * s + centeredUV.y * c;
                 uv = spiraledUV + pivot;
 
-                float wave = sin(uv.y * _WaveFrequency + _Time.y * _WaveSpeed);
+                float wave = sin(uv.y * _WaveFrequency + _WavePhase * _WaveSpeed);
                 uv.x += wave * _WaveAmplitude * uv.y;
 
                 return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv) * _BaseColor * IN.color;
@@ -93,7 +95,7 @@ Shader "Custom/SineWaveSpiralURP"
             TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);
 
             CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_ST; float4 _BaseColor; float _WaveSpeed; float _WaveFrequency; float _WaveAmplitude; float _SpiralAmount;
+                float4 _MainTex_ST; float4 _BaseColor; float _WaveSpeed; float _WaveFrequency; float _WaveAmplitude; float _SpiralAmount; float _WavePhase;
             CBUFFER_END
 
             // Populated via MaterialPropertyBlock inside our Render Feature loop
@@ -122,7 +124,7 @@ Shader "Custom/SineWaveSpiralURP"
                 spiraledUV.y = centeredUV.x * s + centeredUV.y * c;
                 uv = spiraledUV + pivot;
 
-                float wave = sin(uv.y * _WaveFrequency + _Time.y * _WaveSpeed);
+                float wave = sin(uv.y * _WaveFrequency + _WavePhase * _WaveSpeed);
                 uv.x += wave * _WaveAmplitude * uv.y;
 
                 half4 texColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);

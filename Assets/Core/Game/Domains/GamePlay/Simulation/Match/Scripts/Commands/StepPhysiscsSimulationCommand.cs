@@ -1,8 +1,10 @@
 using System.Diagnostics;
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
@@ -64,9 +66,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
             {
-                _playersDecelerationLogic.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
+                var isFrozen = playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent)
+                               && (selectedTalent is {IsCurrentlyActive: true, TalentType: TalentType.Frozen});
+                if (!isFrozen)
+                {
+                    _playersDecelerationLogic.DeceleratePlayerVelocity(playerState.Spaceship, stepDeltaTime);
+                }
+
                 _playersDecelerationLogic.DeceleratePlayerSpin(playerState.Spaceship, stepDeltaTime);
-                _playersEngineLogic.TurnOnEngineForPlayerIfPossible(playerState.Spaceship);
+                _playersEngineLogic.TurnOnEngineForPlayerIfPossible(playerState);
                 _playersEngineLogic.TryAddEngineForceToPlayer(playerState.Spaceship, stepDeltaTime);
             }
 
@@ -146,6 +154,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 ref var grapplingHookProjectileId = ref _matchDataService.SimulationState.GrapplingHookProjectiles.GetByIndex(i);
                 grapplingHookProjectileId.Position = _physicsSimulator.GetGrapplingHookProjectile(grapplingHookProjectileId.Id).Position;
+            }
+
+            for (int i = 0; i < _matchDataService.SimulationState.FishingRodProjectiles.Count; i++)
+            {
+                ref var fishingRodProjectile = ref _matchDataService.SimulationState.FishingRodProjectiles.GetByIndex(i);
+                bool doesTipHaveACollider = fishingRodProjectile.Phase == FishingRodTipPhase.FlyingForward;
+                if (doesTipHaveACollider)
+                {
+                    fishingRodProjectile.Position = _physicsSimulator.GetFishingRodTip(fishingRodProjectile.Id).Position;
+                }
+            }
+
+            for (int i = 0; i < _matchDataService.SimulationState.SoulGhosts.Count; i++)
+            {
+                ref var soulGhost = ref _matchDataService.SimulationState.SoulGhosts.GetByIndex(i);
+                soulGhost.Position = _physicsSimulator.GetSoulGhost(soulGhost.Id).Position;
+            }
+
+            for (int i = 0; i < _matchDataService.SimulationState.FrigidBlocks.Count; i++)
+            {
+                ref var frigidBlock = ref _matchDataService.SimulationState.FrigidBlocks.GetByIndex(i);
+                var body = _physicsSimulator.GetFrigidBlock(frigidBlock.Id);
+                frigidBlock.Position = body.Position;
+                frigidBlock.Rotation = body.GetAngle().FromAngleRadians();
+                frigidBlock.Velocity = body.GetLinearVelocity();
+                frigidBlock.AngularVelocity = body.GetAngularVelocity();
             }
         }
     }

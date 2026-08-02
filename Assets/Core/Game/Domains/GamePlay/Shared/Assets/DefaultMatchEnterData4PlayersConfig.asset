@@ -17,11 +17,5 @@ MonoBehaviour:
     Name: Raz
     TeamId: 1
   - Id: 2
-    Name: Alon
+    Name: Liron
     TeamId: 2
-  - Id: 3
-    Name: Orr
-    TeamId: 3
-  - Id: 4
-    Name: Chen
-    TeamId: 4

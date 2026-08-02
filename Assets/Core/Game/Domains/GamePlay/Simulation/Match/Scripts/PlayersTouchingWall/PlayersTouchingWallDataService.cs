@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
@@ -24,17 +26,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
             _cachedPlayersStickToWall = new List<PlayerStickToWallData>(maxPlayers * MAX_WALLS_PER_PLAYER);
         }
 
-        public void OnPlayerBeginTouchWall(ushort playerId, ushort wallId, Vector2 wallNormalWhenTouchBegin, float wallRotationDegreesWhenTouchBegin, int tick)
+        public void OnPlayerBeginTouchWall(ushort playerId, PhysicsBodyType wallBodyType, ushort wallId, Vector2 wallNormalWhenTouchBegin, float wallRotationDegreesWhenTouchBegin, int tick)
         {
             if (!_playersTouchingWall.ContainsKey(playerId))
             {
                 _playersTouchingWall.Add(playerId, _playerDataPool.Get());
             }
 
-            _playersTouchingWall[playerId].OnBeginTouchWall(wallId, wallNormalWhenTouchBegin, wallRotationDegreesWhenTouchBegin, tick);
+            _playersTouchingWall[playerId].OnBeginTouchWall(new WallTouchKey(wallBodyType, wallId), wallNormalWhenTouchBegin, wallRotationDegreesWhenTouchBegin, tick);
         }
 
-        public void OnPlayerEndTouchWall(ushort playerId, ushort wallId)
+        public void OnPlayerEndTouchWall(ushort playerId, PhysicsBodyType wallBodyType, ushort wallId)
         {
             if (!_playersTouchingWall.ContainsKey(playerId))
             {
@@ -43,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
             }
 
             var playerData = _playersTouchingWall[playerId];
-            playerData.OnEndTouchWall(wallId);
+            playerData.OnEndTouchWall(new WallTouchKey(wallBodyType, wallId));
 
             if (playerData.TouchingWallsCount == 0)
             {
@@ -76,61 +78,88 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
             _playersTouchingWall.Clear();
         }
 
+        // Wall ids and FrigidBlock ids are handed out by different systems and overlap, so a touch is identified by both.
+        private readonly struct WallTouchKey : IEquatable<WallTouchKey>
+        {
+            public readonly PhysicsBodyType WallBodyType;
+            public readonly ushort WallId;
+
+            public WallTouchKey(PhysicsBodyType wallBodyType, ushort wallId)
+            {
+                WallBodyType = wallBodyType;
+                WallId = wallId;
+            }
+
+            public bool Equals(WallTouchKey other)
+            {
+                return WallBodyType == other.WallBodyType && WallId == other.WallId;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is WallTouchKey other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return ((int) WallBodyType << 16) | WallId;
+            }
+        }
+
         private class PlayerTouchingWallsData
         {
-            private readonly CapacityDict<ushort, WallTouchData> _walls;
+            private readonly CapacityDict<WallTouchKey, WallTouchData> _walls;
             private readonly ConcurrentPool<WallTouchData> _wallDataPool;
 
             public int TouchingWallsCount => _walls.Count;
 
             public PlayerTouchingWallsData(int maxWalls)
             {
-                _walls = new CapacityDict<ushort, WallTouchData>(maxWalls);
+                _walls = new CapacityDict<WallTouchKey, WallTouchData>(maxWalls);
                 _wallDataPool = new ConcurrentPool<WallTouchData>(() => new WallTouchData(), maxWalls);
             }
 
-            public void OnBeginTouchWall(ushort wallId, Vector2 wallNormalWhenTouchBegin, float wallRotationDegreesWhenTouchBegin, int tick)
+            public void OnBeginTouchWall(WallTouchKey wallKey, Vector2 wallNormalWhenTouchBegin, float wallRotationDegreesWhenTouchBegin, int tick)
             {
-                if (!_walls.ContainsKey(wallId))
+                if (!_walls.ContainsKey(wallKey))
                 {
                     var data = _wallDataPool.Get();
-                    data.WallId = wallId;
                     data.WallLocalNormal = wallNormalWhenTouchBegin.Rotate(-wallRotationDegreesWhenTouchBegin);
                     data.BeginTick = tick;
                     data.ContactCount = 0;
-                    _walls.Add(wallId, data);
+                    _walls.Add(wallKey, data);
                 }
 
-                _walls[wallId].ContactCount++;
+                _walls[wallKey].ContactCount++;
             }
 
-            public void OnEndTouchWall(ushort wallId)
+            public void OnEndTouchWall(WallTouchKey wallKey)
             {
-                if (!_walls.ContainsKey(wallId))
+                if (!_walls.ContainsKey(wallKey))
                 {
-                    LogService.LogError($"Wall {wallId} contact ended but was not tracked for this player");
+                    LogService.LogError($"Wall {wallKey.WallId} of type {wallKey.WallBodyType} contact ended but was not tracked for this player");
                     return;
                 }
 
-                var data = _walls[wallId];
+                var data = _walls[wallKey];
                 var contactCount = --data.ContactCount;
                 if (contactCount <= 0)
                 {
                     data.Reset();
                     _wallDataPool.Return(data);
-                    _walls.Remove(wallId);
+                    _walls.Remove(wallKey);
                 }
             }
 
             public void GetPlayersStickToWalls(ushort playerId, int currentTick, int minTicksTouching, List<PlayerStickToWallData> output)
             {
-                foreach (var wallId in _walls.Keys)
+                foreach (var kvp in _walls)
                 {
-                    var data = _walls[wallId];
+                    var data = kvp.Value;
                     var ticksTouching = currentTick - data.BeginTick;
                     if (ticksTouching >= minTicksTouching)
                     {
-                        output.Add(new PlayerStickToWallData(playerId, wallId, data.WallLocalNormal));
+                        output.Add(new PlayerStickToWallData(playerId, kvp.Key.WallBodyType, kvp.Key.WallId, data.WallLocalNormal));
                     }
                 }
             }
@@ -149,14 +178,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
 
         private class WallTouchData
         {
-            public ushort WallId;
             public Vector2 WallLocalNormal;
             public int BeginTick;
             public int ContactCount;
 
             public void Reset()
             {
-                WallId = 0;
                 WallLocalNormal = Vector2.Zero;
                 BeginTick = 0;
                 ContactCount = 0;

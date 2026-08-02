@@ -22,15 +22,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
             _cachedPlayersToDamage = new List<ushort>(networkConfig.MaxCap.ConcurrentPlayers);
             _playerInLavaDataPool = new ConcurrentPool<PlayerInLavaData>(() => new PlayerInLavaData(), networkConfig.MaxCap.ConcurrentPlayers);
         }
-
+        
         public void OnPlayerEnterLava(ushort playerId)
         {
-            if (!_playersInLava.ContainsKey(playerId))
+            var didStartBeingExposedToLava = !_playersInLava.ContainsKey(playerId);
+            if (didStartBeingExposedToLava)
             {
                 var playerInLavaData = _playerInLavaDataPool.Get();
                 _playersInLava.Add(playerId, playerInLavaData);
             }
-            
+
             _playersInLava[playerId].LavaAmountPlayerIsIn++;
         }
 
@@ -53,10 +54,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
             }
         }
 
-        public void StepTimePassedSinceLastDamageTaken(float deltaTime)
+        public bool IsPlayerInLava(ushort playerId)
+        {
+            return _playersInLava.ContainsKey(playerId);
+        }
+
+        public void StepTimePassedSinceLastDamageTaken(FixedUnorderedList<ushort> playerIdsNotToIncrementTimerInLava, float deltaTime)
         {
             foreach (var playerId in _playersInLava.Keys)
             {
+                if (playerIdsNotToIncrementTimerInLava.Contains(playerId))
+                {
+                    continue;
+                }
+                
                 _playersInLava[playerId].TimePassSinceLastDamageTaken += deltaTime;
             }
         }
@@ -89,9 +100,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTrack
             _playersInLava.Clear();
         }
         
-        public void ResetPlayerTimePassedSinceLastDamageTaken(ushort playerId)
+        public void TryResetPlayerTimePassedSinceLastDamageTaken(ushort playerId)
         {
-            _playersInLava[playerId].TimePassSinceLastDamageTaken = 0;
+            if (_playersInLava.TryGetValue(playerId, out var playerInLava))
+            {
+                playerInLava.TimePassSinceLastDamageTaken = 0;
+            }
         }
         
         private class PlayerInLavaData

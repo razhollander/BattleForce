@@ -28,6 +28,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public ushort CurrentStageWinnerTeamId { get; set; }
         public List<MatchKOProjectileModel> KOProjectiles { get; private set; }
         public List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; private set; }
+        public List<MatchFishingRodTipModel> FishingRodTips { get; private set; }
+        public List<MatchSoulGhostModel> SoulGhosts { get; private set; }
+        public List<MatchFrigidBlockModel> FrigidBlocks { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
         public List<MatchChickenEggModel> ChickenEggs { get; private set; }
@@ -40,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public StageType StageType { get; set; }
         public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }
         public Dictionary<ushort, int> GemsPerTeam  {get; private set; }
+
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
             Players = new List<MatchPlayerModel>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -59,6 +63,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             SwapFields = new List<MatchSwapFieldModel>(networkConfig.MaxCap.ConcurrentPlayers);
             KOProjectiles = new List<MatchKOProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
             GrapplingHookProjectiles = new List<MatchGrapplingHookProjectileModel>(networkConfig.MaxCap.ConcurrentPlayers);
+            FishingRodTips = new List<MatchFishingRodTipModel>(networkConfig.MaxCap.ConcurrentPlayers);
+            SoulGhosts = new List<MatchSoulGhostModel>(networkConfig.MaxCap.ConcurrentPlayers);
+            FrigidBlocks = new List<MatchFrigidBlockModel>(networkConfig.MaxCap.ConcurrentFrigidBlocks);
             ChickenEggs = new List<MatchChickenEggModel>(networkConfig.MaxCap.ConcurrentChickenEggs);
         }
 
@@ -165,10 +172,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             var playerTeamId = playerState.TeamId;
             var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, playerState.Spaceship);
             Players.Add(newPlayer);
-            TeamIds.Add(playerTeamId);
-            BoltsPerTeam.TryAdd(playerTeamId, 0);
-            GemsPerTeam.TryAdd(playerTeamId, 0);
             return newPlayer;
+        }
+
+        public void AddTeamIdIfDoesntExist(ushort teamId)
+        {
+            TeamIds.Add(teamId);
+            BoltsPerTeam.TryAdd(teamId, 0);
+            GemsPerTeam.TryAdd(teamId, 0);
         }
 
         public MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle)
@@ -243,6 +254,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             SwapFields.Clear();
             KOProjectiles.Clear();
             GrapplingHookProjectiles.Clear();
+            FishingRodTips.Clear();
+            SoulGhosts.Clear();
+            FrigidBlocks.Clear();
             ChickenEggs.Clear();
         }
 
@@ -254,6 +268,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public void SetTeamGems(ushort teamId, int totalTeamGems)
         {
             GemsPerTeam[teamId] = totalTeamGems;
+        }
+
+        public bool IsTeamLeadingInGems(ushort teamId)
+        {
+            if (!GemsPerTeam.TryGetValue(teamId, out var teamGems) || teamGems <= 0)
+            {
+                return false;
+            }
+
+            foreach (var gemsPerTeam in GemsPerTeam)
+            {
+                if (gemsPerTeam.Value > teamGems)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition, float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation, Vector2 size)
@@ -340,6 +372,98 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 if (GrapplingHookProjectiles[i].Id == id)
                 {
                     GrapplingHookProjectiles.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        public MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position, FishingRodTipPhase phase)
+        {
+            var model = new MatchFishingRodTipModel(id, casterPlayerId, position.ToUnityVector2(), phase);
+            FishingRodTips.Add(model);
+            return model;
+        }
+
+        public MatchFishingRodTipModel GetFishingRodTip(ushort id)
+        {
+            var model = FishingRodTips.Find(x => x.Id == id);
+            if (model == null)
+            {
+                LogService.LogError($"Couldn't find fishing rod tip with id {id}");
+            }
+            return model;
+        }
+
+        public void RemoveFishingRodTip(ushort id)
+        {
+            for (int i = 0; i < FishingRodTips.Count; i++)
+            {
+                if (FishingRodTips[i].Id == id)
+                {
+                    FishingRodTips.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        public bool IsPlayerAimingFishingRodThrow(ushort casterPlayerId)
+        {
+            for (int i = 0; i < FishingRodTips.Count; i++)
+            {
+                var tip = FishingRodTips[i];
+                var isTipAimingThrow = tip.Phase == FishingRodTipPhase.CaughtEnemy;
+                if (tip.CasterPlayerId == casterPlayerId && isTipAimingThrow)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public MatchSoulGhostModel AddSoulGhost(ushort id, ushort casterPlayerId, Vector2 position, Vector2 direction)
+        {
+            var model = new MatchSoulGhostModel(id, casterPlayerId, position.ToUnityVector2(), direction.ToUnityVector2());
+            SoulGhosts.Add(model);
+            return model;
+        }
+
+        public MatchSoulGhostModel GetSoulGhost(ushort id)
+        {
+            var model = SoulGhosts.Find(x => x.Id == id);
+            if (model == null)
+            {
+                LogService.LogError($"Couldn't find soul ghost with id {id}");
+            }
+            return model;
+        }
+
+        public void RemoveSoulGhost(ushort id)
+        {
+            for (int i = 0; i < SoulGhosts.Count; i++)
+            {
+                if (SoulGhosts[i].Id == id)
+                {
+                    SoulGhosts.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        public MatchFrigidBlockModel AddFrigidBlock(ushort id, ushort casterPlayerId, Vector2 position, Vector2 rotation)
+        {
+            var model = new MatchFrigidBlockModel(id, casterPlayerId, position.ToUnityVector2(), rotation.ToUnityVector2());
+            FrigidBlocks.Add(model);
+            return model;
+        }
+
+        public void RemoveFrigidBlock(ushort id)
+        {
+            for (int i = 0; i < FrigidBlocks.Count; i++)
+            {
+                if (FrigidBlocks[i].Id == id)
+                {
+                    FrigidBlocks.RemoveAt(i);
                     return;
                 }
             }

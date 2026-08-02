@@ -114,8 +114,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         {
             return _heart;
         }
-
-
+        
         public void SetIsTailWaving(bool isWaving)
         {
             _tailView.SetIsTailWaving(isWaving);

@@ -53,7 +53,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             {
                 _cachedLockedOnObjects.Clear();
 
-                var canPlayerFindTargets = !playerState.Spaceship.IsSpinned && playerState.Spaceship.IsAlive;
+                var isRock = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerState.Id, TalentType.Rock);
+                var isFrozen = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerState.Id, TalentType.Frozen);
+                var canPlayerFindTargets = !playerState.Spaceship.IsSpinned && playerState.Spaceship.IsAlive && !isRock && !isFrozen;
                 if (canPlayerFindTargets)
                 {
                     var rayOriginPosition = playerState.Spaceship.Transform.GetHeadPosition();
@@ -94,7 +96,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             for (int i = 0; i < players.Count; i++)
             {
                 var targetedPlayerState = players[i];
-                var shouldTryTargetPlayer = targetedPlayerState.TeamId != casterPlayerState.TeamId && targetedPlayerState.Spaceship.IsAlive;
+                var isTargetRock = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(targetedPlayerState.Id, TalentType.Rock);
+                var isTargetFrozen = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(targetedPlayerState.Id, TalentType.Frozen);
+                var shouldTryTargetPlayer = targetedPlayerState.TeamId != casterPlayerState.TeamId && targetedPlayerState.Spaceship.IsAlive && !isTargetRock && !isTargetFrozen;
 
                 if (!shouldTryTargetPlayer)
                 {

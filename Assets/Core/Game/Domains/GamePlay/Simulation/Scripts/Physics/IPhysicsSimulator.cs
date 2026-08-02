@@ -26,6 +26,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         Body GetPlayer(ushort playerId);
         Body GetKOProjectile(ushort koProjectileId);
         Body GetGrapplingHookProjectile(ushort grapplingHookProjectileId);
+        Body GetFishingRodTip(ushort fishingRodTipId);
+        Body GetSoulGhost(ushort soulGhostId);
         void AddPlayerBullet(ushort bulletId, ushort teamId, Vector2 bulletPosition, Vector2 bulletVelocity, float bulletRadius);
         void AddTalentCard(ushort id, Vector2 position, float length, float height);
         void AddPowerUpBall(ushort id, Vector2 position, Vector2 velocity, float radius);
@@ -43,16 +45,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void RemoveSwapField(ushort id);
         void AddKOProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
         void RemoveKOProjectile(ushort id);
+        void AddFrigidBlock(ushort id, Vector2 position, Vector2 rotation, Vector2 size, Vector2 velocity, float density, float restitution, float linearDamping, float angularDamping);
+        Body GetFrigidBlock(ushort id);
+        void RemoveFrigidBlock(ushort id);
         void AddGrapplingHookProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
         void UpdateGrapplingHookProjectile(ushort id, Vector2 position, Vector2 velocity);
         void RemoveGrapplingHookProjectile(ushort id);
+        void AddFishingRodTip(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
+        void UpdateFishingRodTip(ushort id, Vector2 position, Vector2 velocity);
+        void RemoveFishingRodTip(ushort id);
+        void AddSoulGhost(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity);
+        void RemoveSoulGhost(ushort id);
         void ClearAllData();
         void DisableBodyCollider(PhysicsBodyType koProjectile, ushort projectileId);
         bool ArcCastOnPlayers(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ingoredTeamId, out PhysicsBodyData hitBodyData);
+        bool EllipseCastOnPlayers(Vector2 center, float radius, Vector2 direction, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData);
         void AddChickenEgg(ushort eggId, ushort teamId, Vector2 position, float eggRadius);
         Body GetChickenEgg(ushort chieckEggId);
         void RemoveChickenEgg(ushort eggId);
         bool RectangleCastOnPlayers(Vector2 center, Vector2 size, float angleRadians, short ignoreTeamId, out PhysicsBodyData hitBodyData);
         bool RayCast(Vector2 originPoint, Vector2 endPoint, out PhysicsBodyData hitBodyData, PhysicsBodyType[] bodyTypesRayCastCanHit = null, PhysicsBodyData? ignoredBody = null);
+        void EnablePlayerToCollideWithPlayers(ushort playerId);
+        void DisablePlayerToCollideWithPlayers(ushort playerId);
+        void EnableRockBody(ushort playerId, float radiusMultiplier, float density, float restitution);
+        void DisableRockBody(ushort playerId, float baseRadius, ushort teamId);
+        void EnablePlayerHeartCollider(ushort playerId);
+        void DisablePlayerHeartCollider(ushort playerId);
     }
 }

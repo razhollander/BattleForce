@@ -4,7 +4,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
 {
     public interface IPlayersEngineLogic
     {
-        void TurnOnEngineForPlayerIfPossible(PlayerSpaceshipStateS2C playerSpaceshipState);
+        void TurnOnEngineForPlayerIfPossible(PlayerStateS2C playerState);
         void TryAddEngineForceToPlayer(PlayerSpaceshipStateS2C playerSpaceshipState, float deltaTIme);
     }
 }

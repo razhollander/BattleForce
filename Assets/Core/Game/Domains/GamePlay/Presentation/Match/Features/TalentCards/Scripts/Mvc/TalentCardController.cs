@@ -7,7 +7,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scr
     public class TalentCardController
     {
         private TalentCardView _talentCardView;
-        private readonly TalentCardsConfig _talentCardsConfig;
+        private readonly TalentIconsConfig _talentCardsConfig;
         private readonly TalentCardPool _talentCardPool;
         private readonly Transform _parent;
         private readonly IMatchDataService _matchDataService;
@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scr
 
         public ushort TalentCardId { get; set; }
 
-        public TalentCardController(ushort talentCardId, IMatchDataService matchDataService, TalentCardsConfig talentCardsConfig, TalentCardPool talentCardPool, Transform parent)
+        public TalentCardController(ushort talentCardId, IMatchDataService matchDataService, TalentIconsConfig talentCardsConfig, TalentCardPool talentCardPool, Transform parent)
         {
             _matchDataService = matchDataService;
             _talentCardsConfig = talentCardsConfig;

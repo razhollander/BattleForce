@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly IMatchDataService _matchDataService;
         private readonly MatchPlayerViewPool _playerPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly List<MatchPlayerController> _playerControllers = new ();
@@ -26,11 +27,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private readonly IAudioService _audioService;
 
         public MatchPlayerControllers(IMatchDataService matchDataService, MatchPlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
-            NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
+            SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             _matchDataService = matchDataService;
             _playerPool = new MatchPlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkConfig = networkConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _audioService = audioService;
@@ -44,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void AddPlayer(ushort playerId)
         {
-            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _networkConfig, _playersParent.transform,
+            var playerController = new MatchPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _sharedGamePlayConfig, _networkConfig, _playersParent.transform,
                 _stageCancellationTokenProvider, _audioService);
             playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
@@ -71,6 +73,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             foreach (var playerController in _playerControllers)
             {
                 playerController.UpdateTalentCooldown(currentServerTick);
+            }
+        }
+
+        public void UpdatePlayersSelectedTalentActiveEffect()
+        {
+            foreach (var playerController in _playerControllers)
+            {
+                playerController.UpdateSelectedTalentActiveEffect();
             }
         }
 
@@ -104,9 +114,64 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             GetPlayer(playerId).SetCurrentPowerUp(powerUpType);
         }
 
+        public void SetPlayerWaterGunState(ushort playerId, bool isOn)
+        {
+            GetPlayer(playerId).SetWaterGunState(isOn);
+        }
+
+        public void SetPlayerFishingRodStickState(ushort playerId, bool isOn)
+        {
+            GetPlayer(playerId).SetFishingRodStickState(isOn);
+        }
+
+        public void SetPlayerFishingRodStickDirection(ushort playerId, bool isDirectionRight)
+        {
+            GetPlayer(playerId).SetFishingRodStickDirection(isDirectionRight);
+        }
+
+        public UnityEngine.Vector2 GetPlayerFishingRodTipPivotPosition(ushort playerId)
+        {
+            return GetPlayer(playerId).GetFishingRodTipPivotPosition();
+        }
+
+        public void SetPlayerHeadbuttChargingState(ushort playerId, bool isCharging)
+        {
+            GetPlayer(playerId).SetHeadbuttChargingState(isCharging);
+        }
+
+        public void ShowPlayerHeadbuttHelmet(ushort playerId)
+        {
+            GetPlayer(playerId).ShowHeadbuttHelmet();
+        }
+
+        public void HidePlayerHeadbuttHelmet(ushort playerId)
+        {
+            GetPlayer(playerId).HideHeadbuttHelmet();
+        }
+
+        public void OnPlayerHeadbuttTalentDeactivated(ushort playerId)
+        {
+            GetPlayer(playerId).OnHeadbuttTalentDeactivated();
+        }
+
         public void SetPlayerChickenState(ushort playerId, bool isChicken)
         {
             GetPlayer(playerId).SetChickenState(isChicken);
+        }
+
+        public void SetPlayerRockState(ushort playerId, bool isRock)
+        {
+            GetPlayer(playerId).SetRockState(isRock);
+        }
+
+        public void SetPlayerFrozenState(ushort playerId, bool isFrozen)
+        {
+            GetPlayer(playerId).SetFrozenState(isFrozen);
+        }
+
+        public void SetPlayerOnLavaEffectState(ushort playerId, bool isExposedToLava)
+        {
+            GetPlayer(playerId).SetOnLavaEffectState(isExposedToLava);
         }
 
         public void PlayLayEggAnimation(ushort playerId)
@@ -152,6 +217,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsPlayerKinged(ushort playerId, bool isKinged)
         {
             GetPlayer(playerId).SetIsKinged(isKinged);
+        }
+
+        public void RefreshLeaderFlags()
+        {
+            foreach (var playerController in _playerControllers)
+            {
+                var teamId = _matchDataService.GetPlayerTeamId(playerController.PlayerId);
+                playerController.SetIsLeader(_matchDataService.IsTeamLeadingInGems(teamId));
+            }
         }
 
         public void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth)

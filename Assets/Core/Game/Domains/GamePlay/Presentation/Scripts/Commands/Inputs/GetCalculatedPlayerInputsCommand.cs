@@ -55,8 +55,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             var isMoveForawrdInputPressed = _gameInputActionsController.IsPlayerMoveForwardInputPressed(_playerId);
 
             CalculateRightAndLeftInputs(_playerDirection, out var isMoveRightInputPressed, out var isMoveLeftInputPressed);
-            var aimDirection = CalculateAimDirection();
-            return new Result(isShootInputPressed, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, isPowerUpInputPressed, isMoveLeftInputPressed, isMoveRightInputPressed, isMoveForawrdInputPressed, aimDirection);
+            var aimDirection = CalculateAimDirection(out var mouseWorldPosition, out var isUsingMouseAim);
+            return new Result(isShootInputPressed, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, isPowerUpInputPressed, isMoveLeftInputPressed, isMoveRightInputPressed, isMoveForawrdInputPressed, aimDirection, mouseWorldPosition, isUsingMouseAim);
         }
 
         private void CalculateRightAndLeftInputs(Vector2 playerDirection, out bool isMoveRightInputPressed, out bool isMoveLeftInputPressed)
@@ -75,12 +75,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             }
         }
 
-        private Vector2 CalculateAimDirection()
+        private Vector2 CalculateAimDirection(out Vector2 mouseWorldPosition, out bool isUsingMouseAim)
         {
             var device = _localPlayersDataService.GetInputDeviceForPlayer(_playerId);
             var isGamepad = device is Gamepad;
-            var mousePos = Input.mousePosition; 
+            isUsingMouseAim = !isGamepad;
+            var mousePos = Input.mousePosition;
             var mouseWorldPos = _worldCameraController.ScreenToWorldPoint(mousePos).ToVector2XY();
+            mouseWorldPosition = mouseWorldPos.ToNumericsVector2();
             var mouseDirection = (mouseWorldPos - _playerPosition).normalized;
             var gamePadAimDirection = _gameInputActionsController.GetPlayerAimDirection(_playerId);
             var aimDirection = isGamepad ? gamePadAimDirection.ToNumericsVector2() : mouseDirection.ToNumericsVector2();
@@ -98,9 +100,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             public bool IsMoveRightInputPressed;
             public bool IsMoveForawrdInputPressed;
             public Vector2 AimDirection;
+            public Vector2 MouseWorldPosition;
+            public bool IsUsingMouseAim;
 
             public Result(bool isShootInputPressed, bool isTalentAInputPressed, bool isTalentBInputPressed, bool isTalentCInputPressed, bool isPowerUpInputPressed, bool isMoveLeftInputPressed,
-                bool isMoveRightInputPressed, bool isMoveForawrdInputPressed, Vector2 aimDirection)
+                bool isMoveRightInputPressed, bool isMoveForawrdInputPressed, Vector2 aimDirection, Vector2 mouseWorldPosition, bool isUsingMouseAim)
 
             {
                 IsTalentAInputPressed = isTalentAInputPressed;
@@ -112,6 +116,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
                 IsMoveRightInputPressed = isMoveRightInputPressed;
                 IsMoveForawrdInputPressed = isMoveForawrdInputPressed;
                 AimDirection = aimDirection;
+                MouseWorldPosition = mouseWorldPosition;
+                IsUsingMouseAim = isUsingMouseAim;
             }
         }
     }

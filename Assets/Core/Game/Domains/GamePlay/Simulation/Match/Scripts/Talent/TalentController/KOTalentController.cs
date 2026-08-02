@@ -27,8 +27,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly ICommandFactory _commandFactory;
-        private SpinPlayerCommand _spinPlayerCommand;
-        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private TrySpinPlayerCommand _trySpinPlayerCommand;
+        private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
         public TalentType TalentType => TalentType.KO;
         private bool IsCurrentlyActive
@@ -70,8 +70,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void InitEntryPoint()
         {
-            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
-            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
+            _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -190,12 +190,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var pushForce = pushDirection * koConfig.PushForce;
             var randomSpin = RNG.NextFloat(koConfig.MinSpin, koConfig.MaxSpin);
             enemyPlayerState.Spaceship.Transform.Direction = pushDirection;
-            _spinPlayerCommand
+            _trySpinPlayerCommand
                 .SetPlayer(enemyPlayerId)
                 .SetSpinAmount(randomSpin)
                 .SetTick(tick)
                 .Execute();
-            _addForceToPlayerCommand.SetForce(pushForce).SetPlayerId(enemyPlayerId).ShouldTurnOffEngine(true).Execute();
+            _tryAddForceToPlayerCommand.SetForce(pushForce).SetPlayerId(enemyPlayerId).ShouldTurnOffEngine(true).Execute();
             _netEventsDataService.AddKOProjectHitPlayerNetEvent(tick, _projectileId, enemyPlayerState.Id, projectile.Position);
             StartReturnPhase();
         }

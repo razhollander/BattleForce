@@ -31,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedConfig;
         private readonly ICommandFactory _commandFactory;
-        private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
+        private readonly TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
         public TalentType TalentType => TalentType.GrapplingHook;
         private bool IsCurrentlyActive
@@ -67,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _sharedConfig = sharedConfig;
-            _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -98,7 +98,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 if (wasTalentInputDownThisTick)
                 {
                     ref var currentProjectile = ref _matchDataService.SimulationState.GetGrapplingHookProjectileById(_projectileId);
-                    if (currentProjectile.IsHookAttached)
+                    if (currentProjectile.HitData.IsHookAttached)
                     {
                         DeactivateTalent(tick);
                     }
@@ -172,9 +172,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
             else
             {
-                if (projectile.IsHookAttached)
+                if (projectile.HitData.IsHookAttached)
                 {
-                    projectile = UpdateHookPositionRelativeToAttachedWall(projectile);
+                    projectile = UpdateHookPositionRelativeToAttachedEntity(projectile);
 
                     var playerToHookDistanceSquared = Vector2.DistanceSquared(casterPlayerState.Spaceship.Transform.Position, projectile.Position);
                     var didPlayerReachHook = playerToHookDistanceSquared <= arriveDistance * arriveDistance;
@@ -198,7 +198,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                         {
                             var directionToHook = (projectile.Position - casterPlayerState.Spaceship.Transform.Position).NormalizeSafe();
                             var force = directionToHook * config.PlayerPullForceWhileHooked * deltaTime;
-                            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
+                            _tryAddForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
                         }
                     }
                 }
@@ -215,21 +215,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
         }
 
-        private TalentGrapplingHookProjectileStateS2C UpdateHookPositionRelativeToAttachedWall(TalentGrapplingHookProjectileStateS2C projectile)
+        private TalentGrapplingHookProjectileStateS2C UpdateHookPositionRelativeToAttachedEntity(TalentGrapplingHookProjectileStateS2C projectile)
         {
-            if (_matchDataService.EnvironmentData.TryGetEnvironmentWall(projectile.AttachedWallId, out var wall))
+            if (TryGetAttachedEntityTransform(projectile.HitData.HitType, projectile.HitData.AttachedEntityId, out var entityPosition, out var entityRotationRadians))
             {
-                var radians = wall.Transform.WorldRotationDegrees * (System.MathF.PI / 180f);
-                var cos = System.MathF.Cos(radians);
-                var sin = System.MathF.Sin(radians);
-
-                Vector2 localPos = projectile.AttachedLocalPosition;
-                Vector2 worldPos = new Vector2(
-                    localPos.X * cos - localPos.Y * sin,
-                    localPos.X * sin + localPos.Y * cos
-                ) + wall.Transform.WorldPosition;
-
-                projectile.Position = worldPos;
+                projectile.Position = LocalToWorld(projectile.HitData.AttachedLocalPosition, entityPosition, entityRotationRadians);
             }
 
             return projectile;
@@ -242,7 +232,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _isInReturnPhase = false;
         }
 
-        public void HitWall(ushort wallId, int tick)
+        public void Hit(GrapplingHookHitType hitType, ushort attachedEntityId, int tick)
         {
             if (!IsCurrentlyActive || _isInReturnPhase)
             {
@@ -250,42 +240,82 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             ref var projectile = ref _matchDataService.SimulationState.GetGrapplingHookProjectileById(_projectileId);
-            if (projectile.IsHookAttached)
+            if (projectile.HitData.IsHookAttached)
             {
                 return;
             }
 
             _attachedOnTick = tick;
-            projectile.IsHookAttached = true;
+            projectile.HitData.IsHookAttached = true;
+            projectile.HitData.HitType = hitType;
+            projectile.HitData.AttachedEntityId = attachedEntityId;
             projectile.Velocity = Vector2.Zero;
 
-            if (TryGetLocalPositionForWall(wallId, projectile.Position, out var localPositionOfWall))
+            if (TryGetAttachedEntityTransform(hitType, attachedEntityId, out var entityPosition, out var entityRotationRadians))
             {
-                projectile.AttachedWallId = wallId;
-                projectile.AttachedLocalPosition = localPositionOfWall;
+                projectile.HitData.AttachedLocalPosition = WorldToLocal(projectile.Position, entityPosition, entityRotationRadians);
             }
-            
-            _netEventsDataService.AddGrapplingHookHitWallNetEvent(tick, _projectileId, wallId, projectile.Position);
+
+            _physicsSimulator.EnablePlayerToCollideWithPlayers(_casterPlayerId);
+            _netEventsDataService.AddGrapplingHookHitWallNetEvent(tick, _projectileId, attachedEntityId, projectile.Position);
+        }
+        
+        private bool TryGetAttachedEntityTransform(GrapplingHookHitType hitType, ushort attachedEntityId, out Vector2 position, out float rotationRadians)
+        {
+            switch (hitType)
+            {
+                case GrapplingHookHitType.Wall:
+                    if (_matchDataService.EnvironmentData.TryGetEnvironmentWall(attachedEntityId, out var wall))
+                    {
+                        position = wall.Transform.WorldPosition;
+                        rotationRadians = wall.Transform.WorldRotationDegrees * (System.MathF.PI / 180f);
+                        return true;
+                    }
+                    break;
+                case GrapplingHookHitType.FrigidBlock:
+                    if (_matchDataService.SimulationState.TryGetFrigidBlockById(attachedEntityId, out var frigidBlock))
+                    {
+                        position = frigidBlock.Position;
+                        rotationRadians = System.MathF.Atan2(frigidBlock.Rotation.Y, frigidBlock.Rotation.X);
+                        return true;
+                    }
+                    break;
+                case GrapplingHookHitType.RockPlayer:
+                    // Keep following only while the player is still a rock; once the rock ends the hook stays where it was.
+                    if (_matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(attachedEntityId, TalentType.Rock))
+                    {
+                        var rockTransform = _matchDataService.SimulationState.GetPlayerById(attachedEntityId).Spaceship.Transform;
+                        position = rockTransform.Position;
+                        rotationRadians = System.MathF.Atan2(rockTransform.Direction.Y, rockTransform.Direction.X);
+                        return true;
+                    }
+                    break;
+            }
+
+            position = default;
+            rotationRadians = default;
+            return false;
         }
 
-        private bool TryGetLocalPositionForWall(ushort wallId, Vector2 worldPosition, out Vector2 localPositionOfWall)
+        private static Vector2 WorldToLocal(Vector2 worldPosition, Vector2 entityPosition, float entityRotationRadians)
         {
-            if (_matchDataService.EnvironmentData.TryGetEnvironmentWall(wallId, out var wall))
-            {
-                Vector2 diff = worldPosition - wall.Transform.WorldPosition;
-                float radians = -wall.Transform.WorldRotationDegrees * (System.MathF.PI / 180f);
-                float cos = System.MathF.Cos(radians);
-                float sin = System.MathF.Sin(radians);
+            Vector2 diff = worldPosition - entityPosition;
+            float cos = System.MathF.Cos(-entityRotationRadians);
+            float sin = System.MathF.Sin(-entityRotationRadians);
 
-                localPositionOfWall = new Vector2(
-                    diff.X * cos - diff.Y * sin,
-                    diff.X * sin + diff.Y * cos);
+            return new Vector2(
+                diff.X * cos - diff.Y * sin,
+                diff.X * sin + diff.Y * cos);
+        }
 
-                return true;
-            }
+        private static Vector2 LocalToWorld(Vector2 localPosition, Vector2 entityPosition, float entityRotationRadians)
+        {
+            float cos = System.MathF.Cos(entityRotationRadians);
+            float sin = System.MathF.Sin(entityRotationRadians);
 
-            localPositionOfWall = default;
-            return false;
+            return new Vector2(
+                localPosition.X * cos - localPosition.Y * sin,
+                localPosition.X * sin + localPosition.Y * cos) + entityPosition;
         }
 
         private void StartReturnPhase()
@@ -313,6 +343,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             _physicsSimulator.RemoveGrapplingHookProjectile(_projectileId);
+            _physicsSimulator.DisablePlayerToCollideWithPlayers(_casterPlayerId);
             _matchDataService.SimulationState.RemoveGrapplingHookProjectileById(_projectileId);
             _netEventsDataService.AddDeactivateGrapplingHookTalentNetEvent(tick, _casterPlayerId, _projectileId, cooldownEndTick);
         }

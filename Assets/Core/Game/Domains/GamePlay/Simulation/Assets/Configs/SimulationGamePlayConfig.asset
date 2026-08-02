@@ -48,6 +48,13 @@ MonoBehaviour:
         - rid: 2200602851054190753
         - rid: 2200602851054190754
         - rid: 2200602851054190755
+        - rid: 1717594783917015173
+        - rid: 1717594787500785824
+        - rid: 2200602851054190760
+        - rid: 1595758794195075078
+        - rid: 1595758799730769926
+        - rid: 1595758799730770084
+        - rid: 1595758876279177872
       TalentsArrowConfigs:
         TalentCooldownConfigs:
         - TalentType: 1
@@ -67,6 +74,12 @@ MonoBehaviour:
         - TalentType: 9
           IsArrowShownOnlyWhilePressed: 1
         - TalentType: 10
+          IsArrowShownOnlyWhilePressed: 0
+        - TalentType: 11
+          IsArrowShownOnlyWhilePressed: 0
+        - TalentType: 12
+          IsArrowShownOnlyWhilePressed: 0
+        - TalentType: 14
           IsArrowShownOnlyWhilePressed: 0
       HammerTalentConfig:
         HammerSpeed: 10
@@ -96,7 +109,7 @@ MonoBehaviour:
         PlayerPullForceWhileHooked: 200
         PlayerVelocitySquaredThresholdToDeactivateHook: 0.1
         GraceTicksUntilCheckIfVelocityIsBelowThreshold: 5
-        PlayerRotateSpeedWhileHooked: 500
+        EnemyHitSpinAmount: 30
       UmbrellaTalentConfig:
         DurationInSeconds: 4
         VelocityGainPerTick: 80
@@ -114,18 +127,62 @@ MonoBehaviour:
         PushForce: 60
         MaxSpin: 200
         MinSpin: 180
+      WaterGunTalentConfig:
+        DurationInSeconds: 3
+        ConeAngleDegrees: 30
+        ConeRange: 9.3
+        EnemyPushForcePerTick: 150
+        CasterRecoilForcePerTick: 0
+      HeadbuttTalentConfig:
+        MaxChargeForce: 70
+        MaxDashWindowSeconds: 1.5
+        MinDashWindowSeconds: 0.3
+        EnemyPushForce: 30
+        EnemySpinAmount: 50
+      RockTalentConfig:
+        DurationInSeconds: 2.5
+        ColliderRadiusMultiplier: 2.6
+        BodyDensity: 1000
+        Restitution: 1
+        EnemyPushRadius: 4
+        EnemyPushForce: 20
+        EnemySpinAmount: 50
+      FrigidBlockTalentConfig:
+        ProjectileSpeed: 30
+        SpawnGapFromCaster: 0.5
+        LinearDamping: 1.2
+        AngularDamping: 1.5
+        Density: 25
+        Restitution: 0.1
+        IdleLinearVelocityThreshold: 0.15
+        IdleAngularVelocityThreshold: 0.15
+        SecondsIdleUntilDestroy: 3
+      FishingRodTalentConfig:
+        TipSpeed: 24
+        ReturnSpeedMultiplier: 3
+        ArriveDistance: 2
+        TipMaxLifetimeSeconds: 1.5
+        ThrowWindowSeconds: 300
+        ThrowPushForce: 40
+        ThrowMinSpin: 60
+        ThrowMaxSpin: 80
+      SoulTalentConfig:
+        GhostSpeed: 15
+        SpawnForwardOffset: 2
+      FrozenTalentConfig:
+        DurationInSeconds: 2.5
       TalentCardWidth: 1.602175
       TalentCardHeight: 2.382844
     Lava:
       DamageAmount: 1
-      DamageIntervalInSeconds: 1
+      DamageIntervalInSeconds: 1.5
     PowerUps:
-      SpawnMinSecondsInterval: 1
-      SpawnMaxSecondsInterval: 2
+      SpawnMinSecondsInterval: 8
+      SpawnMaxSecondsInterval: 13
       MaxConcurrentPowerUpBalls: 5
       MoveSpeed: 5
       Radius: 1.269
-      ObtainablePowerUps: 02000000
+      ObtainablePowerUps: 03000000010000000200000004000000
       GalacticPullDurationSeconds: 4
       GalacticPullForce: 70
       NukeForce: 50
@@ -140,11 +197,11 @@ MonoBehaviour:
     EnvironmentSpikes:
       Damage: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 11
+    DeafultEnvironmentId: 6
     ShouldChooseRandomStage: 0
     ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3
-    StartMatchCountdownDuration: 1
+    StartMatchCountdownDuration: 3
     ShootCooldownMultiplierWhenDead: 1
     StageRestartDelaySeconds: 3
     GemsCollectedForTeamAlive: 1
@@ -159,9 +216,41 @@ MonoBehaviour:
     StageSizeMultiplier: 1
     SpeedupSimulation: 1
     IsAutoShoot: 0
+    CanPlayersCollideWithEachOther: 1
+    RandomPlayersInput: 0
   references:
     version: 2
     RefIds:
+    - rid: 1595758794195075078
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 15
+        CooldownInSeconds: 8
+    - rid: 1595758799730769926
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 16
+        CooldownInSeconds: 7
+    - rid: 1595758799730770084
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 13
+        CooldownInSeconds: 9
+    - rid: 1595758876279177872
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 17
+        CooldownInSeconds: 9
+    - rid: 1717594783917015173
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 11
+        CooldownInSeconds: 7
+    - rid: 1717594787500785824
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 12
+        CooldownInSeconds: 7
     - rid: 2200602851054190747
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
@@ -171,7 +260,7 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 6
-        CooldownInSeconds: 7
+        CooldownInSeconds: 6
     - rid: 2200602851054190749
       type: {class: TalentStocksCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
@@ -206,4 +295,9 @@ MonoBehaviour:
       type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
       data:
         TalentType: 2
+        CooldownInSeconds: 7
+    - rid: 2200602851054190760
+      type: {class: TalentNormalCooldownConfig, ns: Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations, asm: SimulationAssembly}
+      data:
+        TalentType: 14
         CooldownInSeconds: 6

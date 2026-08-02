@@ -1,10 +1,19 @@
 using System.Numerics;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall
 {
     public readonly struct PlayerStickToWallData
     {
         public readonly ushort PlayerId;
+
+        /// <summary>
+        /// Which kind of wall-like body is being touched (a static Wall or a FrigidBlock). Wall ids and FrigidBlock ids
+        /// come from separate id spaces, so the body type is needed both to tell two touches apart and to know where to
+        /// read the body's current rotation from.
+        /// </summary>
+        public readonly PhysicsBodyType WallBodyType;
+
         public readonly ushort WallId;
 
         /// <summary>
@@ -14,9 +23,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWal
         /// </summary>
         public readonly Vector2 WallLocalNormal;
 
-        public PlayerStickToWallData(ushort playerId, ushort wallId, Vector2 wallLocalNormal)
+        public PlayerStickToWallData(ushort playerId, PhysicsBodyType wallBodyType, ushort wallId, Vector2 wallLocalNormal)
         {
             PlayerId = playerId;
+            WallBodyType = wallBodyType;
             WallId = wallId;
             WallLocalNormal = wallLocalNormal;
         }

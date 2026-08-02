@@ -1,7 +1,7 @@
-using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.CoolBGMusic.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
@@ -15,12 +15,17 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Sc
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Nuke.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimArrowEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SwapFields.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
@@ -63,11 +68,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IGainBoltEffectController _gainBoltEffectController;
         private IHitDamageIndicatorEffectController _hitDamageIndicatorEffectController;
         private IPlayerTeleportEffectController _playerTeleportEffectController;
+        private IHeadbuttHitEffectController _headbuttHitEffectController;
         private IEnvironmentTeleportGateControllers _environmentTeleportGateControllers;
         private IEnvironmentFieldBarrierControllers _environmentFieldBarrierControllers;
         private ISwapFieldControllers _swapFieldControllers;
         private IKOProjectilesControllers _koProjectilesControllers;
         private IGrapplingHookProjectilesControllers _grapplingHookProjectilesControllers;
+        private IFishingRodTipControllers _fishingRodTipControllers;
+        private ISecondCastAimArrowControllers _secondCastAimArrowControllers;
+        private ISoulGhostControllers _soulGhostControllers;
+        private IFrigidBlocksControllers _frigidBlocksControllers;
         private IDashPulseGustEffectController _dashPulseGustEffectController;
         private IMagneticPullEffectController _magneticPullEffectController;
         private IBackgroundParallaxController _backgroundParallaxController;
@@ -76,6 +86,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ILocalPlayersDataService _localPlayersDataService;
         private IGameInputActionsController _gameInputActionsController;
         private IAudioService _audioService;
+        private ICoolBGMusicController _coolBGMusicController;
         private INukeShockwaveEffectController _nukeShockwaveEffectController;
 
         public StartGamePlayMatchCommand SetEnterData(GamePlayMatchInitiatorEnterData enterEnterData)
@@ -107,11 +118,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _gainBoltEffectController = _diContainer.Resolve<IGainBoltEffectController>();
             _hitDamageIndicatorEffectController = _diContainer.Resolve<IHitDamageIndicatorEffectController>();
             _playerTeleportEffectController = _diContainer.Resolve<IPlayerTeleportEffectController>();
+            _headbuttHitEffectController = _diContainer.Resolve<IHeadbuttHitEffectController>();
             _environmentTeleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
             _environmentFieldBarrierControllers = _diContainer.Resolve<IEnvironmentFieldBarrierControllers>();
             _swapFieldControllers = _diContainer.Resolve<ISwapFieldControllers>();
             _koProjectilesControllers = _diContainer.Resolve<IKOProjectilesControllers>();
             _grapplingHookProjectilesControllers = _diContainer.Resolve<IGrapplingHookProjectilesControllers>();
+            _fishingRodTipControllers = _diContainer.Resolve<IFishingRodTipControllers>();
+            _secondCastAimArrowControllers = _diContainer.Resolve<ISecondCastAimArrowControllers>();
+            _soulGhostControllers = _diContainer.Resolve<ISoulGhostControllers>();
+            _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
             _magneticPullEffectController = _diContainer.Resolve<IMagneticPullEffectController>();
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
@@ -120,12 +136,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
             _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
             _audioService = _diContainer.Resolve<IAudioService>();
+            _coolBGMusicController = _diContainer.Resolve<ICoolBGMusicController>();
             _nukeShockwaveEffectController = _diContainer.Resolve<INukeShockwaveEffectController>();
         }
 
         public void Execute()
         {
-            _audioService.PlayAudioLoop(AudioClipType.MatchGamePlayBGMusic);
+            InitCoolBackgroundMusic();
             _fullTickPacketsHandler.InitEntryPoint();
             _startStagePacketHandler.InitEntryPoint();
             _talentCardControllers.InitEntryPoint();
@@ -136,6 +153,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _swapFieldControllers.InitEntryPoint();
             _koProjectilesControllers.InitEntryPoint();
             _grapplingHookProjectilesControllers.InitEntryPoint();
+            _fishingRodTipControllers.InitEntryPoint();
+            _secondCastAimArrowControllers.InitEntryPoint();
+            _soulGhostControllers.InitEntryPoint();
+            _frigidBlocksControllers.InitEntryPoint();
             _powerUpBallObtainedEffectController.InitEntryPoint();
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
@@ -146,6 +167,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentSpringControllers.InitEntryPoint();
             _environmentSpikeControllers.InitEntryPoint();
             _playerTeleportEffectController.InitEntryPoint();
+            _headbuttHitEffectController.InitEntryPoint();
             _environmentTeleportGateControllers.InitEntryPoint();
             _backgroundParallaxController.InitEntryPoint();
             _lockOnTargetEffectController.InitEntryPoint();
@@ -162,7 +184,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _tickProcessor.InitEntryPoint();
             _clientMatchPresentationTickProcessor.InitEntryPoint();
         }
-        
+
+        private void InitCoolBackgroundMusic()
+        {
+            _coolBGMusicController.InitEntryPoint();
+
+            if (!_coolBGMusicController.TryPlayStageBackgroundMusic())
+            {
+                _audioService.PlayAudioLoop(AudioClipType.MatchGamePlayBGMusic);
+            }
+        }
+
         private void AddPlayersDevicesNotAddedDuringMatchMaking()
         {
             _localPlayersDataService.SetLocalPlayers(_enterData.PlayerIdToDeviceIdDictionary);

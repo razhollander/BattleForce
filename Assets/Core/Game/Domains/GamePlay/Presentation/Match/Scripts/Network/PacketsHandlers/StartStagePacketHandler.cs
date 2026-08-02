@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.CoolBGMusic.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
@@ -19,17 +20,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly IStageEndedUiController _stageEndedUiController;
         private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
         private readonly IAudioService _audioService;
+        private readonly ICoolBGMusicController _coolBGMusicController;
         private readonly StartStagePacketS2C _startStagePacket;
 
         public PacketTypeS2C PacketType => PacketTypeS2C.StartStage;
 
-        public StartStagePacketHandler(IClientNetworkManager networkManager, ICommandFactory commandFactory, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IStageEndedUiController stageEndedUiController, ILastFullSyncTickDataService lastFullSyncTickDataService, IAudioService audioService)
+        public StartStagePacketHandler(IClientNetworkManager networkManager, ICommandFactory commandFactory, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IStageEndedUiController stageEndedUiController, ILastFullSyncTickDataService lastFullSyncTickDataService, IAudioService audioService, ICoolBGMusicController coolBGMusicController)
         {
             _networkManager = networkManager;
             _commandFactory = commandFactory;
             _stageEndedUiController = stageEndedUiController;
             _lastFullSyncTickDataService = lastFullSyncTickDataService;
             _audioService = audioService;
+            _coolBGMusicController = coolBGMusicController;
             _startStagePacket = new StartStagePacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount);
         }
 
@@ -54,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 .Execute();
 
             _stageEndedUiController.Hide();
+            _coolBGMusicController.TryPlayStageBackgroundMusic();
         }
     }
 }

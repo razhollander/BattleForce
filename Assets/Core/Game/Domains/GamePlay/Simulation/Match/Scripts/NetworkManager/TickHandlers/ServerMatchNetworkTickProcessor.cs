@@ -46,8 +46,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private ApplyGalacticPullForcesCommand _applyGalacticPullForcesCommand;
         private TryDeactivateEndedGalacticFieldsCommand _tryDeactivateEndedGalacticFieldsCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
+        private StepFrigidBlocksCommand _stepFrigidBlocksCommand;
         private StepTimersCommand _stepTimersCommand;
-        private TryEndPlayersSpinCommand _tryEndPlayersSpinCommand;
+        private TryEndPlayersSpinIfReachedZeroAngularVecityCommand _tryEndPlayersSpinIfReachedZeroAngularVecityCommand;
         private TryEndStagePreparationPhaseCommand _tryEndStagePreparationPhaseCommand;
         private StepAllPlayersTalentsCooldownsCommand _stepAllPlayersTalentsCooldownsCommand;
         private StepAllPlayersTalentsCommand _stepAllPlayersTalentsCommand;
@@ -83,11 +84,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         public void InitEntryPoint()
         {
-            _tryEndPlayersSpinCommand = _commandFactory.CreateCommandVoid<TryEndPlayersSpinCommand>();
+            _tryEndPlayersSpinIfReachedZeroAngularVecityCommand = _commandFactory.CreateCommandVoid<TryEndPlayersSpinIfReachedZeroAngularVecityCommand>();
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
+            _stepFrigidBlocksCommand = _commandFactory.CreateCommandVoid<StepFrigidBlocksCommand>();
             _tryEndStagePreparationPhaseCommand = _commandFactory.CreateCommandVoid<TryEndStagePreparationPhaseCommand>();
             _stepAllPlayersTalentsCooldownsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCooldownsCommand>();
             _stepAllPlayersTalentsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCommand>();
@@ -124,7 +126,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _applyGalacticPullForcesCommand.Execute();
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
-                _tryEndPlayersSpinCommand.SetTick(currentTick).Execute();
+                _stepFrigidBlocksCommand.SetTick(currentTick).SetDeltaTime(stepDeltaTime).Execute();
+                _tryEndPlayersSpinIfReachedZeroAngularVecityCommand.SetTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
                 _trySendPlayersLockOnTargetChangedCommand.SetProcessedTick(currentTick).Execute();
                 _overrideableNetEventsService.RegisterAllOverridableNetEvents();
@@ -250,6 +253,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.TalentCardHitNetEvents = _netEventsDataService.TalentCardHitNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerSpinnedStartedNetEvents = _netEventsDataService.PlayerSpinnedStartedNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerSpinnedEndedNetEvents = _netEventsDataService.PlayerSpinnedEndedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerStartedExposedToLavaNetEvents = _netEventsDataService.PlayerStartedExposedToLavaNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerEndedExposedToLavaNetEvents = _netEventsDataService.PlayerEndedExposedToLavaNetEventsPerClient[clientId];
                 _fullTickPacket.PowerUpSpawnedNetEvents = _netEventsDataService.PowerUpBallSpawnedNetEventsPerClient[clientId];
                 _fullTickPacket.PowerUpObtainedNetEvents = _netEventsDataService.PowerUpBallObtainedNetEventsPerClient[clientId];
                 _fullTickPacket.StageEndNetEvents = _netEventsDataService.StageEndNetEventsPerClient[clientId];
@@ -275,6 +280,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.DeactivateGrapplingHookTalentNetEvents = _netEventsDataService.DeactivateGrapplingHookTalentNetEventsPerClient[clientId];
                 _fullTickPacket.ActivateUmbrellaTalentNetEvents = _netEventsDataService.ActivateUmbrellaTalentNetEventsPerClient[clientId];
                 _fullTickPacket.DeactivateUmbrellaTalentNetEvents = _netEventsDataService.DeactivateUmbrellaTalentNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateWaterGunTalentNetEvents = _netEventsDataService.ActivateWaterGunTalentNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateWaterGunTalentNetEvents = _netEventsDataService.DeactivateWaterGunTalentNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateHeadbuttChargingNetEvents = _netEventsDataService.ActivateHeadbuttChargingNetEventsPerClient[clientId];
+                _fullTickPacket.PerformHeadbuttDashNetEvents = _netEventsDataService.PerformHeadbuttDashNetEventsPerClient[clientId];
+                _fullTickPacket.HeadbuttHitEnemyNetEvents = _netEventsDataService.HeadbuttHitEnemyNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateHeadbuttTalentNetEvents = _netEventsDataService.DeactivateHeadbuttTalentNetEventsPerClient[clientId];
                 _fullTickPacket.CreateMagneticPullFieldNetEvents = _netEventsDataService.CreateMagneticPullFieldNetEventsPerClient[clientId];
                 _fullTickPacket.LayChickenEggNetEvents = _netEventsDataService.LayChickenEggNetEventsPerClient[clientId];
                 _fullTickPacket.ChickenEggHitNetEvents = _netEventsDataService.ChickenEggHitNetEventsPerClient[clientId];
@@ -291,6 +302,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.ActivateShuffleNetEvents = _netEventsDataService.ActivateShuffleNetEventsPerClient[clientId];
                 _fullTickPacket.StartPowerUpGrantingPhaseNetEvents = _netEventsDataService.StartPowerUpGrantingPhaseNetEventsPerClient[clientId];
                 _fullTickPacket.EndPowerUpGrantingPhaseNetEvents = _netEventsDataService.EndPowerUpGrantingPhaseNetEventsPerClient[clientId];
+                _fullTickPacket.ShootFrigidBlockNetEvents = _netEventsDataService.ShootFrigidBlockNetEventsPerClient[clientId];
+                _fullTickPacket.DestroyFrigidBlockNetEvents = _netEventsDataService.DestroyFrigidBlockNetEventsPerClient[clientId];
+                _fullTickPacket.FishingRodThrowNetEvents = _netEventsDataService.FishingRodThrowNetEventsPerClient[clientId];
+                _fullTickPacket.FishingRodCaughtEnemyNetEvents = _netEventsDataService.FishingRodCaughtEnemyNetEventsPerClient[clientId];
+                _fullTickPacket.FishingRodTipHitWallNetEvents = _netEventsDataService.FishingRodTipHitWallNetEventsPerClient[clientId];
+                _fullTickPacket.CreateFishingRodProjectileNetEvents = _netEventsDataService.CreateFishingRodProjectileNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateFishingRodTalentNetEvents = _netEventsDataService.DeactivateFishingRodTalentNetEventsPerClient[clientId];
+                _fullTickPacket.CreateSoulGhostNetEvents = _netEventsDataService.CreateSoulGhostNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateSoulTalentNetEvents = _netEventsDataService.DeactivateSoulTalentNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateRockTalentNetEvents = _netEventsDataService.ActivateRockTalentNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateRockTalentNetEvents = _netEventsDataService.DeactivateRockTalentNetEventsPerClient[clientId];
+                _fullTickPacket.ActivateFrozenTalentNetEvents = _netEventsDataService.ActivateFrozenTalentNetEventsPerClient[clientId];
+                _fullTickPacket.DeactivateFrozenTalentNetEvents = _netEventsDataService.DeactivateFrozenTalentNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

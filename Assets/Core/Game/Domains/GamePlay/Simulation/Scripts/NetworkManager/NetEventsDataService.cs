@@ -28,6 +28,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<TalentCardHitNetEventS2C>> TalentCardHitNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>> PlayerSpinnedStartedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>> PlayerSpinnedEndedNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>> PlayerStartedExposedToLavaNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>> PlayerEndedExposedToLavaNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> PowerUpBallSpawnedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> PowerUpBallObtainedNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> PlayerSwitchTeamNetEventsPerClient { get; }
@@ -55,9 +57,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> CreateGrapplingHookProjectileNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> GrapplingHookHitWallNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> DeactivateGrapplingHookTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<CreateFishingRodProjectileNetEventS2C>> CreateFishingRodProjectileNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<FishingRodCaughtEnemyNetEventS2C>> FishingRodCaughtEnemyNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<FishingRodTipHitWallNetEventS2C>> FishingRodTipHitWallNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<FishingRodThrowNetEventS2C>> FishingRodThrowNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>> DeactivateFishingRodTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<CreateSoulGhostNetEventS2C>> CreateSoulGhostNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateSoulTalentNetEventS2C>> DeactivateSoulTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ActivateRockTalentNetEventS2C>> ActivateRockTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateRockTalentNetEventS2C>> DeactivateRockTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ActivateFrozenTalentNetEventS2C>> ActivateFrozenTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>> DeactivateFrozenTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>> CreateMagneticPullFieldNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>> ActivateWaterGunTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>> DeactivateWaterGunTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>> ActivateHeadbuttChargingNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PerformHeadbuttDashNetEventS2C>> PerformHeadbuttDashNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>> HeadbuttHitEnemyNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>> DeactivateHeadbuttTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ChickenEggHitNetEventS2C>> ChickenEggHitNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> ActivateYearsOfPainTalentNetEventsPerClient { get; }
@@ -73,6 +92,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>> ActivateShuffleNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>> StartPowerUpGrantingPhaseNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>> EndPowerUpGrantingPhaseNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<ShootFrigidBlockNetEventS2C>> ShootFrigidBlockNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<DestroyFrigidBlockNetEventS2C>> DestroyFrigidBlockNetEventsPerClient { get; }
 
         private readonly ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>> _bulletSpawnListPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>> _playerRejoinAcceptListPool;
@@ -85,6 +106,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<TalentCardHitNetEventS2C>> _talentCardHitListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>> _playerSpinnedStartedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>> _playerSpinnedEndedListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>> _playerStartedExposedToLavaListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>> _playerEndedExposedToLavaListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>> _powerUpBallsSpawnedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PowerUpBallObtainedNetEventS2C>> _powerUpBallsObtainedListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>> _playerSwitchTeamListPool;
@@ -116,9 +139,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>> _createGrapplingHookProjectileNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<GrapplingHookHitWallNetEventS2C>> _grapplingHookHitWallNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>> _deactivateGrapplingHookTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<CreateFishingRodProjectileNetEventS2C>> _createFishingRodProjectileNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<FishingRodCaughtEnemyNetEventS2C>> _fishingRodCaughtEnemyNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<FishingRodTipHitWallNetEventS2C>> _fishingRodTipHitWallNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<FishingRodThrowNetEventS2C>> _fishingRodThrowNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>> _deactivateFishingRodTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<CreateSoulGhostNetEventS2C>> _createSoulGhostNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateSoulTalentNetEventS2C>> _deactivateSoulTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateRockTalentNetEventS2C>> _activateRockTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateRockTalentNetEventS2C>> _deactivateRockTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateFrozenTalentNetEventS2C>> _activateFrozenTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>> _deactivateFrozenTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>> _createMagneticPullFieldNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> _activateUmbrellaTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> _deactivateUmbrellaTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>> _activateWaterGunTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>> _deactivateWaterGunTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>> _activateHeadbuttChargingNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PerformHeadbuttDashNetEventS2C>> _performHeadbuttDashNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>> _headbuttHitEnemyNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>> _deactivateHeadbuttTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>> _layChickenEggNetEventsPool;
         private readonly ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>> _chickenEggHitNetEventsPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>> _activateYearsOfPainTalentNetEventsListPool;
@@ -130,6 +170,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<ActivateShuffleNetEventS2C>> _activateShuffleNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>> _startPowerUpGrantingPhaseNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>> _endPowerUpGrantingPhaseNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<ShootFrigidBlockNetEventS2C>> _shootFrigidBlockNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<DestroyFrigidBlockNetEventS2C>> _destroyFrigidBlockNetEventsListPool;
 
         public NetEventsDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -145,6 +187,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             TalentCardHitNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<TalentCardHitNetEventS2C>>(maxConcurrentPlayers);
             PlayerSpinnedStartedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>>(maxConcurrentPlayers);
             PlayerSpinnedEndedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>>(maxConcurrentPlayers);
+            PlayerStartedExposedToLavaNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>>(maxConcurrentPlayers);
+            PlayerEndedExposedToLavaNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>>(maxConcurrentPlayers);
             PowerUpBallSpawnedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>>(maxConcurrentPlayers);
             PowerUpBallObtainedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PowerUpBallObtainedNetEventS2C>>(maxConcurrentPlayers);
             PlayerSwitchTeamNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(maxConcurrentPlayers);
@@ -176,9 +220,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             CreateGrapplingHookProjectileNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>>(maxConcurrentPlayers);
             GrapplingHookHitWallNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<GrapplingHookHitWallNetEventS2C>>(maxConcurrentPlayers);
             DeactivateGrapplingHookTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(maxConcurrentPlayers);
+            CreateFishingRodProjectileNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateFishingRodProjectileNetEventS2C>>(maxConcurrentPlayers);
+            FishingRodCaughtEnemyNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<FishingRodCaughtEnemyNetEventS2C>>(maxConcurrentPlayers);
+            FishingRodTipHitWallNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<FishingRodTipHitWallNetEventS2C>>(maxConcurrentPlayers);
+            FishingRodThrowNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<FishingRodThrowNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateFishingRodTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>>(maxConcurrentPlayers);
+            CreateSoulGhostNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateSoulGhostNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateSoulTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateSoulTalentNetEventS2C>>(maxConcurrentPlayers);
+            ActivateRockTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateRockTalentNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateRockTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateRockTalentNetEventS2C>>(maxConcurrentPlayers);
+            ActivateFrozenTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateFrozenTalentNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateFrozenTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>>(maxConcurrentPlayers);
             CreateMagneticPullFieldNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>>(maxConcurrentPlayers);
             ActivateUmbrellaTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateUmbrellaTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
+            ActivateWaterGunTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateWaterGunTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>>(maxConcurrentPlayers);
+            ActivateHeadbuttChargingNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>>(maxConcurrentPlayers);
+            PerformHeadbuttDashNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PerformHeadbuttDashNetEventS2C>>(maxConcurrentPlayers);
+            HeadbuttHitEnemyNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>>(maxConcurrentPlayers);
+            DeactivateHeadbuttTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>>(maxConcurrentPlayers);
             LayChickenEggNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>>(maxConcurrentPlayers);
             ChickenEggHitNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ChickenEggHitNetEventS2C>>(maxConcurrentPlayers);
             ActivateYearsOfPainTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(maxConcurrentPlayers);
@@ -190,6 +251,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             ActivateShuffleNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateShuffleNetEventS2C>>(maxConcurrentPlayers);
             StartPowerUpGrantingPhaseNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>>(maxConcurrentPlayers);
             EndPowerUpGrantingPhaseNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>>(maxConcurrentPlayers);
+            ShootFrigidBlockNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ShootFrigidBlockNetEventS2C>>(maxConcurrentPlayers);
+            DestroyFrigidBlockNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DestroyFrigidBlockNetEventS2C>>(maxConcurrentPlayers);
             _bulletSpawnListPool = new ConcurrentPool<FixedUnorderedList<BulletSpawnNetEventS2C>>(() => new FixedUnorderedList<BulletSpawnNetEventS2C>(networkConfig.MaxCap.BulletSpawnNetEvents), maxConcurrentPlayers);
             _playerRejoinAcceptListPool = new ConcurrentPool<FixedClassUnorderedList<PlayerRejoinAcceptPacketS2C>>(() =>
             {
@@ -213,6 +276,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _talentCardHitListPool = new ConcurrentPool<FixedUnorderedList<TalentCardHitNetEventS2C>>(() => new FixedUnorderedList<TalentCardHitNetEventS2C>(networkConfig.MaxCap.TalentCardHitNetEvents), maxConcurrentPlayers);
             _playerSpinnedStartedListPool = new ConcurrentPool<FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>>(() => new FixedUnorderedList<PlayerSpinnedStartedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedStartedNetEvents), maxConcurrentPlayers);
             _playerSpinnedEndedListPool = new ConcurrentPool<FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>>(() => new FixedUnorderedList<PlayerSpinnedEndedNetEventS2C>(networkConfig.MaxCap.PlayerSpinnedEndedNetEvents), maxConcurrentPlayers);
+            _playerStartedExposedToLavaListPool = new ConcurrentPool<FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>>(() => new FixedUnorderedList<PlayerStartedExposedToLavaNetEventS2C>(networkConfig.MaxCap.PlayerStartedExposedToLavaNetEvents), maxConcurrentPlayers);
+            _playerEndedExposedToLavaListPool = new ConcurrentPool<FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>>(() => new FixedUnorderedList<PlayerEndedExposedToLavaNetEventS2C>(networkConfig.MaxCap.PlayerEndedExposedToLavaNetEvents), maxConcurrentPlayers);
             _powerUpBallsSpawnedListPool = new ConcurrentPool<FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>>(() => new FixedUnorderedList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents), maxConcurrentPlayers);
             _powerUpBallsObtainedListPool = new ConcurrentPool<FixedUnorderedList<PowerUpBallObtainedNetEventS2C>>(() => new FixedUnorderedList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents), maxConcurrentPlayers);
             _playerSwitchTeamListPool = new ConcurrentPool<FixedUnorderedList<PlayerSwitchTeamNetEventS2C>>(() => new FixedUnorderedList<PlayerSwitchTeamNetEventS2C>(networkConfig.MaxCap.PlayerSwitchTeamNetEvents), maxConcurrentPlayers);
@@ -260,9 +325,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _createGrapplingHookProjectileNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>>(() => new FixedUnorderedList<CreateGrapplingHookProjectileNetEventS2C>(networkConfig.MaxCap.CreateGrapplingHookProjectileNetEvents), maxConcurrentPlayers);
             _grapplingHookHitWallNetEventsListPool = new ConcurrentPool<FixedUnorderedList<GrapplingHookHitWallNetEventS2C>>(() => new FixedUnorderedList<GrapplingHookHitWallNetEventS2C>(networkConfig.MaxCap.GrapplingHookHitWallNetEvents), maxConcurrentPlayers);
             _deactivateGrapplingHookTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateGrapplingHookTalentNetEventS2C>(networkConfig.MaxCap.DeactivateGrapplingHookTalentNetEvents), maxConcurrentPlayers);
+            _createFishingRodProjectileNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateFishingRodProjectileNetEventS2C>>(() => new FixedUnorderedList<CreateFishingRodProjectileNetEventS2C>(networkConfig.MaxCap.CreateFishingRodProjectileNetEvents), maxConcurrentPlayers);
+            _fishingRodCaughtEnemyNetEventsListPool = new ConcurrentPool<FixedUnorderedList<FishingRodCaughtEnemyNetEventS2C>>(() => new FixedUnorderedList<FishingRodCaughtEnemyNetEventS2C>(networkConfig.MaxCap.FishingRodCaughtEnemyNetEvents), maxConcurrentPlayers);
+            _fishingRodTipHitWallNetEventsListPool = new ConcurrentPool<FixedUnorderedList<FishingRodTipHitWallNetEventS2C>>(() => new FixedUnorderedList<FishingRodTipHitWallNetEventS2C>(networkConfig.MaxCap.FishingRodTipHitWallNetEvents), maxConcurrentPlayers);
+            _fishingRodThrowNetEventsListPool = new ConcurrentPool<FixedUnorderedList<FishingRodThrowNetEventS2C>>(() => new FixedUnorderedList<FishingRodThrowNetEventS2C>(networkConfig.MaxCap.FishingRodThrowNetEvents), maxConcurrentPlayers);
+            _deactivateFishingRodTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateFishingRodTalentNetEventS2C>(networkConfig.MaxCap.DeactivateFishingRodTalentNetEvents), maxConcurrentPlayers);
+            _createSoulGhostNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateSoulGhostNetEventS2C>>(() => new FixedUnorderedList<CreateSoulGhostNetEventS2C>(networkConfig.MaxCap.CreateSoulGhostNetEvents), maxConcurrentPlayers);
+            _deactivateSoulTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateSoulTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateSoulTalentNetEventS2C>(networkConfig.MaxCap.DeactivateSoulTalentNetEvents), maxConcurrentPlayers);
+            _activateRockTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateRockTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateRockTalentNetEventS2C>(networkConfig.MaxCap.ActivateRockTalentNetEvents), maxConcurrentPlayers);
+            _deactivateRockTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateRockTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateRockTalentNetEventS2C>(networkConfig.MaxCap.DeactivateRockTalentNetEvents), maxConcurrentPlayers);
+            _activateFrozenTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateFrozenTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateFrozenTalentNetEventS2C>(networkConfig.MaxCap.ActivateFrozenTalentNetEvents), maxConcurrentPlayers);
+            _deactivateFrozenTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>(networkConfig.MaxCap.DeactivateFrozenTalentNetEvents), maxConcurrentPlayers);
             _createMagneticPullFieldNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>>(() => new FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents), maxConcurrentPlayers);
             _activateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
             _deactivateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
+            _activateWaterGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>(networkConfig.MaxCap.ActivateWaterGunTalentNetEvents), maxConcurrentPlayers);
+            _deactivateWaterGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateWaterGunTalentNetEvents), maxConcurrentPlayers);
+            _activateHeadbuttChargingNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>>(() => new FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>(networkConfig.MaxCap.ActivateHeadbuttChargingNetEvents), maxConcurrentPlayers);
+            _performHeadbuttDashNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformHeadbuttDashNetEventS2C>>(() => new FixedUnorderedList<PerformHeadbuttDashNetEventS2C>(networkConfig.MaxCap.PerformHeadbuttDashNetEvents), maxConcurrentPlayers);
+            _headbuttHitEnemyNetEventsListPool = new ConcurrentPool<FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>>(() => new FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>(networkConfig.MaxCap.HeadbuttHitEnemyNetEvents), maxConcurrentPlayers);
+            _deactivateHeadbuttTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>(networkConfig.MaxCap.DeactivateHeadbuttTalentNetEvents), maxConcurrentPlayers);
             _layChickenEggNetEventsPool = new ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>>(() => new FixedUnorderedList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents), maxConcurrentPlayers);
             _chickenEggHitNetEventsPool = new ConcurrentPool<FixedUnorderedList<ChickenEggHitNetEventS2C>>(() => new FixedUnorderedList<ChickenEggHitNetEventS2C>(networkConfig.MaxCap.ChickenEggHitNetEvents), maxConcurrentPlayers);
             _activateYearsOfPainTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateYearsOfPainTalentNetEventS2C>(networkConfig.MaxCap.ActivateYearsOfPainTalentNetEvents), maxConcurrentPlayers);
@@ -274,6 +356,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _activateShuffleNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateShuffleNetEventS2C>>(() => new FixedUnorderedList<ActivateShuffleNetEventS2C>(networkConfig.MaxCap.ActivateShufflePowerUpNetEvents), maxConcurrentPlayers);
             _startPowerUpGrantingPhaseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>>(() => new FixedUnorderedList<StartPowerUpGrantingPhaseNetEventS2C>(networkConfig.MaxCap.StartPowerUpGrantingPhaseNetEvents), maxConcurrentPlayers);
             _endPowerUpGrantingPhaseNetEventsListPool = new ConcurrentPool<FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>>(() => new FixedUnorderedList<EndPowerUpGrantingPhaseNetEventS2C>(networkConfig.MaxCap.EndPowerUpGrantingPhaseNetEvents), maxConcurrentPlayers);
+            _shootFrigidBlockNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ShootFrigidBlockNetEventS2C>>(() => new FixedUnorderedList<ShootFrigidBlockNetEventS2C>(networkConfig.MaxCap.ShootFrigidBlockNetEvents), maxConcurrentPlayers);
+            _destroyFrigidBlockNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DestroyFrigidBlockNetEventS2C>>(() => new FixedUnorderedList<DestroyFrigidBlockNetEventS2C>(networkConfig.MaxCap.DestroyFrigidBlockNetEvents), maxConcurrentPlayers);
         }
 
         public void StartSavingClientEvents(long clientId)
@@ -362,6 +446,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             else
             {
                 LogService.LogError($"Player already exists! {clientId}");
+            }
+
+            if (!PlayerStartedExposedToLavaNetEventsPerClient.ContainsKey(clientId))
+            {
+                PlayerStartedExposedToLavaNetEventsPerClient.Add(clientId, _playerStartedExposedToLavaListPool.Get());
+            }
+
+            if (!PlayerEndedExposedToLavaNetEventsPerClient.ContainsKey(clientId))
+            {
+                PlayerEndedExposedToLavaNetEventsPerClient.Add(clientId, _playerEndedExposedToLavaListPool.Get());
             }
 
             if (!PlayerSpinnedEndedNetEventsPerClient.ContainsKey(clientId))
@@ -588,6 +682,50 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 DeactivateGrapplingHookTalentNetEventsPerClient.Add(clientId, _deactivateGrapplingHookTalentNetEventsListPool.Get());
             }
+            if (!CreateFishingRodProjectileNetEventsPerClient.ContainsKey(clientId))
+            {
+                CreateFishingRodProjectileNetEventsPerClient.Add(clientId, _createFishingRodProjectileNetEventsListPool.Get());
+            }
+            if (!FishingRodCaughtEnemyNetEventsPerClient.ContainsKey(clientId))
+            {
+                FishingRodCaughtEnemyNetEventsPerClient.Add(clientId, _fishingRodCaughtEnemyNetEventsListPool.Get());
+            }
+            if (!FishingRodTipHitWallNetEventsPerClient.ContainsKey(clientId))
+            {
+                FishingRodTipHitWallNetEventsPerClient.Add(clientId, _fishingRodTipHitWallNetEventsListPool.Get());
+            }
+            if (!FishingRodThrowNetEventsPerClient.ContainsKey(clientId))
+            {
+                FishingRodThrowNetEventsPerClient.Add(clientId, _fishingRodThrowNetEventsListPool.Get());
+            }
+            if (!DeactivateFishingRodTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                DeactivateFishingRodTalentNetEventsPerClient.Add(clientId, _deactivateFishingRodTalentNetEventsListPool.Get());
+            }
+            if (!CreateSoulGhostNetEventsPerClient.ContainsKey(clientId))
+            {
+                CreateSoulGhostNetEventsPerClient.Add(clientId, _createSoulGhostNetEventsListPool.Get());
+            }
+            if (!DeactivateSoulTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                DeactivateSoulTalentNetEventsPerClient.Add(clientId, _deactivateSoulTalentNetEventsListPool.Get());
+            }
+            if (!ActivateRockTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                ActivateRockTalentNetEventsPerClient.Add(clientId, _activateRockTalentNetEventsListPool.Get());
+            }
+            if (!DeactivateRockTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                DeactivateRockTalentNetEventsPerClient.Add(clientId, _deactivateRockTalentNetEventsListPool.Get());
+            }
+            if (!ActivateFrozenTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                ActivateFrozenTalentNetEventsPerClient.Add(clientId, _activateFrozenTalentNetEventsListPool.Get());
+            }
+            if (!DeactivateFrozenTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                DeactivateFrozenTalentNetEventsPerClient.Add(clientId, _deactivateFrozenTalentNetEventsListPool.Get());
+            }
             if (!CreateMagneticPullFieldNetEventsPerClient.ContainsKey(clientId))
             {
                 CreateMagneticPullFieldNetEventsPerClient.Add(clientId, _createMagneticPullFieldNetEventsListPool.Get());
@@ -599,6 +737,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             if (!DeactivateUmbrellaTalentNetEventsPerClient.ContainsKey(clientId))
             {
                 DeactivateUmbrellaTalentNetEventsPerClient.Add(clientId, _deactivateUmbrellaTalentNetEventsListPool.Get());
+            }
+            if (!ActivateWaterGunTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                ActivateWaterGunTalentNetEventsPerClient.Add(clientId, _activateWaterGunTalentNetEventsListPool.Get());
+            }
+            if (!DeactivateWaterGunTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                DeactivateWaterGunTalentNetEventsPerClient.Add(clientId, _deactivateWaterGunTalentNetEventsListPool.Get());
+            }
+            if (!ActivateHeadbuttChargingNetEventsPerClient.ContainsKey(clientId))
+            {
+                ActivateHeadbuttChargingNetEventsPerClient.Add(clientId, _activateHeadbuttChargingNetEventsListPool.Get());
+            }
+            if (!PerformHeadbuttDashNetEventsPerClient.ContainsKey(clientId))
+            {
+                PerformHeadbuttDashNetEventsPerClient.Add(clientId, _performHeadbuttDashNetEventsListPool.Get());
+            }
+            if (!HeadbuttHitEnemyNetEventsPerClient.ContainsKey(clientId))
+            {
+                HeadbuttHitEnemyNetEventsPerClient.Add(clientId, _headbuttHitEnemyNetEventsListPool.Get());
+            }
+            if (!DeactivateHeadbuttTalentNetEventsPerClient.ContainsKey(clientId))
+            {
+                DeactivateHeadbuttTalentNetEventsPerClient.Add(clientId, _deactivateHeadbuttTalentNetEventsListPool.Get());
             }
             if (!LayChickenEggNetEventsPerClient.ContainsKey(clientId))
             {
@@ -644,6 +806,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 EndPowerUpGrantingPhaseNetEventsPerClient.Add(clientId, _endPowerUpGrantingPhaseNetEventsListPool.Get());
             }
+            if (!ShootFrigidBlockNetEventsPerClient.ContainsKey(clientId))
+            {
+                ShootFrigidBlockNetEventsPerClient.Add(clientId, _shootFrigidBlockNetEventsListPool.Get());
+            }
+            if (!DestroyFrigidBlockNetEventsPerClient.ContainsKey(clientId))
+            {
+                DestroyFrigidBlockNetEventsPerClient.Add(clientId, _destroyFrigidBlockNetEventsListPool.Get());
+            }
         }
 
         public void StopSavingClientEvents(long clientId)
@@ -682,6 +852,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var playerSpinnedEndedList = PlayerSpinnedEndedNetEventsPerClient[clientId];
             playerSpinnedEndedList.Clear();
             _playerSpinnedEndedListPool.Return(playerSpinnedEndedList);
+            var playerStartedExposedToLavaList = PlayerStartedExposedToLavaNetEventsPerClient[clientId];
+            playerStartedExposedToLavaList.Clear();
+            _playerStartedExposedToLavaListPool.Return(playerStartedExposedToLavaList);
+            var playerEndedExposedToLavaList = PlayerEndedExposedToLavaNetEventsPerClient[clientId];
+            playerEndedExposedToLavaList.Clear();
+            _playerEndedExposedToLavaListPool.Return(playerEndedExposedToLavaList);
             var powerUpBallsSpawnedList = PowerUpBallSpawnedNetEventsPerClient[clientId];
             powerUpBallsSpawnedList.Clear();
             _powerUpBallsSpawnedListPool.Return(powerUpBallsSpawnedList);
@@ -787,6 +963,50 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             deactivateGrapplingHookTalentNetEventsList.Clear();
             _deactivateGrapplingHookTalentNetEventsListPool.Return(deactivateGrapplingHookTalentNetEventsList);
 
+            var createFishingRodProjectileNetEventsList = CreateFishingRodProjectileNetEventsPerClient[clientId];
+            createFishingRodProjectileNetEventsList.Clear();
+            _createFishingRodProjectileNetEventsListPool.Return(createFishingRodProjectileNetEventsList);
+
+            var fishingRodCaughtEnemyNetEventsList = FishingRodCaughtEnemyNetEventsPerClient[clientId];
+            fishingRodCaughtEnemyNetEventsList.Clear();
+            _fishingRodCaughtEnemyNetEventsListPool.Return(fishingRodCaughtEnemyNetEventsList);
+
+            var fishingRodTipHitWallNetEventsList = FishingRodTipHitWallNetEventsPerClient[clientId];
+            fishingRodTipHitWallNetEventsList.Clear();
+            _fishingRodTipHitWallNetEventsListPool.Return(fishingRodTipHitWallNetEventsList);
+
+            var fishingRodThrowNetEventsList = FishingRodThrowNetEventsPerClient[clientId];
+            fishingRodThrowNetEventsList.Clear();
+            _fishingRodThrowNetEventsListPool.Return(fishingRodThrowNetEventsList);
+
+            var deactivateFishingRodTalentNetEventsList = DeactivateFishingRodTalentNetEventsPerClient[clientId];
+            deactivateFishingRodTalentNetEventsList.Clear();
+            _deactivateFishingRodTalentNetEventsListPool.Return(deactivateFishingRodTalentNetEventsList);
+
+            var createSoulGhostNetEventsList = CreateSoulGhostNetEventsPerClient[clientId];
+            createSoulGhostNetEventsList.Clear();
+            _createSoulGhostNetEventsListPool.Return(createSoulGhostNetEventsList);
+
+            var deactivateSoulTalentNetEventsList = DeactivateSoulTalentNetEventsPerClient[clientId];
+            deactivateSoulTalentNetEventsList.Clear();
+            _deactivateSoulTalentNetEventsListPool.Return(deactivateSoulTalentNetEventsList);
+
+            var activateRockTalentNetEventsList = ActivateRockTalentNetEventsPerClient[clientId];
+            activateRockTalentNetEventsList.Clear();
+            _activateRockTalentNetEventsListPool.Return(activateRockTalentNetEventsList);
+
+            var deactivateRockTalentNetEventsList = DeactivateRockTalentNetEventsPerClient[clientId];
+            deactivateRockTalentNetEventsList.Clear();
+            _deactivateRockTalentNetEventsListPool.Return(deactivateRockTalentNetEventsList);
+
+            var activateFrozenTalentNetEventsList = ActivateFrozenTalentNetEventsPerClient[clientId];
+            activateFrozenTalentNetEventsList.Clear();
+            _activateFrozenTalentNetEventsListPool.Return(activateFrozenTalentNetEventsList);
+
+            var deactivateFrozenTalentNetEventsList = DeactivateFrozenTalentNetEventsPerClient[clientId];
+            deactivateFrozenTalentNetEventsList.Clear();
+            _deactivateFrozenTalentNetEventsListPool.Return(deactivateFrozenTalentNetEventsList);
+
             var createMagneticPullFieldNetEventsList = CreateMagneticPullFieldNetEventsPerClient[clientId];
             createMagneticPullFieldNetEventsList.Clear();
             _createMagneticPullFieldNetEventsListPool.Return(createMagneticPullFieldNetEventsList);
@@ -799,7 +1019,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var deactivateUmbrellaTalentNetEventsList = DeactivateUmbrellaTalentNetEventsPerClient[clientId];
             deactivateUmbrellaTalentNetEventsList.Clear();
             _deactivateUmbrellaTalentNetEventsListPool.Return(deactivateUmbrellaTalentNetEventsList);
-            
+
+            var activateWaterGunTalentNetEventsList = ActivateWaterGunTalentNetEventsPerClient[clientId];
+            activateWaterGunTalentNetEventsList.Clear();
+            _activateWaterGunTalentNetEventsListPool.Return(activateWaterGunTalentNetEventsList);
+
+            var deactivateWaterGunTalentNetEventsList = DeactivateWaterGunTalentNetEventsPerClient[clientId];
+            deactivateWaterGunTalentNetEventsList.Clear();
+            _deactivateWaterGunTalentNetEventsListPool.Return(deactivateWaterGunTalentNetEventsList);
+
+            var activateHeadbuttChargingList = ActivateHeadbuttChargingNetEventsPerClient[clientId];
+            activateHeadbuttChargingList.Clear();
+            _activateHeadbuttChargingNetEventsListPool.Return(activateHeadbuttChargingList);
+
+            var performHeadbuttDashList = PerformHeadbuttDashNetEventsPerClient[clientId];
+            performHeadbuttDashList.Clear();
+            _performHeadbuttDashNetEventsListPool.Return(performHeadbuttDashList);
+
+            var headbuttHitEnemyList = HeadbuttHitEnemyNetEventsPerClient[clientId];
+            headbuttHitEnemyList.Clear();
+            _headbuttHitEnemyNetEventsListPool.Return(headbuttHitEnemyList);
+
+            var deactivateHeadbuttTalentList = DeactivateHeadbuttTalentNetEventsPerClient[clientId];
+            deactivateHeadbuttTalentList.Clear();
+            _deactivateHeadbuttTalentNetEventsListPool.Return(deactivateHeadbuttTalentList);
+
             var layChickenEggNetEventsList = LayChickenEggNetEventsPerClient[clientId];
             layChickenEggNetEventsList.Clear();
             _layChickenEggNetEventsPool.Return(layChickenEggNetEventsList);
@@ -838,6 +1082,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _endPowerUpGrantingPhaseNetEventsListPool.Return(endPowerUpGrantingPhaseNetEventsList);
             EndPowerUpGrantingPhaseNetEventsPerClient.Remove(clientId);
 
+            var shootFrigidBlockNetEventsList = ShootFrigidBlockNetEventsPerClient[clientId];
+            shootFrigidBlockNetEventsList.Clear();
+            _shootFrigidBlockNetEventsListPool.Return(shootFrigidBlockNetEventsList);
+            ShootFrigidBlockNetEventsPerClient.Remove(clientId);
+
+            var destroyFrigidBlockNetEventsList = DestroyFrigidBlockNetEventsPerClient[clientId];
+            destroyFrigidBlockNetEventsList.Clear();
+            _destroyFrigidBlockNetEventsListPool.Return(destroyFrigidBlockNetEventsList);
+            DestroyFrigidBlockNetEventsPerClient.Remove(clientId);
+
             BulletSpawnNetEventsPerClient.Remove(clientId);
             PlayerRejoinAcceptNetEventsPerClient.Remove(clientId);
             MatchMakingPlayerJoinAcceptNetEventsPerClient.Remove(clientId);
@@ -849,6 +1103,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             TalentCardHitNetEventsPerClient.Remove(clientId);
             PlayerSpinnedStartedNetEventsPerClient.Remove(clientId);
             PlayerSpinnedEndedNetEventsPerClient.Remove(clientId);
+            PlayerStartedExposedToLavaNetEventsPerClient.Remove(clientId);
+            PlayerEndedExposedToLavaNetEventsPerClient.Remove(clientId);
             PowerUpBallSpawnedNetEventsPerClient.Remove(clientId);
             PowerUpBallObtainedNetEventsPerClient.Remove(clientId);
             PlayerSwitchTeamNetEventsPerClient.Remove(clientId);
@@ -880,8 +1136,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             CreateGrapplingHookProjectileNetEventsPerClient.Remove(clientId);
             GrapplingHookHitWallNetEventsPerClient.Remove(clientId);
             DeactivateGrapplingHookTalentNetEventsPerClient.Remove(clientId);
+            CreateFishingRodProjectileNetEventsPerClient.Remove(clientId);
+            FishingRodCaughtEnemyNetEventsPerClient.Remove(clientId);
+            FishingRodTipHitWallNetEventsPerClient.Remove(clientId);
+            FishingRodThrowNetEventsPerClient.Remove(clientId);
+            DeactivateFishingRodTalentNetEventsPerClient.Remove(clientId);
+            CreateSoulGhostNetEventsPerClient.Remove(clientId);
+            DeactivateSoulTalentNetEventsPerClient.Remove(clientId);
+            ActivateRockTalentNetEventsPerClient.Remove(clientId);
+            DeactivateRockTalentNetEventsPerClient.Remove(clientId);
+            ActivateFrozenTalentNetEventsPerClient.Remove(clientId);
+            DeactivateFrozenTalentNetEventsPerClient.Remove(clientId);
             ActivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
             DeactivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
+            ActivateWaterGunTalentNetEventsPerClient.Remove(clientId);
+            DeactivateWaterGunTalentNetEventsPerClient.Remove(clientId);
+            ActivateHeadbuttChargingNetEventsPerClient.Remove(clientId);
+            PerformHeadbuttDashNetEventsPerClient.Remove(clientId);
+            HeadbuttHitEnemyNetEventsPerClient.Remove(clientId);
+            DeactivateHeadbuttTalentNetEventsPerClient.Remove(clientId);
             LayChickenEggNetEventsPerClient.Remove(clientId);
             ChickenEggHitNetEventsPerClient.Remove(clientId);
             ActivateYearsOfPainTalentNetEventsPerClient.Remove(clientId);
@@ -1207,6 +1480,27 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             }
         }
 
+        public void AddShootFrigidBlockNetEvent(int onTick, TalentFrigidBlockStateS2C frigidBlock, int cooldownEndTick)
+        {
+            foreach (var kvp in ShootFrigidBlockNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.FrigidBlock = frigidBlock;
+                netEvent.CooldownEndTick = cooldownEndTick;
+            }
+        }
+
+        public void AddDestroyFrigidBlockNetEvent(int onTick, ushort blockId)
+        {
+            foreach (var kvp in DestroyFrigidBlockNetEventsPerClient)
+            {
+                ref var netEvent = ref kvp.Value.AddAndGet();
+                netEvent.OccuredOnTick = onTick;
+                netEvent.BlockId = blockId;
+            }
+        }
+
         public void RemoveAllEventsOlderThanTick(long clientId, int tick)
         {
             if (BulletSpawnNetEventsPerClient.TryGetValue(clientId, out var bulletSpawnNetEvents))
@@ -1240,7 +1534,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                     }
                 }
             }
-            
+
+            if (PlayerStartedExposedToLavaNetEventsPerClient.TryGetValue(clientId, out var playerStartedExposedToLavaNetEvents))
+            {
+                for (var i = playerStartedExposedToLavaNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerStartedExposedToLavaNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerStartedExposedToLavaNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PlayerEndedExposedToLavaNetEventsPerClient.TryGetValue(clientId, out var playerEndedExposedToLavaNetEvents))
+            {
+                for (var i = playerEndedExposedToLavaNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerEndedExposedToLavaNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerEndedExposedToLavaNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
             if (PlayerRejoinAcceptNetEventsPerClient.TryGetValue(clientId, out var joinAcceptNetEvents))
             {
                 for (int i = joinAcceptNetEvents.Count - 1; i >= 0; i--)
@@ -1662,6 +1978,127 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 }
             }
 
+            if (CreateFishingRodProjectileNetEventsPerClient.TryGetValue(clientId, out var createFishingRodProjectileNetEvents))
+            {
+                for (int i = createFishingRodProjectileNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (createFishingRodProjectileNetEvents[i].OccuredOnTick < tick)
+                    {
+                        createFishingRodProjectileNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (FishingRodCaughtEnemyNetEventsPerClient.TryGetValue(clientId, out var fishingRodCaughtEnemyNetEvents))
+            {
+                for (int i = fishingRodCaughtEnemyNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (fishingRodCaughtEnemyNetEvents[i].OccuredOnTick < tick)
+                    {
+                        fishingRodCaughtEnemyNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (FishingRodTipHitWallNetEventsPerClient.TryGetValue(clientId, out var fishingRodTipHitWallNetEvents))
+            {
+                for (int i = fishingRodTipHitWallNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (fishingRodTipHitWallNetEvents[i].OccuredOnTick < tick)
+                    {
+                        fishingRodTipHitWallNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (FishingRodThrowNetEventsPerClient.TryGetValue(clientId, out var fishingRodThrowNetEvents))
+            {
+                for (int i = fishingRodThrowNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (fishingRodThrowNetEvents[i].OccuredOnTick < tick)
+                    {
+                        fishingRodThrowNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateFishingRodTalentNetEventsPerClient.TryGetValue(clientId, out var deactivateFishingRodTalentNetEvents))
+            {
+                for (int i = deactivateFishingRodTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateFishingRodTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateFishingRodTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (CreateSoulGhostNetEventsPerClient.TryGetValue(clientId, out var createSoulGhostNetEvents))
+            {
+                for (int i = createSoulGhostNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (createSoulGhostNetEvents[i].OccuredOnTick < tick)
+                    {
+                        createSoulGhostNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateSoulTalentNetEventsPerClient.TryGetValue(clientId, out var deactivateSoulTalentNetEvents))
+            {
+                for (int i = deactivateSoulTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateSoulTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateSoulTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (ActivateRockTalentNetEventsPerClient.TryGetValue(clientId, out var activateRockTalentNetEvents))
+            {
+                for (int i = activateRockTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateRockTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateRockTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateRockTalentNetEventsPerClient.TryGetValue(clientId, out var deactivateRockTalentNetEvents))
+            {
+                for (int i = deactivateRockTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateRockTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateRockTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (ActivateFrozenTalentNetEventsPerClient.TryGetValue(clientId, out var activateFrozenTalentNetEvents))
+            {
+                for (int i = activateFrozenTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateFrozenTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateFrozenTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateFrozenTalentNetEventsPerClient.TryGetValue(clientId, out var deactivateFrozenTalentNetEvents))
+            {
+                for (int i = deactivateFrozenTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateFrozenTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateFrozenTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
             if (CreateMagneticPullFieldNetEventsPerClient.TryGetValue(clientId, out var createMagneticPullFieldNetEvents))
             {
                 for (int i = createMagneticPullFieldNetEvents.Count - 1; i >= 0; i--)
@@ -1691,6 +2128,72 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                     if (deactivateUmbrellaTalentNetEvents[i].OccuredOnTick < tick)
                     {
                         deactivateUmbrellaTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (ActivateWaterGunTalentNetEventsPerClient.TryGetValue(clientId, out var activateWaterGunTalentNetEvents))
+            {
+                for (int i = activateWaterGunTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateWaterGunTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateWaterGunTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateWaterGunTalentNetEventsPerClient.TryGetValue(clientId, out var deactivateWaterGunTalentNetEvents))
+            {
+                for (int i = deactivateWaterGunTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateWaterGunTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateWaterGunTalentNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (ActivateHeadbuttChargingNetEventsPerClient.TryGetValue(clientId, out var activateHeadbuttChargingNetEvents))
+            {
+                for (int i = activateHeadbuttChargingNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (activateHeadbuttChargingNetEvents[i].OccuredOnTick < tick)
+                    {
+                        activateHeadbuttChargingNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PerformHeadbuttDashNetEventsPerClient.TryGetValue(clientId, out var performHeadbuttDashNetEvents))
+            {
+                for (int i = performHeadbuttDashNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (performHeadbuttDashNetEvents[i].OccuredOnTick < tick)
+                    {
+                        performHeadbuttDashNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (HeadbuttHitEnemyNetEventsPerClient.TryGetValue(clientId, out var headbuttHitEnemyNetEvents))
+            {
+                for (int i = headbuttHitEnemyNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (headbuttHitEnemyNetEvents[i].OccuredOnTick < tick)
+                    {
+                        headbuttHitEnemyNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DeactivateHeadbuttTalentNetEventsPerClient.TryGetValue(clientId, out var deactivateHeadbuttTalentNetEvents))
+            {
+                for (int i = deactivateHeadbuttTalentNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (deactivateHeadbuttTalentNetEvents[i].OccuredOnTick < tick)
+                    {
+                        deactivateHeadbuttTalentNetEvents.RemoveAt(i);
                     }
                 }
             }
@@ -1815,6 +2318,28 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                     }
                 }
             }
+
+            if (ShootFrigidBlockNetEventsPerClient.TryGetValue(clientId, out var shootFrigidBlockNetEvents))
+            {
+                for (int i = shootFrigidBlockNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (shootFrigidBlockNetEvents[i].OccuredOnTick < tick)
+                    {
+                        shootFrigidBlockNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (DestroyFrigidBlockNetEventsPerClient.TryGetValue(clientId, out var destroyFrigidBlockNetEvents))
+            {
+                for (int i = destroyFrigidBlockNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (destroyFrigidBlockNetEvents[i].OccuredOnTick < tick)
+                    {
+                        destroyFrigidBlockNetEvents.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         public void AddStartMatchCountdownNetEvent(int onTick, ushort seconds)
@@ -1846,14 +2371,14 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
             }
         }
 
-        public void AddStageEndNetEvent(int onTick, ushort winningTeamId, Dictionary<ushort, int> jemsWon, Dictionary<ushort, int> totalJems, ushort playerIdDoingWinningBlow)
+        public void AddStageEndNetEvent(int onTick, ushort winningTeamId, Dictionary<ushort, int> jemsWon, Dictionary<ushort, int> totalJems, ushort playerIdToFocusOn)
         {
             foreach (var kvp in StageEndNetEventsPerClient)
             {
                 var packet = kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.WinningTeamId = winningTeamId;
-                packet.PlayerIdDoingWinningBlow = playerIdDoingWinningBlow;
+                packet.PlayerIdToFocusOn = playerIdToFocusOn;
                 packet.JemsWonPerTeam.Clear();
                 foreach (var jems in jemsWon)
                 {
@@ -1903,6 +2428,26 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
         public void AddPlayerSpinnedEndedNetEvent(int onTick, ushort playerId)
         {
             foreach (var kvp in PlayerSpinnedEndedNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
+            }
+        }
+
+        public void AddPlayerStartedExposedToLavaNetEvent(int onTick, ushort playerId)
+        {
+            foreach (var kvp in PlayerStartedExposedToLavaNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.PlayerId = playerId;
+            }
+        }
+
+        public void AddPlayerEndedExposedToLavaNetEvent(int onTick, ushort playerId)
+        {
+            foreach (var kvp in PlayerEndedExposedToLavaNetEventsPerClient)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
@@ -2109,6 +2654,139 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
             }
         }
 
+        public void AddCreateFishingRodProjectileNetEvent(int onTick, ushort projectileId, ushort playerCasterId, Vector2 position)
+        {
+            foreach (var kvp in CreateFishingRodProjectileNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.FishingRodProjectile.Id = projectileId;
+                packet.FishingRodProjectile.PlayerCasterId = playerCasterId;
+                packet.FishingRodProjectile.Position = position;
+                packet.FishingRodProjectile.Phase = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.FlyingForward;
+                packet.FishingRodProjectile.CaughtEnemyId = 0;
+            }
+        }
+
+        public void AddFishingRodCaughtEnemyNetEvent(int onTick, ushort projectileId, ushort casterPlayerId, ushort caughtEnemyId)
+        {
+            foreach (var kvp in FishingRodCaughtEnemyNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.ProjectileId = projectileId;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.CaughtEnemyId = caughtEnemyId;
+            }
+        }
+
+        public void AddFishingRodTipHitWallNetEvent(int onTick, ushort projectileId, Vector2 hitPosition)
+        {
+            foreach (var kvp in FishingRodTipHitWallNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.ProjectileId = projectileId;
+                packet.HitPosition = hitPosition;
+            }
+        }
+
+        public void AddFishingRodThrowNetEvent(int onTick, ushort casterPlayerId, ushort thrownEnemyId, Vector2 throwDirection)
+        {
+            foreach (var kvp in FishingRodThrowNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.ThrownEnemyId = thrownEnemyId;
+                packet.ThrowDirection = throwDirection;
+            }
+        }
+
+        public void AddDeactivateFishingRodTalentNetEvent(int onTick, ushort casterPlayerId, ushort projectileId, int talentCooldownEndTick)
+        {
+            foreach (var kvp in DeactivateFishingRodTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.ProjectileId = projectileId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+            }
+        }
+
+        public void AddCreateSoulGhostNetEvent(int onTick, ushort ghostId, ushort playerCasterId, Vector2 position, Vector2 direction)
+        {
+            foreach (var kvp in CreateSoulGhostNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.SoulGhost.Id = ghostId;
+                packet.SoulGhost.PlayerCasterId = playerCasterId;
+                packet.SoulGhost.Position = position;
+                packet.SoulGhost.Direction = direction;
+                packet.SoulGhost.Velocity = Vector2.Zero;
+            }
+        }
+
+        public void AddDeactivateSoulTalentNetEvent(int onTick, ushort ghostId, ushort casterPlayerId, int talentCooldownEndTick, bool didTeleport, Vector2 teleportPosition,
+            Vector2 teleportDirection)
+        {
+            foreach (var kvp in DeactivateSoulTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.GhostId = ghostId;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+                packet.DidTeleport = didTeleport;
+                packet.TeleportPosition = teleportPosition;
+                packet.TeleportDirection = teleportDirection;
+            }
+        }
+
+        public void AddActivateRockTalentNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in ActivateRockTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddDeactivateRockTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick)
+        {
+            foreach (var kvp in DeactivateRockTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+            }
+        }
+
+        public void AddActivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in ActivateFrozenTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddDeactivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick)
+        {
+            foreach (var kvp in DeactivateFrozenTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+            }
+        }
+
         public void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId)
         {
             foreach (var kvp in ActivateUmbrellaTalentNetEventsPerClient)
@@ -2122,6 +2800,69 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
         public void AddDeactivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick)
         {
             foreach (var kvp in DeactivateUmbrellaTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+            }
+        }
+
+        public void AddActivateWaterGunTalentNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in ActivateWaterGunTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddDeactivateWaterGunTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick)
+        {
+            foreach (var kvp in DeactivateWaterGunTalentNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.TalentCooldownEndTick = talentCooldownEndTick;
+            }
+        }
+
+        public void AddActivateHeadbuttChargingNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in ActivateHeadbuttChargingNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddPerformHeadbuttDashNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in PerformHeadbuttDashNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddHeadbuttHitEnemyNetEvent(int onTick, ushort casterPlayerId, ushort enemyPlayerId)
+        {
+            foreach (var kvp in HeadbuttHitEnemyNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+                packet.EnemyPlayerId = enemyPlayerId;
+            }
+        }
+
+        public void AddDeactivateHeadbuttTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick)
+        {
+            foreach (var kvp in DeactivateHeadbuttTalentNetEventsPerClient)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;

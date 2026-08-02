@@ -1,7 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using UnityEngine;
 using Vector2 = System.Numerics.Vector2;
-using CoreDomain.Scripts.Services.UpdateService;
 
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
@@ -13,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void UpdatePlayersTickDeltas();
         void UpdatePlayersBulletCooldowns();
         void UpdatePlayersTalentCooldowns(int currentServerTick);
+        void UpdatePlayersSelectedTalentActiveEffect();
         void ShootBulletEffectForPlayer(ushort playerId);
         void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth);
         void SetPlayerTransform(ushort playerId, Vector2 position, Vector2 direction);
@@ -30,7 +30,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void SetPlayersSpinnedState(ushort playerId, bool isOn);
         void SetPlayerUmbrellaState(ushort playerId, bool isOn);
         void SetPlayerCurrentPowerUp(ushort playerId, PowerUpType powerUpType);
+        void SetPlayerWaterGunState(ushort playerId, bool isOn);
+        void SetPlayerFishingRodStickState(ushort playerId, bool isOn);
+        void SetPlayerFishingRodStickDirection(ushort playerId, bool isDirectionRight);
+        UnityEngine.Vector2 GetPlayerFishingRodTipPivotPosition(ushort playerId);
+        void SetPlayerHeadbuttChargingState(ushort playerId, bool isCharging);
+        void ShowPlayerHeadbuttHelmet(ushort playerId);
+        void HidePlayerHeadbuttHelmet(ushort playerId);
+        void OnPlayerHeadbuttTalentDeactivated(ushort playerId);
         void SetPlayerChickenState(ushort playerId, bool isOn);
+        void SetPlayerRockState(ushort playerId, bool isRock);
+        void SetPlayerFrozenState(ushort playerId, bool isFrozen);
+        void SetPlayerOnLavaEffectState(ushort playerId, bool isExposedToLava);
         void PlayLayEggAnimation(ushort playerId);
         void PlayerYearsOfPainForPlayer(ushort playerId, Vector2 direction);
         void PlaySonicSnapEffectForPlayer(ushort playerId);
@@ -40,5 +51,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         void SetIsDeadAuraEnabled(ushort playerId, bool isEnabled);
         void SetPlayerIsLockOnTargetSightShown(ushort playerId, bool isShown);
         void SetIsPlayerKinged(ushort playerId, bool isKinged);
+        void RefreshLeaderFlags();
     }
 }

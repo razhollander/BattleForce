@@ -119,6 +119,8 @@ MonoBehaviour:
         0.5 },\n    \"Size\": { \"x\": 1.2, \"y\": 1.2 },\n    \"Shape\": \"Circle\"\n 
         }\n]"
       _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":0.0,"Y":0.0}},{"Position":{"X":-15.6,"Y":-16.7}},{"Position":{"X":-22.6,"Y":15.4}},{"Position":{"X":21.9,"Y":10.0}},{"Position":{"X":16.3,"Y":-15.5}}]'
+      _cameraBoundariesJson: 
     - _environmentName: 
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
@@ -144,6 +146,8 @@ MonoBehaviour:
       _rotatingWheelsJson: 
       _fieldBarriersJson: 
       _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: 
+      _cameraBoundariesJson: 
     - _environmentName: A
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: "[\n  {\n    \"Id\": 1,\n    \"Points\": [\n      { \"X\": 20.0,
@@ -267,6 +271,8 @@ MonoBehaviour:
         ]\n      }\n    ]\n  }\n]"
       _fieldBarriersJson: 
       _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: 
+      _cameraBoundariesJson: 
     - _environmentName: GPU
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: "[\n  {\"Id\": 1, \"Points\": [{\"X\": 22.50, \"Y\": 14.00}, {\"X\":
@@ -611,6 +617,8 @@ MonoBehaviour:
         8.0 },\n    \"Size\": { \"x\": 3.5, \"y\": 3.5 },\n    \"Shape\": \"Circle\"\n 
         }\n]"
       _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":0.0,"Y":0.0}},{"Position":{"X":-14.1,"Y":-7.1}},{"Position":{"X":-20.9,"Y":8.2}},{"Position":{"X":19.1,"Y":5.1}},{"Position":{"X":17.0,"Y":-8.8}}]'
+      _cameraBoundariesJson: '{"TopLeft":{"X":-39.45,"Y":24.73},"BottomRight":{"X":39.8,"Y":-30.9}}'
     - _environmentName: Middle Lava River
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
@@ -659,6 +667,8 @@ MonoBehaviour:
         {\n      \"x\": 22,\n      \"y\": -14\n    },\n    \"Size\": {\n      \"x\":
         5,\n      \"y\": 5\n    },\n    \"Shape\": \"Circle\"\n  }\n]"
       _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":0.0,"Y":0.0}},{"Position":{"X":-30.9,"Y":-19.3}},{"Position":{"X":-22.6,"Y":15.4}},{"Position":{"X":22.3,"Y":11.0}},{"Position":{"X":33.1,"Y":-17.3}}]'
+      _cameraBoundariesJson: 
     - _environmentName: Swiss
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: "[\n  {\n    \"Id\": 6,\n    \"Points\": [\n      { \"X\": -28.16,
@@ -705,6 +715,8 @@ MonoBehaviour:
         \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\":
         \"Circle\"\n  }\n]"
       _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":0.0,"Y":0.0}},{"Position":{"X":-16.1,"Y":-18.1}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":20.5,"Y":14.2}},{"Position":{"X":15.6,"Y":-15.9}}]'
+      _cameraBoundariesJson: 
     - _environmentName: 4 rooms
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: "[\n  { \"Id\": 1, \"Points\": [{\"X\": 2, \"Y\": 26.16}, {\"X\":
@@ -771,6 +783,8 @@ MonoBehaviour:
         \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\":
         \"Circle\"\n  }\n]"
       _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":-19.3,"Y":8.4}},{"Position":{"X":-13.0,"Y":-21.2}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":15.1,"Y":15.6}},{"Position":{"X":-19.9,"Y":-10.4}},{"Position":{"X":9.3,"Y":-20.1}},{"Position":{"X":9.7,"Y":8.3}},{"Position":{"X":21.3,"Y":-10.1}}]'
+      _cameraBoundariesJson: 
     - _environmentName: Testing
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
@@ -812,6 +826,8 @@ MonoBehaviour:
         \"Size\": {\n      \"x\": 3.5,\n      \"y\": 3.5\n    },\n    \"Shape\":
         \"Circle\"\n  }\n]"
       _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":-30.5,"Y":15.1}},{"Position":{"X":-13.0,"Y":-21.2}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":24.6,"Y":16.9}},{"Position":{"X":-32.2,"Y":-15.3}},{"Position":{"X":19.5,"Y":-14.1}},{"Position":{"X":-8.2,"Y":-3.3}},{"Position":{"X":30.6,"Y":1.0}}]'
+      _cameraBoundariesJson: 
     - _environmentName: Big Empty
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: '[{     "Id": 6,     "Points": [       {         "X": -47.324464,        
@@ -835,8 +851,10 @@ MonoBehaviour:
       _environmentSpikesJson: 
       _teleportGatesJson: 
       _rotatingWheelsJson: 
-      _fieldBarriersJson: 
+      _fieldBarriersJson: '[{"Position":{"x":-38,"y":-20},"Size":{"x":4,"y":4},"Shape":"Circle"},{"Position":{"x":38,"y":20},"Size":{"x":4,"y":4},"Shape":"Circle"},{"Position":{"x":-38,"y":20},"Size":{"x":4,"y":4},"Shape":"Circle"},{"Position":{"x":38,"y":-20},"Size":{"x":4,"y":4},"Shape":"Circle"}]'
       _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":-30.5,"Y":15.1}},{"Position":{"X":-13.0,"Y":-21.2}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":24.6,"Y":16.9}},{"Position":{"X":-32.2,"Y":-15.3}},{"Position":{"X":19.5,"Y":-14.1}},{"Position":{"X":-8.2,"Y":-3.3}},{"Position":{"X":30.6,"Y":1.0}}]'
+      _cameraBoundariesJson: 
     - _environmentName: Crazy Eyes
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: "[\n  {\n    \"Id\": 1,\n    \"Points\": [\n      { \"X\": -47.32,
@@ -917,6 +935,8 @@ MonoBehaviour:
         {\n      \"x\": 22,\n      \"y\": -14\n    },\n    \"Size\": {\n      \"x\":
         5,\n      \"y\": 5\n    },\n    \"Shape\": \"Circle\"\n  }\n]"
       _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":-30.5,"Y":15.1}},{"Position":{"X":2.4,"Y":-17.3}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":24.6,"Y":16.9}},{"Position":{"X":-32.2,"Y":-15.3}},{"Position":{"X":-1.2,"Y":-1.6}},{"Position":{"X":30.0,"Y":-17.8}},{"Position":{"X":30.6,"Y":1.0}}]'
+      _cameraBoundariesJson: 
     - _environmentName: Earphone
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
       _wallsJson: "[\n  {\"Id\": 1, \"Points\": [{\"X\": 0.00, \"Y\": -30.00}, {\"X\":
@@ -978,8 +998,8 @@ MonoBehaviour:
       _teleportGatesJson: "[\n  {\n    \"Id\": 1,\n    \"GateA\": {\n      \"Position\":
         {\n        \"X\": 1,\n        \"Y\": 24\n      },\n      \"NormalRotation\":
         0,\n      \"AttachToRotationWheelId\": 101\n    },\n    \"GateB\": {\n     
-        \"Position\": {\n        \"X\": -36,\n        \"Y\": -24.75\n      },\n
-        \"NormalRotation\": 0\n    }\n  }\n]"
+        \"Position\": {\n        \"X\": -36,\n        \"Y\": -24.75\n      },\n \"NormalRotation\":
+        0\n    }\n  }\n]"
       _rotatingWheelsJson: "[\n  {\n    \"Id\": 101,\n    \"CenterPosition\": {\n     
         \"X\": 0,\n      \"Y\": 0\n    },\n    \"RotationSpeed\": -12,\n    \"Walls\":
         [\n      {\n        \"Id\": 201,\n        \"Position\": {\n          \"X\":
@@ -997,49 +1017,59 @@ MonoBehaviour:
         \"Shape\": \"Circle\"\n  },\n  {\n    \"Position\": { \"x\": 18.0, \"y\":
         8.0 },\n    \"Size\": { \"x\": 3.5, \"y\": 3.5 },\n    \"Shape\": \"Circle\"\n
         }\n]"
-      _stageBoundriesWallsJson:
+      _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":-26.6,"Y":-24.7}},{"Position":{"X":7.7,"Y":-20.9}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":-17.8,"Y":5.7}},{"Position":{"X":-33.6,"Y":-23.5}},{"Position":{"X":-8.0,"Y":-9.3}},{"Position":{"X":21.4,"Y":-6.4}},{"Position":{"X":12.5,"Y":12.7}}]'
+      _cameraBoundariesJson: 
     - _environmentName: Pinwheel Bounce
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
-      _wallsJson: "[{\"Id\":6,\"Points\":[{\"X\":-47.324464,\"Y\":-28.16},{\"X\":-43.804464,\"Y\":-28.16},{\"X\":-43.804464,\"Y\":28.16},{\"X\":-47.324464,\"Y\":28.16}]},{\"Id\":7,\"Points\":[{\"X\":43.804464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":28.16},{\"X\":43.804464,\"Y\":28.16}]},{\"Id\":8,\"Points\":[{\"X\":-47.324464,\"Y\":24.64},{\"X\":47.324464,\"Y\":24.64},{\"X\":47.324464,\"Y\":28.16},{\"X\":-47.324464,\"Y\":28.16}]},{\"Id\":9,\"Points\":[{\"X\":-47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-24.64},{\"X\":-47.324464,\"Y\":-24.64}]}]"
-      _lavaWallsJson: "[{\"Id\":10,\"Points\":[{\"X\":-3,\"Y\":-3},{\"X\":3,\"Y\":-3},{\"X\":3,\"Y\":3},{\"X\":-3,\"Y\":3}]}]"
-      _talentCardsJson: "[{\"Id\":1,\"Position\":{\"X\":-20,\"Y\":10},\"TalentType\":\"Swap\"},{\"Id\":2,\"Position\":{\"X\":20,\"Y\":-10},\"TalentType\":\"KO\"},{\"Id\":3,\"Position\":{\"X\":-20,\"Y\":-10},\"TalentType\":\"SentryGun\"},{\"Id\":4,\"Position\":{\"X\":20,\"Y\":10},\"TalentType\":\"DashPulse\"}]"
-      _environmentSpringsJson: "[{\"Id\":1,\"Position\":{\"X\":0,\"Y\":6},\"DirectionAngle\":90},{\"Id\":2,\"Position\":{\"X\":0,\"Y\":-6},\"DirectionAngle\":270},{\"Id\":3,\"Position\":{\"X\":6,\"Y\":0},\"DirectionAngle\":0},{\"Id\":4,\"Position\":{\"X\":-6,\"Y\":0},\"DirectionAngle\":180}]"
-      _environmentSpikesJson:
-      _teleportGatesJson: "[{\"Id\":1,\"GateA\":{\"Position\":{\"X\":0,\"Y\":24.64},\"NormalRotation\":270},\"GateB\":{\"Position\":{\"X\":0,\"Y\":-24.64},\"NormalRotation\":90}}]"
-      _rotatingWheelsJson: "[{\"Id\":100,\"CenterPosition\":{\"X\":28,\"Y\":0},\"RotationSpeed\":15,\"Walls\":[{\"Id\":101,\"Position\":{\"X\":0,\"Y\":0},\"Points\":[{\"X\":-10,\"Y\":0.5},{\"X\":10,\"Y\":0.5},{\"X\":10,\"Y\":-0.5},{\"X\":-10,\"Y\":-0.5}]}],\"Spikes\":[{\"Id\":101,\"Position\":{\"X\":10,\"Y\":0},\"DirectionAngle\":0}]},{\"Id\":110,\"CenterPosition\":{\"X\":-28,\"Y\":0},\"RotationSpeed\":-15,\"Walls\":[{\"Id\":111,\"Position\":{\"X\":0,\"Y\":0},\"Points\":[{\"X\":-10,\"Y\":0.5},{\"X\":10,\"Y\":0.5},{\"X\":10,\"Y\":-0.5},{\"X\":-10,\"Y\":-0.5}]}],\"Spikes\":[{\"Id\":111,\"Position\":{\"X\":-10,\"Y\":0},\"DirectionAngle\":180}]}]"
-      _fieldBarriersJson: "[{\"Position\":{\"x\":-38,\"y\":-20},\"Size\":{\"x\":4,\"y\":4},\"Shape\":\"Circle\"},{\"Position\":{\"x\":38,\"y\":20},\"Size\":{\"x\":4,\"y\":4},\"Shape\":\"Circle\"},{\"Position\":{\"x\":-38,\"y\":20},\"Size\":{\"x\":4,\"y\":4},\"Shape\":\"Circle\"},{\"Position\":{\"x\":38,\"y\":-20},\"Size\":{\"x\":4,\"y\":4},\"Shape\":\"Circle\"}]"
-      _stageBoundriesWallsJson:
+      _wallsJson: '[{"Id":6,"Points":[{"X":-47.324464,"Y":-28.16},{"X":-43.804464,"Y":-28.16},{"X":-43.804464,"Y":28.16},{"X":-47.324464,"Y":28.16}]},{"Id":7,"Points":[{"X":43.804464,"Y":-28.16},{"X":47.324464,"Y":-28.16},{"X":47.324464,"Y":28.16},{"X":43.804464,"Y":28.16}]},{"Id":8,"Points":[{"X":-47.324464,"Y":24.64},{"X":47.324464,"Y":24.64},{"X":47.324464,"Y":28.16},{"X":-47.324464,"Y":28.16}]},{"Id":9,"Points":[{"X":-47.324464,"Y":-28.16},{"X":47.324464,"Y":-28.16},{"X":47.324464,"Y":-24.64},{"X":-47.324464,"Y":-24.64}]}]'
+      _lavaWallsJson: '[{"Id":10,"Points":[{"X":-3,"Y":-3},{"X":3,"Y":-3},{"X":3,"Y":3},{"X":-3,"Y":3}]}]'
+      _talentCardsJson: '[{"Id":1,"Position":{"X":-20,"Y":10},"TalentType":"Swap"},{"Id":2,"Position":{"X":20,"Y":-10},"TalentType":"KO"},{"Id":3,"Position":{"X":-20,"Y":-10},"TalentType":"SentryGun"},{"Id":4,"Position":{"X":20,"Y":10},"TalentType":"DashPulse"}]'
+      _environmentSpringsJson: '[{"Id":1,"Position":{"X":0,"Y":6},"DirectionAngle":90},{"Id":2,"Position":{"X":0,"Y":-6},"DirectionAngle":270},{"Id":3,"Position":{"X":6,"Y":0},"DirectionAngle":0},{"Id":4,"Position":{"X":-6,"Y":0},"DirectionAngle":180}]'
+      _environmentSpikesJson: 
+      _teleportGatesJson: '[{"Id":1,"GateA":{"Position":{"X":0,"Y":24.64},"NormalRotation":270},"GateB":{"Position":{"X":0,"Y":-24.64},"NormalRotation":90}}]'
+      _rotatingWheelsJson: '[{"Id":100,"CenterPosition":{"X":28,"Y":0},"RotationSpeed":15,"Walls":[{"Id":101,"Position":{"X":0,"Y":0},"Points":[{"X":-10,"Y":0.5},{"X":10,"Y":0.5},{"X":10,"Y":-0.5},{"X":-10,"Y":-0.5}]}],"Spikes":[{"Id":101,"Position":{"X":10,"Y":0},"DirectionAngle":0}]},{"Id":110,"CenterPosition":{"X":-28,"Y":0},"RotationSpeed":-15,"Walls":[{"Id":111,"Position":{"X":0,"Y":0},"Points":[{"X":-10,"Y":0.5},{"X":10,"Y":0.5},{"X":10,"Y":-0.5},{"X":-10,"Y":-0.5}]}],"Spikes":[{"Id":111,"Position":{"X":-10,"Y":0},"DirectionAngle":180}]}]'
+      _fieldBarriersJson: '[{"Position":{"x":-38,"y":-20},"Size":{"x":4,"y":4},"Shape":"Circle"},{"Position":{"x":38,"y":20},"Size":{"x":4,"y":4},"Shape":"Circle"},{"Position":{"x":-38,"y":20},"Size":{"x":4,"y":4},"Shape":"Circle"},{"Position":{"x":38,"y":-20},"Size":{"x":4,"y":4},"Shape":"Circle"}]'
+      _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":-30.5,"Y":15.1}},{"Position":{"X":-13.0,"Y":-21.2}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":24.6,"Y":16.9}},{"Position":{"X":-32.2,"Y":-15.3}},{"Position":{"X":19.5,"Y":-14.1}},{"Position":{"X":36.6,"Y":-19.6}},{"Position":{"X":30.6,"Y":1.0}}]'
+      _cameraBoundariesJson: 
     - _environmentName: Twin Rivers
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
-      _wallsJson: "[{\"Id\":6,\"Points\":[{\"X\":-47.324464,\"Y\":-28.16},{\"X\":-43.804464,\"Y\":-28.16},{\"X\":-43.804464,\"Y\":28.16},{\"X\":-47.324464,\"Y\":28.16}]},{\"Id\":7,\"Points\":[{\"X\":43.804464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":28.16},{\"X\":43.804464,\"Y\":28.16}]},{\"Id\":8,\"Points\":[{\"X\":-47.324464,\"Y\":24.64},{\"X\":47.324464,\"Y\":24.64},{\"X\":47.324464,\"Y\":28.16},{\"X\":-47.324464,\"Y\":28.16}]},{\"Id\":9,\"Points\":[{\"X\":-47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-24.64},{\"X\":-47.324464,\"Y\":-24.64}]}]"
-      _lavaWallsJson: "[{\"Id\":10,\"Points\":[{\"X\":-43.804464,\"Y\":6},{\"X\":43.804464,\"Y\":6},{\"X\":43.804464,\"Y\":10},{\"X\":-43.804464,\"Y\":10}]},{\"Id\":11,\"Points\":[{\"X\":-43.804464,\"Y\":-10},{\"X\":43.804464,\"Y\":-10},{\"X\":43.804464,\"Y\":-6},{\"X\":-43.804464,\"Y\":-6}]}]"
-      _talentCardsJson: "[{\"Id\":1,\"Position\":{\"X\":-30,\"Y\":14},\"TalentType\":\"Umbrella\"},{\"Id\":2,\"Position\":{\"X\":30,\"Y\":-14},\"TalentType\":\"MagneticPull\"},{\"Id\":3,\"Position\":{\"X\":-30,\"Y\":-14},\"TalentType\":\"Chicken\"},{\"Id\":4,\"Position\":{\"X\":30,\"Y\":14},\"TalentType\":\"GrapplingHook\"}]"
-      _environmentSpringsJson: "[{\"Id\":1,\"Position\":{\"X\":-15,\"Y\":0},\"DirectionAngle\":0},{\"Id\":2,\"Position\":{\"X\":15,\"Y\":0},\"DirectionAngle\":180}]"
-      _environmentSpikesJson: "[{\"Id\":1,\"Position\":{\"X\":0,\"Y\":24.1},\"DirectionAngle\":270},{\"Id\":2,\"Position\":{\"X\":0,\"Y\":-24.1},\"DirectionAngle\":90}]"
-      _teleportGatesJson: "[{\"Id\":1,\"GateA\":{\"Position\":{\"X\":0,\"Y\":5.5},\"NormalRotation\":90},\"GateB\":{\"Position\":{\"X\":0,\"Y\":10.5},\"NormalRotation\":270}},{\"Id\":2,\"GateA\":{\"Position\":{\"X\":0,\"Y\":-5.5},\"NormalRotation\":270},\"GateB\":{\"Position\":{\"X\":0,\"Y\":-10.5},\"NormalRotation\":90}}]"
-      _rotatingWheelsJson:
-      _fieldBarriersJson: "[{\"Position\":{\"x\":-15,\"y\":14},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"},{\"Position\":{\"x\":15,\"y\":14},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"},{\"Position\":{\"x\":-15,\"y\":-14},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"},{\"Position\":{\"x\":15,\"y\":-14},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"}]"
-      _stageBoundriesWallsJson:
+      _wallsJson: '[{"Id":6,"Points":[{"X":-47.324464,"Y":-28.16},{"X":-43.804464,"Y":-28.16},{"X":-43.804464,"Y":28.16},{"X":-47.324464,"Y":28.16}]},{"Id":7,"Points":[{"X":43.804464,"Y":-28.16},{"X":47.324464,"Y":-28.16},{"X":47.324464,"Y":28.16},{"X":43.804464,"Y":28.16}]},{"Id":8,"Points":[{"X":-47.324464,"Y":24.64},{"X":47.324464,"Y":24.64},{"X":47.324464,"Y":28.16},{"X":-47.324464,"Y":28.16}]},{"Id":9,"Points":[{"X":-47.324464,"Y":-28.16},{"X":47.324464,"Y":-28.16},{"X":47.324464,"Y":-24.64},{"X":-47.324464,"Y":-24.64}]}]'
+      _lavaWallsJson: '[{"Id":10,"Points":[{"X":-43.804464,"Y":6},{"X":43.804464,"Y":6},{"X":43.804464,"Y":10},{"X":-43.804464,"Y":10}]},{"Id":11,"Points":[{"X":-43.804464,"Y":-10},{"X":43.804464,"Y":-10},{"X":43.804464,"Y":-6},{"X":-43.804464,"Y":-6}]}]'
+      _talentCardsJson: '[{"Id":1,"Position":{"X":-30,"Y":14},"TalentType":"Umbrella"},{"Id":2,"Position":{"X":30,"Y":-14},"TalentType":"MagneticPull"},{"Id":3,"Position":{"X":-30,"Y":-14},"TalentType":"Chicken"},{"Id":4,"Position":{"X":30,"Y":14},"TalentType":"GrapplingHook"}]'
+      _environmentSpringsJson: '[{"Id":1,"Position":{"X":-15,"Y":0},"DirectionAngle":0},{"Id":2,"Position":{"X":15,"Y":0},"DirectionAngle":180}]'
+      _environmentSpikesJson: '[{"Id":1,"Position":{"X":0,"Y":24.1},"DirectionAngle":270},{"Id":2,"Position":{"X":0,"Y":-24.1},"DirectionAngle":90}]'
+      _teleportGatesJson: '[{"Id":1,"GateA":{"Position":{"X":0,"Y":5.5},"NormalRotation":90},"GateB":{"Position":{"X":0,"Y":10.5},"NormalRotation":270}},{"Id":2,"GateA":{"Position":{"X":0,"Y":-5.5},"NormalRotation":270},"GateB":{"Position":{"X":0,"Y":-10.5},"NormalRotation":90}}]'
+      _rotatingWheelsJson: 
+      _fieldBarriersJson: '[{"Position":{"x":-15,"y":14},"Size":{"x":3,"y":3},"Shape":"Circle"},{"Position":{"x":15,"y":14},"Size":{"x":3,"y":3},"Shape":"Circle"},{"Position":{"x":-15,"y":-14},"Size":{"x":3,"y":3},"Shape":"Circle"},{"Position":{"x":15,"y":-14},"Size":{"x":3,"y":3},"Shape":"Circle"}]'
+      _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":-30.5,"Y":15.1}},{"Position":{"X":6.0,"Y":-17.6}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":24.6,"Y":16.9}},{"Position":{"X":-32.2,"Y":-15.3}},{"Position":{"X":-6.3,"Y":-2.0}},{"Position":{"X":36.6,"Y":-19.6}},{"Position":{"X":30.6,"Y":1.0}}]'
+      _cameraBoundariesJson: 
     - _environmentName: Solar Flare
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
-      _wallsJson: "[{\"Id\":6,\"Points\":[{\"X\":-47.324464,\"Y\":-28.16},{\"X\":-43.804464,\"Y\":-28.16},{\"X\":-43.804464,\"Y\":28.16},{\"X\":-47.324464,\"Y\":28.16}]},{\"Id\":7,\"Points\":[{\"X\":43.804464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":28.16},{\"X\":43.804464,\"Y\":28.16}]},{\"Id\":8,\"Points\":[{\"X\":-47.324464,\"Y\":24.64},{\"X\":47.324464,\"Y\":24.64},{\"X\":47.324464,\"Y\":28.16},{\"X\":-47.324464,\"Y\":28.16}]},{\"Id\":9,\"Points\":[{\"X\":-47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-24.64},{\"X\":-47.324464,\"Y\":-24.64}]}]"
-      _lavaWallsJson: "[{\"Id\":10,\"Points\":[{\"X\":0,\"Y\":5},{\"X\":5,\"Y\":0},{\"X\":0,\"Y\":-5},{\"X\":-5,\"Y\":0}]}]"
-      _talentCardsJson: "[{\"Id\":1,\"Position\":{\"X\":0,\"Y\":18},\"TalentType\":\"YearsOfPain\"},{\"Id\":2,\"Position\":{\"X\":-35,\"Y\":-8},\"TalentType\":\"Swap\"},{\"Id\":3,\"Position\":{\"X\":35,\"Y\":8},\"TalentType\":\"DashPulse\"}]"
-      _environmentSpringsJson: "[{\"Id\":1,\"Position\":{\"X\":0,\"Y\":20},\"DirectionAngle\":270},{\"Id\":2,\"Position\":{\"X\":0,\"Y\":-20},\"DirectionAngle\":90}]"
-      _environmentSpikesJson:
-      _teleportGatesJson: "[{\"Id\":1,\"GateA\":{\"Position\":{\"X\":-40,\"Y\":0},\"NormalRotation\":0},\"GateB\":{\"Position\":{\"X\":40,\"Y\":0},\"NormalRotation\":180}}]"
-      _rotatingWheelsJson: "[{\"Id\":100,\"CenterPosition\":{\"X\":0,\"Y\":0},\"RotationSpeed\":25,\"Walls\":[{\"Id\":101,\"Position\":{\"X\":0,\"Y\":0},\"Points\":[{\"X\":-18,\"Y\":0.6},{\"X\":18,\"Y\":0.6},{\"X\":18,\"Y\":-0.6},{\"X\":-18,\"Y\":-0.6}]}],\"Spikes\":[{\"Id\":101,\"Position\":{\"X\":18,\"Y\":0},\"DirectionAngle\":0},{\"Id\":102,\"Position\":{\"X\":-18,\"Y\":0},\"DirectionAngle\":180}]}]"
-      _fieldBarriersJson: "[{\"Position\":{\"x\":-38,\"y\":-20},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"},{\"Position\":{\"x\":38,\"y\":20},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"},{\"Position\":{\"x\":-38,\"y\":20},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"},{\"Position\":{\"x\":38,\"y\":-20},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"}]"
-      _stageBoundriesWallsJson:
+      _wallsJson: '[{"Id":6,"Points":[{"X":-47.324464,"Y":-28.16},{"X":-43.804464,"Y":-28.16},{"X":-43.804464,"Y":28.16},{"X":-47.324464,"Y":28.16}]},{"Id":7,"Points":[{"X":43.804464,"Y":-28.16},{"X":47.324464,"Y":-28.16},{"X":47.324464,"Y":28.16},{"X":43.804464,"Y":28.16}]},{"Id":8,"Points":[{"X":-47.324464,"Y":24.64},{"X":47.324464,"Y":24.64},{"X":47.324464,"Y":28.16},{"X":-47.324464,"Y":28.16}]},{"Id":9,"Points":[{"X":-47.324464,"Y":-28.16},{"X":47.324464,"Y":-28.16},{"X":47.324464,"Y":-24.64},{"X":-47.324464,"Y":-24.64}]}]'
+      _lavaWallsJson: '[{"Id":10,"Points":[{"X":0,"Y":5},{"X":5,"Y":0},{"X":0,"Y":-5},{"X":-5,"Y":0}]}]'
+      _talentCardsJson: '[{"Id":1,"Position":{"X":0,"Y":18},"TalentType":"YearsOfPain"},{"Id":2,"Position":{"X":-35,"Y":-8},"TalentType":"Swap"},{"Id":3,"Position":{"X":35,"Y":8},"TalentType":"DashPulse"}]'
+      _environmentSpringsJson: '[{"Id":1,"Position":{"X":0,"Y":20},"DirectionAngle":270},{"Id":2,"Position":{"X":0,"Y":-20},"DirectionAngle":90}]'
+      _environmentSpikesJson: 
+      _teleportGatesJson: '[{"Id":1,"GateA":{"Position":{"X":-40,"Y":0},"NormalRotation":0},"GateB":{"Position":{"X":40,"Y":0},"NormalRotation":180}}]'
+      _rotatingWheelsJson: '[{"Id":100,"CenterPosition":{"X":0,"Y":0},"RotationSpeed":25,"Walls":[{"Id":101,"Position":{"X":0,"Y":0},"Points":[{"X":-18,"Y":0.6},{"X":18,"Y":0.6},{"X":18,"Y":-0.6},{"X":-18,"Y":-0.6}]}],"Spikes":[{"Id":101,"Position":{"X":18,"Y":0},"DirectionAngle":0},{"Id":102,"Position":{"X":-18,"Y":0},"DirectionAngle":180}]}]'
+      _fieldBarriersJson: '[{"Position":{"x":-38,"y":-20},"Size":{"x":3,"y":3},"Shape":"Circle"},{"Position":{"x":38,"y":20},"Size":{"x":3,"y":3},"Shape":"Circle"},{"Position":{"x":-38,"y":20},"Size":{"x":3,"y":3},"Shape":"Circle"},{"Position":{"x":38,"y":-20},"Size":{"x":3,"y":3},"Shape":"Circle"}]'
+      _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":-35.6,"Y":2.4}},{"Position":{"X":7.7,"Y":-20.9}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":-17.8,"Y":5.7}},{"Position":{"X":-29.0,"Y":-15.9}},{"Position":{"X":19.2,"Y":-0.7}},{"Position":{"X":30.8,"Y":-13.2}},{"Position":{"X":29.5,"Y":17.8}}]'
+      _cameraBoundariesJson: 
     - _environmentName: Convergence
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
-      _wallsJson: "[{\"Id\":6,\"Points\":[{\"X\":-47.324464,\"Y\":-28.16},{\"X\":-43.804464,\"Y\":-28.16},{\"X\":-43.804464,\"Y\":28.16},{\"X\":-47.324464,\"Y\":28.16}]},{\"Id\":7,\"Points\":[{\"X\":43.804464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":28.16},{\"X\":43.804464,\"Y\":28.16}]},{\"Id\":8,\"Points\":[{\"X\":-47.324464,\"Y\":24.64},{\"X\":47.324464,\"Y\":24.64},{\"X\":47.324464,\"Y\":28.16},{\"X\":-47.324464,\"Y\":28.16}]},{\"Id\":9,\"Points\":[{\"X\":-47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-28.16},{\"X\":47.324464,\"Y\":-24.64},{\"X\":-47.324464,\"Y\":-24.64}]},{\"Id\":20,\"Points\":[{\"X\":-35,\"Y\":3},{\"X\":42,\"Y\":3},{\"X\":42,\"Y\":4},{\"X\":-35,\"Y\":4}]},{\"Id\":21,\"Points\":[{\"X\":-35,\"Y\":-4},{\"X\":42,\"Y\":-4},{\"X\":42,\"Y\":-3},{\"X\":-35,\"Y\":-3}]}]"
-      _lavaWallsJson: "[{\"Id\":10,\"Points\":[{\"X\":38,\"Y\":-3},{\"X\":43,\"Y\":-3},{\"X\":43,\"Y\":3},{\"X\":38,\"Y\":3}]}]"
-      _talentCardsJson: "[{\"Id\":1,\"Position\":{\"X\":-35,\"Y\":15},\"TalentType\":\"DashPulse\"},{\"Id\":2,\"Position\":{\"X\":35,\"Y\":-15},\"TalentType\":\"SentryGun\"}]"
-      _environmentSpringsJson: "[{\"Id\":1,\"Position\":{\"X\":-38,\"Y\":0},\"DirectionAngle\":0}]"
-      _environmentSpikesJson:
-      _teleportGatesJson: "[{\"Id\":1,\"GateA\":{\"Position\":{\"X\":2.5,\"Y\":0},\"NormalRotation\":0,\"AttachToRotationWheelId\":100},\"GateB\":{\"Position\":{\"X\":-9.5,\"Y\":0},\"NormalRotation\":0}},{\"Id\":2,\"GateA\":{\"Position\":{\"X\":2.5,\"Y\":0},\"NormalRotation\":0,\"AttachToRotationWheelId\":110},\"GateB\":{\"Position\":{\"X\":2.5,\"Y\":0},\"NormalRotation\":0}},{\"Id\":3,\"GateA\":{\"Position\":{\"X\":2.5,\"Y\":0},\"NormalRotation\":0,\"AttachToRotationWheelId\":120},\"GateB\":{\"Position\":{\"X\":14.5,\"Y\":0},\"NormalRotation\":0}},{\"Id\":4,\"GateA\":{\"Position\":{\"X\":2.5,\"Y\":0},\"NormalRotation\":0,\"AttachToRotationWheelId\":130},\"GateB\":{\"Position\":{\"X\":26.5,\"Y\":0},\"NormalRotation\":0}},{\"Id\":5,\"GateA\":{\"Position\":{\"X\":2.5,\"Y\":0},\"NormalRotation\":0,\"AttachToRotationWheelId\":140},\"GateB\":{\"Position\":{\"X\":40,\"Y\":0},\"NormalRotation\":0}}]"
-      _rotatingWheelsJson: "[{\"Id\":100,\"CenterPosition\":{\"X\":-24,\"Y\":0},\"RotationSpeed\":30,\"Walls\":[{\"Id\":101,\"Position\":{\"X\":0,\"Y\":0},\"Points\":[{\"X\":0,\"Y\":-0.3},{\"X\":2.5,\"Y\":-0.3},{\"X\":2.5,\"Y\":0.3},{\"X\":0,\"Y\":0.3}]}]},{\"Id\":110,\"CenterPosition\":{\"X\":-12,\"Y\":0},\"RotationSpeed\":30,\"Walls\":[{\"Id\":111,\"Position\":{\"X\":0,\"Y\":0},\"Points\":[{\"X\":0,\"Y\":-0.3},{\"X\":2.5,\"Y\":-0.3},{\"X\":2.5,\"Y\":0.3},{\"X\":0,\"Y\":0.3}]}]},{\"Id\":120,\"CenterPosition\":{\"X\":0,\"Y\":0},\"RotationSpeed\":30,\"Walls\":[{\"Id\":121,\"Position\":{\"X\":0,\"Y\":0},\"Points\":[{\"X\":0,\"Y\":-0.3},{\"X\":2.5,\"Y\":-0.3},{\"X\":2.5,\"Y\":0.3},{\"X\":0,\"Y\":0.3}]}]},{\"Id\":130,\"CenterPosition\":{\"X\":12,\"Y\":0},\"RotationSpeed\":30,\"Walls\":[{\"Id\":131,\"Position\":{\"X\":0,\"Y\":0},\"Points\":[{\"X\":0,\"Y\":-0.3},{\"X\":2.5,\"Y\":-0.3},{\"X\":2.5,\"Y\":0.3},{\"X\":0,\"Y\":0.3}]}]},{\"Id\":140,\"CenterPosition\":{\"X\":24,\"Y\":0},\"RotationSpeed\":30,\"Walls\":[{\"Id\":141,\"Position\":{\"X\":0,\"Y\":0},\"Points\":[{\"X\":0,\"Y\":-0.3},{\"X\":2.5,\"Y\":-0.3},{\"X\":2.5,\"Y\":0.3},{\"X\":0,\"Y\":0.3}]}]}]"
-      _fieldBarriersJson: "[{\"Position\":{\"x\":-38,\"y\":-18},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"},{\"Position\":{\"x\":38,\"y\":18},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"},{\"Position\":{\"x\":38,\"y\":-18},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"},{\"Position\":{\"x\":-38,\"y\":18},\"Size\":{\"x\":3,\"y\":3},\"Shape\":\"Circle\"}]"
-      _stageBoundriesWallsJson:
-  AvailableLayoutIndexes: 000000000300000004000000050000000a0000000b00000008000000090000000c0000000d000000
+      _wallsJson: '[{"Id":6,"Points":[{"X":-47.324464,"Y":-28.16},{"X":-43.804464,"Y":-28.16},{"X":-43.804464,"Y":28.16},{"X":-47.324464,"Y":28.16}]},{"Id":7,"Points":[{"X":43.804464,"Y":-28.16},{"X":47.324464,"Y":-28.16},{"X":47.324464,"Y":28.16},{"X":43.804464,"Y":28.16}]},{"Id":8,"Points":[{"X":-47.324464,"Y":24.64},{"X":47.324464,"Y":24.64},{"X":47.324464,"Y":28.16},{"X":-47.324464,"Y":28.16}]},{"Id":9,"Points":[{"X":-47.324464,"Y":-28.16},{"X":47.324464,"Y":-28.16},{"X":47.324464,"Y":-24.64},{"X":-47.324464,"Y":-24.64}]},{"Id":20,"Points":[{"X":-35,"Y":3},{"X":42,"Y":3},{"X":42,"Y":4},{"X":-35,"Y":4}]},{"Id":21,"Points":[{"X":-35,"Y":-4},{"X":42,"Y":-4},{"X":42,"Y":-3},{"X":-35,"Y":-3}]}]'
+      _lavaWallsJson: '[{"Id":10,"Points":[{"X":38,"Y":-3},{"X":43,"Y":-3},{"X":43,"Y":3},{"X":38,"Y":3}]}]'
+      _talentCardsJson: '[{"Id":1,"Position":{"X":-35,"Y":15},"TalentType":"DashPulse"},{"Id":2,"Position":{"X":35,"Y":-15},"TalentType":"SentryGun"}]'
+      _environmentSpringsJson: '[{"Id":1,"Position":{"X":-38,"Y":0},"DirectionAngle":0}]'
+      _environmentSpikesJson: 
+      _teleportGatesJson: '[{"Id":1,"GateA":{"Position":{"X":2.5,"Y":0},"NormalRotation":0,"AttachToRotationWheelId":100},"GateB":{"Position":{"X":-9.5,"Y":0},"NormalRotation":0}},{"Id":2,"GateA":{"Position":{"X":2.5,"Y":0},"NormalRotation":0,"AttachToRotationWheelId":110},"GateB":{"Position":{"X":2.5,"Y":0},"NormalRotation":0}},{"Id":3,"GateA":{"Position":{"X":2.5,"Y":0},"NormalRotation":0,"AttachToRotationWheelId":120},"GateB":{"Position":{"X":14.5,"Y":0},"NormalRotation":0}},{"Id":4,"GateA":{"Position":{"X":2.5,"Y":0},"NormalRotation":0,"AttachToRotationWheelId":130},"GateB":{"Position":{"X":26.5,"Y":0},"NormalRotation":0}},{"Id":5,"GateA":{"Position":{"X":2.5,"Y":0},"NormalRotation":0,"AttachToRotationWheelId":140},"GateB":{"Position":{"X":40,"Y":0},"NormalRotation":0}}]'
+      _rotatingWheelsJson: '[{"Id":100,"CenterPosition":{"X":-24,"Y":0},"RotationSpeed":30,"Walls":[{"Id":101,"Position":{"X":0,"Y":0},"Points":[{"X":0,"Y":-0.3},{"X":2.5,"Y":-0.3},{"X":2.5,"Y":0.3},{"X":0,"Y":0.3}]}]},{"Id":110,"CenterPosition":{"X":-12,"Y":0},"RotationSpeed":30,"Walls":[{"Id":111,"Position":{"X":0,"Y":0},"Points":[{"X":0,"Y":-0.3},{"X":2.5,"Y":-0.3},{"X":2.5,"Y":0.3},{"X":0,"Y":0.3}]}]},{"Id":120,"CenterPosition":{"X":0,"Y":0},"RotationSpeed":30,"Walls":[{"Id":121,"Position":{"X":0,"Y":0},"Points":[{"X":0,"Y":-0.3},{"X":2.5,"Y":-0.3},{"X":2.5,"Y":0.3},{"X":0,"Y":0.3}]}]},{"Id":130,"CenterPosition":{"X":12,"Y":0},"RotationSpeed":30,"Walls":[{"Id":131,"Position":{"X":0,"Y":0},"Points":[{"X":0,"Y":-0.3},{"X":2.5,"Y":-0.3},{"X":2.5,"Y":0.3},{"X":0,"Y":0.3}]}]},{"Id":140,"CenterPosition":{"X":24,"Y":0},"RotationSpeed":30,"Walls":[{"Id":141,"Position":{"X":0,"Y":0},"Points":[{"X":0,"Y":-0.3},{"X":2.5,"Y":-0.3},{"X":2.5,"Y":0.3},{"X":0,"Y":0.3}]}]}]'
+      _fieldBarriersJson: '[{"Position":{"x":-38,"y":-18},"Size":{"x":3,"y":3},"Shape":"Circle"},{"Position":{"x":38,"y":18},"Size":{"x":3,"y":3},"Shape":"Circle"},{"Position":{"x":38,"y":-18},"Size":{"x":3,"y":3},"Shape":"Circle"},{"Position":{"x":-38,"y":18},"Size":{"x":3,"y":3},"Shape":"Circle"}]'
+      _stageBoundriesWallsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":-31.1,"Y":0.0}},{"Position":{"X":7.7,"Y":-20.9}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":-28.0,"Y":12.4}},{"Position":{"X":-29.0,"Y":-15.9}},{"Position":{"X":19.2,"Y":-0.7}},{"Position":{"X":30.8,"Y":-13.2}},{"Position":{"X":29.5,"Y":17.8}}]'
+      _cameraBoundariesJson: 
+  AvailableLayoutIndexes: 000000000300000004000000050000000a0000000b000000

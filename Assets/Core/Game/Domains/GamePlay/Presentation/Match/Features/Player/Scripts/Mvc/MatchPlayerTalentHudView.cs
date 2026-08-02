@@ -1,3 +1,4 @@
+using Core.Scripts.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,12 +21,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private MatchPlayerTalentStockUIView _stockView;
         [SerializeField] private Color _cooldownOverlayColor = Color.white;
         [SerializeField] private Color _cooldownOverlayColorWhenOnCooldown = Color.black;
+        [SerializeField] private GameObject _activeEffect;
+
+        public void SetIsActiveEffectShown(bool isShown)
+        {
+            _activeEffect.TrySetActive(isShown);
+        }
 
         public void SetNoneTalent()
         {
             _talentImage.sprite = _noneTalentSprite;
             _canvasGroup.alpha = 0.5f;
             _cooldownText.gameObject.SetActive(false);
+            SetIsActiveEffectShown(false);
         }
 
         public void SetStocksAmount(int amount)

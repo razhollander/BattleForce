@@ -18,6 +18,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<TalentCardHitNetEventS2C> TalentCardHitNetEvents { get; }
         List<PlayerSpinnedStartedNetEventS2C> PlayerSpinnedStartedNetEvents { get; }
         List<PlayerSpinnedEndedNetEventS2C> PlayerSpinnedEndedNetEvents { get; }
+        List<PlayerStartedExposedToLavaNetEventS2C> PlayerStartedExposedToLavaNetEvents { get; }
+        List<PlayerEndedExposedToLavaNetEventS2C> PlayerEndedExposedToLavaNetEvents { get; }
         List<PowerUpBallSpawnedNetEventS2C> PowerUpBallSpawnedNetEvents { get; }
         List<PowerUpBallObtainedNetEventS2C> PowerUpBallObtainedNetEvents { get; }
         List<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents { get; }
@@ -37,6 +39,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<CreateGrapplingHookProjectileNetEventS2C> CreateGrapplingHookProjectileNetEvents { get; }
         List<GrapplingHookHitWallNetEventS2C> GrapplingHookHitWallNetEvents { get; }
         List<DeactivateGrapplingHookTalentNetEventS2C> DeactivateGrapplingHookTalentNetEvents { get; }
+        List<CreateFishingRodProjectileNetEventS2C> CreateFishingRodProjectileNetEvents { get; }
+        List<FishingRodCaughtEnemyNetEventS2C> FishingRodCaughtEnemyNetEvents { get; }
+        List<FishingRodTipHitWallNetEventS2C> FishingRodTipHitWallNetEvents { get; }
+        List<FishingRodThrowNetEventS2C> FishingRodThrowNetEvents { get; }
+        List<DeactivateFishingRodTalentNetEventS2C> DeactivateFishingRodTalentNetEvents { get; }
+        List<CreateSoulGhostNetEventS2C> CreateSoulGhostNetEvents { get; }
+        List<DeactivateSoulTalentNetEventS2C> DeactivateSoulTalentNetEvents { get; }
+        List<ActivateRockTalentNetEventS2C> ActivateRockTalentNetEvents { get; }
+        List<DeactivateRockTalentNetEventS2C> DeactivateRockTalentNetEvents { get; }
+        List<ActivateFrozenTalentNetEventS2C> ActivateFrozenTalentNetEvents { get; }
+        List<DeactivateFrozenTalentNetEventS2C> DeactivateFrozenTalentNetEvents { get; }
+        List<ShootFrigidBlockNetEventS2C> ShootFrigidBlockNetEvents { get; }
+        List<DestroyFrigidBlockNetEventS2C> DestroyFrigidBlockNetEvents { get; }
         List<ActivateSentryGunTalentNetEventS2C> ActivateSentryGunTalentNetEvents { get; }
         List<DeactivateSentryGunTalentNetEventS2C> DeactivateSentryGunTalentNetEvents { get; }
         List<PerformDashPulseNetEventS2C> PerformDashPulseNetEvents { get; }
@@ -44,6 +59,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<PlayerSelectedTalentFinishedCooldownLocalEvent> PlayerSelectedTalentFinishedCooldownLocalEvents { get; }
         List<ActivateUmbrellaTalentNetEventS2C> ActivateUmbrellaTalentNetEvents { get; }
         List<DeactivateUmbrellaTalentNetEventS2C> DeactivateUmbrellaTalentNetEvents { get; }
+        List<ActivateWaterGunTalentNetEventS2C> ActivateWaterGunTalentNetEvents { get; }
+        List<DeactivateWaterGunTalentNetEventS2C> DeactivateWaterGunTalentNetEvents { get; }
+        List<ActivateHeadbuttChargingNetEventS2C> ActivateHeadbuttChargingNetEvents { get; }
+        List<PerformHeadbuttDashNetEventS2C> PerformHeadbuttDashNetEvents { get; }
+        List<HeadbuttHitEnemyNetEventS2C> HeadbuttHitEnemyNetEvents { get; }
+        List<DeactivateHeadbuttTalentNetEventS2C> DeactivateHeadbuttTalentNetEvents { get; }
         List<CreateMagneticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents { get; }
         List<LayChickenEggNetEventS2C> LayChickenEggNetEvents { get; }
         List<ChickenEggHitNetEventS2C> ChickenEggHitNetEvents { get; }

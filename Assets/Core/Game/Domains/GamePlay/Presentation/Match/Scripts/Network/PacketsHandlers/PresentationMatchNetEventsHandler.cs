@@ -2,11 +2,11 @@ using System;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.LocalEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
 using Core.Scripts.Extensions;
@@ -203,8 +203,40 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 var player = _matchDataService.GetPlayer(playerSpinnedEndedNetEvent.PlayerId);
                 player.Spaceship.IsSpinned = false;
-                
+
                 _cachedPresentationEventsService.PlayerSpinnedEndedNetEvents.Add(playerSpinnedEndedNetEvent);
+            }
+        }
+
+        public void ProcessPlayerStartedExposedToLavaEvents(CapacityList<PlayerStartedExposedToLavaNetEventS2C> playerStartedExposedToLavaNetEvents)
+        {
+            if (playerStartedExposedToLavaNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerStartedExposedToLavaNetEvent in playerStartedExposedToLavaNetEvents)
+            {
+                var player = _matchDataService.GetPlayer(playerStartedExposedToLavaNetEvent.PlayerId);
+                player.Spaceship.IsExposedToLava = true;
+
+                _cachedPresentationEventsService.PlayerStartedExposedToLavaNetEvents.Add(playerStartedExposedToLavaNetEvent);
+            }
+        }
+
+        public void ProcessPlayerEndedExposedToLavaEvents(CapacityList<PlayerEndedExposedToLavaNetEventS2C> playerEndedExposedToLavaNetEvents)
+        {
+            if (playerEndedExposedToLavaNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerEndedExposedToLavaNetEvent in playerEndedExposedToLavaNetEvents)
+            {
+                var player = _matchDataService.GetPlayer(playerEndedExposedToLavaNetEvent.PlayerId);
+                player.Spaceship.IsExposedToLava = false;
+
+                _cachedPresentationEventsService.PlayerEndedExposedToLavaNetEvents.Add(playerEndedExposedToLavaNetEvent);
             }
         }
 
@@ -446,11 +478,143 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 return;
             }
-            
+
             foreach (var netEvent in events)
             {
                 SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.GrapplingHook, netEvent.TalentCooldownEndTick);
                 _cachedPresentationEventsService.DeactivateGrapplingHookTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessCreateFishingRodProjectileEvents(CapacityList<CreateFishingRodProjectileNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                var tipState = netEvent.FishingRodProjectile;
+                SetPlayerTalentActive(tipState.PlayerCasterId, TalentType.FishingRod);
+                _matchDataService.AddFishingRodTip(tipState.Id, tipState.PlayerCasterId, tipState.Position, tipState.Phase);
+                _cachedPresentationEventsService.CreateFishingRodProjectileNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessFishingRodCaughtEnemyEvents(CapacityList<FishingRodCaughtEnemyNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                _matchDataService.GetFishingRodTip(netEvent.ProjectileId).Phase = FishingRodTipPhase.CaughtEnemy;
+                _cachedPresentationEventsService.FishingRodCaughtEnemyNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessFishingRodTipHitWallEvents(CapacityList<FishingRodTipHitWallNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                //_matchDataService.GetFishingRodTip(netEvent.ProjectileId).Phase = FishingRodTipPhase.ReturningBackwards; no need since the client doesn't care, FishingRodTipPhase.ReturningBackwards is only used for server side
+                _cachedPresentationEventsService.FishingRodTipHitWallNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessFishingRodThrowEvents(CapacityList<FishingRodThrowNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                _cachedPresentationEventsService.FishingRodThrowNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateFishingRodTalentEvents(CapacityList<DeactivateFishingRodTalentNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.FishingRod, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateFishingRodTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessCreateSoulGhostEvents(CapacityList<CreateSoulGhostNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                var ghostState = netEvent.SoulGhost;
+                SetPlayerTalentActive(ghostState.PlayerCasterId, TalentType.Soul);
+                _matchDataService.AddSoulGhost(ghostState.Id, ghostState.PlayerCasterId, ghostState.Position, ghostState.Direction);
+                _cachedPresentationEventsService.CreateSoulGhostNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateSoulTalentEvents(CapacityList<DeactivateSoulTalentNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Soul, netEvent.TalentCooldownEndTick);
+                _matchDataService.RemoveSoulGhost(netEvent.GhostId);
+                _cachedPresentationEventsService.DeactivateSoulTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessShootFrigidBlockEvents(CapacityList<ShootFrigidBlockNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                var block = netEvent.FrigidBlock;
+                SetPlayerTalentDeactive(block.PlayerCasterId, TalentType.FrigidBlock, netEvent.CooldownEndTick);
+                _matchDataService.AddFrigidBlock(block.Id, block.PlayerCasterId, block.Position, block.Rotation);
+                _cachedPresentationEventsService.ShootFrigidBlockNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDestroyFrigidBlockEvents(CapacityList<DestroyFrigidBlockNetEventS2C> events)
+        {
+            if (events.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in events)
+            {
+                _matchDataService.RemoveFrigidBlock(netEvent.BlockId);
+                _cachedPresentationEventsService.DestroyFrigidBlockNetEvents.Add(netEvent);
             }
         }
 
@@ -527,6 +691,34 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Umbrella, netEvent.TalentCooldownEndTick);
                 _cachedPresentationEventsService.DeactivateUmbrellaTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessActivateWaterGunTalentEvents(CapacityList<ActivateWaterGunTalentNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.WaterGun);
+                _cachedPresentationEventsService.ActivateWaterGunTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateWaterGunTalentEvents(CapacityList<DeactivateWaterGunTalentNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.WaterGun, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateWaterGunTalentNetEvents.Add(netEvent);
             }
         }
 
@@ -648,6 +840,62 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.SentryGun, netEvent.TalentCooldownEndTick);
                 _cachedPresentationEventsService.DeactivateSentryGunTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessActivateRockTalentEvents(CapacityList<ActivateRockTalentNetEventS2C> activateRockTalentNetEvents)
+        {
+            if (activateRockTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in activateRockTalentNetEvents)
+            {
+                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.Rock);
+                _cachedPresentationEventsService.ActivateRockTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateRockTalentEvents(CapacityList<DeactivateRockTalentNetEventS2C> deactivateRockTalentNetEvents)
+        {
+            if (deactivateRockTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in deactivateRockTalentNetEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Rock, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateRockTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessActivateFrozenTalentEvents(CapacityList<ActivateFrozenTalentNetEventS2C> activateFrozenTalentNetEvents)
+        {
+            if (activateFrozenTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in activateFrozenTalentNetEvents)
+            {
+                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.Frozen);
+                _cachedPresentationEventsService.ActivateFrozenTalentNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateFrozenTalentEvents(CapacityList<DeactivateFrozenTalentNetEventS2C> deactivateFrozenTalentNetEvents)
+        {
+            if (deactivateFrozenTalentNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var netEvent in deactivateFrozenTalentNetEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Frozen, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateFrozenTalentNetEvents.Add(netEvent);
             }
         }
 
@@ -814,6 +1062,48 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             if (events.IsNullOrEmpty()) return;
             foreach (var netEvent in events)
                 _cachedPresentationEventsService.ActivateShuffleNetEvents.Add(netEvent);
+        }
+
+        public void ProcessActivateHeadbuttChargingEvents(CapacityList<ActivateHeadbuttChargingNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty()) return;
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentActive(netEvent.CasterPlayerId, TalentType.Headbutt);
+                _cachedPresentationEventsService.ActivateHeadbuttChargingNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessPerformHeadbuttDashEvents(CapacityList<PerformHeadbuttDashNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty()) return;
+
+            foreach (var netEvent in netEvents)
+            {
+                _cachedPresentationEventsService.PerformHeadbuttDashNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessHeadbuttHitEnemyEvents(CapacityList<HeadbuttHitEnemyNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty()) return;
+
+            foreach (var netEvent in netEvents)
+            {
+                _cachedPresentationEventsService.HeadbuttHitEnemyNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessDeactivateHeadbuttTalentEvents(CapacityList<DeactivateHeadbuttTalentNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty()) return;
+
+            foreach (var netEvent in netEvents)
+            {
+                SetPlayerTalentDeactive(netEvent.CasterPlayerId, TalentType.Headbutt, netEvent.TalentCooldownEndTick);
+                _cachedPresentationEventsService.DeactivateHeadbuttTalentNetEvents.Add(netEvent);
+            }
         }
     }
 }

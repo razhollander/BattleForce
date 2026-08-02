@@ -4,8 +4,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
 {
     public class PlayerTailView : MonoBehaviour
     {
-        private static readonly int SPIRAL_SHADER_PROPERTY = Shader.PropertyToID("_SpiralAmount"); 
-        private static readonly int WAVE_AMPLITUDE_SHADER_PROPERTY = Shader.PropertyToID("_WaveAmplitude"); 
+        private static readonly int SPIRAL_SHADER_PROPERTY = Shader.PropertyToID("_SpiralAmount");
+        private static readonly int WAVE_AMPLITUDE_SHADER_PROPERTY = Shader.PropertyToID("_WaveAmplitude");
+        private static readonly int WAVE_PHASE_SHADER_PROPERTY = Shader.PropertyToID("_WavePhase");
     
         [SerializeField] private SpriteRenderer _spriteRenderer;
 
@@ -28,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
         private bool _targetTail;
         private float _maxWaveAmplitude;
         private float _currentWaveAmplitude;
+        private float _wavePhase;
 
         public void OnCreated()
         {
@@ -35,12 +37,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc
             _previousRotationZ = transform.eulerAngles.z;
             _maxWaveAmplitude = _tailMaterial.GetFloat(WAVE_AMPLITUDE_SHADER_PROPERTY);
             _currentWaveAmplitude = _maxWaveAmplitude;
+            _wavePhase = Time.time;
+            _tailMaterial.SetFloat(WAVE_PHASE_SHADER_PROPERTY, _wavePhase);
         }
-    
+
         public void UpdateTail()
         {
+            AdvanceWavePhase();
             UpdateTailBend();
             UpdateTailWaveAmplitude();
+        }
+
+        private void AdvanceWavePhase()
+        {
+            _wavePhase += Time.deltaTime;
+            _tailMaterial.SetFloat(WAVE_PHASE_SHADER_PROPERTY, _wavePhase);
         }
 
         private void UpdateTailWaveAmplitude()

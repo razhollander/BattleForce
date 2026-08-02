@@ -15,11 +15,13 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
         public bool IsTalentCInputPressed;
         public bool IsPowerUpInputPressed;
         public Vector2 AimDirection;
+        public bool IsUsingMouseAim;
+        public Vector2 MouseWorldPosition;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)PlayerId);
-            
+
             byte inputByte = (byte)(
                 (IsMoveRightInputPressed ? 1 << 0 : 0) |
                 (IsMoveLeftInputPressed  ? 1 << 1 : 0) |
@@ -27,17 +29,23 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
                 (IsTalentAInputPressed   ? 1 << 3 : 0) |
                 (IsTalentBInputPressed   ? 1 << 4 : 0) |
                 (IsTalentCInputPressed   ? 1 << 5 : 0) |
-                (IsPowerUpInputPressed   ? 1 << 6 : 0)
+                (IsPowerUpInputPressed   ? 1 << 6 : 0) |
+                (IsUsingMouseAim         ? 1 << 7 : 0)
             );
-            
+
             writer.Put(inputByte);
             writer.PutVector2AsAngle16(AimDirection);
+
+            if (IsUsingMouseAim)
+            {
+                writer.PutVector2Quantized(MouseWorldPosition);
+            }
         }
 
         public void Deserialize(NetDataReader reader)
         {
             PlayerId = reader.GetByte();
-            
+
             byte data = reader.GetByte();
             IsMoveRightInputPressed = (data & (1 << 0)) != 0;
             IsMoveLeftInputPressed  = (data & (1 << 1)) != 0;
@@ -46,8 +54,10 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
             IsTalentBInputPressed   = (data & (1 << 4)) != 0;
             IsTalentCInputPressed   = (data & (1 << 5)) != 0;
             IsPowerUpInputPressed   = (data & (1 << 6)) != 0;
+            IsUsingMouseAim         = (data & (1 << 7)) != 0;
 
             AimDirection = reader.GetVector2FromAngle16();
+            MouseWorldPosition = IsUsingMouseAim ? reader.GetVector2Quantized() : Vector2.Zero;
         }
     }
 }

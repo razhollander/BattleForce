@@ -4,6 +4,7 @@ using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.WaterGunStream.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Scripts.Extensions;
 using Core.Scripts.Helpers;
@@ -20,27 +21,40 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         [SerializeField] private PlayerView _playerView;
         [SerializeField] private SimpleHealthBar _healthBar; 
         [SerializeField] private GameObject _healthBarGameObject; 
-        [SerializeField] private GameObject _aimArrowTransform; 
-        [SerializeField] private GameObject _moveAssistArrowTransform; 
-        [SerializeField] private SpriteRenderer _moveAssistArrowSpriteRenderer; 
-        [SerializeField] private Transform _assistArrowParentTransform; 
+        [SerializeField] private GameObject _aimArrowTransform;
+        [SerializeField] private GameObject _moveAssistArrowTransform;
+
+        [SerializeField] private SpriteRenderer _moveAssistArrowSpriteRenderer;
+        [SerializeField] private Transform _assistArrowParentTransform;
         [SerializeField] private SpriteAnimator _sentryGunAnimator;
         [SerializeField] private Canvas _spinnedEyesCanvas;
         [SerializeField] private UIImageAnimator _spinnedEyesAnimator;
         [SerializeField] private UmbrellaStickView _umbrellaStickView;
+        [SerializeField] private WaterGunStreamView _waterGunStreamView;
+        [SerializeField] private FishingRodStickView _fishingRodStickView;
         [SerializeField] private PlayerChickenView _playerChickenView;
         [SerializeField] private YearsOfPainView _yearsOfPainView;
         [SerializeField] private SonicSnapEffectView _sonicSnapEffectView;
+        [SerializeField] private HeadbuttChargeEffectView _headbuttChargeEffectView;
         [SerializeField] private GameObject _deadAura;
         [SerializeField] private PlayerEyesView _playerEyesView;
         [SerializeField] private MatchPlayerTalentsHudView _talentsHudView;
         [SerializeField] private MatchPlayerPowerUpHudView _powerUpHudView;
         [SerializeField] private GameObject _crownGameObject;
+        [SerializeField] private LeaderFlagView _leaderFlagView;
         [SerializeField] private DeadTombstoneView _deadTombstoneView;
         [SerializeField] private ActivatePowerUpEffectView _activatePowerUpEffectView;
+        [SerializeField] private GameObject _headbuttHelmet;
+        [SerializeField] private GameObject _rockGameObject;
+        [SerializeField] private GameObject _frozenGameObject;
+        [SerializeField] private GameObject _onLavaEffect;
+        [field: SerializeField] public Transform LeaderFlagPivot { get; private set; }
+        [field: SerializeField] public Transform FishingRodPivot { get; private set; }
+
         public Action Despawn { get; set; }
         
         public PlayerView Base => _playerView;
+
         public void UpdateTalents(TalentVisualData[] talents)
         {
             _talentsHudView.UpdateTalents(talents);
@@ -50,7 +64,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         {
             _talentsHudView.UpdateTalentCooldown(talentIndex, maxCooldown, cooldownLeft, isOnCooldown);
         }
+        
+        public void SetRockState(bool isOn)
+        {
+            _rockGameObject.TrySetActive(isOn);
+        }
 
+        public void SetFrozenState(bool isOn)
+        {
+            _frozenGameObject.TrySetActive(isOn);
+        }
+
+        public void SetOnLavaEffectState(bool isOn)
+        {
+            _onLavaEffect.TrySetActive(isOn);
+        }
+        
         public void UpdateTalentStocks(int talentIndex, int stockAmount)
         {
             _talentsHudView.UpdateTalentStocks(talentIndex, stockAmount);
@@ -59,6 +88,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetSelectedTalent(int selectedTalentIndex, CancellationToken cancellationToken)
         {
             _talentsHudView.SelectTalent(selectedTalentIndex, cancellationToken);
+        }
+
+        public void SetSelectedTalentActiveEffect(int selectedTalentIndex, bool isSelectedTalentActive)
+        {
+            _talentsHudView.SetSelectedTalentActiveEffect(selectedTalentIndex, isSelectedTalentActive);
         }
         
         public void MakeAngryForShortDuration(CancellationToken cancellationToken)
@@ -132,7 +166,70 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 DisableUmbrellaState();
             }
         }
+
+        public void SetHeadbuttChargingState(bool isCharging, float maxChargeDurationInSeconds)
+        {
+            if (isCharging)
+            {
+                _headbuttChargeEffectView.StartCharging(maxChargeDurationInSeconds);
+            }
+            else
+            {
+                _headbuttChargeEffectView.StopCharging();
+            }
+        }
+
+        public void ShowHeadbuttHelmet()
+        {
+            _headbuttHelmet.SetActive(true);
+            _playerEyesView.SetHeadbuttActive(true);
+        }
+
+        public void HideHeadbuttHelmet()
+        {
+            _headbuttHelmet.SetActive(false);
+            _playerEyesView.SetHeadbuttActive(false);
+        }
+
+        public void SetWaterGunState(bool isOn)
+        {
+            if (isOn)
+            {
+                _waterGunStreamView.Show();
+            }
+            else
+            {
+                _waterGunStreamView.Hide();
+            }
+        }
         
+        public void SetFishingRodStickState(bool isOn)
+        {
+            if (isOn)
+            {
+                _fishingRodStickView.Show();
+            }
+            else
+            {
+                _fishingRodStickView.Hide();
+            }
+        }
+
+        public void RefreshFishingRodStickPosition()
+        {
+            _fishingRodStickView.SetPosition(FishingRodPivot.position);
+        }
+
+        public void SetFishingRodStickDirection(bool isDirectionRight)
+        {
+            _fishingRodStickView.SetDirectionIfDifferent(isDirectionRight);
+        }
+
+        public Vector2 GetFishingRodTipPivotPosition()
+        {
+            return _fishingRodStickView.FishingRodTipPivot.position;
+        }
+
         public void SetIsHealthBarShown(bool isShown)
         {
             _healthBarGameObject.SetActive(isShown);
@@ -140,7 +237,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void InterpolateAimRotation(System.Numerics.Vector2 direction, float decay)
         {
-            if (direction.LengthSquared() < 0.0001f)
+            if (direction.LengthSquared().IsAlmostEqual(0))
             {
                 LogService.LogError("Direction is too small (0) to interpolate");
 
@@ -165,6 +262,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             _playerEyesView.OnDespawned();
             _playerChickenView.SetChickenState(false);
             DisableUmbrellaState();
+            _waterGunStreamView.Hide();
+            _fishingRodStickView.Hide();
+            _headbuttChargeEffectView.StopCharging();
+            HideHeadbuttHelmet();
+            SetOnLavaEffectState(false);
+            SetFrozenState(false);
+            SetRockState(false);
             Base.OnDespawned();
         }
 
@@ -176,12 +280,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void OnCreated()
         {
             _playerEyesView.OnCreated();
+            _headbuttChargeEffectView.OnCreated();
             Base.OnCreated();
         }
 
         public void InterpolateUmbrellaRotation(System.Numerics.Vector2 rotation, float decay)
         {
-            if (rotation.LengthSquared() < 0.0001f)
+            if (rotation.LengthSquared().IsAlmostEqual(0))
             {
                 LogService.LogError("Direction is too small (0) to interpolate");
                 return;
@@ -195,9 +300,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
                 decay,
                 Time.deltaTime
             ));
-
-            _playerEyesView.UpdateEyesToLookAtDirection(rotation);
         }
+
+        public void InterpolateWaterGunRotation(System.Numerics.Vector2 aimDirection, float decay)
+        {
+            if (aimDirection.LengthSquared().IsAlmostEqual(0))
+            {
+                LogService.LogError("Direction is too small (0) to interpolate");
+                return;
+            }
+
+            _waterGunStreamView.UpdateStreamRotation(aimDirection, decay);
+        }
+
+
         public void SetIsDeadEffectEnabled(bool isEnabled, CancellationToken cancellationToken)
         {
             _deadTombstoneView.SetIsShown(isEnabled);
@@ -230,6 +346,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void OnSpawned()
         {
             SetIsHealthBarShown(true);
+            SetIsLeader(false);
             _sonicSnapEffectView.Hide();
             Base.OnSpawned();
         }
@@ -243,6 +360,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public void SetIsKinged(bool isKinged)
         {
             _crownGameObject.SetActive(isKinged);
+        }
+
+        public void SetIsLeader(bool isLeader)
+        {
+            _leaderFlagView.SetIsShown(isLeader);
         }
 
         public void SetCurrentPowerUp(bool shouldShowPowerUp, Sprite powerUpIcon)
@@ -263,6 +385,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         public async Awaitable EndPowerUpGrantingPhaseReel(Sprite grantedSprite, CancellationToken cancellationToken)
         {
             await _powerUpHudView.StopGrantingPhaseReelAndShowGranted(grantedSprite, cancellationToken);
+        }
+
+        public void UpdateLeaderFlag(bool isRight, Vector2 position)
+        {
+            _leaderFlagView.SetIsRight(isRight);
+            _leaderFlagView.SetPosition(position);
         }
     }
 }

@@ -23,8 +23,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
-        private SpinPlayerCommand _spinPlayerCommand;
-        private AddForceToPlayerCommand _addForceToPlayerCommand;
+        private TrySpinPlayerCommand _trySpinPlayerCommand;
+        private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private readonly ICommandFactory _commandFactory;
 
         public TalentType TalentType => TalentType.MagneticPull;
@@ -55,8 +55,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         public void InitEntryPoint()
         {
-            _spinPlayerCommand = _commandFactory.CreateCommandVoid<SpinPlayerCommand>();
-            _addForceToPlayerCommand = _commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
+            _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -126,8 +126,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var forceToEnemy = -directionToEnemy * pullForce;
             var randomSpin = RNG.NextFloat(config.MinSpin, config.MaxSpin);
-            _spinPlayerCommand.SetPlayer(hitEnemyPlayer.Id).SetSpinAmount(randomSpin).SetTick(tick).Execute();
-            _addForceToPlayerCommand.SetForce(forceToEnemy).SetPlayerId(enemyId).ShouldTurnOffEngine(true).Execute();
+            _trySpinPlayerCommand.SetPlayer(hitEnemyPlayer.Id).SetSpinAmount(randomSpin).SetTick(tick).Execute();
+            _tryAddForceToPlayerCommand.SetForce(forceToEnemy).SetPlayerId(enemyId).ShouldTurnOffEngine(true).Execute();
         }
 
         public void StopIfActive(int tick)

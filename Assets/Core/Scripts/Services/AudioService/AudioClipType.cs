@@ -38,5 +38,21 @@ namespace Core.Scripts.Services.AudioService
         SingleShufflePowerUp2 = 35,
         PowerUpActivated = 36,
         PowerUpRandomReels = 37,
+        HeadbuttHit = 38,
+        HeadbuttDash = 39,
+        SoulTeleport = 41,
+        RockStart = 42,
+        RockEnd = 43,
+        FrozenActivated = 44,
+        FrozenDeactivated = 45,
+        FrigidBlockActivated = 46,
+        SoulActivated = 47,
+        HeadbuttCharge = 49,
+        FishingRodReel = 50,
+        FishingRodCatch = 51,
+        FishingRodActivate = 52,
+        FishingRodThrowEnemy = 53,
+        WaterGunLoop = 54,
+        FishingRodHitWall = 55
     }
 }

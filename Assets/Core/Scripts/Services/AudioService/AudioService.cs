@@ -149,18 +149,34 @@ namespace Core.Scripts.Services.AudioService
                 return INVALID_LOOP_ID;
             }
 
+            return PlayAudioLoopWithId(audioData.Clip, audioData.Volume, audioClipType.ToString());
+        }
+
+        public int PlayAudioLoopWithId(AudioClip clip, float volume)
+        {
+            if (clip == null)
+            {
+                LogService.LogError("Tried to play a loop audio with a null clip");
+                return INVALID_LOOP_ID;
+            }
+
+            return PlayAudioLoopWithId(clip, volume, clip.name);
+        }
+
+        private int PlayAudioLoopWithId(AudioClip clip, float volume, string logName)
+        {
             var poolable = _audioSourcePool.Spawn();
-            poolable.name = POOLABLE_LOOP_AUDIO_OBJECT_NAME_FORMAT.Format(audioClipType);
+            poolable.name = POOLABLE_LOOP_AUDIO_OBJECT_NAME_FORMAT.Format(logName);
             var source = poolable.AudioSource;
-            source.clip = audioData.Clip;
+            source.clip = clip;
             source.loop = true;
-            source.SetAudioSourceVolume(audioData.Volume);
+            source.SetAudioSourceVolume(volume);
             source.Play();
 
             var loopId = _nextLoopId++ % int.MaxValue;
             _activeLoopAudioSourcesByLoopId[loopId] = poolable;
 
-            LogService.LogTopic($"Played Audio {audioClipType} with loop id {loopId}", LogTopicType.Audio);
+            LogService.LogTopic($"Played Audio {logName} with loop id {loopId}", LogTopicType.Audio);
 
             return loopId;
         }

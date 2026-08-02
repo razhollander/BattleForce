@@ -40,6 +40,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<ISimulationGamePlayConfigService>().To<SimulationGamePlayConfigService>().AsSingle().NonLazy();
             Container.Bind<IPlaybackIOService>().To<PlaybackIOService>().AsSingle().NonLazy();
             Container.Bind<ISimulationInputService>().To<SimulationInputService>().AsSingle();
+            Container.Bind<IRandomPlayersInputService>().To<RandomPlayersInputService>().AsSingle();
+            Container.Bind<IPlayersMouseDataService>().To<PlayersMouseDataService>().AsSingle();
             Container.Bind<IClientsNetworkDataService>().To<ClientsNetworkDataService>().AsSingle();
         }
     }

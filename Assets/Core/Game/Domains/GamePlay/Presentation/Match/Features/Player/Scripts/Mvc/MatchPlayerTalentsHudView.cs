@@ -31,15 +31,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
 
         public void UpdateTalentStocks(int talentIndex, int stockAmount)
         {
-            if (_talentViews != null && talentIndex < _talentViews.Length)
+            if (talentIndex < _talentViews.Length)
             {
                 _talentViews[talentIndex].SetStocksAmount(stockAmount);
+            }
+        }
+
+        public void SetSelectedTalentActiveEffect(int selectedTalentIndex, bool isSelectedTalentActive)
+        {
+            for (int i = 0; i < _talentViews.Length; i++)
+            {
+                var isSelected = i == selectedTalentIndex;
+                _talentViews[i].SetIsActiveEffectShown(isSelected && isSelectedTalentActive);
             }
         }
         
         public void UpdateTalents(TalentVisualData[] talents)
         {
-            if (_talentViews == null) return;
             for (int i = 0; i < _talentViews.Length; i++)
             {
                 var view = _talentViews[i];

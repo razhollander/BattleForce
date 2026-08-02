@@ -17,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IOverrideableNetEventsService _overrideableNetEventsService;
         private readonly IMatchDataService _matchDataService;
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
-        private readonly AddForceToPlayerCommand _addForceToPlayerCommand;
+        private readonly TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
         public DashPulseTalentController(INetEventsDataService netEventsDataService, IOverrideableNetEventsService overrideableNetEventsService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService, ICommandFactory commandFactory)
         {
@@ -25,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _overrideableNetEventsService = overrideableNetEventsService;
             _matchDataService = matchDataService;
             _gamePlayConfigService = gamePlayConfigService;
-            _addForceToPlayerCommand = commandFactory.CreateCommandVoid<AddForceToPlayerCommand>();
+            _tryAddForceToPlayerCommand = commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -63,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             var direction = casterPlayerState.Spaceship.Transform.Direction;
             var pushForce = direction * _gamePlayConfigService.GamePlayConfig.Talents.PulseDashConfig.DashVelocity;
-            _addForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(pushForce).Execute();
+            _tryAddForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(pushForce).Execute();
 
             _netEventsDataService.AddPerformDashPulseNetEvent(tick, _casterPlayerId);
             

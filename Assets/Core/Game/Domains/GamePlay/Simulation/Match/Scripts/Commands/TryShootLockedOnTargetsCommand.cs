@@ -14,7 +14,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ILockOnTargetTimerService _lockOnTargetTimerService;
         private INetEventsDataService _netEventsDataService;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
-        private PlayerHitCommand _playerHitCommand;
+        private TryHitPlayerCommand _tryHitPlayerCommand;
         private ObtainPowerUpBallCommand _obtainPowerUpBallCommand;
 
         private int _processedTick;
@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
-            _playerHitCommand = _commandFactory.CreateCommandVoid<PlayerHitCommand>();
+            _tryHitPlayerCommand = _commandFactory.CreateCommandVoid<TryHitPlayerCommand>();
             _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
         }
 
@@ -73,7 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void ShootHeartTarget(ushort targetId)
         {
-            _playerHitCommand
+            _tryHitPlayerCommand
                 .SetPlayerIdGotHit(targetId)
                 .SetWasHitByAnotherPlayer(true, _casterPlayerId)
                 .SetProcessedTick(_processedTick)

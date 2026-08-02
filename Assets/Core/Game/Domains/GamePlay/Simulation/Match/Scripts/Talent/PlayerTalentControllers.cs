@@ -1,9 +1,12 @@
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentController;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
@@ -22,11 +25,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         private readonly MagneticPullTalentController _magneticPullTalentController;
         private readonly ChickenTalentController _chickenTalentController;
         private readonly YearsOfPainTalentController _yearsOfPainTalentController;
-        
+        private readonly WaterGunTalentController _waterGunTalentController;
+        private readonly HeadbuttTalentController _headbuttTalentController;
+        private readonly RockTalentController _rockTalentController;
+        private readonly FrigidBlockTalentController _frigidBlockTalentController;
+        private readonly FishingRodTalentController _fishingRodTalentController;
+        private readonly SoulTalentController _soulTalentController;
+        private readonly FrozenTalentController _frozenTalentController;
+
         private ushort _casterPlayerId;
         private bool _isInitialized = false;
         public PlayerTalentControllers(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig,
+            IPlayersMouseDataService playersMouseDataService, IPlayersInLavaTrackerService playersInLavaTrackerService)
         {
             _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig);
             _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
@@ -37,6 +48,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _magneticPullTalentController = new MagneticPullTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
             _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfigService, networkConfig, physicsSimulator, commandFactory);
             _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
+            _waterGunTalentController = new WaterGunTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
+            _headbuttTalentController = new HeadbuttTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
+            _rockTalentController = new RockTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory, playersInLavaTrackerService);
+            _frigidBlockTalentController = new FrigidBlockTalentController(matchDataService, gamePlayConfigService, networkConfig, sharedGamePlayConfig, commandFactory);
+            _fishingRodTalentController = new FishingRodTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory, playersMouseDataService);
+            _soulTalentController = new SoulTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig);
+            _frozenTalentController = new FrozenTalentController(netEventsDataService, matchDataService, gamePlayConfigService, networkConfig, commandFactory, playersInLavaTrackerService);
         }
 
         public void InitEntryPoint()
@@ -50,6 +68,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _koTalentController.InitEntryPoint();
             _magneticPullTalentController.InitEntryPoint();
             _yearsOfPainTalentController.InitEntryPoint();
+            _waterGunTalentController.InitEntryPoint();
+            _headbuttTalentController.InitEntryPoint();
+            _rockTalentController.InitEntryPoint();
+            _frigidBlockTalentController.InitEntryPoint();
+            _fishingRodTalentController.InitEntryPoint();
+            _frozenTalentController.InitEntryPoint();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -64,6 +88,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _magneticPullTalentController.SetCasterId(casterPlayerId);
             _chickenTalentController.SetCasterId(casterPlayerId);
             _yearsOfPainTalentController.SetCasterId(casterPlayerId);
+            _waterGunTalentController.SetCasterId(casterPlayerId);
+            _headbuttTalentController.SetCasterId(casterPlayerId);
+            _rockTalentController.SetCasterId(casterPlayerId);
+            _frigidBlockTalentController.SetCasterId(casterPlayerId);
+            _fishingRodTalentController.SetCasterId(casterPlayerId);
+            _soulTalentController.SetCasterId(casterPlayerId);
+            _frozenTalentController.SetCasterId(casterPlayerId);
         }
 
         private ITalentController GetTalentByType(TalentType talentType)
@@ -79,6 +110,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
                 case TalentType.MagneticPull: return _magneticPullTalentController;
                 case TalentType.Chicken: return _chickenTalentController;
                 case TalentType.YearsOfPain: return _yearsOfPainTalentController;
+                case TalentType.WaterGun: return _waterGunTalentController;
+                case TalentType.Headbutt: return _headbuttTalentController;
+                case TalentType.Rock: return _rockTalentController;
+                case TalentType.FrigidBlock: return _frigidBlockTalentController;
+                case TalentType.FishingRod: return _fishingRodTalentController;
+                case TalentType.Soul: return _soulTalentController;
+                case TalentType.Frozen: return _frozenTalentController;
                 default: return default;
             }
         }
@@ -99,6 +137,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _magneticPullTalentController?.OnTick(tick, deltaTime);
             _chickenTalentController?.OnTick(tick, deltaTime);
             _yearsOfPainTalentController?.OnTick(tick, deltaTime);
+            _waterGunTalentController?.OnTick(tick, deltaTime);
+            _headbuttTalentController?.OnTick(tick, deltaTime);
+            _rockTalentController?.OnTick(tick, deltaTime);
+            _frigidBlockTalentController?.OnTick(tick, deltaTime);
+            _fishingRodTalentController?.OnTick(tick, deltaTime);
+            _soulTalentController?.OnTick(tick, deltaTime);
+            _frozenTalentController?.OnTick(tick, deltaTime);
         }
 
         public void StopTalentIfActive(TalentType talentType, int tick)
@@ -121,9 +166,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _koTalentController.HitWall();
         }
 
-        public void HitGrapplingHookWithWall(ushort wallId, int tick)
+        public void HitGrapplingHook(GrapplingHookHitType hitType, ushort attachedEntityId, int tick)
         {
-            _grapplingHookTalentController.HitWall(wallId, tick);
+            _grapplingHookTalentController.Hit(hitType, attachedEntityId, tick);
+        }
+
+        public void CatchFishingRodEnemy(ushort enemyPlayerId, int tick)
+        {
+            _fishingRodTalentController.CatchEnemy(enemyPlayerId, tick);
+        }
+
+        public void HitFishingRodWithWall(int tick)
+        {
+            _fishingRodTalentController.HitWall(tick);
+        }
+
+        public void HitSoulGhostWithWall(int tick)
+        {
+            _soulTalentController.HitWall(tick);
+        }
+
+        public void TryHeadbuttHitEnemy(ushort potentialCasterId, ushort potentialEnemyId, int tick)
+        {
+            if (potentialCasterId != _casterPlayerId) return;
+            _headbuttTalentController.HitEnemy(potentialEnemyId, tick);
         }
 
         public void ResetData()
@@ -137,6 +203,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _magneticPullTalentController.ResetData();
             _chickenTalentController.ResetData();
             _yearsOfPainTalentController.ResetData();
+            _waterGunTalentController.ResetData();
+            _headbuttTalentController.ResetData();
+            _rockTalentController.ResetData();
+            _frigidBlockTalentController.ResetData();
+            _fishingRodTalentController.ResetData();
+            _soulTalentController.ResetData();
+            _frozenTalentController.ResetData();
+        }
+
+        public bool IsHeadbuttCharging()
+        {
+            return _headbuttTalentController.IsCharging;
         }
     }
 }

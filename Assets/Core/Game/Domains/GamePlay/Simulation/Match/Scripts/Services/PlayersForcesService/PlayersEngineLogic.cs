@@ -9,14 +9,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
     public class PlayersEngineLogic : IPlayersEngineLogic
     {
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
+        private readonly IPlayersTalentsManager _playersTalentsManager;
 
-        public PlayersEngineLogic(ISimulationGamePlayConfigService gamePlayConfigService)
+        public PlayersEngineLogic(ISimulationGamePlayConfigService gamePlayConfigService, IPlayersTalentsManager playersTalentsManager)
         {
             _gamePlayConfigService = gamePlayConfigService;
+            _playersTalentsManager = playersTalentsManager;
         }
 
-        public void TurnOnEngineForPlayerIfPossible(PlayerSpaceshipStateS2C playerSpaceshipState)
+        public void TurnOnEngineForPlayerIfPossible(PlayerStateS2C playerState)
         {
+            var playerSpaceshipState = playerState.Spaceship;
             if (playerSpaceshipState.IsEngineOn || !playerSpaceshipState.IsAlive)
             {
                 return;
@@ -35,7 +38,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
             {
                 return;
             }
+
+            var isPlayerHeadbuttCharging = selectedTalent is {TalentType: TalentType.Headbutt, IsCurrentlyActive: true};
+            var isChargingHeadbutt = isPlayerHeadbuttCharging && _playersTalentsManager.IsHeadbuttCharging(playerState.Id);
+            if (isChargingHeadbutt)
+            {
+                return;
+            }
+
+            var isPlayerRock = selectedTalent is {TalentType: TalentType.Rock, IsCurrentlyActive: true};
+            if (isPlayerRock)
+            {
+                return;
+            }
             
+            var isPlayerFrozen = selectedTalent is {TalentType: TalentType.Frozen, IsCurrentlyActive: true};
+            if (isPlayerFrozen)
+            {
+                return;
+            }
+
             var isPlayerIdle = playerSpaceshipState.Transform.Velocity.Length() < _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TurnEngineOnWhenReachVelocity;
             if (isPlayerIdle)
             {
@@ -66,20 +88,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersFo
             var newSpeed = Mathf.Clamp(velocityLength, 0, targetMovementSpeed);
             transformState.Velocity = transformState.Velocity / velocityLength * newSpeed;
             playerSpaceshipState.Transform = transformState;
-            
-            // var transformState = playerSpaceshipState.Transform;
-            // var targetMovementSpeed = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
-            // var lookDirection = transformState.Direction;
-            // var currentForwardSpeed = System.Numerics.Vector2.Dot(transformState.Velocity, lookDirection);
-            // var isBelowTargetMovementSpeed = currentForwardSpeed < targetMovementSpeed;
-            // if (!isBelowTargetMovementSpeed)
-            // {
-            //     return;
-            // }
-            //
-            // var engineForce = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.EngineAcceleration * deltaTIme * lookDirection;
-            // transformState.Velocity += engineForce;
-            // playerSpaceshipState.Transform = transformState;
         }
     }
 }

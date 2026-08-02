@@ -34,6 +34,7 @@ namespace Core.Scripts.Network
         public int ConcurrentEvironmentSprings = 32;
         public int ConcurrentEvironmentSpikes = 32;
         public int ConcurrentChickenEggs = 128;
+        public int ConcurrentFrigidBlocks = 32;
         public int PacketTypes = 256; // if one day this is changed to a bigger number, need to parse packet types as ushort instead of byte
         public int ConcurrentEnvironmentRotatingWheels = 16;
         public int ConcurrentFieldBarriers = 16;
@@ -97,11 +98,19 @@ namespace Core.Scripts.Network
         public int PlayerMaxShootCooldownChangedNetEvents = 128;
         public int PlayerSpinnedStartedNetEvents = 128;
         public int PlayerSpinnedEndedNetEvents = 128;
+        public int PlayerStartedExposedToLavaNetEvents = 128;
+        public int PlayerEndedExposedToLavaNetEvents = 128;
         public int CreateGrapplingHookProjectileNetEvents = 128;
         public int GrapplingHookHitWallNetEvents = 128;
         public int DeactivateGrapplingHookTalentNetEvents = 128;
         public int ActivateUmbrellaTalentNetEvents = 128;
         public int DeactivateUmbrellaTalentNetEvents = 128;
+        public int ActivateWaterGunTalentNetEvents = 128;
+        public int DeactivateWaterGunTalentNetEvents = 128;
+        public int ActivateHeadbuttChargingNetEvents = 128;
+        public int PerformHeadbuttDashNetEvents = 128;
+        public int HeadbuttHitEnemyNetEvents = 128;
+        public int DeactivateHeadbuttTalentNetEvents = 128;
         public int CreateMagneticPullFieldNetEvents = 128;
         public int LayChickenEggNetEvents = 128;
         public int ChickenEggHitNetEvents = 128;
@@ -118,6 +127,19 @@ namespace Core.Scripts.Network
         public int DeactivateGalacticForceFieldNetEvents = 64;
         public int StartPowerUpGrantingPhaseNetEvents = 64;
         public int EndPowerUpGrantingPhaseNetEvents = 64;
+        public int ShootFrigidBlockNetEvents = 128;
+        public int DestroyFrigidBlockNetEvents = 128;
+        public int CreateFishingRodProjectileNetEvents = 128;
+        public int FishingRodCaughtEnemyNetEvents = 128;
+        public int FishingRodTipHitWallNetEvents = 128;
+        public int FishingRodThrowNetEvents = 128;
+        public int DeactivateFishingRodTalentNetEvents = 128;
+        public int CreateSoulGhostNetEvents = 128;
+        public int DeactivateSoulTalentNetEvents = 128;
+        public int ActivateRockTalentNetEvents = 128;
+        public int DeactivateRockTalentNetEvents = 128;
+        public int ActivateFrozenTalentNetEvents = 128;
+        public int DeactivateFrozenTalentNetEvents = 128;
 
         [Serializable]
         public class EnvironmentRotatingWheel

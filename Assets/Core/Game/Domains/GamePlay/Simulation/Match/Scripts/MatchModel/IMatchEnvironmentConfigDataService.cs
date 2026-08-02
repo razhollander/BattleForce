@@ -16,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         WallConfig[] WallConfigs { get; }
         EnvironmentRotatingWheelConfig[] RotatingWheels { get; }
         EnvironmentFieldBarrierConfig[] FieldBarrierConfigs { get; }
+        PowerUpSpawnPointConfig[] PowerUpSpawnPoints { get; }
         void InitEnvironmentLayout(int environmentLayoutId);
     }
 }

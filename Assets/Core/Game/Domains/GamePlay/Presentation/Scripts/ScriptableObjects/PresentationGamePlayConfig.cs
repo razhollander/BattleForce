@@ -11,13 +11,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
     {
         //public float InterpolationFactor = 0.85f;
         public float ExponentialDecay = 15; // usefull range 1-25, 1=slow, 25=fast
-        [EditableRef] public TalentCardsConfig TalentCards;
+        [EditableRef] public TalentIconsConfig TalentCards; // change to icons
         [EditableRef] public PowerUpsConfig PowerUps;
         [EditableRef] public TalentsConfig TalentsConfig;
         [EditableRef] public TeamFloorConfig TeamFloor;
         [EditableRef] public EnvironmentTeleportConfig Teleports;
         [EditableRef] public EnvironmentFieldBarriersConfig FieldBarriers;
         [EditableRef] public HapticsConfig HapticsConfig;
+        public bool CoolBGMusic = false;
+        [EditableRef] public CoolBGMusicConfig CoolBGMusicConfig;
         public bool ShouldOverrideClientId = false;
         [EnableIf(nameof(ShouldOverrideClientId))]
         public long ClientIdOverride = 1;
