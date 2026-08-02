@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.Extensions;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
-using Core.Scripts.Extensions;
 using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.Logger.Base;
 

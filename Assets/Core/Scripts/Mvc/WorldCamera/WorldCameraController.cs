@@ -32,12 +32,12 @@ namespace Core.Scripts.Mvc.WorldCamera
         public void InitExitPoint()
         {
             _updateSubscriptionService.UnregisterLateUpdatable(this);
-            _worldCameraView.Cleanup();
+            _worldCameraView.Dispose();
         }
 
         public void MultiplyOthographicSize(float multiplier)
         {
-            _worldCameraView.MultiplyOthographicSize(multiplier);
+            _worldCameraView.MultiplyOthographicSizeAndDisableZoom(multiplier);
         }
 
         public void SetisDampingEnabled(bool isEnabled)

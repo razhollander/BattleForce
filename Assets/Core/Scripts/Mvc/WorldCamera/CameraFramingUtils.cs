@@ -5,10 +5,10 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
 {
     public static class CameraFramingUtils
     {
-        private const float PercentToFraction = 0.01f;
+        private const float PERCENT_TO_FRACTION = 0.01f;
         // Floor for the fraction of the screen the bounding box may occupy, guarding the divisions below
         // against non-positive margins if callers pass out-of-range percentages.
-        private const float MinScreenFraction = 0.05f;
+        private const float MIN_SCREEN_FRACTION = 0.05f;
 
         // Axis-aligned bounds enclosing every target expanded by its radius.
         public static void CalculateTargetsBounds(IReadOnlyList<CameraTarget> targets, out Vector2 center, out Vector2 extents)
@@ -35,8 +35,8 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         // bottom margin), never zooming closer than minOrthographicSize.
         public static float CalculateFramedOrthographicSize(Vector2 extents, float aspect, float edgeMarginPercentage, float extraBottomPercentage, float minOrthographicSize)
         {
-            var boundingBoxScreenFraction = Mathf.Max(1f - edgeMarginPercentage * PercentToFraction, MinScreenFraction);
-            var boundingBoxHeightFraction = Mathf.Max(boundingBoxScreenFraction - extraBottomPercentage * PercentToFraction, MinScreenFraction);
+            var boundingBoxScreenFraction = Mathf.Max(1f - edgeMarginPercentage * PERCENT_TO_FRACTION, MIN_SCREEN_FRACTION);
+            var boundingBoxHeightFraction = Mathf.Max(boundingBoxScreenFraction - extraBottomPercentage * PERCENT_TO_FRACTION, MIN_SCREEN_FRACTION);
             var sizeForHeight = extents.y / boundingBoxHeightFraction;
             var sizeForWidth = extents.x / aspect / boundingBoxScreenFraction;
             var desiredSize = Mathf.Max(sizeForHeight, sizeForWidth);
@@ -46,7 +46,7 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         // World-space downward shift that pushes the framed targets up, leaving the extra margin at the bottom.
         public static float CalculateBottomWorldOffset(float orthographicSize, float extraBottomPercentage)
         {
-            return orthographicSize * extraBottomPercentage * PercentToFraction;
+            return orthographicSize * extraBottomPercentage * PERCENT_TO_FRACTION;
         }
 
         // Largest orthographic size whose frustum still fits inside the given world bounds.

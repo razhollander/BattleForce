@@ -59,22 +59,31 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
             _zoomInDamping = _deafultZoomInDamping;
         }
 
-        public void Cleanup()
+        public void Dispose()
         {
-            _zoomCancellationTokenSource?.Cancel();
-            _zoomCancellationTokenSource = null;
+            DisableZoom();
+            DisableShake();
+            
+        }
+
+        private void DisableShake()
+        {
             _shakeTween?.Kill();
             _shakeTween = null;
             _shakeOffset = Vector3.zero;
         }
 
-        public void MultiplyOthographicSize(float multiplier)
+        public void MultiplyOthographicSizeAndDisableZoom(float multiplier)
+        {
+            DisableZoom();
+            _camera.orthographicSize = _deafultOrthographicSize * multiplier;
+        }
+
+        private void DisableZoom()
         {
             _zoomCancellationTokenSource?.Cancel();
             _zoomCancellationTokenSource = null;
-            // Hands the lens back to the framing and seeds a starting zoom for this map.
             _isOrthographicSizeLockedByZoom = false;
-            _camera.orthographicSize = _deafultOrthographicSize * multiplier;
         }
 
         public void SetIsDampingEnabled(bool isEnabled)
@@ -135,8 +144,7 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
 
         public void ShakeCamera(float intensity, float durationInSeconds)
         {
-            _shakeTween?.Kill();
-            _shakeOffset = Vector3.zero;
+            DisableShake();
             _shakeTween = DOTween.Shake(() => _shakeOffset, offset => _shakeOffset = offset, durationInSeconds, intensity, ShakeVibrato, ShakeRandomness, true, true)
                 .SetEase(Ease.Linear)
                 .OnKill(() => _shakeOffset = Vector3.zero);
@@ -219,8 +227,6 @@ namespace CoreDomain.Scripts.Mvc.WorldCamera
         {
             var cancellationToken = cancellationTokenSource.Token;
             var targetSize = _deafultOrthographicSize * targetMultiplier;
-
-            // Take ownership of the lens size so framing stops driving it while we animate; released on the next MultiplyOthographicSize.
             _isOrthographicSizeLockedByZoom = true;
             await DOTween.To(() => _camera.orthographicSize, SetOrthographicSize, targetSize, durationSeconds)
                 .SetEase(_zoomEase)
