@@ -99,12 +99,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private int CalculateDisappearOnTick(WhacAMoleConfig whacAMoleConfig)
         {
-            if (whacAMoleConfig.MoleLifetimeSeconds <= 0)
+            if (whacAMoleConfig.MaxMoleLifetimeSeconds <= 0)
             {
                 return NEVER_EXPIRES_TICK;
             }
 
-            var lifetimeTicks = (int)System.MathF.Ceiling(whacAMoleConfig.MoleLifetimeSeconds * _networkConfig.TicksPerSeconds);
+            var lifetimeSeconds = RNG.NextFloat(whacAMoleConfig.MinMoleLifetimeSeconds, whacAMoleConfig.MaxMoleLifetimeSeconds);
+            var lifetimeTicks = (int)System.MathF.Ceiling(lifetimeSeconds * _networkConfig.TicksPerSeconds);
             return _processedTick + lifetimeTicks;
         }
 

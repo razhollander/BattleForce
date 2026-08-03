@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner
@@ -24,7 +25,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner
 
         public void RestartSpawnTimer()
         {
-            _secondsLeftUntilSpawn = _gamePlayConfigService.GamePlayConfig.WhacAMole.MoleSpawnIntervalSeconds;
+            var whacAMoleConfig = _gamePlayConfigService.GamePlayConfig.WhacAMole;
+            _secondsLeftUntilSpawn = RNG.NextFloat(whacAMoleConfig.MinMoleSpawnIntervalSeconds, whacAMoleConfig.MaxMoleSpawnIntervalSeconds);
         }
     }
 }

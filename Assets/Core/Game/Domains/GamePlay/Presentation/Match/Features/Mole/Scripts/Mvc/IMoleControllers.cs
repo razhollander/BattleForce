@@ -5,10 +5,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
     public interface IMoleControllers
     {
         void InitEntryPoint();
-        void CreateMole(ushort moleId, Vector2 position);
+        void CreateMoleAtSpawnPoint(Vector2 spawnPointPosition);
+        void SetMoleOutsideHole(ushort moleId, Vector2 position);
+        void SetMoleHit(ushort moleId);
+        void SetMoleInHole(ushort moleId);
         Vector2 GetMolePosition(ushort moleId);
-        void DestroyMoleWithHitEffect(ushort moleId);
-        void DestroyMoleWithExpireEffect(ushort moleId);
         void DestroyAll();
     }
 }

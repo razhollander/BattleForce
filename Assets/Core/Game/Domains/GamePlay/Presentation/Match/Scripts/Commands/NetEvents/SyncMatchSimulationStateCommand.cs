@@ -205,7 +205,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateLavaWalls(mapSizeMultiplier);
             CreateTalentCards();
             CreatePowerUpBalls();
-            CreateMoles();
+            CreateMoles(mapSizeMultiplier);
             CreateTeamBoards();
             var teleportGatesPerWheelId = CreateTeleportGates(mapSizeMultiplier);
             CreateRotatingWheels(mapSizeMultiplier, teleportGatesPerWheelId);
@@ -239,13 +239,33 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
 
-        private void CreateMoles()
+        // Every authored spawn point gets its own mole up front, all hiding in their holes. Server spawns only pop
+        // the matching one out, so a rejoining client just has to re-pop the moles that are already out.
+        private void CreateMoles(float mapSizeMultiplier)
         {
+            if (_simulationState.StageType != StageType.WhacAMole)
+            {
+                return;
+            }
+
+            var spawnPoints = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetMoleSpawnPoints();
+
+            if (spawnPoints.IsNullOrEmpty())
+            {
+                LogService.LogError($"No mole spawn points authored for environment layout {_simulationState.EnvironmentLayoutId}!");
+                return;
+            }
+
+            foreach (var spawnPoint in spawnPoints)
+            {
+                _moleControllers.CreateMoleAtSpawnPoint((spawnPoint.Position * mapSizeMultiplier).ToUnityVector2());
+            }
+
             foreach (var mole in _simulationState.Moles.AsSpan())
             {
                 var position = mole.Position.ToUnityVector2();
                 _matchDataService.AddMole(mole.Id, position);
-                _moleControllers.CreateMole(mole.Id, position);
+                _moleControllers.SetMoleOutsideHole(mole.Id, position);
             }
         }
 

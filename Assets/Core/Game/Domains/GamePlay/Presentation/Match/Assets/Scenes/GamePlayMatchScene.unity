@@ -1186,6 +1186,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3f9d5a752fb4466d9923072cb7b4cd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1138906652 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 855860077673476449, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
+  m_PrefabInstance: {fileID: 1138906647}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ef9baceb714547afbf84fb366c4c0f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PresentationMatchAssembly::Core.Game.Domains.GamePlay.Presentation.Match.Features.WhacAMoleCountdown.Scripts.WhacAMoleCountdownView
 --- !u!1 &1520472468
 GameObject:
   m_ObjectHideFlags: 0
@@ -1247,6 +1258,7 @@ MonoBehaviour:
   gainBoltEffectViewPrefab: {fileID: 5904124016507781903, guid: 3a610ff1711a84992ac57463dd23197a, type: 3}
   _hitDamageIndicatorEffectViewPrefab: {fileID: 1192209281468319034, guid: 755102510b46c4e2886ee757e24e0175, type: 3}
   _preparationPhaseCountdownView: {fileID: 3063400823214837602}
+  _whacAMoleCountdownView: {fileID: 1138906652}
   _moleViewPrefab: {fileID: 4210773196150881004, guid: 716835b644d54a3a984ba5ddf9ef239b, type: 3}
   playerTeleportEffectViewPrefab: {fileID: 5393333576666438519, guid: 9ed99fee5b48d4f88bc8062e974117a7, type: 3}
   _headbuttHitEffectViewPrefab: {fileID: 7000000000000000003, guid: 572d09554bbc45f9b92c7275dbbfba0b, type: 3}

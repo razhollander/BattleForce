@@ -1,17 +1,26 @@
 using System;
-using System.Threading;
 using CoreDomain.Scripts.Helpers.Pools;
+using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc
 {
+    /// <summary>
+    /// The state is carried by the sprite, the legacy clip only adds the pop and squash motion.
+    /// Legacy animation cannot drive sprite curves, so the sprite is assigned here instead.
+    /// </summary>
     public class MoleView : MonoBehaviour, IPoolable
     {
+        [SerializeField] private SpriteRenderer _spriteRenderer;
+        [SerializeField] private Sprite _inHoleSprite;
+        [SerializeField] private Sprite _outsideHoleSprite;
+        [SerializeField] private Sprite _hitSprite;
+
+        [Header("Motion")]
         [SerializeField] private Animation _animation;
-        [SerializeField] private string _spawnAnimationClipName = "MoleSpawn";
+        [SerializeField] private string _inHoleAnimationClipName = "MoleInHole";
+        [SerializeField] private string _outsideHoleAnimationClipName = "MoleOutsideHole";
         [SerializeField] private string _hitAnimationClipName = "MoleHit";
-        [SerializeField] private string _expireAnimationClipName = "MoleExpire";
-        [SerializeField] private float _despawnAnimationDurationSeconds = 0.25f;
 
         public Action Despawn { get; set; }
 
@@ -20,32 +29,41 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             transform.position = position;
         }
 
-        public void PlaySpawnAnimation()
+        public void PlayState(MoleStateType stateType)
         {
-            _animation.Play(_spawnAnimationClipName);
+            _spriteRenderer.sprite = GetSprite(stateType);
+            _animation.Play(GetAnimationClipName(stateType));
         }
 
-        public async Awaitable PlayHitAndDespawn(CancellationToken cancellationToken)
+        private Sprite GetSprite(MoleStateType stateType)
         {
-            await PlayAndDespawn(_hitAnimationClipName, cancellationToken);
-        }
-
-        public async Awaitable PlayExpireAndDespawn(CancellationToken cancellationToken)
-        {
-            await PlayAndDespawn(_expireAnimationClipName, cancellationToken);
-        }
-
-        private async Awaitable PlayAndDespawn(string animationClipName, CancellationToken cancellationToken)
-        {
-            _animation.Play(animationClipName);
-
-            try
+            switch (stateType)
             {
-                await Awaitable.WaitForSecondsAsync(_despawnAnimationDurationSeconds, cancellationToken);
+                case MoleStateType.InHole:
+                    return _inHoleSprite;
+                case MoleStateType.OutsideHole:
+                    return _outsideHoleSprite;
+                case MoleStateType.Hit:
+                    return _hitSprite;
+                default:
+                    LogService.LogError("Not implemented mole state type: " + stateType);
+                    return _inHoleSprite;
             }
-            finally
+        }
+
+        private string GetAnimationClipName(MoleStateType stateType)
+        {
+            switch (stateType)
             {
-                Despawn();
+                case MoleStateType.InHole:
+                    return _inHoleAnimationClipName;
+                case MoleStateType.OutsideHole:
+                    return _outsideHoleAnimationClipName;
+                case MoleStateType.Hit:
+                    return _hitAnimationClipName;
+                default:
+                    LogService.LogError("Not implemented mole state type: " + stateType);
+                    return _inHoleAnimationClipName;
             }
         }
 

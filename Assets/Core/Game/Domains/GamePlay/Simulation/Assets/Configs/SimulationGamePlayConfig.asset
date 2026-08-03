@@ -199,7 +199,7 @@ MonoBehaviour:
     EnvironmentSpikes:
       Damage: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 6
+    DeafultEnvironmentId: 21
     ShouldChooseRandomStage: 0
     ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3
@@ -215,6 +215,18 @@ MonoBehaviour:
     PreparationPhaseDuration: 4
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
+    IsWhacAMoleModeEnabled: 1
+    WhacAMoleEveryXStages: 1
+    WhacAMole:
+      StageDurationSeconds: 15
+      MinMoleSpawnIntervalSeconds: 1
+      MaxMoleSpawnIntervalSeconds: 2
+      MaxConcurrentMoles: 8
+      MoleRadius: 0.8
+      MinMoleLifetimeSeconds: 3
+      MaxMoleLifetimeSeconds: 5
+      ScorePerMoleHit: 1
+      GemsForWinningTeam: 1
     StageSizeMultiplier: 1
     SpeedupSimulation: 1
     IsAutoShoot: 0

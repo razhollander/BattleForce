@@ -43,11 +43,11 @@ Animation:
   m_GameObject: {fileID: 4210773196150881001}
   m_Enabled: 1
   serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: de37dd57b12642a3b0478d8e52c7b80d, type: 2}
+  m_Animation: {fileID: 7400000, guid: 454111c86e2148038009563e8fb22b59, type: 2}
   m_Animations:
-  - {fileID: 7400000, guid: de37dd57b12642a3b0478d8e52c7b80d, type: 2}
+  - {fileID: 7400000, guid: 454111c86e2148038009563e8fb22b59, type: 2}
+  - {fileID: 7400000, guid: ee05d1eb2c42417bb934ee4bb9214210, type: 2}
   - {fileID: 7400000, guid: a200feb13fcc43058344bfbb97e64a63, type: 2}
-  - {fileID: 7400000, guid: b44735be91404b72a9da08b9ef84dfa4, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 0
   m_AnimatePhysics: 0
@@ -65,11 +65,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b68516c543bc04d7da7783db93c61b55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: PresentationMatchAssembly::Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc.MoleView
+  _spriteRenderer: {fileID: 4210773196150881007}
+  _inHoleSprite: {fileID: 6575794577908992223, guid: 3d8ca76bcebbb4da985736227a5dbc54, type: 3}
+  _outsideHoleSprite: {fileID: -8989884226682088306, guid: 99cfac5027ad84cffa143c7511a35841, type: 3}
+  _hitSprite: {fileID: -7070598856844948889, guid: 864afdb45f40f4756bda9e589e11f50b, type: 3}
   _animation: {fileID: 4210773196150881003}
-  _spawnAnimationClipName: MoleSpawn
+  _inHoleAnimationClipName: MoleInHole
+  _outsideHoleAnimationClipName: MoleOutsideHole
   _hitAnimationClipName: MoleHit
-  _expireAnimationClipName: MoleExpire
-  _despawnAnimationDurationSeconds: 0.25
 --- !u!1 &4210773196150881005
 GameObject:
   m_ObjectHideFlags: 0
@@ -123,6 +126,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -144,11 +149,12 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: bdc01cda79a29446295daa2c4b924253, type: 3}
+  m_Sprite: {fileID: 6575794577908992223, guid: 3d8ca76bcebbb4da985736227a5dbc54, type: 3}
   m_Color: {r: 0.5372549, g: 0.34117648, b: 0.20392157, a: 1}
   m_FlipX: 0
   m_FlipY: 0

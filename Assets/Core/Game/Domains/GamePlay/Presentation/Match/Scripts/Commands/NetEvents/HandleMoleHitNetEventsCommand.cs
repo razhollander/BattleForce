@@ -33,7 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var moleHitNetEvent in moleHitNetEvents)
             {
-                _moleControllers.DestroyMoleWithHitEffect(moleHitNetEvent.MoleId);
+                _moleControllers.SetMoleHit(moleHitNetEvent.MoleId);
                 _teamsBoardUIController.UpdateTeamMolesHit(moleHitNetEvent.ByTeamId, moleHitNetEvent.TeamMolesHitTotal);
             }
 

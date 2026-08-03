@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var moleSpawnedNetEvent in moleSpawnedNetEvents)
             {
-                _moleControllers.CreateMole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.Position.ToUnityVector2());
+                _moleControllers.SetMoleOutsideHole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.Position.ToUnityVector2());
             }
 
             _audioService.PlayAudio(AudioClipType.MoleSpawned);

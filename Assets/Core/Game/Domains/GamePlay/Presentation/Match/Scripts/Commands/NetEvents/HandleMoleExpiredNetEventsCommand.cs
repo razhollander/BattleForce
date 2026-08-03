@@ -27,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var moleExpiredNetEvent in moleExpiredNetEvents)
             {
-                _moleControllers.DestroyMoleWithExpireEffect(moleExpiredNetEvent.MoleId);
+                _moleControllers.SetMoleInHole(moleExpiredNetEvent.MoleId);
             }
 
             moleExpiredNetEvents.Clear();
