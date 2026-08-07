@@ -1,27 +1,61 @@
 using System;
+using System.Threading;
+using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
+using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Helpers.Pools;
-using CoreDomain.Scripts.Services.Logger.Base;
+using DG.Tweening;
 using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc
 {
     /// <summary>
-    /// The state is carried by the sprite, the legacy clip only adds the pop and squash motion.
-    /// Legacy animation cannot drive sprite curves, so the sprite is assigned here instead.
+    /// The hole is always drawn behind the mole and the bottom dirt is always drawn in front of it, so the body only has
+    /// to slide up and down between them. A sprite mask cuts the body off at the dirt line, which lets it travel deep
+    /// enough to be completely out of sight without ever poking out below the hole.
     /// </summary>
     public class MoleView : MonoBehaviour, IPoolable
     {
-        [SerializeField] private SpriteRenderer _spriteRenderer;
-        [SerializeField] private Sprite _inHoleSprite;
-        [SerializeField] private Sprite _outsideHoleSprite;
-        [SerializeField] private Sprite _hitSprite;
+        private const float OUTSIDE_HOLE_BODY_LOCAL_POSITION_Y = 0f;
+
+        [SerializeField] private Transform _bodyTransform;
+        [SerializeField] private SpriteRenderer _bodySpriteRenderer;
+        [SerializeField] private SpriteRenderer _handsSpriteRenderer;
+
+        [Header("Sprites")]
+        [SerializeField] private Sprite _idleBodySprite;
+        [SerializeField] private Sprite _idleHandsSprite;
+        [SerializeField] private Sprite _hitBodySprite;
+        [SerializeField] private Sprite _hitHandsSprite;
+        [SerializeField] private Sprite _hitWhamBodySprite;
+
+        [Header("Golden Sprites")]
+        [SerializeField] private Sprite _goldenIdleBodySprite;
+        [SerializeField] private Sprite _goldenIdleHandsSprite;
+        [SerializeField] private Sprite _goldenHitBodySprite;
+        [SerializeField] private Sprite _goldenHitHandsSprite;
+        [SerializeField] private Sprite _goldenHitWhamBodySprite;
+
+        [Header("Health Bar")]
+        [SerializeField] private SimpleHealthBar _healthBar;
+        [SerializeField] private Canvas _healthBarCanvas;
 
         [Header("Motion")]
-        [SerializeField] private Animation _animation;
-        [SerializeField] private string _inHoleAnimationClipName = "MoleInHole";
-        [SerializeField] private string _outsideHoleAnimationClipName = "MoleOutsideHole";
-        [SerializeField] private string _hitAnimationClipName = "MoleHit";
+        [SerializeField] private float _inHoleBodyLocalPositionY = -1.6f; // deep enough for the mask to cut the whole body away
+        [SerializeField] private float _emergeDurationSeconds = 0.4f;
+        [SerializeField] private Ease _emergeEase = Ease.OutBack;
+        [SerializeField] private float _hideDurationSeconds = 0.35f;
+        [SerializeField] private Ease _hideEase = Ease.InBack;
+        [SerializeField] private float _hitWhamDurationSeconds = 0.5f;
 
+        [Header("Hole Shake")]
+        [SerializeField] private Vector3 _holeShakeStrength = new Vector3(0.25f, 0.08f, 0f);
+        [SerializeField] private int _holeShakeVibrato = 20;
+        [SerializeField] private float _holeShakeRandomness = 20f;
+
+        private Tween _bodyTween;
+        private bool _isGolden;
+        
+        
         public Action Despawn { get; set; }
 
         public void SetPosition(Vector2 position)
@@ -29,46 +63,90 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             transform.position = position;
         }
 
-        public void PlayState(MoleStateType stateType)
+        // A golden mole reuses the same view as a normal mole, it only swaps its sprite set.
+        public void SetIsGolden(bool isGolden)
         {
-            _spriteRenderer.sprite = GetSprite(stateType);
-            _animation.Play(GetAnimationClipName(stateType));
+            _isGolden = isGolden;
         }
 
-        private Sprite GetSprite(MoleStateType stateType)
+        public void ShowHealthBar(int remainingLives, int maxLives)
         {
-            switch (stateType)
-            {
-                case MoleStateType.InHole:
-                    return _inHoleSprite;
-                case MoleStateType.OutsideHole:
-                    return _outsideHoleSprite;
-                case MoleStateType.Hit:
-                    return _hitSprite;
-                default:
-                    LogService.LogError("Not implemented mole state type: " + stateType);
-                    return _inHoleSprite;
-            }
+            _healthBar.UpdateBar(remainingLives, maxLives, CancellationToken.None);
+            SetIsHealthBarShown(true);
         }
 
-        private string GetAnimationClipName(MoleStateType stateType)
+        public void UpdateHealthBar(int remainingLives, int maxLives, CancellationToken cancellationToken)
         {
-            switch (stateType)
-            {
-                case MoleStateType.InHole:
-                    return _inHoleAnimationClipName;
-                case MoleStateType.OutsideHole:
-                    return _outsideHoleAnimationClipName;
-                case MoleStateType.Hit:
-                    return _hitAnimationClipName;
-                default:
-                    LogService.LogError("Not implemented mole state type: " + stateType);
-                    return _inHoleAnimationClipName;
-            }
+            _healthBar.UpdateBar(remainingLives, maxLives, cancellationToken);
+        }
+
+        private void SetIsHealthBarShown(bool isShown)
+        {
+            _healthBarCanvas.enabled = isShown;
+        }
+
+        public void ShowInHoleImmediately()
+        {
+            KillBodyTween();
+            SetIsHealthBarShown(false);
+            SetIdleSprites();
+            _handsSpriteRenderer.enabled = false;
+            SetBodyLocalPositionY(_inHoleBodyLocalPositionY);
+        }
+
+        public void ShowOutsideHoleImmediately()
+        {
+            KillBodyTween();
+            SetIdleSprites();
+            _handsSpriteRenderer.enabled = true;
+            SetBodyLocalPositionY(OUTSIDE_HOLE_BODY_LOCAL_POSITION_Y);
+        }
+
+        // The whole mole is shaken, so the hole shakes while the mole itself is still hidden inside it.
+        public async Awaitable PlayHoleShakeAsync(float shakeDurationSeconds, CancellationToken cancellationToken)
+        {
+            var positionBeforeShake = transform.position;
+            await transform.DOShakePosition(shakeDurationSeconds, _holeShakeStrength, _holeShakeVibrato, _holeShakeRandomness, fadeOut: false)
+                .WithCancellationSafe(cancellationToken);
+            transform.position = positionBeforeShake;
+        }
+
+        // The hands are only shown once the body has reached the top, they are the only part that is drawn over the dirt.
+        public async Awaitable PlayEmergeFromHoleAsync(CancellationToken cancellationToken)
+        {
+            SetIdleSprites();
+            _handsSpriteRenderer.enabled = false;
+            var emergeTween = CreateBodyMoveTween(OUTSIDE_HOLE_BODY_LOCAL_POSITION_Y, _emergeDurationSeconds, _emergeEase);
+            emergeTween.OnComplete(ShowHands); // an interrupted emerge kills the tween, so the hands only show on a finished one
+            await emergeTween.WithCancellationSafe(cancellationToken);
+        }
+
+        public async Awaitable PlayHideInHoleAsync(CancellationToken cancellationToken)
+        {
+            SetIsHealthBarShown(false);
+            _handsSpriteRenderer.enabled = false;
+            var hideTween = CreateBodyMoveTween(_inHoleBodyLocalPositionY, _hideDurationSeconds, _hideEase);
+            await hideTween.WithCancellationSafe(cancellationToken);
+        }
+
+        public async Awaitable PlayHitAsync(CancellationToken cancellationToken)
+        {
+            KillBodyTween();
+            SetIsHealthBarShown(false);
+            SetBodyLocalPositionY(OUTSIDE_HOLE_BODY_LOCAL_POSITION_Y); // the mole may still have been emerging when it was hit
+            _bodySpriteRenderer.sprite = _isGolden ? _goldenHitWhamBodySprite : _hitWhamBodySprite;
+            _handsSpriteRenderer.sprite = _isGolden ? _goldenHitHandsSprite : _hitHandsSprite;
+            _handsSpriteRenderer.enabled = true;
+
+            await Awaitable.WaitForSecondsAsync(_hitWhamDurationSeconds, cancellationToken);
+
+            _bodySpriteRenderer.sprite = _isGolden ? _goldenHitBodySprite : _hitBodySprite;
+            await PlayHideInHoleAsync(cancellationToken);
         }
 
         public void OnCreated()
         {
+         
         }
 
         public void OnSpawned()
@@ -78,7 +156,41 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
 
         public void OnDespawned()
         {
+            KillBodyTween();
             gameObject.SetActive(false);
+        }
+
+        private Tween CreateBodyMoveTween(float localPositionY, float durationSeconds, Ease ease)
+        {
+            KillBodyTween();
+            _bodyTween = _bodyTransform.DOLocalMoveY(localPositionY, durationSeconds).SetEase(ease);
+            return _bodyTween;
+        }
+
+        private void ShowHands()
+        {
+            _handsSpriteRenderer.enabled = true;
+        }
+
+        private void SetIdleSprites()
+        {
+            _bodySpriteRenderer.sprite = _isGolden ? _goldenIdleBodySprite : _idleBodySprite;
+            _handsSpriteRenderer.sprite = _isGolden ? _goldenIdleHandsSprite : _idleHandsSprite;
+        }
+
+        private void SetBodyLocalPositionY(float localPositionY)
+        {
+            var localPosition = _bodyTransform.localPosition;
+            localPosition.y = localPositionY;
+            _bodyTransform.localPosition = localPosition;
+        }
+
+        private void KillBodyTween()
+        {
+            if (_bodyTween != null && _bodyTween.IsActive())
+            {
+                _bodyTween.Kill();
+            }
         }
     }
 }

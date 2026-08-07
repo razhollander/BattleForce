@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Zenject;
@@ -8,23 +7,20 @@ using Zenject;
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc
 {
     /// <summary>
-    /// One mole lives at every authored spawn point for the whole stage. A server spawn only pops the mole at the
-    /// matching spawn point out of its hole, so moles are never created or destroyed mid stage.
+    /// One mole lives at every authored spawn point for the whole stage. A server spawn only shakes the hole of the
+    /// mole at the matching spawn point and then pops it out, so moles are never created or destroyed mid stage.
     /// </summary>
     public class MoleControllers : IMoleControllers
     {
         private readonly MolePool _pool;
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly List<MoleController> _controllers = new List<MoleController>();
-        private readonly Dictionary<ushort, MoleController> _controllerPerOutsideHoleMoleId = new Dictionary<ushort, MoleController>();
+        private readonly Dictionary<ushort, MoleController> _controllerPerActiveMoleId = new Dictionary<ushort, MoleController>();
         private Transform _parent;
 
-        public MoleControllers(MoleView moleViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig,
-            IStageCancellationTokenProvider stageCancellationTokenProvider)
+        public MoleControllers(MoleView moleViewPrefab, DiContainer diContainer, IStageCancellationTokenProvider stageCancellationTokenProvider)
         {
             _pool = new MolePool(moleViewPrefab, diContainer);
-            _gamePlayConfig = gamePlayConfig;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
         }
 
@@ -36,12 +32,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
 
         public void CreateMoleAtSpawnPoint(Vector2 spawnPointPosition)
         {
-            var controller = new MoleController(spawnPointPosition, _pool, _parent, _stageCancellationTokenProvider, _gamePlayConfig.MoleHitStateDurationSeconds);
+            var controller = new MoleController(spawnPointPosition, _pool, _parent, _stageCancellationTokenProvider);
             controller.CreateView();
             _controllers.Add(controller);
         }
 
-        public void SetMoleOutsideHole(ushort moleId, Vector2 position)
+        public void SetMoleEmergingFromHole(ushort moleId, Vector2 position, float shakeDurationSeconds, bool isGolden, byte remainingLives, byte maxLives)
         {
             var controller = GetControllerNearestTo(position);
 
@@ -51,13 +47,30 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
                 return;
             }
 
-            _controllerPerOutsideHoleMoleId[moleId] = controller;
-            controller.SetState(MoleStateType.OutsideHole);
+            _controllerPerActiveMoleId[moleId] = controller;
+            controller.SetEmergingFromHoleState(moleId, shakeDurationSeconds, isGolden, remainingLives, maxLives);
+        }
+
+        // A damaged golden mole is still active, so unlike a hit or expiry this must not drop it from the active lookup.
+        public void SetGoldenMoleDamaged(ushort moleId, byte remainingLives, byte maxLives)
+        {
+            if (!_controllerPerActiveMoleId.TryGetValue(moleId, out var controller))
+            {
+                LogService.LogError($"No active golden mole with id {moleId}!");
+                return;
+            }
+
+            if (controller.ActiveMoleId != moleId)
+            {
+                return;
+            }
+
+            controller.SetGoldenMoleDamaged(remainingLives, maxLives);
         }
 
         public void SetMoleHit(ushort moleId)
         {
-            if (!TryTakeOutsideHoleController(moleId, out var controller))
+            if (!TryTakeActiveMoleController(moleId, out var controller))
             {
                 return;
             }
@@ -67,17 +80,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
 
         public void SetMoleInHole(ushort moleId)
         {
-            if (!TryTakeOutsideHoleController(moleId, out var controller))
+            if (!TryTakeActiveMoleController(moleId, out var controller))
             {
                 return;
             }
 
-            controller.SetState(MoleStateType.InHole);
+            controller.SetInHoleState();
         }
 
-        public Vector2 GetMolePosition(ushort moleId)
+        public bool TryGetMolePosition(ushort moleId, out Vector2 position)
         {
-            return _controllerPerOutsideHoleMoleId.TryGetValue(moleId, out var controller) ? controller.SpawnPointPosition : Vector2.zero;
+            if (!_controllerPerActiveMoleId.TryGetValue(moleId, out var controller) || controller.ActiveMoleId != moleId)
+            {
+                position = Vector2.zero;
+                return false;
+            }
+
+            position = controller.SpawnPointPosition;
+            return true;
         }
 
         public void DestroyAll()
@@ -88,19 +108,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             }
 
             _controllers.Clear();
-            _controllerPerOutsideHoleMoleId.Clear();
+            _controllerPerActiveMoleId.Clear();
         }
 
-        private bool TryTakeOutsideHoleController(ushort moleId, out MoleController controller)
+        // Net events of the different mole types are drained one type at a time, so a spawn of the mole that reused this
+        // spawn point can be handled before the hit or expiry of the mole it replaced. Such a stale event is dropped here.
+        private bool TryTakeActiveMoleController(ushort moleId, out MoleController controller)
         {
-            if (!_controllerPerOutsideHoleMoleId.TryGetValue(moleId, out controller))
+            if (!_controllerPerActiveMoleId.TryGetValue(moleId, out controller))
             {
-                LogService.LogError($"No mole outside its hole with id {moleId}!");
+                LogService.LogError($"No active mole with id {moleId}!");
                 return false;
             }
 
-            _controllerPerOutsideHoleMoleId.Remove(moleId);
-            return true;
+            _controllerPerActiveMoleId.Remove(moleId);
+            return controller.ActiveMoleId == moleId;
         }
 
         // The spawn position is quantized on the wire, so the mole belongs to the closest authored spawn point.

@@ -144,6 +144,7 @@ namespace Core.Scripts.Network
         public int MoleSpawnedNetEvents = 64;
         public int MoleHitNetEvents = 64;
         public int MoleExpiredNetEvents = 64;
+        public int GoldenMoleDamagedNetEvents = 64;
 
         [Serializable]
         public class EnvironmentRotatingWheel

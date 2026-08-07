@@ -35,22 +35,30 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 
                 foreach (var targetedObject in playerModel.Spaceship.LockOnTargetObjects.AsSpan())
                 {
-                    var targetPosition = GetTargetPosition(targetedObject);
+                    if (!TryGetTargetPosition(targetedObject, out var targetPosition))
+                    {
+                        continue;
+                    }
+
                     _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedObject.GetKey(), casterPlayerHeadPosition, targetPosition);
                 }
             }
         }
 
-        private Vector2 GetTargetPosition(ObjectLockedOnTargetS2C targetedEnemy)
+        // A whacked mole is dropped from the controllers before the server stops sending it as a target, so an unknown
+        // mole is skipped instead of dragging the lock on line to the world origin.
+        private bool TryGetTargetPosition(ObjectLockedOnTargetS2C targetedEnemy, out Vector2 targetPosition)
         {
             switch (targetedEnemy.TargetType)
             {
                 case LockOnTargetType.PowerUpBall:
-                    return _powerUpBallControllers.GetPowerUpBallPosition(targetedEnemy.TargetId);
+                    targetPosition = _powerUpBallControllers.GetPowerUpBallPosition(targetedEnemy.TargetId);
+                    return true;
                 case LockOnTargetType.Mole:
-                    return _moleControllers.GetMolePosition(targetedEnemy.TargetId);
+                    return _moleControllers.TryGetMolePosition(targetedEnemy.TargetId, out targetPosition);
                 default:
-                    return _playerControllers.GetPlayerHeartTransform(targetedEnemy.TargetId).position.ToVector2XY();
+                    targetPosition = _playerControllers.GetPlayerHeartTransform(targetedEnemy.TargetId).position.ToVector2XY();
+                    return true;
             }
         }
     }

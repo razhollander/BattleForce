@@ -109,6 +109,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleMoleSpawnedNetEventsCommand _handleMoleSpawnedNetEventsCommand;
         private readonly HandleMoleHitNetEventsCommand _handleMoleHitNetEventsCommand;
         private readonly HandleMoleExpiredNetEventsCommand _handleMoleExpiredNetEventsCommand;
+        private readonly HandleGoldenMoleDamagedNetEventsCommand _handleGoldenMoleDamagedNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -203,6 +204,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleMoleSpawnedNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleSpawnedNetEventsCommand>();
             _handleMoleHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleHitNetEventsCommand>();
             _handleMoleExpiredNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleExpiredNetEventsCommand>();
+            _handleGoldenMoleDamagedNetEventsCommand = commandFactory.CreateCommandVoid<HandleGoldenMoleDamagedNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -250,6 +252,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updatePreperationPhaseCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
             _updateWhacAMoleCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleMoleSpawnedNetEventsCommand.Execute();
+            _handleGoldenMoleDamagedNetEventsCommand.Execute();
             _handleMoleHitNetEventsCommand.Execute();
             _handleMoleExpiredNetEventsCommand.Execute();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();

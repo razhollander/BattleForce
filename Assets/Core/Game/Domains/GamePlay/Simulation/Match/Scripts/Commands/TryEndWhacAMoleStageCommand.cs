@@ -87,8 +87,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             return winningTeamId;
         }
 
+        // A stage nobody scored in has no leading team, so it must not hand every team the winning gems.
         private void AwardGemsToLeadingTeams(int highestMolesHit)
         {
+            if (highestMolesHit <= 0)
+            {
+                return;
+            }
+
             var simulationState = _matchDataService.SimulationState;
             var gemsForWinningTeam = _gamePlayConfigService.GamePlayConfig.WhacAMole.GemsForWinningTeam;
 

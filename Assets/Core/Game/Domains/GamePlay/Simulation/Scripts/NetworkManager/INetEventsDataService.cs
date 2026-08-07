@@ -68,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<MoleSpawnedNetEventS2C>> MoleSpawnedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<MoleHitNetEventS2C>> MoleHitNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<MoleExpiredNetEventS2C>> MoleExpiredNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<GoldenMoleDamagedNetEventS2C>> GoldenMoleDamagedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>> ActivateWaterGunTalentNetEventsPerClient { get; }
@@ -150,9 +151,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddDeactivateRockTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddActivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
-        void AddMoleSpawnedNetEvent(int onTick, ushort moleId, System.Numerics.Vector2 position);
-        void AddMoleHitNetEvent(int onTick, ushort moleId, ushort byPlayerId, ushort byTeamId, int teamMolesHitTotal);
+        void AddMoleSpawnedNetEvent(int onTick, ushort moleId, System.Numerics.Vector2 position, bool isGolden, byte maxLives);
+        void AddMoleHitNetEvent(int onTick, ushort moleId, ushort byPlayerId, ushort byTeamId, byte scoreGained, int teamMolesHitTotal, bool isGolden);
         void AddMoleExpiredNetEvent(int onTick, ushort moleId);
+        void AddGoldenMoleDamagedNetEvent(int onTick, ushort moleId, byte remainingLives, byte maxLives);
         void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddActivateWaterGunTalentNetEvent(int onTick, ushort casterPlayerId);

@@ -54,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<MoleSpawnedNetEventS2C> _cachedUnprocessedMoleSpawnedEvents;
         private readonly CapacityList<MoleHitNetEventS2C> _cachedUnprocessedMoleHitEvents;
         private readonly CapacityList<MoleExpiredNetEventS2C> _cachedUnprocessedMoleExpiredEvents;
+        private readonly CapacityList<GoldenMoleDamagedNetEventS2C> _cachedUnprocessedGoldenMoleDamagedEvents;
         private readonly CapacityList<StageEndNetEventS2C> _cachedUnprocessedStageEndEvents;
         private readonly CapacityList<TeamLostNetEventS2C> _cachedUnprocessedTeamLostEvents;
         private readonly CapacityList<TalentSwitchNetEventS2C> _cachedUnprocessedTalentSwitchEvents;
@@ -155,6 +156,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedMoleSpawnedEvents = new CapacityList<MoleSpawnedNetEventS2C>(networkConfig.MaxCap.MoleSpawnedNetEvents);
             _cachedUnprocessedMoleHitEvents = new CapacityList<MoleHitNetEventS2C>(networkConfig.MaxCap.MoleHitNetEvents);
             _cachedUnprocessedMoleExpiredEvents = new CapacityList<MoleExpiredNetEventS2C>(networkConfig.MaxCap.MoleExpiredNetEvents);
+            _cachedUnprocessedGoldenMoleDamagedEvents = new CapacityList<GoldenMoleDamagedNetEventS2C>(networkConfig.MaxCap.GoldenMoleDamagedNetEvents);
             _cachedUnprocessedStageEndEvents = new CapacityList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents);
             _cachedUnprocessedTeamLostEvents = new CapacityList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
             _cachedUnprocessedTalentSwitchEvents = new CapacityList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents);
@@ -281,6 +283,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessMoleSpawnedEvents(latestFullTickPacket.MoleSpawnedNetEvents, ignoreEventsNotAboveTick);
             ProcessMoleHitEvents(latestFullTickPacket.MoleHitNetEvents, ignoreEventsNotAboveTick);
             ProcessMoleExpiredEvents(latestFullTickPacket.MoleExpiredNetEvents, ignoreEventsNotAboveTick);
+            ProcessGoldenMoleDamagedEvents(latestFullTickPacket.GoldenMoleDamagedNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerDiedEvents(latestFullTickPacket.PlayerDiedNetEvents, ignoreEventsNotAboveTick);
             ProcessStageEndEvents(latestFullTickPacket.StageEndNetEvents, ignoreEventsNotAboveTick);
             ProcessTeamLostEvents(latestFullTickPacket.TeamLostNetEvents, ignoreEventsNotAboveTick);
@@ -1400,6 +1403,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedMoleExpiredEvents.Sort();
                 _presentationNetEventsHandler.ProcessMoleExpiredEvents(_cachedUnprocessedMoleExpiredEvents);
+            }
+        }
+
+        private void ProcessGoldenMoleDamagedEvents(FixedUnorderedList<GoldenMoleDamagedNetEventS2C> goldenMoleDamagedNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedGoldenMoleDamagedEvents.Clear();
+
+            foreach (var netEvent in goldenMoleDamagedNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedGoldenMoleDamagedEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedGoldenMoleDamagedEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedGoldenMoleDamagedEvents.Sort();
+                _presentationNetEventsHandler.ProcessGoldenMoleDamagedEvents(_cachedUnprocessedGoldenMoleDamagedEvents);
             }
         }
 

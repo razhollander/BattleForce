@@ -10,7 +10,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public ushort MoleId;
         public ushort ByPlayerId;
         public ushort ByTeamId;
+        public byte ScoreGained;
         public int TeamMolesHitTotal;
+        public bool IsGolden;
 
         public void Serialize(NetDataWriter writer)
         {
@@ -18,7 +20,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             writer.Put((byte)MoleId);
             writer.Put((byte)ByPlayerId);
             writer.Put((byte)ByTeamId);
+            writer.Put(ScoreGained);
             writer.Put(TeamMolesHitTotal);
+            writer.Put(IsGolden);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -27,7 +31,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             MoleId = reader.GetByte();
             ByPlayerId = reader.GetByte();
             ByTeamId = reader.GetByte();
+            ScoreGained = reader.GetByte();
             TeamMolesHitTotal = reader.GetInt();
+            IsGolden = reader.GetBool();
         }
 
         public int CompareTo(MoleHitNetEventS2C other)

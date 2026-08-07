@@ -64,10 +64,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
+            ref var mole = ref simulationState.GetMoleById(_moleId);
+
+            if (!mole.IsEmerged)
+            {
+                LogService.LogTopic($"Mole {_moleId} is still hiding in its shaking hole!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            mole.RemainingLives--;
+
+            if (mole.RemainingLives > 0) // only a golden mole can survive a hit, its remaining life is shown on its health bar
+            {
+                _netEventsDataService.AddGoldenMoleDamagedNetEvent(_processedTick, _moleId, mole.RemainingLives, mole.MaxLives);
+                return;
+            }
+
+            var whacAMoleConfig = _gamePlayConfigService.GamePlayConfig.WhacAMole;
+            var isGolden = mole.IsGolden;
+            var score = isGolden ? whacAMoleConfig.GoldenMoleScoreOnKill : whacAMoleConfig.ScorePerMoleHit;
             simulationState.RemoveMoleById(_moleId);
             _physicsSimulator.RemoveMole(_moleId);
-            simulationState.AddMolesHitForTeam(_byTeamId, _gamePlayConfigService.GamePlayConfig.WhacAMole.ScorePerMoleHit);
-            _netEventsDataService.AddMoleHitNetEvent(_processedTick, _moleId, _byPlayerId, _byTeamId, simulationState.MolesHitPerTeamId[_byTeamId]);
+            simulationState.AddMolesHitForTeam(_byTeamId, score);
+            _netEventsDataService.AddMoleHitNetEvent(_processedTick, _moleId, _byPlayerId, _byTeamId, (byte)score, simulationState.MolesHitPerTeamId[_byTeamId], isGolden);
         }
     }
 }

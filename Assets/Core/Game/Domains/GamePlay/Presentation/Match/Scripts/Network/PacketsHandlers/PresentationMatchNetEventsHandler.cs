@@ -278,7 +278,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var moleSpawnedNetEvent in moleSpawnedNetEvents)
             {
-                _matchDataService.AddMole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.Position.ToUnityVector2());
+                _matchDataService.AddMole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.Position.ToUnityVector2(),
+                    moleSpawnedNetEvent.IsGolden, moleSpawnedNetEvent.MaxLives, moleSpawnedNetEvent.MaxLives);
                 _cachedPresentationEventsService.MoleSpawnedNetEvents.Add(moleSpawnedNetEvent);
             }
         }
@@ -309,6 +310,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _matchDataService.RemoveMole(moleExpiredNetEvent.MoleId);
                 _cachedPresentationEventsService.MoleExpiredNetEvents.Add(moleExpiredNetEvent);
+            }
+        }
+
+        public void ProcessGoldenMoleDamagedEvents(CapacityList<GoldenMoleDamagedNetEventS2C> goldenMoleDamagedNetEvents)
+        {
+            if (goldenMoleDamagedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var goldenMoleDamagedNetEvent in goldenMoleDamagedNetEvents)
+            {
+                var moleModel = _matchDataService.GetMole(goldenMoleDamagedNetEvent.MoleId);
+
+                if (moleModel != null)
+                {
+                    moleModel.RemainingLives = goldenMoleDamagedNetEvent.RemainingLives;
+                }
+
+                _cachedPresentationEventsService.GoldenMoleDamagedNetEvents.Add(goldenMoleDamagedNetEvent);
             }
         }
 

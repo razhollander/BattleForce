@@ -18,7 +18,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
         [EditableRef] public EnvironmentTeleportConfig Teleports;
         [EditableRef] public EnvironmentFieldBarriersConfig FieldBarriers;
         [EditableRef] public HapticsConfig HapticsConfig;
-        public float MoleHitStateDurationSeconds = 1f;
         public bool CoolBGMusic = false;
         [EditableRef] public CoolBGMusicConfig CoolBGMusicConfig;
         public bool ShouldOverrideClientId = false;

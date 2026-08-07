@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.CoolBGMusic.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.MoleHitScoreEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc;
@@ -69,6 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IStartStagePacketHandler _startStagePacketHandler;
         private IGainBoltEffectController _gainBoltEffectController;
         private IHitDamageIndicatorEffectController _hitDamageIndicatorEffectController;
+        private IMoleHitScoreEffectController _moleHitScoreEffectController;
         private IPlayerTeleportEffectController _playerTeleportEffectController;
         private IHeadbuttHitEffectController _headbuttHitEffectController;
         private IEnvironmentTeleportGateControllers _environmentTeleportGateControllers;
@@ -120,6 +122,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
             _gainBoltEffectController = _diContainer.Resolve<IGainBoltEffectController>();
             _hitDamageIndicatorEffectController = _diContainer.Resolve<IHitDamageIndicatorEffectController>();
+            _moleHitScoreEffectController = _diContainer.Resolve<IMoleHitScoreEffectController>();
             _playerTeleportEffectController = _diContainer.Resolve<IPlayerTeleportEffectController>();
             _headbuttHitEffectController = _diContainer.Resolve<IHeadbuttHitEffectController>();
             _environmentTeleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
@@ -183,6 +186,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             AddPlayersDevicesNotAddedDuringMatchMaking(); // in case we entered from playback
             _gainBoltEffectController.InitEntryPoint();
             _hitDamageIndicatorEffectController.InitEntryPoint();
+            _moleHitScoreEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();

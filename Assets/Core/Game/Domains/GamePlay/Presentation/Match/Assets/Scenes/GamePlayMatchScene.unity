@@ -1257,6 +1257,7 @@ MonoBehaviour:
   _teamsBoardContainerView: {fileID: 1138906651}
   gainBoltEffectViewPrefab: {fileID: 5904124016507781903, guid: 3a610ff1711a84992ac57463dd23197a, type: 3}
   _hitDamageIndicatorEffectViewPrefab: {fileID: 1192209281468319034, guid: 755102510b46c4e2886ee757e24e0175, type: 3}
+  _moleHitScoreEffectViewPrefab: {fileID: 1192209281468319034, guid: 9c18204168b94b45a44e5636fe7bf826, type: 3}
   _preparationPhaseCountdownView: {fileID: 3063400823214837602}
   _whacAMoleCountdownView: {fileID: 1138906652}
   _moleViewPrefab: {fileID: 4210773196150881004, guid: 716835b644d54a3a984ba5ddf9ef239b, type: 3}

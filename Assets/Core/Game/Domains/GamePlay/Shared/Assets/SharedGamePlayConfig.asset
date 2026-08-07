@@ -36,3 +36,4 @@ MonoBehaviour:
   MagneticPullFieldRadius: 10
   LockOnTargetDurationInSeconds: 0.65
   HeadbuttMaxChargeDurationSeconds: 2
+  MoleHoleShakeDurationSeconds: 0.6

@@ -175,6 +175,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 var mole = moles.GetByIndex(i);
                 var molePosition = mole.Position;
 
+                if (!mole.IsEmerged) // a mole whose hole is still shaking is not out yet, so it cannot be locked on
+                {
+                    continue;
+                }
+
                 if (!IsPositionInLockOnCone(casterPlayerState, rayOriginPosition, molePosition))
                 {
                     continue;

@@ -31,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private INetEventsDataService _netEventsDataService;
         private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
         private IStageDataService _stageDataService;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
         private NetworkConfig _networkConfig;
 
         private int _processedTick;
@@ -50,6 +51,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
         }
 
@@ -63,6 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             DespawnExpiredMoles();
+            EmergeMolesWhoseHoleFinishedShaking();
 
             var isStageAcceptingMoles = !simulationState.IsInPreparationPhase && !_stageDataService.IsStageEnded;
             if (!isStageAcceptingMoles)
@@ -85,6 +88,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
         }
 
+        // The mole is only added to the state here, it stays out of the physics simulation until its hole finished shaking,
+        // so nothing can target or hit it while it is still hidden.
         private void SpawnMole(WhacAMoleConfig whacAMoleConfig)
         {
             if (!TryFindAvailableSpawnPointPosition(whacAMoleConfig.MoleRadius, out var position))
@@ -92,12 +97,40 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
-            var mole = _matchDataService.AddMole(position, CalculateDisappearOnTick(whacAMoleConfig));
-            _physicsSimulator.AddMole(mole.Id, position, whacAMoleConfig.MoleRadius);
-            _netEventsDataService.AddMoleSpawnedNetEvent(_processedTick, mole.Id, position);
+            var isGolden = _molesSpawnerService.ShouldSpawnGoldenMole();
+            var lives = (byte)(isGolden ? whacAMoleConfig.GoldenMoleLives : 1);
+            var emergeOnTick = _processedTick + CalculateHoleShakeTicks();
+            var mole = _matchDataService.AddMole(position, emergeOnTick, CalculateDisappearOnTick(whacAMoleConfig, emergeOnTick), isGolden, lives);
+            _molesSpawnerService.RegisterMoleSpawned(isGolden);
+            _netEventsDataService.AddMoleSpawnedNetEvent(_processedTick, mole.Id, position, isGolden, lives);
         }
 
-        private int CalculateDisappearOnTick(WhacAMoleConfig whacAMoleConfig)
+        private void EmergeMolesWhoseHoleFinishedShaking()
+        {
+            var moles = _matchDataService.SimulationState.Moles;
+            var moleRadius = _gamePlayConfigService.GamePlayConfig.WhacAMole.MoleRadius;
+
+            for (var i = 0; i < moles.Count; i++)
+            {
+                ref var mole = ref moles.GetByIndex(i);
+
+                if (mole.IsEmerged || _processedTick < mole.EmergeOnTick)
+                {
+                    continue;
+                }
+
+                mole.IsEmerged = true;
+                _physicsSimulator.AddMole(mole.Id, mole.Position, moleRadius);
+            }
+        }
+
+        private int CalculateHoleShakeTicks()
+        {
+            return (int)System.MathF.Ceiling(_sharedGamePlayConfig.MoleHoleShakeDurationSeconds * _networkConfig.TicksPerSeconds);
+        }
+
+        // The lifetime only starts once the mole is actually out of its hole, the shake is not part of it.
+        private int CalculateDisappearOnTick(WhacAMoleConfig whacAMoleConfig, int emergeOnTick)
         {
             if (whacAMoleConfig.MaxMoleLifetimeSeconds <= 0)
             {
@@ -106,7 +139,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             var lifetimeSeconds = RNG.NextFloat(whacAMoleConfig.MinMoleLifetimeSeconds, whacAMoleConfig.MaxMoleLifetimeSeconds);
             var lifetimeTicks = (int)System.MathF.Ceiling(lifetimeSeconds * _networkConfig.TicksPerSeconds);
-            return _processedTick + lifetimeTicks;
+            return emergeOnTick + lifetimeTicks;
         }
 
         private void DespawnExpiredMoles()
@@ -123,8 +156,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     continue;
                 }
 
+                if (mole.IsEmerged)
+                {
+                    _physicsSimulator.RemoveMole(mole.Id);
+                }
+
                 moles.RemoveAt(i);
-                _physicsSimulator.RemoveMole(mole.Id);
                 _netEventsDataService.AddMoleExpiredNetEvent(_processedTick, mole.Id);
             }
         }
@@ -146,10 +183,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             for (var i = 0; i < spawnPoints.Length; i++)
             {
                 var candidatePosition = spawnPoints[(startIndex + i) % spawnPoints.Length].Position * mapSizeMultiplier;
+                var isSpawnPointFree = !_physicsSimulator.IsSquareHitAnyBodyTypes(candidatePosition, moleRadius, BLOCKING_SPAWN_BODY_TYPES)
+                                       && !IsSpawnPointTakenByShakingMole(candidatePosition);
 
-                if (!_physicsSimulator.IsSquareHitAnyBodyTypes(candidatePosition, moleRadius, BLOCKING_SPAWN_BODY_TYPES))
+                if (isSpawnPointFree)
                 {
                     position = candidatePosition;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // A mole whose hole is still shaking has no physics body yet, so the physics check above cannot see it.
+        private bool IsSpawnPointTakenByShakingMole(Vector2 candidatePosition)
+        {
+            foreach (var mole in _matchDataService.SimulationState.Moles.AsSpan())
+            {
+                if (!mole.IsEmerged && mole.Position == candidatePosition)
+                {
                     return true;
                 }
             }

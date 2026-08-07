@@ -223,9 +223,13 @@ MonoBehaviour:
       MaxMoleSpawnIntervalSeconds: 2
       MaxConcurrentMoles: 8
       MoleRadius: 0.8
-      MinMoleLifetimeSeconds: 3
-      MaxMoleLifetimeSeconds: 5
+      MinMoleLifetimeSeconds: 5
+      MaxMoleLifetimeSeconds: 7
       ScorePerMoleHit: 1
+      MinMolesUntilGoldenMole: 3
+      MaxMolesUntilGoldenMole: 6
+      GoldenMoleLives: 3
+      GoldenMoleScoreOnKill: 3
       GemsForWinningTeam: 1
     StageSizeMultiplier: 1
     SpeedupSimulation: 1

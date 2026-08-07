@@ -240,7 +240,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         }
 
         // Every authored spawn point gets its own mole up front, all hiding in their holes. Server spawns only pop
-        // the matching one out, so a rejoining client just has to re-pop the moles that are already out.
+        // the matching one out, so a rejoining client just has to replay whatever shake time each spawned mole has left.
         private void CreateMoles(float mapSizeMultiplier)
         {
             if (_simulationState.StageType != StageType.WhacAMole)
@@ -264,8 +264,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             foreach (var mole in _simulationState.Moles.AsSpan())
             {
                 var position = mole.Position.ToUnityVector2();
-                _matchDataService.AddMole(mole.Id, position);
-                _moleControllers.SetMoleOutsideHole(mole.Id, position);
+                var remainingShakeTicks = mole.EmergeOnTick - _stateOccouredOnTick;
+                _matchDataService.AddMole(mole.Id, position, mole.IsGolden, mole.RemainingLives, mole.MaxLives);
+                _moleControllers.SetMoleEmergingFromHole(mole.Id, position, remainingShakeTicks * _networkConfig.DeltaTime, mole.IsGolden, mole.RemainingLives, mole.MaxLives);
             }
         }
 

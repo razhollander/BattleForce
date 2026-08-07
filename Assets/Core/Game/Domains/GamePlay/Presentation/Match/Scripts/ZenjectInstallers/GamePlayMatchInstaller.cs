@@ -20,6 +20,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Sc
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.MoleHitScoreEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.WhacAMoleCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
@@ -71,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private TeamsBoardContainerView _teamsBoardContainerView;
         [SerializeField] private GainBoltEffectView gainBoltEffectViewPrefab;
         [SerializeField] private HitDamageIndicatorEffectView _hitDamageIndicatorEffectViewPrefab;
+        [SerializeField] private MoleHitScoreEffectView _moleHitScoreEffectViewPrefab;
         [SerializeField] private PreparationPhaseCountdownView _preparationPhaseCountdownView;
         [SerializeField] private WhacAMoleCountdownView _whacAMoleCountdownView;
         [SerializeField] private MoleView _moleViewPrefab;
@@ -133,6 +135,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<TeamsBoardUIController>().AsSingle().WithArguments(_teamsBoardContainerView).NonLazy();
             Container.BindInterfacesTo<GainBoltEffectController>().AsSingle().WithArguments(gainBoltEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<HitDamageIndicatorEffectController>().AsSingle().WithArguments(_hitDamageIndicatorEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<MoleHitScoreEffectController>().AsSingle().WithArguments(_moleHitScoreEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<PreparationPhaseCountdownController>().AsSingle().WithArguments(_preparationPhaseCountdownView).NonLazy();
             Container.BindInterfacesTo<WhacAMoleCountdownController>().AsSingle().WithArguments(_whacAMoleCountdownView).NonLazy();
             Container.BindInterfacesTo<MoleControllers>().AsSingle().WithArguments(_moleViewPrefab).NonLazy();

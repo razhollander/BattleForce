@@ -5,5 +5,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner
         void StepTimer(float deltaTime);
         void RestartSpawnTimer();
         bool IsSpawnTimerEnded();
+        bool ShouldSpawnGoldenMole();
+        void RegisterMoleSpawned(bool isGolden);
     }
 }

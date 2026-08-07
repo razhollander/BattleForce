@@ -11,12 +11,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMoleControllers _moleControllers;
         private IAudioService _audioService;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _moleControllers = _diContainer.Resolve<IMoleControllers>();
             _audioService = _diContainer.Resolve<IAudioService>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public void Execute()
@@ -30,7 +32,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var moleSpawnedNetEvent in moleSpawnedNetEvents)
             {
-                _moleControllers.SetMoleOutsideHole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.Position.ToUnityVector2());
+                _moleControllers.SetMoleEmergingFromHole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.Position.ToUnityVector2(),
+                    _sharedGamePlayConfig.MoleHoleShakeDurationSeconds, moleSpawnedNetEvent.IsGolden, moleSpawnedNetEvent.MaxLives, moleSpawnedNetEvent.MaxLives);
             }
 
             _audioService.PlayAudio(AudioClipType.MoleSpawned);

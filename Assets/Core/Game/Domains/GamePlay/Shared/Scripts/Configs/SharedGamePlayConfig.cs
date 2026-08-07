@@ -26,4 +26,5 @@ public class SharedGamePlayConfig : ScriptableObject
     public float MagneticPullFieldRadius = 10f;
     public float LockOnTargetDurationInSeconds = 1.5f;
     public float HeadbuttMaxChargeDurationSeconds = 2f;
+    public float MoleHoleShakeDurationSeconds = 0.6f; // the mole stays hidden and unhittable while its hole shakes
 }

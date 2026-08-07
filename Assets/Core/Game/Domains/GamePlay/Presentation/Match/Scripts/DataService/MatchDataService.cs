@@ -141,9 +141,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return Moles.Find(x => x.Id == moleId);
         }
 
-        public MatchMoleModel AddMole(ushort moleId, UnityEngine.Vector2 position)
+        public MatchMoleModel AddMole(ushort moleId, UnityEngine.Vector2 position, bool isGolden, byte remainingLives, byte maxLives)
         {
-            var newMole = new MatchMoleModel(moleId, position);
+            var newMole = new MatchMoleModel(moleId, position, isGolden, remainingLives, maxLives);
             Moles.Add(newMole);
             return newMole;
         }
