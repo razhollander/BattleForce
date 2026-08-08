@@ -36,9 +36,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
-            var spaceshipTransform = _matchDataService.SimulationState.GetPlayerById(_playerId).Spaceship.Transform;
+            var playerTransform = _matchDataService.SimulationState.GetPlayerById(_playerId).Spaceship.Transform;
 
-            if (!_physicsSimulator.CircleCastOnEnvironmentSpikes(spaceshipTransform.Position, spaceshipTransform.Radius, out var spikeBodyData))
+            if (!_physicsSimulator.CircleCastOnEnvironmentSpikes(playerTransform.Position, playerTransform.Radius, out var spikeBodyData))
             {
                 return;
             }

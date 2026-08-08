@@ -54,8 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             StepPreperationPhaseTimer(_deltaTime);
             _lockOnTargetTimerService.StepTimers(_deltaTime);
         }
-
-        // Rock/Frozen players are immune to hazard damage, so their damage-interval timers must not advance while immune.
+        
         private void StepPlayersInHazardsTimers(float deltaTime)
         {
             var immunePlayerIds = GetRockOrFrozenPlayerIds();

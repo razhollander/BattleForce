@@ -185,12 +185,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             _netEventsDataService.AddDeactivateRockTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);
             _playersInLavaTrackerService.TryResetPlayerTimePassedSinceLastDamageTaken(_casterPlayerId);
-
-            // Immunity ends with Rock: if the player is still in lava, resume the exposed state.
             _updatePlayerLavaExposureCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
-
-            // A spike the player entered while immune never damaged them, so collide with it now that immunity ended.
-            _tryCollidePlayerWithOverlappingSpikeCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
+            _tryCollidePlayerWithOverlappingSpikeCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute(); // A spike the player entered while immune never damaged them, so collide with it now that immunity ended.
         }
 
         public void ResetData()

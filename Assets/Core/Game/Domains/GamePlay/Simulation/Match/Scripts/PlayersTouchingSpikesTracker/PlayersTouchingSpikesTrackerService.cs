@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
@@ -9,20 +10,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpi
 {
     public class PlayersTouchingSpikesTrackerService : IPlayersTouchingSpikesTrackerService
     {
-        private const int MAX_SPIKES_PER_PLAYER = 8;
-
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly CapacityDict<ushort, PlayerTouchingSpikesData> _playersTouchingSpikes;
         private readonly ConcurrentPool<PlayerTouchingSpikesData> _playerDataPool;
-        private readonly List<PlayerTouchingSpikeToDamage> _cachedPlayersToDamage;
+        private readonly List<PlayerTouchingSpikeToDamageData> _cachedPlayersToDamage;
 
         public PlayersTouchingSpikesTrackerService(ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig)
         {
             _gamePlayConfigService = gamePlayConfigService;
             var maxPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             _playersTouchingSpikes = new CapacityDict<ushort, PlayerTouchingSpikesData>(maxPlayers);
-            _playerDataPool = new ConcurrentPool<PlayerTouchingSpikesData>(() => new PlayerTouchingSpikesData(MAX_SPIKES_PER_PLAYER), maxPlayers);
-            _cachedPlayersToDamage = new List<PlayerTouchingSpikeToDamage>(maxPlayers);
+            _playerDataPool = new ConcurrentPool<PlayerTouchingSpikesData>(() => new PlayerTouchingSpikesData(networkConfig.MaxCap.ConcurrentSpikeCollidingWithPlayer), maxPlayers);
+            _cachedPlayersToDamage = new List<PlayerTouchingSpikeToDamageData>(maxPlayers);
         }
 
         public void OnPlayerBeginTouchSpike(ushort playerId, ushort spikeId)
@@ -37,13 +36,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpi
 
         public void OnPlayerEndTouchSpike(ushort playerId, ushort spikeId)
         {
-            if (!_playersTouchingSpikes.ContainsKey(playerId))
+            if (!_playersTouchingSpikes.TryGetValue(playerId, out var playerData))
             {
                 LogService.LogError($"Player {playerId} stopped touching spike {spikeId} but does not exist in touching spikes tracker");
                 return;
             }
 
-            var playerData = _playersTouchingSpikes[playerId];
             playerData.OnEndTouchSpike(spikeId);
 
             if (playerData.TouchingSpikesCount == 0)
@@ -67,10 +65,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpi
             }
         }
 
-        public List<PlayerTouchingSpikeToDamage> GetPlayersToDamage()
+        public List<PlayerTouchingSpikeToDamageData> GetPlayersToDamage()
         {
             _cachedPlayersToDamage.Clear();
-            if (_playersTouchingSpikes.Count == 0) return _cachedPlayersToDamage;
+            if (_playersTouchingSpikes.IsNullOrEmpty())
+            {
+                return _cachedPlayersToDamage;
+            }
 
             var damageIntervalInSeconds = _gamePlayConfigService.GamePlayConfig.EnvironmentSpikes.DamageIntervalInSeconds;
             foreach (var playerId in _playersTouchingSpikes.Keys)
@@ -79,7 +80,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpi
                 var didPassDamageInterval = playerData.TimePassSinceLastDamageTaken >= damageIntervalInSeconds;
                 if (didPassDamageInterval)
                 {
-                    _cachedPlayersToDamage.Add(new PlayerTouchingSpikeToDamage(playerId, playerData.GetAnyTouchedSpikeId()));
+                    _cachedPlayersToDamage.Add(new PlayerTouchingSpikeToDamageData(playerId, playerData.GetAnyTouchedSpikeId()));
                 }
             }
 

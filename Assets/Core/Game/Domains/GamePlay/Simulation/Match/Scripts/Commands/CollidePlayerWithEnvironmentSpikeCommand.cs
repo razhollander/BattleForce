@@ -46,15 +46,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
-            if (!_matchDataService.SimulationState.GetPlayerById(_playerId).Spaceship.IsAlive)
+            var isPlayerAlive = _matchDataService.SimulationState.GetPlayerById(_playerId).Spaceship.IsAlive;
+            if (!isPlayerAlive)
             {
                 return;
             }
 
-            var damage = _gamePlayConfigService.GamePlayConfig.EnvironmentSpikes.Damage;
+            var playerDamageTaken = _gamePlayConfigService.GamePlayConfig.EnvironmentSpikes.Damage;
             _tryHitPlayerCommand
                 .SetPlayerIdGotHit(_playerId)
-                .SetHitDamage(damage)
+                .SetHitDamage(playerDamageTaken)
                 .SetProcessedTick(_processedTick)
                 .Execute();
 

@@ -743,8 +743,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 _playersTouchingSpikesTrackerService.OnPlayerEndTouchSpike(playerId, spikeId);
                 return;
             }
-
-            // A fresh contact deals damage immediately; the tracker's interval timer re-damages the player while the contact persists.
+            
             _playersTouchingSpikesTrackerService.OnPlayerBeginTouchSpike(playerId, spikeId);
             _collidePlayerWithEnvironmentSpikeCommand
                 .SetPlayerId(playerId)

@@ -136,11 +136,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             _netEventsDataService.AddDeactivateFrozenTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);
             _playersInLavaTrackerService.TryResetPlayerTimePassedSinceLastDamageTaken(_casterPlayerId);
-
             _updatePlayerLavaExposureCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
-
-            // A spike the player entered while immune never damaged them, so collide with it now that immunity ended.
-            _tryCollidePlayerWithOverlappingSpikeCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
+            _tryCollidePlayerWithOverlappingSpikeCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute(); // A spike the player entered while immune never damaged them, so collide with it now that immunity ended.
         }
 
         public void ResetData()
