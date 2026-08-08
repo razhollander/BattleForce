@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public void Execute()
         {
             var playerSpaceship = _matchDataService.SimulationState.GetPlayerById(_playerId).Spaceship;
-            if (!CanPlayerPerformBarrelDash(playerSpaceship))
+            if (!_gamePlayConfigService.GamePlayConfig.PlayerSpaceship.CanBarrelDash || !CanPlayerPerformBarrelDash(playerSpaceship))
             {
                 return;
             }

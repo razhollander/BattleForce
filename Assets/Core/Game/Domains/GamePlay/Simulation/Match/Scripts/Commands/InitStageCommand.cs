@@ -287,7 +287,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private void CreateWalls(float mapSizeMultiplier)
         {
             var wallConfigs = _matchEnvironmentConfigDataService.WallConfigs;
-
+            if (wallConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+            
             foreach (var wallConfig in wallConfigs)
             {
                 var points = new Vector2[wallConfig.Points.Length];

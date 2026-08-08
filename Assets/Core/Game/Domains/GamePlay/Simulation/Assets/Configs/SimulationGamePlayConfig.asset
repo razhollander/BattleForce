@@ -31,6 +31,7 @@ MonoBehaviour:
       LockOnTargetMaxRange: 13
       LockOnTargetHalfArcAngleDegrees: 45
       LockOnTargetHitDamage: 1
+      CanBarrelDash: 1
       BarrelDashForce: 30
       BarrelDashSpinAmount: 57
     PlayerBullet:
@@ -200,7 +201,7 @@ MonoBehaviour:
       Damage: 1
       DamageIntervalInSeconds: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 15
+    DeafultEnvironmentId: 0
     ShouldChooseRandomStage: 0
     ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3
