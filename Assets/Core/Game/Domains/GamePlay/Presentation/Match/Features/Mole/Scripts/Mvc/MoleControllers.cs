@@ -100,6 +100,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             controller.SetInHoleState();
         }
 
+        // The stage timer ended, so every mole hides at once without a per-mole net event from the server.
+        public void SetAllMolesInHole()
+        {
+            foreach (var controller in _controllerPerActiveMoleId.Values)
+            {
+                controller.SetInHoleState();
+            }
+
+            _controllerPerActiveMoleId.Clear();
+        }
+
         public bool TryGetMolePosition(ushort moleId, out Vector2 position)
         {
             if (!_controllerPerActiveMoleId.TryGetValue(moleId, out var controller) || controller.ActiveMoleId != moleId)

@@ -729,11 +729,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return hasCollision;
         }
 
-        public bool RectangleCastOnPlayers(Vector2 center, Vector2 size, float angleRadians, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        // Casts the rectangle against two body types at once. firstPriorityBodyType wins when both are inside the shape;
+        // ignoreTeamId only applies to players, since they are the only bodies grouped by team. hitBodyData carries the type that was hit.
+        public bool RectangleCastByPriority(Vector2 center, Vector2 size, float angleRadians, short ignoreTeamId, PhysicsBodyType firstPriorityBodyType, PhysicsBodyType secondPriorityBodyType, out PhysicsBodyData hitBodyData)
+        {
+            return TryRectangleCast(center, size, angleRadians, firstPriorityBodyType, secondPriorityBodyType, ignoreTeamId, out hitBodyData);
+        }
+
+        private bool TryRectangleCast(Vector2 center, Vector2 size, float angleRadians, PhysicsBodyType firstPriorityBodyType, PhysicsBodyType secondPriorityBodyType, short ignoreTeamId, out PhysicsBodyData hitBodyData)
         {
             _unityMainThreadDispatcher.EnqueueDraw(()=>DebugDrawUtils.DrawRotatedRect(center, size, angleRadians));
-            var hasCollision = false;
-            hitBodyData = default;
 
             var hx = size.X * 0.5f;
             var hy = size.Y * 0.5f;
@@ -748,49 +753,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var max = Vector2.Max(Vector2.Max(v1, v2), Vector2.Max(v3, v4));
 
             var aabb = new AABB(min, max);
-            PhysicsBodyData hitBody = default;
 
-            _world.QueryAABB(fixture =>
-            {
-                var currentBodyData = (PhysicsBodyData) fixture.Body.UserData;
-                var shouldContinueQuery = true;
-                var isPlayerFromNotIgnoredTeam = currentBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && fixture.FilterData.groupIndex != -ignoreTeamId;
-                if (isPlayerFromNotIgnoredTeam)
-                {
-                    var polygonShape = GetPolygonShape();
-                    polygonShape.SetAsBox(hx, hy);
+            var polygonShape = GetPolygonShape();
+            polygonShape.SetAsBox(hx, hy);
 
-                    var input = new ShapeCastInput();
-                    input.proxyA.Set(polygonShape, 0);
-                    input.proxyB.Set(fixture.Shape, 0);
-                    input.transformA = new Transform(center, rot);
-                    input.transformB = fixture.Body.GetTransform();
-                    input.translationB = Vector2.Zero;
+            var hasCollision = TryShapeCastHit(polygonShape, new Transform(center, rot), aabb, firstPriorityBodyType, secondPriorityBodyType, ignoreTeamId, out hitBodyData);
 
-                    if (Contact.ShapeCast(out _, input))
-                    {
-                        hasCollision = true;
-                        hitBody = currentBodyData;
-                    }
-
-                    _polygonShapePool.Return(polygonShape);
-                    shouldContinueQuery = !hasCollision;
-                }
-
-                return shouldContinueQuery;
-            }, aabb);
-
-            hitBodyData = hitBody;
+            _polygonShapePool.Return(polygonShape);
 
             return hasCollision;
         }
 
-        public bool ArcCastOnPlayers(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        // Casts the arc against two body types at once. firstPriorityBodyType wins when both are inside the shape;
+        // ignoreTeamId only applies to players, since they are the only bodies grouped by team. hitBodyData carries the type that was hit.
+        public bool ArcCastByPriority(Vector2 center, float radius, Vector2 direction, float arcAngleDegrees, short ignoreTeamId, PhysicsBodyType firstPriorityBodyType, PhysicsBodyType secondPriorityBodyType, out PhysicsBodyData hitBodyData)
+        {
+            return TryArcCast(center, radius, direction, arcAngleDegrees, firstPriorityBodyType, secondPriorityBodyType, ignoreTeamId, out hitBodyData);
+        }
+
+        private bool TryArcCast(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, PhysicsBodyType firstPriorityBodyType, PhysicsBodyType secondPriorityBodyType, short ignoreTeamId, out PhysicsBodyData hitBodyData)
         {
             var arcAngleRad = arcAngleDegrees.ToRadians();
             var startAngleRad = directon.ToAngleRadians()-arcAngleRad*0.5f;
-            var hasCollision = false;
-            
+
             // We use 1 point for the center, leaving up to 7 points for the outer curve
             int vertexCount = 8;
             var vertices = new Vector2[vertexCount];
@@ -822,47 +807,86 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _unityMainThreadDispatcher.EnqueueDraw(() => DebugDrawUtils.DrawPolygon(center, vertices));
 
             var aabb = new AABB(min, max);
-            PhysicsBodyData hitBody = default;
 
-            // 3. Query the world
+            var polygonShape = GetPolygonShape();
+            // Set the approximation vertices
+            polygonShape.Set(vertices);
+
+            // transformA handles the position. Rotation is baked into vertices
+            // but we pass Identity to stay consistent with local-space vertices.
+            var hasCollision = TryShapeCastHit(polygonShape, new Transform(center, Matrix3x2.Identity), aabb, firstPriorityBodyType, secondPriorityBodyType, ignoreTeamId, out hitBodyData);
+
+            _polygonShapePool.Return(polygonShape);
+
+            return hasCollision;
+        }
+
+        // Runs one broadphase query for both body types. A first-priority hit ends the query at once; a second-priority hit is
+        // remembered but the search continues, so a first-priority body that is also inside the shape still wins. ignoreTeamId
+        // only filters players, the only bodies grouped by team.
+        private bool TryShapeCastHit(PolygonShape castShape, Transform castTransform, AABB aabb, PhysicsBodyType firstPriorityBodyType, PhysicsBodyType secondPriorityBodyType, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        {
+            var hasFirstPriorityHit = false;
+            var hasSecondPriorityHit = false;
+            PhysicsBodyData firstPriorityHitBody = default;
+            PhysicsBodyData secondPriorityHitBody = default;
+
             _world.QueryAABB(fixture =>
             {
                 var currentBodyData = (PhysicsBodyData) fixture.Body.UserData;
-                var shouldContinueQuery = true;
-                var isPlayerFromNotIgnoredTeam = currentBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && fixture.FilterData.groupIndex != -ignoreTeamId;
-                if (isPlayerFromNotIgnoredTeam)
+                var bodyType = currentBodyData.PhysicsBodyType;
+
+                var isFirstPriority = bodyType == firstPriorityBodyType;
+                var isSecondPriority = bodyType == secondPriorityBodyType;
+                if (!isFirstPriority && !isSecondPriority)
                 {
-                    var polygonShape = GetPolygonShape();
-
-                    // Set the approximation vertices
-                    polygonShape.Set(vertices);
-
-                    var input = new ShapeCastInput();
-                    input.proxyA.Set(polygonShape, 0);
-                    input.proxyB.Set(fixture.Shape, 0);
-
-                    // transformA handles the position. Rotation is baked into vertices
-                    // but we pass Identity to stay consistent with local-space vertices.
-                    input.transformA = new Transform(center, Matrix3x2.Identity);
-                    input.transformB = fixture.Body.GetTransform();
-                    input.translationB = Vector2.Zero;
-                    
-                    if (Contact.ShapeCast(out _, input))
-                    {
-                        hasCollision = true;
-                        hitBody = currentBodyData;
-                    }
-
-                    _polygonShapePool.Return(polygonShape);
-                    shouldContinueQuery = !hasCollision;
+                    return true;
                 }
 
-                return shouldContinueQuery;
+                var isPlayerFromIgnoredTeam = bodyType == PhysicsBodyType.PlayerSpaceship && fixture.FilterData.groupIndex == -ignoreTeamId;
+                if (isPlayerFromIgnoredTeam)
+                {
+                    return true;
+                }
+
+                // A second-priority hit is already recorded, so another one cannot change the outcome - only a first-priority hit still matters.
+                if (isSecondPriority && hasSecondPriorityHit)
+                {
+                    return true;
+                }
+
+                var input = new ShapeCastInput();
+                input.proxyA.Set(castShape, 0);
+                input.proxyB.Set(fixture.Shape, 0);
+                input.transformA = castTransform;
+                input.transformB = fixture.Body.GetTransform();
+                input.translationB = Vector2.Zero;
+
+                if (!Contact.ShapeCast(out _, input))
+                {
+                    return true;
+                }
+
+                if (isFirstPriority)
+                {
+                    hasFirstPriorityHit = true;
+                    firstPriorityHitBody = currentBodyData;
+                    return false; // nothing outranks a first-priority hit, so stop querying
+                }
+
+                hasSecondPriorityHit = true;
+                secondPriorityHitBody = currentBodyData;
+                return true; // keep looking in case a first-priority body is also inside the shape
             }, aabb);
 
-            hitBodyData = hitBody;
+            if (hasFirstPriorityHit)
+            {
+                hitBodyData = firstPriorityHitBody;
+                return true;
+            }
 
-            return hasCollision;
+            hitBodyData = secondPriorityHitBody;
+            return hasSecondPriorityHit;
         }
 
         public bool EllipseCastOnPlayers(Vector2 center, float radius, Vector2 direction, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData)

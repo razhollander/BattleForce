@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         void SetMoleHit(ushort moleId);
         void SetMoleExpiring(ushort moleId, float shakeDurationSeconds);
         void SetMoleInHole(ushort moleId);
+        void SetAllMolesInHole();
         bool TryGetMolePosition(ushort moleId, out Vector2 position);
         void DestroyAll();
     }

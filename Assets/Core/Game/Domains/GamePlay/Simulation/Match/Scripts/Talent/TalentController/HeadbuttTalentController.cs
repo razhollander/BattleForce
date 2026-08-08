@@ -143,7 +143,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             DeactivateTalent(tick);
         }
 
-        // Smashing a mole brings the dash to a halt just like ramming an enemy does, but it does not consume the dash's single enemy hit.
+        // Smashing a mole bounces the caster straight back: velocity and facing direction both flip 180 degrees, but it does not consume the dash's single enemy hit.
         public void HitMole()
         {
             if (_phase != HeadButtPhaseType.Dashing)
@@ -151,8 +151,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
-            casterPlayerState.Spaceship.Transform.Velocity = Vector2.Zero;
+            ref var casterTransform = ref _matchDataService.SimulationState.GetPlayerById(_casterPlayerId).Spaceship.Transform;
+            casterTransform.Velocity = -casterTransform.Velocity;
+            casterTransform.Direction = -casterTransform.Direction;
         }
 
         public void StopIfActive(int tick)

@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorE
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MoleHitScoreEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
@@ -21,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMoleHitScoreEffectController _moleHitScoreEffectController;
         private IHitDamageIndicatorEffectController _hitDamageIndicatorEffectController;
         private IMatchPlayerControllers _playerControllers;
+        private IMatchPlayerUIControllers _playerUIControllers;
 
         public override void ResolveDependencies()
         {
@@ -31,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _moleHitScoreEffectController = _diContainer.Resolve<IMoleHitScoreEffectController>();
             _hitDamageIndicatorEffectController = _diContainer.Resolve<IHitDamageIndicatorEffectController>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
+            _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
         }
 
         public void Execute()
@@ -56,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                 _moleControllers.SetMoleHit(moleHitNetEvent.MoleId);
                 _teamsBoardUIController.UpdateTeamMolesHit(moleHitNetEvent.ByTeamId, moleHitNetEvent.TeamMolesHitTotal);
+                _playerUIControllers.UpdatePlayerMolesHitScore(moleHitNetEvent.ByPlayerId, moleHitNetEvent.ByPlayerMolesHitScoreTotal);
             }
 
             _audioService.PlayAudio(AudioClipType.MoleHit);

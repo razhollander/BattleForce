@@ -15,6 +15,5 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public int MaxMolesUntilGoldenMole = 6;
         public int GoldenMoleLives = 3;
         public int GoldenMoleScoreOnKill = 3; // awarded to the team of the player who lands the final hit
-        public int GemsForWinningTeam = 1;
     }
 }

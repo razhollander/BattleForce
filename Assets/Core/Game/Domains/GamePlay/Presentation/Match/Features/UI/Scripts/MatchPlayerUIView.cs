@@ -1,8 +1,5 @@
-using System.Collections.Generic;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using Core.Scripts.Utils.CustomCollections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +13,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private Image _equipmentImage;
         [SerializeField] private TextMeshProUGUI _moneyText;
         [SerializeField] private SimpleHealthBar _healthBar;
+        [SerializeField] private GameObject _healthBarGameObject;
+        [SerializeField] private TextMeshProUGUI _molesHitScoreText;
+        [SerializeField] private GameObject _molesHitScoreContainer;
         [SerializeField]private CanvasGroup _canvasGroup;
 
         [Header("Talents")]
@@ -61,7 +61,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 
         public void HideHealthBar()
         {
-            _healthBar.gameObject.SetActive(false);
+            _healthBarGameObject.SetActive(false);
+        }
+        
+        public void ShowMolesHitScore(int molesHitScore)
+        {
+            HideHealthBar();
+            _molesHitScoreContainer.SetActive(true);
+            UpdateMolesHitScore(molesHitScore);
+        }
+
+        public void UpdateMolesHitScore(int molesHitScore)
+        {
+            _molesHitScoreText.text = molesHitScore.ToString();
         }
 
         public void UpdateTalents(TalentVisualData[] talents)

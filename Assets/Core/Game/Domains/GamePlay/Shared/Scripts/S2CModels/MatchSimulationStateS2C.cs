@@ -1138,6 +1138,21 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             }
         }
 
+        public int AddMolesHitScoreForPlayer(ushort playerId, int scoreDelta)
+        {
+            var player = GetPlayerById(playerId);
+            player.MolesHitScore += scoreDelta;
+            return player.MolesHitScore;
+        }
+
+        public void ResetMolesHitScoreForAllPlayers()
+        {
+            foreach (var player in Players.AsSpan())
+            {
+                player.MolesHitScore = 0;
+            }
+        }
+
         public void ClearObjectStates()
         {
             Bullets.Clear();

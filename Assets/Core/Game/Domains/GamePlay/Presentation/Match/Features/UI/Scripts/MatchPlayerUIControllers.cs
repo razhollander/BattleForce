@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Utils.CustomCollections;
 using Core.Scripts.Network;
 
@@ -33,6 +34,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId, _gamePlayConfig, _sharedGamePlayConfig, _networkConfig, _stageCancellationTokenProvider);
             newPlayerController.CreateView(_view.PlayerUIView, _view.PlayersContainer);
+
+            switch (_matchDataService.StageType)
+            {
+                case StageType.DeathMatch: // the health bar is shown by default
+                    break;
+                case StageType.WhacAMole: // the health bar slot shows the player's moles-hit score contribution instead
+                    newPlayerController.ShowMolesHitScore(_matchDataService.GetPlayer(playerId).MolesHitScore);
+                    break;
+                default:
+                    newPlayerController.HideHealthBar();
+                    break;
+            }
+
             var playerTalentsState =_matchDataService.GetPlayer(playerId).Spaceship.TalentsState;
             newPlayerController.UpdateTalents(playerTalentsState.Talents, playerTalentsState.SelectedTalentIndex, currentServerTick);
             _playerControllers.Add(playerId, newPlayerController);
@@ -46,6 +60,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         public void HidePlayerHealthBar(ushort playerId)
         {
             _playerControllers[playerId].HideHealthBar();
+        }
+
+        public void UpdatePlayerMolesHitScore(ushort playerId, int molesHitScore)
+        {
+            _playerControllers[playerId].UpdateMolesHitScore(molesHitScore);
         }
 
         public void SwitchToPlayerDeadState(ushort playerId)

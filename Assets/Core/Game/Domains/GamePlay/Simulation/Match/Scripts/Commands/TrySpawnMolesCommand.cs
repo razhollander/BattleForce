@@ -68,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ProcessExpiringMoles();
             EmergeMolesWhoseHoleFinishedShaking();
 
-            var isStageAcceptingMoles = !simulationState.IsInPreparationPhase && !_stageDataService.IsStageEnded;
+            var isStageAcceptingMoles = !simulationState.IsInPreparationPhase && !_stageDataService.IsStageEnded && _processedTick < simulationState.WhacAMoleEndTick;
             if (!isStageAcceptingMoles)
             {
                 return;

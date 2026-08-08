@@ -232,10 +232,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 return;
             }
 
+            // MatchPlayerUIView health bars are hidden centrally in MatchPlayerUIControllers.AddPlayer for every non-DeathMatch stage.
             foreach (var player in _simulationState.Players.AsSpan())
             {
                 _playerControllers.HidePlayerHealthBar(player.Id);
-                _playerUIControllers.HidePlayerHealthBar(player.Id);
             }
         }
 

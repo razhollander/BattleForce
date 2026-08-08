@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public ushort ByTeamId;
         public byte ScoreGained;
         public int TeamMolesHitTotal;
+        public int ByPlayerMolesHitScoreTotal;
         public bool IsGolden;
 
         public void Serialize(NetDataWriter writer)
@@ -22,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             writer.Put((byte)ByTeamId);
             writer.Put(ScoreGained);
             writer.Put(TeamMolesHitTotal);
+            writer.Put(ByPlayerMolesHitScoreTotal);
             writer.Put(IsGolden);
         }
 
@@ -33,6 +35,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             ByTeamId = reader.GetByte();
             ScoreGained = reader.GetByte();
             TeamMolesHitTotal = reader.GetInt();
+            ByPlayerMolesHitScoreTotal = reader.GetInt();
             IsGolden = reader.GetBool();
         }
 

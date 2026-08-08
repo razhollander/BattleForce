@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Mvc.WorldCamera;
 using Core.Scripts.Services.AudioService;
 using Core.Scripts.Utils;
@@ -26,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchDataService _matchDataService;
         private IAudioService _audioService;
         private IStageCancellationTokenProvider _stageCancellationTokenProvider;
+        private IMoleControllers _moleControllers;
 
         public override void ResolveDependencies()
         {
@@ -36,6 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _audioService = _diContainer.Resolve<IAudioService>();
             _stageCancellationTokenProvider = _diContainer.Resolve<IStageCancellationTokenProvider>();
+            _moleControllers = _diContainer.Resolve<IMoleControllers>();
         }
 
         public void Execute()
@@ -47,7 +51,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
 
             _audioService.PlayAudio(AudioClipType.StageWinLaugh);
-            
+
+            // The server hides all moles at the timer end without per-mole net events, so the client mirrors that here.
+            if (_matchDataService.StageType == StageType.WhacAMole)
+            {
+                _moleControllers.SetAllMolesInHole();
+            }
+
             foreach (var stageEndEvent in stageEndEvents)
             {
                 var winningTeamId = stageEndEvent.WinningTeamId;

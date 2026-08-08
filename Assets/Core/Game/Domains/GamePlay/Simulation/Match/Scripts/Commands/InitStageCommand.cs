@@ -103,6 +103,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             var simulationState = _matchDataService.SimulationState;
             simulationState.ResetMolesHitPerTeam(_matchDataService.TeamIds);
+            simulationState.ResetMolesHitScoreForAllPlayers();
 
             if (stageType != StageType.WhacAMole)
             {

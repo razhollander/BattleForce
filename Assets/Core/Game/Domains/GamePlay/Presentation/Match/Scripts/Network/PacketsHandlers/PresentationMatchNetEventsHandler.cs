@@ -295,6 +295,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _matchDataService.RemoveMole(moleHitNetEvent.MoleId);
                 _matchDataService.SetTeamMolesHit(moleHitNetEvent.ByTeamId, moleHitNetEvent.TeamMolesHitTotal);
+                _matchDataService.SetPlayerMolesHitScore(moleHitNetEvent.ByPlayerId, moleHitNetEvent.ByPlayerMolesHitScoreTotal);
                 _cachedPresentationEventsService.MoleHitNetEvents.Add(moleHitNetEvent);
             }
         }

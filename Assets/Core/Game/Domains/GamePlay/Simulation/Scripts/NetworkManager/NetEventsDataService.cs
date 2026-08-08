@@ -2901,7 +2901,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
             }
         }
 
-        public void AddMoleHitNetEvent(int onTick, ushort moleId, ushort byPlayerId, ushort byTeamId, byte scoreGained, int teamMolesHitTotal, bool isGolden)
+        public void AddMoleHitNetEvent(int onTick, ushort moleId, ushort byPlayerId, ushort byTeamId, byte scoreGained, int teamMolesHitTotal, int byPlayerMolesHitScoreTotal, bool isGolden)
         {
             foreach (var kvp in MoleHitNetEventsPerClient)
             {
@@ -2912,6 +2912,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.ByTeamId = byTeamId;
                 packet.ScoreGained = scoreGained;
                 packet.TeamMolesHitTotal = teamMolesHitTotal;
+                packet.ByPlayerMolesHitScoreTotal = byPlayerMolesHitScoreTotal;
                 packet.IsGolden = isGolden;
             }
         }

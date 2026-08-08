@@ -200,7 +200,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public MatchPlayerModel AddPlayer(PlayerStateS2C playerState)
         {
             var playerTeamId = playerState.TeamId;
-            var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, playerState.Spaceship);
+            var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, playerState.MolesHitScore, playerState.Spaceship);
             Players.Add(newPlayer);
             return newPlayer;
         }
@@ -306,6 +306,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public void SetTeamMolesHit(ushort teamId, int totalTeamMolesHit)
         {
             MolesHitPerTeam[teamId] = totalTeamMolesHit;
+        }
+
+        public void SetPlayerMolesHitScore(ushort playerId, int totalPlayerMolesHitScore)
+        {
+            GetPlayer(playerId).MolesHitScore = totalPlayerMolesHitScore;
         }
 
         public bool IsTeamLeadingInGems(ushort teamId)

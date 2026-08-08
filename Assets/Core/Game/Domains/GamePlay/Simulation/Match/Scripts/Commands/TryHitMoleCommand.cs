@@ -86,7 +86,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             simulationState.RemoveMoleById(_moleId);
             _physicsSimulator.RemoveMole(_moleId);
             simulationState.AddMolesHitForTeam(_byTeamId, score);
-            _netEventsDataService.AddMoleHitNetEvent(_processedTick, _moleId, _byPlayerId, _byTeamId, (byte)score, simulationState.MolesHitPerTeamId[_byTeamId], isGolden);
+            var byPlayerMolesHitScoreTotal = simulationState.AddMolesHitScoreForPlayer(_byPlayerId, score);
+            _netEventsDataService.AddMoleHitNetEvent(_processedTick, _moleId, _byPlayerId, _byTeamId, (byte)score, simulationState.MolesHitPerTeamId[_byTeamId], byPlayerMolesHitScoreTotal, isGolden);
         }
     }
 }

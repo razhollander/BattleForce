@@ -25,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
+        private TryHitMoleCommand _tryHitMoleCommand;
         private readonly ICommandFactory _commandFactory;
 
         public TalentType TalentType => TalentType.MagneticPull;
@@ -57,6 +58,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
+            _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -101,13 +103,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var offset = casterPlayerState.Spaceship.Transform.Radius;
             var center = casterPlayerState.Spaceship.Transform.Position + (direction * offset);
             ushort hitEnemyId = 0;
+            var didHitEnemy = false;
 
-            var didHitEnemy = _physicsSimulator.ArcCastOnPlayers(center, _sharedGamePlayConfig.MagneticPullFieldRadius, direction,
-                _gamePlayConfigService.GamePlayConfig.Talents.MagneticPullTalentConfig.FieldArcAngle, (short) casterPlayerState.TeamId, out var hitBodyData);
-            if (didHitEnemy)
+            var fieldRadius = _sharedGamePlayConfig.MagneticPullFieldRadius;
+            var fieldArcAngle = _gamePlayConfigService.GamePlayConfig.Talents.MagneticPullTalentConfig.FieldArcAngle;
+            // A hit enemy takes priority; a mole is only whacked when none was inside the arc. Moles only exist in the WhacAMole stage, so elsewhere the mole type simply never matches.
+            if (_physicsSimulator.ArcCastByPriority(center, fieldRadius, direction, fieldArcAngle, (short) casterPlayerState.TeamId, PhysicsBodyType.PlayerSpaceship, PhysicsBodyType.Mole, out var hitBodyData))
             {
-                hitEnemyId = hitBodyData.Id;
-                ApplyPullToEnemyPhysics(tick, hitEnemyId, casterPlayerState);
+                if (hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship)
+                {
+                    didHitEnemy = true;
+                    hitEnemyId = hitBodyData.Id;
+                    ApplyPullToEnemyPhysics(tick, hitEnemyId, casterPlayerState);
+                }
+                else
+                {
+                    _tryHitMoleCommand
+                        .SetMoleId(hitBodyData.Id)
+                        .SetByPlayerId(_casterPlayerId)
+                        .SetByTeamId(casterPlayerState.TeamId)
+                        .SetProcessedTick(tick)
+                        .Execute();
+                }
             }
             
             ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);

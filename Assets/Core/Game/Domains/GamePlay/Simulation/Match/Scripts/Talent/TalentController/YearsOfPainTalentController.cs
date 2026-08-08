@@ -25,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
+        private TryHitMoleCommand _tryHitMoleCommand;
         private readonly ICommandFactory _commandFactory;
 
         public TalentType TalentType => TalentType.YearsOfPain;
@@ -56,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
+            _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -104,12 +106,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var center = casterPlayerState.Spaceship.Transform.Position + (direction * (offset + colliderSize.Y * 0.5f));
             var angleRadians = direction.ToAngleRadians();
             ushort hitEnemyId = 0;
+            var didHitEnemy = false;
 
-            var didHitEnemy = _physicsSimulator.RectangleCastOnPlayers(center, colliderSize, angleRadians, (short) casterPlayerState.TeamId, out var hitBodyData);
-            if (didHitEnemy)
+            // A hit enemy takes priority; a mole is only whacked when none was inside the rectangle. Moles only exist in the WhacAMole stage, so elsewhere the mole type simply never matches.
+            if (_physicsSimulator.RectangleCastByPriority(center, colliderSize, angleRadians, (short) casterPlayerState.TeamId, PhysicsBodyType.PlayerSpaceship, PhysicsBodyType.Mole, out var hitBodyData))
             {
-                hitEnemyId = hitBodyData.Id;
-                ApplyEffectToEnemyPhysics(tick, hitEnemyId, casterPlayerState);
+                if (hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship)
+                {
+                    didHitEnemy = true;
+                    hitEnemyId = hitBodyData.Id;
+                    ApplyEffectToEnemyPhysics(tick, hitEnemyId, casterPlayerState);
+                }
+                else
+                {
+                    _tryHitMoleCommand
+                        .SetMoleId(hitBodyData.Id)
+                        .SetByPlayerId(_casterPlayerId)
+                        .SetByTeamId(casterPlayerState.TeamId)
+                        .SetProcessedTick(tick)
+                        .Execute();
+                }
             }
 
             ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);

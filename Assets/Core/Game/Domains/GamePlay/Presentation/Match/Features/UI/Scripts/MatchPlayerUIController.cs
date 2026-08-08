@@ -48,6 +48,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _view.HideHealthBar();
         }
 
+        public void ShowMolesHitScore(int molesHitScore)
+        {
+            _view.ShowMolesHitScore(molesHitScore);
+        }
+
+        public void UpdateMolesHitScore(int molesHitScore)
+        {
+            _view.UpdateMolesHitScore(molesHitScore);
+        }
+
         public void SwitchToPlayerDeadState()
         {
             _view.SetOpacity(0.5f);
