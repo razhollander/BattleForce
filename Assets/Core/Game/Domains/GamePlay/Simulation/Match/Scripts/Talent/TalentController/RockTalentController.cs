@@ -30,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private UpdatePlayerLavaExposureCommand _updatePlayerLavaExposureCommand;
+        private TryCollidePlayerWithOverlappingSpikeCommand _tryCollidePlayerWithOverlappingSpikeCommand;
 
         public TalentType TalentType => TalentType.Rock;
 
@@ -56,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _updatePlayerLavaExposureCommand = _commandFactory.CreateCommandVoid<UpdatePlayerLavaExposureCommand>();
+            _tryCollidePlayerWithOverlappingSpikeCommand = _commandFactory.CreateCommandVoid<TryCollidePlayerWithOverlappingSpikeCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -186,6 +188,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             // Immunity ends with Rock: if the player is still in lava, resume the exposed state.
             _updatePlayerLavaExposureCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
+
+            // A spike the player entered while immune never damaged them, so collide with it now that immunity ended.
+            _tryCollidePlayerWithOverlappingSpikeCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
         }
 
         public void ResetData()

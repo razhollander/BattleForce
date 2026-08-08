@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ICommandFactory _commandFactory;
         private readonly IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private UpdatePlayerLavaExposureCommand _updatePlayerLavaExposureCommand;
+        private TryCollidePlayerWithOverlappingSpikeCommand _tryCollidePlayerWithOverlappingSpikeCommand;
 
         public TalentType TalentType => TalentType.Frozen;
 
@@ -47,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         public void InitEntryPoint()
         {
             _updatePlayerLavaExposureCommand = _commandFactory.CreateCommandVoid<UpdatePlayerLavaExposureCommand>();
+            _tryCollidePlayerWithOverlappingSpikeCommand = _commandFactory.CreateCommandVoid<TryCollidePlayerWithOverlappingSpikeCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -134,8 +136,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             _netEventsDataService.AddDeactivateFrozenTalentNetEvent(tick, _casterPlayerId, cooldownEndTick);
             _playersInLavaTrackerService.TryResetPlayerTimePassedSinceLastDamageTaken(_casterPlayerId);
-            
+
             _updatePlayerLavaExposureCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
+
+            // A spike the player entered while immune never damaged them, so collide with it now that immunity ended.
+            _tryCollidePlayerWithOverlappingSpikeCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
         }
 
         public void ResetData()

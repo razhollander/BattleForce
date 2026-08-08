@@ -643,6 +643,48 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return hasCollision;
         }
 
+        public bool CircleCastOnEnvironmentSpikes(Vector2 center, float radius, out PhysicsBodyData hitBodyData)
+        {
+            var hasCollision = false;
+            var lowerBound = center - new Vector2(radius, radius);
+            var upperBound = center + new Vector2(radius, radius);
+            var aabb = new AABB(lowerBound, upperBound);
+            PhysicsBodyData hitBody = default;
+
+            _world.QueryAABB(fixture =>
+            {
+                var currentBodyData = (PhysicsBodyData) fixture.Body.UserData;
+                if (currentBodyData.PhysicsBodyType != PhysicsBodyType.EnvironmentSpike)
+                {
+                    return true;
+                }
+
+                var circleShape = GetCircleShape();
+                circleShape.Radius = radius;
+                circleShape.Center = Vector2.Zero;
+
+                var input = new ShapeCastInput();
+                input.proxyA.Set(circleShape, 0);
+                input.proxyB.Set(fixture.Shape, 0);
+                input.transformA = new Transform(center, Matrix3x2.Identity);
+                input.transformB = fixture.Body.GetTransform();
+                input.translationB = Vector2.Zero;
+
+                if (Contact.ShapeCast(out _, input))
+                {
+                    hasCollision = true;
+                    hitBody = currentBodyData;
+                }
+
+                _circleShapePool.Return(circleShape);
+                return !hasCollision;
+            }, aabb);
+
+            hitBodyData = hitBody;
+
+            return hasCollision;
+        }
+
         public bool RectangleCast(Vector2 center, Vector2 size, float angleRadians, params PhysicsBodyType[] bodyTypes)
         {
             _unityMainThreadDispatcher.EnqueueDraw(()=>DebugDrawUtils.DrawRotatedRect(center, size, angleRadians));
