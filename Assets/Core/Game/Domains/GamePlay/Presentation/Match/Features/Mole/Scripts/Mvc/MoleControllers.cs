@@ -78,6 +78,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             controller.SetHitState();
         }
 
+        // The mole stays hittable while it shakes, so unlike a hit or a straight hide it keeps its spot in the active lookup
+        // until the shake ends. A hit landing during the shake still funnels through SetMoleHit and takes it from there.
+        public void SetMoleExpiring(ushort moleId, float shakeDurationSeconds)
+        {
+            if (!_controllerPerActiveMoleId.TryGetValue(moleId, out var controller) || controller.ActiveMoleId != moleId)
+            {
+                return;
+            }
+
+            controller.SetExpiringState(shakeDurationSeconds);
+        }
+
         public void SetMoleInHole(ushort moleId)
         {
             if (!TryTakeActiveMoleController(moleId, out var controller))

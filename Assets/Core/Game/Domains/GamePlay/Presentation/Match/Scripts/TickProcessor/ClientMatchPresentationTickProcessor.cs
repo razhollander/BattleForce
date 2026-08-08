@@ -251,10 +251,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTickDeltas();
             _updatePreperationPhaseCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
             _updateWhacAMoleCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
-            _handleMoleSpawnedNetEventsCommand.Execute();
+            _handleMoleSpawnedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleGoldenMoleDamagedNetEventsCommand.Execute();
             _handleMoleHitNetEventsCommand.Execute();
-            _handleMoleExpiredNetEventsCommand.Execute();
+            _handleMoleExpiredNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();
             _handleDeactivateKOTalentNetEventsCommand.Execute();
             _handleCreateGrapplingHookProjecitleNetEventsCommand.Execute();

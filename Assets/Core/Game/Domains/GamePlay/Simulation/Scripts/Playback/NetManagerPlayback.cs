@@ -14,16 +14,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Playback
         private NetworkC2SPacketsListener _packetsListener;
         private readonly IPlaybackRecorderService _playbackRecorderService;
         private readonly ITickService _tickService;
-        private readonly NetworkConfig _networkConfig;
         private NetManager _netManager;
 
-        public int ConnectedPeersCount => _netManager != null ? _netManager.ConnectedPeersCount : 0;
+        public int ConnectedPeersCount => _netManager?.ConnectedPeersCount ?? 0;
 
-        public NetManagerPlayback(IPlaybackRecorderService playbackRecorderService, ITickService tickService, NetworkConfig networkConfig)
+        public NetManagerPlayback(IPlaybackRecorderService playbackRecorderService, ITickService tickService)
         {
             _playbackRecorderService = playbackRecorderService;
             _tickService = tickService;
-            _networkConfig = networkConfig;
         }
 
         public void SetPacketsListener(NetworkC2SPacketsListener packetsListener)

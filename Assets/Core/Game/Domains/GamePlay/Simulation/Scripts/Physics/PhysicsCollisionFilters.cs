@@ -88,6 +88,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsCollisionType.Wall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
+                                    | GetCollisionMask(PhysicsCollisionType.Mole)
                                     | GetCollisionMask(PhysicsCollisionType.ChickenEgg);
                     break;
                 case PhysicsBodyType.SwapField:
@@ -103,6 +104,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 case PhysicsBodyType.FishingRodTip:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
+                                    | GetCollisionMask(PhysicsCollisionType.Mole)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.SoulGhost:
@@ -113,10 +115,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsCollisionType.KOProjectile);
                     break;
-                // A mole is a sensor that only needs to notice bullets and spaceships - those are the two ways it can be whacked.
+                // A mole is a sensor that only needs to notice the things that can whack it: bullets, spaceships carrying a talent that spins whatever it touches, and the projectiles of such talents.
+                // A chicken egg is missing here on purpose - both it and the mole are static bodies, so Box2D never pairs them. TryBreakChickenEggsOnMolesCommand resolves that overlap instead.
                 case PhysicsBodyType.Mole:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerBullet)
-                                    | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsCollisionType.KOProjectile)
+                                    | GetCollisionMask(PhysicsCollisionType.FishingRodTip);
                     break;
                 default:
                     collisionMask = 0xFFFF;

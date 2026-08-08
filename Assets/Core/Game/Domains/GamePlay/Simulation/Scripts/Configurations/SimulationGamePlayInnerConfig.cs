@@ -34,6 +34,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public bool IsWhacAMoleModeEnabled = true;
         [ConditionalField(nameof(IsWhacAMoleModeEnabled), true)]
         public int WhacAMoleEveryXStages = 3;
+        // DeafultEnvironmentId names a DeathMatch layout, which a WhacAMole stage cannot use, so that
+        // stage type needs its own pick for when ShouldChooseRandomStage is off.
+        [ConditionalField(nameof(IsWhacAMoleModeEnabled), true)]
+        public int DefaultWhacAMoleEnvironmentId = 21;
         public WhacAMoleConfig WhacAMole;
         public float StageSizeMultiplier = 1.0f;
         public float SpeedupSimulation = 2f;

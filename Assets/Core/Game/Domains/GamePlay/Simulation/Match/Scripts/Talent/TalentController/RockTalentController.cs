@@ -30,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private UpdatePlayerLavaExposureCommand _updatePlayerLavaExposureCommand;
+        private TryHitMoleCommand _tryHitMoleCommand;
 
         public TalentType TalentType => TalentType.Rock;
 
@@ -56,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _updatePlayerLavaExposureCommand = _commandFactory.CreateCommandVoid<UpdatePlayerLavaExposureCommand>();
+            _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -105,10 +107,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _updatePlayerLavaExposureCommand.SetPlayerId(_casterPlayerId).SetProcessedTick(tick).Execute();
         }
 
+        // Distance decides what the rock pushes, not a physics contact: the contact of an enemy the ship already overlapped began before the rock grew, so it raises nothing.
+        // Both radii count, since that is what the two touching means.
         private void PushAndSpinNearbyEnemies(int tick, PlayerStateS2C casterPlayerState, RockTalentConfig config)
         {
             var rockPosition = casterPlayerState.Spaceship.Transform.Position;
-            var radiusSquared = config.EnemyPushRadius * config.EnemyPushRadius;
+            var rockRadius = GetRockRadius(casterPlayerState, config);
 
             foreach (var enemyPlayerState in _matchDataService.SimulationState.Players.AsSpan())
             {
@@ -119,8 +123,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                     continue;
                 }
 
+                var pushRadius = rockRadius + enemyPlayerState.Spaceship.Transform.Radius;
                 var toEnemy = enemyPlayerState.Spaceship.Transform.Position - rockPosition;
-                if (toEnemy.LengthSquared() > radiusSquared)
+                if (toEnemy.LengthSquared() > pushRadius * pushRadius)
                 {
                     continue;
                 }
@@ -131,12 +136,47 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
         }
 
+        // Runs every tick the rock lasts, so a mole that emerges under the rock or one the rock is pushed onto is whacked just like the moles it covered the moment it grew.
+        private void WhackMolesCoveredByRock(int tick)
+        {
+            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
+            var rockPosition = casterPlayerState.Spaceship.Transform.Position;
+            var rockRadius = GetRockRadius(casterPlayerState, _gamePlayConfigService.GamePlayConfig.Talents.RockTalentConfig);
+            var whackRadius = rockRadius + _gamePlayConfigService.GamePlayConfig.WhacAMole.MoleRadius;
+            var whackRadiusSquared = whackRadius * whackRadius;
+            var moles = _matchDataService.SimulationState.Moles;
+
+            for (int i = moles.Count - 1; i >= 0; i--) // backwards, since a whacked mole is removed from the list
+            {
+                var mole = moles[i];
+
+                if (!mole.IsEmerged || (mole.Position - rockPosition).LengthSquared() > whackRadiusSquared)
+                {
+                    continue;
+                }
+
+                _tryHitMoleCommand
+                    .SetMoleId(mole.Id)
+                    .SetByPlayerId(_casterPlayerId)
+                    .SetByTeamId(casterPlayerState.TeamId)
+                    .SetProcessedTick(tick)
+                    .Execute();
+            }
+        }
+
+        private float GetRockRadius(PlayerStateS2C casterPlayerState, RockTalentConfig config)
+        {
+            return casterPlayerState.Spaceship.Transform.Radius * config.ColliderRadiusMultiplier;
+        }
+
         public void OnTick(int tick, float deltaTime)
         {
             if (!IsCurrentlyActive)
             {
                 return;
             }
+
+            WhackMolesCoveredByRock(tick);
 
             var elapsedSecondsBeingRock = (tick - _startTick) * deltaTime;
             var didRockDurationFinish = elapsedSecondsBeingRock >= _gamePlayConfigService.GamePlayConfig.Talents.RockTalentConfig.DurationInSeconds;

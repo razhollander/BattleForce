@@ -166,6 +166,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _koTalentController.HitWall();
         }
 
+        public void HitKOTalentWithMole(ushort moleId, int tick)
+        {
+            _koTalentController.HitMole(moleId, tick);
+        }
+
         public void HitGrapplingHook(GrapplingHookHitType hitType, ushort attachedEntityId, int tick)
         {
             _grapplingHookTalentController.Hit(hitType, attachedEntityId, tick);
@@ -174,6 +179,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         public void CatchFishingRodEnemy(ushort enemyPlayerId, int tick)
         {
             _fishingRodTalentController.CatchEnemy(enemyPlayerId, tick);
+        }
+
+        public void CatchFishingRodMole(ushort moleId, int tick)
+        {
+            _fishingRodTalentController.CatchMole(moleId, tick);
         }
 
         public void HitFishingRodWithWall(int tick)
@@ -190,6 +200,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         {
             if (potentialCasterId != _casterPlayerId) return;
             _headbuttTalentController.HitEnemy(potentialEnemyId, tick);
+        }
+
+        public void HeadbuttHitMole()
+        {
+            _headbuttTalentController.HitMole();
         }
 
         public void ResetData()

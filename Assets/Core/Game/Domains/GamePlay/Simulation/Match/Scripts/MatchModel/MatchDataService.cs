@@ -124,6 +124,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             mole.EmergeOnTick = emergeOnTick;
             mole.IsEmerged = false;
             mole.DisappearOnTick = disappearOnTick;
+            mole.HideOnTick = 0;
             mole.IsGolden = isGolden;
             mole.RemainingLives = lives;
             mole.MaxLives = lives;
@@ -178,6 +179,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             fishingRodProjectile.Velocity = velocity;
             fishingRodProjectile.Phase = FishingRodTipPhase.FlyingForward;
             fishingRodProjectile.CaughtEnemyId = 0;
+            fishingRodProjectile.CaughtEnemyType = FishingRodCaughtEnemyType.None;
             fishingRodProjectile.EnemyCaughtArrowDirection = Vector2.Zero;
             return fishingRodProjectile;
         }

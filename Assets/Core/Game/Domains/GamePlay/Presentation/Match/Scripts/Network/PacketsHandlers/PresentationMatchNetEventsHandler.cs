@@ -299,6 +299,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        // An expired mole is not gone yet, it only starts its pre-hide shake and stays hittable until it goes into its
+        // hole, so the model keeps it here. A mole caught during that shake is dropped by ProcessMoleHitEvents, and one
+        // that hides on its own leaves no event, so its stale model entry is cleared with the rest on the next full sync.
         public void ProcessMoleExpiredEvents(CapacityList<MoleExpiredNetEventS2C> moleExpiredNetEvents)
         {
             if (moleExpiredNetEvents.IsNullOrEmpty())
@@ -308,7 +311,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var moleExpiredNetEvent in moleExpiredNetEvents)
             {
-                _matchDataService.RemoveMole(moleExpiredNetEvent.MoleId);
                 _cachedPresentationEventsService.MoleExpiredNetEvents.Add(moleExpiredNetEvent);
             }
         }
@@ -561,7 +563,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 var tipState = netEvent.FishingRodProjectile;
                 SetPlayerTalentActive(tipState.PlayerCasterId, TalentType.FishingRod);
-                _matchDataService.AddFishingRodTip(tipState.Id, tipState.PlayerCasterId, tipState.Position, tipState.Phase);
+                _matchDataService.AddFishingRodTip(tipState.Id, tipState.PlayerCasterId, tipState.Position, tipState.Phase, tipState.CaughtEnemyId, tipState.CaughtEnemyType);
                 _cachedPresentationEventsService.CreateFishingRodProjectileNetEvents.Add(netEvent);
             }
         }
@@ -575,7 +577,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in events)
             {
-                _matchDataService.GetFishingRodTip(netEvent.ProjectileId).Phase = FishingRodTipPhase.CaughtEnemy;
+                var tipModel = _matchDataService.GetFishingRodTip(netEvent.ProjectileId);
+                tipModel.Phase = FishingRodTipPhase.CaughtEnemy;
+                tipModel.CaughtEnemyId = netEvent.CaughtEnemyId;
+                tipModel.CaughtEnemyType = netEvent.CaughtEnemyType;
                 _cachedPresentationEventsService.FishingRodCaughtEnemyNetEvents.Add(netEvent);
             }
         }

@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     public class TrySpawnMolesCommand : BaseCommand, ICommandVoid
     {
         private const int NEVER_EXPIRES_TICK = 0;
+        private const int NOT_EXPIRING_TICK = 0; // a mole that has not started its pre-hide shake yet has a zero hide tick
 
         private static readonly PhysicsBodyType[] BLOCKING_SPAWN_BODY_TYPES =
         {
@@ -64,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
-            DespawnExpiredMoles();
+            ProcessExpiringMoles();
             EmergeMolesWhoseHoleFinishedShaking();
 
             var isStageAcceptingMoles = !simulationState.IsInPreparationPhase && !_stageDataService.IsStageEnded;
@@ -102,7 +103,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var emergeOnTick = _processedTick + CalculateHoleShakeTicks();
             var mole = _matchDataService.AddMole(position, emergeOnTick, CalculateDisappearOnTick(whacAMoleConfig, emergeOnTick), isGolden, lives);
             _molesSpawnerService.RegisterMoleSpawned(isGolden);
-            _netEventsDataService.AddMoleSpawnedNetEvent(_processedTick, mole.Id, position, isGolden, lives);
+            _netEventsDataService.AddMoleSpawnedNetEvent(_processedTick, mole.Id, position, emergeOnTick, isGolden, lives);
         }
 
         private void EmergeMolesWhoseHoleFinishedShaking()
@@ -129,6 +130,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             return (int)System.MathF.Ceiling(_sharedGamePlayConfig.MoleHoleShakeDurationSeconds * _networkConfig.TicksPerSeconds);
         }
 
+        private int CalculateHideShakeTicks()
+        {
+            return (int)System.MathF.Ceiling(_sharedGamePlayConfig.MoleHideShakeDurationSeconds * _networkConfig.TicksPerSeconds);
+        }
+
         // The lifetime only starts once the mole is actually out of its hole, the shake is not part of it.
         private int CalculateDisappearOnTick(WhacAMoleConfig whacAMoleConfig, int emergeOnTick)
         {
@@ -142,27 +148,42 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             return emergeOnTick + lifetimeTicks;
         }
 
-        private void DespawnExpiredMoles()
+        // A mole whose lifetime ended does not vanish at once: it first shakes in place while staying hittable, and only
+        // goes back into its hole once that shake is over. The expired net event is sent when the shake starts and carries
+        // the hide tick, so no second event is needed once the mole is finally removed.
+        private void ProcessExpiringMoles()
         {
             var moles = _matchDataService.SimulationState.Moles;
 
             for (int i = moles.Count - 1; i >= 0; i--)
             {
-                var mole = moles[i];
-                var hasExpired = mole.DisappearOnTick != NEVER_EXPIRES_TICK && _processedTick >= mole.DisappearOnTick;
+                ref var mole = ref moles.GetByIndex(i);
 
-                if (!hasExpired)
+                if (mole.HideOnTick != NOT_EXPIRING_TICK)
+                {
+                    if (_processedTick < mole.HideOnTick)
+                    {
+                        continue;
+                    }
+
+                    if (mole.IsEmerged)
+                    {
+                        _physicsSimulator.RemoveMole(mole.Id);
+                    }
+
+                    moles.RemoveAt(i);
+                    continue;
+                }
+
+                var hasReachedLifetimeEnd = mole.DisappearOnTick != NEVER_EXPIRES_TICK && _processedTick >= mole.DisappearOnTick;
+
+                if (!hasReachedLifetimeEnd)
                 {
                     continue;
                 }
 
-                if (mole.IsEmerged)
-                {
-                    _physicsSimulator.RemoveMole(mole.Id);
-                }
-
-                moles.RemoveAt(i);
-                _netEventsDataService.AddMoleExpiredNetEvent(_processedTick, mole.Id);
+                mole.HideOnTick = _processedTick + CalculateHideShakeTicks();
+                _netEventsDataService.AddMoleExpiredNetEvent(_processedTick, mole.Id, mole.HideOnTick);
             }
         }
 

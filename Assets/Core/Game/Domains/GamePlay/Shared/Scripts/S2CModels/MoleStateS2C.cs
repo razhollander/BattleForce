@@ -13,6 +13,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public int EmergeOnTick; // until this tick the mole is still hidden in its shaking hole, so it cannot be targeted or hit
         public bool IsEmerged; // server only, tells whether the mole already got its physics body
         public int DisappearOnTick; // server only, zero means this mole never expires on its own
+        public bool IsShakingBeforeHiding => HideOnTick != 0;
+        public int HideOnTick; // once its lifetime ends the mole shakes in place until this tick and then goes back into its hole, zero means it is not expiring yet
         public bool IsGolden;
         public byte RemainingLives; // a normal mole has a single life, a golden mole starts with MaxLives
         public byte MaxLives;
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             EmergeOnTick = emergeOnTick;
             IsEmerged = false;
             DisappearOnTick = disappearOnTick;
+            HideOnTick = 0;
             IsGolden = isGolden;
             RemainingLives = lives;
             MaxLives = lives;
@@ -34,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((byte)Id);
             writer.PutVector2Quantized(Position);
             writer.Put(EmergeOnTick);
+            writer.Put(HideOnTick);
             writer.Put(IsGolden);
             writer.Put(RemainingLives);
             writer.Put(MaxLives);
@@ -44,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             Id = reader.GetByte();
             Position = reader.GetVector2Quantized();
             EmergeOnTick = reader.GetInt();
+            HideOnTick = reader.GetInt();
             IsGolden = reader.GetBool();
             RemainingLives = reader.GetByte();
             MaxLives = reader.GetByte();

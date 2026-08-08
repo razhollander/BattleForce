@@ -27,4 +27,5 @@ public class SharedGamePlayConfig : ScriptableObject
     public float LockOnTargetDurationInSeconds = 1.5f;
     public float HeadbuttMaxChargeDurationSeconds = 2f;
     public float MoleHoleShakeDurationSeconds = 0.6f; // the mole stays hidden and unhittable while its hole shakes
+    public float MoleHideShakeDurationSeconds = 1f; // once its lifetime ends the mole shakes in place before hiding, and stays hittable while it does
 }

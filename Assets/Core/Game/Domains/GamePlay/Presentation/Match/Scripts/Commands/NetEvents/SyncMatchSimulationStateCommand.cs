@@ -267,6 +267,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var remainingShakeTicks = mole.EmergeOnTick - _stateOccouredOnTick;
                 _matchDataService.AddMole(mole.Id, position, mole.IsGolden, mole.RemainingLives, mole.MaxLives);
                 _moleControllers.SetMoleEmergingFromHole(mole.Id, position, remainingShakeTicks * _networkConfig.DeltaTime, mole.IsGolden, mole.RemainingLives, mole.MaxLives);
+
+                if (mole.IsShakingBeforeHiding)
+                {
+                    var remainingHideShakeTicks = mole.HideOnTick - _stateOccouredOnTick;
+                    if (remainingHideShakeTicks > 0)
+                    {
+                        _moleControllers.SetMoleExpiring(mole.Id, remainingHideShakeTicks * _networkConfig.DeltaTime);
+                    }
+                }
             }
         }
 
@@ -719,7 +728,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var position = fishingRodTip.Position;
                 var casterPosition = casterState.Spaceship.Transform.Position.ToUnityVector2();
                 var rotation = fishingRodTip.Position - casterPosition.ToNumericsVector2();
-                _matchDataService.AddFishingRodTip(fishingRodTip.Id, casterId, position, fishingRodTip.Phase);
+                _matchDataService.AddFishingRodTip(fishingRodTip.Id, casterId, position, fishingRodTip.Phase, fishingRodTip.CaughtEnemyId, fishingRodTip.CaughtEnemyType);
                 _fishingRodTipControllers.CreateFishingRodTip(fishingRodTip.Id, position.ToUnityVector2(), rotation.ToUnityVector2(), casterPosition, fishingRodTip.Phase);
 
                 if (fishingRodTip.Phase == FishingRodTipPhase.CaughtEnemy)

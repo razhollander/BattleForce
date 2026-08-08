@@ -53,6 +53,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         [SerializeField] private float _holeShakeRandomness = 20f;
 
         private Tween _bodyTween;
+        private Tween _shakeTween;
+        private Vector3 _positionBeforeShake;
         private bool _isGolden;
         
         
@@ -88,6 +90,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         public void ShowInHoleImmediately()
         {
             KillBodyTween();
+            KillShakeTween();
             SetIsHealthBarShown(false);
             SetIdleSprites();
             _handsSpriteRenderer.enabled = false;
@@ -97,6 +100,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         public void ShowOutsideHoleImmediately()
         {
             KillBodyTween();
+            KillShakeTween();
             SetIdleSprites();
             _handsSpriteRenderer.enabled = true;
             SetBodyLocalPositionY(OUTSIDE_HOLE_BODY_LOCAL_POSITION_Y);
@@ -105,10 +109,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         // The whole mole is shaken, so the hole shakes while the mole itself is still hidden inside it.
         public async Awaitable PlayHoleShakeAsync(float shakeDurationSeconds, CancellationToken cancellationToken)
         {
-            var positionBeforeShake = transform.position;
-            await transform.DOShakePosition(shakeDurationSeconds, _holeShakeStrength, _holeShakeVibrato, _holeShakeRandomness, fadeOut: false)
-                .WithCancellationSafe(cancellationToken);
-            transform.position = positionBeforeShake;
+            await PlayShakeAsync(shakeDurationSeconds, cancellationToken);
+        }
+
+        // The mole is already out of its hole here, it shakes in place to warn it is about to leave before it drops back in.
+        public async Awaitable PlayShakeInPlaceAsync(float shakeDurationSeconds, CancellationToken cancellationToken)
+        {
+            await PlayShakeAsync(shakeDurationSeconds, cancellationToken);
+        }
+
+        // The shake tween is tracked so a hit landing mid shake can kill it and snap the mole back to its resting position.
+        private async Awaitable PlayShakeAsync(float shakeDurationSeconds, CancellationToken cancellationToken)
+        {
+            KillShakeTween();
+            _positionBeforeShake = transform.position;
+            _shakeTween = transform.DOShakePosition(shakeDurationSeconds, _holeShakeStrength, _holeShakeVibrato, _holeShakeRandomness, fadeOut: false);
+            await _shakeTween.WithCancellationSafe(cancellationToken);
+            transform.position = _positionBeforeShake;
         }
 
         // The hands are only shown once the body has reached the top, they are the only part that is drawn over the dirt.
@@ -132,6 +149,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         public async Awaitable PlayHitAsync(CancellationToken cancellationToken)
         {
             KillBodyTween();
+            KillShakeTween();
             SetIsHealthBarShown(false);
             SetBodyLocalPositionY(OUTSIDE_HOLE_BODY_LOCAL_POSITION_Y); // the mole may still have been emerging when it was hit
             _bodySpriteRenderer.sprite = _isGolden ? _goldenHitWhamBodySprite : _hitWhamBodySprite;
@@ -157,6 +175,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         public void OnDespawned()
         {
             KillBodyTween();
+            KillShakeTween();
             gameObject.SetActive(false);
         }
 
@@ -190,6 +209,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             if (_bodyTween != null && _bodyTween.IsActive())
             {
                 _bodyTween.Kill();
+            }
+        }
+
+        private void KillShakeTween()
+        {
+            if (_shakeTween != null && _shakeTween.IsActive())
+            {
+                _shakeTween.Kill();
+                transform.position = _positionBeforeShake;
             }
         }
     }

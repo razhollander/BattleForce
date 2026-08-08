@@ -143,6 +143,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             DeactivateTalent(tick);
         }
 
+        // Smashing a mole brings the dash to a halt just like ramming an enemy does, but it does not consume the dash's single enemy hit.
+        public void HitMole()
+        {
+            if (_phase != HeadButtPhaseType.Dashing)
+            {
+                return;
+            }
+
+            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
+            casterPlayerState.Spaceship.Transform.Velocity = Vector2.Zero;
+        }
+
         public void StopIfActive(int tick)
         {
             if (_phase == HeadButtPhaseType.Charging)

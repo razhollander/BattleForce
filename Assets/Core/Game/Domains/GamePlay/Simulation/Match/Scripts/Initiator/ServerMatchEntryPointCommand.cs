@@ -35,7 +35,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private ITickService _tickService;
         private ICommandFactory _commandFactory;
-        private NetworkConfig _networkConfig;
         private IStageDataService _stageDataService;
         private ISimulationInputService _simulationInputService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
@@ -63,7 +62,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _tickService = _diContainer.Resolve<ITickService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
-            _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _simulationInputService = _diContainer.Resolve<ISimulationInputService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
@@ -111,7 +109,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         {
             if (_playbackRecorderService.IsPlaybackEnabled)
             {
-                _networkManager.SwitchToNetManager(new NetManagerPlayback(_playbackRecorderService, _tickService, _networkConfig));
+                _networkManager.SwitchToNetManager(new NetManagerPlayback(_playbackRecorderService, _tickService));
             }
             else
             {

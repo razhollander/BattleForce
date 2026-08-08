@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public int OccuredOnTick;
         public ushort MoleId;
         public Vector2 Position;
+        public int EmergeOnTick; // the tick the hole finishes shaking and the mole climbs out, so the client shakes only until then
         public bool IsGolden;
         public byte MaxLives;
 
@@ -19,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             writer.Put(OccuredOnTick);
             writer.Put((byte)MoleId);
             writer.PutVector2Quantized(Position);
+            writer.Put(EmergeOnTick);
             writer.Put(IsGolden);
             writer.Put(MaxLives);
         }
@@ -28,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             OccuredOnTick = reader.GetInt();
             MoleId = reader.GetByte();
             Position = reader.GetVector2Quantized();
+            EmergeOnTick = reader.GetInt();
             IsGolden = reader.GetBool();
             MaxLives = reader.GetByte();
         }

@@ -206,6 +206,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             }
         }
 
+        public void HitKOTalentWithMole(ushort casterId, ushort moleId, int tick)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.HitKOTalentWithMole(moleId, tick);
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
+            }
+        }
+
         public void HitGrapplingHook(ushort casterId, ushort projectileId, GrapplingHookHitType hitType, ushort attachedEntityId, int tick)
         {
             if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
@@ -223,6 +235,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
             {
                 controllers.CatchFishingRodEnemy(enemyPlayerId, tick);
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
+            }
+        }
+
+        public void CatchFishingRodWithMole(ushort casterId, ushort moleId, int tick)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.CatchFishingRodMole(moleId, tick);
             }
             else
             {
@@ -273,6 +297,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             if (_talentControllersPerPlayer.TryGetValue(potentialCasterId, out var controllers))
             {
                 controllers.TryHeadbuttHitEnemy(potentialCasterId, potentialEnemyId, tick);
+            }
+        }
+
+        public void HeadbuttHitMole(ushort casterId)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.HeadbuttHitMole();
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
             }
         }
 

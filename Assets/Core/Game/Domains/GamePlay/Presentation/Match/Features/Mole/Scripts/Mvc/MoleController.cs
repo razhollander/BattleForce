@@ -64,6 +64,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             _moleView.PlayHideInHoleAsync(_stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
         }
 
+        // The mole's lifetime ended, it shakes in place while staying hittable and only hides once the shake is over. The
+        // active mole id is kept for the whole shake so a hit can still land on it, only the hide at the end clears it.
+        public void SetExpiringState(float shakeDurationSeconds)
+        {
+            if (shakeDurationSeconds <= 0) // a rejoining client can catch a mole that already finished its shake
+            {
+                SetInHoleState();
+                return;
+            }
+
+            _stateType = MoleStateType.Expiring;
+            ShakeThenHideAsync(shakeDurationSeconds).Forget();
+        }
+
         // The mole stays hidden while its hole shakes, it only climbs out once the shake is over.
         public void SetEmergingFromHoleState(ushort moleId, float shakeDurationSeconds, bool isGolden, byte remainingLives, byte maxLives)
         {
@@ -110,6 +124,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             }
 
             ShowHealthBar();
+        }
+
+        private async Awaitable ShakeThenHideAsync(float shakeDurationSeconds)
+        {
+            await _moleView.PlayShakeInPlaceAsync(shakeDurationSeconds, _stageCancellationTokenProvider.CancellationTokenSource.Token);
+
+            if (_stateType != MoleStateType.Expiring) // the mole may have been hit or respawned while it was still shaking
+            {
+                return;
+            }
+
+            SetInHoleState();
         }
 
         // Every mole shows a health bar once it is fully out of its hole (a normal mole has one life, a golden mole three).

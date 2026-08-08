@@ -16,12 +16,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         void ResetAllTalentsData();
         void HitKOTalentWithEnemy(ushort casterId, ushort enemyPlayerId, int tick);
         void HitKOTalentWithWall(ushort casterId);
+        void HitKOTalentWithMole(ushort casterId, ushort moleId, int tick);
         void HitGrapplingHook(ushort casterId, ushort projectileId, GrapplingHookHitType hitType, ushort attachedEntityId, int tick);
         void CatchFishingRodWithEnemy(ushort casterId, ushort enemyPlayerId, int tick);
+        void CatchFishingRodWithMole(ushort casterId, ushort moleId, int tick);
         void HitFishingRodWithWall(ushort casterId, ushort projectileId, int tick);
         void HitSoulGhostWithWall(ushort casterId, ushort ghostId, int tick);
         void StopTalentIfActive(TalentType talentType, ushort playerId, int tick);
         void TryHeadbuttHitEnemy(ushort potentialCasterId, ushort potentialEnemyId, int tick);
+        void HeadbuttHitMole(ushort casterId);
         bool IsHeadbuttCharging(ushort playerId);
     }
 }

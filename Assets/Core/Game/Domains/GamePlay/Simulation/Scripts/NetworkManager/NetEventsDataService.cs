@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
@@ -2759,12 +2760,13 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.FishingRodProjectile.Id = projectileId;
                 packet.FishingRodProjectile.PlayerCasterId = playerCasterId;
                 packet.FishingRodProjectile.Position = position;
-                packet.FishingRodProjectile.Phase = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.FlyingForward;
+                packet.FishingRodProjectile.Phase = FishingRodTipPhase.FlyingForward;
                 packet.FishingRodProjectile.CaughtEnemyId = 0;
+                packet.FishingRodProjectile.CaughtEnemyType = FishingRodCaughtEnemyType.None;
             }
         }
 
-        public void AddFishingRodCaughtEnemyNetEvent(int onTick, ushort projectileId, ushort casterPlayerId, ushort caughtEnemyId)
+        public void AddFishingRodCaughtEnemyNetEvent(int onTick, ushort projectileId, ushort casterPlayerId, ushort caughtEnemyId, FishingRodCaughtEnemyType caughtEnemyType)
         {
             foreach (var kvp in FishingRodCaughtEnemyNetEventsPerClient)
             {
@@ -2773,6 +2775,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.ProjectileId = projectileId;
                 packet.CasterPlayerId = casterPlayerId;
                 packet.CaughtEnemyId = caughtEnemyId;
+                packet.CaughtEnemyType = caughtEnemyType;
             }
         }
 
@@ -2787,7 +2790,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
             }
         }
 
-        public void AddFishingRodThrowNetEvent(int onTick, ushort casterPlayerId, ushort thrownEnemyId, Vector2 throwDirection)
+        public void AddFishingRodThrowNetEvent(int onTick, ushort casterPlayerId, ushort thrownEnemyId, FishingRodCaughtEnemyType thrownEnemyType, Vector2 throwDirection)
         {
             foreach (var kvp in FishingRodThrowNetEventsPerClient)
             {
@@ -2795,6 +2798,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.OccuredOnTick = onTick;
                 packet.CasterPlayerId = casterPlayerId;
                 packet.ThrownEnemyId = thrownEnemyId;
+                packet.ThrownEnemyType = thrownEnemyType;
                 packet.ThrowDirection = throwDirection;
             }
         }
@@ -2883,7 +2887,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
             }
         }
 
-        public void AddMoleSpawnedNetEvent(int onTick, ushort moleId, System.Numerics.Vector2 position, bool isGolden, byte maxLives)
+        public void AddMoleSpawnedNetEvent(int onTick, ushort moleId, System.Numerics.Vector2 position, int emergeOnTick, bool isGolden, byte maxLives)
         {
             foreach (var kvp in MoleSpawnedNetEventsPerClient)
             {
@@ -2891,6 +2895,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.OccuredOnTick = onTick;
                 packet.MoleId = moleId;
                 packet.Position = position;
+                packet.EmergeOnTick = emergeOnTick;
                 packet.IsGolden = isGolden;
                 packet.MaxLives = maxLives;
             }
@@ -2911,13 +2916,14 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
             }
         }
 
-        public void AddMoleExpiredNetEvent(int onTick, ushort moleId)
+        public void AddMoleExpiredNetEvent(int onTick, ushort moleId, int hideOnTick)
         {
             foreach (var kvp in MoleExpiredNetEventsPerClient)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;
                 packet.MoleId = moleId;
+                packet.HideOnTick = hideOnTick;
             }
         }
 

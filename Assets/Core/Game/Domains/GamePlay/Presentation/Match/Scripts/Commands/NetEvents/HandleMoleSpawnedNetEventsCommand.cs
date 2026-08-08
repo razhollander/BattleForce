@@ -1,6 +1,7 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
+using Core.Scripts.Network;
 using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -11,14 +12,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMoleControllers _moleControllers;
         private IAudioService _audioService;
-        private SharedGamePlayConfig _sharedGamePlayConfig;
+        private NetworkConfig _networkConfig;
+
+        private int _tick;
+
+        public HandleMoleSpawnedNetEventsCommand SetTick(int tick)
+        {
+            _tick = tick;
+            return this;
+        }
 
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _moleControllers = _diContainer.Resolve<IMoleControllers>();
             _audioService = _diContainer.Resolve<IAudioService>();
-            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
+            _networkConfig = _diContainer.Resolve<NetworkConfig>();
         }
 
         public void Execute()
@@ -32,8 +41,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var moleSpawnedNetEvent in moleSpawnedNetEvents)
             {
+                var remainingShakeSeconds = (moleSpawnedNetEvent.EmergeOnTick - _tick) * _networkConfig.DeltaTime;
                 _moleControllers.SetMoleEmergingFromHole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.Position.ToUnityVector2(),
-                    _sharedGamePlayConfig.MoleHoleShakeDurationSeconds, moleSpawnedNetEvent.IsGolden, moleSpawnedNetEvent.MaxLives, moleSpawnedNetEvent.MaxLives);
+                    remainingShakeSeconds, moleSpawnedNetEvent.IsGolden, moleSpawnedNetEvent.MaxLives, moleSpawnedNetEvent.MaxLives);
             }
 
             _audioService.PlayAudio(AudioClipType.MoleSpawned);

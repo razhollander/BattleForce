@@ -44,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
         private TrySpawnMolesCommand _trySpawnMolesCommand;
+        private TryBreakChickenEggsOnMolesCommand _tryBreakChickenEggsOnMolesCommand;
         private TryEndWhacAMoleStageCommand _tryEndWhacAMoleStageCommand;
         private ApplyGalacticPullForcesCommand _applyGalacticPullForcesCommand;
         private TryDeactivateEndedGalacticFieldsCommand _tryDeactivateEndedGalacticFieldsCommand;
@@ -90,6 +91,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
             _trySpawnMolesCommand = _commandFactory.CreateCommandVoid<TrySpawnMolesCommand>();
+            _tryBreakChickenEggsOnMolesCommand = _commandFactory.CreateCommandVoid<TryBreakChickenEggsOnMolesCommand>();
             _tryEndWhacAMoleStageCommand = _commandFactory.CreateCommandVoid<TryEndWhacAMoleStageCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
@@ -127,6 +129,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _stepAllPlayersTalentsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
                 _trySpawnMolesCommand.SetProcessedTick(currentTick).Execute();
+                _tryBreakChickenEggsOnMolesCommand.SetProcessedTick(currentTick).Execute(); // right after the spawner, so both eggs laid this tick and moles that just emerged are covered
                 _tryEndWhacAMoleStageCommand.SetProcessedTick(currentTick).Execute();
                 _tryDeactivateEndedGalacticFieldsCommand.SetTick(currentTick).Execute();
                 _applyGalacticPullForcesCommand.Execute();

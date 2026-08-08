@@ -146,7 +146,6 @@ MonoBehaviour:
         ColliderRadiusMultiplier: 2.6
         BodyDensity: 1000
         Restitution: 1
-        EnemyPushRadius: 4
         EnemyPushForce: 20
         EnemySpinAmount: 50
       FrigidBlockTalentConfig:
@@ -201,7 +200,7 @@ MonoBehaviour:
       Size: {x: 4.1362, y: 1.663131}
     DeafultEnvironmentId: 21
     ShouldChooseRandomStage: 0
-    ShouldChooseRandomTalentsForPlayer: 0
+    ShouldChooseRandomTalentsForPlayer: 1
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 3
     ShootCooldownMultiplierWhenDead: 1
@@ -217,14 +216,15 @@ MonoBehaviour:
     EveryXStages: 2
     IsWhacAMoleModeEnabled: 1
     WhacAMoleEveryXStages: 1
+    DefaultWhacAMoleEnvironmentId: 22
     WhacAMole:
-      StageDurationSeconds: 15
+      StageDurationSeconds: 120
       MinMoleSpawnIntervalSeconds: 1
       MaxMoleSpawnIntervalSeconds: 2
       MaxConcurrentMoles: 8
       MoleRadius: 0.8
-      MinMoleLifetimeSeconds: 5
-      MaxMoleLifetimeSeconds: 7
+      MinMoleLifetimeSeconds: 10
+      MaxMoleLifetimeSeconds: 13
       ScorePerMoleHit: 1
       MinMolesUntilGoldenMole: 3
       MaxMolesUntilGoldenMole: 6

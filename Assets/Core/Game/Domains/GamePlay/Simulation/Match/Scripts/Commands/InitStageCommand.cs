@@ -135,13 +135,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         
         private int GenerateNextStageEnvironmentLayoutId(StageType stageType)
         {
-            var environmentLayoutId = _gamePlayConfigService.GamePlayConfig.DeafultEnvironmentId;
+            var environmentLayoutId = GetDefaultEnvironmentLayoutId(stageType);
             if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomStage)
             {
                 environmentLayoutId = GenerateRandomStageId(stageType);
             }
 
             return environmentLayoutId;
+        }
+
+        // Each stage type has its own default layout, because a WhacAMole layout authors mole spawn points
+        // that a DeathMatch layout does not, and vice versa.
+        private int GetDefaultEnvironmentLayoutId(StageType stageType)
+        {
+            var gamePlayConfig = _gamePlayConfigService.GamePlayConfig;
+
+            return stageType == StageType.WhacAMole ? gamePlayConfig.DefaultWhacAMoleEnvironmentId : gamePlayConfig.DeafultEnvironmentId;
         }
 
         // Each stage type draws from its own pool and never repeats a layout until that pool is exhausted.
@@ -152,7 +161,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             if (availableLayoutIndexes.IsNullOrEmpty())
             {
                 LogService.LogError($"No environment layout indexes configured for stage type {stageType}!");
-                return _gamePlayConfigService.GamePlayConfig.DeafultEnvironmentId;
+                return GetDefaultEnvironmentLayoutId(stageType);
             }
 
             var didntPlayYetStageIndexes = _matchDataService.GetDidntPlayYetStageIndexes(stageType);

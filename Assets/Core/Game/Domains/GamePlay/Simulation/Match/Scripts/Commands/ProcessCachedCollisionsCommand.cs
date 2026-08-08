@@ -121,6 +121,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePowerUpBallRockCollision(objectA, objectB, collisionEvent.Contact);
                 HandleBulletMoleCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerMoleCollision(objectA, objectB);
+                HandleKOProjectileMoleCollision(objectA, objectB);
+                HandleFishingRodTipMoleCollision(objectA, objectB);
             }
 
             _physicsSimulator.ClearCachedCollisions();
@@ -233,7 +235,35 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             HitMole(moleId, bulletModel.BelongToPlayerId);
         }
 
-        // A mole is smashed by a ship only while that ship is in a state that would spin whatever it touches.
+        private void HandleKOProjectileMoleCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isProjectileToMole = objectA.PhysicsBodyType == PhysicsBodyType.KOProjectile && objectB.PhysicsBodyType == PhysicsBodyType.Mole;
+            var isMoleToProjectile = objectA.PhysicsBodyType == PhysicsBodyType.Mole && objectB.PhysicsBodyType == PhysicsBodyType.KOProjectile;
+
+            if (!isProjectileToMole && !isMoleToProjectile)
+            {
+                return;
+            }
+
+            var projectileId = isProjectileToMole ? objectA.Id : objectB.Id;
+            var moleId = isProjectileToMole ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetKOProjectileById(projectileId, out var koProjectile))
+            {
+                LogService.LogTopic("Ko Projectile was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            if (!_matchDataService.SimulationState.TryGetMoleIndexById(moleId, out _))
+            {
+                LogService.LogTopic("Mole was already removed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            _playersTalentsManager.HitKOTalentWithMole(koProjectile.PlayerCasterId, moleId, _processedTick);
+        }
+
+        // A mole is smashed by a ship only while that ship carries a talent that spins whatever it touches.
         private void HandlePlayerMoleCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
             var isPlayerToMole = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Mole;
@@ -259,15 +289,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             HitMole(moleId, playerId);
+
+            if (IsHeadbuttDashingForPlayer(playerId))
+            {
+                _playersTalentsManager.HeadbuttHitMole(playerId);
+            }
         }
 
+        // Being spinned is not enough - only a talent that spins the target it hits can whack a mole.
+        // Rock is deliberately absent: it decides what it covers by distance inside RockTalentController, so a contact here would whack the same mole a second time.
         private bool CanPlayerSmashMoles(ushort playerId)
         {
-            var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
+            return _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.GrapplingHook)
+                   || IsHeadbuttDashingForPlayer(playerId);
+        }
 
-            return playerState.Spaceship.IsSpinned
-                   || IsRockActiveForPlayer(playerId)
-                   || _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.GrapplingHook);
+        private bool IsHeadbuttDashingForPlayer(ushort playerId)
+        {
+            return _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.Headbutt)
+                   && !_playersTalentsManager.IsHeadbuttCharging(playerId);
         }
 
         private void HitMole(ushort moleId, ushort byPlayerId)
@@ -485,6 +525,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _playersTalentsManager.HitFishingRodWithWall(projectile.PlayerCasterId, projectileId, _processedTick);
+        }
+
+        private void HandleFishingRodTipMoleCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isTipToMole = objectA.PhysicsBodyType == PhysicsBodyType.FishingRodTip && objectB.PhysicsBodyType == PhysicsBodyType.Mole;
+            var isMoleToTip = objectA.PhysicsBodyType == PhysicsBodyType.Mole && objectB.PhysicsBodyType == PhysicsBodyType.FishingRodTip;
+
+            if (!isTipToMole && !isMoleToTip)
+            {
+                return;
+            }
+
+            var projectileId = isTipToMole ? objectA.Id : objectB.Id;
+            var moleId = isTipToMole ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetFishingRodProjectileById(projectileId, out var projectile))
+            {
+                return;
+            }
+
+            if (!_matchDataService.SimulationState.TryGetMoleIndexById(moleId, out _))
+            {
+                LogService.LogTopic("Mole was already removed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            _playersTalentsManager.CatchFishingRodWithMole(projectile.PlayerCasterId, moleId, _processedTick);
         }
 
         private void HandleSoulGhostWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
