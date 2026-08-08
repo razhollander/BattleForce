@@ -81,7 +81,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            var direction = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var direction = casterPlayerState.Spaceship.AimDirection;
             var config = _gamePlayConfigService.GamePlayConfig.Talents.FrigidBlockTalentConfig;
             var blockThickness = _sharedGamePlayConfig.FrigidBlockSize.y;
             var spawnOffset = casterPlayerState.Spaceship.Transform.Radius + blockThickness * 0.5f + config.SpawnGapFromCaster;

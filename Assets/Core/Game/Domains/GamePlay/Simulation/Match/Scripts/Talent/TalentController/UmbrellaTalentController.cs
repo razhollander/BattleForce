@@ -133,7 +133,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
-            var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var aimDirection = casterPlayerState.Spaceship.AimDirection;
             var force = aimDirection * _gamePlayConfigService.GamePlayConfig.Talents.UmbrellaTalentConfig.VelocityGainPerTick * deltaTime;
             _tryAddForceToPlayerCommand.SetPlayerId(_casterPlayerId).SetForce(force).Execute();
         }

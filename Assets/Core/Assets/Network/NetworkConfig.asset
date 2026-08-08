@@ -17,18 +17,19 @@ MonoBehaviour:
     ConcurrentBullets: 256
     ConcurrentTalentCards: 128
     ConcurrentEvironmentWalls: 256
-    ConcurrentEvironmentLavaWalls: 16
+    ConcurrentEvironmentLavaWalls: 128
     ConcurrentEvironmentStageBoundaries: 256
     ConcurrentEvironmentTeleportPairs: 8
     ConcurrentEvironmentSprings: 32
     ConcurrentEvironmentSpikes: 32
     ConcurrentChickenEggs: 128
+    ConcurrentFrigidBlocks: 32
     PacketTypes: 256
     ConcurrentEnvironmentRotatingWheels: 16
     ConcurrentFieldBarriers: 16
     EnvironmentRotatingWheelCap:
       MaxWalls: 32
-      MaxLavaWalls: 16
+      MaxLavaWalls: 32
       MaxSprings: 8
       MaxSpikes: 16
       MaxTeleportGates: 8
@@ -92,6 +93,12 @@ MonoBehaviour:
     DeactivateGrapplingHookTalentNetEvents: 128
     ActivateUmbrellaTalentNetEvents: 128
     DeactivateUmbrellaTalentNetEvents: 128
+    ActivateWaterGunTalentNetEvents: 128
+    DeactivateWaterGunTalentNetEvents: 128
+    ActivateHeadbuttChargingNetEvents: 128
+    PerformHeadbuttDashNetEvents: 128
+    HeadbuttHitEnemyNetEvents: 128
+    DeactivateHeadbuttTalentNetEvents: 128
     CreateMagneticPullFieldNetEvents: 128
     LayChickenEggNetEvents: 128
     ChickenEggHitNetEvents: 128
@@ -99,7 +106,7 @@ MonoBehaviour:
     PlayerLockOnTargetsChangedNetEvents: 128
     PlayerLockOnTargetHitNetEvents: 128
     PlayerPowerUpChangedNetEvents: 64
-    SonicSlapActivatedNetEvents: 64
+    ActivateSonicSlapNetEvents: 64
     ActivateNukePowerUpNetEvents: 16
     ActivateShufflePowerUpNetEvents: 16
     ShuffleSwapPlayerPositionNetEvents: 64
@@ -108,6 +115,19 @@ MonoBehaviour:
     DeactivateGalacticForceFieldNetEvents: 64
     StartPowerUpGrantingPhaseNetEvents: 64
     EndPowerUpGrantingPhaseNetEvents: 64
+    ShootFrigidBlockNetEvents: 128
+    DestroyFrigidBlockNetEvents: 128
+    CreateFishingRodProjectileNetEvents: 128
+    FishingRodCaughtEnemyNetEvents: 128
+    FishingRodTipHitWallNetEvents: 128
+    FishingRodThrowNetEvents: 128
+    DeactivateFishingRodTalentNetEvents: 128
+    CreateSoulGhostNetEvents: 128
+    DeactivateSoulTalentNetEvents: 128
+    ActivateRockTalentNetEvents: 128
+    DeactivateRockTalentNetEvents: 128
+    ActivateFrozenTalentNetEvents: 128
+    DeactivateFrozenTalentNetEvents: 128
   TicksPerSeconds: 60
   DeltaTime: 0.01666667
   PhysicsVelocityIterations: 8

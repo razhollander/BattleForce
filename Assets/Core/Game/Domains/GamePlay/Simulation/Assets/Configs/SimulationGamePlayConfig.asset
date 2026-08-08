@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SimulationAssembly::Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig
   InnerConfig:
     PlayerSpaceship:
-      StartHealth: 1
+      StartHealth: 3
       TargetMovementSpeed: 5
       RotationSpeed: 150
       ShootCooldown: 0.35
@@ -31,6 +31,9 @@ MonoBehaviour:
       LockOnTargetMaxRange: 13
       LockOnTargetHalfArcAngleDegrees: 45
       LockOnTargetHitDamage: 1
+      CanBarrelDash: 1
+      BarrelDashForce: 30
+      BarrelDashSpinAmount: 57
     PlayerBullet:
       MoveSpeed: 10
       Radius: 0.14154
@@ -135,8 +138,8 @@ MonoBehaviour:
         CasterRecoilForcePerTick: 0
       HeadbuttTalentConfig:
         MaxChargeForce: 70
-        MaxDashWindowSeconds: 1.5
-        MinDashWindowSeconds: 0.3
+        MaxSecondsInDash: 1.5
+        MinSecondsInDash: 0.3
         EnemyPushForce: 30
         EnemySpinAmount: 50
       RockTalentConfig:
@@ -190,14 +193,15 @@ MonoBehaviour:
       NukeMaxSpinAmount: 300
       ShuffleSwapIntervalInSeconds: 0.25
     EnvironmentSprings:
-      Force: 40
+      Force: 55
       MaxSpin: 65
       MinSpin: 50
       Size: {x: 2, y: 1}
     EnvironmentSpikes:
       Damage: 1
+      DamageIntervalInSeconds: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 6
+    DeafultEnvironmentId: 0
     ShouldChooseRandomStage: 0
     ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3
@@ -217,7 +221,7 @@ MonoBehaviour:
     SpeedupSimulation: 1
     IsAutoShoot: 0
     CanPlayersCollideWithEachOther: 1
-    RandomPlayersInput: 0
+    TestWithRandomPlayersInput: 0
   references:
     version: 2
     RefIds:

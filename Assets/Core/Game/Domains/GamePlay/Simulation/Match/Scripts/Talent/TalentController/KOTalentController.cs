@@ -113,7 +113,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _isInReturnPhase = false;
 
             var koConfig = _gamePlayConfigService.GamePlayConfig.Talents.KOTalentConfig;
-            var aimDirection = casterPlayerState.Spaceship.TalentsState.AimDirection;
+            var aimDirection = casterPlayerState.Spaceship.AimDirection;
             var velocity = aimDirection * koConfig.ProjectileSpeed;
             var koProjectile = _matchDataService.AddKOProjectile(tick, _casterPlayerId, casterPlayerState.Spaceship.Transform.Position, aimDirection, velocity, koConfig.ProjectileSize);
             _projectileId = koProjectile.Id;

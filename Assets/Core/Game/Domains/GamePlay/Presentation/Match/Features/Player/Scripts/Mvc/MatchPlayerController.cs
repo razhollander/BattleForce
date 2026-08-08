@@ -301,7 +301,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerPosition = playerTransformState.Position.ToUnityVector2();
             var playerRotation = playerTransformState.Direction.ToUnityVector2().ToQuaternion();
             var decay = _gamePlayConfig.ExponentialDecay;
-            var aimDirection = playerModel.Spaceship.TalentsState.AimDirection;
+            var aimDirection = playerModel.Spaceship.AimDirection;
             _playerView.Base.InterpolateTransform(playerPosition, playerRotation, decay);
             UpdateAim(playerModel.Spaceship.AssistArrowType, aimDirection, decay);
             var isPlayerFrozen = false;
